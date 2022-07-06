@@ -30,6 +30,7 @@ namespace Sentry.data.Core
         string SetDatasetFavorite(int datasetId, string associateId);
         SecurityTicket GetLatestInheritanceTicket(int datasetId);
         List<string> GetDatasetNamesForAsset(string asset);
+        List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset);
         Task<string> RequestAccessRemoval(AccessRequest request);
 
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);

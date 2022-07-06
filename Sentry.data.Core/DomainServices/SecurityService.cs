@@ -36,33 +36,9 @@ namespace Sentry.data.Core
             string ticketId = _baseTicketProvider.CreateChangeTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
-                Security security = _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
+                Security security = model.Scope.Equals(AccessScope.Asset) ? GetSecurityForAsset(model.SecurableObjectName) : _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
 
-                SecurityTicket ticket = new SecurityTicket()
-                {
-                    TicketId = ticketId,
-                    AdGroupName = model.AdGroupName,
-                    GrantPermissionToUserId = model.PermissionForUserId,
-                    TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
-                    RequestedById = model.RequestorsId,
-                    RequestedDate = model.RequestedDate,
-                    IsAddingPermission = model.IsAddingPermission,
-                    IsRemovingPermission = !model.IsAddingPermission,
-                    ParentSecurity = security,
-                    Permissions = new List<SecurityPermission>(),
-                    AwsArn = model.AwsArn
-                };
-
-                foreach (Permission perm in model.Permissions)
-                {
-                    ticket.Permissions.Add(new SecurityPermission()
-                    {
-                        AddedDate = DateTime.Now,
-                        Permission = perm,
-                        AddedFromTicket = ticket,
-                        IsEnabled = false
-                    });
-                }
+                SecurityTicket ticket = model.IsAddingPermission ? BuildAddingPermissionTicket(ticketId, model, security) : BuildRemovingPermissionTicket(ticketId, model, security);
 
                 security.Tickets.Add(ticket);
 
@@ -73,6 +49,69 @@ namespace Sentry.data.Core
                 return ticketId;
             }
             return string.Empty;
+        }
+
+        public SecurityTicket BuildAddingPermissionTicket(string ticketId, AccessRequest model, Security security)
+        {
+            SecurityTicket ticket = new SecurityTicket()
+            {
+                TicketId = ticketId,
+                AdGroupName = model.AdGroupName,
+                GrantPermissionToUserId = model.PermissionForUserId,
+                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                RequestedById = model.RequestorsId,
+                RequestedDate = model.RequestedDate,
+                IsAddingPermission = model.IsAddingPermission,
+                IsRemovingPermission = !model.IsAddingPermission,
+                ParentSecurity = security,
+                Permissions = new List<SecurityPermission>(),
+                AwsArn = model.AwsArn
+            };
+
+            foreach (Permission perm in model.Permissions)
+            {
+                ticket.Permissions.Add(new SecurityPermission()
+                {
+                    AddedDate = DateTime.Now,
+                    Permission = perm,
+                    AddedFromTicket = ticket,
+                    IsEnabled = false
+                });
+            }
+            return ticket;
+        }
+
+        public SecurityTicket BuildRemovingPermissionTicket(string ticketId, AccessRequest model, Security security)
+        {
+            SecurityTicket ticket = new SecurityTicket()
+            {
+                TicketId = ticketId,
+                AdGroupName = model.AdGroupName,
+                GrantPermissionToUserId = model.PermissionForUserId,
+                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                RequestedById = model.RequestorsId,
+                RequestedDate = model.RequestedDate,
+                IsAddingPermission = model.IsAddingPermission,
+                IsRemovingPermission = !model.IsAddingPermission,
+                ParentSecurity = security,
+                Permissions = new List<SecurityPermission>(),
+                AwsArn = model.AwsArn
+            };
+
+            foreach (Permission permission in model.Permissions)
+            {
+                SecurityTicket ticketForPermCode = security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.Permission.PermissionCode == permission.PermissionCode && p.IsEnabled && p.AddedFromTicket.TicketId == model.TicketId));
+                SecurityPermission toRemove = ticketForPermCode.Permissions.First(p => p.Permission.PermissionCode == permission.PermissionCode);
+                toRemove.RemovedFromTicket = ticket;
+                ticket.Permissions.Add(toRemove);
+            }
+
+            return ticket;
+        }
+
+        public Security GetSecurityForAsset(string keycode)
+        {
+            return _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(keycode)).Security;
         }
 
         /// <summary>
@@ -444,16 +483,37 @@ namespace Sentry.data.Core
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
             ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.COMPLETED;
-
-            ticket.Permissions.ToList().ForEach(x =>
+            if (ticket.IsAddingPermission)
             {
-                x.IsEnabled = true;
-                x.EnabledDate = DateTime.Now;
-            });
+                ticket.Permissions.ToList().ForEach(x =>
+                {
+                    x.IsEnabled = true;
+                    x.EnabledDate = DateTime.Now;
+                });
+            }
+            else
+            {
+                List<SecurityPermission> toRemove = _datasetContext.SecurityPermission.Where(p => p.RemovedFromTicket == ticket).ToList();
+                toRemove.ForEach(x =>
+                {
+                    x.IsEnabled = false;
+                    x.RemovedDate = DateTime.Now;
+                });
+            }
+
+
+
 
             if(ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
             {
-                BuildS3RequestAssistance(ticket);
+                try
+                {
+                    BuildS3RequestAssistance(ticket);
+                }
+                catch (Exception e)
+                {
+                    Sentry.Common.Logging.Logger.Fatal("Failed creating S3 Jira Request for Cherwell #" + ticket.TicketId, e);
+                }
             }
 
             await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);

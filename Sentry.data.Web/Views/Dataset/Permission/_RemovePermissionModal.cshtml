@@ -15,6 +15,21 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div id="RemovePermissionLoading" class="d-none text-center">
+                    <div class="preloader-wrapper big active">
+                        <div class="spinner-layer spinner-blue-only">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="gap-patch">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="RemovePermissionRequestResult" class="d-none modal-body">
 
                 </div>
@@ -40,7 +55,7 @@
                         <label for="Permission" class="" id="permissionLabel">Permission (Readonly)</label>
                     </div>
                     <div class="md-form">
-                        @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled"})
+                        @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled" })
                         @Html.TextAreaFor(model => model.BusinessReason, new { @class = "md-textarea w-100" })
                     </div>
                     <div class="md-form">

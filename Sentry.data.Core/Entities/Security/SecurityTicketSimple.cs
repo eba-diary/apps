@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Entities.Security
 {
@@ -13,10 +14,12 @@ namespace Sentry.data.Core.Entities.Security
         {
             TicketId = ticket.TicketId;
             TicketStatus = ticket.TicketStatus;
+            InheritanceActive = ticket.Permissions != null ? ticket.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) : false;
         }
 
         public string TicketId { get; set; }
         public string TicketStatus { get; set; }
+        public bool InheritanceActive { get; set; }
 
     }
 }

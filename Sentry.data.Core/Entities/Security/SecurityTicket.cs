@@ -110,7 +110,7 @@ namespace Sentry.data.Core
             {
                 vr.Add("TicketStatus", "Ticket Status is required");
             }
-            if(Permissions == null || Permissions.Count == 0)
+            if(IsAddingPermission && (Permissions == null || Permissions.Count == 0))
             {
                 vr.Add("Permissions", "Permissions are required on the ticket");
             }

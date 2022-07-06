@@ -2393,6 +2393,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         });
         $("#inheritanceModalSubmit").click(function () {
             if (data.Dataset.validateInheritanceModal()) {
+                $("#InheritanceLoading").removeClass('d-none');
+                $("#InheritanceModalBody").addClass('d-none');
+                $("#InheritanceModalFooter").addClass('d-none');
                 $.ajax({
                     type: 'POST',
                     data: $("#InheritanceRequestForm").serialize(),
@@ -2400,6 +2403,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                     success: function (data) {
                         //handle result data
                         $("#inheritanceModal").modal('hide');
+                        $("#InheritanceLoading").addClass('d-none');
+                        $("#InheritanceModalBody").removeClass('d-none');
+                        $("#InheritanceModalFooter").removeClass('d-none');
                     }
                 });
             }
@@ -2423,19 +2429,18 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     permissionInheritanceSwitchInit(result) {
         var inheritance = $("#inheritanceSwitch").attr("value");
-        switch (inheritance) {
-            case "Active":
-                $('#inheritanceSwitchInput').prop('checked', true);
-                $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
-                $("#Inheritance_IsAddingPermission").val(false);
-                break;
-            case "Pending":
-                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
-                break
-            default: //we treat default the same as "DISABLED"
-                $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
-                $('#inheritanceSwitchInput').prop('checked', false);
-                $("#Inheritance_IsAddingPermission").val(true);
+        if (inheritance == "Completed" && result.InheritanceActive) {
+            $('#inheritanceSwitchInput').prop('checked', true);
+            $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
+            $("#Inheritance_IsAddingPermission").val(false);
+        }
+        else if (inheritance == 'Pending') {
+            $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
+        }
+        else {
+            $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
+            $('#inheritanceSwitchInput').prop('checked', false);
+            $("#Inheritance_IsAddingPermission").val(true);
         }
     },
 
@@ -2459,13 +2464,16 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         });
         $("#removePermissionModalSubmit").click(function () {
             if (data.Dataset.validateRemovePermissionModal()) {
+                $("#RemovePermissionLoading").removeClass("d-none");
+                $("#RemovePermissionModalForm").addClass("d-none");
+                $("#RemovePermissionModalButtons").addClass("d-none");
+
                 $.ajax({
                     type: 'POST',
                     data: $("#RemovePermissionRequestForm").serialize(),
                     url: '/Dataset/SubmitRemovePermissionRequest',
                     success: function (data) {
-                        $("#RemovePermissionModalForm").addClass("d-none");
-                        $("#RemovePermissionModalButtons").addClass("d-none");
+                        $("#RemovePermissionLoading").addClass("d-none");
                         $("#RemovePermissionRequestResult").html(data);
                         $("#RemovePermissionRequestResult").removeClass("d-none");
                     }

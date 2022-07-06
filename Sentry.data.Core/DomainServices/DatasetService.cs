@@ -140,6 +140,11 @@ namespace Sentry.data.Core
             return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset)).Select(ds => ds.DatasetName).ToList();
         }
 
+        public List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset)
+        {
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).Select(ds => ds.DatasetName).ToList();
+        }
+
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
@@ -164,7 +169,7 @@ namespace Sentry.data.Core
 
         public SecurityTicket GetLatestInheritanceTicket(int datasetId)
         {
-            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault());
+            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).LastOrDefault());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)
