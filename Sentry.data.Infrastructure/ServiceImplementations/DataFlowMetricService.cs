@@ -60,6 +60,14 @@ namespace Sentry.data.Infrastructure
                                 fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                             }
                             fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
+                            if(dto.TotalFlowteps == dto.CurrentFlowStep)
+                            {
+                                fileGroup.AllEventsPresent = true;
+                            }
+                            if(dto.StatusCode != "C")
+                            {
+                                fileGroup.AllEventsComplete = false;
+                            }
                             fileGroup.FlowEvents.Add(dto);
                         }
                     }

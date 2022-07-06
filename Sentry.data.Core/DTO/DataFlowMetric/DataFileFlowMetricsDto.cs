@@ -13,8 +13,12 @@ namespace Sentry.data.Core
         public DateTime LastEventTime { get; set; }
         public TimeSpan Duration { get; set; }
         public List<DataFlowMetricDto> FlowEvents { get; set; }
+        public bool AllEventsPresent { get; set; }
+        public bool AllEventsComplete { get; set; }
         public DataFileFlowMetricsDto()
         {
+            AllEventsComplete = true;
+            AllEventsPresent = false;
             FlowEvents = new List<DataFlowMetricDto>();
         }
     }
