@@ -144,16 +144,17 @@ namespace Sentry.data.Core
             // 4) Add OriginalFileName from datasetfile
             string result = temp + datasetFile_OriginalFileName;
 
+            // creating the ndjson object for the trigger file content
             JObject jobject = new JObject();
             jobject.Add("SourceBucket", datasetFile_FileBucket);
             jobject.Add("SourceKey", result);
             string content = jobject.ToString();
+            string singleLineContent = content.Replace("\r\n", " ");
 
             // Writing content into the trigger file at the trigger file location
-            //File.WriteAllText(triggerFileLocation, content);  
             File.Create(triggerFileLocation);
             TextWriter tw = new StreamWriter(triggerFileLocation);
-            tw.WriteLine(content);
+            tw.WriteLine(singleLineContent);
             tw.Close();
 
             return true;
