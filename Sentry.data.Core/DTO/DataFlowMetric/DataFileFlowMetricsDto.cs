@@ -15,8 +15,6 @@ namespace Sentry.data.Core
         public List<DataFlowMetricDto> FlowEvents { get; set; }
         public bool AllEventsPresent { get; set; }
         public bool AllEventsComplete { get; set; }
-        public string CollapseId { get; set; }
-        public string CollapseTarget { get; set; }
         public DataFileFlowMetricsDto()
         {
             AllEventsComplete = true;

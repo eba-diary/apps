@@ -4,34 +4,11 @@
 }
 
 <div class="accordion" id="dataFlowMetricAccordion">
-    <div class="card">
-        <div id="headingOne">
-            <button class="btn btn-block btn-icon text-left" type="button" data-toggle="collapse" data-target="#collapseOne">
-                <h4 class="accordion-heading" style="padding-left:25px"> zzz_ExampleFileName.csv</h4>
-                <h4 class="accordion-heading">Monday, June 15, 2009 1:45:30 PM</h4>
-                <h4 class="accordion-heading">Monday, June 15, 2009 1:45:30 PM</h4>
-                <h4 class="accordion-heading">00:00:00</h4>
-                <i class="icon-error-outline" style="padding-left:30px;  color: red"></i>
-                <i class="icon-checkmark" style="color: green"></i>
-                <i class="icon-clock"></i>
-            </button>
-        </div>
-        <div id="collapseOne" class="collapse" data-parent="#dataFlowMetricAccordion">
-            <div>
-                <h5 class="accordion-body" style="padding-left: 25px">  <a href="#"> Event 1</a></h5>
-                <br />
-                <h5 class="accordion-body" style="padding-left: 25px">  <a href="#"> Event 2</a></h5>
-                <br />
-                <h5 class="accordion-body" style="padding-left: 25px">  <a href="#"> Event 3</a></h5>
-            </div>
-        </div>
-    </div>
-
         @for(var x = 0; x < Model.DataFlowMetricGroups.Count; x++)
             {
                 <div class="card">
-                    <div id="@Model.DataFlowMetricGroups[x].FileName">
-                        <button class="btn btn-block btn-icon text-left collapsed" type="button" data-toggle="collapse" data-target="@Model.DataFlowMetricGroups[x].CollapseTarget">
+                    <div>
+                        <button class="btn btn-block btn-icon text-left " type="button" data-toggle="collapse" data-target="#@Model.DataFlowMetricGroups[x].FileName">
                             <h4 class="accordion-heading" style="padding-left:25px"> @Model.DataFlowMetricGroups[x].FileName</h4>
                             <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].FirstEventTime</h4>
                             <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].LastEventTime</h4>
@@ -50,7 +27,7 @@
                             }
                         </button>
                     </div>
-                    <div id="@Model.DataFlowMetricGroups[x].CollapseId" class="collapse" data-parent="#dataFlowMetricAccordion">
+                    <div id="@Model.DataFlowMetricGroups[x].FileName" class="collapse" data-parent="#dataFlowMetricAccordion">
                         @for (var i = 0; i < Model.DataFlowMetricGroups[x].FlowEvents.Count; i++)
                         {
                             <a href="#">

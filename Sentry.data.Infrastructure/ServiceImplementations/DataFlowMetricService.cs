@@ -30,7 +30,6 @@ namespace Sentry.data.Infrastructure
         }
         public List<DataFileFlowMetricsDto> GetFileMetricGroups(List<DataFlowMetricDto> dtoList)
         {
-            int totalFileGroups = 0;
             List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
             foreach(DataFlowMetricDto dto in dtoList)
             {
@@ -43,8 +42,6 @@ namespace Sentry.data.Infrastructure
                     fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
                     fileGroup.FlowEvents.Add(dto);
                     totalFileGroups++;
-                    fileGroup.CollapseTarget = "#" + totalFileGroups.ToString();
-                    fileGroup.CollapseId = totalFileGroups.ToString();
                     if (dto.TotalFlowteps == dto.CurrentFlowStep)
                     {
                         fileGroup.AllEventsPresent = true;
@@ -91,9 +88,6 @@ namespace Sentry.data.Infrastructure
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
                         fileGroup.FlowEvents.Add(dto);
-                        totalFileGroups++;
-                        fileGroup.CollapseTarget = "#" + totalFileGroups.ToString();
-                        fileGroup.CollapseId = totalFileGroups.ToString();
                         if (dto.TotalFlowteps == dto.CurrentFlowStep)
                         {
                             fileGroup.AllEventsPresent = true;

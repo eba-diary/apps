@@ -42,7 +42,7 @@ namespace Sentry.data.Web.Controllers
             //uncomment above and add dataFlowAccordionModel to below return statement, in current test environment, this throws expected error
             DataFlowMetricEntity entity1 = new DataFlowMetricEntity();
             entity1.DatesetFileId = 1;
-            entity1.FileName = "Example File Name 1";
+            entity1.FileName = "ExampleFileNameOne";
             entity1.MetricGeneratedDateTime = DateTime.Now;
             entity1.EventContents = "Woah, look at the size of this event!";
             entity1.StatusCode = "C";
@@ -51,7 +51,7 @@ namespace Sentry.data.Web.Controllers
             entity1.EventMetricId = 1;
             DataFlowMetricEntity entity2 = new DataFlowMetricEntity();
             entity2.DatesetFileId = 1;
-            entity2.FileName = "Example File Name 1";
+            entity2.FileName = "ExampleFileNameOne";
             entity2.MetricGeneratedDateTime = DateTime.Now;
             entity2.EventContents = "Woah, look at the size of this event!";
             entity2.StatusCode = "C";
@@ -60,7 +60,7 @@ namespace Sentry.data.Web.Controllers
             entity2.EventMetricId = 2;
             DataFlowMetricEntity entity3 = new DataFlowMetricEntity();
             entity3.DatesetFileId = 2;
-            entity3.FileName = "Example File Name 2";
+            entity3.FileName = "ExampleFileNameTwo";
             entity3.MetricGeneratedDateTime = DateTime.Now;
             entity3.EventContents = "Woah, look at the size of this event!";
             entity3.StatusCode = "F";
@@ -69,7 +69,7 @@ namespace Sentry.data.Web.Controllers
             entity3.EventMetricId = 3;
             DataFlowMetricEntity entity4 = new DataFlowMetricEntity();
             entity4.DatesetFileId = 3;
-            entity4.FileName = "Example File Name 3";
+            entity4.FileName = "ExampleFileNameThree";
             entity4.MetricGeneratedDateTime = DateTime.Now;
             entity4.EventContents = "Woah, look at the size of this event!";
             entity4.StatusCode = "C";
