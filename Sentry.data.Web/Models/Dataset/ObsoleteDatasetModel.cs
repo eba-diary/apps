@@ -47,7 +47,7 @@ namespace Sentry.data.Web
             this.DatasetCategory = ds.DatasetCategories.First();
             
 
-            this.DatasetScopeType = ds.DatasetScopeType;
+            this.DatasetScopeType = ds.DatasetScopeType();
 
 
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();

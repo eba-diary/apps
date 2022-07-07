@@ -107,6 +107,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
             registry.For<IMessageHandler<string>>().Add<SparkConverterEventService>();
+            registry.For<IMessageHandler<string>>().Add<FileDeleteEventService>();
 
             //Wire up Obsidian provider
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();

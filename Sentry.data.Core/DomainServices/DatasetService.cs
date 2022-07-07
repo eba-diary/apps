@@ -15,14 +15,13 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class DatasetService : IDatasetService, IEntityService
+    public class DatasetService : IDatasetService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly IUserService _userService;
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
-        private readonly IAWSLambdaProvider _awsLambdaProvider;
         private readonly IQuartermasterService _quartermasterService;
         private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
@@ -30,7 +29,7 @@ namespace Sentry.data.Core
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             IUserService userService, IConfigService configService, 
-                            ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider,
+                            ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
                             IDataFeatures featureFlags)
         {
@@ -39,7 +38,6 @@ namespace Sentry.data.Core
             _userService = userService;
             _configService = configService;
             _schemaService = schemaService;
-            _awsLambdaProvider = awsLambdaProvider;
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
@@ -785,7 +783,7 @@ namespace Sentry.data.Core
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
             dto.DatasetFileConfigSchemas = ds.DatasetFileConfigs.Where(w => !w.DeleteInd).Select(x => x.ToDatasetFileConfigSchemaDto()).ToList();
-            dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
+            dto.DatasetScopeTypeNames = ds.DatasetScopeType().ToDictionary(x => x.Name, y => y.Description);
             dto.DatasetFileCount = ds.DatasetFiles.Count();
             dto.OriginationCode = ds.OriginationCode;
             dto.DataClassificationDescription = ds.DataClassification.GetDescription();
@@ -797,33 +795,6 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
-        }
-
-        private string GeneratePreviewLambdaTriggerEvent(string bucket, DatasetFile dsf)
-        {
-            S3LamdaEvent lambdaEvent = new S3LamdaEvent()
-            {
-                Records = new List<S3ObjectEvent>()
-                {
-                    new S3ObjectEvent()
-                    {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
-                        {
-                            bucket = new Bucket()
-                            {
-                                name = bucket
-                            },
-                            Object = new data.Core.Entities.S3.Object()
-                            {
-                                key = dsf.FileLocation
-                            }
-                        }
-                    }
-                }
-            };
-
-            return JsonConvert.SerializeObject(lambdaEvent);
         }
         #endregion
 

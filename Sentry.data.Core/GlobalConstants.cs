@@ -461,5 +461,11 @@
             public const string CSV = "CSV";
             public const string TXT = "TXT";
         }
+
+        public static class DeleteFileResponseStatus
+        {
+            public const string SUCCESS = "SUCCESS";
+            public const string FAILURE = "FAILURE";
+        }
     }
 }
