@@ -8,13 +8,14 @@ namespace Sentry.data.Web.Controllers
     public class AdminController : BaseController
     {
         private readonly IDatasetService _datasetService;
-        public AdminController(IDatasetService datasetService)
+        private readonly IDeadSparkJobService _deadSparkJobService;
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService)
         {
             _datasetService = datasetService;
+            _deadSparkJobService = deadSparkJobService;
         }
 
         // GET: Admin
-
         public ActionResult Index()
         {
             Dictionary<string, string> myDict =
@@ -24,9 +25,22 @@ namespace Sentry.data.Web.Controllers
             myDict.Add("2", "File Processing Logs");
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
+            myDict.Add("5", "Reprocess Dead Spark Jobs");
 
             return View(myDict);
         }
+
+
+        [Route("Admin/ReprocessDeadSparkJobs")]
+        public ActionResult ReprocessDeadSparkJobs()
+        {
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(-10);
+
+            List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
+
+            return View(deadSparkJobModelList);
+        }
+
         public ActionResult GetAdminAction(string viewId)
         {
             string viewPath = "";
@@ -45,7 +59,7 @@ namespace Sentry.data.Web.Controllers
                     }
                     return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
-                    viewPath = "_AdminTest2";
+                    viewPath = "_AdminTest3";
                     break;
                 case "3":
                     viewPath = "_AdminTest3";
@@ -53,6 +67,10 @@ namespace Sentry.data.Web.Controllers
                 case "4":
                     viewPath = "_AdminTest4";
                     break;
+                case "5":
+                    List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(-10);
+                    List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
+                    return PartialView("_ReprocessDeadSparkJobs", deadSparkJobModelList);
             }
 
             return PartialView(viewPath);

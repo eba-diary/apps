@@ -1,9 +1,10 @@
 ﻿using Sentry.data.Core;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace Sentry.data.Infrastructure
 {
-    public class DataInventorySqlExecuter : IDbExecuter
+    public class DataInventorySqlExecuter : IDbExecuter<DeadSparkJob>
     {
         public void ExecuteCommand(object parameter)
         {
@@ -17,6 +18,11 @@ namespace Sentry.data.Infrastructure
                 connection.Open();
                 command.ExecuteNonQuery();
             }
+        }
+
+        public List<DeadSparkJob> ExecuteQuery(int timeCreated)
+        {
+            throw new System.NotSupportedException();
         }
     }
 }

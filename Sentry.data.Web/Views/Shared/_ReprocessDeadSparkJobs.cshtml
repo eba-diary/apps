@@ -1,0 +1,75 @@
+﻿
+@model List<DeadSparkJobModel>
+@{
+    ViewBag.Title = "_AdminTest";
+}
+<div class="d-inline-block">
+    <h1>Reprocess Dead Spark Jobs</h1>
+
+    <form class="form-inline">
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="jobCreationCheck" class="sr-only">Hours in past to check</label>
+            <input type="number" min="0" class="form-control" id="jobCreationCheck" placeholder="Hours in past to check">
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Check for Dead Jobs</button>
+    </form>
+</div>
+
+<br />
+<br />
+<br />
+
+<!--Table-->
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.hiddenRow').hide();
+
+        $('.accordion-toggle').click(function () {
+            $('.hiddenRow').hide();
+            $(this).next('tr.hiddenRow').slideDown(500);
+        });
+    });
+</script>
+
+<table class="table table-bordered" style="border-collapse:collapse;">
+    <thead>
+        <tr>
+            <th>Submission Time</th>
+            <th>Dataset Name</th>
+            <th>Schema Name</th>
+            <th>Dataset Name</th>
+            <th>Dataset Name</th>
+            <th>Dataset Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (DeadSparkJobModel job in Model)
+        {
+            <tr colspan="6" data-toggle="collapse" data-target=@string.Format($"#{job.SubmissionID}") class="accordion-toggle">
+                <td>@job.SubmissionTime</td>
+                <td>@job.DatasetName</td>
+                <td>@job.SchemaName</td>
+                <td>@job.SourceKey</td>
+                <td>@job.FlowExecutionGuid</td>
+                <td>@job.ReprocessingRequired</td>
+            </tr>
+            <tr id="@job.SubmissionID" class="hiddenRow">
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+            </tr>
+            }
+        </tbody>
+</table>
+
+<!--Reprocess button-->
+<button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton" disabled>Reprocess Selected</button>
+
+@section Scripts {
+    
+}
+

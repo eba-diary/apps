@@ -11,10 +11,10 @@ namespace Sentry.data.Infrastructure
     public class ElasticDataInventorySearchProvider : IDataInventorySearchProvider
     {
         private readonly IElasticContext _context;
-        private readonly IDbExecuter _dbExecuter;
+        private readonly IDbExecuter<ElasticDataInventorySearchProvider> _dbExecuter;
         private readonly string AssetCategoriesAggregationKey = "SaidListNames";
 
-        public ElasticDataInventorySearchProvider(IElasticContext context, IDbExecuter dbExecuter)
+        public ElasticDataInventorySearchProvider(IElasticContext context, IDbExecuter<ElasticDataInventorySearchProvider> dbExecuter)
         {
             _context = context;
             _dbExecuter = dbExecuter;
