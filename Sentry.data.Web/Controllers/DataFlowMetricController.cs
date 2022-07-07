@@ -39,7 +39,7 @@ namespace Sentry.data.Web.Controllers
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
             DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
             */
-            //uncomment above and add dataFlowAccordionModel to below return statement, in current test environment, this throws expected error
+            //uncomment above and delete below mock when you get access to elastic search database
             DataFlowMetricEntity entity1 = new DataFlowMetricEntity();
             entity1.DatesetFileId = 1;
             entity1.FileName = "ExampleFileNameOne";
