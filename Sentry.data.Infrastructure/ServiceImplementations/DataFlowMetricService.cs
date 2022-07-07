@@ -41,7 +41,6 @@ namespace Sentry.data.Infrastructure
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
                     fileGroup.FlowEvents.Add(dto);
-                    totalFileGroups++;
                     if (dto.TotalFlowteps == dto.CurrentFlowStep)
                     {
                         fileGroup.AllEventsPresent = true;
