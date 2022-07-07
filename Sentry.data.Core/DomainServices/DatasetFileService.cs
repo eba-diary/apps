@@ -1,9 +1,16 @@
-﻿using Sentry.data.Core.Exceptions;
+﻿using Hangfire;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers.Paginate;
 using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Sentry.data.Core
 {
+
     public class DatasetFileService : IDatasetFileService
     {
         private readonly IDatasetContext _datasetContext;
@@ -75,6 +82,83 @@ namespace Sentry.data.Core
 
         }
 
+        /*
+         *  Schedules the hangfire delayed job for reprocessing
+         *  Logic for the time delay will be placed in this method eventually
+         */
+        public bool ScheduleReprocessing(int stepId, int[] datasetFileIds)
+        {
+            bool successfullySubmitted = true;
+
+            // try and catch block to see if the hangfire job is created without error
+            // done on each datasetFileId
+            try
+            {
+                foreach (int id in datasetFileIds)
+                {
+                    BackgroundJob.Schedule<DatasetFileService>((x) =>  x.ReprocessDatasetFiles(stepId, new int[] {id}), System.TimeSpan.FromDays(1)); 
+                }
+            } catch (System.Exception ex)
+            {
+                successfullySubmitted = false;
+            }
+
+            return successfullySubmitted;
+        }
+
+        /* Implementation of reprocessing
+             * 
+             * SourceKey
+             *      start with FileKey from datasetfile
+             *      1) remove file name
+             *      2) Adjust root prefix to be raw
+             *      3) Append flowexecutionguid from dataset file
+             *      4) Add OriginalFileName from datasetfile
+        */
+        private bool ReprocessDatasetFiles(int stepId, int[] datasetFileIds)
+        {
+
+            // extractng the necessary data from stepId and datasetFileIds to get the location of trigger file
+            string dataFlowStep_TriggerKey = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().TriggerKey;
+            string datasetFile_FlowExecutionGuid = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().FlowExecutionGuid;
+            string datasetFile_OriginalFileName = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().OriginalFileName;
+            string datasetFile_FileBucket = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().FileBucket;
+
+            // trigger file location
+            string triggerFileLocation = dataFlowStep_TriggerKey + "/" + datasetFile_FlowExecutionGuid + "/" + datasetFile_OriginalFileName + ".trg";
+
+            // gets the file key
+            string filekey = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().FileKey;
+
+            // 1) remove the file name
+            String[] splitString = filekey.Split('/');
+            Array.Resize(ref splitString, splitString.Length - 1);
+            string newStr = String.Join("/", splitString) + "/";
+
+            // 2) adjust root prefix to be raw
+            newStr = newStr.Replace("rawquery", "raw");
+
+            // 3) Append flowexecution guid from the dataset file
+            string temp = newStr + datasetFile_FlowExecutionGuid + "/";
+
+            // 4) Add OriginalFileName from datasetfile
+            string result = temp + datasetFile_OriginalFileName;
+
+            JObject jobject = new JObject();
+            jobject.Add("SourceBucket", datasetFile_FileBucket);
+            jobject.Add("SourceKey", result);
+            string content = jobject.ToString();
+
+            // Writing content into the trigger file at the trigger file location
+            //File.WriteAllText(triggerFileLocation, content);  
+            File.Create(triggerFileLocation);
+            TextWriter tw = new StreamWriter(triggerFileLocation);
+            tw.WriteLine(content);
+            tw.Close();
+
+            return true;
+        }
+        
         
         #region PrivateMethods
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
@@ -86,4 +170,6 @@ namespace Sentry.data.Core
         }
         #endregion
     }
+
+    
 }
