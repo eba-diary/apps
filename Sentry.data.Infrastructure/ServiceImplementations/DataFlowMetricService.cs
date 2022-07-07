@@ -45,6 +45,14 @@ namespace Sentry.data.Infrastructure
                     totalFileGroups++;
                     fileGroup.CollapseTarget = "#" + totalFileGroups.ToString();
                     fileGroup.CollapseId = totalFileGroups.ToString();
+                    if (dto.TotalFlowteps == dto.CurrentFlowStep)
+                    {
+                        fileGroup.AllEventsPresent = true;
+                    }
+                    if (dto.StatusCode != "C")
+                    {
+                        fileGroup.AllEventsComplete = false;
+                    }
                     fileGroups.Add(fileGroup);
                 }
                 else
@@ -86,6 +94,14 @@ namespace Sentry.data.Infrastructure
                         totalFileGroups++;
                         fileGroup.CollapseTarget = "#" + totalFileGroups.ToString();
                         fileGroup.CollapseId = totalFileGroups.ToString();
+                        if (dto.TotalFlowteps == dto.CurrentFlowStep)
+                        {
+                            fileGroup.AllEventsPresent = true;
+                        }
+                        if (dto.StatusCode != "C")
+                        {
+                            fileGroup.AllEventsComplete = false;
+                        }
                         fileGroups.Add(fileGroup);
                     }
                 }

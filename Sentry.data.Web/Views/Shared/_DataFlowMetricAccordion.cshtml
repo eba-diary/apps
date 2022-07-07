@@ -26,17 +26,17 @@
             </div>
         </div>
     </div>
-    <!--Accordion Auto-generation, add back at stymbols to activate
-        for(var x = 0; x < Model.DataFlowMetricGroups.Count; x++)
+
+        @for(var x = 0; x < Model.DataFlowMetricGroups.Count; x++)
             {
                 <div class="card">
-                    <div id="Model.DataFlowMetricGroups[x].FileName">
-                        <button class="btn btn-block btn-icon text-left" type="button" data-toggle="collapse" data-target="Model.DataFlowMetricGroups[x].CollapseTarget">
-                            <h4 class="accordion-heading" style="padding-left:25px"> Model.DataFlowMetricGroups[x].FileName</h4>
-                            <h4 class="accordion-heading">Model.DataFlowMetricGroups[x].FirstEventTime</h4>
-                            <h4 class="accordion-heading">Model.DataFlowMetricGroups[x].LastEventTime</h4>
-                            <h4 class="accordion-heading">Model.DataFlowMetricGroups[x].Duration</h4>
-                            if (Model.DataFlowMetricGroups[x].AllEventsPresent && Model.DataFlowMetricGroups[x].AllEventsComplete)
+                    <div id="@Model.DataFlowMetricGroups[x].FileName">
+                        <button class="btn btn-block btn-icon text-left collapsed" type="button" data-toggle="collapse" data-target="@Model.DataFlowMetricGroups[x].CollapseTarget">
+                            <h4 class="accordion-heading" style="padding-left:25px"> @Model.DataFlowMetricGroups[x].FileName</h4>
+                            <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].FirstEventTime</h4>
+                            <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].LastEventTime</h4>
+                            <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].Duration</h4>
+                            @if (Model.DataFlowMetricGroups[x].AllEventsPresent && @Model.DataFlowMetricGroups[x].AllEventsComplete)
                             {
                                 <i class="icon-checkmark" style="padding-left: 30px; color: green"></i>
                             }
@@ -50,22 +50,21 @@
                             }
                         </button>
                     </div>
-                    <div id="Model.DataFlowMetricGroups[x].CollapseId" class="collapse" data-parent="#dataFlowMetricAccordion">
-                        for (var i = 0; i < Model.DataFlowMetricGroups[x].FlowEvents.Count; i++)
+                    <div id="@Model.DataFlowMetricGroups[x].CollapseId" class="collapse" data-parent="#dataFlowMetricAccordion">
+                        @for (var i = 0; i < Model.DataFlowMetricGroups[x].FlowEvents.Count; i++)
                         {
                             <a href="#">
-                            <h5 class="accordion-body" style="padding-left: 25px"> Model.DataFlowMetricGroups[x].FlowEvents[i].EventMetricId</h5>
-                            <h5 class="accordion-body"> Model.DataFlowMetricGroups[x].FlowEvents[i].CurrentFlowStep/Model.DataFlowMetricGroups[x].FlowEvents[i].TotalFlowteps</h5>
-                            <h5 class="accordion-body"> Model.DataFlowMetricGroups[x].FlowEvents[i].TotalFlowteps</h5>
-                            <h5 class="accordion-body"> Model.DataFlowMetricGroups[x].FlowEvents[i].StatusCode</h5>
-                            <br />
+                                <h5 class="accordion-body" style="padding-left: 25px"> @Model.DataFlowMetricGroups[x].FlowEvents[i].EventMetricId</h5>
+                                <h5 class="accordion-body"> @Model.DataFlowMetricGroups[x].FlowEvents[i].CurrentFlowStep/@Model.DataFlowMetricGroups[x].FlowEvents[i].TotalFlowteps</h5>
+                                <h5 class="accordion-body"> @Model.DataFlowMetricGroups[x].FlowEvents[i].StatusCode</h5>
                             </a>
+                            <br />
 
                         }
 
                     </div>
                 </div>
             }
-        -->
+
 
 </div>
