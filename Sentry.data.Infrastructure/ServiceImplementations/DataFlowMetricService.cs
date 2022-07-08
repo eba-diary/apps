@@ -37,6 +37,7 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
                     fileGroup.FileName = dto.FileName;
+                    fileGroup.DatasetFileId = dto.DatesetFileId;
                     fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
@@ -49,6 +50,7 @@ namespace Sentry.data.Infrastructure
                     {
                         fileGroup.AllEventsComplete = false;
                     }
+                    fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
                     fileGroups.Add(fileGroup);
                 }
                 else
@@ -83,6 +85,7 @@ namespace Sentry.data.Infrastructure
                     {
                         DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
                         fileGroup.FileName = dto.FileName;
+                        fileGroup.DatasetFileId = dto.DatesetFileId;
                         fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
@@ -95,6 +98,7 @@ namespace Sentry.data.Infrastructure
                         {
                             fileGroup.AllEventsComplete = false;
                         }
+                        fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
                         fileGroups.Add(fileGroup);
                     }
                 }

@@ -5,6 +5,7 @@ using System.Web;
 using Sentry.data.Infrastructure;
 using Sentry.data.Core;
 using System.Web.Mvc;
+using System.Threading;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -42,7 +43,7 @@ namespace Sentry.data.Web.Controllers
             //uncomment above and delete below mock when you get access to elastic search database
             DataFlowMetricEntity entity1 = new DataFlowMetricEntity();
             entity1.DatesetFileId = 1;
-            entity1.FileName = "ExampleFileNameOne";
+            entity1.FileName = "ExampleFileNameOne.csv";
             entity1.MetricGeneratedDateTime = DateTime.Now;
             entity1.EventContents = "Woah, look at the size of this event!";
             entity1.StatusCode = "C";
@@ -51,7 +52,8 @@ namespace Sentry.data.Web.Controllers
             entity1.EventMetricId = 1;
             DataFlowMetricEntity entity2 = new DataFlowMetricEntity();
             entity2.DatesetFileId = 1;
-            entity2.FileName = "ExampleFileNameOne";
+            entity2.FileName = "ExampleFileNameOne.csv";
+            Thread.Sleep(100);
             entity2.MetricGeneratedDateTime = DateTime.Now;
             entity2.EventContents = "Woah, look at the size of this event!";
             entity2.StatusCode = "C";
@@ -60,7 +62,7 @@ namespace Sentry.data.Web.Controllers
             entity2.EventMetricId = 2;
             DataFlowMetricEntity entity3 = new DataFlowMetricEntity();
             entity3.DatesetFileId = 2;
-            entity3.FileName = "ExampleFileNameTwo";
+            entity3.FileName = "ExampleFileNameTwo.csv";
             entity3.MetricGeneratedDateTime = DateTime.Now;
             entity3.EventContents = "Woah, look at the size of this event!";
             entity3.StatusCode = "F";
@@ -69,18 +71,28 @@ namespace Sentry.data.Web.Controllers
             entity3.EventMetricId = 3;
             DataFlowMetricEntity entity4 = new DataFlowMetricEntity();
             entity4.DatesetFileId = 3;
-            entity4.FileName = "ExampleFileNameThree";
+            entity4.FileName = "ExampleFileNameThree.csv";
             entity4.MetricGeneratedDateTime = DateTime.Now;
             entity4.EventContents = "Woah, look at the size of this event!";
             entity4.StatusCode = "C";
             entity4.TotalFlowSteps = 5;
             entity4.CurrentFlowStep = 4;
             entity4.EventMetricId = 4;
+            DataFlowMetricEntity entity5 = new DataFlowMetricEntity();
+            entity5.DatesetFileId = 4;
+            entity5.FileName = "ExampleFileNameFour.csv";
+            entity5.MetricGeneratedDateTime = DateTime.Now;
+            entity5.EventContents = "Woah, look at the size of this event!";
+            entity5.StatusCode = "F";
+            entity5.TotalFlowSteps = 5;
+            entity5.CurrentFlowStep = 4;
+            entity5.EventMetricId = 5;
             List<DataFlowMetricEntity> dataFlowMetricEntities = new List<DataFlowMetricEntity>();
             dataFlowMetricEntities.Add(entity1);
             dataFlowMetricEntities.Add(entity2);
             dataFlowMetricEntities.Add(entity3);
             dataFlowMetricEntities.Add(entity4);
+            dataFlowMetricEntities.Add(entity5);
 
             List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(dataFlowMetricEntities);
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);

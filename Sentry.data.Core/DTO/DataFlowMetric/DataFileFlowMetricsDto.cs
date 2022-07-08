@@ -8,6 +8,7 @@ namespace Sentry.data.Core
 {
     public class DataFileFlowMetricsDto
     {
+        public int DatasetFileId { get; set; }
         public string FileName { get; set; }
         public DateTime FirstEventTime { get; set; }
         public DateTime LastEventTime { get; set; }
@@ -15,6 +16,7 @@ namespace Sentry.data.Core
         public List<DataFlowMetricDto> FlowEvents { get; set; }
         public bool AllEventsPresent { get; set; }
         public bool AllEventsComplete { get; set; }
+        public string TargetCode { get; set; }
         public DataFileFlowMetricsDto()
         {
             AllEventsComplete = true;

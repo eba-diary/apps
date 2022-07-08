@@ -8,7 +8,7 @@
             {
                 <div class="card">
                     <div>
-                        <button class="btn btn-block btn-icon text-left " type="button" data-toggle="collapse" data-target="#@Model.DataFlowMetricGroups[x].FileName">
+                        <button class="btn btn-block btn-icon text-left " type="button" data-toggle="collapse" data-target="#@Model.DataFlowMetricGroups[x].TargetCode">
                             <h4 class="accordion-heading" style="padding-left:25px"> @Model.DataFlowMetricGroups[x].FileName</h4>
                             <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].FirstEventTime</h4>
                             <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].LastEventTime</h4>
@@ -27,7 +27,7 @@
                             }
                         </button>
                     </div>
-                    <div id="@Model.DataFlowMetricGroups[x].FileName" class="collapse" data-parent="#dataFlowMetricAccordion">
+                    <div id="@Model.DataFlowMetricGroups[x].TargetCode" class="collapse" data-parent="#dataFlowMetricAccordion">
                         @for (var i = 0; i < Model.DataFlowMetricGroups[x].FlowEvents.Count; i++)
                         {
                             <a href="#">
