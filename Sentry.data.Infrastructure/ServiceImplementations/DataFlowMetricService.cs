@@ -18,12 +18,47 @@ namespace Sentry.data.Infrastructure
         {
             return _dataFlowMetricProvider.GetDataFlowMetricEntities(dto);
         }
+        public DataFlowMetricDto ToDto(DataFlowMetricEntity entity)
+        {
+            return new DataFlowMetricDto()
+            {
+                QueryMadeDateTime = entity.QueryMadeDateTime,
+                SchemaId = entity.SchemaId,
+                EventContents = entity.EventContents,
+                TotalFlowteps = entity.TotalFlowSteps,
+                FileModifiedDateTime = entity.FileModifiedDateTime,
+                OriginalFileName = entity.OriginalFileName,
+                DatasetId = entity.DatasetId,
+                CurrentFlowStep = entity.CurrentFlowStep,
+                DataActionId = entity.DataActionId,
+                DataFlowId = entity.DataFlowId,
+                Partition = entity.Partition,
+                DataActionTypeId = entity.DataActionTypeId,
+                MessageKey = entity.MessageKey,
+                Duration = entity.Duration,
+                Offset = entity.Offset,
+                DataFlowName = entity.DataFlowName,
+                DataFlowStepId = entity.DataFlowStepId,
+                FlowExecutionGuid = entity.FlowExecutionGuid,
+                FileSize = entity.FileSize,
+                EventMetricId = entity.EventMetricId,
+                StorageCode = entity.StorageCode,
+                FileCreatedDateTime = entity.FileCreatedDateTime,
+                RunInstanceGuid = entity.RunInstanceGuid,
+                FileName = entity.FileName,
+                SaidKeyCode = entity.SaidKeyCode,
+                MetricGeneratedDateTime = entity.MetricGeneratedDateTime,
+                DatesetFileId = entity.DatesetFileId,
+                ProcessStartDateTime = entity.ProcessStartDateTime,
+                StatusCode = entity.StatusCode,
+            };
+        }
         public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetricEntity> entityList)
         {
             List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
             foreach(DataFlowMetricEntity entity in entityList)
             {
-                DataFlowMetricDto dto = entity.ToDto();
+                DataFlowMetricDto dto = ToDto(entity);
                 dataFlowMetricDtos.Add(dto);
             }
             return dataFlowMetricDtos;
