@@ -79,9 +79,10 @@
             {
                 @Html.HiddenFor(model => model.FileExtensionID)
 
-                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "mdb-main-label" })
-                @Html.DropDownListFor(model => model.FileExtensionID,
-                    new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "mdb-select" })
+                <div class="textReadOnly md-form">
+                    <label for="FileExtensionReadonly" class="active">File Extension (Readonly)</label>
+                    <input id="FileExtensionReadonly" placeholder="@Model.FileExtensionReadonly" disabled class="disabled form-control" />
+                </div>
             }
         </div>
         <div class="schemaRootPathPanel md-form">

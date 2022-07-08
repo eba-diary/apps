@@ -286,7 +286,7 @@ namespace Sentry.data.Core.Tests
                 FileKey = "test/key/file.txt",
                 FileBucket = "test-bucket-name",
                 ETag = "etag-string-value",
-                OriginalFileName = "clancy",
+                OriginalFileName = "a",
                 ObjectStatus = ObjectStatusEnum.Active
             };
 
@@ -294,7 +294,7 @@ namespace Sentry.data.Core.Tests
         }
 
 
-        public static DatasetFile MockDatasetFileYoder(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
+        public static DatasetFile MockDatasetFileB(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {
             DatasetFile df = new DatasetFile()
             {
@@ -319,7 +319,7 @@ namespace Sentry.data.Core.Tests
                 FileKey = "test/key/file.txt",
                 FileBucket = "test-bucket-name",
                 ETag = "etag-string-value",
-                OriginalFileName = "yoder",
+                OriginalFileName = "b",
                 ObjectStatus = ObjectStatusEnum.Active
             };
 
@@ -327,11 +327,11 @@ namespace Sentry.data.Core.Tests
         }
 
 
-        public static DatasetFile MockDatasetFileGary(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
+        public static DatasetFile MockDatasetFileC(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {
             DatasetFile df = new DatasetFile()
             {
-                DatasetFileId = 3000,
+                DatasetFileId = 5000,
                 FileName = "2014.annual.singlefile.csv",
                 Dataset = ds,
                 UploadUserName = user.AssociateId,
@@ -351,7 +351,9 @@ namespace Sentry.data.Core.Tests
                 SchemaRevision = MockSchemaRevision(),
                 FileKey = "test/key/file.txt",
                 FileBucket = "test-bucket-name",
-                ETag = "etag-string-value"
+                ETag = "etag-string-value",
+                OriginalFileName = "c",
+                ObjectStatus = ObjectStatusEnum.Active
             };
 
             return df;
@@ -883,6 +885,7 @@ namespace Sentry.data.Core.Tests
                 security.Tickets.Add(
                     new SecurityTicket()
                     {
+                        IsAddingPermission = true,
                         Permissions = new List<SecurityPermission>()
                         {
                             new SecurityPermission()

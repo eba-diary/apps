@@ -13,21 +13,14 @@ namespace Sentry.data.Core
         /// <param name="pageParameters"></param>
         /// <returns></returns>
         PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters);
-
         /// <summary>
         /// Update data file record and save
         /// </summary>
         /// <param name="dto"></param>
         void UpdateAndSave(DatasetFileDto dto);
-
-        List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, string[] fileNameList);
-        List<DatasetFile> GetDatasetFileList(int datasetId, int schemaId, int[] datasetFileIdList);
-
-        void Delete(int datasetId, int schemaId,List<DatasetFile> dbList);
-        void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
-        
+        string Delete(int datasetId, int schemaId, DeleteFilesParamDto dto);
+        void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);        
         UserSecurity GetUserSecurityForDatasetFile(int datasetId);
-
-        string ValidateDeleteDataFilesParams(int datasetId, int schemaId, DeleteFilesParamDto dto);
+        void UploadDatasetFileToS3(UploadDatasetFileDto uploadDatasetFileDto);
     }
 }

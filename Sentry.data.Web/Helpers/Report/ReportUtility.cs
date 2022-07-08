@@ -64,7 +64,7 @@ namespace Sentry.data.Web.Helpers
             }
             else if (span.TotalSeconds > 5)
             {
-                result = string.Format("{0} seconds ago", String.Format("{0:0}",span.TotalSeconds));
+                result = string.Format("{0} seconds ago", String.Format("{0:0}", span.TotalSeconds));
             }
             else
             {
@@ -74,24 +74,34 @@ namespace Sentry.data.Web.Helpers
             return result;
         }
 
-        
         [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
         public static void SetupLists(IDatasetContext _datasetContext, BusinessIntelligenceModel model)
         {
             var temp = GetCategoryList(_datasetContext).ToList();
 
-            if(model.DatasetCategoryIds?.Count > 0)
+            if (model.DatasetCategoryIds?.Count > 0)
             {
                 foreach (var cat in model.DatasetCategoryIds)
                 {
-                   foreach(var t in temp)
+                    foreach (var t in temp)
                     {
-                        if(t.Value == cat.ToString())
+                        if (t.Value == cat.ToString())
                         {
                             t.Selected = true;
                         }
                     }
                 }
+            }
+            else
+            {
+                // add an empty option as the first item in the list; needed in order for the select2 placeholder text
+                temp = temp.Prepend(new SelectListItem
+                {
+                    Selected = true,
+                    Disabled = true,
+                    Text = "",
+                    Value = "0"
+                }).ToList();
             }
 
             model.AllCategories = temp.OrderBy(x => x.Value);
@@ -104,14 +114,25 @@ namespace Sentry.data.Web.Helpers
             {
                 foreach (var bu in model.DatasetBusinessUnitIds)
                 {
-                    foreach(var t in temp)
+                    foreach (var t in temp)
                     {
-                        if(t.Value == bu.ToString())
+                        if (t.Value == bu.ToString())
                         {
                             t.Selected = true;
                         }
                     }
                 }
+            }
+            else
+            {
+                // add an empty option as the first item in the list; needed in order for the select2 placeholder text
+                temp = temp.Prepend(new SelectListItem
+                {
+                    Selected = true,
+                    Disabled = true,
+                    Text = "",
+                    Value = "0"
+                }).ToList();
             }
 
             model.AllBusinessUnits = temp;
@@ -132,6 +153,17 @@ namespace Sentry.data.Web.Helpers
                         }
                     }
                 }
+            }
+            else
+            {
+                // add an empty option as the first item in the list; needed in order for the select2 placeholder text
+                temp = temp.Prepend(new SelectListItem
+                {
+                    Selected = true,
+                    Disabled = true,
+                    Text = "",
+                    Value = "0"
+                }).ToList();
             }
 
             model.AllDatasetFunctions = temp;
@@ -169,7 +201,7 @@ namespace Sentry.data.Web.Helpers
 
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityCodes.REPORT).
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x => x.ObjectType == GlobalConstants.DataEntityCodes.REPORT).
                                                                                             Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
@@ -213,8 +245,6 @@ namespace Sentry.data.Web.Helpers
             }
             return items;
         }
-
-        
 
         public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
         {
@@ -302,11 +332,11 @@ namespace Sentry.data.Web.Helpers
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
 
-            if(dataSource.Is<S3Basic>())
+            if (dataSource.Is<S3Basic>())
             {
                 rj.Schedule = "*/1 * * * *";
             }
-            else if(dataSource.Is<DfsBasic>())
+            else if (dataSource.Is<DfsBasic>())
             {
                 rj.Schedule = "Instant";
             }

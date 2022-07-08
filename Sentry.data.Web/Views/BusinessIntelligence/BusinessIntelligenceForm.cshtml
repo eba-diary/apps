@@ -1,7 +1,6 @@
 ﻿@model Sentry.data.Web.BusinessIntelligenceModel
 
 <h2>@ViewData["Title"]</h2>
-<div id="informationPanel"></div>
 
 @using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post, new { @id = "BusinessIntelligenceForm", @enctype = "multipart/form-data" }))
 {
@@ -11,6 +10,9 @@
 
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
+
+    @*This DIV is required for JQuery to add hidden input values to*@
+    <div id="informationPanel"></div>
 
     <h4 class="pt-2">Information</h4>
 
@@ -175,7 +177,6 @@
     <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
     <script>
         $(function () {
-            $('#DatasetCategoryIds').materialSelect();
             data.Report.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
         });
     </script>

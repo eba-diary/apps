@@ -17,5 +17,6 @@
     [IsSecuredByUser] BIT NOT NULL DEFAULT 0, 
     [GrantPermissionToUser_ID] VARCHAR(8) NULL, 
     [AwsArn] VARCHAR(2048) NULL, 
+    [IsSystemGenerated] BIT NULL DEFAULT 0, 
     CONSTRAINT [FK_SecurityTicket_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
 )

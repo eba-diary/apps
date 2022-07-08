@@ -35,5 +35,6 @@ namespace Sentry.data.Core
         public bool CanCreateDataFlow { get; set; }
         public bool CanModifyDataflow { get; set; }
         public bool CanViewData { get; set; }
+        public bool CanDeleteDatasetFile { get; set; }
     }
 }

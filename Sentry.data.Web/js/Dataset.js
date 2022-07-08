@@ -511,11 +511,6 @@ data.Dataset = {
 
 
     UpdateMetadata: function () {
-
-        if (!isNaN(getUrlParameter('configID'))) {
-            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
-        }
-
         if ($('#datasetConfigList').val() === undefined) { return; }
 
         var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
@@ -786,7 +781,7 @@ data.Dataset = {
 
         $("[id^='UploadDatafile']").click(function (e) {
             e.preventDefault();
-            data.Dataset.UploadFileModal(0);
+            data.Dataset.LoadUploadFileModal(0);
         });
 
         $('.tile').click(function (e) {
@@ -993,6 +988,10 @@ data.Dataset = {
 
     DetailInit: function (datasetDetailModel) {
 
+        if (!isNaN(getUrlParameter('configID'))) {
+            $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
+        }
+
         this.delroyInit();
 
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
@@ -1005,9 +1004,9 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
-        $("[id^='UploadModal']").click(function (e) {
+        $(document).on('click', '#data-file-upload-open-modal', function (e) {
             e.preventDefault();
-            data.Dataset.UploadFileModal($(this).data("id"));
+            data.Dataset.LoadUploadFileModal(datasetDetailModel.DatasetId);
         });
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
@@ -1251,19 +1250,17 @@ data.Dataset = {
         //*****************************************************************************************************
         $('#datasetConfigList').on('select2:select', function (e) {
             $("#tab-spinner").show();
+            var configId = $('#datasetConfigList').val();
+            
             var url = new URL(window.location.href);
-            url.searchParams.set('configID', $('#datasetConfigList').val());
+            url.searchParams.set('configID', configId);
             window.history.pushState({}, '', url);
 
-            Id = $('#datasetConfigList').val();
             self.vm.NoColumnsReturned(false);
             $('#schemaHR').show();
             self.vm.SchemaRows.removeAll();
 
-            if ($("#datasetFilesTable_filter").length > 0) {
-                var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val();
-                $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
-            }
+            $('#datasetFilesTable').DataTable().ajax.url(data.Dataset.getDatasetFileTableUrl()).load();
 
             if (!$("#DataPreviewNoRows").hasClass("d-none"))
             { 
@@ -1275,25 +1272,12 @@ data.Dataset = {
             $("#schemaSearchInput").val("")
 
             $("#tab-spinner").hide();
-
         });
-        Id = $('#datasetConfigList').val();
-        //on initial load, try pulling the Id from the URL first. 
 
-        Id = $('#datasetConfigList').val();
-        //on initial load, try pulling the Id from the URL first.
-
-        $('#dataLastUpdatedSpinner').show();
-        //data.Dataset.UpdateMetadata();
-        var url = new URL(window.location.href);
-
-        Id = url.searchParams.get('configID')
-        if (Id == undefined) {
-            Id = $('#datasetConfigList').val();
+        //Don't init dataset file data table until the file tab is selected when tab feature is on
+        if (!datasetDetailModel.DisplayTabSections) {
+            data.Dataset.DatasetFileTableInit(datasetDetailModel);
         }
-
-        data.Dataset.DatasetFileTableInit(Id);
-        data.Dataset.DatasetBundingFileTableInit(Id);
 
         //Hook up handlers for tabbed sections
 
@@ -1407,13 +1391,10 @@ data.Dataset = {
                     url: '/Dataset/DetailTab/' + id + '/' + 'DataFiles',
                     data: datasetDetailModel,
                     success: function (view) {
-                        $('#tabDataFiles').html(view);
-                        if (self.vm.ShowDataFileTable()) {
-                            var configId = $('#datasetConfigList').val();
-                            data.Dataset.DatasetFileTableInit(configId);
-                            data.Dataset.DatasetBundingFileTableInit(configId);
-                        }
                         $("#tab-spinner").hide();
+                        $('#tabDataFiles').html(view);
+
+                        data.Dataset.DatasetFileTableInit(datasetDetailModel);
                     }
                 });
             }
@@ -1458,13 +1439,73 @@ data.Dataset = {
             }
         });
 
+        $(document).on("change", "#data-file-delete-all-checkbox", function (e) {
+            e.preventDefault();
+            $('.data-file-delete-checkbox').prop('checked', this.checked);
+            data.Dataset.toggleDeleteButton();            
+        });
+
+        $(document).on("change", ".data-file-delete-checkbox", this.toggleDeleteButton);
+
+        $(document).on("click", "#data-file-delete-open-modal", function (e) {
+            $("#data-file-delete-count").text($(".data-file-delete-checkbox:checked").length);
+        });
+
+        $(document).on("click", "#data-file-delete", function (e) {
+            e.preventDefault();            
+
+            $("#data-file-delete-close").hide();
+            $("#data-file-delete-cancel").hide();
+            $("#data-file-delete").hide();
+            $(".data-file-delete-spinner").removeClass("d-none");
+
+            //get all ids to delete
+            var ids = [];
+
+            $('.data-file-delete-checkbox:checkbox:checked').each(function () {
+                ids.push($(this).data("id"));
+            });
+
+            var datasetId = encodeURI(datasetDetailModel.DatasetId);
+            var schemaId = encodeURI($('#datasetConfigList option:selected').data("id"));
+
+            //delete
+            $.ajax({
+                type: "POST",
+                url: '../../api/v2/datafile/dataset/' + datasetId + '/schema/' + schemaId + '/Delete',
+                data: JSON.stringify({ UserFileIdList: ids }),
+                contentType: "application/json",
+                success: function () {
+                    $("#datasetFilesTable").DataTable().ajax.reload();
+                },
+                error: function () {
+                    data.Dataset.makeToast("error", "Something went wrong deleting file(s). Please try again or reach out to DSCSupport@sentry.com.");
+                },
+                complete: function () {
+                    $("#data-file-delete-modal").modal("hide");
+                    $("#data-file-delete-close").show();
+                    $("#data-file-delete-cancel").show();
+                    $("#data-file-delete").show();
+                    $(".data-file-delete-spinner").addClass("d-none");
+                }
+            });            
+        });
+
         var url = new URL(window.location.href);
         var tab = url.searchParams.get('tab');
         if (tab == undefined) {
             tab = 'SchemaAbout';
         }
         $("#detailTab" + tab).trigger('click');
+    },
 
+    toggleDeleteButton: function () {
+        if ($('.data-file-delete-checkbox:checkbox:checked').length > 0) {
+            $("#data-file-delete-open-modal").removeClass("display-none");
+        }
+        else {
+            $("#data-file-delete-open-modal").addClass("display-none");
+        }
     },
 
     CancelLink: function (id) {
@@ -1596,21 +1637,6 @@ data.Dataset = {
             });
     },
 
-    UploadFileModal: function (id) {
-        /// <summary>
-        /// Load Modal for Uploading new Datafile
-        /// </summary>
-        var modal = Sentry.ShowModalWithSpinner("Upload Data File");
-        //var createDatafileUrl = "/Dataset/GetDatasetUploadPartialView/?datasetId=" + encodeURI(id);
-        var selectedConfig = $('#datasetConfigList').find(":selected").val();
-        var createDatafileUrl = "/Dataset/Upload/" + encodeURI(id) + "/Config/" + encodeURI(selectedConfig);
-
-        $.get(createDatafileUrl, function (e) {
-            modal.ReplaceModalBody(e);
-            data.Dataset.UploadModalInit(id);
-        });
-    },
-
     EditDataFileInformation: function (id) {
         var modal = Sentry.ShowModalWithSpinner("Edit Data File");
 
@@ -1619,114 +1645,99 @@ data.Dataset = {
         });
     },
 
-    UploadModalInit: function (id) {
-        var configs;
-        var idFromSelectList = $('#datasetConfigList').find(":selected").val();
-        var dID;
+    LoadUploadFileModal: function (datasetId) {
+        var selectedConfig = $('#datasetConfigList').find(":selected").val();
+        $("#upload-data-file-form-wrapper").load("/Dataset/Upload/" + encodeURI(datasetId) + "/Config/" + encodeURI(selectedConfig), data.Dataset.InitUploadModal);
+    },
 
-        if (idFromSelectList === undefined) {
-            dId = id;
-        } else {
-            dId = idFromSelectList;
-        }
+    InitUploadModal: function () {
+        $("#upload-data-file-form-wrapper").removeClass('text-center');
 
-        $('#btnUploadFile').prop("disabled", true);
+        $(document).on("change", "#data-file-to-upload", function (e) {
+            $(".file-path-wrapper").removeClass("is-invalid");
 
-        $("[id^='btnUploadFile']").off('click').on('click', function () {
-            $('#btnUploadFile').closest('.bootbox').hide();
-            $('.modal-backdrop').remove();
-
-            var modal = Sentry.ShowModalWithSpinner("Upload Results", {
-                Confirm: {
-                    label: 'Confirm',
-                    className: 'btn-success'
-                },
-                Cancel:
-                {
-                    label: 'Cancel',
-                    className: 'btn-cancel'
-                }
-            });
-
-            // This approach is from the following site:
-            // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
-            if (window.FormData !== undefined) {
-                var fileUpload = $("#DatasetFileUpload").get(0);
-                var files = fileUpload.files;
-
-                //Create FormData object
-                var fileData = new FormData();
-
-                fileData.append(files[0].name, files[0]);
-                var datasetID = $('#DatasetId').val();
-                var configID = $("#configList").val();
-
-                var token = $('input[name="__RequestVerificationToken"]').val();
-
-                var xhr = new XMLHttpRequest();
-
-                (xhr.upload || xhr).addEventListener('progress', function (e) {
-                    var done = e.position || e.loaded;
-                    var total = e.totalSize || e.total;
-
-                    $('#percentTotal').text(Math.round(done / total * 100) + '%');
-                    $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
-                    $('#progressBar').width(Math.round(done / total * 100) + '%');
-
-                    $('.btn-success').prop("disabled", true);
-                });
-                xhr.addEventListener('load', function (e) {
-                    $('.modal-footer button').prop("disabled", false);
-                    modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g, ''));
-                });
-
-                $('.btn-cancel')[0].addEventListener('click', function () { xhr.abort(); }, false);
-                $('.bootbox-close-button').hide();
-                var url = '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
-                xhr.open('post', url, true);
-                xhr.setRequestHeader('__RequestVerificationToken', token);
-                xhr.send(fileData);
-            } else {
-                alert("FormData is not supported");
+            if (!$(".file-path").val()) {
+                //no file selected
+                $("#submit-upload-file").prop("disabled", true);
+            }
+            else if ((this.files[0].size / 1024 / 1024) > 100) {
+                //file size > 100MB
+                $("#submit-upload-file").prop("disabled", true);
+                $("#upload-invalid-message").text('File exceeds size limit of 100MB');
+                $(".file-path-wrapper").addClass("is-invalid");
+            }
+            else {
+                $("#submit-upload-file").prop("disabled", false);
             }
         });
 
-        $("#DatasetFileUpload").change(function () {
+        $(document).on("submit", "#upload-data-file-form", function (e) {
 
-            var fileUpload = $("#DatasetFileUpload").get(0);
-            var files = fileUpload.files;
-            if (files[0].size / 1000000 > 100) {
-                message = 'The file you are attempting to upload to is too large to upload through the browser.  ' +
-                    'Please use a drop location to upload this file.' +
-                    '<br/><br/>' +
-                    'If you don\'t have access to this drop location please contact <a href="mailto:DSCSupport@sentry.com"> Data.sentry.com Administration </a> for further assistance.'
+            e.preventDefault();
+            e.stopImmediatePropagation();
 
-                largeFileModel = Sentry.ShowModalCustom("File Too Large", message, Sentry.ModalButtonsOK())
-                //largeFileModel = Sentry.ShowModalAlert(message);
-                largeFileModel.show();
-            }
-            else {
-                $("#btnUploadFile").prop("disabled", false);
-                $('#btnUploadFile').show();
-            }
+            $("#upload-progress").removeClass("d-none");
+            $("#data-file-upload-close").addClass("d-none");
+            $("#upload-modal-buttons").addClass("d-none");
+
+            var form = e.target;
+            var xhr = new XMLHttpRequest();
+
+            xhr.open(form.method, form.action);
+            
+            xhr.upload.onprogress = function (progress) {
+                $('#upload-progress-bar').width(Math.round(progress.loaded / progress.total * 100) + '%');
+            };
+
+            xhr.upload.error = function () {
+                $("#upload-invalid-message").text('Error uploading the selected file');
+                $(".file-path-wrapper").addClass("is-invalid");
+
+                $("#data-file-upload-close").removeClass("d-none");
+                $("#upload-modal-buttons").removeClass("d-none");
+                $("#upload-progress").addClass("d-none");
+            };
+
+            xhr.upload.onload = function () {
+                $("#upload-progress-1").addClass("d-none");
+                $("#upload-progress-2").removeClass("d-none");
+            };
+
+            xhr.onloadend = function () {
+                if (xhr.status == 200) {
+                    var responseJson = JSON.parse(xhr.response);
+                    if (responseJson.Success) {
+                        data.Dataset.makeToast("success", "File has been successfully uploaded to S3. It may take a few moments before the file is visible in the Files tab.");
+                    }
+                    else {
+                        data.Dataset.makeToast("error", responseJson.Message);
+                    }
+                }
+                else {
+                    data.Dataset.makeToast("error", "There was an issue uploading the file. Please try again or reach out to DSCSupport@sentry.com.");
+                }
+
+                $("#data-file-upload-modal").modal("hide");
+            };
+
+            xhr.send(new FormData(form));
         });
     },
 
-    DatasetFileTableInit: function (Id) {
+    DatasetFileTableInit: function (datasetDetailModel) {
 
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             orderCellsTop: true,
             width: "100%",
             serverSide: true,
-            //responsive: true,
             processing: true,
             searching: true,
             paging: true,
             destroy: true,
             rowId: 'Id',
             ajax: {
-                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id,
-                type: "POST"
+                type: "POST",
+                url: data.Dataset.getDatasetFileTableUrl()
             },
             iDisplayLength: 10,
             aLengthMenu: [
@@ -1734,44 +1745,99 @@ data.Dataset = {
                 [10, 25, 50, 100, 200, "All"]
             ],
             columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
-                { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
-                { data: "Name", className: "Name" },
+                { data: null, className: "details-control", orderable: false, defaultContent: "", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", orderable: false, searchable: false },
+                { data: "FileName", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
-                { data: "CreateDtm", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "CreatedDtm", type: "date", className: "createddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ModifiedDtm", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
-                { data: "ConfigFileName", className: "ConfigFileName" }
+                { data: "ConfigFileName", className: "ConfigFileName" },
+                { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
             ],
             language: {
-                processing: ""
+                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>',
+                emptyTable: 'No Data Files Available'
             },
             order: [5, 'desc'],
             stateSave: true,
-            "createdRow": function (row, data, dataIndex) { }
+            initComplete: () => data.Dataset.datasetFilesTableInitComplete(datasetDetailModel),
+            drawCallback: function () {
+                $('#data-file-delete-all-checkbox').prop('checked', false);
+                data.Dataset.toggleDeleteButton();
+            }
         });
 
-        if ($("#datasetFilesTable_filter").length > 0) {
-            yadcf.init(data.Dataset.DatasetFilesTable, [
-                { column_number: 2, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 3, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-               // { column_number: 4, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },  SEE CLA-4004
-               // { column_number: 5, filter_type: 'range_date', datepicker_type: null, filter_reset_button_text: false, filter_delay: 500 },
-                { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
-            ],
+        yadcf.init(data.Dataset.DatasetFilesTable, [
                 {
-                    filters_tr_index: 1
+                    column_number: 2,
+                    filter_type: 'text',
+                    style_class: 'form-control',
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                },
+                {
+                    column_number: 4,
+                    filter_type: 'range_date',
+                    datepicker_type: null,
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                },
+                {
+                    column_number: 5,
+                    filter_type: 'range_date',
+                    datepicker_type: null,
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                },
+            ],
+            {
+                filters_tr_index: 1
+            }
+        );
+
+        $(".yadcf-filter-range-date", data.Dataset.DatasetFilesTable.settings()[0].nTHead).pickadate({
+            format: 'mm/dd/yyyy',
+            formatSubmit: 'mm/dd/yyyy',
+            onSet: function (context) {
+                if (context.clear !== undefined) {
+                    context.select = "";
                 }
-            );
+
+                if (context.select !== undefined && context.select !== null) {
+                    yadcf.dateSelect(new Date(context.select), this.$node);
+                }
+            }
+        });
+
+        data.Dataset.datasetFilesTableInitEvents();
+    },
+
+    datasetFilesTableInitComplete: function (datasetDetailModel) {
+        var datasetFileTable = $("#datasetFilesTable").DataTable();
+        datasetFileTable.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
+
+        var parent = $("#datasetFilesTable_filter").parent();
+        parent.parent().css("align-items", "end");
+
+        if (datasetDetailModel.DisplayDatasetFileUpload) {
+            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>');
         }
 
-        $(".dataTables_filter").parent().addClass("text-right");
-        $(".dataTables_filter").parent().css("right", "3px");
+        //use the global search location to add delete button even though we are going to remove global search from the dom
+        if (datasetDetailModel.DisplayDatasetFileDelete) {
+            parent.append('<button type="button" id="data-file-delete-open-modal" data-toggle="modal" data-target="#data-file-delete-modal" class="btn btn-danger waves-effect waves-light data-file-button display-none"><em class="far fa-trash-alt button-icon"></em>Delete</button>');
+        }
 
-        var table = $('#datasetFilesTable').DataTable();
+        //searching property needs to be set to true (adds the global search input) in order for yadcf filters for columns to properly model bind
+        //But we don't want the global search available
+        $("#datasetFilesTable_filter").remove();
+    },
+
+    datasetFilesTableInitEvents: function () {
 
         $('#datasetFilesTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
-            var row = table.row(tr);
+            var row = $('#datasetFilesTable').DataTable().row(tr);
 
             if (row.child.isShown()) {
                 // This row is already open - close it
@@ -1866,6 +1932,24 @@ data.Dataset = {
         });
     },
 
+    getDatasetFileTableUrl: function () {
+        return "/Dataset/GetDatasetFileInfoForGrid/?Id=" + encodeURIComponent($('#datasetConfigList').val());
+    },
+
+    renderDeleteFileOption: function (d, color) {
+        if (d.ObjectStatus === 1) { //is active
+            var checkboxId = 'data-file-delete-' + d.Id;
+
+            return '<fieldset class="form-group mb-0 text-left">' +
+                '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.Id + '" class="form-check-input data-file-delete-checkbox" >' +
+                '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
+            '</fieldset >';
+        }
+        else {
+            return '<i class="far fa-clock text-center dsc-' + color +'-text" title="Pending delete"></i>';
+        }
+    },
+
     formatDatasetFileDetails: function (d) {
         // `d` is the original data object for the row
         var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
@@ -1921,7 +2005,7 @@ data.Dataset = {
                 [10, 25, 50, 100, 200, "All"]
             ],
             ajax: {
-                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + Id,
+                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + encodeURI($('#datasetConfigList').val()),
                 type: "POST"
             },
             columns: [
@@ -2289,22 +2373,23 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     managePermissionsInit() {
+        data.Dataset.manageInheritanceInit();
+        data.Dataset.removePermissionModalInit();
+        $("#RequestAccessButton").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.AccessRequest.InitForDataset($(this).data("id"));
+        });
+    },
 
+    manageInheritanceInit() {
         $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');
         });
-        data.Dataset.permissionInheritanceSwitchInit();
+        data.Dataset.updateInheritanceStatus();
         //Event to refresh inheritance switch on modal close
         $("#inheritanceModal").on('hide.bs.modal', function () {
-            $.ajax({
-                type: "GET",
-                url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
-                success: function (result) {
-                    $("#inheritanceSwitch").attr("value", result.TicketStatus);
-                    data.Dataset.permissionInheritanceSwitchInit(result);
-                }
-            });
+            data.Dataset.updateInheritanceStatus();
         });
         $("#inheritanceModalSubmit").click(function () {
             if (data.Dataset.validateInheritanceModal()) {
@@ -2322,21 +2407,29 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#inheritanceValidationMessage").removeClass("d-none");
             }
         });
-        $("#RequestAccessButton").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.AccessRequest.InitForDataset($(this).data("id"));
+
+    },
+
+    updateInheritanceStatus() {
+        $.ajax({
+            type: "GET",
+            url: '/Dataset/Detail/' + $("#DatasetHeader").attr("value") + '/Permissions/GetLatestInheritanceTicket',
+            success: function (result) {
+                $("#inheritanceSwitch").attr("value", result.TicketStatus);
+                data.Dataset.permissionInheritanceSwitchInit(result);
+            }
         });
     },
 
     permissionInheritanceSwitchInit(result) {
         var inheritance = $("#inheritanceSwitch").attr("value");
         switch (inheritance) {
-            case "ACTIVE":
+            case "Active":
                 $('#inheritanceSwitchInput').prop('checked', true);
                 $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
                 $("#Inheritance_IsAddingPermission").val(false);
                 break;
-            case "PENDING":
+            case "Pending":
                 $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
                 break
             default: //we treat default the same as "DISABLED"
@@ -2348,6 +2441,84 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     validateInheritanceModal() {
         return ($("#Inheritance_BusinessReason").val() != '' && $("#Inheritance_SelectedApprover").val != '')
+    },
+
+    removePermissionModalInit() {
+        $(".removePermissionIcon").click(function (e) {
+            var cells = $(e.target).parent().parent().children();
+            var scope = $(cells[0]).text();
+            var identity = $(cells[1]).text();
+            var permission = $(cells[2]).text();
+            var code = $(cells[4]).text();
+            var ticketId = cells.parent().attr("id");
+            data.Dataset.removePermissionModalOnOpen(scope, identity, permission, code, ticketId);
+            $("#removePermissionModal").modal('show');
+        });
+        $("#removePermissionModal").on('hide.bs.modal', function () {
+            data.Dataset.removePermissionModalOnClose();
+        });
+        $("#removePermissionModalSubmit").click(function () {
+            if (data.Dataset.validateRemovePermissionModal()) {
+                $.ajax({
+                    type: 'POST',
+                    data: $("#RemovePermissionRequestForm").serialize(),
+                    url: '/Dataset/SubmitRemovePermissionRequest',
+                    success: function (data) {
+                        $("#RemovePermissionModalForm").addClass("d-none");
+                        $("#RemovePermissionModalButtons").addClass("d-none");
+                        $("#RemovePermissionRequestResult").html(data);
+                        $("#RemovePermissionRequestResult").removeClass("d-none");
+                    }
+                });
+            }
+            else {
+                $("#removePermissionValidationMessage").removeClass("d-none");
+            }
+        });
+    },
+
+    removePermissionModalOnClose() {
+        $("#RemovePermission_Identity").val("");
+        $("#RemovePermission_Scope").val("");
+        $("#RemovePermission_Permission").val("");
+        $("#RemovePermission_BusinessReason").val("");
+        $("#RemovePermission_TicketId").val("");
+        $("#RemovePermission_Code").val("");
+
+        $("#RemovePermission_SelectedApprover").materialSelect({ destroy: true });
+
+        $("#identityLabel").removeClass("active");
+        $("#scopeLabel").removeClass("active");
+        $("#permissionLabel").removeClass("active");
+        $("#RemovePermissionRequestResult").html("");
+        $("#RemovePermissionRequestResult").addClass("d-none");
+        $("#removePermissionValidationMessage").addClass("d-none");
+    },
+
+    removePermissionModalOnOpen(scope, identity, permission, code, ticketId) {
+        $("#RemovePermission_Identity").val(identity);
+        $("#RemovePermission_Scope").val(scope);
+        $("#RemovePermission_Permission").val(permission);
+        $("#RemovePermission_TicketId").val(ticketId);
+        $("#RemovePermission_Code").val(code);
+        $("#RemovePermission_SelectedApprover").materialSelect();
+        $("#identityLabel").addClass("active");
+        $("#scopeLabel").addClass("active");
+        $("#permissionLabel").addClass("active");
+        $("#RemovePermissionModalForm").removeClass("d-none");
+        $("#RemovePermissionModalButtons").removeClass("d-none");
+
+
+        if (scope == $("#ManagePermissionDatasetName").text()) {
+            $("#RemovePermissionScopeContainer").addClass("d-none");
+        }
+        else {
+            $("#RemovePermissionScopeContainer").removeClass("d-none");
+        }
+    },
+
+    validateRemovePermissionModal() {
+        return ($("#RemovePermission_BusinessReason").val() != '' && $("#RemovePermission_SelectedApprover").val != '')
     },
 
     initRequestAccessWorkflow() {

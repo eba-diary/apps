@@ -10,36 +10,45 @@
     </div>
 }
 
-
-
-<div class="@(Model.DatasetFileCount == 0 ?"visible-item":"hidden-item")">
-    <h5 class="@color pt-1">No Data Files Available</h5>
+<div id="hide_detailSectionHeader_DataFiles">
+    <table class="table @tableColor table-bordered table-hover table-striped nowrap" aria-describedby="Dataset Schema Files Table" id="datasetFilesTable">
+        <thead>
+            <tr class="table-header">
+                <th>Details</th>
+                <th>Actions</th>
+                <th>Name</th>
+                <th>Upload User Name</th>
+                <th>Initial Upload Date</th>
+                <th>Modified Date</th>
+                <th>Schema</th>
+                <th class="text-center" id="delete-file-column-header"><em class="far fa-trash-alt"></em></th>
+            </tr>
+            <tr class="filter-row">
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th class="data-file-delete-all-filter" id="delete-file-column-filter">
+                    <fieldset class="form-group" >
+                        <input type="checkbox" id="data-file-delete-all-checkbox" class="form-check-input">
+                        <label for="data-file-delete-all-checkbox" class="form-check-label p-0" title="Select all files on page"></label>
+                    </fieldset>
+                </th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
-<div class="@(Model.DatasetFileCount != 0 ?"visible-item":"hidden-item")">
-    <div id="hide_detailSectionHeader_DataFiles">
-        <table class="table @tableColor table-bordered table-hover table-striped nowrap" aria-describedby="Dataset Schema Files Table" id="datasetFilesTable">
-            <thead>
-                <tr class="table-header">
-                    <th>Details</th>
-                    <th>Actions</th>
-                    <th>Name</th>
-                    <th>Upload User Name</th>
-                    <th>Initial Upload Date</th>
-                    <th>Modified Date</th>
-                    <th>Schema</th>
-                </tr>
-                <tr class="filter-row">
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
+@if (Model.DisplayDatasetFileDelete)
+{
+    Html.RenderPartial("Details/_DeleteDatasetFiles");
+}
+
+@if (Model.DisplayDatasetFileUpload)
+{
+    Html.RenderPartial("Details/_UploadDatasetFile");
+}

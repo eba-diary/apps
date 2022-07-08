@@ -24,8 +24,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             _dataFeatures = dataFeatures;
         }
 
-
-
         /// <summary>
         /// Return all data files associated with schema.
         /// </summary>
@@ -124,46 +122,16 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             //SECURITY CHECK
             UserSecurity us = _datafileService.GetUserSecurityForDatasetFile(datasetId);
-            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()
-                || !us.CanEditDataset 
-                || !us.CanManageSchema)
+            if (!us.CanDeleteDatasetFile)
             {
                 return Content(System.Net.HttpStatusCode.Forbidden, "Feature not available to this user.");
             }
 
-            string simpleError = _datafileService.ValidateDeleteDataFilesParams(datasetId, schemaId, deleteFilesParamModel.ToDto());
-            if (simpleError != null)
+            string error = _datafileService.Delete(datasetId, schemaId, deleteFilesParamModel.ToDto()); 
+            if (error != null)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, simpleError);
+                return Content(System.Net.HttpStatusCode.BadRequest, error);
             }
-
-            //TURN USER LIST INTO DBLIST
-            List<DatasetFile> dbList;
-
-            //IF userFileNameList PASSED
-            if (deleteFilesParamModel.UserFileNameList != null && deleteFilesParamModel.UserFileNameList.Length > 0)
-            {
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesParamModel.UserFileNameList);
-            }
-            else  //userIdList PASSED
-            {
-                //VALIDATE LESS THAN 1
-                if (deleteFilesParamModel.UserFileIdList.Any(w => w < 1 ) )
-                {
-                    return Content(System.Net.HttpStatusCode.BadRequest, nameof(deleteFilesParamModel.UserFileIdList) + " contains an item less than one.  Please pass items greater than zero.");
-                }
-                dbList = _datafileService.GetDatasetFileList(datasetId, schemaId, deleteFilesParamModel.UserFileIdList);
-            }
-
-
-            //VALIDATE: ANYTHING TO DELETE
-            if(dbList != null && dbList.Count == 0)
-            {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Nothing found to delete.");
-            }
-
-            //FINAL STEP :  CALL SERVICE TO DELETE METADATA AND DPP TO DELETE
-            _datafileService.Delete(datasetId, schemaId, dbList);
 
             return Ok("Delete Successful.  Thanks for using DSC!");
         }

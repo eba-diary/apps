@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 
 namespace Sentry.data.Web
@@ -59,6 +60,25 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
                 SelectedApprover = model.SelectedApprover
+            };
+        }
+        
+        public static Core.AccessRequest ToCore(this RemovePermissionModel model)
+        {
+            return new Core.AccessRequest()
+            {
+                SecurableObjectId = model.SecurableObjectId,
+                SecurableObjectName = model.SecurableObjectName,
+                AdGroupName = model.AdGroupName,
+                BusinessReason = model.BusinessReason,
+                SelectedPermissionCodes = new List<string>() { model.Code },
+                SelectedApprover = model.SelectedApprover,
+                Type = AccessRequestType.RemovePermission,
+                IsAddingPermission = false,
+                AwsArn = model.Identity,
+                SaidKeyCode = model.SaidKeyCode,
+                Scope = model.Scope.Equals(model.SaidKeyCode) ? AccessScope.Asset : AccessScope.Dataset,
+                TicketId = model.TicketId
             };
         }
 

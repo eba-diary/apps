@@ -228,6 +228,7 @@ namespace Sentry.data.Web.Controllers
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
                 dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
                 dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
+                dfcm.FileExtensionReadonly = dfcm.ExtensionList.Where(s => s.Value == dfcm.FileExtensionID.ToString()).Select(n => n.Text).FirstOrDefault();
 
                 //ViewBag.ModifyType = "Edit";
 
