@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces;
 
@@ -26,7 +27,7 @@ namespace Sentry.data.Infrastructure
             {
                 QueryMadeDateTime = entity.QueryMadeDateTime,
                 SchemaId = entity.SchemaId,
-                EventContents = entity.EventContents,
+                EventContents = JObject.Parse(entity.EventContents),
                 TotalFlowteps = entity.TotalFlowSteps,
                 FileModifiedDateTime = entity.FileModifiedDateTime,
                 OriginalFileName = entity.OriginalFileName,

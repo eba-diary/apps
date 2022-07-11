@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace Sentry.data.Core
     {
         public DateTime QueryMadeDateTime { get; set; }
         public int SchemaId { get; set; }
-        public string EventContents { get; set; }
+        public JObject EventContents { get; set; }
         public int TotalFlowteps { get; set; }
         public DateTime FileModifiedDateTime { get; set; }
         public string OriginalFileName { get; set; }
