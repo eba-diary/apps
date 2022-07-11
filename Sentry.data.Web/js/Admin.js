@@ -10,6 +10,51 @@ data.Admin = {
         });
     },
 
+    ReprocessDeadJobs: function () {
+        $("#reprocessButton").click(function () {
+            var files = [];
+
+            $('.table-checkbox:checked').each(function () {
+                var obj = { fileId: $(this).data("file-id"), stepId: $(this).data("step-id") };
+                files.push(obj);
+            });
+
+            const key = "fileId";
+            const DatasetFileId = "stepId";
+
+            var returnJson = files.reduce(function (rv, x) {
+                (rv[x[key]] = rv[x[key]] || []).push(x[DatasetFileId]);
+                return rv;
+            }, {});
+
+            for (let x in returnJson) {
+                var fileArray = []
+                for (let i in returnJson[x]) {
+                    fileArray.push(returnJson[x][i]);
+                }
+
+                var ajaxReturn = {
+                    DataFlowStepId: x,
+                    DatasetFileIds: fileArray
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../api/v2/datafile/DataFile/Reprocess",
+                    contentType: "application/json",
+                    data: JSON.stringify({ DataFlowStepId: 1, DatasetFileIds: [1, 2] }),
+                    success: function () {
+                        alert("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
+                    },
+                    error: function () {
+                        alert("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
+                    }
+
+                });
+            };
+        });
+    },
+
     ApproveAsset: function (id) {
         $.post("/Admin/Approve/" + id, {}, function () {
             $("#approve-row-" + id).hide("slow");

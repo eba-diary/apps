@@ -21,7 +21,7 @@ namespace Sentry.data.Infrastructure
 
         public List<DeadSparkJobDto> GetDeadSparkJobDtos(int timeCreated)
         {
-            List<DeadSparkJob> deadSparkJobList = _dbExecuter.ExecuteQuery(-10);
+            List<DeadSparkJob> deadSparkJobList = _dbExecuter.ExecuteQuery(timeCreated);
 
             return MapToDtoList(deadSparkJobList);
         }
@@ -53,7 +53,8 @@ namespace Sentry.data.Infrastructure
                 LivyAppID = deadSparkJob.LivyAppID,
                 LivyDriverlogUrl = deadSparkJob.LivyDriverlogUrl,
                 LivySparkUiUrl = deadSparkJob.LivySparkUiUrl,
-                DatasetFileID = deadSparkJob.DatasetFileID
+                DatasetFileID = deadSparkJob.DatasetFileID,
+                DataFlowStepID = deadSparkJob.DataFlowID
             };
 
             return deadSparkJobDto;

@@ -41,6 +41,18 @@ namespace Sentry.data.Web.Controllers
             return View(deadSparkJobModelList);
         }
 
+        [HttpPost]
+        public ActionResult GetDeadJobs(int timeCheck)
+        {
+            timeCheck *= -1;
+
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(timeCheck);
+
+            List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
+
+            return PartialView("_DeadJobTable", deadSparkJobModelList);
+        }
+
         public ActionResult GetAdminAction(string viewId)
         {
             string viewPath = "";

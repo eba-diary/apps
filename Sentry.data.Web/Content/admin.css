@@ -10,3 +10,9 @@
     width: 400px;
     height: 30px;
 }
+
+.table-checkbox {
+    position: unset !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}

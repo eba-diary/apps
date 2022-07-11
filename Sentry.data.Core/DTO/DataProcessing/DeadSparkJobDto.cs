@@ -22,5 +22,6 @@ namespace Sentry.data.Core
         public string LivyDriverlogUrl { get; set; }
         public string LivySparkUiUrl { get; set; }
         public int DatasetFileID { get; set; }
+        public int DataFlowStepID { get; set; }
     }
 }

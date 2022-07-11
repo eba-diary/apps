@@ -18,7 +18,10 @@ namespace Sentry.data.Infrastructure
             using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DatabaseConnectionString")))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("exec dbo.uspTest", connection);
+                SqlCommand command = new SqlCommand("dbo.uspTest", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@timeCheck", timeCreated);
+
                 /*SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @JobID, @TimeCreated", connection);
 
                 command.Parameters.AddWithValue("@JobID", System.Data.SqlDbType.Int);
@@ -51,7 +54,7 @@ namespace Sentry.data.Infrastructure
                         deadSparkJob.BatchID = int.Parse(row["BatchId"].ToString());
                         deadSparkJob.State = row["State"].ToString();
                         deadSparkJob.LivyAppID = row["LivyAppId"].ToString();
-                        deadSparkJob.LivyDriverlogUrl = row["LiveDriverlogUrl"].ToString();
+                        deadSparkJob.LivyDriverlogUrl = row["LivyDriverlogUrl"].ToString();
                         deadSparkJob.LivySparkUiUrl = row["LivySparkUiUrl"].ToString();
                         deadSparkJob.DayOfMonth = int.Parse(row["Day of Month"].ToString());
                         deadSparkJob.HourOfDay = int.Parse(row["Hour of Day"].ToString());
