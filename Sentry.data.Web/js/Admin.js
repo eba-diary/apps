@@ -263,6 +263,15 @@ data.Admin = {
             $("#accordion-view-area").load(url);
         })
     },
+    FlowMetricAccordionInit: function () {
+        $("#EventContentModal").on("show.bs.modal", function (event) {
+            var link = $(event.relatedTarget);
+            var content = JSON.stringify(link.data("eventcontent"));
+            var modalBody = "<textarea class='form-control' style = 'height: 500px'>" + content + "</textarea>"
+            $("#EventDetails").html(modalBody);
+
+        })
+    },
     // Loads Admin jobs pages
 
     AdminPageInit: function () {

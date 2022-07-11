@@ -10,9 +10,11 @@ namespace Sentry.data.Infrastructure
     public class DataFlowMetricService: IDataFlowMetricService
     {
         private readonly IDataFlowMetricProvider _dataFlowMetricProvider;
-        public DataFlowMetricService(IDataFlowMetricProvider dataFlowMetricProvider)
+        private readonly IDatasetContext _context;
+        public DataFlowMetricService(IDataFlowMetricProvider dataFlowMetricProvider, IDatasetContext context)
         {
             _dataFlowMetricProvider = dataFlowMetricProvider;
+            _context = context;
         }
         public List<DataFlowMetricEntity> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
         {
@@ -51,6 +53,7 @@ namespace Sentry.data.Infrastructure
                 DatesetFileId = entity.DatesetFileId,
                 ProcessStartDateTime = entity.ProcessStartDateTime,
                 StatusCode = entity.StatusCode,
+                DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
             };
         }
         public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetricEntity> entityList)

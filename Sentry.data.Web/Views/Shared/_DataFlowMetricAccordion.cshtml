@@ -30,8 +30,9 @@
                     <div id="@Model.DataFlowMetricGroups[x].TargetCode" class="collapse" data-parent="#dataFlowMetricAccordion">
                         @for (var i = 0; i < Model.DataFlowMetricGroups[x].FlowEvents.Count; i++)
                         {
-                            <a href="#">
+                            <a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent="@Model.DataFlowMetricGroups[x].FlowEvents[i].EventContents">
                                 <h5 class="accordion-body" style="padding-left: 25px"> @Model.DataFlowMetricGroups[x].FlowEvents[i].EventMetricId</h5>
+                                <h5 class="accordion-body">@Model.DataFlowMetricGroups[x].FlowEvents[i].DataFlowStepName</h5>
                                 <h5 class="accordion-body"> @Model.DataFlowMetricGroups[x].FlowEvents[i].CurrentFlowStep/@Model.DataFlowMetricGroups[x].FlowEvents[i].TotalFlowteps</h5>
                                 <h5 class="accordion-body"> @Model.DataFlowMetricGroups[x].FlowEvents[i].StatusCode</h5>
                             </a>
@@ -42,6 +43,25 @@
                     </div>
                 </div>
             }
-
-
 </div>
+
+<div class="modal fade" tabindex="-1" id="EventContentModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalTitle">Event Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body" id="EventDetails">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    data.Admin.FlowMetricAccordionInit();
+</script>

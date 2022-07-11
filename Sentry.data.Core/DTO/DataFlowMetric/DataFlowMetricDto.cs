@@ -25,6 +25,7 @@ namespace Sentry.data.Core
         public int Offset { get; set; }
         public string DataFlowName { get; set; }
         public int DataFlowStepId { get; set; }
+        public string DataFlowStepName { get; set; }
         public string FlowExecutionGuid { get; set; }
         public int FileSize { get; set; }
         public int EventMetricId { get; set; }
