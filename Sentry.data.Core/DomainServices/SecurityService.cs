@@ -503,19 +503,20 @@ namespace Sentry.data.Core
             }
 
 
-            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))
             {
                 //we can assume the securable here is a dataset currently, an asset doesn't have anything to inherit from
                 Dataset dataset = _datasetContext.Datasets.FirstOrDefault(ds => ds.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId));
-                List<SecurityTicket> inheritedTickets = _datasetContext.SecurityTicket.Where(t => t.ParentSecurity.SecurityId.Equals(_datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(dataset.Asset.SaidKeyCode)).Security.SecurityId)).ToList();
+                Asset asset = _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(dataset.Asset.SaidKeyCode));
+                List<SecurityTicket> inheritedTickets = _datasetContext.SecurityTicket.Where(t => t.ParentSecurity.SecurityId.Equals(asset.Security.SecurityId)).ToList();
                 //fallback and catchup code
-                bool inheritanceStatus = ticket.AddedPermissions.FirstOrDefault(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS).IsEnabled;
+                bool inheritanceStatus = ticket.IsAddingPermission;
 
                 foreach (SecurityTicket inheritedTicket in inheritedTickets)
                 {
                     inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
                     inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
-                    if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && p.IsEnabled))
+                    if (inheritedTicket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && p.IsEnabled))
                     {
                         BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
                     }
@@ -523,7 +524,7 @@ namespace Sentry.data.Core
             }
 
 
-            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
             {
                 try
                 {
@@ -533,7 +534,8 @@ namespace Sentry.data.Core
                     }
                     else //Asset
                     {
-                        List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(_datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+                        string keycode = _datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode;
+                        List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(keycode) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
                         BuildS3RequestAssistance(datasets, ticket);
                     }
                 }
@@ -566,7 +568,8 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(_datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+                    string keycode = _datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode;
+                    List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(keycode) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
                     foreach(Dataset dataset in datasets)
                     {
                         await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
