@@ -6,17 +6,15 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class DataInventoryController : BaseController
+    public class DataInventoryController : BaseSearchableController
     {
         private readonly IDataInventoryService _dataInventoryService;
         private readonly IFilterSearchService _filterSearchService;
-        private readonly IDataFeatures _featureFlags;
 
-        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService, IDataFeatures featureFlags)
+        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService)
         {
             _dataInventoryService = dataInventoryService;
             _filterSearchService = filterSearchService;
-            _featureFlags = featureFlags;
         }
         
         public ActionResult Search(string target = null, string search = null, string savedSearch = null)
@@ -130,7 +128,7 @@ namespace Sentry.data.Web.Controllers
                 DefaultSearch = searchModel
             };
 
-            return View("~/Views/Search/FilterSearch.cshtml", model);
+            return GetFilterSearchView(model);
         }
 
         private FilterSearchModel BuildBaseSearchModel()

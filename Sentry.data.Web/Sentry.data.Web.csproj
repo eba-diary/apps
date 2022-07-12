@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -410,7 +410,10 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="Controllers\BaseSearchableController.cs" />
+    <Compile Include="Controllers\BusinessIntelligenceSearchController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
+    <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
@@ -1968,6 +1971,9 @@
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\BaseDataInventory\" />
+    <Folder Include="Views\BaseSearchable\" />
+    <Folder Include="Views\BusinessIntelligenceSearch\" />
+    <Folder Include="Views\DatasetSearch\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />

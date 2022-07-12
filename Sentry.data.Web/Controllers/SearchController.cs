@@ -12,13 +12,11 @@ namespace Sentry.data.Web.Controllers
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class SearchController : BaseController
     {
-        public IAssociateInfoProvider _associateInfoProvider;
-        public IDatasetContext _datasetContext;
-        private UserService _userService;
+        private readonly IAssociateInfoProvider _associateInfoProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly UserService _userService;
         private readonly IEventService _eventService;
         private readonly IDatasetService _datasetService;
-
-        private string Title { get; set; }
 
         public SearchController(IDatasetContext dsCtxt, UserService userService, 
             IAssociateInfoProvider associateInfoService, IEventService eventService,
