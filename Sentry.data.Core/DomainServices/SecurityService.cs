@@ -553,7 +553,7 @@ namespace Sentry.data.Core
         {
 
             //If the SecurityTicket just approved includes dataset permissions
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            if (_dataFeatures.CLA3718_Authorization.GetValue() && (ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET) || ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.ASSET)))
             {
                 if (ticket.ParentSecurity.SecurableEntityName.Equals(GlobalConstants.SecurableEntityName.DATASET))
                 {

@@ -1473,7 +1473,12 @@ namespace Sentry.data.Core.Tests
             {
                 AddedPermissions = new List<SecurityPermission>() {
                     new SecurityPermission() {
-                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATA_ASSET } } }
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATA_ASSET } } },
+                RemovedPermissions = new List<SecurityPermission>(),
+                ParentSecurity = new Security()
+                {
+                    SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
+                }
             };
             var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
 
@@ -1499,7 +1504,12 @@ namespace Sentry.data.Core.Tests
             {
                 AddedPermissions = new List<SecurityPermission>() {
                     new SecurityPermission() {
-                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } },
+                RemovedPermissions = new List<SecurityPermission>(),
+                ParentSecurity = new Security()
+                {
+                    SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
+                }
             };
             var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
 
@@ -1523,7 +1533,12 @@ namespace Sentry.data.Core.Tests
             {
                 AddedPermissions = new List<SecurityPermission>() {
                     new SecurityPermission() {
-                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } },
+                RemovedPermissions = new List<SecurityPermission>(),
+                ParentSecurity = new Security()
+                {
+                    SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
+                }
             };
             var dataset = new Dataset() { Security = new Security() { Tickets = new List<SecurityTicket>() { ticket } } };
             var context = new Mock<IDatasetContext>();
