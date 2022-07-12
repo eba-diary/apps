@@ -14,7 +14,7 @@ namespace Sentry.data.Core.Entities.Security
         {
             TicketId = ticket.TicketId;
             TicketStatus = ticket.TicketStatus;
-            InheritanceActive = ticket.Permissions != null ? ticket.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) : false;
+            InheritanceActive = ticket.AddedPermissions != null ? ticket.AddedPermissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) : false;
         }
 
         public string TicketId { get; set; }

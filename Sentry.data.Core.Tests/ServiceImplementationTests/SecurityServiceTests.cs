@@ -40,8 +40,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -83,8 +83,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -147,7 +147,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
             SecurityPermission viewFullDatasetPermission1 = BuildBasePermission(ticket1, CanViewFullDataset(), true);
-            ticket1.Permissions.Add(viewFullDatasetPermission1);
+            ticket1.AddedPermissions.Add(viewFullDatasetPermission1);
             security.Tickets.Add(ticket1);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -390,7 +390,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, "MyServiceAccountGroup");
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanManageSchema(), true);
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
@@ -430,7 +430,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurity = BuildBaseSecurity();
             var parentTicket = BuildBaseTicket(parentSecurity, "MyServiceAccountGroup");
             var parentPermission = BuildBasePermission(parentTicket, CanManageSchema(), true);
-            parentTicket.Permissions.Add(parentPermission);
+            parentTicket.AddedPermissions.Add(parentPermission);
             parentSecurity.Tickets.Add(parentTicket);
             var parentSecurable = new Asset() { Security = parentSecurity };
 
@@ -438,7 +438,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, string.Empty);
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, InheritParentPermissions(), true);
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
@@ -477,7 +477,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), false);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -507,7 +507,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -537,7 +537,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -567,7 +567,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -597,7 +597,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -667,7 +667,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -695,8 +695,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), true);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -730,8 +730,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), true);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -765,9 +765,9 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission2 = BuildBasePermission(ticket1, CanQueryDataset(), true);
             SecurityPermission previewPermission3 = BuildBasePermission(ticket1, CanUploadToDataset(), true);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket1.Permissions.Add(previewPermission2);
-            ticket1.Permissions.Add(previewPermission3);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission3);
             security.Tickets.Add(ticket1);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -802,7 +802,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurity = BuildBaseSecurity();
             var parentTicket = BuildBaseTicket(parentSecurity, "MyServiceAccountGroup");
             var parentPermission = BuildBasePermission(parentTicket, CanPreviewDataset(), true);
-            parentTicket.Permissions.Add(parentPermission);
+            parentTicket.AddedPermissions.Add(parentPermission);
             parentSecurity.Tickets.Add(parentTicket);
             var parentSecurable = new Asset() { Security = parentSecurity };
 
@@ -810,7 +810,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, string.Empty);
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, InheritParentPermissions(), approvalStatus);
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
@@ -908,7 +908,7 @@ namespace Sentry.data.Core.Tests
             ticket1.GrantPermissionToUserId = "999999";
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS }, true);
 
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -1368,7 +1368,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
-            security.Tickets.First().Permissions.First().IsEnabled = false;
+            security.Tickets.First().AddedPermissions.First().IsEnabled = false;
             var securable = new Mock<ISecurable>();
             securable.Setup(s => s.Security).Returns(security);
 
@@ -1384,7 +1384,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
-            security.Tickets.First().Permissions.First().IsEnabled = false;
+            security.Tickets.First().AddedPermissions.First().IsEnabled = false;
             var securable = new Mock<ISecurable>();
             securable.Setup(s => s.Security).Returns(security);
 
@@ -1400,8 +1400,8 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
-            security.Tickets.First().Permissions.First().IsEnabled = false;
-            security.Tickets.First().Permissions.First().RemovedDate = DateTime.Now;
+            security.Tickets.First().AddedPermissions.First().IsEnabled = false;
+            security.Tickets.First().AddedPermissions.First().RemovedDate = DateTime.Now;
             var securable = new Mock<ISecurable>();
             securable.Setup(s => s.Security).Returns(security);
 
@@ -1471,7 +1471,7 @@ namespace Sentry.data.Core.Tests
             var inevService = new Mock<IInevService>();
             var ticket = new SecurityTicket()
             {
-                Permissions = new List<SecurityPermission>() {
+                AddedPermissions = new List<SecurityPermission>() {
                     new SecurityPermission() {
                         Permission = new Permission() { SecurableObject = SecurableEntityName.DATA_ASSET } } }
             };
@@ -1497,7 +1497,7 @@ namespace Sentry.data.Core.Tests
             var inevService = new Mock<IInevService>();
             var ticket = new SecurityTicket()
             {
-                Permissions = new List<SecurityPermission>() {
+                AddedPermissions = new List<SecurityPermission>() {
                     new SecurityPermission() {
                         Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
             };
@@ -1521,7 +1521,7 @@ namespace Sentry.data.Core.Tests
             //Arrange
             var ticket = new SecurityTicket()
             {
-                Permissions = new List<SecurityPermission>() {
+                AddedPermissions = new List<SecurityPermission>() {
                     new SecurityPermission() {
                         Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } }
             };
@@ -1565,7 +1565,7 @@ namespace Sentry.data.Core.Tests
                 SecurityTicketId = Guid.NewGuid(),
                 TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
                 TicketId = "C00123456",
-                Permissions = new List<SecurityPermission>()
+                AddedPermissions = new List<SecurityPermission>()
             };
         }
 

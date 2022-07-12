@@ -30,7 +30,8 @@ namespace Sentry.data.Core
         public virtual string AwsArn { get; set; }
         public virtual Security ParentSecurity { get; set; }
 
-        public virtual IList<SecurityPermission> Permissions { get; set; }
+        public virtual IList<SecurityPermission> AddedPermissions { get; set; }
+        public virtual IList<SecurityPermission> RemovedPermissions { get; set; }
 
         public virtual string SaidKeyCode { get; set; }
 
@@ -110,7 +111,7 @@ namespace Sentry.data.Core
             {
                 vr.Add("TicketStatus", "Ticket Status is required");
             }
-            if(IsAddingPermission && (Permissions == null || Permissions.Count == 0))
+            if(IsAddingPermission && (AddedPermissions == null || AddedPermissions.Count == 0))
             {
                 vr.Add("Permissions", "Permissions are required on the ticket");
             }
