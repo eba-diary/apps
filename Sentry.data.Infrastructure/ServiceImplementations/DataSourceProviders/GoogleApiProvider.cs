@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure
                 BaseUrl = new Uri(baseUri)
             };
 
-            if (TryGetWebProxy(out WebProxy webProxy))
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
                 _client.Proxy = webProxy;
             }
@@ -257,7 +257,7 @@ namespace Sentry.data.Infrastructure
             if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                 var httpHandler = new System.Net.Http.HttpClientHandler();
-                if (TryGetWebProxy(out WebProxy webProxy))
+                if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
                 {
                     httpHandler.Proxy = webProxy;
                 }
@@ -323,9 +323,9 @@ namespace Sentry.data.Infrastructure
 
             byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
 
-            _ = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            string privateKey = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
 
-            byte[] keyBytes = Convert.FromBase64String(EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
+            byte[] keyBytes = Convert.FromBase64String(privateKey);
 
             var asymmetricKeyParameter = PrivateKeyFactory.CreateKey(keyBytes);
             var rsaKeyParameter = (RsaKeyParameters)asymmetricKeyParameter;
