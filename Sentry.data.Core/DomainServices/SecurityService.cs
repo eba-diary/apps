@@ -503,13 +503,39 @@ namespace Sentry.data.Core
             }
 
 
+            if (ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+            {
+                //we can assume the securable here is a dataset currently, an asset doesn't have anything to inherit from
+                Dataset dataset = _datasetContext.Datasets.FirstOrDefault(ds => ds.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId));
+                List<SecurityTicket> inheritedTickets = _datasetContext.SecurityTicket.Where(t => t.ParentSecurity.SecurityId.Equals(_datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(dataset.Asset.SaidKeyCode)).Security.SecurityId)).ToList();
+                //fallback and catchup code
+                bool inheritanceStatus = ticket.Permissions.FirstOrDefault(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS).IsEnabled;
+
+                foreach (SecurityTicket inheritedTicket in inheritedTickets)
+                {
+                    inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
+                    inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
+                    if (ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && p.IsEnabled))
+                    {
+                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
+                    }
+                }
+            }
 
 
-            if(ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
+            if (ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
             {
                 try
                 {
-                    BuildS3RequestAssistance(ticket);
+                    if (ticket.ParentSecurity.SecurableEntityName.Equals(GlobalConstants.SecurableEntityName.DATASET))
+                    {
+                        BuildS3RequestAssistance(ticket);
+                    }
+                    else //Asset
+                    {
+                        List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(_datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode) && ds.Security.Tickets.Any(t => t.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+                        BuildS3RequestAssistance(datasets, ticket);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -523,24 +549,40 @@ namespace Sentry.data.Core
 
         private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
         {
+
             //If the SecurityTicket just approved includes dataset permissions
-            if (_dataFeatures.CLA3718_Authorization.GetValue() &&
-                ticket.Permissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET))
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
             {
-                //lookup the dataset this ticket is for
-                var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
-                if (dataset == null)
+                if (ticket.ParentSecurity.SecurableEntityName.Equals(GlobalConstants.SecurableEntityName.DATASET))
                 {
-                    throw new DatasetNotFoundException($"Could not find a dataset with SecurityTicket ID '{ticket.TicketId}' attached.");
+                    //lookup the dataset this ticket is for
+                    var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+                    if (dataset == null)
+                    {
+                        throw new DatasetNotFoundException($"Could not find a dataset with SecurityTicket ID '{ticket.TicketId}' attached.");
+                    }
+                    //publish an Infrastructure Event that dataset permissions have changed
+                    await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
                 }
-                //publish an Infrastructure Event that dataset permissions have changed
-                await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
+                else
+                {
+                    List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(_datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode) && ds.Security.Tickets.Any(t => t.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+                    foreach(Dataset dataset in datasets)
+                    {
+                        await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
+                    }
+                }
             }
         }
 
         public void BuildS3RequestAssistance(SecurityTicket ticket)
         {
             var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+            BuildS3TicketForDatasetAndTicket(dataset, ticket);
+        }
+
+        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket)
+        {
             string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
             string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
             StringBuilder sb = new StringBuilder();
@@ -569,6 +611,14 @@ namespace Sentry.data.Core
             acceptanceCriteria.Value = sb.ToString();
             customFields.Add(acceptanceCriteria);
             _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), "", summary, issueType, customFields);
+        }
+
+        public void BuildS3RequestAssistance(IList<Dataset> datasets, SecurityTicket ticket)
+        {
+            foreach(Dataset dataset in datasets)
+            {
+                BuildS3TicketForDatasetAndTicket(dataset, ticket);
+            }
         }
 
         /// <summary>
