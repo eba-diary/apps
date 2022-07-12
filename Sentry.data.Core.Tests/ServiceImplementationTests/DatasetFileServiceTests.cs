@@ -581,12 +581,12 @@ namespace Sentry.data.Core.Tests
 
             var datasetFileService = new DatasetFileService(context.Object, null, null, null);
 
-            string triggerFileLocation = "TriggerKey/20220614171525000/zzztest0614.csv.trg";
-
             // Act
             string result = datasetFileService.GetTriggerFileLocation(stepId, datasetFileIds[0]);
 
             // Assert
+            string triggerFileLocation = "TriggerKey/20220614171525000/zzztest0614.csv.trg";
+
             Assert.AreEqual(triggerFileLocation, result);
         }
 
@@ -615,10 +615,8 @@ namespace Sentry.data.Core.Tests
 
             datasetFileList.Add(datasetFile);   
             context.Setup(d => d.DatasetFileStatusActive).Returns(datasetFileList.AsQueryable());
-
             
             var datasetFileService = new DatasetFileService(context.Object, null, null, null);
-
 
             // Act
             string result = datasetFileService.GetSourceBucketAndSourceKey(datasetfileId);

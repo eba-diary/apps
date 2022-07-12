@@ -121,6 +121,10 @@ namespace Sentry.data.Core
             return UploadTriggerFile(triggerFileLocation, content);
         }
         
+
+        /*
+         * Helper function for ReprocessingDatasetFile which gets the trigger file location
+         */
         internal string GetTriggerFileLocation(int stepId, int datasetFileId)
         {
             DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
@@ -135,6 +139,10 @@ namespace Sentry.data.Core
             return triggerFileLocation;
         }
 
+
+        /*
+         * Helper function for ReprocessingDatasetFile wich gets the content of the trigger file
+         */
         internal string GetSourceBucketAndSourceKey(int datasetFileId) 
         {
             DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
@@ -172,6 +180,10 @@ namespace Sentry.data.Core
             return singleLineContent;
         }
 
+
+        /*
+         *  Helper function for ReprocessDataFile which uplaods the trigger file into s3
+         */
         internal bool UploadTriggerFile(string triggerFileLocation, string triggerFileContent)
         {
             _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
