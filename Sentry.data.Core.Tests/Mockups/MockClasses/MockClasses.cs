@@ -285,7 +285,9 @@ namespace Sentry.data.Core.Tests
                 SchemaRevision = MockSchemaRevision(),
                 FileKey = "test/key/file.txt",
                 FileBucket = "test-bucket-name",
-                ETag = "etag-string-value"
+                ETag = "etag-string-value",
+                OriginalFileName = "zzztest0614.csv",
+                ObjectStatus = ObjectStatusEnum.Active
             };
 
             return df;
@@ -832,6 +834,7 @@ namespace Sentry.data.Core.Tests
             }
             return security;
         }
-
+                                  
+        
     }
 }

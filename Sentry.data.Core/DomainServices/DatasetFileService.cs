@@ -16,13 +16,15 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly IUserService _userService;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
         public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService,
-                                    IUserService userService)
+                                    IUserService userService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
@@ -90,13 +92,11 @@ namespace Sentry.data.Core
         {
             bool successfullySubmitted = true;
 
-            // try and catch block to see if the hangfire job is created without error
-            // done on each datasetFileId
             try
             {
                 foreach (int id in datasetFileIds)
                 {
-                    BackgroundJob.Schedule<DatasetFileService>((x) =>  x.ReprocessDatasetFiles(stepId, new int[] {id}), System.TimeSpan.FromDays(1)); 
+                    BackgroundJob.Schedule<DatasetFileService>((x) =>  x.ReprocessDatasetFile(stepId, id), System.TimeSpan.FromDays(1)); 
                 }
             } catch (System.Exception ex)
             {
@@ -106,29 +106,47 @@ namespace Sentry.data.Core
             return successfullySubmitted;
         }
 
-        /* Implementation of reprocessing
-             * 
-             * SourceKey
-             *      start with FileKey from datasetfile
-             *      1) remove file name
-             *      2) Adjust root prefix to be raw
-             *      3) Append flowexecutionguid from dataset file
-             *      4) Add OriginalFileName from datasetfile
+
+        /* 
+         * Implementation of reprocessing
+         * @param int stepid
+         * @param int[] datasetFileIds
         */
-        private bool ReprocessDatasetFiles(int stepId, int[] datasetFileIds)
+        private bool ReprocessDatasetFile(int stepId, int datasetFileId)
         {
+            string triggerFileLocation = GetTriggerFileLocation(stepId, datasetFileId);
+
+            string content = GetSourceBucketAndSourceKey(datasetFileId);
+
+            return UploadTriggerFile(triggerFileLocation, content);
+        }
+        
+        internal string GetTriggerFileLocation(int stepId, int datasetFileId)
+        {
+            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
             // extractng the necessary data from stepId and datasetFileIds to get the location of trigger file
-            string dataFlowStep_TriggerKey = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().TriggerKey;
-            string datasetFile_FlowExecutionGuid = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().FlowExecutionGuid;
-            string datasetFile_OriginalFileName = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().OriginalFileName;
-            string datasetFile_FileBucket = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().FileBucket;
-
+            string flowExecutionGuid = datasetFile.FlowExecutionGuid;
+            string originalFileName = datasetFile.OriginalFileName;
+            string TriggerKey = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().TriggerKey;
             // trigger file location
-            string triggerFileLocation = dataFlowStep_TriggerKey + "/" + datasetFile_FlowExecutionGuid + "/" + datasetFile_OriginalFileName + ".trg";
+            string triggerFileLocation = TriggerKey + flowExecutionGuid + "/" + originalFileName + ".trg";
+
+            return triggerFileLocation;
+        }
+
+        internal string GetSourceBucketAndSourceKey(int datasetFileId) 
+        {
+            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+            string flowExecutionGuid = datasetFile.FlowExecutionGuid;
+            string originalFileName = datasetFile.OriginalFileName;
 
             // gets the file key
-            string filekey = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds[0]).FirstOrDefault().FileKey;
+            string filekey = datasetFile.FileKey;
+
+            // gets the source bucket
+            string sourceBucket = datasetFile.FileBucket;
 
             // 1) remove the file name
             String[] splitString = filekey.Split('/');
@@ -139,28 +157,27 @@ namespace Sentry.data.Core
             newStr = newStr.Replace("rawquery", "raw");
 
             // 3) Append flowexecution guid from the dataset file
-            string temp = newStr + datasetFile_FlowExecutionGuid + "/";
+            string temp = newStr + flowExecutionGuid + "/";
 
             // 4) Add OriginalFileName from datasetfile
-            string result = temp + datasetFile_OriginalFileName;
+            string result = temp + originalFileName;
 
             // creating the ndjson object for the trigger file content
             JObject jobject = new JObject();
-            jobject.Add("SourceBucket", datasetFile_FileBucket);
+            jobject.Add("SourceBucket", sourceBucket);
             jobject.Add("SourceKey", result);
             string content = jobject.ToString();
             string singleLineContent = content.Replace("\r\n", " ");
 
-            // Writing content into the trigger file at the trigger file location
-            File.Create(triggerFileLocation);
-            TextWriter tw = new StreamWriter(triggerFileLocation);
-            tw.WriteLine(singleLineContent);
-            tw.Close();
+            return singleLineContent;
+        }
 
+        internal bool UploadTriggerFile(string triggerFileLocation, string triggerFileContent)
+        {
+            _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
             return true;
         }
-        
-        
+
         #region PrivateMethods
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
         {
