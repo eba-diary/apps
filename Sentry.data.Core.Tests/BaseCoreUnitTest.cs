@@ -33,6 +33,7 @@ namespace Sentry.data.Core.Tests
             registry.For<IBaseTicketProvider>().Use(() => MockRepository.GenerateStub<ICherwellProvider>());
             registry.For<IDataFeatures>().Use(new MockDataFeatures());
             registry.For<IInevService>().Use(() => MockRepository.GenerateStub<IInevService>());
+            registry.For<IQuartermasterService>().Use(() => MockRepository.GenerateStub<IQuartermasterService>());
 
             //set the container
             _container = new StructureMap.Container(registry);
@@ -95,6 +96,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
 
             public IFeatureFlag<bool> CLA3718_Authorization { get; } = new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4152_UploadFileFromUI => new MockBooleanFeatureFlag(true);
         }
     }
 }

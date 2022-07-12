@@ -1,25 +1,20 @@
-﻿using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Threading;
-using System.Data;
-using Sentry.data.Core;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.Shared;
-using DoddleReport.Web;
-using DoddleReport;
-using Sentry.Core;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Controllers
 {
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
+        private readonly IDatasetService _datasetService;
+        public AdminController(IDatasetService datasetService)
+        {
+            _datasetService = datasetService;
+        }
+
         // GET: Admin
+
         public ActionResult Index()
         {
             Dictionary<string, string> myDict =
@@ -32,15 +27,23 @@ namespace Sentry.data.Web.Controllers
 
             return View(myDict);
         }
-        
-        public ActionResult GetAdminTest(string viewId)
+        public ActionResult GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
             {
                 case "1":
-                    viewPath = "_DataFileReprocessing";
-                    break;
+                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
+                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
+                    foreach(DatasetDto d in dtoList)
+                    {
+                        SelectListItem item = new SelectListItem();
+                        item.Text = d.DatasetName;
+                        item.Value = d.DatasetId.ToString();
+                        dataReprocessingModel.AllDatasets.Add(item);
+                    }
+                    return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
                     viewPath = "_AdminTest2";
                     break;
