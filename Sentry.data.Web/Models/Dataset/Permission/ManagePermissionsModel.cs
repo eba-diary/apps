@@ -36,7 +36,8 @@ namespace Sentry.data.Web
             }
             InheritanceRequest = new RequestPermissionInheritanceModel(permissions);
             RemovePermissionRequest = new RemovePermissionModel(permissions);
-            InheritanceTicket = new SecurityTicket();//permissions.InheritanceTicket;
+            InheritanceTicket = permissions.InheritanceTicket != null ? permissions.InheritanceTicket : new SecurityTicket();
+            InheritanceRequest.TicketId = InheritanceTicket != null ? InheritanceTicket.TicketId : "";
         }
 
         public int DatasetId { get; set; }
