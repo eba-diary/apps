@@ -22,8 +22,6 @@ namespace Sentry.data.Web.Controllers
         [Route("Connectors")]
         public async Task<ActionResult> Connectors()
         {
-            ConnectorViewModel viewModel = new ConnectorViewModel();
-
             List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
 
             return View(connectorDtos.MapToModelList());

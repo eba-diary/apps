@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
         private readonly IHttpClientProvider _httpClient;
         private readonly string _baseUrl;
 
-        public ConfluentConnectorProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry, string baseUrl = "")
+        public ConfluentConnectorProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry, string baseUrl)
         {
             _httpClient = httpClientProvider;
             _asyncProviderPolicy = policyRegistry.Get<IAsyncPolicy>(PollyPolicyKeys.ConfluentConnectorProviderAsyncPolicy);
@@ -123,16 +123,16 @@ namespace Sentry.data.Infrastructure
             //Counts the amount of running Connector Tasks
             foreach (ConfluentConnectorStatusTask task in confluentConnectorRoot.ConfluentConnectorStatus.Tasks)
             {
-                if (task.state == ConnectorStateEnum.RUNNING.ToString()) connectorRunningTaskCount++;
+                if (task.State == ConnectorStateEnum.RUNNING.ToString()) connectorRunningTaskCount++;
             }
 
             //Checks if all Connector Tasks are running
-            if (confluentConnectorRoot.ConfluentConnectorStatus.Tasks.All(x => x.state == ConnectorStateEnum.RUNNING.ToString()))
+            if (confluentConnectorRoot.ConfluentConnectorStatus.Tasks.All(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.RUNNING;
             }
             //Checks if all of the Connector Tasks have failed
-            else if (!confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Any(x => x.state == ConnectorStateEnum.RUNNING.ToString()))
+            else if (!confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Any(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.FAILED;
             }

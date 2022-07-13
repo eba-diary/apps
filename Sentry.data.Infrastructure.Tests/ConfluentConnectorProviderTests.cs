@@ -42,7 +42,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(httpResponse1);
 
             //Setup provider
-            ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry);
+            ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry, "");
 
             //Act
             JObject connectorJObject = await providerA.GetS3ConnectorStatusAsync(CONNECTOR_NAME);
@@ -78,7 +78,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(httpResponse1);
 
             //Setup provider
-            ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry);
+            ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry, "");
 
             //Act
             JObject connectorJObject = await providerA.GetS3ConnectorConfigAsync(CONNECTOR_NAME);
@@ -118,7 +118,7 @@ namespace Sentry.data.Infrastructure.Tests
                 .ReturnsAsync(httpResponse2);
 
             //Setup provider
-            ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry);
+            ConfluentConnectorProvider providerA = new ConfluentConnectorProvider(StubIHttpClientProvider.Object, policyRegistry, "");
 
             //Act
             /*The call for S3 Connectors should only bring back connectors with a connector.class value of io.confluent.connect.s3.S3SinkConnector */
