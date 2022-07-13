@@ -11,13 +11,6 @@ namespace Sentry.data.Core.Tests
     public class DataFlowMetricServiceTests
     {
         [TestMethod]
-        public void DataFlowMetricProvider_GetDataFlowMetricEntities_DtoMappings()
-        {
-            //Arrange
-            //Act
-            //Assert
-        }
-        [TestMethod]
         public void DataFlowMetricProvider_GetDataFlowMetricEntities_NoSearchResults()
         {
             //Arrange
