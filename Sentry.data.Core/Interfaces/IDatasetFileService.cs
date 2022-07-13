@@ -23,5 +23,6 @@ namespace Sentry.data.Core
         void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);        
         UserSecurity GetUserSecurityForDatasetFile(int datasetId);
         void UploadDatasetFileToS3(UploadDatasetFileDto uploadDatasetFileDto);
+        bool ScheduleReprocessing(int stepId, int[] datasetFileIds);
     }
 }

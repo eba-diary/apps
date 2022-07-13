@@ -170,6 +170,7 @@ namespace Sentry.data.Core
             }
             catch (System.Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 successfullySubmitted = false;
             }
 
@@ -302,8 +303,6 @@ namespace Sentry.data.Core
 
             return model;
         }
-        
-
 
         /* 
          * Implementation of reprocessing
@@ -312,80 +311,71 @@ namespace Sentry.data.Core
         */
         private bool ReprocessDatasetFile(int stepId, int datasetFileId)
         {
-            string triggerFileLocation = GetTriggerFileLocation(stepId, datasetFileId);
+            try
+            {
+                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.FirstOrDefault(w => w.DatasetFileId == datasetFileId);
 
-            string content = GetSourceBucketAndSourceKey(datasetFileId);
 
-            return UploadTriggerFile(triggerFileLocation, content);
+                string triggerFileLocation = GetTriggerFileLocation(stepId, datasetFile);
+                if (triggerFileLocation != null)
+                {
+                    string triggerFileContent = GetSourceBucketAndSourceKey(datasetFile);
+                    if(triggerFileContent != null)
+                    {
+                        _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+                
+            } catch (Exception ex)
+            {
+                // the case when reprocessing fails
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            
+            return true;
         }
-
 
         /*
          * Helper function for ReprocessingDatasetFile which gets the trigger file location
          */
-        internal string GetTriggerFileLocation(int stepId, int datasetFileId)
+        internal string GetTriggerFileLocation(int stepId, DatasetFile datasetFile)
         {
-            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+            // getting the triggerkey
+            string triggerKey = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).Select(x => x.TriggerKey).FirstOrDefault();
 
-            // extractng the necessary data from stepId and datasetFileIds to get the location of trigger file
-            string flowExecutionGuid = datasetFile.FlowExecutionGuid;
-            string originalFileName = datasetFile.OriginalFileName;
-            string TriggerKey = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault().TriggerKey;
             // trigger file location
-            string triggerFileLocation = TriggerKey + flowExecutionGuid + "/" + originalFileName + ".trg";
+            return triggerKey + datasetFile.FlowExecutionGuid + "/" + datasetFile.OriginalFileName + ".trg";
 
-            return triggerFileLocation;
         }
-
 
         /*
          * Helper function for ReprocessingDatasetFile wich gets the content of the trigger file
          */
-        internal string GetSourceBucketAndSourceKey(int datasetFileId)
+        internal string GetSourceBucketAndSourceKey(DatasetFile datasetFile)
         {
-            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
-            string flowExecutionGuid = datasetFile.FlowExecutionGuid;
-            string originalFileName = datasetFile.OriginalFileName;
-
-            // gets the file key
-            string filekey = datasetFile.FileKey;
-
-            // gets the source bucket
-            string sourceBucket = datasetFile.FileBucket;
-
-            // 1) remove the file name
-            String[] splitString = filekey.Split('/');
-            Array.Resize(ref splitString, splitString.Length - 1);
+            List<string> splitString = datasetFile.FileKey.Split('/').ToList();
+            splitString.RemoveAt(splitString.Count - 1);
             string newStr = String.Join("/", splitString) + "/";
 
-            // 2) adjust root prefix to be raw
             newStr = newStr.Replace("rawquery", "raw");
 
-            // 3) Append flowexecution guid from the dataset file
-            string temp = newStr + flowExecutionGuid + "/";
-
-            // 4) Add OriginalFileName from datasetfile
-            string result = temp + originalFileName;
+            string result = newStr + datasetFile.FlowExecutionGuid + "/" + datasetFile.OriginalFileName;            
 
             // creating the ndjson object for the trigger file content
             JObject jobject = new JObject();
-            jobject.Add("SourceBucket", sourceBucket);
+            jobject.Add("SourceBucket", datasetFile.FileBucket);
             jobject.Add("SourceKey", result);
-            string content = jobject.ToString();
-            string singleLineContent = content.Replace("\r\n", " ");
-
-            return singleLineContent;
-        }
-
-
-        /*
-         *  Helper function for ReprocessDataFile which uplaods the trigger file into s3
-         */
-        internal bool UploadTriggerFile(string triggerFileLocation, string triggerFileContent)
-        {
-            _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
-            return true;
+            return jobject.ToString(Formatting.None);
         }
         #endregion
 

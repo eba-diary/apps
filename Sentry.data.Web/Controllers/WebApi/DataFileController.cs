@@ -163,7 +163,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     string error_message = string.Format("Invalid Request with dataflowstepId: {0} and datasetFileIds: {1}", datasetFileReprocessModel.DataFlowStepId, string.Join(",", datasetFileReprocessModel.DatasetFileIds));
                     return Content(System.Net.HttpStatusCode.BadRequest, error_message); // there was an error
                 }
-
+                _datafileService.ScheduleReprocessing(datasetFileReprocessModel.DataFlowStepId, datasetFileReprocessModel.DatasetFileIds);
                 return Content(System.Net.HttpStatusCode.OK, "Kicking off reprocessing"); // On to reprocessing
                 
             }

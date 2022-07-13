@@ -741,7 +741,7 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, null, null, null, null);
 
             // Act
-            string result = datasetFileService.GetTriggerFileLocation(stepId, datasetFileIds[0]);
+            string result = datasetFileService.GetTriggerFileLocation(stepId, datasetFile);
 
             // Assert
             string triggerFileLocation = "TriggerKey/20220614171525000/zzztest0614.csv.trg";
@@ -778,7 +778,7 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, null, null, null, null);
 
             // Act
-            string result = datasetFileService.GetSourceBucketAndSourceKey(datasetfileId);
+            string result = datasetFileService.GetSourceBucketAndSourceKey(datasetFile);
 
             // Assert
             string expected = "{   \"SourceBucket\": \"my-bucket-name\",   \"SourceKey\": \"raw/CRVS/PROD/8921001/2022/7/5/20220614171525000/zzztest0614.csv\" }";
