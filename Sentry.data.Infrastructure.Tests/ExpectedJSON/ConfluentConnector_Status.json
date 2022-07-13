@@ -9,6 +9,11 @@
       "id": 0,
       "state": "RUNNING",
       "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+    },
+    {
+      "id": 1,
+      "state": "RUNNING",
+      "worker_id": "fit-n-kafksv-10.sentry.com:8083"
     }
   ],
   "type": "sink"

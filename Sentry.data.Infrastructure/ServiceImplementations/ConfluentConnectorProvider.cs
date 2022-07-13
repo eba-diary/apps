@@ -18,14 +18,14 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IAsyncPolicy _asyncProviderPolicy;
         private readonly IHttpClientProvider _httpClient;
+        private readonly string _baseUrl;
 
-        public ConfluentConnectorProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry)
+        public ConfluentConnectorProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry, string baseUrl = "")
         {
             _httpClient = httpClientProvider;
             _asyncProviderPolicy = policyRegistry.Get<IAsyncPolicy>(PollyPolicyKeys.ConfluentConnectorProviderAsyncPolicy);
+            _baseUrl = baseUrl;
         }
-
-        public string BaseUrl { get; set; } = "";
 
         /// <summary>
         /// Requests all Confluent S3 Connectors
@@ -69,9 +69,9 @@ namespace Sentry.data.Infrastructure
         {
             HttpResponseMessage response = await GetRequestAsync(resource).ConfigureAwait(false);
 
-            string connectorOjbectsList = response.Content.ReadAsStringAsync().Result;
+            string connectorObjectsList = response.Content.ReadAsStringAsync().Result;
 
-            return JObject.Parse(connectorOjbectsList);
+            return JObject.Parse(connectorObjectsList);
         }
 
         private List<ConnectorDto> MapJsonToDtos(JObject jConnectorObjects)
@@ -84,7 +84,7 @@ namespace Sentry.data.Infrastructure
                 JToken connectorToken = currentToken.Children().First();
 
                 //Checks if the current connector class is set to io.confluent.connect.s3.S3SinkConnector
-                if ((string)connectorToken.SelectToken("info.config.['connector.class']") == "io.confluent.connect.s3.S3SinkConnector")
+                if ((connectorToken.SelectToken("info.config.['connector.class']").ToString() == "io.confluent.connect.s3.S3SinkConnector")) 
                 {
                     //Get the status json string from current jToken
                     string statusToken = connectorToken.SelectToken("status").ToString();
@@ -127,17 +127,17 @@ namespace Sentry.data.Infrastructure
             }
 
             //Checks if all Connector Tasks are running
-            if (connectorRunningTaskCount == confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Count)
+            if (confluentConnectorRoot.ConfluentConnectorStatus.Tasks.All(x => x.state == ConnectorStateEnum.RUNNING.ToString()))
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.RUNNING;
             }
             //Checks if all of the Connector Tasks have failed
-            else if (connectorRunningTaskCount == 0)
+            else if (!confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Any(x => x.state == ConnectorStateEnum.RUNNING.ToString()))
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.FAILED;
             }
             //Checks if a portion of the Connector Tasks have failed
-            else if (connectorRunningTaskCount > 0 || connectorRunningTaskCount < confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Count)
+            else
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.DEGRADED;
             }
@@ -149,37 +149,7 @@ namespace Sentry.data.Infrastructure
         {
             var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
-                var x = await _httpClient.GetAsync(BaseUrl + resource).ConfigureAwait(false);
-
-                return x;
-
-            }).ConfigureAwait(false);
-
-            HttpResponseMessage response = pollyResponse;
-
-            return response;
-        }
-
-        private async Task<HttpResponseMessage> PostRequestAsync(string resource, HttpContent postContent)
-        {
-            var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
-            {
-                var x =  await _httpClient.PostAsync(BaseUrl + $"/{resource}", postContent).ConfigureAwait(false);
-
-                return x;
-
-            }).ConfigureAwait(false);
-
-             HttpResponseMessage response = pollyResponse;
-
-            return response;
-        }
-
-        private async Task<HttpResponseMessage> DeleteRequestAsync(string resource)
-        {
-            var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
-            {
-                var x = await _httpClient.DeleteAsync(BaseUrl + resource).ConfigureAwait(false);
+                var x = await _httpClient.GetAsync(_baseUrl + resource).ConfigureAwait(false);
 
                 return x;
 

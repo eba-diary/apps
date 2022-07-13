@@ -1,5 +1,5 @@
 ﻿
-@model ConnectorViewModel
+@model List<ConnectorModel>
 @{
     ViewBag.Title = "Connectors";
     ViewBag.Fluid = true;
@@ -18,7 +18,7 @@
         </thead>
 
         <tbody>
-            @foreach (ConnectorModel rootModel in Model.Connectors)
+            @foreach (ConnectorModel rootModel in Model)
             {
                 <tr>
                     <td>@rootModel.ConnectorName</td>
@@ -46,7 +46,7 @@
                         <a href="#" type="button" class="modalViewBtn"
                                 data-name="@rootModel.ConnectorName"
                                 data-type="config"
-                                data-controller="GetConnectorConfig"
+                                data-action="GetConnectorConfig"
                                 data-toggle="modal" data-target="#modalViewDetails">
                             View Config Data
                         </a>
@@ -55,7 +55,7 @@
                         <a href="#" type="button" class="modalViewBtn"
                                 data-name="@rootModel.ConnectorName"
                                 data-type="status"
-                                data-controller="GetConnectorStatus"
+                                data-action="GetConnectorStatus"
                                 data-toggle="modal" data-target="#modalViewDetails">
                             View Status Data
                         </a>

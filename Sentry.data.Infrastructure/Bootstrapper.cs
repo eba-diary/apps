@@ -194,7 +194,6 @@ namespace Sentry.data.Infrastructure
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
                 .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
 
-            
 
             //establish httpclient specific to ConfluentConnectorProvider
             var confluentConnectorClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
@@ -202,9 +201,10 @@ namespace Sentry.data.Infrastructure
             confluentConnectorClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             confluentConnectorClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
             var confluentConnectorHttpClientProvider = new HttpClientProvider(confluentConnectorClient);
+
             registry.For<IKafkaConnectorProvider>().Singleton().Use<ConfluentConnectorProvider>().
-                Ctor<IHttpClientProvider>().Is(confluentConnectorHttpClientProvider)
-                .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ConfluentConnectorApi"));
+                Ctor<IHttpClientProvider>().Is(confluentConnectorHttpClientProvider).Ctor<string>("baseUrl").Is(Configuration.Config.GetHostSetting("ConfluentConnectorApi"));
+
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);

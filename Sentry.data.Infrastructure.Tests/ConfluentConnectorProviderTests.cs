@@ -46,9 +46,14 @@ namespace Sentry.data.Infrastructure.Tests
 
             //Act
             JObject connectorJObject = await providerA.GetS3ConnectorStatusAsync(CONNECTOR_NAME);
+            JArray taskArray = (JArray)connectorJObject["tasks"];
+
 
             //Assert
             Assert.AreEqual(CONNECTOR_NAME, connectorJObject["name"]);
+            Assert.AreEqual("fit-n-kafksv-10.sentry.com:8083", connectorJObject["connector"]["worker_id"]);
+            Assert.AreEqual(2, taskArray.Count);
+
         }
 
         [TestMethod]
@@ -80,6 +85,8 @@ namespace Sentry.data.Infrastructure.Tests
 
             //Assert
             Assert.AreEqual(CONNECTOR_NAME, connectorJObject["name"]);
+            Assert.AreEqual("io.confluent.connect.s3.S3SinkConnector", connectorJObject["connector.class"]);
+            Assert.AreEqual("sentry-dlst-qual-droplocation-ae2", connectorJObject["s3.bucket.name"]);
         }
 
         [TestMethod]

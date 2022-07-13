@@ -218,18 +218,18 @@ data.Admin = {
     RetrieveModalDataInit: function () {
         $(".modalViewBtn").click(function () {
             var connectorName = $(this).data("name");
-            var controllerUrl = $(this).data("controller");
+            var actionUrl = $(this).data("action");
 
             $("#modalViewLabel").text(`${connectorName} Info`);
 
             $.ajax({
                 type: "POST",
-                url: `Admin/${controllerUrl}`,
+                url: `Admin/${actionUrl}`,
                 traditional: true,
                 dataType: "json",
                 data: { ConnectorId: connectorName },
                 success: function (data) {
-                    json = JSON.stringify(data, null, "\t");
+                    var json = JSON.stringify(data, null, "\t");
 
                     $(".modal-body").html(`<textarea style="resize:both;" rows="20" class="w-100" readonly=true>${json}</textarea>`);
 

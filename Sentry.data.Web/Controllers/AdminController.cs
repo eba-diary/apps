@@ -26,9 +26,7 @@ namespace Sentry.data.Web.Controllers
 
             List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
 
-            viewModel.Connectors = connectorDtos.MapToModelList();
-
-            return View(viewModel);
+            return View(connectorDtos.MapToModelList());
         }
 
         [HttpPost]

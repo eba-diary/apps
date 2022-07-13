@@ -12,6 +12,5 @@ namespace Sentry.data.Core
     {
         public int id { get; set; }
         public string state { get; set; }
-        public string worker_id { get; set; }
     }
 }
