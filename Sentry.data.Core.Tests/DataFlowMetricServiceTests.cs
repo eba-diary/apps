@@ -1,9 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Helpers.Paginate;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Tests
 {
@@ -11,18 +14,12 @@ namespace Sentry.data.Core.Tests
     public class DataFlowMetricServiceTests
     {
         [TestMethod]
-        public void DataFlowMetricProvider_GetDataFlowMetricEntities_NoSearchResults()
-        {
-            //Arrange
-            //Act
-            //Assert
-        }
-        [TestMethod]
         public void DataFlowMetricService_ToDto_Mappings()
         {
-             //Arrange
-             //Act
-             //Assert
+            //Arrange
+            DataFlowMetricEntity entity = MockClasses.MockDataFlowMetricEntity();
+            //Act
+            //Assert
 
         }
         [TestMethod]
