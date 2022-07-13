@@ -32,5 +32,6 @@ namespace Sentry.data.Core
         public string AwsArn { get; set; }
         public AccessScope Scope { get; set; }
         public string TicketId { get; set; }
+        public bool IsSystemGenerated { get; set; }
     }
 }

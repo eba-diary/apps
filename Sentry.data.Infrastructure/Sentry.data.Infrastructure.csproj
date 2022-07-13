@@ -242,6 +242,7 @@
     <Compile Include="DomainContexts\ElasticContext.cs" />
     <Compile Include="Exceptions\InfrastructureEventingException.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
+    <Compile Include="Exceptions\SecBotProviderException.cs" />
     <Compile Include="FeatureFlags\DataFeatures.cs" />
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
@@ -390,6 +391,7 @@
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
+    <Compile Include="ServiceImplementations\SecBotProvider.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
     <Compile Include="ServiceImplementations\ThreadSafeInstanceGenerator.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />

@@ -21,5 +21,12 @@ namespace Sentry.data.Core
         SecurityTicket GetSecurableInheritanceTicket(ISecurable securable);
         void BuildS3RequestAssistance(SecurityTicket ticket);
 
+        /// <summary>
+        /// Enqueues a Hangfire job that will create new AD security groups,
+        /// and create the default Security Tickets in the database for them
+        /// </summary>
+        /// <param name="ds">The Dataset that was just created</param>
+        void EnqueueCreateDefaultSecurityForDataset(int datasetId);
+
     }
 }

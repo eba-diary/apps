@@ -324,6 +324,12 @@ namespace Sentry.data.Core
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
+            }
+
             return ds.DatasetId;
         }
 

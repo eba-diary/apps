@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Rhino.Mocks;
+using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
@@ -1426,7 +1427,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
@@ -1445,7 +1446,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
@@ -1480,7 +1481,7 @@ namespace Sentry.data.Core.Tests
                     SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
                 }
             };
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
 
             //Act
             await service.ApproveTicket(ticket, "");
@@ -1511,7 +1512,7 @@ namespace Sentry.data.Core.Tests
                     SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
                 }
             };
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
 
             //Act
             await Assert.ThrowsExceptionAsync<DatasetNotFoundException>(() => service.ApproveTicket(ticket, ""));
@@ -1544,13 +1545,115 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(s => s.Datasets).Returns((new List<Dataset>() { dataset }).AsQueryable());
             var inevService = new Mock<IInevService>();
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
 
             //Act
             await service.ApproveTicket(ticket, "");
 
             //Assert
             inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>()));
+        }
+
+        #endregion
+
+        #region "GetDefaultSecurityGroupDtos"
+        [TestMethod]
+        public void GetDefaultSecurityGroupDtos_Test()
+        {
+            //Arrange
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Asset = new Asset() { SaidKeyCode = "ABCD" } };
+
+            //Act
+            var groupDtos = SecurityService.GetDefaultSecurityGroupDtos(ds);
+
+            //Assert
+            Assert.AreEqual(4, groupDtos.Count(g => g.SaidAssetCode == "ABCD")); //4 groups total for the asset
+            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupTypeEnum.Prdcr)); //2 producer groups
+            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupTypeEnum.Cnsmr)); //2 consumer groups
+            Assert.AreEqual(2, groupDtos.Count(g => !g.IsAssetLevelGroup())); //2 dataset-level groups
+            Assert.AreEqual(2, groupDtos.Count(g => g.IsAssetLevelGroup())); //2 asset-level groups
+        }
+        #endregion
+
+        #region "CreateDefaultSecurityForDataset"
+
+        [TestMethod]
+        public async Task CreateDefaultSecurityForDataset_Internal_Test()
+        {
+            //Arrange
+            var security = new Security() { SecurityId = Guid.NewGuid() };
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
+            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupTypeEnum.Cnsmr, AdSecurityGroupEnvironmentTypeEnum.NP) };
+            var consumerPermissions = new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } };
+            var datasetTickets = new List<SecurityTicket>().AsEnumerable();
+            var assetTickets = new List<SecurityTicket>().AsEnumerable();
+
+            var obsidianService = new Mock<IObsidianService>();
+            obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(false);
+            var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Security).Returns((new List<Security>() { security }).AsQueryable());
+            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object) 
+                { CallBase = true }; //call the real method for anything not explicitely .Setup()
+            securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+
+            //Act
+            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, null, datasetTickets, assetTickets);
+
+            //Assert
+            adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.Once); //verify the AD group attempted to be created
+            securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.Once); //verify a ticket was built
+            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.Once); //verify the ticket was approved
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Once); 
+        }
+
+        #endregion
+
+        #region "GetProducerPermissions / GetConsumerPermissions"
+
+        [TestMethod]
+        public void GetConsumerPermissions_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_UPLOAD_TO_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS, SecurableObject = SecurableEntityName.DATA_ASSET }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetConsumerPermissions();
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual(PermissionCodes.CAN_VIEW_FULL_DATASET, actual[0].PermissionCode);
+        }
+
+        [TestMethod]
+        public void GetProducerPermissions_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_UPLOAD_TO_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS, SecurableObject = SecurableEntityName.DATA_ASSET }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetProducerPermissions();
+
+            //Assert
+            Assert.AreEqual(2, actual.Count);
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_VIEW_FULL_DATASET));
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_UPLOAD_TO_DATASET));
         }
 
         #endregion

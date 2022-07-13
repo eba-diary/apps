@@ -5,12 +5,14 @@ using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
+using RestSharp.Authenticators;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
+using Sentry.data.Infrastructure.ServiceImplementations;
 using Sentry.Messaging.Common;
 using System;
 using System.Linq;
@@ -170,6 +172,15 @@ namespace Sentry.data.Infrastructure
             registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IClient>().Singleton().Use<InfrastructureEventing.Client>().
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
+
+            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().
+                Ctor<RestSharp.IRestClient>().Is(new RestSharp.RestClient()
+                {
+                    BaseUrl = new Uri(Configuration.Config.GetHostSetting("SecBotUrl")),
+                    Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
+                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+                }).
+                AlwaysUnique();
 
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();
