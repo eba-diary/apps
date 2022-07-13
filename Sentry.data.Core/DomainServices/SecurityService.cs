@@ -518,28 +518,16 @@ namespace Sentry.data.Core
                 });
             }
 
+            EvaluateApprovedTicketForS3Inheritance(ticket);
 
-            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))
-            {
-                //we can assume the securable here is a dataset currently, an asset doesn't have anything to inherit from
-                Dataset dataset = _datasetContext.Datasets.FirstOrDefault(ds => ds.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId));
-                Asset asset = _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(dataset.Asset.SaidKeyCode));
-                List<SecurityTicket> inheritedTickets = _datasetContext.SecurityTicket.Where(t => t.ParentSecurity.SecurityId.Equals(asset.Security.SecurityId)).ToList();
-                //fallback and catchup code
-                bool inheritanceStatus = ticket.IsAddingPermission;
+            EvaluateApprovedTicketForS3Access(ticket);
 
-                foreach (SecurityTicket inheritedTicket in inheritedTickets)
-                {
-                    inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
-                    inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
-                    if (inheritedTicket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && p.IsEnabled))
-                    {
-                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
-                    }
-                }
-            }
+            await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
 
+        }
 
+        private void EvaluateApprovedTicketForS3Access(SecurityTicket ticket)
+        {
             if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
             {
                 try
@@ -560,9 +548,29 @@ namespace Sentry.data.Core
                     Sentry.Common.Logging.Logger.Fatal("Failed creating S3 Jira Request for Cherwell #" + ticket.TicketId, e);
                 }
             }
+        }
 
-            await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
+        private void EvaluateApprovedTicketForS3Inheritance(SecurityTicket ticket)
+        {
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+            {
+                //we can assume the securable here is a dataset currently, an asset doesn't have anything to inherit from
+                Dataset dataset = _datasetContext.Datasets.FirstOrDefault(ds => ds.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId));
+                Asset asset = _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(dataset.Asset.SaidKeyCode));
+                List<SecurityTicket> inheritedTickets = _datasetContext.SecurityTicket.Where(t => t.ParentSecurity.SecurityId.Equals(asset.Security.SecurityId)).ToList();
+                //fallback and catchup code
+                bool inheritanceStatus = ticket.IsAddingPermission;
 
+                foreach (SecurityTicket inheritedTicket in inheritedTickets)
+                {
+                    inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
+                    inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
+                    if (inheritedTicket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && p.IsEnabled))
+                    {
+                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
+                    }
+                }
+            }
         }
 
         private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
@@ -670,7 +678,7 @@ namespace Sentry.data.Core
         /// _adSecurityAdminProvider.CreateAdSecurityGroupAsync())
         /// </summary>
         /// <param name="ds">The dataset to create the groups for</param>
-        public async Task CreateDefaultSecurityForDataset(int datasetId)
+        public Task CreateDefaultSecurityForDataset(int datasetId)
         {
             //lookup the dataset
             var ds = _datasetContext.GetById<Dataset>(datasetId);
@@ -679,19 +687,25 @@ namespace Sentry.data.Core
                 throw new ArgumentOutOfRangeException(nameof(datasetId), $"Dataset with ID \"{datasetId}\" could not be found.");
             }
 
-            //enumerate the 4 AD groups we're going to create
-            var groups = GetDefaultSecurityGroupDtos(ds);
+            // This "wrapping" of the async portion of this method is required so that the error checking above runs immediately.
+            // See https://sonarqube.sentry.com/coding_rules?open=csharpsquid%3AS4457&rule_key=csharpsquid%3AS4457
+            return CreateDefaultSecurityForDatasetAsync();
+            async Task CreateDefaultSecurityForDatasetAsync()
+            {
+                //enumerate the 4 AD groups we're going to create
+                var groups = GetDefaultSecurityGroupDtos(ds);
 
-            //get the list of permissions consumers and producers will be granted
-            var consumerPermissions = GetConsumerPermissions();
-            var producerPermissions = GetProducerPermissions();
+                //get the list of permissions consumers and producers will be granted
+                var consumerPermissions = GetConsumerPermissions();
+                var producerPermissions = GetProducerPermissions();
 
-            //get the list of existing security tickets for this dataset and asset
-            var datasetTickets = GetSecurityTicketsForSecurable(ds, false);
-            var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, false);
+                //get the list of existing security tickets for this dataset and asset
+                var datasetTickets = GetSecurityTicketsForSecurable(ds, false);
+                var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, false);
 
-            //actually create the AD groups
-            await CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, producerPermissions, datasetTickets, assetTickets);
+                //actually create the AD groups
+                await CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, producerPermissions, datasetTickets, assetTickets);
+            }
 
         }
 
@@ -715,7 +729,7 @@ namespace Sentry.data.Core
                         RequestorsId = Environment.UserName,
                         RequestedDate = DateTime.Now,
                         IsAddingPermission = true,
-                        Permissions = group.GroupType == AdSecurityGroupTypeEnum.Cnsmr ? consumerPermissions : producerPermissions,
+                        Permissions = group.GroupType == AdSecurityGroupType.Cnsmr ? consumerPermissions : producerPermissions,
                         IsSystemGenerated = true
                     };
                     var security = group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security;
@@ -728,12 +742,12 @@ namespace Sentry.data.Core
 
         internal static List<AdSecurityGroupDto> GetDefaultSecurityGroupDtos(Dataset ds)
         {
-            var envType = ds.NamedEnvironmentType == NamedEnvironmentType.Prod ? AdSecurityGroupEnvironmentTypeEnum.P : AdSecurityGroupEnvironmentTypeEnum.NP;
+            var envType = ds.NamedEnvironmentType == NamedEnvironmentType.Prod ? AdSecurityGroupEnvironmentType.P : AdSecurityGroupEnvironmentType.NP;
             return new List<AdSecurityGroupDto> {
-                AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupTypeEnum.Cnsmr, envType),
-                AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupTypeEnum.Prdcr, envType),
-                AdSecurityGroupDto.NewAssetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupTypeEnum.Cnsmr, envType),
-                AdSecurityGroupDto.NewAssetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupTypeEnum.Prdcr, envType)
+                AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, envType),
+                AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Prdcr, envType),
+                AdSecurityGroupDto.NewAssetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, envType),
+                AdSecurityGroupDto.NewAssetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Prdcr, envType)
             };
         }
 

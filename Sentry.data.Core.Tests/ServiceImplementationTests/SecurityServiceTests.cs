@@ -1568,8 +1568,8 @@ namespace Sentry.data.Core.Tests
 
             //Assert
             Assert.AreEqual(4, groupDtos.Count(g => g.SaidAssetCode == "ABCD")); //4 groups total for the asset
-            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupTypeEnum.Prdcr)); //2 producer groups
-            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupTypeEnum.Cnsmr)); //2 consumer groups
+            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr)); //2 producer groups
+            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr)); //2 consumer groups
             Assert.AreEqual(2, groupDtos.Count(g => !g.IsAssetLevelGroup())); //2 dataset-level groups
             Assert.AreEqual(2, groupDtos.Count(g => g.IsAssetLevelGroup())); //2 asset-level groups
         }
@@ -1583,7 +1583,7 @@ namespace Sentry.data.Core.Tests
             //Arrange
             var security = new Security() { SecurityId = Guid.NewGuid() };
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
-            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupTypeEnum.Cnsmr, AdSecurityGroupEnvironmentTypeEnum.NP) };
+            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
             var consumerPermissions = new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } };
             var datasetTickets = new List<SecurityTicket>().AsEnumerable();
             var assetTickets = new List<SecurityTicket>().AsEnumerable();

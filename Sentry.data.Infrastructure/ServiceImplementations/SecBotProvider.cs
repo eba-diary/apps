@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             //only successful if the status code == 201
             if (response.IsSuccessful && response.StatusCode == System.Net.HttpStatusCode.Created)
             {
-                var secBotJobUrl = response.Headers.Where(h => h.Name == "Location").FirstOrDefault();
+                var secBotJobUrl = response.Headers.FirstOrDefault(h => h.Name == "Location");
                 Logger.Info($"SecBot job created at \"{secBotJobUrl}\"");
             }
             else
@@ -65,8 +65,8 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         }
 
 
-#pragma warning disable IDE1006 // Naming Styles disabled, as this class is setup to match the format that Jenkins responds to
-        private sealed class JenkinsCrumbResponse
+#pragma warning disable IDE1006  // Naming Styles disabled, as this class is setup to match the format that Jenkins responds to
+        public sealed class JenkinsCrumbResponse
         {
             public string _class { get; set; }
             public string crumb { get; set; }

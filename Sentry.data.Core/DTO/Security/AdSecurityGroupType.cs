@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core.DTO.Security
 {
-    public enum AdSecurityGroupTypeEnum
+    public enum AdSecurityGroupType
     {
         Prdcr,
         Cnsmr

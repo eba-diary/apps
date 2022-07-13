@@ -15,7 +15,7 @@ namespace Sentry.data.Core.DTO.Security
         /// <summary>
         /// Private constructor for creating a new DTO
         /// </summary>
-        private AdSecurityGroupDto(string saidAssetCode, string datasetShortName, AdSecurityGroupTypeEnum groupType, AdSecurityGroupEnvironmentTypeEnum environmentType)
+        private AdSecurityGroupDto(string saidAssetCode, string datasetShortName, AdSecurityGroupType groupType, AdSecurityGroupEnvironmentType environmentType)
         {
             SaidAssetCode = saidAssetCode;
             DatasetShortName = datasetShortName;
@@ -26,12 +26,12 @@ namespace Sentry.data.Core.DTO.Security
         /// <summary>
         /// Static method for creating a "Dataset"-level group
         /// </summary>
-        public static AdSecurityGroupDto NewDatasetGroup(string saidAssetCode, string datasetShortName, AdSecurityGroupTypeEnum groupType, AdSecurityGroupEnvironmentTypeEnum environmentType)
+        public static AdSecurityGroupDto NewDatasetGroup(string saidAssetCode, string datasetShortName, AdSecurityGroupType groupType, AdSecurityGroupEnvironmentType environmentType)
         {
             return new AdSecurityGroupDto(saidAssetCode, datasetShortName, groupType, environmentType);
         }
 
-        public static AdSecurityGroupDto NewAssetGroup(string saidAssetCode, string datasetShortName, AdSecurityGroupTypeEnum groupType, AdSecurityGroupEnvironmentTypeEnum environmentType)
+        public static AdSecurityGroupDto NewAssetGroup(string saidAssetCode, string datasetShortName, AdSecurityGroupType groupType, AdSecurityGroupEnvironmentType environmentType)
         {
             return new AdSecurityGroupDto(saidAssetCode, SecurityConstants.ASSET_LEVEL_GROUP_NAME, groupType, environmentType);
         }
@@ -39,8 +39,8 @@ namespace Sentry.data.Core.DTO.Security
 
         public string SaidAssetCode { get; }
         public string DatasetShortName { get; }
-        public AdSecurityGroupTypeEnum GroupType { get; }
-        public AdSecurityGroupEnvironmentTypeEnum EnvironmentType { get; }
+        public AdSecurityGroupType GroupType { get; }
+        public AdSecurityGroupEnvironmentType EnvironmentType { get; }
 
         public bool IsAssetLevelGroup() => DatasetShortName == SecurityConstants.ASSET_LEVEL_GROUP_NAME;
 
