@@ -1,71 +1,25 @@
-﻿
-@model List<DeadSparkJobModel>
+﻿@model List<DeadSparkJobModel>
 @{
     ViewBag.Title = "_AdminTest";
 }
 
-<script>
+
+
+<script type="text/javascript">
 
     $(document).ready(function () {
-        @*$('.hiddenRow').hide();
+        data.Admin.ReprocessDeadJobs();
 
-
-        $('.accordion-toggle').click(function () {
-            if ($(this).next('tr.hiddenRow').is(':hidden')) {
-                $(this).next('tr.hiddenRow').slideDown(500);
-            } else {
-                $(this).next('tr.hiddenRow').hide();
-            }
-        });*@
-
-        $("#reprocessButton").click(function () {
-            var files = [];
-
-            $('.table-checkbox:checked').each(function () {
-                var obj = { fileId: $(this).data("file-id"), stepId: $(this).data("step-id") };
-                files.push(obj);
-            });
-
-            const key = "fileId";
-            const DatasetFileId = "stepId";
-
-            var returnJson = files.reduce(function (rv, x) {
-                (rv[x[key]] = rv[x[key]] || []).push(x[DatasetFileId]);
-                return rv;
-            }, {});
-
-            for (let x in returnJson) {
-                var fileArray = []
-                for (let i in returnJson[x]) {
-                    fileArray.push(returnJson[x][i]);
-                }
-
-                var ajaxReturn = {
-                    DataFlowStepId: parseInt(x),
-                    DatasetFileIds: fileArray
-                };
-                console.log(JSON.stringify(ajaxReturn));
-                $.ajax({
-                    type: "POST",
-                    url: "../../api/v2/datafile/DataFile/Reprocess",
-                    contentType: "application/json",
-                    data: JSON.stringify(ajaxReturn),
-                    success: function () {
-                        alert("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
-                    },
-                    error: function () {
-                        alert("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
-                    }
-
-                });
-            };
-
-            
+        $('#deadJobs').DataTable({
+            'columnDefs': [{
+                'targets': [0, 7], /* column index */
+                'orderable': false, /* true or false */
+            }]
         });
     });
 </script>
 
-<table class="table table-bordered" width="100%" style="border-collapse:collapse;">
+<table id="deadJobs" class="display table table-striped table-bordered table-hover" style="width:100%">
     <thead>
         <tr>
             <th></th>
@@ -81,7 +35,7 @@
     <tbody>
         @foreach (DeadSparkJobModel job in Model)
         {
-            <tr colspan="6" data-toggle="collapse"class="accordion-toggle">
+            <tr>
                 <td>
                     <input class="table-checkbox" type="checkbox" data-file-id="@job.DatasetFileID" data-step-id="@job.DataFlowStepID" />
                 </td>
@@ -92,19 +46,19 @@
                 <td>@job.FlowExecutionGuid</td>
                 <td>@job.ReprocessingRequired</td>
                 <td>
-                    <i class="bi bi-plus"></i>
+                    <button type="button" data-toggle="collapse"  data-target="@job.SubmissionID" class="clickable btn btn-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light">
+                        <span class="sr-only">View more info</span>
+                    </button>
                 </td>
             </tr>
-            <tr id="@job.SubmissionID" class="hiddenRow">
-                <td></td>
-                <td>@job.SubmissionID</td>
-                <td>@job.BatchID</td>
-                <td>@job.LivyAppID</td>
-                <td>@job.LivyDriverlogUrl</td>
-                <td>@job.LivySparkUiUrl</td>
-                <td>@job.DatasetFileID</td>
-                <td></td>
+            <tr id="@job.SubmissionID" class="collapse">
+                <td>
+                    <div>Hidden by default</div>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!--Reprocess button-->
+<button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton">Reprocess Selected</button>

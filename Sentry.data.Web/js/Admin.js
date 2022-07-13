@@ -11,6 +11,11 @@ data.Admin = {
     },
 
     ReprocessDeadJobs: function () {
+        $(".dropdown-toggle").click(function () {
+            var collapseElem = $(this).data("target");
+            $(`#${collapseElem}`).collapse('toggle');
+        });
+
         $("#reprocessButton").click(function () {
             var files = [];
 
