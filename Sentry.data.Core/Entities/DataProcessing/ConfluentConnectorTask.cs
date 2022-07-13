@@ -8,9 +8,8 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
-    public class ConfluentConnectorStatus
+    public class ConfluentConnectorTask
     {
-        public string Name { get; set; }
-        public List<ConfluentConnectorStatusTask> Tasks { get; set; }
+        public string State { get; set; }
     }
 }

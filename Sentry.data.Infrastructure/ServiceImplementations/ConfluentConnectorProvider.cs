@@ -76,7 +76,7 @@ namespace Sentry.data.Infrastructure
 
         private List<ConnectorDto> MapJsonToDtos(JObject jConnectorObjects)
         {
-            List<ConfluentConnectorRoot> confluentConnectorRootList = new List<ConfluentConnectorRoot>();
+            List<ConfluentConnector> confluentConnectorList = new List<ConfluentConnector>();
 
             //Iterates over list of jObjects
             foreach (JToken currentToken in jConnectorObjects.Children())
@@ -87,52 +87,52 @@ namespace Sentry.data.Infrastructure
                 if ((connectorToken.SelectToken("info.config.['connector.class']").ToString() == "io.confluent.connect.s3.S3SinkConnector")) 
                 {
                     //Get the status json string from current jToken
-                    string statusToken = connectorToken.SelectToken("status").ToString();
+                    string tasksToken = connectorToken.SelectToken("status.tasks").ToString();
 
                     //Create and set the ConfluentConnectorRoot object
-                    ConfluentConnectorRoot confluentConnectorRoot = new ConfluentConnectorRoot()
+                    ConfluentConnector confluentConnectorRoot = new ConfluentConnector()
                     {
                         ConnectorName = currentToken.First.Path,
-                        ConfluentConnectorStatus = JsonConvert.DeserializeObject<ConfluentConnectorStatus>(statusToken)
+                        Tasks = JsonConvert.DeserializeObject<List<ConfluentConnectorTask>>(tasksToken)
                     };
 
-                    confluentConnectorRootList.Add(confluentConnectorRoot);
+                    confluentConnectorList.Add(confluentConnectorRoot);
                 }
             };
 
-            return MapToList(confluentConnectorRootList);
+            return MapToList(confluentConnectorList);
         }
 
-        private List<ConnectorDto> MapToList(List<ConfluentConnectorRoot> confluentConnectorRoots)
+        private List<ConnectorDto> MapToList(List<ConfluentConnector> confluentConnectors)
         {
             List<ConnectorDto> connectorDtos = new List<ConnectorDto>();
 
-            confluentConnectorRoots.ForEach(ccr => connectorDtos.Add(MapToRootDto(ccr)));
+            confluentConnectors.ForEach(ccr => connectorDtos.Add(MapToRootDto(ccr)));
 
             return connectorDtos;
         }
 
-        private ConnectorDto MapToRootDto(ConfluentConnectorRoot confluentConnectorRoot)
+        private ConnectorDto MapToRootDto(ConfluentConnector confluentConnectors)
         {
             ConnectorDto connectorDto = new ConnectorDto();
 
-            connectorDto.ConnectorName = confluentConnectorRoot.ConnectorName;
+            connectorDto.ConnectorName = confluentConnectors.ConnectorName;
 
             int connectorRunningTaskCount = 0;
 
             //Counts the amount of running Connector Tasks
-            foreach (ConfluentConnectorStatusTask task in confluentConnectorRoot.ConfluentConnectorStatus.Tasks)
+            foreach (ConfluentConnectorTask task in confluentConnectors.Tasks)
             {
                 if (task.State == ConnectorStateEnum.RUNNING.ToString()) connectorRunningTaskCount++;
             }
 
             //Checks if all Connector Tasks are running
-            if (confluentConnectorRoot.ConfluentConnectorStatus.Tasks.All(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
+            if (confluentConnectors.Tasks.All(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.RUNNING;
             }
             //Checks if all of the Connector Tasks have failed
-            else if (!confluentConnectorRoot.ConfluentConnectorStatus.Tasks.Any(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
+            else if (!confluentConnectors.Tasks.Any(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
             {
                 connectorDto.ConnectorState = ConnectorStateEnum.FAILED;
             }

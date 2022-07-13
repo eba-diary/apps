@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public class ConfluentConnectorRoot
+    public class ConfluentConnector
     {
         public string ConnectorName { get; set; }
-        public ConfluentConnectorStatus ConfluentConnectorStatus { get; set; }
+        public List<ConfluentConnectorTask> Tasks { get; set; }
     }
 }
