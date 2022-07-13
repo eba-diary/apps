@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Sentry.data.Core.GlobalEnums
 {
 
-    public enum ConnectorStateEnum
+    public enum ConnectorState
     { 
         [Description("UNASSIGNED")]
         [EnumMember(Value = "UNASSIGNED")]

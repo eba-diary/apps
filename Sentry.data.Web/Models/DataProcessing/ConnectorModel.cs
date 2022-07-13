@@ -10,6 +10,6 @@ namespace Sentry.data.Web
     public class ConnectorModel
     {
         public string ConnectorName { get; set; }
-        public ConnectorStateEnum ConnectorState { get; set; }
+        public ConnectorState ConnectorState { get; set; }
     }
 }

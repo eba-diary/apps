@@ -126,9 +126,9 @@ namespace Sentry.data.Infrastructure.Tests
             
             //Assert
             Assert.AreEqual(3, rootDtos.Count);
-            Assert.AreEqual(ConnectorStateEnum.RUNNING, rootDtos[0].ConnectorState);
-            Assert.AreEqual(ConnectorStateEnum.DEGRADED, rootDtos[1].ConnectorState);
-            Assert.AreEqual(ConnectorStateEnum.FAILED, rootDtos[2].ConnectorState);
+            Assert.AreEqual(ConnectorState.RUNNING, rootDtos[0].ConnectorState);
+            Assert.AreEqual(ConnectorState.DEGRADED, rootDtos[1].ConnectorState);
+            Assert.AreEqual(ConnectorState.FAILED, rootDtos[2].ConnectorState);
         }
 
         protected JObject GetData(string fileName)

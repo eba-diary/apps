@@ -26,13 +26,13 @@ namespace Sentry.data.Web.Tests
             cdList.Add(new ConnectorDto()
             {
                 ConnectorName = "test_connector1",
-                ConnectorState = ConnectorStateEnum.RUNNING
+                ConnectorState = ConnectorState.RUNNING
             });
 
             cdList.Add(new ConnectorDto()
             {
                 ConnectorName = "test_connector2",
-                ConnectorState = ConnectorStateEnum.FAILED
+                ConnectorState = ConnectorState.FAILED
             });
 
             List<ConnectorModel> cmList = cdList.MapToModelList();

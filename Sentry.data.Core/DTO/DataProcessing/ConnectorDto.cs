@@ -10,6 +10,6 @@ namespace Sentry.data.Core
     public class ConnectorDto
     {
         public string ConnectorName { get; set; }
-        public ConnectorStateEnum ConnectorState { get; set; }
+        public ConnectorState ConnectorState { get; set; }
     }
 }

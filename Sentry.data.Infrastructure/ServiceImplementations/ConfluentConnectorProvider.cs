@@ -98,7 +98,7 @@ namespace Sentry.data.Infrastructure
 
                     confluentConnectorList.Add(confluentConnectorRoot);
                 }
-            };
+            }
 
             return MapToList(confluentConnectorList);
         }
@@ -123,23 +123,23 @@ namespace Sentry.data.Infrastructure
             //Counts the amount of running Connector Tasks
             foreach (ConfluentConnectorTask task in confluentConnectors.Tasks)
             {
-                if (task.State == ConnectorStateEnum.RUNNING.ToString()) connectorRunningTaskCount++;
+                if (task.State == ConnectorState.RUNNING.ToString()) connectorRunningTaskCount++;
             }
 
             //Checks if all Connector Tasks are running
-            if (confluentConnectors.Tasks.All(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
+            if (confluentConnectors.Tasks.All(x => x.State == ConnectorState.RUNNING.ToString()))
             {
-                connectorDto.ConnectorState = ConnectorStateEnum.RUNNING;
+                connectorDto.ConnectorState = ConnectorState.RUNNING;
             }
             //Checks if all of the Connector Tasks have failed
-            else if (!confluentConnectors.Tasks.Any(x => x.State == ConnectorStateEnum.RUNNING.ToString()))
+            else if (!confluentConnectors.Tasks.Any(x => x.State == ConnectorState.RUNNING.ToString()))
             {
-                connectorDto.ConnectorState = ConnectorStateEnum.FAILED;
+                connectorDto.ConnectorState = ConnectorState.FAILED;
             }
             //Checks if a portion of the Connector Tasks have failed
             else
             {
-                connectorDto.ConnectorState = ConnectorStateEnum.DEGRADED;
+                connectorDto.ConnectorState = ConnectorState.DEGRADED;
             }
 
             return connectorDto;
