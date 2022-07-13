@@ -36,7 +36,7 @@ namespace Sentry.data.Core
         public string FileName { get; set; }
         public string SaidKeyCode { get; set; }
         public DateTime MetricGeneratedDateTime { get; set; }
-        public int DatesetFileId { get; set; }
+        public int DatasetFileId { get; set; }
         public DateTime ProcessStartDateTime { get; set; }
         public string StatusCode { get; set; }
 

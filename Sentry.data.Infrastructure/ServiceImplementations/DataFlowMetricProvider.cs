@@ -25,7 +25,7 @@ namespace Sentry.data.Infrastructure
             must.AddMatch<DataFlowMetricEntity>(x => x.SchemaId, dto.SchemaToSearch);
             if(dto.FileToSearch != "-1")
             {
-                must.AddMatch<DataFlowMetricEntity>(x => x.DatesetFileId, dto.FileToSearch);
+                must.AddMatch<DataFlowMetricEntity>(x => x.DatasetFileId, dto.FileToSearch);
             }
             BoolQuery boolQuery = new BoolQuery();
             boolQuery.Must = must;

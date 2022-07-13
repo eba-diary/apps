@@ -46,42 +46,6 @@ namespace Sentry.data.Core.Tests
 
             return ds;
         }
-        public static DataFlowMetricEntity MockDataFlowMetricEntity()
-        {
-            DataFlowMetricEntity entity = new DataFlowMetricEntity
-            {
-                QueryMadeDateTime = DateTime.Now,
-                SchemaId = 0,
-                EventContents = "contents",
-                TotalFlowSteps = 0,
-                FileModifiedDateTime = DateTime.Now,
-                OriginalFileName = "name",
-                DatasetId = 0,
-                CurrentFlowStep = 0,
-                DataActionId = 0,
-                DataFlowId = 0,
-                Partition = 0,
-                DataActionTypeId = 0,
-                MessageKey = 0,
-                Duration = 0,
-                Offset = 0,
-                DataFlowName = "name",
-                DataFlowStepId = 0,
-                FlowExecutionGuid = "guid",
-                FileSize = 0,
-                EventMetricId = 0,
-                StorageCode = "code",
-                FileCreatedDateTime = DateTime.Now,
-                RunInstanceGuid = 0,
-                FileName = "name",
-                SaidKeyCode = "code",
-                MetricGeneratedDateTime = DateTime.Now,
-                DatesetFileId = 0,
-                ProcessStartDateTime = DateTime.Now,
-                StatusCode = "code"
-            };
-            return entity;
-        }
         public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
         {
             List<DatasetDto> dtoList = new List<DatasetDto>();

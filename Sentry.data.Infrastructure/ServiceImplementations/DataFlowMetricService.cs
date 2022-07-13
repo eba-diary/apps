@@ -51,7 +51,7 @@ namespace Sentry.data.Infrastructure
                 FileName = entity.FileName,
                 SaidKeyCode = entity.SaidKeyCode,
                 MetricGeneratedDateTime = entity.MetricGeneratedDateTime,
-                DatesetFileId = entity.DatesetFileId,
+                DatasetFileId = entity.DatasetFileId,
                 ProcessStartDateTime = entity.ProcessStartDateTime,
                 StatusCode = entity.StatusCode,
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
@@ -76,7 +76,7 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
                     fileGroup.FileName = dto.FileName;
-                    fileGroup.DatasetFileId = dto.DatesetFileId;
+                    fileGroup.DatasetFileId = dto.DatasetFileId;
                     fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
@@ -124,7 +124,7 @@ namespace Sentry.data.Infrastructure
                     {
                         DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
                         fileGroup.FileName = dto.FileName;
-                        fileGroup.DatasetFileId = dto.DatesetFileId;
+                        fileGroup.DatasetFileId = dto.DatasetFileId;
                         fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;

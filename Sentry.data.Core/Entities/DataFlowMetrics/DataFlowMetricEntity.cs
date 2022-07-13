@@ -86,7 +86,7 @@ namespace Sentry.data.Core
         public DateTime MetricGeneratedDateTime { get; set; }
 
         [PropertyName("datasetfileid")]
-        public int DatesetFileId { get; set; }
+        public int DatasetFileId { get; set; }
 
         [PropertyName("processstartdate")]
         public DateTime ProcessStartDateTime { get; set; }
