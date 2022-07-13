@@ -11,19 +11,61 @@ namespace Sentry.data.Core.Tests
     public class DataFlowMetricServiceTests
     {
         [TestMethod]
-        public void DataFlowMetricEntity_ToDto()
+        public void DataFlowMetricProvider_GetDataFlowMetricEntities_DtoMappings()
         {
+            //Arrange
+            //Act
+            //Assert
+        }
+        [TestMethod]
+        public void DataFlowMetricProvider_GetDataFlowMetricEntities_NoSearchResults()
+        {
+            //Arrange
+            //Act
+            //Assert
+        }
+        [TestMethod]
+        public void DataFlowMetricService_ToDto_Mappings()
+        {
+             //Arrange
+             //Act
+             //Assert
 
         }
         [TestMethod]
-        public void DataFlowMetricService_GetFileMetricGroups_AllFilesInGroupHaveSameId()
+        public void DataFlowMetricService_ToDto_EmptyInput()
         {
-
+            //Arrange
+            //Act
+            //Assert
         }
         [TestMethod]
-        public void DataFlowMetricService_GetMetricsList()
+        public void DataFlowMetricService_GetMetricsList_Mappings()
         {
-
+            //Arrange
+            //Act
+            //Assert
+        }
+        [TestMethod]
+        public void DataFlowMetricService_GetMetricsList_EmptyInput()
+        {
+            //Arrange
+            //Act
+            //Assert
+        }
+        [TestMethod]
+        public void DataFlowMetricService_GetFileMetricGroups_Mappings()
+        {
+            //Arrange
+            //Act
+            //Assert
+        }
+        [TestMethod]
+        public void DataFlowMetricService_GetFileMetricGroups_EmptyInput()
+        {
+            //Arrange
+            //Act
+            //Assert
         }
     }
 }
