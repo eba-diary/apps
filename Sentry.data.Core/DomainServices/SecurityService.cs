@@ -80,6 +80,7 @@ namespace Sentry.data.Core
                 IsRemovingPermission = !model.IsAddingPermission,
                 ParentSecurity = security,
                 AddedPermissions = new List<SecurityPermission>(),
+                RemovedPermissions = new List<SecurityPermission>(),
                 AwsArn = model.AwsArn,
                 IsSystemGenerated = model.IsSystemGenerated
             };
@@ -111,6 +112,7 @@ namespace Sentry.data.Core
                 IsRemovingPermission = !model.IsAddingPermission,
                 ParentSecurity = security,
                 AddedPermissions = new List<SecurityPermission>(),
+                RemovedPermissions = new List<SecurityPermission>(),
                 AwsArn = model.AwsArn
             };
 
@@ -733,7 +735,8 @@ namespace Sentry.data.Core
                         IsSystemGenerated = true
                     };
                     var security = group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security;
-                    var securityTicket = BuildAddingPermissionTicket(null, accessRequest, security);
+                    var securityTicket = BuildAddingPermissionTicket("DEFAULT_SECURITY", accessRequest, security);
+                    _datasetContext.Add(securityTicket);
                     await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }

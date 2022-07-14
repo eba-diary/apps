@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using RestSharp;
 using Sentry.Common.Logging;
+using System.Net;
 
 namespace Sentry.data.Infrastructure.ServiceImplementations
 {
@@ -31,13 +32,15 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         public async Task CreateAdSecurityGroupAsync(AdSecurityGroupDto adSecurityGroupDto)
         {
             //Attempt to get an authentication "crumb" from SecBot Jenkins cluster
+            var cookieJar = new CookieContainer();
+            restClient.CookieContainer = cookieJar;
             restClient.PreAuthenticate = true;
             var authRequest = new RestRequest("crumbIssuer/api/json", Method.GET);
             var authResponse = await restClient.ExecuteGetTaskAsync<JenkinsCrumbResponse>(authRequest);
-            if (!authResponse.IsSuccessful || authResponse.StatusCode == System.Net.HttpStatusCode.OK)
+            if (!authResponse.IsSuccessful || authResponse.StatusCode != HttpStatusCode.OK)
             {
                 Logger.Error("Could not retrieve an Authentication crumb from SecBot. See custom fields for additional details.", authResponse.ErrorException, new TextVariable("http_response_content", authResponse.Content), new TextVariable("http_status_code", authResponse.StatusCode.ToString()));
-                throw new Exceptions.SecBotProviderException($"Could not retrieve an Authentication crumb from SecBot. Http Status = \"{authResponse.StatusCode}\";", authResponse.ErrorException);
+                throw new Exceptions.SecBotProviderException($"Could not retrieve an Authentication crumb from SecBot. Http Status = \"{authResponse.StatusCode}\"; Response Content = \"{authResponse.Content}\";", authResponse.ErrorException);
             }
 
             //create a request with all the parameters needed for the SecBot Jenkins job
@@ -52,7 +55,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             var response = await restClient.ExecutePostTaskAsync(request);
 
             //only successful if the status code == 201
-            if (response.IsSuccessful && response.StatusCode == System.Net.HttpStatusCode.Created)
+            if (response.IsSuccessful && response.StatusCode == HttpStatusCode.Created)
             {
                 var secBotJobUrl = response.Headers.FirstOrDefault(h => h.Name == "Location");
                 Logger.Info($"SecBot job created at \"{secBotJobUrl}\"");
@@ -60,7 +63,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             else
             {
                 Logger.Error("SecBot request was not successful. See custom fields for additional details.", response.ErrorException, new TextVariable("http_response_content", response.Content), new TextVariable("http_status_code", response.StatusCode.ToString()));
-                throw new Exceptions.SecBotProviderException($"SecBot request was not successful. Http Status = \"{response.StatusCode}\";", response.ErrorException);
+                throw new Exceptions.SecBotProviderException($"SecBot request was not successful. Http Status = \"{response.StatusCode}\"; Response Content = \"{response.Content}\"", response.ErrorException);
             }
         }
 
