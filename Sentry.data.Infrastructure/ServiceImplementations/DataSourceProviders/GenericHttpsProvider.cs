@@ -368,33 +368,15 @@ namespace Sentry.data.Infrastructure
 
         protected void ConfigureHttpClient()
         {
-            NetworkCredential proxyCredentials;
-            string proxyUrl;
-
-            if (!_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                proxyCredentials = new NetworkCredential(userName, password);
+                var httpClientHandler = new HttpClientHandler
+                {
+                    Proxy = webProxy
+                };
+
+                _httpClient = new HttpClient(httpClientHandler, disposeHandler: true);
             }
-            else
-            {
-                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-            }
-
-            var proxy = new WebProxy(proxyUrl)
-            {
-                Credentials = proxyCredentials
-            };
-
-            var httpClientHandler = new HttpClientHandler
-            {
-                Proxy = proxy
-            };
-
-            _httpClient = new HttpClient(httpClientHandler, disposeHandler: true);
         }
 
         protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
