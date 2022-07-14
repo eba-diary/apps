@@ -17,16 +17,15 @@ namespace Sentry.data.Infrastructure
     public class GenericHttpsProvider : BaseHttpsProvider
     {
         private readonly Lazy<IJobService> _jobService;
-        private readonly HttpClientProvider _httpClient;
+        private HttpClient _httpClient;
         protected bool _IsTargetS3;
         protected string _targetPath;
 
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
-            IRestClient restClient, IDataFeatures dataFeatures, HttpClientProvider httpClient) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
-            _httpClient = httpClient;
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
         }
@@ -40,7 +39,7 @@ namespace Sentry.data.Infrastructure
             //Set Job
             _job = job;
 
-
+            ConfigureHttpClient();
             FindTargetJob();
 
             //Setup temporary work space for job
@@ -384,6 +383,37 @@ namespace Sentry.data.Infrastructure
             };
 
             Logger.Debug($"{methodName} Method End");
+        }
+
+        protected void ConfigureHttpClient()
+        {
+            NetworkCredential proxyCredentials;
+            string proxyUrl;
+
+            if (!_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            {
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                proxyCredentials = new NetworkCredential(userName, password);
+            }
+            else
+            {
+                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
+                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
+            }
+
+            var proxy = new WebProxy(proxyUrl)
+            {
+                Credentials = proxyCredentials
+            };
+
+            var httpClientHandler = new HttpClientHandler
+            {
+                Proxy = proxy
+            };
+
+            _httpClient = new HttpClient(httpClientHandler, disposeHandler: true);
         }
 
         protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
