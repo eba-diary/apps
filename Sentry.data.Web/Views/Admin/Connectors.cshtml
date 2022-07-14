@@ -1,0 +1,96 @@
+﻿
+@model List<ConnectorModel>
+@{
+    ViewBag.Title = "Connectors";
+    ViewBag.Fluid = true;
+}
+
+<br />
+<div class="container">
+    <table id="connector_table" class="col-8-lg table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>State</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (ConnectorModel rootModel in Model)
+            {
+                <tr>
+                    <td>@rootModel.ConnectorName</td>
+
+                    @switch (rootModel.ConnectorState)
+                    {
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.RUNNING:
+                            <td class="text-success"> @rootModel.ConnectorState </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.FAILED:
+                            <td class="text-danger"> @rootModel.ConnectorState </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.PAUSED:
+                            <td class="text-primary"> @rootModel.ConnectorState </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.DEGRADED:
+                            <td class="text-warning"> @rootModel.ConnectorState </td>
+                            break;
+                        case Sentry.data.Core.GlobalEnums.ConnectorStateEnum.UNASSIGNED:
+                            <td> @rootModel.ConnectorState </td>
+                            break;
+                    }
+
+                    <td>
+                        <a href="#" type="button" class="modalViewBtn"
+                                data-name="@rootModel.ConnectorName"
+                                data-type="config"
+                                data-action="GetConnectorConfig"
+                                data-toggle="modal" data-target="#modalViewDetails">
+                            View Config Data
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" type="button" class="modalViewBtn"
+                                data-name="@rootModel.ConnectorName"
+                                data-type="status"
+                                data-action="GetConnectorStatus"
+                                data-toggle="modal" data-target="#modalViewDetails">
+                            View Status Data
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="modalViewDetails" tabindex="-1" aria-labelledby="modalViewDetailsLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalViewLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect waves-light w-100" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/dataTables")
+    @Styles.Render("~/bundles/css/dataTables")
+
+    <script type="text/javascript">
+        data.Admin.SetupConnectorFilterTableInit();
+        data.Admin.RetrieveModalDataInit();
+    </script>
+}
+

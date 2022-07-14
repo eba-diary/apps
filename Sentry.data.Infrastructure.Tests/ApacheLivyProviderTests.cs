@@ -13,9 +13,6 @@ using System;
 
 namespace Sentry.data.Infrastructure.Tests
 {
-
-
-
     [TestClass]
     public class ApacheLivyProviderTests
     {

@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -415,6 +415,7 @@
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\ConnectorExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
@@ -435,6 +436,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -1209,6 +1211,7 @@
     <Content Include="Views\Shared\_AdminTest2.cshtml" />
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />
+    <Content Include="Views\Admin\Connectors.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
