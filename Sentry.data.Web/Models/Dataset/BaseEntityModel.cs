@@ -26,6 +26,7 @@ namespace Sentry.data.Web
             this.CreationUserName = dto.CreationUserName;
             this.PrimaryContactId = dto.PrimaryContactId;
             this.PrimaryContactName = dto.PrimaryContactName;
+            this.AlternateContactEmail = dto.AlternateContactEmail;
             this.PrimaryContactEmail = dto.PrimaryContactEmail;
             this.IsSecured = dto.IsSecured;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
@@ -90,6 +91,11 @@ namespace Sentry.data.Web
 
         [DisplayName("Selected Contacts")]
         public List<ContactInfoModel> ContactDetails { get; set; }
+
+        [DisplayName("Alternate Contact Email")]
+        public string AlternateContactEmail { get; set; }
+
+        public bool CLA1130_SHOW_ALTERNATE_EMAIL { get; set; }
 
         public List<ImageModel> Images { get; set; }
 

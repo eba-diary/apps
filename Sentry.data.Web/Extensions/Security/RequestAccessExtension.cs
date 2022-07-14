@@ -47,7 +47,8 @@ namespace Sentry.data.Web
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
                 SelectedApprover = model.SelectedApprover,
                 SaidKeyCode = model.SaidKeyCode,
-                IsAddingPermission = model.IsAddingPermission
+                IsAddingPermission = model.IsAddingPermission,
+                TicketId = model.TicketId
             };
         }
 
