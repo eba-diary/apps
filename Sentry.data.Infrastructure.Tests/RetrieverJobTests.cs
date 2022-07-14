@@ -132,7 +132,7 @@ namespace Sentry.data.Infrastructure.Tests
             Lazy<IJobService> mockJobService = MockRepository.GenerateMock<Lazy<IJobService>>();
             BaseHttpsProvider baseProvider = MockRepository.GenerateMock<BaseHttpsProvider>(mockDatasetContext, mockConfigService, mockEncryptionService, stubRestClient, null);
 
-            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null);
+            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null, null);
             baseProvider.Stub(a => a.Request).Return(req);
 
             ////
@@ -194,7 +194,7 @@ namespace Sentry.data.Infrastructure.Tests
 
 
 
-            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null);
+            GenericHttpsProvider genericHttpsProvider = new GenericHttpsProvider(mockDatasetContext, mockConfigService, mockEncryptionService, mockJobService, policyRegistry, stubRestClient, null, null);
             baseProvider.Stub(a => a.Request).Return(req);
 
             ////
