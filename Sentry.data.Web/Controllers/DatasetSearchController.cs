@@ -4,37 +4,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class DatasetSearchController : Controller
+    public class DatasetSearchController : BaseSearchableController
     {
-        private readonly IUserService _userService;
-
-        public DatasetSearchController(IUserService userService)
+        public DatasetSearchController(IFilterSearchService filterSearchService) : base(filterSearchService)
         {
-            _userService = userService;
+            
         }
 
-        [Route("Search/Dataset")]
-        [Route("Dataset/Search")]
-        public ActionResult Search()
+        //[Route("Search/Dataset")]
+        //[Route("Dataset/Search")]
+        //public ActionResult Search()
+        //{
+        //    //validate user has permissions
+        //    if (!SharedContext.CurrentUser.CanViewDataset)
+        //    {
+        //        return View("Forbidden");
+        //    }
+
+        //    ViewBag.Title = "Dataset";
+        //    SearchIndexModel model = new SearchIndexModel()
+        //    {
+        //        SearchType = SearchType.DATASET_SEARCH
+        //    };
+
+        //    return View(model);
+        //}
+
+        protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
-            IApplicationUser user = _userService.GetCurrentUser();
-
-            //validate user has permissions
-            if (!user.CanViewDataset)
+            return new FilterSearchConfigModel()
             {
-                return View("Forbidden");
-            }
-
-            ViewBag.Title = "Dataset";
-            SearchIndexModel model = new SearchIndexModel()
-            {
-                SearchType = GlobalConstants.SearchType.DATASET_SEARCH
+                PageTitle = "Dataset",
+                SearchType = SearchType.DATASET_SEARCH,
+                IconPath = "~/Images/Icons/DatasetsBlue.svg",
+                ResultView = "~/Views/Search/TileResults.cshtml",
+                DefaultSearch = searchModel
             };
-
-            return View(model);
         }
     }
 }

@@ -1202,6 +1202,7 @@
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
+    <Content Include="Views\Search\TileResults.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

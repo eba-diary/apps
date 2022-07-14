@@ -4,37 +4,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class BusinessIntelligenceSearchController : Controller
+    public class BusinessIntelligenceSearchController : BaseSearchableController
     {
-        private readonly IUserService _userService;
-
-        public BusinessIntelligenceSearchController(IUserService userService)
+        public BusinessIntelligenceSearchController(IFilterSearchService filterSearchService) : base(filterSearchService)
         {
-            _userService = userService;
+            
         }
 
-        [Route("Search/BusinessIntelligence")]
-        [Route("BusinessIntelligence/Search")]
-        public ActionResult Search()
+        //[Route("Search/BusinessIntelligence")]
+        //[Route("BusinessIntelligence/Search")]
+        //public ActionResult Search()
+        //{
+        //    //validate user has permissions
+        //    if (!SharedContext.CurrentUser.CanViewReports)
+        //    {
+        //        return View("Forbidden");
+        //    }
+
+        //    ViewBag.Title = "Business Intelligence";
+        //    SearchIndexModel model = new SearchIndexModel()
+        //    {
+        //        SearchType = GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH
+        //    };
+
+        //    return View(model);
+        //}
+
+        protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
-            IApplicationUser user = _userService.GetCurrentUser();
-
-            //validate user has permissions
-            if (!user.CanViewReports)
+            return new FilterSearchConfigModel()
             {
-                return View("Forbidden");
-            }
-
-            ViewBag.Title = "Business Intelligence";
-            SearchIndexModel model = new SearchIndexModel()
-            {
-                SearchType = GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH
+                PageTitle = "Business Intelligence",
+                SearchType = SearchType.BUSINESS_INTELLIGENCE_SEARCH,
+                IconPath = "~/Images/Icons/Business IntelligenceBlue.svg",
+                ResultView = "~/Views/Search/TileResults.cshtml",
+                DefaultSearch = searchModel
             };
-
-            return View(model);
         }
     }
 }

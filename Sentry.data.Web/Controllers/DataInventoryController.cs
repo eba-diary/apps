@@ -9,23 +9,17 @@ namespace Sentry.data.Web.Controllers
     public class DataInventoryController : BaseSearchableController
     {
         private readonly IDataInventoryService _dataInventoryService;
-        private readonly IFilterSearchService _filterSearchService;
 
-        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService)
+        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
             _dataInventoryService = dataInventoryService;
-            _filterSearchService = filterSearchService;
         }
         
         public ActionResult Search(string target = null, string search = null, string savedSearch = null)
         {
-            if (!string.IsNullOrEmpty(savedSearch))
+            if (TryGetSavedSearch(SearchType.DATA_INVENTORY, savedSearch, out ActionResult view))
             {
-                SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, savedSearch, SharedContext.CurrentUser.AssociateId);
-                if (savedSearchDto != null)
-                {
-                    return GetView(savedSearchDto.ToModel());
-                }
+                return view;
             }
             
             FilterSearchModel model = BuildBaseSearchModel();
@@ -48,7 +42,7 @@ namespace Sentry.data.Web.Controllers
                 });
             }
             
-            return GetView(model);
+            return GetFilterSearchView(model);
         }
 
         [HttpPost]
@@ -116,9 +110,9 @@ namespace Sentry.data.Web.Controllers
         }
 
         #region Methods
-        private ActionResult GetView(FilterSearchModel searchModel)
+        protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
-            FilterSearchConfigModel model = new FilterSearchConfigModel()
+            return new FilterSearchConfigModel()
             {
                 PageTitle = "Data Inventory",
                 SearchType = SearchType.DATA_INVENTORY,
@@ -127,8 +121,6 @@ namespace Sentry.data.Web.Controllers
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
                 DefaultSearch = searchModel
             };
-
-            return GetFilterSearchView(model);
         }
 
         private FilterSearchModel BuildBaseSearchModel()
