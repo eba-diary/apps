@@ -338,6 +338,7 @@
     <Compile Include="Helpers\LoggingUtils.cs" />
     <Compile Include="Helpers\Paginate\PagedList.cs" />
     <Compile Include="Helpers\ParsingHelpers.cs" />
+    <Compile Include="Helpers\WebHelper.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />

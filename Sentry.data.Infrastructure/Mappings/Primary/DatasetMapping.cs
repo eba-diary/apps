@@ -41,6 +41,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
             this.Property(x => x.NamedEnvironment);
             this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
+            this.Property((x) => x.AlternateContactEmail);
+
 
             Property(x => x.Metadata, m =>
             {
