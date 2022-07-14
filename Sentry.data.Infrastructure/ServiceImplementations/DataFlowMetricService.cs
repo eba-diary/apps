@@ -28,7 +28,7 @@ namespace Sentry.data.Infrastructure
                 QueryMadeDateTime = entity.QueryMadeDateTime,
                 SchemaId = entity.SchemaId,
                 EventContents = JObject.Parse(entity.EventContents),
-                TotalFlowteps = entity.TotalFlowSteps,
+                TotalFlowSteps = entity.TotalFlowSteps,
                 FileModifiedDateTime = entity.FileModifiedDateTime,
                 OriginalFileName = entity.OriginalFileName,
                 DatasetId = entity.DatasetId,
@@ -81,7 +81,7 @@ namespace Sentry.data.Infrastructure
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
                     fileGroup.FlowEvents.Add(dto);
-                    if (dto.TotalFlowteps == dto.CurrentFlowStep)
+                    if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                     {
                         fileGroup.AllEventsPresent = true;
                     }
@@ -109,7 +109,7 @@ namespace Sentry.data.Infrastructure
                                 fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                             }
                             fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
-                            if(dto.TotalFlowteps == dto.CurrentFlowStep)
+                            if(dto.TotalFlowSteps == dto.CurrentFlowStep)
                             {
                                 fileGroup.AllEventsPresent = true;
                             }
@@ -129,7 +129,7 @@ namespace Sentry.data.Infrastructure
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
                         fileGroup.FlowEvents.Add(dto);
-                        if (dto.TotalFlowteps == dto.CurrentFlowStep)
+                        if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                         {
                             fileGroup.AllEventsPresent = true;
                         }

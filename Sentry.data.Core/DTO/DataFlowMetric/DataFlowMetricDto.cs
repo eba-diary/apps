@@ -12,7 +12,7 @@ namespace Sentry.data.Core
         public DateTime QueryMadeDateTime { get; set; }
         public int SchemaId { get; set; }
         public JObject EventContents { get; set; }
-        public int TotalFlowteps { get; set; }
+        public int TotalFlowSteps { get; set; }
         public DateTime FileModifiedDateTime { get; set; }
         public string OriginalFileName { get; set; }
         public int DatasetId { get; set; }

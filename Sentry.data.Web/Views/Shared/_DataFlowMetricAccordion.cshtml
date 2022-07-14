@@ -35,6 +35,8 @@
                             <h5 class="col-sm">Flow Step Name</h5>
                             <h5 class="col-sm">Execution Order</h5>
                             <h5 class="col-sm">Status Code</h5>
+                            <h5 class="col-sm">Offset</h5>
+                            <h5 class="col-sm">Partition</h5>
                         </div>
                         @for (var i = 0; i < Model.DataFlowMetricGroups[x].FlowEvents.Count; i++)
                         {
@@ -43,9 +45,11 @@
                                     <div class="row">
                                         <h5 class="col-sm"> @Model.DataFlowMetricGroups[x].FlowEvents[i].EventMetricId</h5>
                                         <h5 class="col-sm"> @Model.DataFlowMetricGroups[x].FlowEvents[i].DataFlowStepName</h5>
-                                        <h5 class="col-sm"> @Model.DataFlowMetricGroups[x].FlowEvents[i].CurrentFlowStep/@Model.DataFlowMetricGroups[x].FlowEvents[i].TotalFlowteps</h5>
+                                        <h5 class="col-sm"> @Model.DataFlowMetricGroups[x].FlowEvents[i].CurrentFlowStep/@Model.DataFlowMetricGroups[x].FlowEvents[i].TotalFlowSteps</h5>
                                         <h5 class="col-sm"> @Model.DataFlowMetricGroups[x].FlowEvents[i].StatusCode</h5>
-                                   </div>
+                                        <h5 class="col-sm">@Model.DataFlowMetricGroups[x].FlowEvents[i].Offset</h5>
+                                        <h5 class="col-sm">@Model.DataFlowMetricGroups[x].FlowEvents[i].Partition</h5>
+                                    </div>
                                 </a>
 
 

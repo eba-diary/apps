@@ -51,6 +51,8 @@ namespace Sentry.data.Web.Controllers
             entity1.CurrentFlowStep = 4;
             entity1.EventMetricId = 1;
             entity1.DataFlowStepId = 1014;
+            entity1.Offset = 1;
+            entity1.Partition = 1;
             DataFlowMetricEntity entity2 = new DataFlowMetricEntity();
             entity2.DatasetFileId = 1;
             entity2.FileName = "ExampleFileNameOne.csv";
@@ -62,6 +64,8 @@ namespace Sentry.data.Web.Controllers
             entity2.CurrentFlowStep = 5;
             entity2.EventMetricId = 2;
             entity2.DataFlowStepId = 1014;
+            entity2.Offset = 1;
+            entity2.Partition = 1;
             DataFlowMetricEntity entity3 = new DataFlowMetricEntity();
             entity3.DatasetFileId = 2;
             entity3.FileName = "ExampleFileNameTwo.csv";
@@ -72,6 +76,8 @@ namespace Sentry.data.Web.Controllers
             entity3.CurrentFlowStep = 5;
             entity3.EventMetricId = 3; 
             entity3.DataFlowStepId = 1014;
+            entity3.Offset = 1;
+            entity3.Partition = 1;
             DataFlowMetricEntity entity4 = new DataFlowMetricEntity();
             entity4.DatasetFileId = 3;
             entity4.FileName = "ExampleFileNameThree.csv";
@@ -82,6 +88,8 @@ namespace Sentry.data.Web.Controllers
             entity4.CurrentFlowStep = 4;
             entity4.EventMetricId = 4;
             entity4.DataFlowStepId = 1014;
+            entity4.Offset = 1;
+            entity4.Partition = 1;
             DataFlowMetricEntity entity5 = new DataFlowMetricEntity();
             entity5.DatasetFileId = 4;
             entity5.FileName = "ExampleFileNameFour.csv";
@@ -92,6 +100,8 @@ namespace Sentry.data.Web.Controllers
             entity5.CurrentFlowStep = 4;
             entity5.EventMetricId = 5;
             entity5.DataFlowStepId = 1014;
+            entity5.Offset = 1;
+            entity5.Partition = 1;
             List<DataFlowMetricEntity> dataFlowMetricEntities = new List<DataFlowMetricEntity>();
             dataFlowMetricEntities.Add(entity1);
             dataFlowMetricEntities.Add(entity2);
