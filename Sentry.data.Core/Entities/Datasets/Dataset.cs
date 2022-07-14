@@ -106,6 +106,8 @@ namespace Sentry.data.Core
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
 
+        public virtual string AlternateContactEmail { get; set; }
+
         public virtual ValidationResults ValidateForDelete()
         {
             ValidationResults results = new ValidationResults();
@@ -191,6 +193,7 @@ namespace Sentry.data.Core
             public const string datasetDateRequired = "datasetDateRequired";
             public const string datasetLocationRequired = "datasetLocationRequired";
             public const string datasetOriginationRequired = "datasetOriginationRequired";
+            public const string datasetAlternateContactEmailFormatInvalid = "datasetAlternateContactEmailFormatInvalid";
         }
     }
 }

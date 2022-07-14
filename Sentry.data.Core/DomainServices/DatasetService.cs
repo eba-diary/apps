@@ -387,6 +387,7 @@ namespace Sentry.data.Core
 
             ds.IsSecured = dto.IsSecured;
 
+            ds.AlternateContactEmail = dto.AlternateContactEmail;
 
             _datasetContext.SaveChanges();
         }
@@ -525,6 +526,8 @@ namespace Sentry.data.Core
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
 
+            ValidateAlternateContactEmail(dto, results);
+
             return new ValidationException(results);
         }
 
@@ -539,6 +542,20 @@ namespace Sentry.data.Core
                 if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
                 {
                     results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+                }
+            }
+        }
+
+        private void ValidateAlternateContactEmail(DatasetDto dto, ValidationResults results)
+        {
+            
+            if(dto.AlternateContactEmail != null)
+            {
+                Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                Match match = regex.Match(dto.AlternateContactEmail);
+                if (!match.Success || !dto.AlternateContactEmail.ToUpper().Contains("@SENTRY.COM") || dto.AlternateContactEmail.Length > 256)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid, "Alternate Contact Email must be valid sentry.com email address");
                 }
             }
         }
@@ -670,7 +687,8 @@ namespace Sentry.data.Core
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
                 Asset = asset,
                 NamedEnvironment = dto.NamedEnvironment,
-                NamedEnvironmentType = dto.NamedEnvironmentType
+                NamedEnvironmentType = dto.NamedEnvironmentType,
+                AlternateContactEmail = dto.AlternateContactEmail
             };
 
             switch (dto.DataClassification)
@@ -764,6 +782,7 @@ namespace Sentry.data.Core
             dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
+            dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
 
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
