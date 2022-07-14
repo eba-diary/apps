@@ -26,6 +26,8 @@ namespace Sentry.data.Infrastructure.Tests
             DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
             var stubIDatasetContext = new Mock<IDatasetContext>();
             DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
+            stubIElasticContext.Setup();
+            
             //Act
             DataFlowMetricDto dto = dataFlowMetricService.ToDto(entity);
             //Assert
@@ -146,7 +148,7 @@ namespace Sentry.data.Infrastructure.Tests
             DataFlowMetricDto dto4 = new DataFlowMetricDto()
             {
                 DatasetFileId = 4,
-                FileName = "FileName34",
+                FileName = "FileName4",
                 MetricGeneratedDateTime = DateTime.Now,
                 CurrentFlowStep = 5,
                 TotalFlowSteps = 5,
