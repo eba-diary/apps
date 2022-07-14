@@ -12,7 +12,7 @@ namespace Sentry.data.Infrastructure
 
         public GenericHttpsDataFlowProvider(Lazy<IDatasetContext> datasetContext, Lazy<IConfigService> configService,
                 Lazy<IEncryptionService> encryptionService, Lazy<IJobService> jobService, IDataFlowService dataFlowService,
-                IRestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures)
+                IRestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry, IDataFeatures dataFeatures, HttpClientProvider httpClient) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures, httpClient)
         {
             _dataFlowService = dataFlowService;
         }
