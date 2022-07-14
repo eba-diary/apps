@@ -206,6 +206,9 @@
                         @Html.LabelFor(model => model.AlternateContactEmail, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.AlternateContactEmail) ? "active" : "" })
                         @Html.ValidationMessageFor(model => model.AlternateContactEmail, "", new { @class = "text-danger" })
                     </div>
+                    <span class="text-muted">
+                        <em>Email Address like a Distribution List or Alternate Contact.</em>
+                    </span>
                 }
 
                 <div class="md-form fieldDescription">
