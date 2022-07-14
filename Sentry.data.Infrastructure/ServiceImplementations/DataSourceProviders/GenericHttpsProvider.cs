@@ -208,34 +208,15 @@ namespace Sentry.data.Infrastructure
 
             string baseUri = _job.DataSource.BaseUri.ToString();
 
-            NetworkCredential proxyCredentials;
-            string proxyUrl;
-
-            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
-            {
-                Logger.Debug($"{methodName} using edge proxy: true");
-                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                proxyCredentials = new NetworkCredential(userName, password);
-            }
-            else
-            {
-                Logger.Debug($"{methodName} using edge proxy: false");
-                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-            }
-
-            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
-
             _client = new RestClient
             {
-                BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(proxyUrl)
-                {
-                    Credentials = proxyCredentials
-                }
+                BaseUrl = new Uri(baseUri)
             };
+
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
+            {
+                _client.Proxy = webProxy;
+            }
 
             Logger.Debug($"{methodName} Method End");
         }

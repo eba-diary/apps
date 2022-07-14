@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Amazon.Runtime.Internal;
+using Newtonsoft.Json;
 using Polly;
 using RestSharp;
 using Sentry.Common.Logging;
@@ -114,32 +115,12 @@ namespace Sentry.data.Infrastructure
             string methodName = $"{nameof(BaseHttpsProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
             Logger.Debug($"{methodName} Method Start");
 
-            NetworkCredential proxyCredentials;
-            string proxyUrl;
+            RestClient client = new RestClient();
 
-            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                Logger.Debug($"{methodName} using edge proxy: true");
-                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                proxyCredentials = new NetworkCredential(userName, password);
+                client.Proxy = webProxy;
             }
-            else
-            {
-                Logger.Debug($"{methodName} using edge proxy: false");
-                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-            }
-            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
-
-            RestClient client = new RestClient
-            {
-                Proxy = new WebProxy(proxyUrl)
-                {
-                    Credentials = proxyCredentials
-                }
-            };
 
             _request.ResponseWriter = (responseStream) => responseStream.CopyTo(targetStream);
 
