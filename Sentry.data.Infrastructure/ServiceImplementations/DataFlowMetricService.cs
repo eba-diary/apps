@@ -142,6 +142,11 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
+            foreach(DataFileFlowMetricsDto fileGroup in fileGroups)
+            {
+                fileGroup.FlowEvents.Sort();
+            }
+            fileGroups.Sort();
             return fileGroups;
         }
     }

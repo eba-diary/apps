@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class DataFileFlowMetricsDto
+    public class DataFileFlowMetricsDto : IComparable<DataFileFlowMetricsDto>
     {
         public int DatasetFileId { get; set; }
         public string FileName { get; set; }
@@ -22,6 +22,22 @@ namespace Sentry.data.Core
             AllEventsComplete = true;
             AllEventsPresent = false;
             FlowEvents = new List<DataFlowMetricDto>();
+        }
+
+        public int CompareTo(DataFileFlowMetricsDto other)
+        {
+            if(LastEventTime > other.LastEventTime)
+            {
+                return -1;
+            }
+            else if(LastEventTime < other.LastEventTime)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

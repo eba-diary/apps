@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class DataFlowMetricDto
+    public class DataFlowMetricDto : IComparable<DataFlowMetricDto>
     {
         public DateTime QueryMadeDateTime { get; set; }
         public int SchemaId { get; set; }
@@ -40,5 +40,20 @@ namespace Sentry.data.Core
         public DateTime ProcessStartDateTime { get; set; }
         public string StatusCode { get; set; }
 
+        public int CompareTo(DataFlowMetricDto other)
+        {
+            if(CurrentFlowStep > other.CurrentFlowStep)
+            {
+                return 1;
+            }
+            else if(CurrentFlowStep < other.CurrentFlowStep)
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }
