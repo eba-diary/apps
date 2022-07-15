@@ -347,6 +347,7 @@
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\HangfireJobScheduler.cs" />
     <Compile Include="ServiceImplementations\DataInventorySqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />

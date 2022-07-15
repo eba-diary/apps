@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Sentry.data.Core.Interfaces;
 
 namespace Sentry.data.Core
 {
@@ -23,14 +24,16 @@ namespace Sentry.data.Core
         private readonly IUserService _userService;
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IJobScheduler _jobScheduler;
 
-        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider)
+        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IJobScheduler jobScheduler)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _jobScheduler = jobScheduler;
         }
 
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
@@ -157,15 +160,21 @@ namespace Sentry.data.Core
          *  Schedules the hangfire delayed job for reprocessing
          *  Logic for the time delay will be placed in this method eventually
          */
-        public bool ScheduleReprocessing(int stepId, int[] datasetFileIds)
+        public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
             bool successfullySubmitted = true;
 
             try
             {
-                foreach (int id in datasetFileIds)
+                int batchSize = 100;
+                int counter = 1;
+                List<int> batch = datasetFileIds.Take(batchSize).ToList();
+
+                while (batch.Any())
                 {
-                    BackgroundJob.Schedule<DatasetFileService>((x) => x.ReprocessDatasetFile(stepId, id), System.TimeSpan.FromDays(1));
+                    _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, batch), TimeSpan.FromSeconds(30 * counter)); // this is returning null
+                    counter++;
+                    batch = batch.Skip(batchSize*counter).Take(batchSize).ToList();
                 }
             }
             catch (System.Exception ex)
@@ -309,31 +318,34 @@ namespace Sentry.data.Core
          * @param int stepid
          * @param int[] datasetFileIds
         */
-        private bool ReprocessDatasetFile(int stepId, int datasetFileId)
+        private bool ReprocessDatasetFile(int stepId, List<int> datasetFileIds)
         {
             try
             {
-                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.FirstOrDefault(w => w.DatasetFileId == datasetFileId);
-
-
-                string triggerFileLocation = GetTriggerFileLocation(stepId, datasetFile);
-                if (triggerFileLocation != null)
+                //List<DatasetFile> datasetFiles = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds).ToList();
+                DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+                string triggerFileLocation, triggerFileContent;
+                foreach (int id in datasetFileIds)
                 {
-                    string triggerFileContent = GetSourceBucketAndSourceKey(datasetFile);
-                    if(triggerFileContent != null)
+                    DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == id).FirstOrDefault();
+                    triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
+                    if (triggerFileLocation != null)
                     {
-                        _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
+                        triggerFileContent = GetSourceBucketAndSourceKey(datasetFile);
+                        if (triggerFileContent != null)
+                        {
+                            _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                     else
                     {
                         return false;
                     }
                 }
-                else
-                {
-                    return false;
-                }
-                
             } catch (Exception ex)
             {
                 // the case when reprocessing fails
@@ -347,20 +359,16 @@ namespace Sentry.data.Core
         /*
          * Helper function for ReprocessingDatasetFile which gets the trigger file location
          */
-        internal string GetTriggerFileLocation(int stepId, DatasetFile datasetFile)
+        private string GetTriggerFileLocation(DataFlowStep dataFlowStep, DatasetFile datasetFile)
         {
-            // getting the triggerkey
-            string triggerKey = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).Select(x => x.TriggerKey).FirstOrDefault();
-
             // trigger file location
-            return triggerKey + datasetFile.FlowExecutionGuid + "/" + datasetFile.OriginalFileName + ".trg";
-
+            return dataFlowStep.TriggerKey + datasetFile.FlowExecutionGuid + "/" + datasetFile.OriginalFileName + ".trg";
         }
 
         /*
          * Helper function for ReprocessingDatasetFile wich gets the content of the trigger file
          */
-        internal string GetSourceBucketAndSourceKey(DatasetFile datasetFile)
+        private string GetSourceBucketAndSourceKey(DatasetFile datasetFile)
         {
 
             List<string> splitString = datasetFile.FileKey.Split('/').ToList();

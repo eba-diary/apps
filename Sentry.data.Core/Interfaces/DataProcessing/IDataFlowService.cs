@@ -115,7 +115,7 @@ namespace Sentry.data.Core
         int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true);
 
 
-        bool ValidateStepIdAndDatasetFileIds(int stepId, int[] datasetFileIds);
+        bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds);
 
         DataFlowDto GetDataFlowDtoByStepId(int stepId);
 

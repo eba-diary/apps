@@ -117,7 +117,7 @@ namespace Sentry.data.Infrastructure
                 Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
-
+            
             registry.For<IDataFeatures>().Singleton().Use<FeatureFlags.DataFeatures>();
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
@@ -128,6 +128,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
+            registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));

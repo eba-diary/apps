@@ -904,6 +904,5 @@ namespace Sentry.data.Core.Tests
             return security;
         }
                                   
-        
     }
 }
