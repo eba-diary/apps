@@ -44,7 +44,7 @@ namespace Sentry.data.Core
         public int DataActionTypeId { get; set; }
 
         [PropertyName("messagekey")]
-        public int MessageKey  { get; set; }
+        public string MessageKey  { get; set; }
 
         [PropertyName("duration")]
         public int Duration { get; set; }
@@ -74,7 +74,7 @@ namespace Sentry.data.Core
         public DateTime FileCreatedDateTime { get; set; }
 
         [PropertyName("runinstanceguid")]
-        public int RunInstanceGuid { get; set; }
+        public string RunInstanceGuid { get; set; }
 
         [PropertyName("filename")]
         public string FileName { get; set; }

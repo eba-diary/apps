@@ -21,7 +21,7 @@ namespace Sentry.data.Core
         public int DataFlowId { get; set; }
         public int Partition { get; set; }
         public int DataActionTypeId { get; set; }
-        public int MessageKey { get; set; }
+        public string MessageKey { get; set; }
         public int Duration { get; set; }
         public int Offset { get; set; }
         public string DataFlowName { get; set; }
@@ -32,7 +32,7 @@ namespace Sentry.data.Core
         public int EventMetricId { get; set; }
         public string StorageCode { get; set; }
         public DateTime FileCreatedDateTime { get; set; }
-        public int RunInstanceGuid { get; set; }
+        public string RunInstanceGuid { get; set; }
         public string FileName { get; set; }
         public string SaidKeyCode { get; set; }
         public DateTime MetricGeneratedDateTime { get; set; }

@@ -113,7 +113,7 @@ namespace Sentry.data.Web.Controllers
             dataFlowMetricEntities.Add(entity5);
 
             List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(dataFlowMetricEntities);
-            List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
+            List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.SortFlowMetrics(_dataFlowMetricService.GetFileMetricGroups(metricDtoList));
             DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
             return PartialView("_DataFlowMetricAccordion", dataFlowAccordionModel);
         }

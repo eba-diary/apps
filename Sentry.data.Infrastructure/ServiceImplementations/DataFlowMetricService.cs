@@ -142,12 +142,16 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
-            foreach(DataFileFlowMetricsDto fileGroup in fileGroups)
-            {
-                fileGroup.FlowEvents.Sort();
-            }
-            fileGroups.Sort();
             return fileGroups;
+        }
+        public List<DataFileFlowMetricsDto> SortFlowMetrics(List<DataFileFlowMetricsDto> dtoList)
+        {
+            foreach(DataFileFlowMetricsDto dto in dtoList)
+            {
+                dto.FlowEvents.Sort();
+            }
+            dtoList.Sort();
+            return dtoList;
         }
     }
 }

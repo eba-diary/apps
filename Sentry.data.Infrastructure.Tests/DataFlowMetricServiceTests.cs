@@ -25,7 +25,7 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFlowStep> flowSteps = new List<DataFlowStep>();
             DataFlowStep flowStep = new DataFlowStep();
             action.Name = "Flow Step Name";
-            action.Id = 1;
+            flowStep.Id = 1;
             flowStep.Action = action;
             flowSteps.Add(flowStep);
 
@@ -37,6 +37,36 @@ namespace Sentry.data.Infrastructure.Tests
 
             DataFlowMetricEntity entity = new DataFlowMetricEntity()
             {
+                SaidKeyCode = "DATA",
+                StatusCode = "C",
+                QueryMadeDateTime = DateTime.Now,
+                SchemaId = 0,
+                EventContents = @"{""field"":""value""}",
+                TotalFlowSteps = 0,
+                FileModifiedDateTime = DateTime.Now,
+                OriginalFileName = "file name",
+                DatasetId = 0,
+                CurrentFlowStep = 0,
+                DataActionId = 0,
+                DataFlowId = 0,
+                Partition = 0,
+                DataActionTypeId = 0,
+                MessageKey = "message key",
+                Duration = 0,
+                Offset = 0,
+                DataFlowName = "flow name",
+                DataFlowStepId = 1,
+                FlowExecutionGuid = "execution guid",
+                FileSize = 0,
+                EventMetricId = 0,
+                StorageCode = "storage code",
+                FileCreatedDateTime = DateTime.Now,
+                RunInstanceGuid = "run instance guid",
+                FileName = "file name",
+                MetricGeneratedDateTime = DateTime.Now,
+                DatasetFileId = 0,
+                ProcessStartDateTime = DateTime.Now,
+
 
             };
 
@@ -47,7 +77,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(entity.StatusCode, dto.StatusCode);
             Assert.AreEqual(entity.QueryMadeDateTime, dto.QueryMadeDateTime);
             Assert.AreEqual(entity.SchemaId, dto.SchemaId);
-            Assert.AreEqual(entity.EventContents, dto.EventContents);
+            Assert.AreEqual(entity.EventContents, dto.EventContents.ToString(Newtonsoft.Json.Formatting.None));
             Assert.AreEqual(entity.TotalFlowSteps, dto.TotalFlowSteps);
             Assert.AreEqual(entity.FileModifiedDateTime, dto.FileModifiedDateTime);
             Assert.AreEqual(entity.OriginalFileName, dto.OriginalFileName);
@@ -73,7 +103,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(entity.DatasetFileId, dto.DatasetFileId);
             Assert.AreEqual(entity.ProcessStartDateTime, dto.ProcessStartDateTime);
             Assert.AreEqual("Flow Step Name", dto.DataFlowStepName);
-            
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
         }
         [TestMethod]
         public void DataFlowMetricService_GetMetricsList_EmptyInput()
@@ -88,6 +119,8 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFlowMetricDto> dtoList = dataFlowMetricService.GetMetricList(dataFlowMetricEntities);
             //Assert
             Assert.IsTrue(dtoList.Count == 0);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
         }
         [TestMethod]
         public void DataFlowMetricService_GetFileMetricGroups_Mappings()
@@ -121,7 +154,9 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(dataFlowMetricDtos[1].FileName, dataFileFlowMetrics[0].FileName);
             Assert.AreEqual(dataFlowMetricDtos[2].FileName, dataFileFlowMetrics[0].FileName);
             Assert.AreEqual(dataFlowMetricDtos[2].MetricGeneratedDateTime - dataFlowMetricDtos[0].MetricGeneratedDateTime, dataFileFlowMetrics[0].Duration);
-        
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
+
         }
         [TestMethod]
         public void DataFlowMetricService_GetFileMetricGroups_IconBooleans()
@@ -183,6 +218,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsFalse(dataFileFlowMetrics[2].AllEventsComplete);
             Assert.IsTrue(dataFileFlowMetrics[3].AllEventsPresent);
             Assert.IsFalse(dataFileFlowMetrics[3].AllEventsComplete);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
         }
         [TestMethod]
         public void DataFlowMetricService_GetFileMetricGroups_EmptyInput()
@@ -197,6 +234,118 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFileFlowMetricsDto> dataFileFlowMetricsDtos = dataFlowMetricService.GetFileMetricGroups(dtoList);
             //Assert
             Assert.IsTrue(dataFileFlowMetricsDtos.Count == 0);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
+        }
+        [TestMethod]
+        public void DataFlowMetricService_SortFlowMetrics_EmptyInput()
+        {
+            //Arrange
+            var stubIElasticContext = new Mock<IElasticContext>();
+            DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
+            List<DataFileFlowMetricsDto> dtoList = new List<DataFileFlowMetricsDto>();
+            //Act
+            List<DataFileFlowMetricsDto> sortedList = dataFlowMetricService.SortFlowMetrics(dtoList);
+            //Assert
+            Assert.IsTrue(sortedList.Count == 0);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
+        }
+        [TestMethod]
+        public void DataFlowMetricService_SortFlowMetrics_FlowEventsInOrder()
+        {
+            //Arrange
+            var stubIElasticContext = new Mock<IElasticContext>();
+            DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
+
+            List<DataFlowMetricDto> flowEvents = new List<DataFlowMetricDto>();
+            DataFlowMetricDto eventOne = new DataFlowMetricDto()
+            {
+                CurrentFlowStep = 2
+            };
+            flowEvents.Add(eventOne);
+            DataFlowMetricDto eventTwo = new DataFlowMetricDto()
+            {
+                CurrentFlowStep = 5
+            };
+            flowEvents.Add(eventTwo);
+            DataFlowMetricDto eventThree = new DataFlowMetricDto()
+            {
+                CurrentFlowStep = 4
+            };
+            flowEvents.Add(eventThree);
+            DataFlowMetricDto eventFour = new DataFlowMetricDto()
+            {
+                CurrentFlowStep = 1
+            };
+            flowEvents.Add(eventFour);
+            DataFlowMetricDto eventFive = new DataFlowMetricDto()
+            {
+                CurrentFlowStep = 3
+            };
+            flowEvents.Add(eventFive);
+            List<DataFileFlowMetricsDto> fileFlowMetrics = new List<DataFileFlowMetricsDto>();
+            DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
+            fileGroup.FlowEvents = flowEvents;
+            fileFlowMetrics.Add(fileGroup);
+            //Act
+            List<DataFileFlowMetricsDto> sortedFileFlowMetrics = dataFlowMetricService.SortFlowMetrics(fileFlowMetrics);
+            //Assert
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[0].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[1].CurrentFlowStep);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[1].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[2].CurrentFlowStep);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[2].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[3].CurrentFlowStep);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[3].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[4].CurrentFlowStep);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
+        }
+        [TestMethod]
+        public void DataFlowMetricService_SortFlowMetrics_FileGroupsInOrder()
+        {
+            //Arrange
+            var stubIElasticContext = new Mock<IElasticContext>();
+            DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
+
+            List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
+            DataFileFlowMetricsDto fileGroupOne = new DataFileFlowMetricsDto()
+            {
+                LastEventTime = new DateTime(2022,7,15)
+            };
+            fileGroups.Add(fileGroupOne);
+            DataFileFlowMetricsDto fileGroupTwo = new DataFileFlowMetricsDto()
+            {
+                LastEventTime = new DateTime(2022, 7, 16)
+            };
+            fileGroups.Add(fileGroupTwo);
+            DataFileFlowMetricsDto fileGroupThree = new DataFileFlowMetricsDto()
+            {
+                LastEventTime = new DateTime(2022, 7, 14)
+            };
+            fileGroups.Add(fileGroupThree);
+            DataFileFlowMetricsDto fileGroupFour = new DataFileFlowMetricsDto()
+            {
+                LastEventTime = new DateTime(2022, 7, 13)
+            };
+            fileGroups.Add(fileGroupFour);
+            DataFileFlowMetricsDto fileGroupFive = new DataFileFlowMetricsDto()
+            {
+                LastEventTime = new DateTime(2022, 7, 17)
+            };
+            fileGroups.Add(fileGroupFive);
+            //Act
+            List<DataFileFlowMetricsDto> sortedFileGroups = dataFlowMetricService.SortFlowMetrics(fileGroups);
+            //Assert
+            Assert.IsTrue(sortedFileGroups[0].LastEventTime > sortedFileGroups[1].LastEventTime);
+            Assert.IsTrue(sortedFileGroups[1].LastEventTime > sortedFileGroups[2].LastEventTime);
+            Assert.IsTrue(sortedFileGroups[2].LastEventTime > sortedFileGroups[3].LastEventTime);
+            Assert.IsTrue(sortedFileGroups[3].LastEventTime > sortedFileGroups[4].LastEventTime);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
         }
     }
 }
