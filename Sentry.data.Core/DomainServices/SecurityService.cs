@@ -743,7 +743,10 @@ namespace Sentry.data.Core
             }
         }
 
-        internal static List<AdSecurityGroupDto> GetDefaultSecurityGroupDtos(Dataset ds)
+        /// <summary>
+        /// Get a list of what the Default Security Groups should be for this dataset
+        /// </summary>
+        public List<AdSecurityGroupDto> GetDefaultSecurityGroupDtos(Dataset ds)
         {
             var envType = ds.NamedEnvironmentType == NamedEnvironmentType.Prod ? AdSecurityGroupEnvironmentType.P : AdSecurityGroupEnvironmentType.NP;
             return new List<AdSecurityGroupDto> {
