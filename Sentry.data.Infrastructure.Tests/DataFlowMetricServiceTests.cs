@@ -21,12 +21,25 @@ namespace Sentry.data.Infrastructure.Tests
         public void DataFlowMetricService_ToDto_Mappings()
         {
             //Arrange
-            DataFlowMetricEntity entity = Mock.Of<DataFlowMetricEntity>();
+            ProducerS3DropAction action = new ProducerS3DropAction();
+            List<DataFlowStep> flowSteps = new List<DataFlowStep>();
+            DataFlowStep flowStep = new DataFlowStep();
+            action.Name = "Flow Step Name";
+            action.Id = 1;
+            flowStep.Action = action;
+            flowSteps.Add(flowStep);
+
             var stubIElasticContext = new Mock<IElasticContext>();
             DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
             var stubIDatasetContext = new Mock<IDatasetContext>();
             DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
-            
+            stubIDatasetContext.Setup(m => m.DataFlowStep).Returns(flowSteps.AsQueryable());
+
+            DataFlowMetricEntity entity = new DataFlowMetricEntity()
+            {
+
+            };
+
             //Act
             DataFlowMetricDto dto = dataFlowMetricService.ToDto(entity);
             //Assert
@@ -59,6 +72,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(entity.MetricGeneratedDateTime, dto.MetricGeneratedDateTime);
             Assert.AreEqual(entity.DatasetFileId, dto.DatasetFileId);
             Assert.AreEqual(entity.ProcessStartDateTime, dto.ProcessStartDateTime);
+            Assert.AreEqual("Flow Step Name", dto.DataFlowStepName);
+            
         }
         [TestMethod]
         public void DataFlowMetricService_GetMetricsList_EmptyInput()

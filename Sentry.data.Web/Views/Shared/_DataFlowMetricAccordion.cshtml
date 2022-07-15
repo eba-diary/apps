@@ -17,15 +17,15 @@
                             <h4 class="accordion-heading">@Model.DataFlowMetricGroups[x].Duration</h4>
                             @if (Model.DataFlowMetricGroups[x].AllEventsPresent && @Model.DataFlowMetricGroups[x].AllEventsComplete)
                             {
-                                <i class="icon-checkmark" style="padding-left: 30px; color: green"></i>
+                                <em class="icon-checkmark" style="padding-left: 30px; color: green"></em>
                             }
                             else if (!Model.DataFlowMetricGroups[x].AllEventsPresent && Model.DataFlowMetricGroups[x].AllEventsComplete)
                             {
-                                <i class="icon-clock" style="padding-left:30px"></i>
+                                <em class="icon-clock" style="padding-left:30px"></em>
                             }
                             else
                             {
-                                <i class="icon-error-outline" style="padding-left:30px;  color: red"></i>
+                                <em class="icon-error-outline" style="padding-left:30px;  color: red"></em>
                             }
                         </button>
                     </div>

@@ -16,7 +16,7 @@ namespace Sentry.data.Core
         [PropertyName("messagevalue")]
         public string EventContents { get; set; }
 
-        [PropertyName("maxexecutuionorder")]
+        [PropertyName("maxexecutionorder")]
         public int TotalFlowSteps { get; set; }
 
         [PropertyName("filemodifieddate")]
