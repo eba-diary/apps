@@ -1562,9 +1562,10 @@ namespace Sentry.data.Core.Tests
         {
             //Arrange
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Asset = new Asset() { SaidKeyCode = "ABCD" } };
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             //Act
-            var groupDtos = SecurityService.GetDefaultSecurityGroupDtos(ds);
+            var groupDtos = securityService.GetDefaultSecurityGroupDtos(ds);
 
             //Assert
             Assert.AreEqual(4, groupDtos.Count(g => g.SaidAssetCode == "ABCD")); //4 groups total for the asset
