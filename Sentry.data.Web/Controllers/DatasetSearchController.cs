@@ -17,22 +17,22 @@ namespace Sentry.data.Web.Controllers
 
         //[Route("Search/Dataset")]
         //[Route("Dataset/Search")]
-        //public ActionResult Search()
-        //{
-        //    //validate user has permissions
-        //    if (!SharedContext.CurrentUser.CanViewDataset)
-        //    {
-        //        return View("Forbidden");
-        //    }
+        public ActionResult Search()
+        {
+            //validate user has permissions
+            //if (!SharedContext.CurrentUser.CanViewDataset)
+            //{
+            //    return View("Forbidden");
+            //}
 
-        //    ViewBag.Title = "Dataset";
-        //    SearchIndexModel model = new SearchIndexModel()
-        //    {
-        //        SearchType = SearchType.DATASET_SEARCH
-        //    };
+            //ViewBag.Title = "Dataset";
+            //SearchIndexModel model = new SearchIndexModel()
+            //{
+            //    SearchType = SearchType.DATASET_SEARCH
+            //};
 
-        //    return View(model);
-        //}
+            return View("~/Views/Search/TileResults.cshtml");
+        }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
