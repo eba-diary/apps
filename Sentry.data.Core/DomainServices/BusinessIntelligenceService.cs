@@ -239,23 +239,13 @@ namespace Sentry.data.Core
                 }                
             }
 
-            ValidateAlternateContactEmail(dto, errors);
+            //VALIDATE EMAIL ADDRESS
+            if (!ValidationHelper.IsDSCEmailValid(dto.AlternateContactEmail))
+            {
+                errors.Add("Alternate Contact Email must be valid sentry.com email address");
+            }
 
             return errors;
-        }
-
-        private void ValidateAlternateContactEmail(BusinessIntelligenceDto dto, List<string> errors)
-        {
-
-            if (dto.AlternateContactEmail != null)
-            {
-                Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-                Match match = regex.Match(dto.AlternateContactEmail);
-                if (!match.Success || !dto.AlternateContactEmail.ToUpper().Contains("@SENTRY.COM") || dto.AlternateContactEmail.Length > 256)
-                {
-                    errors.Add("Alternate Contact Email must be valid sentry.com email address");
-                }
-            }
         }
 
         public List<KeyValuePair<string,string>> GetAllTagGroups()
