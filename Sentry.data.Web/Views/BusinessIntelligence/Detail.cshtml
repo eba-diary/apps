@@ -132,11 +132,33 @@
                                 {
                                     <p class="@textColor col-lg-6"><a href="mailto:@contact.Email?Subject=Exhibit%20Inquiry%20- @Model.DatasetName">@contact.Name</a></p>
                                 }
-
                             </div>
                         </div>
 
                         <hr />
+
+
+                        @if (@Model.CLA1130_SHOW_ALTERNATE_EMAIL)
+                        {
+                            <div class="row pl-3">
+
+                                <div class="col">
+                                    <h5 class="@textColor pt-3">Alternative Email</h5>
+                                    @if (@Model.AlternateContactEmail != null)
+                                    {
+                                        string emailAddress = "mailto:" + @Model.AlternateContactEmail;
+                                        <p class="ds-format-email">
+                                            <a href="@emailAddress">@Model.AlternateContactEmail</a>
+                                        </p>
+                                    }
+                                </div>
+
+                            </div>
+                            <hr />
+                        }
+
+
+
                         <div class="row pl-3">
                             <div class="col">
                                 <h5 class="@textColor pt-3">Exhibit Views</h5>
