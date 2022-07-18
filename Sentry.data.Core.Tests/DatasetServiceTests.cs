@@ -54,6 +54,118 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameRequired));
         }
 
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_AlternateContactEmailIsNotSentry()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                AlternateContactEmail = "jeb@gmail.com"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                AlternateContactEmail = "jeb@gmail.com"
+
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
+        }
+
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_AlternateContactEmailIsInvalid()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                AlternateContactEmail = "jeb@@@@@gmail.com"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                AlternateContactEmail = "jeb@@@@@gmail.com"
+
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
+        }
+
+
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_AlternateContactEmailIsValid()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                AlternateContactEmail = "jeb@sentry.com"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                AlternateContactEmail = "jeb@sentry.com"
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
+        }
+
+
+
         [TestCategory("Core DatasetService")]
         [TestMethod]
         public async Task Validate_ShortName_Regex()
