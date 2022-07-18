@@ -206,7 +206,7 @@ data.Admin = {
 
     SetupConnectorFilterTableInit: function () {
         $(document).ready(function () {
-            $('#connector_table').DataTable({
+            $('#connector-status-table').DataTable({
                 'columnDefs': [{
                     'targets': [2, 3], /* column index */
                     'orderable': false, /* true or false */

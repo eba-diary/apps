@@ -19,14 +19,6 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
         }
 
-        [Route("Connectors")]
-        public async Task<ActionResult> Connectors()
-        {
-            List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
-
-            return View(connectorDtos.MapToModelList());
-        }
-
         [HttpPost]
         public async Task<JObject> GetConnectorConfig(string ConnectorId)
         {
@@ -52,10 +44,11 @@ namespace Sentry.data.Web.Controllers
             myDict.Add("2", "File Processing Logs");
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
+            myDict.Add("5", "Connector Status");
 
             return View(myDict);
         }
-        public ActionResult GetAdminAction(string viewId)
+        public async Task<ActionResult> GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
@@ -81,6 +74,10 @@ namespace Sentry.data.Web.Controllers
                 case "4":
                     viewPath = "_AdminTest4";
                     break;
+                case "5":
+                    List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
+
+                    return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
             }
 
             return PartialView(viewPath);
