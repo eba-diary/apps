@@ -1211,7 +1211,7 @@
     <Content Include="Views\Shared\_AdminTest2.cshtml" />
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />
-    <Content Include="Views\Admin\Connectors.cshtml" />
+    <Content Include="Views\Shared\_ConnectorStatus.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
