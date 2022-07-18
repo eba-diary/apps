@@ -80,6 +80,33 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
         }
 
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_ShortName_Default()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                ShortName = GlobalConstants.SecurityConstants.ASSET_LEVEL_GROUP_NAME
+            };
+
+            // Act
+            var result = await datasetService.Validate(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count >= 1); 
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
+        }
+
         [TestCategory("Core DatasetService")]
         [TestMethod]
         public async Task Validate_ShortName_Duplicate()

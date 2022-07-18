@@ -2530,18 +2530,25 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     initRequestAccessWorkflow() {
+        let consumeDatasetGroupName = $("#consumeDatasetGroupName").text();
+        let producerDatasetGroupName = $("#producerDatasetGroupName").text();
+        let consumeAssetGroupName = $("#consumeAssetGroupName").text();
+        let producerAssetGroupName = $("#producerAssetGroupName").text();
+
         data.Dataset.addRequestAccessBreadcrumb("Access To", "#RequestAccessToSection")
         $("#RequestAccessToDatasetBtn").click(function (e) {
             var datasetName = $("#RequestAccessDatasetName").text();
             $("#RequestAccess_Scope").val('0')
             data.Dataset.editActiveRequestAccessBreadcrumb(datasetName);
-            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
+            $("#RequestAccessConsumeEntitlement").text(consumeDatasetGroupName);
+            $("#RequestAccessManageEntitlement").text(producerDatasetGroupName);
             data.Dataset.onAccessToSelection(e);
         });
         $("#RequestAccessToAssetBtn").click(function (e) {
             $("#RequestAccess_Scope").val('1')
             data.Dataset.editActiveRequestAccessBreadcrumb(e.target.value);
-            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
+            $("#RequestAccessConsumeEntitlement").text(consumeAssetGroupName);
+            $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
             data.Dataset.onAccessToSelection(e);
         });
         $("#RequestAccessTypeConsumeBtn").click(function (e) {
@@ -2555,7 +2562,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.editActiveRequestAccessBreadcrumb("Manage");
             data.Dataset.requestAccessCleanActiveBreadcrumb();
             data.Dataset.addRequestAccessBreadcrumb("Manage Request", "#RequestAccessManageTypeSection");
-            $("#RequestAccessManageEntitlement").text("Placeholder Entitlement");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessManageTypeSection").removeClass("d-none");
         });

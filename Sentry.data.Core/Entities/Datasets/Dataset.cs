@@ -5,6 +5,7 @@ using Sentry.Core;
 using Newtonsoft.Json;
 using Sentry.data.Core.GlobalEnums;
 using System.Text.RegularExpressions;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -161,6 +162,10 @@ namespace Sentry.data.Core
                 if (ShortName != null && ShortName.Length > 12)
                 {
                     vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+                }
+                if (ShortName == SecurityConstants.ASSET_LEVEL_GROUP_NAME)
+                {
+                    vr.Add(ValidationErrors.datasetShortNameInvalid, $"Short Name cannot be \"{SecurityConstants.ASSET_LEVEL_GROUP_NAME}\"");
                 }
             }
 

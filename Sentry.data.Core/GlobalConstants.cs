@@ -467,5 +467,10 @@
             public const string SUCCESS = "SUCCESS";
             public const string FAILURE = "FAILURE";
         }
+
+        public static class SecurityConstants
+        {
+            public const string ASSET_LEVEL_GROUP_NAME = "Default";
+        }
     }
 }

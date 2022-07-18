@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -224,6 +225,13 @@ namespace Sentry.data.Core
                 SaidKeyCode = ds.Asset.SaidKeyCode
             };
 
+            //determine the names of the default security groups
+            var securityGroups = _securityService.GetDefaultSecurityGroupDtos(ds);
+            ar.ConsumeDatasetGroupName = securityGroups.First(g => !g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
+            ar.ProducerDatasetGroupName = securityGroups.First(g => !g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
+            ar.ConsumeAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
+            ar.ProducerAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
+
             Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
             if (!_featureFlags.CLA3718_Authorization.GetValue())
             {
@@ -323,6 +331,12 @@ namespace Sentry.data.Core
             _configService.CreateAndSaveDatasetFileConfig(configDto);
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
+
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
+            }
 
             return ds.DatasetId;
         }
@@ -601,6 +615,10 @@ namespace Sentry.data.Core
                 if (dto.ShortName.Length > 12)
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+                }
+                if (dto.ShortName == SecurityConstants.ASSET_LEVEL_GROUP_NAME)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, $"Short Name cannot be \"{SecurityConstants.ASSET_LEVEL_GROUP_NAME}\"");
                 }
                 if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
                     d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
