@@ -1,1 +1,63 @@
-﻿Hi
+﻿@model TileResultsModel
+
+@{
+    ViewBag.Fluid = true;
+}
+
+<div id="DatasetItemList" class="">
+    <div>
+        @* page size *@
+        <div class="float-left md-form">
+            @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Page Size</label>
+        </div>
+
+        @* sort *@
+        <div class="float-right md-form">
+            @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Sort By</label>
+        </div>
+    </div>
+
+    <ul id="listOfDatasets" class="list-unstyled">
+        @foreach (var tile in collection)
+        {
+            //no more color by category
+            //convert to use User Favorites
+            <li class="ul-dataset-list-item borderSide_blue boxShadowSm" title="@tile.Title">
+                <div class="category-type-wrap">
+                    <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
+                    <div class="category-type categoryBanner-blue" title="@tile.AbbreviatedCategory">
+                        <span>@tile.AbbreviatedCategory</span>
+                    </div>
+                </div>
+
+
+                <div class="dataset-list-content">
+                    @foreach (var type in Model.ReportTypes)
+                    {
+                        <div class="extension bg_gray @type">
+                            <span>@type</span>
+                        </div>
+                    }
+                    
+                    <span class="search-dataset-name">@Model.Name @(Model.Status != "Active" ? "(Pending Delete)" : "")</span>
+
+                    @if(Model.IsSecured)
+                    {
+                        <em class="fas fa-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></em>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $('#tile-result-page-size').materialSelect();
+            $('#tile-result-sort').materialSelect();
+        });
+    </script>
+}

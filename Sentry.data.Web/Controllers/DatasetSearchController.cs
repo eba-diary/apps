@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,36 @@ namespace Sentry.data.Web.Controllers
             //    SearchType = SearchType.DATASET_SEARCH
             //};
 
-            return View("~/Views/Search/TileResults.cshtml");
+            TileResultsModel tileResultsModel = new TileResultsModel()
+            {
+                PageSizeOptions = new List<SelectListItem>()
+                {
+                    new SelectListItem()
+                    {
+                        Value = "10",
+                        Text = "10",
+                        Selected = true,
+                    },
+                    new SelectListItem()
+                    {
+                        Value = "25",
+                        Text = "25"
+                    },
+                    new SelectListItem()
+                    {
+                        Value = "100",
+                        Text = "100"
+                    },
+                    new SelectListItem()
+                    {
+                        Value = "All",
+                        Text = "All"
+                    },
+                },
+                SortByOptions = Utility.BuildDatasetSortByOptions()
+            };
+
+            return View("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
