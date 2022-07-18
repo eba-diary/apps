@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Sentry.Common.Logging;
 
 namespace Sentry.data.Core
@@ -238,7 +239,23 @@ namespace Sentry.data.Core
                 }                
             }
 
+            ValidateAlternateContactEmail(dto, errors);
+
             return errors;
+        }
+
+        private void ValidateAlternateContactEmail(BusinessIntelligenceDto dto, List<string> errors)
+        {
+
+            if (dto.AlternateContactEmail != null)
+            {
+                Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                Match match = regex.Match(dto.AlternateContactEmail);
+                if (!match.Success || !dto.AlternateContactEmail.ToUpper().Contains("@SENTRY.COM") || dto.AlternateContactEmail.Length > 256)
+                {
+                    errors.Add("Alternate Contact Email must be valid sentry.com email address");
+                }
+            }
         }
 
         public List<KeyValuePair<string,string>> GetAllTagGroups()
@@ -461,6 +478,7 @@ namespace Sentry.data.Core
             ds.DeleteInd = false;
             ds.DeleteIssueDTM = DateTime.MaxValue;
             ds.Asset = _datasetContext.Assets.FirstOrDefault(da => da.SaidKeyCode == "DATA");
+            ds.AlternateContactEmail = dto.AlternateContactEmail;
 
             return ds;
         }
@@ -523,6 +541,7 @@ namespace Sentry.data.Core
             dto.ContactIds = (ds.Metadata.ReportMetadata.Contacts != null)? ds.Metadata.ReportMetadata.Contacts.ToList() : new List<string>();
             dto.ContactDetails = (ds.Metadata.ReportMetadata.Contacts != null)? MapContactsToDto(ds.Metadata.ReportMetadata.Contacts) : new List<ContactInfoDto>();
             dto.Images = MapToDto(ds.Images);
+            dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
 
         private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
@@ -542,6 +561,7 @@ namespace Sentry.data.Core
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
             dto.Images = ds.Images.Select(x => x.StorageKey).ToList();
+            dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
 
         private void MapToDto(List<TagGroup> tagGroups, List<TagGroupDto> dto)
