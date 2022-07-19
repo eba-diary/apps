@@ -155,29 +155,31 @@ namespace Sentry.data.Core
          *  Schedules the hangfire delayed job for reprocessing
          *  Logic for the time delay will be placed in this method eventually
          */
-        public void ScheduleReprocessing(int stepId, List<int> datasetFileIds)
+        public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
-            int batchCounter = 1;
-            try
-            {
-                int batchSize = 100;
-                int counter = 1;
-                List<int> batch = datasetFileIds.Take(batchSize).ToList();
+            bool submittedSuccessful = true;
 
-                while (batch.Any())
+            int batchSize = 100;
+            int counter = 1;
+            List<int> batch = datasetFileIds.Take(batchSize).ToList();
+
+            while (batch.Any())
+            {
+                foreach (int id in batch)
                 {
-                    foreach (int id in batch) // goes through each datasetFileId in the batch 
+                    try
                     {
                         _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter)); // this is returning null
-                        counter++;
-                        batch = batch.Skip(batchSize * counter).ToList();
+                    } catch (Exception ex)
+                    {
+                        submittedSuccessful = false;
+                        continue;
                     }
-                    batchCounter++;
                 }
-            } catch (Exception ex)
-            {
-                throw new Exception("Error occured when scheduling hangfire job in batch: " + batchCounter + " saying "+ ex.Message, ex);
+                counter++;
+                batch = batch.Skip(batchSize * counter).ToList();
             }
+            return submittedSuccessful;
         }
 
         #region PrivateMethods
