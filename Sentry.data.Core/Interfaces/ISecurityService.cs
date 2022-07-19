@@ -33,6 +33,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="ds">The Dataset that was just created</param>
         void EnqueueCreateDefaultSecurityForDataset(int datasetId);
+        void EnqueueCreateDefaultSecurityForDatasetList(int[] datasetIdList);
 
     }
 }

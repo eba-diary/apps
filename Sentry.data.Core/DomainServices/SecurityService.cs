@@ -672,6 +672,18 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
+        /// Enqueues datasets to run the create default security job. 
+        /// </summary>
+        /// <param name="datasetIds">List of datasets to enqueue</param>
+        public void EnqueueCreateDefaultSecurityForDatasetList(int[] datasetIds)
+        {
+            foreach(int datasetId in datasetIds)
+            {
+                EnqueueCreateDefaultSecurityForDataset(datasetId);
+            }
+        }
+
+        /// <summary>
         /// This method orchestrates creating new AD security groups,
         /// and creating the default SecurityTickets in the database for them.
         /// It is only run from the Goldeneye Service as a Hangfire job, 
@@ -740,6 +752,23 @@ namespace Sentry.data.Core
                     await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }
+            }
+            if(!(ds.DataClassification == DataClassificationType.HighlySensitive || ds.IsSecured))
+            {
+                var accessRequest = new AccessRequest()
+                {
+                    SecurityId = ds.Security.SecurityId,
+                    RequestorsId = Environment.UserName,
+                    RequestedDate = DateTime.Now,
+                    IsAddingPermission = true,
+                    Permissions = new List<Permission>() { _datasetContext.Permission.FirstOrDefault(p => p.PermissionCode.Equals(GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))},
+                    IsSystemGenerated = true
+                };
+                var security = ds.Security;
+                var securityTicket = BuildAddingPermissionTicket("DEFAULT_SECURITY_INHERITANCE", accessRequest, security);
+                _datasetContext.Add(securityTicket);
+                await ApproveTicket(securityTicket, Environment.UserName);
+                _datasetContext.SaveChanges();
             }
         }
 
