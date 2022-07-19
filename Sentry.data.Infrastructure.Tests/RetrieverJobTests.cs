@@ -17,6 +17,7 @@ namespace Sentry.data.Infrastructure.Tests
     [TestClass]
     public class RetrieverJobTests
     {
+
         [TestMethod]
         public void GoogleApiProvider_SendRequest_Returns_OK_Response()
         {

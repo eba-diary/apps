@@ -80,9 +80,8 @@ namespace Sentry.data.Web.Controllers
                     viewPath = "_AdminTest4";
                     break;
                 case "5":
-                    List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(-10);
-                    List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
-                    return PartialView("_ReprocessDeadSparkJobs", deadSparkJobModelList);
+                    viewPath = "_ReprocessDeadSparkJobs";
+                    break;
             }
 
             return PartialView(viewPath);

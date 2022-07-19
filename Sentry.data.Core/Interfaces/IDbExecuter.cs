@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Sentry.data.Core
 {
-    public interface IDbExecuter<T>
+    public interface IDbExecuter
     {
         void ExecuteCommand(object parameter);
 
-        List<T> ExecuteQuery(int timeCreated);
+        DataTable ExecuteQuery(int timeCreated);
     }
 }

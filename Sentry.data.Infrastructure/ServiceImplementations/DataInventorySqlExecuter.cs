@@ -1,10 +1,11 @@
 ﻿using Sentry.data.Core;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Sentry.data.Infrastructure
 {
-    public class DataInventorySqlExecuter : IDbExecuter<DeadSparkJob>
+    public class DataInventorySqlExecuter : IDbExecuter
     {
         public void ExecuteCommand(object parameter)
         {
@@ -20,7 +21,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public List<DeadSparkJob> ExecuteQuery(int timeCreated)
+        public DataTable ExecuteQuery(int timeCreated)
         {
             throw new System.NotSupportedException();
         }

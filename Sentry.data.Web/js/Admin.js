@@ -45,6 +45,9 @@ data.Admin = {
                 }
             ],
             order: [],
+            drawCallback: function () {
+                $('#data-file-select-all').prop('checked', false);
+            }
         });
 
         // click event logic for table row + and - icons based on dropdown state
@@ -63,7 +66,7 @@ data.Admin = {
 
     // group selected jobs by DataFlowStepId and send them to be reprocessed
     ReprocessDeadJobs: function () {
-        $("#selectAll").click(function (event) {
+        $("#data-file-select-all").click(function (event) {
             var selectAllCheckbox = $(this);
             if (selectAllCheckbox.is(":checked")) {
                 $(".select-all-target").each(function () {
@@ -92,6 +95,9 @@ data.Admin = {
                 return rv;
             }, {});
 
+            var totalJobCount = 0;
+            var successfulJobCount = 0;
+
             // loop through all json keys and POST them to the data file reprocess controller
             for (let x in returnJson) {
                 $.ajax({
@@ -100,12 +106,15 @@ data.Admin = {
                     contentType: "application/json",
                     data: JSON.stringify({ DataFlowStepId: x, DatasetFileIds: returnJson[x] }),
                     success: function () {
-                        alert("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
+                        /*alert("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".");*/
+                        totalJobCount++;
+                        successfulJobCount++;
                     },
                     error: function () {
-                        alert("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
-                    }
+                        totalJobCount++;
 
+                        if (Object.keys(returnJson).length == totalJobCount) alert(`${successfulJobCount} out of ${totalJobCount} reprocessing jobs were successful`);
+                    }
                 });
             };
         });

@@ -136,8 +136,8 @@ namespace Sentry.data.Infrastructure
             settings.ThrowExceptions();
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
-            registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter<DeadSparkJob>>().Is(new DataInventorySqlExecuter());
-            registry.For<IDeadJobProvider>().Add<DeadJobProvider>().Ctor<IDbExecuter<DeadSparkJob>>().Is(new DeadSparkJobSqlExecuter());
+            registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
+            registry.For<IDeadJobProvider>().Add<DeadJobProvider>().Ctor<IDbExecuter>().Is(new DeadSparkJobSqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
             registry.For<IDeadSparkJobService>().Use<DeadSparkJobService>();
 

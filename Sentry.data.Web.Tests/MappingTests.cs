@@ -17,6 +17,100 @@ namespace Sentry.data.Web.Tests
     public class MappingTests
     {
         [TestMethod]
+        public void MapToModelList_DeadSparkJobDtoList_ReturnDeadSparkJobModelList()
+        {
+            //Arramge
+            List<DeadSparkJobDto> dpjDtoList = new List<DeadSparkJobDto>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                dpjDtoList.Add(new DeadSparkJobDto()
+                {
+                    SubmissionTime = DateTime.Now,
+                    DatasetName = "Dataset Name",
+                    SchemaName = "Schema Name",
+                    SourceKey = "Source Key",
+                    FlowExecutionGuid = "FlowExecutionGuid",
+                    ReprocessingRequired = "ReprocessingRequired",
+                    SubmissionID = i,
+                    SourceBucketName = "SourceBucketName",
+                    BatchID = i,
+                    LivyAppID = "LivyAppID",
+                    LivyDriverlogUrl = "LivyDriverlogUrl",
+                    LivySparkUiUrl = "LivySparkUiUrl",
+                    DatasetFileID = i,
+                    DataFlowStepID = i
+                });
+            }
+
+            //Act
+            List<DeadSparkJobModel> dpjModelList = dpjDtoList.MapToModelList();
+
+            //Assert
+            for(int i=0; i <dpjModelList.Count; i++)
+            {
+                Assert.AreEqual(dpjModelList[i].SubmissionTime, dpjDtoList[i].SubmissionTime);
+                Assert.AreEqual(dpjModelList[i].DatasetName, dpjDtoList[i].DatasetName);
+                Assert.AreEqual(dpjModelList[i].SchemaName, dpjDtoList[i].SchemaName);
+                Assert.AreEqual(dpjModelList[i].SourceKey, dpjDtoList[i].SourceKey);
+                Assert.AreEqual(dpjModelList[i].FlowExecutionGuid, dpjDtoList[i].FlowExecutionGuid);
+                Assert.AreEqual(dpjModelList[i].ReprocessingRequired, dpjDtoList[i].ReprocessingRequired);
+                Assert.AreEqual(dpjModelList[i].SubmissionID, dpjDtoList[i].SubmissionID);
+                Assert.AreEqual(dpjModelList[i].SourceBucketName, dpjDtoList[i].SourceBucketName);
+                Assert.AreEqual(dpjModelList[i].BatchID, dpjDtoList[i].BatchID);
+                Assert.AreEqual(dpjModelList[i].LivyAppID, dpjDtoList[i].LivyAppID);
+                Assert.AreEqual(dpjModelList[i].LivyDriverlogUrl, dpjDtoList[i].LivyDriverlogUrl);
+                Assert.AreEqual(dpjModelList[i].LivySparkUiUrl, dpjDtoList[i].LivySparkUiUrl);
+                Assert.AreEqual(dpjModelList[i].DatasetFileID, dpjDtoList[i].DatasetFileID);
+                Assert.AreEqual(dpjModelList[i].DataFlowStepID, dpjDtoList[i].DataFlowStepID);
+            }
+
+        }
+
+        [TestMethod]
+        public void MapToModel_DeadSparkJobDto_ReturnDeadSparkJobModel()
+        {
+            //Arramge
+            DeadSparkJobDto dsjDto = new DeadSparkJobDto()
+            {
+                SubmissionTime = DateTime.Now,
+                DatasetName = "Dataset Name",
+                SchemaName = "Schema Name",
+                SourceKey = "Source Key",
+                FlowExecutionGuid = "FlowExecutionGuid",
+                ReprocessingRequired = "ReprocessingRequired",
+                SubmissionID = 1,
+                SourceBucketName = "SourceBucketName",
+                BatchID = 1,
+                LivyAppID = "LivyAppID",
+                LivyDriverlogUrl = "LivyDriverlogUrl",
+                LivySparkUiUrl = "LivySparkUiUrl",
+                DatasetFileID = 1,
+                DataFlowStepID = 1
+            };
+
+            //Act
+            DeadSparkJobModel dpjModel = dsjDto.MapToModel();
+
+            //Assert
+            Assert.AreEqual(dpjModel.SubmissionTime, dsjDto.SubmissionTime);
+            Assert.AreEqual(dpjModel.DatasetName, dsjDto.DatasetName);
+            Assert.AreEqual(dpjModel.SchemaName, dsjDto.SchemaName);
+            Assert.AreEqual(dpjModel.SourceKey, dsjDto.SourceKey);
+            Assert.AreEqual(dpjModel.FlowExecutionGuid, dsjDto.FlowExecutionGuid);
+            Assert.AreEqual(dpjModel.ReprocessingRequired, dsjDto.ReprocessingRequired);
+            Assert.AreEqual(dpjModel.SubmissionID, dsjDto.SubmissionID);
+            Assert.AreEqual(dpjModel.SourceBucketName, dsjDto.SourceBucketName);
+            Assert.AreEqual(dpjModel.BatchID, dsjDto.BatchID);
+            Assert.AreEqual(dpjModel.LivyAppID, dsjDto.LivyAppID);
+            Assert.AreEqual(dpjModel.LivyDriverlogUrl, dsjDto.LivyDriverlogUrl);
+            Assert.AreEqual(dpjModel.LivySparkUiUrl, dsjDto.LivySparkUiUrl);
+            Assert.AreEqual(dpjModel.DatasetFileID, dsjDto.DatasetFileID);
+            Assert.AreEqual(dpjModel.DataFlowStepID, dsjDto.DataFlowStepID);
+
+        }
+
+        [TestMethod]
         public void ToDto_SchemaInfoModel_ReturnFileSchemaDto()
         {
             SchemaInfoModel mdl = new SchemaInfoModel()
