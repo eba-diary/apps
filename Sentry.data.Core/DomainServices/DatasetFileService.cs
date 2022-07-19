@@ -336,6 +336,9 @@ namespace Sentry.data.Core
             }
         }
 
+        /*
+         * Creating a wrapper method to incorporate both the helper methods GetTriggerFileLocation and GetSourceBucketAndSourceKey
+         */
         private KeyValuePair<string, string> GetTriggerFileLocationAndSourceBucketKey(DataFlowStep dataFlowStep, DatasetFile datasetFile)
         {
             string triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
