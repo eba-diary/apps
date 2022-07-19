@@ -157,6 +157,7 @@ namespace Sentry.data.Core
          */
         public void ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
+            int batchCounter = 1;
             try
             {
                 int batchSize = 100;
@@ -171,11 +172,11 @@ namespace Sentry.data.Core
                         counter++;
                         batch = batch.Skip(batchSize * counter).ToList();
                     }
-
+                    batchCounter++;
                 }
             } catch (Exception ex)
             {
-                throw new Exception("Error occured when scheduling hangfire job: " + ex.Message, ex);
+                throw new Exception("Error occured when scheduling hangfire job in batch: " + batchCounter + " saying "+ ex.Message, ex);
             }
         }
 
