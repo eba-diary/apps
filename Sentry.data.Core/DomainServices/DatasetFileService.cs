@@ -160,24 +160,29 @@ namespace Sentry.data.Core
          *  Schedules the hangfire delayed job for reprocessing
          *  Logic for the time delay will be placed in this method eventually
          */
-        public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
+        public void ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
             bool successfullySubmitted = true;
-            int counter = 1;
             try
             {
-                foreach (int id in datasetFileIds)
+                int batchSize = 100;
+                int counter = 1;
+                List<int> batch = datasetFileIds.Take(batchSize).ToList();
+
+                while (batch.Any())
                 {
-                    _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter)); // this is returning null
-                    counter++;
+                    foreach (int id in batch)
+                    {
+                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter)); // this is returning null
+                        counter++;
+                        batch = batch.Skip(batchSize * counter).ToList();
+                    }
+
                 }
             } catch (Exception ex)
             {
-                Logger.Error("Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileIds[counter - 1] + " Failed");
-                successfullySubmitted = false;
+                throw new Exception("Error occured when scheduling hangfire job: " + ex.Message, ex);
             }
-
-            return successfullySubmitted;
         }
 
         #region PrivateMethods
@@ -318,24 +323,25 @@ namespace Sentry.data.Core
             DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
             DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
-            Dictionary<string, string> response = WrapperHelperMethod(dataFlowStep, datasetFile);
-            if (response.Keys.First() != null || response[response.Keys.First()] != null)
+            KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
+            if (response.Key != null || response.Value != null)
             {
-                Logger.Error("Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed");
+                string errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed";
+                Logger.Error(errorMessage);
+                throw new Exception(errorMessage);
             }
             else
             {
-                _s3ServiceProvider.UploadDataFile(response.Keys.First(), response[response.Keys.First()]);
+                _s3ServiceProvider.UploadDataFile(response.Key, response.Value);
             }
         }
 
-        private Dictionary<string, string> WrapperHelperMethod(DataFlowStep dataFlowStep, DatasetFile datasetFile)
+        private KeyValuePair<string, string> GetTriggerFileLocationAndSourceBucketKey(DataFlowStep dataFlowStep, DatasetFile datasetFile)
         {
-            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
             string triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
             string sourceBucketKey = GetSourceBucketAndSourceKey(datasetFile);
-            keyValuePairs.Add(triggerFileLocation, sourceBucketKey);
-            return keyValuePairs;
+            KeyValuePair<string, string> result = new KeyValuePair<string, string>(triggerFileLocation, sourceBucketKey);
+            return result;
         }
 
         /*
