@@ -166,7 +166,7 @@ namespace Sentry.data.Core
 
                 while (batch.Any())
                 {
-                    foreach (int id in batch)
+                    foreach (int id in batch) // goes through each datasetFileId in the batch 
                     {
                         _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter)); // this is returning null
                         counter++;
