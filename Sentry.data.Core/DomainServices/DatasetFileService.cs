@@ -1,16 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
-using Hangfire;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers.Paginate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core.Interfaces;
 
@@ -162,7 +157,6 @@ namespace Sentry.data.Core
          */
         public void ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
-            bool successfullySubmitted = true;
             try
             {
                 int batchSize = 100;
