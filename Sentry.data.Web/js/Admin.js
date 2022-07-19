@@ -2,6 +2,7 @@
  * Javascript methods for the Admin-related pages
  ******************************************************************************************/
 
+
 data.Admin = {
     // Approve.vbhtml
     ApproveInit: function () {
@@ -136,6 +137,14 @@ data.Admin = {
             $("#reprocessButton").prop("disabled", true);
         }
     },
+    GetFlowEvents: function (data) {
+        var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partiton</th></tr>';
+        for (var flowEvent of data.FlowEvents) {
+            s += '<a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent ="' + flowEvent.EventContents +  '"><tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td></tr></a>'
+        }
+        s += '</table>';
+        return s;
+    },
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect();
@@ -244,23 +253,78 @@ data.Admin = {
                 $("#submitButton").prop("disabled", true);
             }
         });
+        $("#EventContentModal").on("show.bs.modal", function (event) {
+            var link = $(event.relatedTarget);
+            var content = JSON.stringify(link.data("eventcontent"), null, "\t");
+            var modalBody = "<textarea class='form-control' style = 'height: 500px'>" + content + "</textarea>"
+            $("#EventDetails").html(modalBody);
+
+        })
         $("#submitButton").click(function (event) {
             var dto = new Object();
             dto.FileToSearch = $("#fileDropdown").find(":selected").val();
             dto.DatasetToSearch = $("#DatasetsList").find(":selected").val();
             dto.SchemaToSearch = $("#schemaDropdown").find(":selected").val();
-            $.ajax({
-                type: "POST",
-                url: "/DataFlowMetric/GetSearchDto",
-                data: JSON.stringify(dto),
-                contentType: "application/json",
-                dataType: "json",
-                success: function () {
-                    alert("That worked!")
+            var table = $('#metricGroupsTable').DataTable({
+                destroy: true,
+                ajax: {
+                    type: "GET",
+                    url: "/DataFlowMetric/PopulateTable",
+                    data: JSON.stringify(dto),
+                    contentType: "application/json",
+                    dataType: "json",
+                    dataSrc: "",
+                   // success: function (data) {
+                 //       console.log(data);
+                 //   }
+                },
+                columns: [
+                    {
+                        className: 'dt-control',
+                        orderable: false,
+                        data: null,
+                        defaultContent: '',
+                    },
+                    { data: 'FileName' },
+                    { data: 'FirstEventTime' },
+                    { data: 'LastEventTime' },
+                    { data: 'Duration' },
+                    {
+                        data: null,
+                        render: (d) => function (data, type, row) {
+                            if (d.AllEventsPresent && d.AllEventsComplete) {
+                                return '<em class="icon-checkmark" style="color: green"></em>';
+                            }
+                            else if (!d.AllEventsPresent && d.AllEventsComplete) {
+                                return '<em class="icon-clock"></em>';
+                            }
+                            else {
+                                return '<em class="icon-error-outline" style="color: red"></em>';
+                            }
+                        }
+                    }
+                ],
+            });
+
+            // Add event listener for opening and closing details
+            $('#metricGroupsTable').on('click', 'td.dt-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row(tr);
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    // Open this row
+                    row.child(data.Admin.GetFlowEvents(row.data())).show();
+                    tr.addClass('shown');
                 }
-            })
+            });
+            /*
             var url = $(this).data("url");
             $("#accordion-view-area").load(url);
+            */
         })
     },
     FlowMetricAccordionInit: function () {
