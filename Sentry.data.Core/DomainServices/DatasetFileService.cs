@@ -163,23 +163,17 @@ namespace Sentry.data.Core
         public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
             bool successfullySubmitted = true;
-
+            int counter = 1;
             try
             {
-                int batchSize = 100;
-                int counter = 1;
-                List<int> batch = datasetFileIds.Take(batchSize).ToList();
-
-                while (batch.Any())
+                foreach (int id in datasetFileIds)
                 {
-                    _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, batch), TimeSpan.FromSeconds(30 * counter)); // this is returning null
+                    _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter)); // this is returning null
                     counter++;
-                    batch = batch.Skip(batchSize*counter).Take(batchSize).ToList();
                 }
-            }
-            catch (System.Exception ex)
+            } catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.Error("Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileIds[counter - 1] + " Failed");
                 successfullySubmitted = false;
             }
 
@@ -318,42 +312,30 @@ namespace Sentry.data.Core
          * @param int stepid
          * @param int[] datasetFileIds
         */
-        private bool ReprocessDatasetFile(int stepId, List<int> datasetFileIds)
+        private void ReprocessDatasetFile(int stepId, int datasetFileId)
         {
-            try
-            {
-                //List<DatasetFile> datasetFiles = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds).ToList();
-                DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
-                string triggerFileLocation, triggerFileContent;
-                foreach (int id in datasetFileIds)
-                {
-                    DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == id).FirstOrDefault();
-                    triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
-                    if (triggerFileLocation != null)
-                    {
-                        triggerFileContent = GetSourceBucketAndSourceKey(datasetFile);
-                        if (triggerFileContent != null)
-                        {
-                            _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            } catch (Exception ex)
-            {
-                // the case when reprocessing fails
-                Console.WriteLine(ex.Message);
-                return false;
-            }
             
-            return true;
+            DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+            Dictionary<string, string> response = WrapperHelperMethod(dataFlowStep, datasetFile);
+            if (response.Keys.First() != null || response[response.Keys.First()] != null)
+            {
+                Logger.Error("Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed");
+            }
+            else
+            {
+                _s3ServiceProvider.UploadDataFile(response.Keys.First(), response[response.Keys.First()]);
+            }
+        }
+
+        private Dictionary<string, string> WrapperHelperMethod(DataFlowStep dataFlowStep, DatasetFile datasetFile)
+        {
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+            string triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
+            string sourceBucketKey = GetSourceBucketAndSourceKey(datasetFile);
+            keyValuePairs.Add(triggerFileLocation, sourceBucketKey);
+            return keyValuePairs;
         }
 
         /*
