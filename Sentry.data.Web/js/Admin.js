@@ -138,9 +138,10 @@ data.Admin = {
         }
     },
     GetFlowEvents: function (data) {
-        var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partiton</th></tr>';
+        console.log(data)
+        var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partiton</th><th>Event Contents</th></tr>';
         for (var flowEvent of data.FlowEvents) {
-            s += '<a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent ="' + flowEvent.EventContents +  '"><tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td></tr></a>'
+            s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent ="' + flowEvent.EventContents + '">View Contents</a></td></tr>'
         }
         s += '</table>';
         return s;
@@ -268,15 +269,12 @@ data.Admin = {
             var table = $('#metricGroupsTable').DataTable({
                 destroy: true,
                 ajax: {
-                    type: "GET",
+                    type: "POST",
                     url: "/DataFlowMetric/PopulateTable",
-                    data: JSON.stringify(dto),
-                    contentType: "application/json",
+                    data: dto,
+                   // contentType: "application/json",
                     dataType: "json",
                     dataSrc: "",
-                   // success: function (data) {
-                 //       console.log(data);
-                 //   }
                 },
                 columns: [
                     {
@@ -285,11 +283,32 @@ data.Admin = {
                         data: null,
                         defaultContent: '',
                     },
-                    { data: 'FileName' },
-                    { data: 'FirstEventTime' },
-                    { data: 'LastEventTime' },
-                    { data: 'Duration' },
                     {
+                        className: 'dt-control',
+                        data: 'FileName'
+                    },
+                    {
+                        className: 'dt-control',
+                        type: 'date',
+                        data: 'FirstEventTime',
+                        render: function (data) {
+                            return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null;
+                        }
+                    },
+                    {
+                        className: 'dt-control',
+                        type: 'date',
+                        data: 'LastEventTime',
+                        render: function (data) {
+                            return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null;
+                        }
+                    },
+                    {
+                        className: 'dt-control',
+                        data: 'Duration'
+                    },
+                    {
+                        className: 'dt-control',
                         data: null,
                         render: (d) => function (data, type, row) {
                             if (d.AllEventsPresent && d.AllEventsComplete) {

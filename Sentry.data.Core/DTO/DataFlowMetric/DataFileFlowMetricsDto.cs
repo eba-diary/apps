@@ -12,7 +12,7 @@ namespace Sentry.data.Core
         public string FileName { get; set; }
         public DateTime FirstEventTime { get; set; }
         public DateTime LastEventTime { get; set; }
-        public TimeSpan Duration { get; set; }
+        public string Duration { get; set; }
         public List<DataFlowMetricDto> FlowEvents { get; set; }
         public bool AllEventsPresent { get; set; }
         public bool AllEventsComplete { get; set; }

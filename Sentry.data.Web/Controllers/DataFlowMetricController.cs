@@ -32,7 +32,7 @@ namespace Sentry.data.Web.Controllers
             searchDto.SchemaToSearch = searchDtoData.SchemaToSearch;
             searchDto.FileToSearch = searchDtoData.FileToSearch;
         }
-        [HttpGet]
+        [HttpPost]
         public JsonResult PopulateTable(DataFlowMetricSearchDto searchDto)
         {
             /*

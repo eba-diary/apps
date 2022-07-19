@@ -79,7 +79,7 @@ namespace Sentry.data.Infrastructure
                     fileGroup.DatasetFileId = dto.DatasetFileId;
                     fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                    fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
+                    fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).Seconds.ToString();
                     fileGroup.FlowEvents.Add(dto);
                     if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                     {
@@ -108,8 +108,8 @@ namespace Sentry.data.Infrastructure
                             {
                                 fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                             }
-                            fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
-                            if(dto.TotalFlowSteps == dto.CurrentFlowStep)
+                            fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).Seconds.ToString();
+                            if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                             {
                                 fileGroup.AllEventsPresent = true;
                             }
@@ -127,7 +127,7 @@ namespace Sentry.data.Infrastructure
                         fileGroup.DatasetFileId = dto.DatasetFileId;
                         fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                        fileGroup.Duration = fileGroup.LastEventTime - fileGroup.FirstEventTime;
+                        fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).Seconds.ToString();
                         fileGroup.FlowEvents.Add(dto);
                         if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                         {
