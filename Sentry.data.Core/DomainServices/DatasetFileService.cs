@@ -165,19 +165,19 @@ namespace Sentry.data.Core
 
             while (batch.Any())
             {
-                foreach (int id in batch)
+                try
                 {
-                    try
+                    foreach (int id in datasetFileIds)
                     {
-                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter)); // this is returning null
-                    } catch (Exception ex)
-                    {
-                        submittedSuccessful = false;
-                        continue;
+                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter));
                     }
+                } catch (Exception ex)
+                {
+                    submittedSuccessful = false;
+                    continue;
                 }
                 counter++;
-                batch = batch.Skip(batchSize * counter).ToList();
+                batch = batch.Skip(batchSize * counter).ToList();  
             }
             return submittedSuccessful;
         }
