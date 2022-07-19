@@ -11,5 +11,6 @@ namespace Sentry.data.Web
     {
         public List<SelectListItem> PageSizeOptions { get; set; }
         public List<SelectListItem> SortByOptions { get; set; }
+        public List<TileModel> Tiles { get; set;}
     }
 }

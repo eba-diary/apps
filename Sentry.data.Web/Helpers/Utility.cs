@@ -335,6 +335,34 @@ namespace Sentry.data.Web.Helpers
 
             return rj;
         }
+        public static List<SelectListItem> BuildTilePageSizeOptions()
+        {
+            return new List<SelectListItem>()
+            {
+                new SelectListItem()
+                {
+                    Value = "10",
+                    Text = "10",
+                    Selected = true,
+                },
+                new SelectListItem()
+                {
+                    Value = "25",
+                    Text = "25"
+                },
+                new SelectListItem()
+                {
+                    Value = "100",
+                    Text = "100"
+                },
+                new SelectListItem()
+                {
+                    Value = "All",
+                    Text = "All"
+                },
+            };
+        }
+
         public static List<SelectListItem> BuildDatasetSortByOptions()
         {
             List<SelectListItem> sortOptions = new List<SelectListItem>();

@@ -528,61 +528,6 @@ namespace Sentry.data.Core
             return new ValidationException(results);
         }
 
-        private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
-        {
-            if (dto.DatasetCategoryIds == null)
-            {
-                results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
-            }
-            else
-            {
-                if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
-                {
-                    results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
-                }
-            }
-        }
-
-        private void ValidateDatasetName(DatasetDto dto, ValidationResults results)
-        {
-            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
-            {
-                results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
-            }
-            else //if name, make sure it is not duplicate
-            {
-                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
-                {
-                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
-                }
-            }
-        }
-
-        private void ValidateDatasetShortName(DatasetDto dto, ValidationResults results)
-        {
-            if (string.IsNullOrWhiteSpace(dto.ShortName))
-            {
-                results.Add(Dataset.ValidationErrors.datasetShortNameRequired, "Short Name is required");
-            }
-            else
-            {
-                if (new Regex(@"[^0-9a-zA-Z]").Match(dto.ShortName).Success)
-                {
-                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
-                }
-                if (dto.ShortName.Length > 12)
-                {
-                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
-                }
-                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
-                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
-                {
-                    results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
-                }
-            }
-        }
-
         public List<Dataset> GetDatasetMarkedDeleted()
         {
             List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
@@ -631,7 +576,88 @@ namespace Sentry.data.Core
                                                                       !x.IsBundled);
         }
 
+        public List<DatasetTileDto> GetDatasetTileDtos()
+        {
+            List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && 
+                                                                               w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
+                                                              FetchAllChildren(_datasetContext);
+
+            string associateId = _userService.GetCurrentUser().AssociateId;
+            List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
+
+            List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
+
+            //map to DatasetTileDto
+            foreach (Dataset dataset in datasets)
+            {
+                DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+
+                DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
+
+                datasetTileDtos.Add(datasetTileDto);
+            }
+
+            return datasetTileDtos;
+        }
+
         #region "private functions"
+        private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
+        {
+            if (dto.DatasetCategoryIds == null)
+            {
+                results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+            }
+            else
+            {
+                if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetCategoryRequired, "Category is required");
+                }
+            }
+        }
+
+        private void ValidateDatasetName(DatasetDto dto, ValidationResults results)
+        {
+            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
+            {
+                results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
+            }
+            else //if name, make sure it is not duplicate
+            {
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
+                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
+                }
+            }
+        }
+
+        private void ValidateDatasetShortName(DatasetDto dto, ValidationResults results)
+        {
+            if (string.IsNullOrWhiteSpace(dto.ShortName))
+            {
+                results.Add(Dataset.ValidationErrors.datasetShortNameRequired, "Short Name is required");
+            }
+            else
+            {
+                if (new Regex(@"[^0-9a-zA-Z]").Match(dto.ShortName).Success)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name can only contain alphanumeric characters");
+                }
+                if (dto.ShortName.Length > 12)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
+                }
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName &&
+                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
+                }
+            }
+        }
+
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
             ds.CanDisplay = false;

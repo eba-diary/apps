@@ -420,6 +420,7 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="Extensions\TileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
@@ -444,6 +445,7 @@
     <Compile Include="Models\Search\SavedSearchOptionModel.cs" />
     <Compile Include="Models\Search\SavedSearchDropdownModel.cs" />
     <Compile Include="Models\Search\SaveSearchModel.cs" />
+    <Compile Include="Models\Search\TileModel.cs" />
     <Compile Include="Models\Search\TileResultsModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />

@@ -11,55 +11,37 @@ namespace Sentry.data.Web.Controllers
 {
     public class DatasetSearchController : BaseSearchableController
     {
-        public DatasetSearchController(IFilterSearchService filterSearchService) : base(filterSearchService)
+        private readonly IDatasetService _datasetService;
+
+        public DatasetSearchController(IFilterSearchService filterSearchService, IDatasetService datasetService) : base(filterSearchService)
         {
-            
+            _datasetService = datasetService;
         }
 
         //[Route("Search/Dataset")]
         //[Route("Dataset/Search")]
-        public ActionResult Search()
+        public ActionResult Search(string savedSearch = null)
         {
             //validate user has permissions
-            //if (!SharedContext.CurrentUser.CanViewDataset)
-            //{
-            //    return View("Forbidden");
-            //}
+            if (!SharedContext.CurrentUser.CanViewDataset)
+            {
+                return View("Forbidden");
+            }
 
-            //ViewBag.Title = "Dataset";
-            //SearchIndexModel model = new SearchIndexModel()
+            //if (TryGetSavedSearch(SearchType.DATASET_SEARCH, savedSearch, out ActionResult view))
             //{
-            //    SearchType = SearchType.DATASET_SEARCH
-            //};
+            //    return view;
+            //}
 
             TileResultsModel tileResultsModel = new TileResultsModel()
             {
-                PageSizeOptions = new List<SelectListItem>()
-                {
-                    new SelectListItem()
-                    {
-                        Value = "10",
-                        Text = "10",
-                        Selected = true,
-                    },
-                    new SelectListItem()
-                    {
-                        Value = "25",
-                        Text = "25"
-                    },
-                    new SelectListItem()
-                    {
-                        Value = "100",
-                        Text = "100"
-                    },
-                    new SelectListItem()
-                    {
-                        Value = "All",
-                        Text = "All"
-                    },
-                },
+                PageSizeOptions = Utility.BuildTilePageSizeOptions(),
                 SortByOptions = Utility.BuildDatasetSortByOptions()
             };
+
+            List<DatasetTileDto> dtos = _datasetService.GetDatasetTileDtos();
+
+            tileResultsModel.Tiles = dtos.ToModel();
 
             return View("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
