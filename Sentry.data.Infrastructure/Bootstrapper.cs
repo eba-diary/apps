@@ -139,6 +139,7 @@ namespace Sentry.data.Infrastructure
 
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
+            registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
@@ -178,6 +179,7 @@ namespace Sentry.data.Infrastructure
 
             //register polly policies
             registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<ConfluentConnectorProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
@@ -192,6 +194,18 @@ namespace Sentry.data.Infrastructure
             registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
                 .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
+
+
+            //establish httpclient specific to ConfluentConnectorProvider
+            var confluentConnectorClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            confluentConnectorClient.DefaultRequestHeaders.Accept.Clear();
+            confluentConnectorClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            confluentConnectorClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            var confluentConnectorHttpClientProvider = new HttpClientProvider(confluentConnectorClient);
+
+            registry.For<IKafkaConnectorProvider>().Singleton().Use<ConfluentConnectorProvider>().
+                Ctor<IHttpClientProvider>().Is(confluentConnectorHttpClientProvider).Ctor<string>("baseUrl").Is(Configuration.Config.GetHostSetting("ConfluentConnectorApi"));
+
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);

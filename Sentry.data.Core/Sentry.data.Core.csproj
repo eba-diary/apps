@@ -135,6 +135,7 @@
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
+    <Compile Include="DomainServices\ConnectorService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DataInventoryService.cs" />
     <Compile Include="DomainServices\DataApplicationService.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="DTO\DataInventory\DataInventoryUpdateDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
@@ -209,6 +211,8 @@
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorTask.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnector.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
@@ -261,6 +265,7 @@
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
+    <Compile Include="GlobalEnums\ConnectorState.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
@@ -363,6 +368,7 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
@@ -390,6 +396,7 @@
     <Compile Include="Interfaces\IFilterSearchService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
+    <Compile Include="Interfaces\IKafkaConnectorService.cs" />
     <Compile Include="Interfaces\ISnowProvider.cs" />
     <Compile Include="Interfaces\IDbExecuter.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />

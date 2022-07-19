@@ -1,5 +1,8 @@
-﻿using Sentry.data.Core;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.data.Core;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -7,13 +10,30 @@ namespace Sentry.data.Web.Controllers
     /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
     public class AdminController : BaseController
     {
+        private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
-        public AdminController(IDatasetService datasetService)
+
+        public AdminController(IKafkaConnectorService connectorService, IDatasetService datasetService)
         {
+            _connectorService = connectorService;
             _datasetService = datasetService;
         }
 
-        // GET: Admin
+        [HttpPost]
+        public async Task<JObject> GetConnectorConfig(string ConnectorId)
+        {
+            return await _connectorService.GetS3ConnectorConfigJSONAsync(ConnectorId);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> GetConnectorStatus(string ConnectorId)
+        {
+            JObject JConnectorStatus = await _connectorService.GetS3ConnectorStatusJSONAsync(ConnectorId);
+
+            string json = JsonConvert.SerializeObject(JConnectorStatus, Formatting.Indented);
+
+            return Content(json, "application/json");
+        }
 
         public ActionResult Index()
         {
@@ -24,10 +44,11 @@ namespace Sentry.data.Web.Controllers
             myDict.Add("2", "File Processing Logs");
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
+            myDict.Add("5", "Connector Status");
 
             return View(myDict);
         }
-        public ActionResult GetAdminAction(string viewId)
+        public async Task<ActionResult> GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
@@ -62,6 +83,10 @@ namespace Sentry.data.Web.Controllers
                 case "4":
                     viewPath = "_AdminTest4";
                     break;
+                case "5":
+                    List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
+
+                    return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
             }
 
             return PartialView(viewPath);

@@ -527,24 +527,5 @@ namespace Sentry.data.Web.Tests
                 UserWhoStartedEvent = "012345"
             };
         }
-
-        //public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
-        //{
-        //    Schema schema = new Schema()
-        //    {
-        //        Schema_NME = "Mock Schema",
-        //        Schema_ID = 11000,
-        //        Schema_DSC = "Mock Schema",
-        //        Created_DTM = DateTime.Now,
-        //        DatasetFileConfig = dfc
-        //    };
-
-        //    var schemas = new List<Schema>();
-
-        //    schemas.Add(schema);
-
-        //    return schemas;
-           
-        //}
     }
 }
