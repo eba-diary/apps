@@ -102,6 +102,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4152_UploadFileFromUI => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4310_UseHttpClient => new MockBooleanFeatureFlag(true);
         }
     }
 }

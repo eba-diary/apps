@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure
 
             FindTargetJob();
 
-            SetTargetPath(resp.ParseContentType());
+            SetTargetPath(ParseContentType(resp.ContentType));
                 
             /*
                 * Google API will not return compressed files, therefore, no need to check whether job
