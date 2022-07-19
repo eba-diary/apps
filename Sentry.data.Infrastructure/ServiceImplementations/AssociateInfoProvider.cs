@@ -24,13 +24,6 @@ namespace Sentry.data.Infrastructure
             PopulateCacheIfNeeded();
         }
 
-        private void OnLoadCacheComplete(IAsyncResult result)
-        {
-            IAssociatesServiceClient service = (IAssociatesServiceClient)result.AsyncState;
-            service.EndLoadLocalCache(result);
-            _localCacheProcessing = false;
-        }
-
         public Associate GetAssociateInfo(string associateId)
         {
             PopulateCacheIfNeeded();
@@ -51,11 +44,11 @@ namespace Sentry.data.Infrastructure
             {
                 lock (_lockObject)
                 {
-                    if (_associateService.HasLocalCache == false && _localCacheProcessing == false)
-                    {
-                        _associateService.BeginLoadLocalCache(OnLoadCacheComplete, _associateService, true);
-                        _localCacheProcessing = true;
-                    }
+                    _localCacheProcessing = true;
+                    _associateService.UseCacheDb = true;
+                    _associateService.LoadLocalCacheAsync(true).ContinueWith(task =>
+                       _localCacheProcessing = false
+                    );
                 }
             }
         }
