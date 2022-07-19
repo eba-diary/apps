@@ -51,15 +51,7 @@ namespace Sentry.data.Infrastructure
 
                 try
                 {
-                    HttpResponseMessage response = await _httpClient.GetAsync(job.GetUri().ToString(), HttpCompletionOption.ResponseHeadersRead);
-                    using (Stream responseStream = await response.Content.ReadAsStreamAsync())
-                    {
-                        using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                        {
-                            await responseStream.CopyToAsync(filestream);
-                        }
-                    }
-                    SetTargetPath(ParseContentType(response.Content.Headers.ContentType.ToString()));
+                    GetResponseIntoFileStream(job, tempFile);
 
                     //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
                     //Jaws will cleanup the source temporary file after it completes processing file.
@@ -85,16 +77,7 @@ namespace Sentry.data.Infrastructure
 
                     try
                     {
-                        HttpResponseMessage response = await _httpClient.GetAsync(job.GetUri().ToString(), HttpCompletionOption.ResponseHeadersRead);
-                        using (Stream responseStream = await response.Content.ReadAsStreamAsync())
-                        {
-                            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                            {
-                                await responseStream.CopyToAsync(filestream);
-                            }
-                        }
-                        SetTargetPath(ParseContentType(response.Content.Headers.ContentType.ToString()));
-
+                        GetResponseIntoFileStream(job, tempFile);
                     }
                     catch (Exception ex)
                     {
@@ -133,16 +116,7 @@ namespace Sentry.data.Infrastructure
 
                     try
                     {
-                        HttpResponseMessage response = await _httpClient.GetAsync(job.GetUri().ToString(), HttpCompletionOption.ResponseHeadersRead);
-                        using (Stream responseStream = await response.Content.ReadAsStreamAsync())
-                        {
-                            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                            {
-                                await responseStream.CopyToAsync(filestream);
-                            }
-                        }
-                        SetTargetPath(ParseContentType(response.Content.Headers.ContentType.ToString()));
-
+                        GetResponseIntoFileStream(job, tempFile);
                     }
                     catch (WebException ex)
                     {
@@ -377,6 +351,10 @@ namespace Sentry.data.Infrastructure
 
                 _httpClient = new HttpClient(httpClientHandler, disposeHandler: true);
             }
+            else
+            {
+                _httpClient = new HttpClient();
+            }
         }
 
         protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
@@ -449,6 +427,19 @@ namespace Sentry.data.Infrastructure
                 _job.JobLoggerMessage("Error", "targetjob_gettargetpath_failure", ex);
                 throw;
             }
+        }
+
+        private async Task GetResponseIntoFileStream(RetrieverJob job, string tempFile)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(job.GetUri().ToString(), HttpCompletionOption.ResponseHeadersRead);
+            using (Stream responseStream = await response.Content.ReadAsStreamAsync())
+            {
+                using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    await responseStream.CopyToAsync(filestream);
+                }
+            }
+            SetTargetPath(ParseContentType(response.Content.Headers.ContentType.ToString()));
         }
     }
 }
