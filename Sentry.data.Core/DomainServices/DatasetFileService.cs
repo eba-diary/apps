@@ -162,21 +162,22 @@ namespace Sentry.data.Core
             int batchSize = 100;
             int counter = 1;
             List<int> batch = datasetFileIds.Take(batchSize).ToList();
-
+            int tempDatasetFileId = -1;
             while (batch.Any())
             {
                 try
                 {
-                    foreach (int id in datasetFileIds)
+                    foreach (int id in batch)
                     {
+                        tempDatasetFileId = id;
                         _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter));
                     }
                 } catch (Exception ex)
                 {
                     submittedSuccessful = false;
-                    continue;
+                    Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
                 }
-                counter++;
+                counter++;    
                 batch = batch.Skip(batchSize * counter).ToList();  
             }
             return submittedSuccessful;
