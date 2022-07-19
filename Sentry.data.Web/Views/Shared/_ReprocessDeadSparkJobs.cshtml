@@ -9,7 +9,7 @@
     $(document).ready(function () {
 
         $("#timeCheck").click(function () {
-            
+
             var time = $("#jobCreationCheck").val();
 
             $.ajax({
@@ -17,7 +17,7 @@
                 url: "Admin/GetDeadJobs",
                 data: '{timeCheck: "' + time + '"}',
                 contentType: "application/json; charset=utf-8",
-                dataType:"html",
+                dataType: "html",
                 success: function (msg) {
                     $("#deadJobTable").html(msg);
                 },
@@ -29,6 +29,7 @@
     });
 </script>
 
+<!--Page Header-->
 <div class="d-inline-block">
     <h1>Reprocess Dead Spark Jobs</h1>
     <input type="checkbox">
@@ -47,13 +48,6 @@
 
 <!--Table-->
 
-<script type="text/javascript">
-    
-</script>
-<div id="deadJobTable">
-</div
+<div id="deadJobTable"></div>
 
-@section Scripts {
-    
-}
 

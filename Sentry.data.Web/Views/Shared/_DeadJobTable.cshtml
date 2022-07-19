@@ -3,62 +3,56 @@
     ViewBag.Title = "_AdminTest";
 }
 
-
-
 <script type="text/javascript">
 
     $(document).ready(function () {
+        data.Admin.DeadJobTableInit();
         data.Admin.ReprocessDeadJobs();
-
-        $('#deadJobs').DataTable({
-            'columnDefs': [{
-                'targets': [0, 7], /* column index */
-                'orderable': false, /* true or false */
-            }]
-        });
     });
 </script>
 
-<table id="deadJobs" class="display table table-striped table-bordered table-hover" style="width:100%">
+<table id="deadJobs" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
     <thead>
         <tr>
             <th></th>
+            <th><input type="checkbox" id="selectAll" class="form-check-input"><label for="selectAll" class="form-check-label">Select All Jobs</label></th>
             <th>Submission Time</th>
             <th>Dataset Name</th>
+            <th>Reprocessing Required</th>
             <th>Schema Name</th>
-            <th>Dataset Name</th>
-            <th>Dataset Name</th>
-            <th>Dataset Name</th>
-            <th></th>
+            <th>Source Key</th>
+            <th>Flow Execution Guid</th>
+            <th>Submission Id</th>
+            <th>Batch ID</th>
+            <th>Livy App Id</th>
+            <th>Livy Driver Log Url</th>
+            <th>Livy Spark Ui Url</th>
+            <th>Dataset File Id</th>
         </tr>
     </thead>
     <tbody>
         @foreach (DeadSparkJobModel job in Model)
         {
-            <tr>
-                <td>
-                    <input class="table-checkbox" type="checkbox" data-file-id="@job.DatasetFileID" data-step-id="@job.DataFlowStepID" />
-                </td>
-                <td>@job.SubmissionTime</td>
-                <td>@job.DatasetName</td>
-                <td>@job.SchemaName</td>
-                <td>@job.SourceKey</td>
-                <td>@job.FlowExecutionGuid</td>
-                <td>@job.ReprocessingRequired</td>
-                <td>
-                    <button type="button" data-toggle="collapse"  data-target="@job.SubmissionID" class="clickable btn btn-primary dropdown-toggle dropdown-toggle-split waves-effect waves-light">
-                        <span class="sr-only">View more info</span>
-                    </button>
-                </td>
-            </tr>
-            <tr id="@job.SubmissionID" class="collapse">
-                <td>
-                    <div>Hidden by default</div>
-                </td>
-            </tr>
+        <tr data-file-id="@job.SubmissionID">
+            <td class="dropdown-toggle-col"><i id="@job.SubmissionID" class="fas fa-plus"></i></td>
+            <td><input data-file-id="@job.DatasetFileID" data-step-id="@job.DataFlowStepID" type="checkbox" id=@(job.SubmissionID.ToString() + "InputId") class="select-all-target form-check-input"><label for=@(job.SubmissionID.ToString() + "InputId") class="form-check-label"></label></td>
+            <td>@job.SubmissionTime</td>
+            <td>@job.DatasetName</td>
+            <td>@job.ReprocessingRequired</td>
+            <td>@job.SchemaName</td>
+            <td>@job.SourceKey</td>
+            <td>@job.FlowExecutionGuid</td>
+            <td>@job.SubmissionTime</td>
+            <td>@job.BatchID</td>
+            <td>@job.LivyAppID</td>
+            <td>@job.LivyDriverlogUrl</td>
+            <td>@job.LivySparkUiUrl</td>
+            <td>@job.DatasetFileID</td>
+        </tr>
         }
     </tbody>
 </table>
 
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton">Reprocess Selected</button>
+

@@ -10,44 +10,95 @@ data.Admin = {
         });
     },
 
+    // load and initialize dead job data table
+    DeadJobTableInit: function () {
+
+        $('#deadJobs').DataTable({
+            responsive: {
+                details: {
+                    type: 'column',
+                    target: '.dropdown-control',
+                    renderer: function (api, rowIdx, columns) {
+                        var data = $.map(columns, function (col, i) {
+                            return col.hidden ?
+                                '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
+                                '<td>' + col.title + ':' + '</td> ' +
+                                '<td>' + col.data + '</td>' +
+                                '</tr>' :
+                                '';
+                        }).join('');
+
+                        return data ?
+                            $('<table/>').append(data) :
+                            false;
+                    }
+                }
+            },
+            columnDefs: [
+                {
+                    targets: [0, 2, 3, 4, 5, 6, 7, 8, 9],
+                    className: 'dropdown-control dropdown-target'
+                },
+                {
+                    targets: [0, 1],
+                    orderable: false
+                }
+            ],
+            order: [],
+        });
+
+        // click event logic for table row + and - icons based on dropdown state
+        $(".dropdown-target").click(function () {
+            var targetId = $(this).parents("tr").data("file-id");
+
+            if (!$(this).parents("tr").hasClass("parent")) {
+                $(`#${targetId}`).removeClass("fa-plus");
+                $(`#${targetId}`).addClass("fa-minus");
+            } else {
+                $(`#${targetId}`).addClass("fa-plus");
+                $(`#${targetId}`).removeClass("fa-minus");
+            }
+        });
+    },
+
+    // group selected jobs by DataFlowStepId and send them to be reprocessed
     ReprocessDeadJobs: function () {
-        $(".dropdown-toggle").click(function () {
-            var collapseElem = $(this).data("target");
-            $(`#${collapseElem}`).collapse('toggle');
+        $("#selectAll").click(function (event) {
+            var selectAllCheckbox = $(this);
+            if (selectAllCheckbox.is(":checked")) {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                });
+            }
+            else {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                });
+            }
         });
 
         $("#reprocessButton").click(function () {
             var files = [];
 
-            $('.table-checkbox:checked').each(function () {
+            // grabs the file & step id's of all checked rows
+            $('.select-all-target:checked').each(function () {
                 var obj = { fileId: $(this).data("file-id"), stepId: $(this).data("step-id") };
                 files.push(obj);
             });
 
-            const key = "fileId";
-            const DatasetFileId = "stepId";
-
+            // groups file id's by step id's and stores them in a JSON object
             var returnJson = files.reduce(function (rv, x) {
-                (rv[x[key]] = rv[x[key]] || []).push(x[DatasetFileId]);
+                (rv[x["fileId"]] = rv[x["fileId"]] || []).push(x["stepId"]);
                 return rv;
             }, {});
 
+            // loop through all json keys and POST them to the data file reprocess controller
             for (let x in returnJson) {
-                var fileArray = []
-                for (let i in returnJson[x]) {
-                    fileArray.push(returnJson[x][i]);
-                }
-
-                var ajaxReturn = {
-                    DataFlowStepId: x,
-                    DatasetFileIds: fileArray
-                };
-
                 $.ajax({
                     type: "POST",
                     url: "../../api/v2/datafile/DataFile/Reprocess",
                     contentType: "application/json",
-                    data: JSON.stringify({ DataFlowStepId: 1, DatasetFileIds: [1, 2] }),
+                    data: JSON.stringify({ DataFlowStepId: x, DatasetFileIds: returnJson[x] }),
                     success: function () {
                         alert("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
                     },

@@ -37,7 +37,7 @@ namespace Sentry.data.Infrastructure
 
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
         {
-            bool isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? false : true;
+            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "Yes" : "No";
 
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {
@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure
                 LivyDriverlogUrl = deadSparkJob.LivyDriverlogUrl,
                 LivySparkUiUrl = deadSparkJob.LivySparkUiUrl,
                 DatasetFileID = deadSparkJob.DatasetFileID,
-                DataFlowStepID = deadSparkJob.DataFlowID
+                DataFlowStepID = deadSparkJob.DataFlowStepID
             };
 
             return deadSparkJobDto;
