@@ -41,7 +41,7 @@ namespace Sentry.data.Infrastructure.Tests
                 StatusCode = "C",
                 QueryMadeDateTime = DateTime.Now,
                 SchemaId = 0,
-                EventContents = @"{""field"":""value""}",
+                EventContents = "Event Contents",
                 TotalFlowSteps = 0,
                 FileModifiedDateTime = DateTime.Now,
                 OriginalFileName = "file name",
@@ -77,7 +77,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(entity.StatusCode, dto.StatusCode);
             Assert.AreEqual(entity.QueryMadeDateTime, dto.QueryMadeDateTime);
             Assert.AreEqual(entity.SchemaId, dto.SchemaId);
-            Assert.AreEqual(entity.EventContents, dto.EventContents.ToString(Newtonsoft.Json.Formatting.None));
+            Assert.AreEqual(entity.EventContents, dto.EventContents);
             Assert.AreEqual(entity.TotalFlowSteps, dto.TotalFlowSteps);
             Assert.AreEqual(entity.FileModifiedDateTime, dto.FileModifiedDateTime);
             Assert.AreEqual(entity.OriginalFileName, dto.OriginalFileName);
@@ -153,7 +153,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(dataFlowMetricDtos[0].FileName, dataFileFlowMetrics[0].FileName);
             Assert.AreEqual(dataFlowMetricDtos[1].FileName, dataFileFlowMetrics[0].FileName);
             Assert.AreEqual(dataFlowMetricDtos[2].FileName, dataFileFlowMetrics[0].FileName);
-            Assert.AreEqual(dataFlowMetricDtos[2].MetricGeneratedDateTime - dataFlowMetricDtos[0].MetricGeneratedDateTime, dataFileFlowMetrics[0].Duration);
+            Assert.AreEqual((dataFlowMetricDtos[2].MetricGeneratedDateTime - dataFlowMetricDtos[0].MetricGeneratedDateTime).TotalSeconds.ToString(), dataFileFlowMetrics[0].Duration);
             stubIDatasetContext.VerifyAll();
             stubIElasticContext.VerifyAll();
 
@@ -265,27 +265,27 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFlowMetricDto> flowEvents = new List<DataFlowMetricDto>();
             DataFlowMetricDto eventOne = new DataFlowMetricDto()
             {
-                CurrentFlowStep = 2
+                EventMetricId = 2
             };
             flowEvents.Add(eventOne);
             DataFlowMetricDto eventTwo = new DataFlowMetricDto()
             {
-                CurrentFlowStep = 5
+                EventMetricId = 5
             };
             flowEvents.Add(eventTwo);
             DataFlowMetricDto eventThree = new DataFlowMetricDto()
             {
-                CurrentFlowStep = 4
+                EventMetricId = 4
             };
             flowEvents.Add(eventThree);
             DataFlowMetricDto eventFour = new DataFlowMetricDto()
             {
-                CurrentFlowStep = 1
+                EventMetricId = 1
             };
             flowEvents.Add(eventFour);
             DataFlowMetricDto eventFive = new DataFlowMetricDto()
             {
-                CurrentFlowStep = 3
+                EventMetricId = 3
             };
             flowEvents.Add(eventFive);
             List<DataFileFlowMetricsDto> fileFlowMetrics = new List<DataFileFlowMetricsDto>();
@@ -295,10 +295,10 @@ namespace Sentry.data.Infrastructure.Tests
             //Act
             List<DataFileFlowMetricsDto> sortedFileFlowMetrics = dataFlowMetricService.SortFlowMetrics(fileFlowMetrics);
             //Assert
-            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[0].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[1].CurrentFlowStep);
-            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[1].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[2].CurrentFlowStep);
-            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[2].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[3].CurrentFlowStep);
-            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[3].CurrentFlowStep < sortedFileFlowMetrics[0].FlowEvents[4].CurrentFlowStep);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[0].EventMetricId > sortedFileFlowMetrics[0].FlowEvents[1].EventMetricId);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[1].EventMetricId > sortedFileFlowMetrics[0].FlowEvents[2].EventMetricId);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[2].EventMetricId > sortedFileFlowMetrics[0].FlowEvents[3].EventMetricId);
+            Assert.IsTrue(sortedFileFlowMetrics[0].FlowEvents[3].EventMetricId > sortedFileFlowMetrics[0].FlowEvents[4].EventMetricId);
             stubIDatasetContext.VerifyAll();
             stubIElasticContext.VerifyAll();
         }
@@ -314,36 +314,36 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
             DataFileFlowMetricsDto fileGroupOne = new DataFileFlowMetricsDto()
             {
-                LastEventTime = new DateTime(2022,7,15)
+                FirstEventTime = new DateTime(2022,7,15)
             };
             fileGroups.Add(fileGroupOne);
             DataFileFlowMetricsDto fileGroupTwo = new DataFileFlowMetricsDto()
             {
-                LastEventTime = new DateTime(2022, 7, 16)
+                FirstEventTime = new DateTime(2022, 7, 16)
             };
             fileGroups.Add(fileGroupTwo);
             DataFileFlowMetricsDto fileGroupThree = new DataFileFlowMetricsDto()
             {
-                LastEventTime = new DateTime(2022, 7, 14)
+                FirstEventTime = new DateTime(2022, 7, 14)
             };
             fileGroups.Add(fileGroupThree);
             DataFileFlowMetricsDto fileGroupFour = new DataFileFlowMetricsDto()
             {
-                LastEventTime = new DateTime(2022, 7, 13)
+                FirstEventTime = new DateTime(2022, 7, 13)
             };
             fileGroups.Add(fileGroupFour);
             DataFileFlowMetricsDto fileGroupFive = new DataFileFlowMetricsDto()
             {
-                LastEventTime = new DateTime(2022, 7, 17)
+                FirstEventTime = new DateTime(2022, 7, 17)
             };
             fileGroups.Add(fileGroupFive);
             //Act
             List<DataFileFlowMetricsDto> sortedFileGroups = dataFlowMetricService.SortFlowMetrics(fileGroups);
             //Assert
-            Assert.IsTrue(sortedFileGroups[0].LastEventTime > sortedFileGroups[1].LastEventTime);
-            Assert.IsTrue(sortedFileGroups[1].LastEventTime > sortedFileGroups[2].LastEventTime);
-            Assert.IsTrue(sortedFileGroups[2].LastEventTime > sortedFileGroups[3].LastEventTime);
-            Assert.IsTrue(sortedFileGroups[3].LastEventTime > sortedFileGroups[4].LastEventTime);
+            Assert.IsTrue(sortedFileGroups[0].FirstEventTime > sortedFileGroups[1].FirstEventTime);
+            Assert.IsTrue(sortedFileGroups[1].FirstEventTime > sortedFileGroups[2].FirstEventTime);
+            Assert.IsTrue(sortedFileGroups[2].FirstEventTime > sortedFileGroups[3].FirstEventTime);
+            Assert.IsTrue(sortedFileGroups[3].FirstEventTime > sortedFileGroups[4].FirstEventTime);
             stubIDatasetContext.VerifyAll();
             stubIElasticContext.VerifyAll();
         }
