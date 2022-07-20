@@ -12,10 +12,9 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
-
-        public AdminController(IKafkaConnectorService connectorService, IDatasetService datasetService)
         private readonly IDeadSparkJobService _deadSparkJobService;
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService)
+
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
@@ -48,10 +47,10 @@ namespace Sentry.data.Web.Controllers
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
             myDict.Add("5", "Connector Status");
+            myDict.Add("6", "Reprocess Dead Jobs");
 
             return View(myDict);
         }
-        public async Task<ActionResult> GetAdminAction(string viewId)
 
 
         [Route("Admin/ReprocessDeadSparkJobs")]
@@ -76,7 +75,7 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
 
-        public ActionResult GetAdminAction(string viewId)
+        public async Task<ActionResult> GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
@@ -106,6 +105,9 @@ namespace Sentry.data.Web.Controllers
                     List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
 
                     return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
+                case "6":
+                    viewPath = "_ReprocessDeadSparkJobs";
+                    break;
             }
 
             return PartialView(viewPath);

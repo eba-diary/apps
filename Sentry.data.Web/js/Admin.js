@@ -250,7 +250,7 @@ data.Admin = {
                         data.Admin.makeToast("success", `Selected file(s) for DATASET: ${tempArr[0]} & SCHEMA: ${tempArr[1]} were posted for reprocessing.`);
                     },
                     error: function (msg) {
-                        data.Admin.makeToast("error", `Selected file(s) for DATASET: ${tempArr[0]} & SCHEMA: ${tempArr[1]} could not be posted for reprocessing. Please try again`);
+                        data.Admin.makeToast("error", `Selected file(s) for DATASET ("${tempArr[0]}") & SCHEMA ("${tempArr[1]}") could not be posted for reprocessing. Please try again`);
                     }
                 });
             };
@@ -378,7 +378,6 @@ data.Admin = {
                 }
             });
         });
-    }
     },
 
     // makeToast config
@@ -424,6 +423,6 @@ data.Admin = {
         }
 
         toastr[severity](message);
-    },
+    }
 }
 
