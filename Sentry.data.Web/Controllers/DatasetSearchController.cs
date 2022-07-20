@@ -34,6 +34,11 @@ namespace Sentry.data.Web.Controllers
                 return view;
             }
 
+            //need to build filter categories
+            //return GetFilterSearchView(model);
+
+            //code below will move to Results() when transitioned into FilterSearch page
+            //only using for testing
             TileResultsModel tileResultsModel = new TileResultsModel()
             {
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(),
@@ -58,6 +63,7 @@ namespace Sentry.data.Web.Controllers
 
         public override ActionResult Results()
         {
+            //will return the TileResults partial view
             throw new NotImplementedException();
         }
 
