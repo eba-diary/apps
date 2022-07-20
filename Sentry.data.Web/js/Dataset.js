@@ -927,6 +927,9 @@ data.Dataset = {
                     $("#IsSecured").parents('.md-form').hide();
                     break;
                 case "2":
+                    if (!$("#IsSecured").is(':checked')) {
+                        $("#IsSecured").next().click();
+                    }
                     $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
                         'identifiable information, and is intended for limited, specific use by a workgroup, ' +
                         'department, or group of individuals with a legitimate need to know. Disclosure or ' +
