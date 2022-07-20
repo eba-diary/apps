@@ -12,6 +12,9 @@ namespace Sentry.data.Web.Controllers
             _filterSearchService = filterSearchService;
         }
 
+        [ChildActionOnly]
+        public abstract ActionResult Results();
+
         protected abstract FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel);
 
         protected bool TryGetSavedSearch(string searchType, string savedSearchName, out ActionResult actionResult)

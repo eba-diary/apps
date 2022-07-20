@@ -34,6 +34,11 @@ namespace Sentry.data.Web.Controllers
         //    return View(model);
         //}
 
+        public override ActionResult Results()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
             return new FilterSearchConfigModel()

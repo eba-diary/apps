@@ -72,7 +72,10 @@
     </div>
 
     <div class="filter-search-results-container display-none">
-        @Html.Partial(Model.ResultView)
+        @{
+            Html.RenderAction("Results");
+        }
+        @*@Html.Partial(Model.ResultView)*@
     </div>
 
 </div>

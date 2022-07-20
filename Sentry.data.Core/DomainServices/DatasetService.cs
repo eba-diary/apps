@@ -611,18 +611,18 @@ namespace Sentry.data.Core
                 _cache.Add(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
             }
 
-            IEnumerable<DatasetTileDto> tileEnumerable;
+            IEnumerable<DatasetTileDto> dtoEnumerable;
 
             if (datasetSearchDto.OrderByDescending)
             {
-                tileEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
+                dtoEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
             }
             else
             {
-                tileEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
+                dtoEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
             }
             
-            datasetTileDtos = tileEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber-1)).Take(datasetSearchDto.PageSize).ToList();
+            datasetTileDtos = dtoEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber-1)).Take(datasetSearchDto.PageSize).ToList();
 
             return datasetTileDtos;
         }

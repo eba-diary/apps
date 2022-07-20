@@ -45,6 +45,12 @@ namespace Sentry.data.Web.Controllers
             return GetFilterSearchView(model);
         }
 
+        [ChildActionOnly]
+        public override ActionResult Results()
+        {
+            return PartialView("SearchResult");
+        }
+
         [HttpPost]
         public JsonResult SearchResult(FilterSearchModel searchModel)
         {
@@ -117,7 +123,6 @@ namespace Sentry.data.Web.Controllers
                 PageTitle = "Data Inventory",
                 SearchType = SearchType.DATA_INVENTORY,
                 IconPath = "~/Images/DataInventory/DataInventoryIconBlue.svg",
-                ResultView = "SearchResult",
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
                 DefaultSearch = searchModel
             };

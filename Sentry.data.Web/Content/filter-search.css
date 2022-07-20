@@ -85,7 +85,8 @@
 }
 
 .filter-search-container {
-    width: 300px;
+    min-width: 275px;
+    max-width: 275px;
 }
 
 .filter-search-result-count-container {

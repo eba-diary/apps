@@ -56,6 +56,11 @@ namespace Sentry.data.Web.Controllers
             return View("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
 
+        public override ActionResult Results()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
             return new FilterSearchConfigModel()
