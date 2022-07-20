@@ -20,12 +20,25 @@
     </div>
     <div class="col-lg-10">
         <div id="partial-view-test">
-            <h1 style="">My Links</h1>
+
+            <h1 id="titleLinks">My Links</h1>
             <a href="#!" class="list-group-item list-group-item-action">Link One</a>
             <a href="#!" class="list-group-item list-group-item-action">Link Two</a>
             <a href="#!" class="list-group-item list-group-item-action">Link Three</a>
-            <button type="button">Add</button>
-            <button type="button">Delete</button>
+            <a href="#!" class="list-group-item list-group-item-action">Link Four</a>
+            <a href="#!" class="list-group-item list-group-item-action">Link Five</a>
+            <a href="#!" class="list-group-item list-group-item-action">Link Six</a>
+            
+            <button type="button" id="toggleBtn">Add</button>
+            <button type="button">Delete</button> 
+
+            <div id="toggleDiv">
+                <h3>Add Information</h3>
+                <input placeholder="Name"/>
+                <input placeholder="Description"/>
+                <input placeholder="Url"/>
+                <button type="button">Add Link</button>
+            </div>
         </div>
     </div>
 </div>
@@ -37,5 +50,18 @@
         $(function () {
             data.Admin.AdminPageInit();
         });
+
+        $(function () {
+            $("#toggleBtn").click(function () {
+                $("#toggleDiv").toggle();
+            });
+        });
+
     </script>
 }
+
+<style>
+    #toggleDiv{
+        display: block;
+    }
+</style>
