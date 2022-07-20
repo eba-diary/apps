@@ -1,0 +1,243 @@
+{
+  "S3_ICCM_TESTV2_CCIS_CLAIMANT_02": {
+    "status": {
+      "name": "S3_ICCM_TESTV2_CCIS_CLAIMANT_02",
+      "connector": {
+        "state": "RUNNING",
+        "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+      },
+      "tasks": [
+        {
+          "id": 0,
+          "state": "RUNNING",
+          "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+        }
+      ],
+      "type": "sink"
+    },
+    "info": {
+      "name": "S3_ICCM_TESTV2_CCIS_CLAIMANT_02",
+      "config": {
+        "connector.class": "io.confluent.connect.s3.S3SinkConnector",
+        "s3.region": "us-east-2",
+        "flush.size": "10000",
+        "tasks.max": "1",
+        "timezone": "UTC",
+        "transforms": "InsertMetadata",
+        "locale": "en-US",
+        "s3.path.style.access.enabled": "false",
+        "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
+        "s3.acl.canned": "bucket-owner-full-control",
+        "transforms.InsertMetadata.partition.field": "kafka_partition",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "s3.proxy.password": "3gCrBtanJKAiuZ2wXNXdyD82RSEpJG",
+        "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "s3.bucket.name": "sentry-dlst-qual-droplocation-ae2",
+        "partition.duration.ms": "86400000",
+        "s3.proxy.user": "SV_DATA_S3CON_I_Q_V1",
+        "s3.ssea.name": "AES256",
+        "file.delim": "_",
+        "transforms.InsertMetadata.offset.field": "kafka_offset",
+        "topics": "ICCM-TESTV2-CCIS-msg-Bodily_Injury-0, ICCM-TESTV2-CCIS-msg-Claimant-0",
+        "partitioner.class": "io.confluent.connect.storage.partitioner.TimeBasedPartitioner",
+        "name": "S3_ICCM_TESTV2_CCIS_CLAIMANT_02",
+        "value.converter.schemas.enable": "false",
+        "transforms.InsertMetadata.timestamp.field": "kafka_timestamp",
+        "storage.class": "io.confluent.connect.s3.storage.S3Storage",
+        "rotate.schedule.interval.ms": "86400000",
+        "path.format": "YYYY/MM/dd",
+        "timestamp.extractor": "Record",
+        "s3.proxy.url": "https://serverproxyqual.sentry.com:8080",
+        "transforms.InsertMetadata.type": "org.apache.kafka.connect.transforms.InsertField$Value"
+      },
+      "tasks": [
+        {
+          "connector": "S3_ICCM_TESTV2_CCIS_CLAIMANT_02",
+          "task": 0
+        }
+      ],
+      "type": "sink"
+    }
+  },
+  "S3_ICCM_TESTV2_CCIS_FINANCIAL_02": {
+    "status": {
+      "name": "S3_ICCM_TESTV2_CCIS_FINANCIAL_02",
+      "connector": {
+        "state": "RUNNING",
+        "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+      },
+      "tasks": [
+        {
+          "id": 0,
+          "state": "RUNNING",
+          "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+        },
+		{
+          "id": 1,
+          "state": "FAILED",
+          "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+        }
+      ],
+      "type": "sink"
+    },
+    "info": {
+      "name": "S3_ICCM_TESTV2_CCIS_FINANCIAL_02",
+      "config": {
+        "connector.class": "io.confluent.connect.s3.S3SinkConnector",
+        "s3.region": "us-east-2",
+        "flush.size": "10000",
+        "tasks.max": "1",
+        "timezone": "UTC",
+        "transforms": "InsertMetadata",
+        "locale": "en-US",
+        "s3.path.style.access.enabled": "false",
+        "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
+        "s3.acl.canned": "bucket-owner-full-control",
+        "transforms.InsertMetadata.partition.field": "kafka_partition",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "s3.proxy.password": "3gCrBtanJKAiuZ2wXNXdyD82RSEpJG",
+        "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "s3.bucket.name": "sentry-dlst-qual-droplocation-ae2",
+        "partition.duration.ms": "86400000",
+        "s3.proxy.user": "SV_DATA_S3CON_I_Q_V1",
+        "s3.ssea.name": "AES256",
+        "file.delim": "_",
+        "transforms.InsertMetadata.offset.field": "kafka_offset",
+        "topics": "ICCM-TESTV2-CCIS-msg-Check-0, ICCM-TESTV2-CCIS-msg-Claim_Payment-0, ICCM-TESTV2-CCIS-msg-Invoice-0, ICCM-TESTV2-CCIS-msg-Payment-0, ICCM-TESTV2-CCIS-msg-Receipt-0, ICCM-TESTV2-CCIS-msg-Reserve-0, ICCM-TESTV2-CCIS-msg-Transaction-0",
+        "partitioner.class": "io.confluent.connect.storage.partitioner.TimeBasedPartitioner",
+        "name": "S3_ICCM_TESTV2_CCIS_FINANCIAL_02",
+        "value.converter.schemas.enable": "false",
+        "transforms.InsertMetadata.timestamp.field": "kafka_timestamp",
+        "storage.class": "io.confluent.connect.s3.storage.S3Storage",
+        "rotate.schedule.interval.ms": "86400000",
+        "path.format": "YYYY/MM/dd",
+        "timestamp.extractor": "Record",
+        "s3.proxy.url": "https://serverproxyqual.sentry.com:8080",
+        "transforms.InsertMetadata.type": "org.apache.kafka.connect.transforms.InsertField$Value"
+      },
+      "tasks": [
+        {
+          "connector": "S3_ICCM_TESTV2_CCIS_FINANCIAL_02",
+          "task": 0
+        }
+      ],
+      "type": "sink"
+    }
+  },
+  "S3_DLRT-QUAL-RMS": {
+    "status": {
+      "name": "S3_DLRT-QUAL-RMS",
+      "connector": {
+        "state": "RUNNING",
+        "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+      },
+      "tasks": [
+        {
+          "id": 0,
+          "state": "FAILED",
+          "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+        }
+      ],
+      "type": "sink"
+    },
+    "info": {
+      "name": "S3_DLRT-QUAL-RMS",
+      "config": {
+        "connector.class": "io.confluent.connect.s3.S3SinkConnector",
+        "s3.region": "us-east-2",
+        "flush.size": "100000",
+        "tasks.max": "1",
+        "timezone": "UTC",
+        "transforms": "InsertMetadata",
+        "locale": "en-US",
+        "s3.path.style.access.enabled": "false",
+        "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
+        "s3.acl.canned": "bucket-owner-full-control",
+        "transforms.InsertMetadata.partition.field": "kafka_partition",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "s3.proxy.password": "3gCrBtanJKAiuZ2wXNXdyD82RSEpJG",
+        "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "s3.bucket.name": "sentry-data-qual-dataset-ae2",
+        "partition.duration.ms": "1800000",
+        "s3.proxy.user": "SV_DATA_S3CON_I_Q_V1",
+        "s3.ssea.name": "AES256",
+        "transforms.InsertMetadata.offset.field": "kafka_offset",
+        "file.delim": "_",
+        "topics": "DLRT-QUAL-RMS",
+        "partitioner.class": "io.confluent.connect.storage.partitioner.TimeBasedPartitioner",
+        "name": "S3_DLRT-QUAL-RMS",
+        "transforms.InsertMetadata.timestamp.field": "kafka_timestamp",
+        "value.converter.schemas.enable": "false",
+        "storage.class": "io.confluent.connect.s3.storage.S3Storage",
+        "rotate.schedule.interval.ms": "1800000",
+        "path.format": "YYYY/MM/dd",
+        "timestamp.extractor": "Record",
+        "transforms.InsertMetadata.type": "org.apache.kafka.connect.transforms.InsertField$Value",
+        "s3.proxy.url": "https://serverproxyqual.sentry.com:8080"
+      },
+      "tasks": [
+        {
+          "connector": "S3_DLRT-QUAL-RMS",
+          "task": 0
+        }
+      ],
+      "type": "sink"
+    }
+  },
+  "SRPL_TEST_QUOTES_CONNECT_EAST_2_1": {
+    "status": {
+      "name": "SRPL_TEST_QUOTES_CONNECT_EAST_2_1",
+      "connector": {
+        "state": "RUNNING",
+        "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+      },
+      "tasks": [
+        {
+          "id": 0,
+          "state": "RUNNING",
+          "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+        },
+        {
+          "id": 1,
+          "state": "RUNNING",
+          "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+        }
+      ],
+      "type": "sink"
+    },
+    "info": {
+      "name": "SRPL_TEST_QUOTES_CONNECT_EAST_2_1",
+      "config": {
+        "connector.class": "com.snowflake.kafka.connector.SnowflakeSinkConnector",
+        "tasks.max": "2",
+        "topics": "PLPC_TEST_QUOTES",
+        "snowflake.private.key.passphrase": "doh-j6sp#wrlJ0",
+        "jvm.proxy.host": "app-proxy-nonprod.sentry.com",
+        "jvm.proxy.username": "BATCH_SERAPL_T",
+        "buffer.flush.time": "300",
+        "jvm.proxy.password": "cL3o2SucVCJf10d",
+        "snowflake.url.name": "https://sentry.us-east-2.aws.snowflakecomputing.com/",
+        "snowflake.database.name": "SRPL_TEST",
+        "snowflake.schema.name": "KAFKA_CONNECTOR",
+        "buffer.count.records": "1000",
+        "snowflake.user.name": "KAFKA_SRPL_T",
+        "snowflake.private.key": "MIIFHzBJBgkqhkiG9w0BBQ0wPDAbBgkqhkiG9w0BBQwwDgQIeK+l1yYoUn0CAggAMB0GCWCGSAFlAwQBKgQQ6zTmlktU8U1xs2rcSc9N0gSCBNCvQs03uuXfyutCPoXFidQnUp7zhf8NYNdIz+InorVQAT834jViwmgJ1HfumtBdT/z1oXI7F2OmM/j1XZ+AlX73UYYyS1QkdCRNuLlzCmDAhAjneOUFmjUvW7xEqhFu05RlKhuqp5Nak1/kbE44rB8oWBnp7r0Kvlu+ZSkmnN3SiPMtAMh9Af2Hj6UxGCYjwZ9oOGv0loWtx4IRPOtYQKmphaFVBSM+mxcJkBRshtHRQX9cPUoK1a/bQJbFVVTovLXwIrAYrb24cp878SOrSFRdg1a4q+XeLgEGNrJ425aBSbQiaMXzR+IghIdshdU8auTmRPf3wkwbWbFkMxFIc8yytipqgQInw4UOpjocFUBraKCy4fuvby0ycaJ73WNnuaALziUqRQUqzcXXs9BbcX2gb2BU6Xxv502UPzM8GsjbWfP0WxXNGaZaHSApdIyFlZrH32u1VNGcmvpaOmUzdR/wq4u93LCBbu1JSgOLMhsLJl8LUb1k953UkQZyVWfpbd2uxIcrr4Bt3WYzej5TGNjUPjOmyRkSCY+l4ePgOVP0OD6gPeTxrGsqdKbdIJTMF0UERxln+QoGFZaVo+MW/5EjsVdMd1xhNlzKlXjxXi6ApFyz20AX1jJdkWPREZW6rLDxF5ESdUWlom/M5CDx/wC7ZgtV5TtDwCzRAa67dd0ZIn1DkOgAh8mYf8bnoVpvgduMMmCdXPVFipv13vHhaodxTji12IAEv/cU6MU8ijUFD/5Pe4IVptBPm2OMkSjzMkF+GAGnmeRPMM2C1aM3ss+EM6Gw9wVn1vEI9TKoYRynLdHj1jaZtzGBd/Z0rGQLAkjTJhs5YItD3jaTJT2nmWzCMh7QQr29u2zoSgZ/tLvK4tPHnGWht3fPQcC8RiKGZorutbQwcSP1vtX6d4lrmLeYcT5N3ZnaI+l4wjy8KDRaHsnAc0CeKUyswrdbcDZmz81a9xa6y6UuJbeSv3shQKIaVA4l3LpUR53pd87MsUr+eBHk7t+Q30BKV2GSAY4y6OErGMxXTDuWm/rJxpGXlmEGD+nreIvUGzTmrEp0Mw5fhOKCVrKf8NpbbPs39KmkogYnz8EiQFt2nyE5edD2B7siLUepuqY24tYSQa7fVDsraw7uuDGIkYhxYpdAmgk72QR+ZvMH2XcsqbBX/CfC3UZDmT2uus9o/2N+zo/U58WiCcQH/se6hAr3mgWP8Cu6TJfzUHzzumcIGQhy8iw9iRRqPkJIIPnDcHBNTBUVLKo2V+8hsFam51bfVuoR149+3byIW4g8tIFoF0r5zo/WSdINd5oHVce2g/EH3ABWlFPkFnJ0IUb4VZqvXB0FB4h3d153e9gylRlCIhRMbJvMN3lPMZgioH6ip3KhzSrOtdnDo5oDbuwNfzWyg+zB+SmG8AUf3wtNKldG2mfLW9+a2aPjFSYmmYIZuOXJC4ArcDAaxk5LUAItbrV35gwL3piXbMM227JM7uF0fZqi4CSvB9mGvTnFaypaRvlS92h2tXJVIGqunjPV2W6kDAaBq6nVSwrc26m+6hLBEJmj24sd/ErjFp8QyTZMHtilaNAtfRLqcrUxI81vRU1ujNcMhbvlY5B+tdlRa+DiIFBf0Dus3iNwXaDAbJBia7uB/5Bn7VUZGg==",
+        "name": "SRPL_TEST_QUOTES_CONNECT_EAST_2_1",
+        "jvm.proxy.port": "8100",
+        "value.converter": "com.snowflake.kafka.connector.records.SnowflakeJsonConverter",
+        "key.converter": "org.apache.kafka.connect.storage.StringConverter"
+      },
+      "tasks": [
+        {
+          "connector": "SRPL_TEST_QUOTES_CONNECT_EAST_2_1",
+          "task": 0
+        },
+        {
+          "connector": "SRPL_TEST_QUOTES_CONNECT_EAST_2_1",
+          "task": 1
+        }
+      ],
+      "type": "sink"
+    }
+  }
+}

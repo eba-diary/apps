@@ -17,6 +17,35 @@ namespace Sentry.data.Web.Tests
     public class MappingTests
     {
         [TestMethod]
+        public void ToModel_ConnectorInfoDto_ReturnConnectorModel() 
+        {
+            //Arrange
+            List<ConnectorDto> cdList = new List<ConnectorDto>();
+
+            //Act
+            cdList.Add(new ConnectorDto()
+            {
+                ConnectorName = "test_connector1",
+                ConnectorState = ConnectorState.RUNNING
+            });
+
+            cdList.Add(new ConnectorDto()
+            {
+                ConnectorName = "test_connector2",
+                ConnectorState = ConnectorState.FAILED
+            });
+
+            List<ConnectorModel> cmList = cdList.MapToModelList();
+            
+            //Assert
+            for(int i=0; i< cmList.Count;i++)
+            {
+                Assert.AreEqual(cmList[i].ConnectorName, cdList[i].ConnectorName);
+                Assert.AreEqual(cmList[i].ConnectorState, cdList[i].ConnectorState);
+            }
+        }
+
+    [TestMethod]
         public void MapToModelList_DeadSparkJobDtoList_ReturnDeadSparkJobModelList()
         {
             //Arramge

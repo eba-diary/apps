@@ -335,6 +335,7 @@
     <Compile Include="Mappings\Primary\RTSourceTypesMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIEndpointsMapping.cs" />
     <Compile Include="Mappings\Subscriptions\StatusTypeMapping.cs" />
+    <Compile Include="PollyPolicies\ConfluentConnectorProviderPolicy.cs" />
     <Compile Include="PollyPolicies\ApacheLivyProviderPolicy.cs" />
     <Compile Include="PollyPolicies\GenericHttpProviderPolicy.cs" />
     <Compile Include="PollyPolicies\FtpProviderPolicy.cs" />
@@ -344,6 +345,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\ConfluentConnectorProvider.cs" />
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />

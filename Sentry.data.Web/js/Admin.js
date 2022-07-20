@@ -343,6 +343,44 @@ data.Admin = {
         });
     },
 
+    SetupConnectorFilterTableInit: function () {
+        $(document).ready(function () {
+            $('#connector-status-table').DataTable({
+                'columnDefs': [{
+                    'targets': [2, 3], /* column index */
+                    'orderable': false, /* true or false */
+                }]
+            });
+        });
+    },
+
+    RetrieveModalDataInit: function () {
+        $(".modalViewBtn").click(function () {
+            var connectorName = $(this).data("name");
+            var actionUrl = $(this).data("action");
+
+            $("#modalViewLabel").text(`${connectorName} Info`);
+
+            $.ajax({
+                type: "POST",
+                url: `Admin/${actionUrl}`,
+                traditional: true,
+                dataType: "json",
+                data: { ConnectorId: connectorName },
+                success: function (data) {
+                    var json = JSON.stringify(data, null, "\t");
+
+                    $(".modal-body").html(`<textarea style="resize:both;" rows="20" class="w-100" readonly=true>${json}</textarea>`);
+
+                },
+                failure: function (errMsg) {
+                    alert(errMsg);
+                }
+            });
+        });
+    }
+    },
+
     // makeToast config
     makeToast: function (severity, message) {
 
