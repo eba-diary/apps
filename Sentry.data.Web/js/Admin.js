@@ -281,7 +281,7 @@ data.Admin = {
                         className: 'dt-control',
                         orderable: false,
                         data: null,
-                        defaultContent: '',
+                        defaultContent: '<center><i id = "expand-collapse-icon" class = "fas fa-plus"></i></center>',
                     },
                     {
                         className: 'dt-control',
@@ -312,13 +312,13 @@ data.Admin = {
                         data: null,
                         render: (d) => function (data, type, row) {
                             if (d.AllEventsPresent && d.AllEventsComplete) {
-                                return '<em class="icon-checkmark" style="color: green"></em>';
+                                return '<center><i class="fas fa-check" style="color: green"></i></center>';
                             }
                             else if (!d.AllEventsPresent && d.AllEventsComplete) {
-                                return '<em class="icon-clock"></em>';
+                                return '<center><i class="fas fa-clock"></i></center>';
                             }
                             else {
-                                return '<em class="icon-error-outline" style="color: red"></em>';
+                                return '<center><i class="fas fa-circle-x" style="color: red"></i></center>';
                             }
                         }
                     }
@@ -329,15 +329,20 @@ data.Admin = {
             $('#metricGroupsTable').on('click', 'td.dt-control', function () {
                 var tr = $(this).closest('tr');
                 var row = table.row(tr);
+                var icon = $(this).closest('tr').find("#expand-collapse-icon");
 
                 if (row.child.isShown()) {
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
+                    icon.addClass('fa-plus')
+                    icon.removeClass('fa-minus')
                 } else {
                     // Open this row
                     row.child(data.Admin.GetFlowEvents(row.data())).show();
                     tr.addClass('shown');
+                    icon.addClass('fa-minus')
+                    icon.removeClass('fa-plus')
                 }
             });
             /*
