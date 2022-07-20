@@ -84,7 +84,7 @@ namespace Sentry.data.Infrastructure
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.DENIED;
             }
-            else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING)
+            else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING || ticketStatus == GlobalConstants.CherwellChangeStatusNames.APPROVAL)
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.APPROVED;
             }
