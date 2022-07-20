@@ -4,27 +4,8 @@
 }
 
 <script>
-
     $(document).ready(function () {
-
-        $("#timeCheck").click(function () {
-
-            var time = $("#jobCreationCheck").val();
-
-            $.ajax({
-                type: "POST",
-                url: "Admin/GetDeadJobs",
-                data: '{timeCheck: "' + time + '"}',
-                contentType: "application/json; charset=utf-8",
-                dataType: "html",
-                success: function (msg) {
-                    $("#deadJobTable").html(msg);
-                },
-                error: function (req, status, error) {
-                    alert("Error try again");
-                }
-            });
-        });
+        data.Admin.RetrieveDeadSparkJobListButton();
     });
 </script>
 

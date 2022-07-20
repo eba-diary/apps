@@ -50,8 +50,8 @@ namespace Sentry.data.Infrastructure
 
                     deadSparkJob.SubmissionID = int.Parse(row["Submission_id"].ToString());
                     deadSparkJob.SubmissionCreated = Convert.ToDateTime(row["sub_Created"]);
-                    deadSparkJob.DatasetName = row["Dataset_NME"].ToString();
-                    deadSparkJob.SchemaName = row["Schema_NME"].ToString();
+                    deadSparkJob.DatasetName = row["Dataset_NME"].ToString().Trim();
+                    deadSparkJob.SchemaName = row["Schema_NME"].ToString().Trim();
                     deadSparkJob.SourceBucketName = row["SourceBucketName"].ToString();
                     deadSparkJob.SourceKey = row["SourceKey"].ToString();
                     deadSparkJob.TargetKey = row["TargetKey"].ToString();

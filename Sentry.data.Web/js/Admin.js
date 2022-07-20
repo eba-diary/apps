@@ -10,9 +10,24 @@ data.Admin = {
         });
     },
 
+    ApproveAsset: function (id) {
+        $.post("/Admin/Approve/" + id, {}, function () {
+            $("#approve-row-" + id).hide("slow");
+        }).fail(function () {
+            alert("An error occurred approving this asset.");
+        });
+    },
+
+    // Complete.vbhtml
+
+    CompleteInit: function () {
+        $("[id^='Complete_']").on("click", function () {
+            data.Admin.CompleteAuction($(this).data("id"));
+        });
+    },
+
     // load and initialize dead job data table
     DeadJobTableInit: function () {
-
         $('#deadJobs').DataTable({
             responsive: {
                 details: {
@@ -37,7 +52,7 @@ data.Admin = {
             columnDefs: [
                 {
                     targets: [0, 2, 3, 4, 5, 6, 7, 8, 9],
-                    className: 'dropdown-control dropdown-target'
+                    className: 'dropdown-control'
                 },
                 {
                     targets: [0, 1],
@@ -47,92 +62,22 @@ data.Admin = {
             order: [],
             drawCallback: function () {
                 $('#data-file-select-all').prop('checked', false);
+                $('.select-all-target').prop('checked', false);
             }
         });
 
         // click event logic for table row + and - icons based on dropdown state
-        $(".dropdown-target").click(function () {
+        $(".dropdown-control").click(function () {
             var targetId = $(this).parents("tr").data("file-id");
+            var childRow = $(`#dropdown-toggle-${targetId}`);
 
             if (!$(this).parents("tr").hasClass("parent")) {
-                $(`#${targetId}`).removeClass("fa-plus");
-                $(`#${targetId}`).addClass("fa-minus");
+                childRow.removeClass("fa-plus");
+                childRow.addClass("fa-minus");
             } else {
-                $(`#${targetId}`).addClass("fa-plus");
-                $(`#${targetId}`).removeClass("fa-minus");
+                childRow.addClass("fa-plus");
+                childRow.removeClass("fa-minus");
             }
-        });
-    },
-
-    // group selected jobs by DataFlowStepId and send them to be reprocessed
-    ReprocessDeadJobs: function () {
-        $("#data-file-select-all").click(function (event) {
-            var selectAllCheckbox = $(this);
-            if (selectAllCheckbox.is(":checked")) {
-                $(".select-all-target").each(function () {
-                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                });
-            }
-            else {
-                $(".select-all-target").each(function () {
-                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                });
-            }
-        });
-
-        $("#reprocessButton").click(function () {
-            var files = [];
-
-            // grabs the file & step id's of all checked rows
-            $('.select-all-target:checked').each(function () {
-                var obj = { fileId: $(this).data("file-id"), stepId: $(this).data("step-id") };
-                files.push(obj);
-            });
-
-            // groups file id's by step id's and stores them in a JSON object
-            var returnJson = files.reduce(function (rv, x) {
-                (rv[x["fileId"]] = rv[x["fileId"]] || []).push(x["stepId"]);
-                return rv;
-            }, {});
-
-            var totalJobCount = 0;
-            var successfulJobCount = 0;
-
-            // loop through all json keys and POST them to the data file reprocess controller
-            for (let x in returnJson) {
-                $.ajax({
-                    type: "POST",
-                    url: "../../api/v2/datafile/DataFile/Reprocess",
-                    contentType: "application/json",
-                    data: JSON.stringify({ DataFlowStepId: x, DatasetFileIds: returnJson[x] }),
-                    success: function () {
-                        /*alert("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".");*/
-                        totalJobCount++;
-                        successfulJobCount++;
-                    },
-                    error: function () {
-                        totalJobCount++;
-
-                        if (Object.keys(returnJson).length == totalJobCount) alert(`${successfulJobCount} out of ${totalJobCount} reprocessing jobs were successful`);
-                    }
-                });
-            };
-        });
-    },
-
-    ApproveAsset: function (id) {
-        $.post("/Admin/Approve/" + id, {}, function () {
-            $("#approve-row-" + id).hide("slow");
-        }).fail(function () {
-            alert("An error occurred approving this asset.");
-        });
-    },
-
-    // Complete.vbhtml
-
-    CompleteInit: function () {
-        $("[id^='Complete_']").on("click", function () {
-            data.Admin.CompleteAuction($(this).data("id"));
         });
     },
 
@@ -218,6 +163,7 @@ data.Admin = {
             },
         });
     },
+
     // activate or deactivate reprocess button based on input list of checked boxes
     ActivateDeactivateReprocessButton: function () {
         var checkedBoxes = $(".select-all-target:checkbox:checked");
@@ -228,6 +174,89 @@ data.Admin = {
             $("#reprocessButton").prop("disabled", true);
         }
     },
+
+    RetrieveDeadSparkJobListButton: function () {
+        $("#timeCheck").click(function () {
+
+            var time = $("#jobCreationCheck").val();
+
+            if (time > 720 || time < 0) {
+                data.Dataset.makeToast("error", `Input must be greater than zero and less than 720`);
+                $("#jobCreationCheck").val(0);
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "Admin/GetDeadJobs",
+                    data: '{timeCheck: "' + time + '"}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "html",
+                    success: function (msg) {
+                        $("#deadJobTable").html(msg);
+                    },
+                    error: function (req, status, error) {
+                        alert("Error try again");
+                    }
+                });
+            }
+        });
+    },
+
+    // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
+    ReprocessDeadJobs: function () {
+        $("#data-file-select-all").click(function (event) {
+            var selectAllCheckbox = $(this);
+            if (selectAllCheckbox.is(":checked")) {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                });
+            }
+            else {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                });
+            }
+        });
+
+        $("#reprocessButton").click(function () {
+            var files = [];
+
+            // grabs the file & step id's of all checked rows
+            $('.select-all-target:checked').each(function () {
+                var obj = { fileId: $(this).data("file-id"), groupId: $(this).data("group-id") };
+                files.push(obj);
+            });
+
+            // groups file id's by step id's and stores them in a JSON object
+            var returnJson = files.reduce(function (rv, x) {
+                (rv[x["groupId"]] = rv[x["groupId"]] || []).push(x["fileId"]);
+                return rv;
+            }, {});
+
+            var tempArr = [];
+
+            // loop through all json keys and POST them to the data file reprocess controller
+            for (let x in returnJson) {
+
+                tempArr = x.split("/");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../api/v2/datafile/DataFile/Reprocess",
+                    // Async has been set to false in order to await callback functions before the next iteration over the returnJson array
+                    async: false,
+                    contentType: "application/json",
+                    data: JSON.stringify({ DataFlowStepId: tempArr[2], DatasetFileIds: returnJson[x] }),
+                    success: function () {
+                        data.Admin.makeToast("success", `Selected file(s) for DATASET: ${tempArr[0]} & SCHEMA: ${tempArr[1]} were posted for reprocessing.`);
+                    },
+                    error: function (msg) {
+                        data.Admin.makeToast("error", `Selected file(s) for DATASET: ${tempArr[0]} & SCHEMA: ${tempArr[1]} could not be posted for reprocessing. Please try again`);
+                    }
+                });
+            };
+        });
+    },
+
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect();
@@ -312,6 +341,51 @@ data.Admin = {
             var url = $(this).data("url");
             $("#partial-view-test").load(url);
         });
-    }
+    },
+
+    // makeToast config
+    makeToast: function (severity, message) {
+
+        if (severity === 'success') {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+        else {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-full-width",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "0",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+
+        toastr[severity](message);
+    },
 }
 

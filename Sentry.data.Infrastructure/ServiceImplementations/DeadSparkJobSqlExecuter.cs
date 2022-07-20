@@ -19,11 +19,11 @@ namespace Sentry.data.Infrastructure
             using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DatabaseConnectionString")))
             {
                 connection.Open();
-                /*SqlCommand command = new SqlCommand("dbo.uspTest", connection);
+                SqlCommand command = new SqlCommand("dbo.uspTest", connection);
                 command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@timeCheck", timeCreated);*/
+                command.Parameters.AddWithValue("@timeCheck", timeCreated);
 
-                SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @JobID, @TimeCreated", connection);
+               /* SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @JobID, @TimeCreated", connection);
 
                 //add parameter for current enviroment (@JobId)
                 command.Parameters.AddWithValue("@JobID", System.Data.SqlDbType.Int);
@@ -31,7 +31,7 @@ namespace Sentry.data.Infrastructure
 
                 //add parameter for time window of job creation (@TimeCreated) 
                 command.Parameters.AddWithValue("@TimeCreated", System.Data.SqlDbType.Int);
-                command.Parameters["@TimeCreated"].Value = timeCreated;
+                command.Parameters["@TimeCreated"].Value = timeCreated;*/
 
                 DataTable dataTable = new DataTable();
 
