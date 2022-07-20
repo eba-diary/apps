@@ -11,7 +11,7 @@ namespace Sentry.data.Core
     {
         public DateTime QueryMadeDateTime { get; set; }
         public int SchemaId { get; set; }
-        public JObject EventContents { get; set; }
+        public string EventContents { get; set; }
         public int TotalFlowSteps { get; set; }
         public DateTime FileModifiedDateTime { get; set; }
         public string OriginalFileName { get; set; }
@@ -42,11 +42,11 @@ namespace Sentry.data.Core
 
         public int CompareTo(DataFlowMetricDto other)
         {
-            if(CurrentFlowStep > other.CurrentFlowStep)
+            if(EventMetricId > other.EventMetricId)
             {
                 return 1;
             }
-            else if(CurrentFlowStep < other.CurrentFlowStep)
+            else if(EventMetricId < other.EventMetricId)
             {
                 return -1;
             }

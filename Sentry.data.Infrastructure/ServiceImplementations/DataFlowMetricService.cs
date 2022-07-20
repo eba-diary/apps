@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
             {
                 QueryMadeDateTime = entity.QueryMadeDateTime,
                 SchemaId = entity.SchemaId,
-                EventContents = JObject.Parse(entity.EventContents),
+                EventContents = entity.EventContents,
                 TotalFlowSteps = entity.TotalFlowSteps,
                 FileModifiedDateTime = entity.FileModifiedDateTime,
                 OriginalFileName = entity.OriginalFileName,
@@ -79,7 +79,7 @@ namespace Sentry.data.Infrastructure
                     fileGroup.DatasetFileId = dto.DatasetFileId;
                     fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                    fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).Seconds.ToString();
+                    fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                     fileGroup.FlowEvents.Add(dto);
                     if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                     {
@@ -108,7 +108,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                             }
-                            fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).Seconds.ToString();
+                            fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                             if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                             {
                                 fileGroup.AllEventsPresent = true;
@@ -127,7 +127,7 @@ namespace Sentry.data.Infrastructure
                         fileGroup.DatasetFileId = dto.DatasetFileId;
                         fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                        fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).Seconds.ToString();
+                        fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                         fileGroup.FlowEvents.Add(dto);
                         if (dto.TotalFlowSteps == dto.CurrentFlowStep)
                         {

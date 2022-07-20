@@ -139,9 +139,9 @@ data.Admin = {
     },
     GetFlowEvents: function (data) {
         console.log(data)
-        var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partiton</th><th>Event Contents</th></tr>';
+        var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partition</th><th>Event Contents</th></tr>';
         for (var flowEvent of data.FlowEvents) {
-            s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent ="' + flowEvent.EventContents + '">View Contents</a></td></tr>'
+            s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent=' + flowEvent.EventContents + '>View Contents</a></td></tr>'
         }
         s += '</table>';
         return s;
@@ -275,6 +275,9 @@ data.Admin = {
                    // contentType: "application/json",
                     dataType: "json",
                     dataSrc: "",
+                    //success: function (data) {
+                   //     console.log(data);
+                   // }
                 },
                 columns: [
                     {

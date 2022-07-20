@@ -26,11 +26,11 @@ namespace Sentry.data.Core
 
         public int CompareTo(DataFileFlowMetricsDto other)
         {
-            if(LastEventTime > other.LastEventTime)
+            if(FirstEventTime > other.FirstEventTime)
             {
                 return -1;
             }
-            else if(LastEventTime < other.LastEventTime)
+            else if(FirstEventTime < other.FirstEventTime)
             {
                 return 1;
             }

@@ -35,15 +35,18 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult PopulateTable(DataFlowMetricSearchDto searchDto)
         {
-            /*
-           List<DataFlowMetricEntity> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
-           List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
-           List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
-           DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
-           return Json(dataFlowAccordionModel)
-           */
-            //uncomment above and delete below mock when you get access to elastic search database
+            searchDto.DatasetToSearch = "464";
+            searchDto.SchemaToSearch = "1946";
+            searchDto.FileToSearch = "-1";
+            List<DataFlowMetricEntity> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
+            List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
+            List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.SortFlowMetrics(_dataFlowMetricService.GetFileMetricGroups(metricDtoList));
+            DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
+            JsonResult result = Json(dataFlowAccordionModel.DataFlowMetricGroups, JsonRequestBehavior.AllowGet);
+            return result;
 
+            //uncomment above and delete below mock when you get access to elastic search database
+            /*
             DataFlowMetricEntity entity1 = new DataFlowMetricEntity();
             entity1.DatasetFileId = 1;
             entity1.FileName = "ExampleFileNameOne.csv";
@@ -119,6 +122,7 @@ namespace Sentry.data.Web.Controllers
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.SortFlowMetrics(_dataFlowMetricService.GetFileMetricGroups(metricDtoList));
             DataFlowMetricAccordionModel dataFlowAccordionModel = GetDataFlowMetricAccordionModel(fileGroups);
             return Json(dataFlowAccordionModel.DataFlowMetricGroups, JsonRequestBehavior.AllowGet);
+            */
         }
         public ActionResult GetDataFlowMetricAccordionView()
         {

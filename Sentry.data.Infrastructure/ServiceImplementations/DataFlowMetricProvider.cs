@@ -32,8 +32,12 @@ namespace Sentry.data.Infrastructure
 
             SearchRequest<DataFlowMetricEntity> request = new SearchRequest<DataFlowMetricEntity>()
             {
-                Size = 1,
-                Query = boolQuery
+                Sort = new List<ISort>()
+                {
+                    new FieldSort(){Field = Infer.Field<DataFlowMetricEntity>(x => x.EventMetricId), Order = SortOrder.Descending}
+                },
+                Size = 10000,
+                Query = boolQuery,
             };
 
             ElasticResult<DataFlowMetricEntity> elasticResult = _elasticContext.SearchAsync(request).Result;
