@@ -36,6 +36,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult PopulateTable(DataFlowMetricSearchDto searchDto)
         {
+            //delete below searchDto assignments when testing is complete
             searchDto.DatasetToSearch = "464";
             searchDto.SchemaToSearch = "1946";
             searchDto.FileToSearch = "-1";

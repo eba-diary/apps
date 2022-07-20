@@ -44,11 +44,11 @@ namespace Sentry.data.Core
         {
             if(EventMetricId > other.EventMetricId)
             {
-                return 1;
+                return -1;
             }
             else if(EventMetricId < other.EventMetricId)
             {
-                return -1;
+                return 1;
             }
             else
             {

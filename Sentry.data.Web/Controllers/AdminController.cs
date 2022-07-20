@@ -41,7 +41,7 @@ namespace Sentry.data.Web.Controllers
             new Dictionary<string, string>();
 
             myDict.Add("1", "Reprocess Data Files");
-            myDict.Add("2", "File Processing Logs");
+            myDict.Add("2", "Data Flow Metrics");
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
             myDict.Add("5", "Connector Status");
