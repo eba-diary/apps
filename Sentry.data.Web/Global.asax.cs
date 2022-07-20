@@ -122,7 +122,7 @@ namespace Sentry.data.Web
             // Fires at the beginning of each request
             if (Request.IsLocal)
             {
-                MiniProfiler.Start();
+                MiniProfiler.StartNew();
             }
 
             //skip this if the _status page is being accessed...
@@ -145,7 +145,7 @@ namespace Sentry.data.Web
             }
             if (Request.IsLocal)
             {
-                MiniProfiler.Stop();
+                MiniProfiler.Current?.Stop();
             }
         }
 

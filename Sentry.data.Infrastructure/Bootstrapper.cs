@@ -225,7 +225,7 @@ namespace Sentry.data.Infrastructure
             {
                 db.ConnectionString = Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString");
                 db.Dialect<MsSql2008Dialect>();
-                db.Driver<StackExchange.Profiling.NHibernate.Drivers.MiniProfilerSql2008ClientDriver>();
+                db.Driver<Sentry.Profiling.NHibernate.Drivers.MiniProfilerSql2008ClientDriver>();
             });
 
             //Configure the NHibernate mappings
