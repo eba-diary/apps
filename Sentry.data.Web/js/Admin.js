@@ -275,9 +275,6 @@ data.Admin = {
                    // contentType: "application/json",
                     dataType: "json",
                     dataSrc: "",
-                    //success: function (data) {
-                   //     console.log(data);
-                   // }
                 },
                 columns: [
                     {
@@ -344,11 +341,13 @@ data.Admin = {
                 }
             });
             /*
+             * Below is related to the accordion partial view, which is not currently used
             var url = $(this).data("url");
             $("#accordion-view-area").load(url);
             */
         })
     },
+    //below is related to the accordion partial view, which is not currently used
     FlowMetricAccordionInit: function () {
         $("#EventContentModal").on("show.bs.modal", function (event) {
             var link = $(event.relatedTarget);

@@ -6,7 +6,7 @@ using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
-    public class DataFlowMetricAccordionModel
+    public class DataFlowMetricGroupModel
     {
         public List<DataFileFlowMetricsDto> DataFlowMetricGroups;
 
