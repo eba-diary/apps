@@ -150,11 +150,11 @@ namespace Sentry.data.Infrastructure.Tests
             List<DeadSparkJobDto> deadSparkJobDtoList = deadJobProvider.GetDeadSparkJobDtos(-10);
 
             //Assert
-            Assert.AreEqual(deadSparkJobDtoList[0].DatasetName, "DatasetName");
-            Assert.AreEqual(deadSparkJobDtoList[0].SchemaName, "SchemaName");
+            Assert.AreEqual("DatasetName", deadSparkJobDtoList[0].DatasetName);
+            Assert.AreEqual("SchemaName", deadSparkJobDtoList[0].SchemaName);
 
-            Assert.AreNotEqual(deadSparkJobDtoList[0].DatasetName, "DatasetName     ");
-            Assert.AreNotEqual(deadSparkJobDtoList[0].SchemaName, "SchemaName     ");
+            Assert.AreNotEqual("DatasetName     ", deadSparkJobDtoList[0].DatasetName);
+            Assert.AreNotEqual("SchemaName     ", deadSparkJobDtoList[0].SchemaName);
         }
     }
 }
