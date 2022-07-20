@@ -317,21 +317,38 @@ namespace Sentry.data.Core
         */
         private void ReprocessDatasetFile(int stepId, int datasetFileId)
         {
-            
-            DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
-            DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+            try
+            {
+                DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
-            KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
-            if (response.Key != null || response.Value != null)
+                KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
+                if (response.Key != null || response.Value != null)
+                {
+                    string errorMessage = "";
+                    if (response.Key == null)
+                    {
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
+
+                    }
+                    else if (response.Value == null)
+                    {
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
+
+                    }
+
+                    Logger.Error(errorMessage);
+                    throw new Exception(errorMessage);
+                }
+                else
+                {
+                    _s3ServiceProvider.UploadDataFile(response.Key, response.Value);
+                }
+            } catch (Exception ex)
             {
-                string errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed";
-                Logger.Error(errorMessage);
-                throw new Exception(errorMessage);
+                Logger.Error("Reprocessig failed ", ex);
             }
-            else
-            {
-                _s3ServiceProvider.UploadDataFile(response.Key, response.Value);
-            }
+            
         }
 
         /*
