@@ -164,6 +164,7 @@
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetSearchDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetTileDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />

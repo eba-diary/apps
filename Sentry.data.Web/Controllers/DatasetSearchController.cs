@@ -3,6 +3,7 @@ using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Web;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
@@ -28,10 +29,10 @@ namespace Sentry.data.Web.Controllers
                 return View("Forbidden");
             }
 
-            //if (TryGetSavedSearch(SearchType.DATASET_SEARCH, savedSearch, out ActionResult view))
-            //{
-            //    return view;
-            //}
+            if (TryGetSavedSearch(SearchType.DATASET_SEARCH, savedSearch, out ActionResult view))
+            {
+                return view;
+            }
 
             TileResultsModel tileResultsModel = new TileResultsModel()
             {
@@ -39,7 +40,16 @@ namespace Sentry.data.Web.Controllers
                 SortByOptions = Utility.BuildDatasetSortByOptions()
             };
 
-            List<DatasetTileDto> dtos = _datasetService.GetDatasetTileDtos();
+            DatasetSearchModel datasetSearchModel = new DatasetSearchModel()
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                SortBy = 1
+            };
+
+            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
+
+            List<DatasetTileDto> dtos = _datasetService.SearchDatasets(datasetSearchDto);
 
             tileResultsModel.Tiles = dtos.ToModel();
 

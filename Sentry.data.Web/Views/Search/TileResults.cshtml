@@ -23,10 +23,10 @@
         @foreach (TileModel tile in Model.Tiles)
         {
             //convert to use User Favorites
-            <li class="tile-result borderSide_blue boxShadowSm" title="@tile.TileTitle">
+            <li class="tile-result borderSide_@tile.Color boxShadowSm @(tile.Status == "Active" ? "tile-active" : "")" data-id="@tile.Id" title="@tile.TileTitle">
                 <div class="category-type-wrap">
                     <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
-                    <div class="category-type categoryBanner-blue" title="@tile.Category">
+                    <div class="category-type categoryBanner-@tile.Color" title="@tile.Category">
                         <span>@tile.Category</span>
                     </div>
                 </div>
@@ -38,32 +38,32 @@
                             <span>@type</span>
                         </div>
                     }
-                    
+
                     <span class="search-dataset-name">@tile.Name @(tile.Status != "Active" ? "(Pending Delete)" : "")</span>
 
-                    @if(tile.IsSecured)
+                    @if (tile.IsSecured)
                     {
                         <em class="fas fa-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></em>
                     }
                 </div>
 
-                <div class="dataset-list-content">@tile.Description</div>
+                <div class="dataset-list-content tile-description" title="@tile.Description">@tile.Description</div>
 
                 <div class="dataset-list-content dataset-detail-content-info">
-                    <div class="col-lg-5 dataset-detail-content-info-row">
-                        <span class=" bold ownerDate dsc-blue-text">Last Activity Date:</span>
+                    <div class="dataset-detail-content-info-row">
+                        <span class="bold ownerDate dsc-@tile.Color-text">Last Activity Date:</span>
                         <span>@tile.LastUpdated</span>
                     </div>
 
                     @if (tile.IsReport)
                     {
                         <div class="SentryOwner col-lg-12 dataset-detail-content-info-row">
-                            <span class="bold dataset-detail-contact-label dsc-blue-text">Refresh Frequency:</span>
+                            <span class="bold dataset-detail-contact-label dsc-@tile.Color-text">Refresh Frequency:</span>
                             <span class="info-detail">@tile.UpdateFrequency</span>
                         </div>
 
                         <div class="contacts col-lg-10 dataset-detail-content-info-row">
-                            <span class="bold dataset-detail-contact-label dsc-blue-text">Contact:</span>
+                            <span class="bold dataset-detail-contact-label dsc-@tile.Color-text">Contact:</span>
                             <div class="info-detail">
                                 <span class="info-detail">@tile.ContactNames</span>
                                 @if (!string.IsNullOrEmpty(tile.AdditionalContactNames))
@@ -81,13 +81,29 @@
             </li>
         }
     </ul>
+
+    <div class="float-right mt-4">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link waves-effect" href="#">1</a></li>
+            <li class="page-item active"><a class="page-link waves-effect" href="#">2</a></li>
+            <li class="page-item"><a class="page-link waves-effect" href="#">3</a></li>
+            <li class="page-item"><a class="page-link waves-effect" href="#">4</a></li>
+            <li class="page-item disabled"><a class="page-link waves-effect" href="#">...</a></li>
+            <li class="page-item"><a class="page-link waves-effect" href="#">7</a></li>
+            <li class="page-item">
+                <a class="page-link next waves-effect" href="#" aria-label="Next">Next</a>
+            </li>
+        </ul>
+    </div>
 </div>
 
 @section Scripts {
     <script type="text/javascript">
         $(function () {
-            $('#tile-result-page-size').materialSelect();
-            $('#tile-result-sort').materialSelect();
+            data.DatasetsSearch.init();
         });
     </script>
 }

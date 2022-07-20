@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -23,7 +24,7 @@ namespace Sentry.data.Core
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IQuartermasterService _quartermasterService;
-        private readonly ObjectCache cache = MemoryCache.Default;
+        private readonly ObjectCache _cache;
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
 
@@ -31,7 +32,7 @@ namespace Sentry.data.Core
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
-                            IDataFeatures featureFlags)
+                            IDataFeatures featureFlags, ObjectCache cache)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -41,6 +42,7 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
+            _cache = cache;
         }
 
         public DatasetDto GetDatasetDto(int id)
@@ -71,7 +73,7 @@ namespace Sentry.data.Core
 
         public List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO()
         {
-            List<DatasetSummaryMetadataDTO> summaryResults = cache["DatasetSummaryMetadata"] as List<DatasetSummaryMetadataDTO>;
+            List<DatasetSummaryMetadataDTO> summaryResults = _cache[CacheKeys.DATASETSUMMARY] as List<DatasetSummaryMetadataDTO>;
 
             if (summaryResults == null)
             {
@@ -104,7 +106,7 @@ namespace Sentry.data.Core
                 }
 
                 //Assign result list to cache object
-                cache.Set("DatasetSummaryMetadata", summaryResults, policy);
+                _cache.Set(CacheKeys.DATASETSUMMARY, summaryResults, policy);
             }
 
             return summaryResults;
@@ -576,28 +578,51 @@ namespace Sentry.data.Core
                                                                       !x.IsBundled);
         }
 
-        public List<DatasetTileDto> GetDatasetTileDtos()
+        public List<DatasetTileDto> SearchDatasets(DatasetSearchDto datasetSearchDto)
         {
-            List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && 
-                                                                               w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
-                                                              FetchAllChildren(_datasetContext);
-
-            string associateId = _userService.GetCurrentUser().AssociateId;
-            List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
-
             List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
 
-            //map to DatasetTileDto
-            foreach (Dataset dataset in datasets)
+            if (_cache.Contains(CacheKeys.SEARCHDATASETS))
             {
-                DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
-
-                DatasetTileDto datasetTileDto = dataset.ToTileDto();
-                datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-                datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
-
-                datasetTileDtos.Add(datasetTileDto);
+                datasetTileDtos = _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
             }
+            else
+            {
+                List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
+                                                                                   w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
+                                                                  FetchAllChildren(_datasetContext);
+
+                string associateId = _userService.GetCurrentUser().AssociateId;
+                List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
+
+                //map to DatasetTileDto
+                foreach (Dataset dataset in datasets)
+                {
+                    DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+
+                    DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                    datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                    datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
+                    datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+
+                    datasetTileDtos.Add(datasetTileDto);
+                }
+
+                _cache.Add(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
+            }
+
+            IEnumerable<DatasetTileDto> tileEnumerable;
+
+            if (datasetSearchDto.OrderByDescending)
+            {
+                tileEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
+            }
+            else
+            {
+                tileEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
+            }
+            
+            datasetTileDtos = tileEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber-1)).Take(datasetSearchDto.PageSize).ToList();
 
             return datasetTileDtos;
         }

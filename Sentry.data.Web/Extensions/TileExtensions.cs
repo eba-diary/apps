@@ -25,6 +25,7 @@ namespace Sentry.data.Web
                 FavoriteTitle = dto.Status == Core.GlobalEnums.ObjectStatusEnum.Active ? "Click to toggle favorite" : "Dataset is marked for deletion, favorite functionality disabled",
                 IsFavorite = dto.IsFavorite,
                 Category = dto.Category,
+                Color = dto.Color,
                 IsSecured = dto.IsSecured,
                 LastUpdated = dto.LastUpdated.ToShortDateString(),
                 IsReport = false,

@@ -1,4 +1,4 @@
-﻿data.DataInventory = {
+﻿data.DataInventorySearch = {
 
     updateHash: {},
 

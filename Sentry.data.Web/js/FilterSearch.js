@@ -173,7 +173,7 @@
             data.Favorites.toggleFavorite(element, "SavedSearch", function () {
                 $(element).removeClass("display-none");
                 $("#favoriteSpinner_" + id).addClass("display-none");
-            }, data.FilterSearch.showToast);
+            });
         });
 
         $(document).on("click", ".saved-search-edit", function (e) {

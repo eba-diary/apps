@@ -12,6 +12,7 @@ namespace Sentry.data.Web
         public string FavoriteTitle { get; set; }
         public bool IsFavorite { get; set; }
         public string Category { get; set; }
+        public string Color { get; set; }
         public bool IsSecured { get; set; }
         public string LastUpdated { get; set; }
         public bool IsReport { get; set; }

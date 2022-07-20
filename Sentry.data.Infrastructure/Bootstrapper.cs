@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Caching;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
@@ -182,6 +183,8 @@ namespace Sentry.data.Infrastructure
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
 
+            //memory cache
+            registry.For<ObjectCache>().Use(() => new MemoryCache("ScopedCache", null));
 
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

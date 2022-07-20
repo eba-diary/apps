@@ -434,6 +434,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\Dataset\DatasetSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RemovePermissionModel.cs" />
@@ -857,7 +858,8 @@
     <Content Include="Images\presence.png" />
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\DataFlow.js" />
-    <Content Include="js\DataInventory.js" />
+    <Content Include="js\DataInventorySearch.js" />
+    <Content Include="js\DatasetsSearch.js" />
     <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />

@@ -467,5 +467,11 @@
             public const string SUCCESS = "SUCCESS";
             public const string FAILURE = "FAILURE";
         }
+
+        public static class CacheKeys
+        {
+            public const string SEARCHDATASETS = "SearchDatasets";
+            public const string DATASETSUMMARY = "DatasetSummaryMetadata";
+        }
     }
 }

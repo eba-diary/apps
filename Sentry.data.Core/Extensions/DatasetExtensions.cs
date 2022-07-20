@@ -18,13 +18,20 @@ namespace Sentry.data.Core
                 Name = dataset.DatasetName,
                 Description = dataset.DatasetDesc,
                 Status = dataset.ObjectStatus,
-                IsSecured = dataset.IsSecured
+                IsSecured = dataset.IsSecured,
+                CreatedDateTime = dataset.DatasetDtm,
+                Color = "darkgray"
             };
 
             if (dataset.DatasetCategories?.Any() == true)
             {
                 List<string> catNameList = dataset.DatasetCategories.Select(x => !string.IsNullOrWhiteSpace(x.AbbreviatedName) ? x.AbbreviatedName : x.Name).ToList();
                 datasetTileDto.Category = string.Join(", ", catNameList);
+
+                if (dataset.DatasetCategories.Count == 1)
+                {
+                    datasetTileDto.Color = dataset.DatasetCategories.First().Color;
+                }
             }
 
             return datasetTileDto;
