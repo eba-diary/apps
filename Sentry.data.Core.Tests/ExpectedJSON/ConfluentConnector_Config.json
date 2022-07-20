@@ -11,7 +11,7 @@
   "s3.acl.canned": "bucket-owner-full-control",
   "transforms.InsertMetadata.partition.field": "kafka_partition",
   "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-  "s3.proxy.password": "3gCrBtanJKAiuZ2wXNXdyD82RSEpJG",
+  "s3.proxy.password": "AAA",
   "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
   "s3.bucket.name": "sentry-dlst-qual-droplocation-ae2",
   "partition.duration.ms": "86400000",
