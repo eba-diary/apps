@@ -16,16 +16,16 @@ namespace Sentry.data.Core.Tests
             // Arrange
             Mock<IDeadJobProvider> mockProvider = new Mock<IDeadJobProvider>();
 
-            List<DeadSparkJobDto> deadSparkJobDtoSetupList = new List<DeadSparkJobDto>();
+            List<DeadSparkJob> deadSparkJobsSetupList = new List<DeadSparkJob>();
 
-            deadSparkJobDtoSetupList.Add(new DeadSparkJobDto()
+            deadSparkJobsSetupList.Add(new DeadSparkJob()
             {
-                SubmissionTime = DateTime.Today,
+                SubmissionCreated = DateTime.Today,
                 DatasetName = "DatasetName",
                 SchemaName = "SchemaName",
                 SourceKey = "SourceKey",
-                FlowExecutionGuid = "FlowExecutionGuid",
-                ReprocessingRequired = "Yes",
+                TargetKey = "_SUCCESS",
+                ExecutionGuid = "FlowExecutionGuid",
                 SubmissionID = 1,
                 SourceBucketName = "SourceBucketName",
                 BatchID = 1,
@@ -36,14 +36,14 @@ namespace Sentry.data.Core.Tests
                 DataFlowStepID = 1
             });
 
-            deadSparkJobDtoSetupList.Add(new DeadSparkJobDto()
+            deadSparkJobsSetupList.Add(new DeadSparkJob()
             {
-                SubmissionTime = DateTime.Today,
+                SubmissionCreated = DateTime.Today,
                 DatasetName = "DatasetName",
                 SchemaName = "SchemaName",
                 SourceKey = "SourceKey",
-                FlowExecutionGuid = "FlowExecutionGuid",
-                ReprocessingRequired = "No",
+                TargetKey = "_FAILED",
+                ExecutionGuid = "FlowExecutionGuid",
                 SubmissionID = 2,
                 SourceBucketName = "SourceBucketName",
                 BatchID = 2,
@@ -54,7 +54,7 @@ namespace Sentry.data.Core.Tests
                 DataFlowStepID = 2
             });
 
-            mockProvider.Setup(e => e.GetDeadSparkJobDtos(-10)).Returns(deadSparkJobDtoSetupList);
+            mockProvider.Setup(e => e.GetDeadSparkJobs(-10)).Returns(deadSparkJobsSetupList);
             DeadSparkJobService jobService = new DeadSparkJobService(mockProvider.Object);
 
 

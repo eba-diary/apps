@@ -63,7 +63,8 @@ namespace Sentry.data.Web.Controllers
             return View(deadSparkJobModelList);
         }
 
-        [HttpPost]
+        [Route("Admin/GetDeadJobs/{timeCheck}")]
+        [HttpGet]
         public ActionResult GetDeadJobs(int timeCheck)
         {
             timeCheck *= -1;

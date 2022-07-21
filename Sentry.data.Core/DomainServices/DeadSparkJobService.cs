@@ -17,7 +17,41 @@ namespace Sentry.data.Core
 
         public List<DeadSparkJobDto> GetDeadSparkJobDtos(int timeCreated)
         {
-            List<DeadSparkJobDto> deadSparkJobDtoList = _deadJobProvider.GetDeadSparkJobDtos(timeCreated);
+            List<DeadSparkJob> deadSparkJobList = _deadJobProvider.GetDeadSparkJobs(timeCreated);
+
+            return MapToDtoList(deadSparkJobList);
+        }
+
+        private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
+        {
+            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "Yes" : "No";
+
+            DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
+            {
+                SubmissionTime = deadSparkJob.SubmissionCreated,
+                DatasetName = deadSparkJob.DatasetName,
+                SchemaName = deadSparkJob.SchemaName,
+                SourceKey = deadSparkJob.SourceKey,
+                FlowExecutionGuid = deadSparkJob.ExecutionGuid,
+                ReprocessingRequired = isReprocessingRequired,
+                SubmissionID = deadSparkJob.SubmissionID,
+                SourceBucketName = deadSparkJob.SourceBucketName,
+                BatchID = deadSparkJob.BatchID,
+                LivyAppID = deadSparkJob.LivyAppID,
+                LivyDriverlogUrl = deadSparkJob.LivyDriverlogUrl,
+                LivySparkUiUrl = deadSparkJob.LivySparkUiUrl,
+                DatasetFileID = deadSparkJob.DatasetFileID,
+                DataFlowStepID = deadSparkJob.DataFlowStepID
+            };
+
+            return deadSparkJobDto;
+        }
+
+        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
+        {
+            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
+
+            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
 
             return deadSparkJobDtoList;
         }

@@ -145,5 +145,3 @@ order by TSD.sub_Created
 SELECT * FROM #IdentifiedDeadJobs
 
 GO
-
-

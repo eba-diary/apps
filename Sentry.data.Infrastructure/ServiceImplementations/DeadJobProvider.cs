@@ -20,23 +20,14 @@ namespace Sentry.data.Infrastructure
             _dbExecuter = dbExecuter;
         }
 
-        public List<DeadSparkJobDto> GetDeadSparkJobDtos(int timeCreated)
+        public List<DeadSparkJob> GetDeadSparkJobs(int timeCreated)
         {
             DataTable dataTable = _dbExecuter.ExecuteQuery(timeCreated);
 
-            List<DeadSparkJob> deadSparkJobList = MapToEntity(dataTable);
-
-            return MapToDtoList(deadSparkJobList);
+            return MapToEntity(dataTable);
         }
 
-        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
-        {
-            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
-
-            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
-
-            return deadSparkJobDtoList;
-        }
+        
 
         private List<DeadSparkJob> MapToEntity(DataTable dataTable)
         {
@@ -76,31 +67,6 @@ namespace Sentry.data.Infrastructure
             }
 
             return deadSparkJobList;
-        }
-
-        private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
-        {
-            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "Yes" : "No";
-
-            DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
-            {
-                SubmissionTime = deadSparkJob.SubmissionCreated,
-                DatasetName = deadSparkJob.DatasetName,
-                SchemaName = deadSparkJob.SchemaName,
-                SourceKey = deadSparkJob.SourceKey,
-                FlowExecutionGuid = deadSparkJob.ExecutionGuid,
-                ReprocessingRequired = isReprocessingRequired,
-                SubmissionID = deadSparkJob.SubmissionID,
-                SourceBucketName = deadSparkJob.SourceBucketName,
-                BatchID = deadSparkJob.BatchID,
-                LivyAppID = deadSparkJob.LivyAppID,
-                LivyDriverlogUrl = deadSparkJob.LivyDriverlogUrl,
-                LivySparkUiUrl = deadSparkJob.LivySparkUiUrl,
-                DatasetFileID = deadSparkJob.DatasetFileID,
-                DataFlowStepID = deadSparkJob.DataFlowStepID
-            };
-
-            return deadSparkJobDto;
         }
     }
 }

@@ -185,9 +185,8 @@ data.Admin = {
                 $("#jobCreationCheck").val(0);
             } else {
                 $.ajax({
-                    type: "POST",
-                    url: "Admin/GetDeadJobs",
-                    data: '{timeCheck: "' + time + '"}',
+                    type: "GET",
+                    url: "Admin/GetDeadJobs/"+time,
                     contentType: "application/json; charset=utf-8",
                     dataType: "html",
                     success: function (msg) {
