@@ -5,11 +5,18 @@
     },
 
     executeSearch: function () {
-
+        data.FilterSearch.completeSearch(0, 0, 0);
+        //use jquery load function
+        //in callback, get the counts for result information from hidden elements
     },
 
     buildFilter: function () {
 
+        //one option is to have the separate controller method to get the categories and run the group queries on the datasets to build the filters model
+        //another option would be to on executeSearch, make ajax request to get the list of datasets that result from the query
+        //then send that result back to another controller method that will load the partial view AND send the results to a controller method that will translate the results to the filters model
+        //
+        data.FilterSearch.completeFilterRetrieval(null)
     },
 
     retrieveResultConfig: function () {

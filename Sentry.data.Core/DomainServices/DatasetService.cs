@@ -613,47 +613,54 @@ namespace Sentry.data.Core
         {
             List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
 
-            if (_cache.Contains(CacheKeys.SEARCHDATASETS))
+            try
             {
-                datasetTileDtos = _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
-            }
-            else
-            {
-                List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
-                                                                                   w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
-                                                                  FetchAllChildren(_datasetContext);
-
-                string associateId = _userService.GetCurrentUser().AssociateId;
-                List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
-
-                //map to DatasetTileDto
-                foreach (Dataset dataset in datasets)
+                if (_cache.Contains(CacheKeys.SEARCHDATASETS))
                 {
-                    DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+                    datasetTileDtos = _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
+                }
+                else
+                {
+                    List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
+                                                                                       w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
+                                                                      FetchAllChildren(_datasetContext);
 
-                    DatasetTileDto datasetTileDto = dataset.ToTileDto();
-                    datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-                    datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
-                    datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+                    string associateId = _userService.GetCurrentUser().AssociateId;
+                    List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
 
-                    datasetTileDtos.Add(datasetTileDto);
+                    //map to DatasetTileDto
+                    foreach (Dataset dataset in datasets)
+                    {
+                        DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+
+                        DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                        datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                        datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
+                        datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+
+                        datasetTileDtos.Add(datasetTileDto);
+                    }
+
+                    _cache.Set(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
                 }
 
-                _cache.Add(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
-            }
+                IEnumerable<DatasetTileDto> dtoEnumerable;
 
-            IEnumerable<DatasetTileDto> dtoEnumerable;
+                if (datasetSearchDto.OrderByDescending)
+                {
+                    dtoEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
+                }
+                else
+                {
+                    dtoEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
+                }
 
-            if (datasetSearchDto.OrderByDescending)
-            {
-                dtoEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
+                datasetTileDtos = dtoEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize).ToList();
             }
-            else
+            catch (Exception ex)
             {
-                dtoEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
+                Logger.Error("Error searching datasets", ex);
             }
-            
-            datasetTileDtos = dtoEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber-1)).Take(datasetSearchDto.PageSize).ToList();
 
             return datasetTileDtos;
         }

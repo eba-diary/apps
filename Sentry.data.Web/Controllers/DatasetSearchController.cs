@@ -34,17 +34,14 @@ namespace Sentry.data.Web.Controllers
                 return view;
             }
 
-            //need to build filter categories
-            //return GetFilterSearchView(model);
+            FilterSearchModel model = new FilterSearchModel();
 
-            //code below will move to Results() when transitioned into FilterSearch page
-            //only using for testing
-            TileResultsModel tileResultsModel = new TileResultsModel()
-            {
-                PageSizeOptions = Utility.BuildTilePageSizeOptions(),
-                SortByOptions = Utility.BuildDatasetSortByOptions()
-            };
+            return GetFilterSearchView(model);
+        }
 
+        [ChildActionOnly]
+        public override ActionResult Results()
+        {
             DatasetSearchModel datasetSearchModel = new DatasetSearchModel()
             {
                 PageNumber = 1,
@@ -52,19 +49,14 @@ namespace Sentry.data.Web.Controllers
                 SortBy = 1
             };
 
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
+            TileResultsModel tileResultsModel = new TileResultsModel()
+            {
+                PageSizeOptions = Utility.BuildTilePageSizeOptions(),
+                SortByOptions = Utility.BuildDatasetSortByOptions(),
+                Tiles = GetTileModels(datasetSearchModel)
+            };
 
-            List<DatasetTileDto> dtos = _datasetService.SearchDatasets(datasetSearchDto);
-
-            tileResultsModel.Tiles = dtos.ToModel();
-
-            return View("~/Views/Search/TileResults.cshtml", tileResultsModel);
-        }
-
-        public override ActionResult Results()
-        {
-            //will return the TileResults partial view
-            throw new NotImplementedException();
+            return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
@@ -74,9 +66,16 @@ namespace Sentry.data.Web.Controllers
                 PageTitle = "Dataset",
                 SearchType = SearchType.DATASET_SEARCH,
                 IconPath = "~/Images/Icons/DatasetsBlue.svg",
-                ResultView = "~/Views/Search/TileResults.cshtml",
                 DefaultSearch = searchModel
             };
+        }
+
+        private List<TileModel> GetTileModels(DatasetSearchModel searchModel)
+        {
+            DatasetSearchDto datasetSearchDto = searchModel.ToDto();
+            List<DatasetTileDto> dtos = _datasetService.SearchDatasets(datasetSearchDto);
+            List<TileModel> models = dtos.ToModel();
+            return models;
         }
     }
 }

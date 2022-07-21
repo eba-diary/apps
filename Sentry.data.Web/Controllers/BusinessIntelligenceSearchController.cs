@@ -46,7 +46,6 @@ namespace Sentry.data.Web.Controllers
                 PageTitle = "Business Intelligence",
                 SearchType = SearchType.BUSINESS_INTELLIGENCE_SEARCH,
                 IconPath = "~/Images/Icons/Business IntelligenceBlue.svg",
-                ResultView = "~/Views/Search/TileResults.cshtml",
                 DefaultSearch = searchModel
             };
         }
