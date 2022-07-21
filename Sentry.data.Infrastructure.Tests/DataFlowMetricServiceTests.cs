@@ -159,7 +159,113 @@ namespace Sentry.data.Infrastructure.Tests
 
         }
         [TestMethod]
-        public void DataFlowMetricService_GetFileMetricGroups_IconBooleans()
+        public void DataFlowMetricService_getFileFlowMetricsStatus_EmptyInput()
+        {
+            //Arrange
+            var stubIElasticContext = new Mock<IElasticContext>();
+            DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
+            List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
+            List<DataFileFlowMetricsDto> fileGroups = dataFlowMetricService.GetFileMetricGroups(dataFlowMetricDtos);
+            List<DataFileFlowMetricsDto> sortedFileGroups = dataFlowMetricService.SortFlowMetrics(fileGroups);
+            //Act
+            dataFlowMetricService.GetFileFlowMetricsStatus(sortedFileGroups);
+            //Assert
+            Assert.IsTrue(sortedFileGroups.Count == 0);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
+        }
+        [TestMethod]
+        public void DataFlowMetricService_GetFileFLowMetricsStatus_ReprocessCase()
+        {
+            //Arrange
+            var stubIElasticContext = new Mock<IElasticContext>();
+            DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
+            List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
+            DateTime time = DateTime.Now;
+            DataFlowMetricDto dto1 = new DataFlowMetricDto()
+            {
+                EventMetricId = 1,
+                DatasetFileId = 1,
+                FileName = "FileName1",
+                MetricGeneratedDateTime = time,
+                CurrentFlowStep = 4,
+                TotalFlowSteps = 5,
+                StatusCode = "C"
+            };
+            DataFlowMetricDto dto2 = new DataFlowMetricDto()
+            {
+                EventMetricId = 2,
+                DatasetFileId = 1,
+                FileName = "FileName1",
+                MetricGeneratedDateTime = time.AddMinutes(1),
+                CurrentFlowStep = 4,
+                TotalFlowSteps = 5,
+                StatusCode = "F"
+            };
+            DataFlowMetricDto dto3 = new DataFlowMetricDto()
+            {
+                EventMetricId = 3,
+                DatasetFileId = 1,
+                FileName = "FileName1",
+                MetricGeneratedDateTime = time.AddMinutes(2),
+                CurrentFlowStep = 4,
+                TotalFlowSteps = 5,
+                StatusCode = "C"
+            };
+            DataFlowMetricDto dto4 = new DataFlowMetricDto()
+            {
+                EventMetricId = 4,
+                DatasetFileId = 1,
+                FileName = "FileName1",
+                MetricGeneratedDateTime = time.AddMinutes(3),
+                CurrentFlowStep = 5,
+                TotalFlowSteps = 5,
+                StatusCode = "C"
+            };
+            DataFlowMetricDto dto5 = new DataFlowMetricDto()
+            {
+                EventMetricId = 5,
+                DatasetFileId = 2,
+                FileName = "FileName2",
+                MetricGeneratedDateTime = time.AddMinutes(4),
+                CurrentFlowStep = 5,
+                TotalFlowSteps = 4,
+                StatusCode = "F"
+            };
+            DataFlowMetricDto dto6 = new DataFlowMetricDto()
+            {
+                EventMetricId = 6,
+                DatasetFileId = 2,
+                FileName = "FileName2",
+                MetricGeneratedDateTime = time.AddMinutes(5),
+                CurrentFlowStep = 4,
+                TotalFlowSteps = 5,
+                StatusCode = "C"
+            };
+            dataFlowMetricDtos.Add(dto1);
+            dataFlowMetricDtos.Add(dto2);
+            dataFlowMetricDtos.Add(dto3);
+            dataFlowMetricDtos.Add(dto4);
+            dataFlowMetricDtos.Add(dto5);
+            dataFlowMetricDtos.Add(dto6);
+            List<DataFileFlowMetricsDto> dataFileFlowMetrics = dataFlowMetricService.GetFileMetricGroups(dataFlowMetricDtos);
+            List<DataFileFlowMetricsDto> sortedFileFlowMetrics = dataFlowMetricService.SortFlowMetrics(dataFileFlowMetrics);
+            //Act
+            dataFlowMetricService.GetFileFlowMetricsStatus(sortedFileFlowMetrics);
+            //Assert
+            Assert.IsFalse(sortedFileFlowMetrics[0].AllEventsPresent);
+            Assert.IsTrue(sortedFileFlowMetrics[0].AllEventsComplete);
+            Assert.IsTrue(sortedFileFlowMetrics[1].AllEventsPresent);
+            Assert.IsTrue(sortedFileFlowMetrics[1].AllEventsComplete);
+            stubIDatasetContext.VerifyAll();
+            stubIElasticContext.VerifyAll();
+        }
+        [TestMethod]
+        public void DataFlowMetricService_GetFileFlowMetricsStatus_BaseCase()
         {
             //Arrange
             var stubIElasticContext = new Mock<IElasticContext>();
@@ -207,8 +313,9 @@ namespace Sentry.data.Infrastructure.Tests
             dataFlowMetricDtos.Add(dto2);
             dataFlowMetricDtos.Add(dto3);
             dataFlowMetricDtos.Add(dto4);
-            //Act
             List<DataFileFlowMetricsDto> dataFileFlowMetrics = dataFlowMetricService.GetFileMetricGroups(dataFlowMetricDtos);
+            //Act
+            dataFlowMetricService.GetFileFlowMetricsStatus(dataFileFlowMetrics);
             //Assert
             Assert.IsTrue(dataFileFlowMetrics[0].AllEventsPresent);
             Assert.IsTrue(dataFileFlowMetrics[0].AllEventsComplete);

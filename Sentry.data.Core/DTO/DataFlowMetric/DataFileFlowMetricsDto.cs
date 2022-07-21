@@ -19,7 +19,7 @@ namespace Sentry.data.Core
         public string TargetCode { get; set; }
         public DataFileFlowMetricsDto()
         {
-            AllEventsComplete = true;
+            AllEventsComplete = false;
             AllEventsPresent = false;
             FlowEvents = new List<DataFlowMetricDto>();
         }

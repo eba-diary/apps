@@ -81,14 +81,6 @@ namespace Sentry.data.Infrastructure
                     fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                     fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                     fileGroup.FlowEvents.Add(dto);
-                    if (dto.TotalFlowSteps == dto.CurrentFlowStep)
-                    {
-                        fileGroup.AllEventsPresent = true;
-                    }
-                    if (dto.StatusCode != "C")
-                    {
-                        fileGroup.AllEventsComplete = false;
-                    }
                     fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
                     fileGroups.Add(fileGroup);
                 }
@@ -109,14 +101,6 @@ namespace Sentry.data.Infrastructure
                                 fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                             }
                             fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
-                            if (dto.TotalFlowSteps == dto.CurrentFlowStep)
-                            {
-                                fileGroup.AllEventsPresent = true;
-                            }
-                            if(dto.StatusCode != "C")
-                            {
-                                fileGroup.AllEventsComplete = false;
-                            }
                             fileGroup.FlowEvents.Add(dto);
                         }
                     }
@@ -129,14 +113,6 @@ namespace Sentry.data.Infrastructure
                         fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
                         fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                         fileGroup.FlowEvents.Add(dto);
-                        if (dto.TotalFlowSteps == dto.CurrentFlowStep)
-                        {
-                            fileGroup.AllEventsPresent = true;
-                        }
-                        if (dto.StatusCode != "C")
-                        {
-                            fileGroup.AllEventsComplete = false;
-                        }
                         fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
                         fileGroups.Add(fileGroup);
                     }
@@ -152,6 +128,20 @@ namespace Sentry.data.Infrastructure
             }
             dtoList.Sort();
             return dtoList;
+        }
+        public void GetFileFlowMetricsStatus(List<DataFileFlowMetricsDto> SortedDtoList)
+        {
+            foreach(DataFileFlowMetricsDto dto in SortedDtoList)
+            {
+                if (dto.FlowEvents[0].StatusCode == "C")
+                {
+                    dto.AllEventsComplete = true;
+                }
+                if (dto.FlowEvents[0].CurrentFlowStep == dto.FlowEvents[0].TotalFlowSteps)
+                {
+                    dto.AllEventsPresent = true;
+                }
+            }
         }
     }
 }
