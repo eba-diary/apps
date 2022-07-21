@@ -5,6 +5,7 @@ using Sentry.Core;
 using Newtonsoft.Json;
 using Sentry.data.Core.GlobalEnums;
 using System.Text.RegularExpressions;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -106,6 +107,8 @@ namespace Sentry.data.Core
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
 
+        public virtual string AlternateContactEmail { get; set; }
+
         public virtual ValidationResults ValidateForDelete()
         {
             ValidationResults results = new ValidationResults();
@@ -160,6 +163,10 @@ namespace Sentry.data.Core
                 {
                     vr.Add(ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
                 }
+                if (ShortName == SecurityConstants.ASSET_LEVEL_GROUP_NAME)
+                {
+                    vr.Add(ValidationErrors.datasetShortNameInvalid, $"Short Name cannot be \"{SecurityConstants.ASSET_LEVEL_GROUP_NAME}\"");
+                }
             }
 
             // Validations that only apply to Reports
@@ -191,6 +198,7 @@ namespace Sentry.data.Core
             public const string datasetDateRequired = "datasetDateRequired";
             public const string datasetLocationRequired = "datasetLocationRequired";
             public const string datasetOriginationRequired = "datasetOriginationRequired";
+            public const string datasetAlternateContactEmailFormatInvalid = "datasetAlternateContactEmailFormatInvalid";
         }
     }
 }

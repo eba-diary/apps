@@ -468,6 +468,11 @@
             public const string FAILURE = "FAILURE";
         }
 
+        public static class SecurityConstants
+        {
+            public const string ASSET_LEVEL_GROUP_NAME = "Default";
+        }
+
         public static class CacheKeys
         {
             public const string SEARCHDATASETS = "SearchDatasets";

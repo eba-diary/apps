@@ -19,5 +19,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataset
         public virtual string NamedEnvironment { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public string AlternateContactEmail { get; set; }
     }
 }

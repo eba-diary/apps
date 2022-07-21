@@ -196,6 +196,21 @@
                     @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
 
+                @************************************************************************************************************************************
+                 AlternateContactEmail
+                *************************************************************************************************************************************@
+                @if (Model.CLA1130_SHOW_ALTERNATE_EMAIL)        //JUST REMOVE THIS LINE WHEN FEATURE GOES LIVE
+                {
+                    <div class="md-form">
+                        @Html.EditorFor(model => model.AlternateContactEmail, new { htmlAttributes = new { @class = "form-control", @type = "email" } })
+                        @Html.LabelFor(model => model.AlternateContactEmail, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.AlternateContactEmail) ? "active" : "" })
+                        @Html.ValidationMessageFor(model => model.AlternateContactEmail, "", new { @class = "text-danger" })
+                    </div>
+                    <span class="text-muted">
+                        <em>Email Address like a Distribution List or Alternate Contact.</em>
+                    </span>
+                }
+
                 <div class="md-form fieldDescription">
                     <span class="text-muted">
                         <p>

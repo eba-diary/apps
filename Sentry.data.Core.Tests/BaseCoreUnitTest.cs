@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using Rhino.Mocks;
+using Moq;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;
@@ -29,11 +29,14 @@ namespace Sentry.data.Core.Tests
             });
 
             //add in the infrastructure implementations using MockRepository so we don't actually initalize contexts or services.
-            registry.For<IDatasetContext>().Use(() => MockRepository.GenerateStub<IDatasetContext>());
-            registry.For<IBaseTicketProvider>().Use(() => MockRepository.GenerateStub<ICherwellProvider>());
+            registry.For<IDatasetContext>().Use(() => new Mock<IDatasetContext>().Object);
+            registry.For<IBaseTicketProvider>().Use(() => new Mock<ICherwellProvider>().Object);
             registry.For<IDataFeatures>().Use(new MockDataFeatures());
-            registry.For<IInevService>().Use(() => MockRepository.GenerateStub<IInevService>());
-            registry.For<IQuartermasterService>().Use(() => MockRepository.GenerateStub<IQuartermasterService>());
+            registry.For<IInevService>().Use(() => new Mock<IInevService>().Object);
+            registry.For<IQuartermasterService>().Use(() => new Mock<IQuartermasterService>().Object);
+            registry.For<Hangfire.IBackgroundJobClient>().Use(() => new Mock<Hangfire.IBackgroundJobClient>().Object);
+            registry.For<IObsidianService>().Use(() => new Mock<IObsidianService>().Object);
+            registry.For<IAdSecurityAdminProvider>().Use(() => new Mock<IAdSecurityAdminProvider>().Object);
 
             //set the container
             _container = new StructureMap.Container(registry);
@@ -98,6 +101,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3718_Authorization { get; } = new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4152_UploadFileFromUI => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4310_UseHttpClient => new MockBooleanFeatureFlag(true);
         }
     }
 }

@@ -140,6 +140,16 @@ namespace Sentry.data.Core
             return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset)).Select(ds => ds.DatasetName).ToList();
         }
 
+        public List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset)
+        {
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).Select(ds => ds.DatasetName).ToList();
+        }
+
+        public List<Dataset> GetInheritanceEnabledDatasetsForAsset(string asset)
+        {
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+        }
+
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
@@ -164,7 +174,7 @@ namespace Sentry.data.Core
 
         public SecurityTicket GetLatestInheritanceTicket(int datasetId)
         {
-            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault());
+            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).LastOrDefault());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)
@@ -215,6 +225,13 @@ namespace Sentry.data.Core
                 SecurableObjectName = ds.DatasetName,
                 SaidKeyCode = ds.Asset.SaidKeyCode
             };
+
+            //determine the names of the default security groups
+            var securityGroups = _securityService.GetDefaultSecurityGroupDtos(ds);
+            ar.ConsumeDatasetGroupName = securityGroups.First(g => !g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
+            ar.ProducerDatasetGroupName = securityGroups.First(g => !g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
+            ar.ConsumeAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
+            ar.ProducerAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
 
             Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
             if (!_featureFlags.CLA3718_Authorization.GetValue())
@@ -316,6 +333,12 @@ namespace Sentry.data.Core
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
+            }
+
             return ds.DatasetId;
         }
 
@@ -389,6 +412,7 @@ namespace Sentry.data.Core
 
             ds.IsSecured = dto.IsSecured;
 
+            ds.AlternateContactEmail = dto.AlternateContactEmail;
 
             _datasetContext.SaveChanges();
         }
@@ -526,6 +550,13 @@ namespace Sentry.data.Core
 
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
+
+
+            //VALIDATE EMAIL ADDRESS
+            if (!ValidationHelper.IsDSCEmailValid(dto.AlternateContactEmail))
+            {
+                results.Add(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid, "Alternate Contact Email must be valid sentry.com email address");
+            }
 
             return new ValidationException(results);
         }
@@ -675,7 +706,11 @@ namespace Sentry.data.Core
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
                 }
-                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName &&
+                if (dto.ShortName == SecurityConstants.ASSET_LEVEL_GROUP_NAME)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, $"Short Name cannot be \"{SecurityConstants.ASSET_LEVEL_GROUP_NAME}\"");
+                }
+                if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
                     d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
@@ -721,7 +756,8 @@ namespace Sentry.data.Core
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
                 Asset = asset,
                 NamedEnvironment = dto.NamedEnvironment,
-                NamedEnvironmentType = dto.NamedEnvironmentType
+                NamedEnvironmentType = dto.NamedEnvironmentType,
+                AlternateContactEmail = dto.AlternateContactEmail
             };
 
             switch (dto.DataClassification)
@@ -815,6 +851,7 @@ namespace Sentry.data.Core
             dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
+            dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
 
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
