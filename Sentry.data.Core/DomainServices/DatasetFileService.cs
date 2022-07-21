@@ -345,7 +345,7 @@ namespace Sentry.data.Core
             } catch (Exception ex)
             {
                 Logger.Error("Reprocessig failed ", ex);
-                throw;
+                throw; // this will be caught in hangfire
             }
             
         }
