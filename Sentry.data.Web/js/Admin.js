@@ -187,7 +187,6 @@ data.Admin = {
                 $.ajax({
                     type: "GET",
                     url: "Admin/GetDeadJobs/"+time,
-                    contentType: "application/json; charset=utf-8",
                     dataType: "html",
                     success: function (msg) {
                         $("#deadJobTable").html(msg);
