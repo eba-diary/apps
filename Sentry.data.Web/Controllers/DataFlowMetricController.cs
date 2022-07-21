@@ -28,7 +28,7 @@ namespace Sentry.data.Web.Controllers
             List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.SortFlowMetrics(_dataFlowMetricService.GetFileMetricGroups(metricDtoList));
             _dataFlowMetricService.GetFileFlowMetricsStatus(fileGroups);
-            DataFlowMetricGroupModel dataFlowMetricGroupModel = new DataFlowMetricGroupModel;
+            DataFlowMetricGroupModel dataFlowMetricGroupModel = new DataFlowMetricGroupModel();
             dataFlowMetricGroupModel.DataFlowMetricGroups = fileGroups;
             JsonResult result = Json(dataFlowMetricGroupModel.DataFlowMetricGroups, JsonRequestBehavior.AllowGet);
             return result;
