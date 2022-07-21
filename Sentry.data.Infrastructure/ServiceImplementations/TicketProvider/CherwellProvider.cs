@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
 
                 AddApproversToTicket(newBusPublicObId, model);
 
-                ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.APPROVAL, GlobalConstants.CherwellChangeStatusOrder.APPROVAL);
+                ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.WAITING_FOR_APPROVAL, GlobalConstants.CherwellChangeStatusOrder.WAITING_FOR_APPROVAL);
 
                 return newBusPublicObId;
             }
@@ -84,7 +84,7 @@ namespace Sentry.data.Infrastructure
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.DENIED;
             }
-            else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING || ticketStatus == GlobalConstants.CherwellChangeStatusNames.APPROVAL)
+            else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING)
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.APPROVED;
             }
