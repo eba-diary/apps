@@ -42,11 +42,11 @@ namespace Sentry.data.Infrastructure.Tests
                 QueryMadeDateTime = DateTime.Now,
                 SchemaId = 0,
                 EventContents = "Event Contents",
-                TotalFlowSteps = 0,
+                MaxExecutionOrder = 0,
                 FileModifiedDateTime = DateTime.Now,
                 OriginalFileName = "file name",
                 DatasetId = 0,
-                CurrentFlowStep = 0,
+                ExecutionOrder = 0,
                 DataActionId = 0,
                 DataFlowId = 0,
                 Partition = 0,
@@ -63,7 +63,7 @@ namespace Sentry.data.Infrastructure.Tests
                 FileCreatedDateTime = DateTime.Now,
                 RunInstanceGuid = "run instance guid",
                 FileName = "file name",
-                MetricGeneratedDateTime = DateTime.Now,
+                EventMetricCreatedDateTime = DateTime.Now,
                 DatasetFileId = 0,
                 ProcessStartDateTime = DateTime.Now,
 
@@ -78,11 +78,11 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(entity.QueryMadeDateTime, dto.QueryMadeDateTime);
             Assert.AreEqual(entity.SchemaId, dto.SchemaId);
             Assert.AreEqual(entity.EventContents, dto.EventContents);
-            Assert.AreEqual(entity.TotalFlowSteps, dto.TotalFlowSteps);
+            Assert.AreEqual(entity.MaxExecutionOrder, dto.TotalFlowSteps);
             Assert.AreEqual(entity.FileModifiedDateTime, dto.FileModifiedDateTime);
             Assert.AreEqual(entity.OriginalFileName, dto.OriginalFileName);
             Assert.AreEqual(entity.DatasetId, dto.DatasetId);
-            Assert.AreEqual(entity.CurrentFlowStep, dto.CurrentFlowStep);
+            Assert.AreEqual(entity.ExecutionOrder, dto.CurrentFlowStep);
             Assert.AreEqual(entity.DataActionId, dto.DataActionId);
             Assert.AreEqual(entity.DataFlowId, dto.DataFlowId);
             Assert.AreEqual(entity.Partition, dto.Partition);
@@ -99,7 +99,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(entity.FileCreatedDateTime, dto.FileCreatedDateTime);
             Assert.AreEqual(entity.RunInstanceGuid, dto.RunInstanceGuid);
             Assert.AreEqual(entity.FileName, dto.FileName);
-            Assert.AreEqual(entity.MetricGeneratedDateTime, dto.MetricGeneratedDateTime);
+            Assert.AreEqual(entity.EventMetricCreatedDateTime, dto.MetricGeneratedDateTime);
             Assert.AreEqual(entity.DatasetFileId, dto.DatasetFileId);
             Assert.AreEqual(entity.ProcessStartDateTime, dto.ProcessStartDateTime);
             Assert.AreEqual("Flow Step Name", dto.DataFlowStepName);

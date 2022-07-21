@@ -17,7 +17,7 @@ namespace Sentry.data.Core
         public string EventContents { get; set; }
 
         [PropertyName("maxexecutionorder")]
-        public int TotalFlowSteps { get; set; }
+        public int MaxExecutionOrder { get; set; }
 
         [PropertyName("filemodifieddate")]
         public DateTime FileModifiedDateTime { get; set; }
@@ -29,7 +29,7 @@ namespace Sentry.data.Core
         public int DatasetId { get; set; }
 
         [PropertyName("executionorder")]
-        public int CurrentFlowStep { get; set; }
+        public int ExecutionOrder { get; set; }
 
         [PropertyName("dataactionid")]
         public int DataActionId { get; set; }
@@ -83,7 +83,7 @@ namespace Sentry.data.Core
         public string SaidKeyCode { get; set; }
 
         [PropertyName("eventmetriccreateddate")]
-        public DateTime MetricGeneratedDateTime { get; set; }
+        public DateTime EventMetricCreatedDateTime { get; set; }
 
         [PropertyName("datasetfileid")]
         public int DatasetFileId { get; set; }
