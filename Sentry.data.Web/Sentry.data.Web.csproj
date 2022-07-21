@@ -412,6 +412,7 @@
     </AdditionalFiles>
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
@@ -1967,6 +1968,7 @@
     <Folder Include="Views\AccessRequest\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\Alert\" />
+    <Folder Include="Views\Auth\" />
     <Folder Include="Views\BaseDataInventory\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
