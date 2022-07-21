@@ -28,8 +28,7 @@
     @* Name *@
     <div class="md-form">
         @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control" } })
-        @Html.Label("Exhibit Name", htmlAttributes: new { @class = "" })
-
+        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.DatasetName) ? "active" : "" })
         @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
     </div>
 
@@ -87,6 +86,7 @@
         @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "" })
         @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
     </div>
+
     <div class="md-form urlDescription">
         <label class="control-label"></label>
         <span class="text-muted">
@@ -146,8 +146,8 @@
 
 
 
-    
-   
+
+
 
 
     @* Thumbnails *@
