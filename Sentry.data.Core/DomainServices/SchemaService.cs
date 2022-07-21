@@ -917,7 +917,7 @@ namespace Sentry.data.Core
                 {
                     Schema = schema,
                     SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                    SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources),
+                    SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
                     SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
@@ -987,10 +987,15 @@ namespace Sentry.data.Core
             return dbName;
         }
 
-        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources)
+        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources, string datasetShortName)
         {
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            {
+                return datasetShortName;
+            }
             return (isHumanResources)? "HR" : cat.Name.ToUpper();
         }
+        
 
         /// <summary>
         /// Generates appropriate bucket after evaluating various variables
