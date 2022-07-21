@@ -63,7 +63,7 @@ namespace Sentry.data.Web
         [Required()]
         [MaxLength(1024)]
         [DisplayName("Dataset Name")]
-        public string DatasetName { get; set; }
+        public virtual string DatasetName { get; set; }
         [Required()]
         [MaxLength(4096)]
         [DisplayName("Description")]
