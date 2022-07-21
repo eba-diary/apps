@@ -26,7 +26,7 @@ namespace Sentry.data.Infrastructure
                 command.Parameters.AddWithValue("@JobID", System.Data.SqlDbType.Int);
                 command.Parameters["@JobID"].Value = Configuration.Config.GetHostSetting("DeadDataSparkJobID");
 
-                //add parameter for time window of job creation (@TimeCreated) 
+                //add parameter for time window of jobs created (@TimeCreated) 
                 command.Parameters.AddWithValue("@TimeCreated", System.Data.SqlDbType.Int);
                 command.Parameters["@TimeCreated"].Value = timeCreated;
 

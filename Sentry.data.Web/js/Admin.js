@@ -203,20 +203,23 @@ data.Admin = {
 
     // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
     ReprocessDeadJobs: function () {
+
+        // defines logic for select all checkbox 
         $("#data-file-select-all").click(function (event) {
             var selectAllCheckbox = $(this);
             if (selectAllCheckbox.is(":checked")) {
                 $(".select-all-target").each(function () {
-                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                    $(this).prop("checked", true);
                 });
             }
             else {
                 $(".select-all-target").each(function () {
-                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
+                    $(this).prop("checked", false);
                 });
             }
         });
 
+        // submits selected jobs to be reprocessed
         $("#reprocessButton").click(function () {
             var files = [];
 
