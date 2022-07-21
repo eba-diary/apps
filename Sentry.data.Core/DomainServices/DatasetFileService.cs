@@ -323,7 +323,7 @@ namespace Sentry.data.Core
                 DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
                 KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
-                if (response.Key != null || response.Value != null)
+                if (response.Key == null || response.Value == null)
                 {
                     string errorMessage = "";
                     if (response.Key == null)
@@ -336,8 +336,6 @@ namespace Sentry.data.Core
                         errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
 
                     }
-
-                    Logger.Error(errorMessage);
                     throw new Exception(errorMessage);
                 }
                 else
@@ -347,6 +345,7 @@ namespace Sentry.data.Core
             } catch (Exception ex)
             {
                 Logger.Error("Reprocessig failed ", ex);
+                throw;
             }
             
         }
