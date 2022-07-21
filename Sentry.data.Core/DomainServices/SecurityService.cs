@@ -677,7 +677,7 @@ namespace Sentry.data.Core
         /// <param name="datasetIdsList">List of datasets to enqueue</param>
         public void EnqueueCreateDefaultSecurityForDatasetList(int[] datasetIdList)
         {
-            foreach(int datasetId in datasetIdsList)
+            foreach(int datasetId in datasetIdList)
             {
                 EnqueueCreateDefaultSecurityForDataset(datasetId);
             }
