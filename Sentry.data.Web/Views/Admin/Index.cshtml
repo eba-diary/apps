@@ -21,23 +21,47 @@
     <div class="col-lg-10">
         <div id="partial-view-test">
 
-            <h1 id="titleLinks">My Links</h1>
-            <a href="#!" class="list-group-item list-group-item-action">Link One</a>
-            <a href="#!" class="list-group-item list-group-item-action">Link Two</a>
-            <a href="#!" class="list-group-item list-group-item-action">Link Three</a>
-            <a href="#!" class="list-group-item list-group-item-action">Link Four</a>
-            <a href="#!" class="list-group-item list-group-item-action">Link Five</a>
-            <a href="#!" class="list-group-item list-group-item-action">Link Six</a>
-            
-            <button type="button" id="toggleBtn">Add</button>
-            <button type="button">Delete</button> 
+            <div class="list-group">
+                <h1>My Links</h1>
+                <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                <a href="#" class="list-group-item">Morbi leo risus</a>
+                <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                <a href="#" class="list-group-item">Vestibulum at eros</a>
+            </div>
+
+
+
+
+
+            <button type="button" class="btn btn-outline-info waves-effect">Info</button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+
+
+            <div class="card form-wrapper">
+                <div class="card-body">
+                    <h3 class="card-title">Add Information</h3>
+                    
+                    <form class="bs-component">
+                        <div class="md"
+                    </form>
+                </div>
+            </div>
 
             <div id="toggleDiv">
                 <h3>Add Information</h3>
-                <input placeholder="Name"/>
-                <input placeholder="Description"/>
-                <input placeholder="Url"/>
-                <button type="button">Add Link</button>
+                <form>
+                    <label for="name">Name:</label><br>
+                    <input placeholder="Name" />
+
+                    <label for="description">Description:</label><br>
+                    <input placeholder="Description" />
+
+                    <label for="url">First :</label><br>
+                    <input placeholder="Url" />
+
+                    <button type="button">Add Link</button>
+                </form>
+
             </div>
         </div>
     </div>
