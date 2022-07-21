@@ -4,7 +4,7 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class DataFlowMetricEntity
+    public class DataFlowMetric
     {
         #region Properties
         [PropertyName("@timestamp")]

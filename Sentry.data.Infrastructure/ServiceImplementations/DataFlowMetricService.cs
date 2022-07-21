@@ -17,11 +17,11 @@ namespace Sentry.data.Infrastructure
             _dataFlowMetricProvider = dataFlowMetricProvider;
             _context = context;
         }
-        public List<DataFlowMetricEntity> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
+        public List<DataFlowMetric> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
         {
             return _dataFlowMetricProvider.GetDataFlowMetricEntities(dto);
         }
-        public DataFlowMetricDto ToDto(DataFlowMetricEntity entity)
+        public DataFlowMetricDto ToDto(DataFlowMetric entity)
         {
             return new DataFlowMetricDto()
             {
@@ -57,10 +57,10 @@ namespace Sentry.data.Infrastructure
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
             };
         }
-        public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetricEntity> entityList)
+        public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetric> entityList)
         {
             List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
-            foreach(DataFlowMetricEntity entity in entityList)
+            foreach(DataFlowMetric entity in entityList)
             {
                 DataFlowMetricDto dto = ToDto(entity);
                 dataFlowMetricDtos.Add(dto);

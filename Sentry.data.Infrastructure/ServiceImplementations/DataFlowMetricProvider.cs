@@ -18,29 +18,29 @@ namespace Sentry.data.Infrastructure
             _elasticContext = elasticContext;
         }
 
-        public List<DataFlowMetricEntity> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
+        public List<DataFlowMetric> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();
-            must.AddMatch<DataFlowMetricEntity>(x => x.DatasetId, dto.DatasetToSearch);
-            must.AddMatch<DataFlowMetricEntity>(x => x.SchemaId, dto.SchemaToSearch);
+            must.AddMatch<DataFlowMetric>(x => x.DatasetId, dto.DatasetToSearch);
+            must.AddMatch<DataFlowMetric>(x => x.SchemaId, dto.SchemaToSearch);
             if(dto.FileToSearch != "-1")
             {
-                must.AddMatch<DataFlowMetricEntity>(x => x.DatasetFileId, dto.FileToSearch);
+                must.AddMatch<DataFlowMetric>(x => x.DatasetFileId, dto.FileToSearch);
             }
             BoolQuery boolQuery = new BoolQuery();
             boolQuery.Must = must;
 
-            SearchRequest<DataFlowMetricEntity> request = new SearchRequest<DataFlowMetricEntity>()
+            SearchRequest<DataFlowMetric> request = new SearchRequest<DataFlowMetric>()
             {
                 Sort = new List<ISort>()
                 {
-                    new FieldSort(){Field = Infer.Field<DataFlowMetricEntity>(x => x.EventMetricId), Order = SortOrder.Descending}
+                    new FieldSort(){Field = Infer.Field<DataFlowMetric>(x => x.EventMetricId), Order = SortOrder.Descending}
                 },
                 Size = 10000,
                 Query = boolQuery,
             };
 
-            ElasticResult<DataFlowMetricEntity> elasticResult = _elasticContext.SearchAsync(request).Result;
+            ElasticResult<DataFlowMetric> elasticResult = _elasticContext.SearchAsync(request).Result;
             return elasticResult.Documents.ToList();
         }
     }

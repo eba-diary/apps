@@ -8,6 +8,6 @@ namespace Sentry.data.Core.Interfaces
 {
     public interface IDataFlowMetricProvider
     {
-        List<DataFlowMetricEntity> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto);
+        List<DataFlowMetric> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto);
     }
 }

@@ -12,9 +12,9 @@ namespace Sentry.data.Web.Tests
 {
     public static class MockClasses
     {
-        public static DataFlowMetricEntity MockDataFlowMetricEntity()
+        public static DataFlowMetric MockDataFlowMetricEntity()
         {
-            DataFlowMetricEntity entity = new DataFlowMetricEntity
+            DataFlowMetric entity = new DataFlowMetric
             {
                 QueryMadeDateTime = DateTime.Now,
                 SchemaId = 0,

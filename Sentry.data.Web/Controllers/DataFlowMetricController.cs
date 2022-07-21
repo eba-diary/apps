@@ -40,7 +40,7 @@ namespace Sentry.data.Web.Controllers
             searchDto.DatasetToSearch = "464";
             searchDto.SchemaToSearch = "1946";
             searchDto.FileToSearch = "-1";
-            List<DataFlowMetricEntity> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
+            List<DataFlowMetric> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
             List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.SortFlowMetrics(_dataFlowMetricService.GetFileMetricGroups(metricDtoList));
             _dataFlowMetricService.GetFileFlowMetricsStatus(fileGroups);
@@ -52,7 +52,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult GetDataFlowMetricAccordionView()
         {
             
-            List<DataFlowMetricEntity> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
+            List<DataFlowMetric> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
             List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
             DataFlowMetricGroupModel dataFlowMetricGroupModel = GetDataFlowMetricAccordionModel(fileGroups);

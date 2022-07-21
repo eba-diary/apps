@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure.Tests
             DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
             stubIDatasetContext.Setup(m => m.DataFlowStep).Returns(flowSteps.AsQueryable());
 
-            DataFlowMetricEntity entity = new DataFlowMetricEntity()
+            DataFlowMetric entity = new DataFlowMetric()
             {
                 SaidKeyCode = "DATA",
                 StatusCode = "C",
@@ -114,7 +114,7 @@ namespace Sentry.data.Infrastructure.Tests
             DataFlowMetricProvider provider = new DataFlowMetricProvider(stubIElasticContext.Object);
             var stubIDatasetContext = new Mock<IDatasetContext>();
             DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(provider, stubIDatasetContext.Object);
-            List<DataFlowMetricEntity> dataFlowMetricEntities = new List<DataFlowMetricEntity>();
+            List<DataFlowMetric> dataFlowMetricEntities = new List<DataFlowMetric>();
             //Act
             List<DataFlowMetricDto> dtoList = dataFlowMetricService.GetMetricList(dataFlowMetricEntities);
             //Assert
