@@ -19,7 +19,7 @@ namespace Sentry.data.Infrastructure
         }
         public List<DataFlowMetric> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
         {
-            return _dataFlowMetricProvider.GetDataFlowMetricEntities(dto);
+            return _dataFlowMetricProvider.GetDataFlowMetrics(dto);
         }
         public DataFlowMetricDto ToDto(DataFlowMetric entity)
         {

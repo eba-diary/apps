@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure
             _elasticContext = elasticContext;
         }
 
-        public List<DataFlowMetric> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
+        public List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();
             must.AddMatch<DataFlowMetric>(x => x.DatasetId, dto.DatasetToSearch);
