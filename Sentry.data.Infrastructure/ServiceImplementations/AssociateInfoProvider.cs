@@ -21,36 +21,29 @@ namespace Sentry.data.Infrastructure
             //    Sentry.Configuration.Config.GetHostSetting("CrossDomainUserID"),
             //    Sentry.Configuration.Config.GetHostSetting("CrossDomainUserPassword"));
 
-            PopulateCacheIfNeeded();
+            var associateCacheOptions = new AssociatesCacheOptions
+            {
+                SuccessCallback = () =>
+                {
+                    Sentry.Common.Logging.Logger.Info("Associate Cache has been loaded");
+                },
+                ExceptionCallback = (ex, retryCount) =>
+                {
+                    Sentry.Common.Logging.Logger.Error($"There was an error loading the associate cache. Retry count: {retryCount}", ex);
+                },
+                IncludeInactive = true
+            };
+            _associateService.LoadLocalCacheWithRetry(associateCacheOptions);
         }
 
         public Associate GetAssociateInfo(string associateId)
         {
-            PopulateCacheIfNeeded();
-
             return _associateService.GetAssociateById(associateId, true);
         }
 
         public Associate GetAssociateInfoByName(string associateName)
         {
-            PopulateCacheIfNeeded();
-
             return _associateService.GetAssociatesByName(associateName, true).First();
-        }
-
-        private void PopulateCacheIfNeeded()
-        {
-            if (_associateService.HasLocalCache == false && _localCacheProcessing == false)
-            {
-                lock (_lockObject)
-                {
-                    _localCacheProcessing = true;
-                    _associateService.UseCacheDb = true;
-                    _associateService.LoadLocalCacheAsync(true).ContinueWith(task =>
-                       _localCacheProcessing = false
-                    );
-                }
-            }
         }
     }
 }
