@@ -12,27 +12,11 @@ namespace Sentry.data.Web.Controllers
     public class DataFlowMetricController : BaseController
     {
         private readonly DataFlowMetricService _dataFlowMetricService;
-        public DataFlowMetricSearchDto searchDto;
-
         public DataFlowMetricController(DataFlowMetricService dataFlowMetricService)
         {
             _dataFlowMetricService = dataFlowMetricService;
         }
-        public DataFlowMetricGroupModel GetDataFlowMetricAccordionModel(List<DataFileFlowMetricsDto> dtoList)
-        {
-            DataFlowMetricGroupModel dataFlowMetricGroupModel = new DataFlowMetricGroupModel();
-            dataFlowMetricGroupModel.DataFlowMetricGroups = dtoList;
-            return dataFlowMetricGroupModel;
-        }
-        //below method is related to the accordion partial view, and is currently not used
-        [HttpPost]
-        public void GetSearchDto(DataFlowMetricSearchDto searchDtoData)
-        {
-            searchDto = new DataFlowMetricSearchDto();
-            searchDto.DatasetToSearch = searchDtoData.DatasetToSearch;
-            searchDto.SchemaToSearch = searchDtoData.SchemaToSearch;
-            searchDto.FileToSearch = searchDtoData.FileToSearch;
-        }
+
         [HttpPost]
         public JsonResult PopulateTable(DataFlowMetricSearchDto searchDto)
         {
@@ -44,19 +28,10 @@ namespace Sentry.data.Web.Controllers
             List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.SortFlowMetrics(_dataFlowMetricService.GetFileMetricGroups(metricDtoList));
             _dataFlowMetricService.GetFileFlowMetricsStatus(fileGroups);
-            DataFlowMetricGroupModel dataFlowMetricGroupModel = GetDataFlowMetricAccordionModel(fileGroups);
+            DataFlowMetricGroupModel dataFlowMetricGroupModel = new DataFlowMetricGroupModel;
+            dataFlowMetricGroupModel.DataFlowMetricGroups = fileGroups;
             JsonResult result = Json(dataFlowMetricGroupModel.DataFlowMetricGroups, JsonRequestBehavior.AllowGet);
             return result;
-        }
-        //below method is related to the accordion partial view, and is currently not used
-        public ActionResult GetDataFlowMetricAccordionView()
-        {
-            
-            List<DataFlowMetric> entityList = _dataFlowMetricService.GetDataFlowMetricEntities(searchDto);
-            List<DataFlowMetricDto> metricDtoList = _dataFlowMetricService.GetMetricList(entityList);
-            List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(metricDtoList);
-            DataFlowMetricGroupModel dataFlowMetricGroupModel = GetDataFlowMetricAccordionModel(fileGroups);
-            return PartialView("_DataFlowMetricAccordion", dataFlowMetricGroupModel);
         }
     }
 }
