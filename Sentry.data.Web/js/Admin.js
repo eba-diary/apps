@@ -67,7 +67,6 @@ data.Admin = {
             dataType: "Json",
             dataSrc: "Records",
             success: function (data) {
-                console.log(data);
                 var s = '<option value="-1"id="defaultFileSelection"> (Optional) Select a File</option>';
                 for (var d of data.Records) {
                     s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'

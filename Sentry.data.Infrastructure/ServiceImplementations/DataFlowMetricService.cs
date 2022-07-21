@@ -17,11 +17,7 @@ namespace Sentry.data.Infrastructure
             _dataFlowMetricProvider = dataFlowMetricProvider;
             _context = context;
         }
-        public List<DataFlowMetric> GetDataFlowMetricEntities(DataFlowMetricSearchDto dto)
-        {
-            return _dataFlowMetricProvider.GetDataFlowMetrics(dto);
-        }
-        public DataFlowMetricDto ToDto(DataFlowMetric entity)
+         DataFlowMetricDto ToDto(DataFlowMetric entity)
         {
             return new DataFlowMetricDto()
             {
@@ -57,7 +53,7 @@ namespace Sentry.data.Infrastructure
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
             };
         }
-        public List<DataFlowMetricDto> GetMetricList(List<DataFlowMetric> entityList)
+        private List<DataFlowMetricDto> GetMetricList(List<DataFlowMetric> entityList)
         {
             List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
             foreach(DataFlowMetric entity in entityList)
@@ -67,8 +63,10 @@ namespace Sentry.data.Infrastructure
             }
             return dataFlowMetricDtos;
         }
-        public List<DataFileFlowMetricsDto> GetFileMetricGroups(List<DataFlowMetricDto> dtoList)
+        public List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto)
         {
+            List<DataFlowMetric> entityList = _dataFlowMetricProvider.GetDataFlowMetrics(searchDto);
+            List<DataFlowMetricDto> dtoList = GetMetricList(entityList);
             List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
             foreach(DataFlowMetricDto dto in dtoList)
             {
@@ -118,7 +116,9 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
-            return fileGroups;
+            List<DataFileFlowMetricsDto> sortedFileGroups = SortFlowMetrics(fileGroups);
+            GetFileFlowMetricsStatus(sortedFileGroups);
+            return sortedFileGroups;
         }
         public List<DataFileFlowMetricsDto> SortFlowMetrics(List<DataFileFlowMetricsDto> dtoList)
         {
