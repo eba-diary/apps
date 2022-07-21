@@ -267,7 +267,7 @@
         public static class CherwellChangeStatusNames
         {
             public const string LOGGING_AND_PREP = "Logging and Prep";
-            public const string APPROVAL = "Approval";
+            public const string WAITING_FOR_APPROVAL = "Approval";
             public const string IMPLEMENTING = "Implementing";
             public const string CLOSED = "Closed";
         }
@@ -275,7 +275,7 @@
         public static class CherwellChangeStatusOrder
         {
             public const string LOGGING_AND_PREP = "1";
-            public const string APPROVAL = "2";
+            public const string WAITING_FOR_APPROVAL = "2";
             public const string IMPLEMENTING = "3";
             public const string CLOSED = "4";
         }
