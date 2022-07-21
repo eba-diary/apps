@@ -322,6 +322,7 @@
     <Compile Include="Mappings\Primary\Security\SecurityMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityPermissionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityTicketMapping.cs" />
+    <Compile Include="Mappings\Primary\SupportLinkMapping.cs" />
     <Compile Include="Mappings\Primary\UserFavoriteMapping.cs" />
     <Compile Include="Mappings\Subscriptions\BusinessAreaSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />
@@ -390,6 +391,7 @@
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
+    <Compile Include="ServiceImplementations\SupportLinkService.cs" />
     <Compile Include="ServiceImplementations\ThreadSafeInstanceGenerator.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />

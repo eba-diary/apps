@@ -46,6 +46,7 @@ namespace Sentry.data.Core
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
         IQueryable<UserFavorite> UserFavorites { get; }
+        IQueryable<SupportLink> SupportLinks { get; }
         IQueryable<BusinessAreaTileRow> BusinessAreaTileRows { get; }
         IQueryable<BusinessArea> BusinessAreas { get; }
         IQueryable<OAuthClaim> OAuthClaims { get; }

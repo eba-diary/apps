@@ -33,37 +33,32 @@
 
 
 
-            <button type="button" class="btn btn-outline-info waves-effect">Info</button>
-            <button type="button" class="btn btn-outline-danger">Delete</button>
+            <button type="button" class="btn btn-outline-primary waves-effect" id="toggleBtn">Add Link</button>
+            <button type="button" class="btn btn-outline-danger">Delete Link</button>
 
 
-            <div class="card form-wrapper">
+            <div class="card form-wrapper" id="toggleDiv">
                 <div class="card-body">
                     <h3 class="card-title">Add Information</h3>
-                    
+
                     <form class="bs-component">
-                        <div class="md">
-                            <in0ptu
+                        <div class="md-form">
+                            <input type="text" id="name" class="form-control" required />
+                            <label for="name" class="">Enter Your Name</label>
                         </div>
+                        <div class="md-form">
+                            <label for="description" class="">Enter Description</label>
+                            <input type="text" id="description" class="form-control" />
+
+                        </div>
+                        <div class="bs-component">
+                            <label for="url">Enter an https:// URL:</label>
+                            <input type="url" id="url" class="form-control" placeholder="https://example.com" required />
+                        </div>
+                        <button type="button" class="btn btn-primary waves-effect waves-light">Submit</button>
+
                     </form>
                 </div>
-            </div>
-
-            <div id="toggleDiv">
-                <h3>Add Information</h3>
-                <form>
-                    <label for="name">Name:</label><br>
-                    <input placeholder="Name" />
-
-                    <label for="description">Description:</label><br>
-                    <input placeholder="Description" />
-
-                    <label for="url">First :</label><br>
-                    <input placeholder="Url" />
-
-                    <button type="button">Add Link</button>
-                </form>
-
             </div>
         </div>
     </div>
@@ -83,11 +78,13 @@
             });
         });
 
+        
+
     </script>
 }
 
 <style>
     #toggleDiv{
-        display: block;
+        width: 50%;
     }
 </style>
