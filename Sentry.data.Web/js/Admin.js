@@ -280,7 +280,7 @@ data.Admin = {
                         className: 'dt-control',
                         orderable: false,
                         data: null,
-                        defaultContent: '<center><i id = "expand-collapse-icon" class = "fas fa-plus"></i></center>',
+                        defaultContent: '<center><em id = "expand-collapse-icon" class = "fas fa-plus"></em></center>',
                     },
                     {
                         className: 'dt-control',
@@ -311,13 +311,13 @@ data.Admin = {
                         data: null,
                         render: (d) => function (data, type, row) {
                             if (d.AllEventsPresent && d.AllEventsComplete) {
-                                return '<center><i class="fas fa-check" style="color: green"></i></center>';
+                                return '<center><em class="fas fa-check" style="color: green"></em></center>';
                             }
                             else if (!d.AllEventsPresent && d.AllEventsComplete) {
-                                return '<center><i class="fas fa-clock"></i></center>';
+                                return '<center><em class="fas fa-clock"></em></center>';
                             }
                             else {
-                                return '<center><i class="fas fa-circle-x" style="color: red"></i></center>';
+                                return '<center><em class="fas fa-circle-x" style="color: red"></em></center>';
                             }
                         }
                     }

@@ -111,19 +111,41 @@ namespace Sentry.data.Core
 
             return summaryResults;
         }
-
+        private List<DatasetDto> GetDatasetDto(bool active)
+        {
+            if (active)
+            {
+                List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS" && x.ObjectStatus.Equals("Active")).FetchAllChildren(_datasetContext).ToList();
+                List<DatasetDto> dtoList = new List<DatasetDto>();
+                foreach (Dataset ds in dsList)
+                {
+                    DatasetDto dto = new DatasetDto();
+                    MapToDto(ds, dto);
+                    dtoList.Add(dto);
+                }
+                return dtoList;
+            }
+            else
+            {
+                List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
+                List<DatasetDto> dtoList = new List<DatasetDto>();
+                foreach (Dataset ds in dsList)
+                {
+                    DatasetDto dto = new DatasetDto();
+                    MapToDto(ds, dto);
+                    dtoList.Add(dto);
+                }
+                return dtoList;
+            }
+        }
         public List<DatasetDto> GetAllDatasetDto()
         {
-            List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
-            List<DatasetDto> dtoList = new List<DatasetDto>();
-            foreach (Dataset ds in dsList)
-            {
-                DatasetDto dto = new DatasetDto();
-                MapToDto(ds, dto);
-                dtoList.Add(dto);
-            }
-            return dtoList;
+            return GetDatasetDto(false);
         } 
+        public List<DatasetDto> GetAllActiveDatasetDto()
+        {
+            return GetDatasetDto(true);
+        }
 
         public IDictionary<int, string> GetDatasetList()
         {
