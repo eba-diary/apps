@@ -147,6 +147,7 @@
     <Compile Include="EventServiceTests.cs" />
     <Compile Include="SparkConverterStatusEventHandlerTests.cs" />
     <Compile Include="FilterSearchServiceTests.cs" />
+    <Compile Include="SupportLinkServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ namespace Sentry.data.Core.Tests
                 DatasetId = 1000,
                 DatasetCategories = MockCategories(),
                 DatasetName = "Claim Dataset",
-                DatasetDesc = "Test Claim Dataset",
+                DatasetDesc = "Test Claim Dataset"
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = user != null ? user.DisplayName : "Nye, Bill",
                 UploadUserName = user != null ? user.DisplayName : "Nye, Bill",
@@ -261,17 +261,6 @@ namespace Sentry.data.Core.Tests
             }
         }
 
-        public static SupportLink MockSupportLink()
-        {
-            SupportLink supportLink = new SupportLink()
-            {
-                SupportLinkId = 12,
-                Name = "Kylian Mbappe",
-                Description = "My favorite soccer player",
-                Url = "https:www.nytime.com/games/wordle/index.html",
-            };
-            return supportLink;
-        }
 
         public static DatasetFile MockDatasetFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {

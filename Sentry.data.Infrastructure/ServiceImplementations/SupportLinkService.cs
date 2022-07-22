@@ -8,7 +8,7 @@ using Sentry.data.Core.DTO.Admin;
 using Sentry.data.Core;
 using Sentry.Common.Logging;
 
-namespace Sentry.data.Infrastructure.ServiceImplementations
+namespace Sentry.data.Infrastructure
 {
     public class SupportLinkService : ISupportLink
     {
@@ -47,15 +47,19 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             try
             {
                 // Does SupportLink with Id exist
-                SupportLink exists = _datasetContext.SupportLinks.Where(w => w.SupportLinkId == id).FirstOrDefault();
+                SupportLink supportLinkExists = _datasetContext.SupportLinks.Where(w => w.SupportLinkId == id).FirstOrDefault();
                 
-                _datasetContext.Remove(exists);
-                _datasetContext.SaveChanges();
+                if(supportLinkExists != null)
+                {
+                    Logger.Error($"Found Support Link {id} to remove");
+                    _datasetContext.Remove(supportLinkExists);
+                    _datasetContext.SaveChanges();
+                } 
             } 
             catch (Exception ex)
             {
                 // the case where the supportLink id is not in the database
-                Logger.Error($"SupportLink with id {id} does not exist", ex);
+                Logger.Error($"Error removing Support Link {id}", ex);
                 throw;
             }
         }
