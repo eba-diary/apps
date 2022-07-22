@@ -420,6 +420,7 @@
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\ApiModels\Admin\SupportLinkModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />

@@ -54,6 +54,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             } 
             catch (Exception ex)
             {
+                // the case where the supportLink id is not in the database
                 Logger.Error($"SupportLink with id {id} does not exist", ex);
                 throw;
             }

@@ -261,6 +261,18 @@ namespace Sentry.data.Core.Tests
             }
         }
 
+        public static SupportLink MockSupportLink()
+        {
+            SupportLink supportLink = new SupportLink()
+            {
+                SupportLinkId = 12,
+                Name = "Kylian Mbappe",
+                Description = "My favorite soccer player",
+                Url = "https:www.nytime.com/games/wordle/index.html",
+            };
+            return supportLink;
+        }
+
         public static DatasetFile MockDatasetFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {
             DatasetFile df = new DatasetFile()
