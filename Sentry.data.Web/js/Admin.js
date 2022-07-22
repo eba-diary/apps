@@ -222,16 +222,16 @@ data.Admin = {
     },
     //loads dataflow metric page events
     DataFlowMetricsInit: function () {
-        $("#DatasetsList").materialSelect();
+        $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect();
         $("#fileDropdown").materialSelect();
-        $("#DatasetsList").change(function (event) {
-            var datasetId = $("#DatasetsList").find(":selected").val();
+        $("#AllDatasets").change(function (event) {
+            var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
             }
-            if ($("#DatasetsList").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
+            if ($("#AllDatasets").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
                 $("#submitButton").prop("disabled", false);
             }
             else {
@@ -241,12 +241,12 @@ data.Admin = {
         });
         $("#schemaDropdown").change(function (event) {
             var schemaId = $("#schemaDropdown").find(":selected").val();
-            var datasetId = $("#DatasetsList").find(":selected").val();
+            var datasetId = $("#AllDatasets").find(":selected").val();
             if (schemaId != -1 && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.GetFileDropdown(url);
             }
-            if ($("#DatasetsList").find(":selected").val != "" && $("#schemaDropdown").find(":selected").val != "-1") {
+            if ($("#AllDatasets").find(":selected").val != "" && $("#schemaDropdown").find(":selected").val != "-1") {
                 $("#submitButton").prop("disabled", false);
             }
             else {
@@ -263,7 +263,7 @@ data.Admin = {
         $("#submitButton").click(function (event) {
             var dto = new Object();
             dto.FileToSearch = $("#fileDropdown").find(":selected").val();
-            dto.DatasetToSearch = $("#DatasetsList").find(":selected").val();
+            dto.DatasetToSearch = $("#AllDatasets").find(":selected").val();
             dto.SchemaToSearch = $("#schemaDropdown").find(":selected").val();
             var table = $('#metricGroupsTable').DataTable({
                 destroy: true,
@@ -349,16 +349,6 @@ data.Admin = {
             var url = $(this).data("url");
             $("#accordion-view-area").load(url);
             */
-        })
-    },
-    //below is related to the accordion partial view, which is not currently used
-    FlowMetricAccordionInit: function () {
-        $("#EventContentModal").on("show.bs.modal", function (event) {
-            var link = $(event.relatedTarget);
-            var content = JSON.stringify(link.data("eventcontent"), null, "\t");
-            var modalBody = "<textarea class='form-control' style = 'height: 500px'>" + content + "</textarea>"
-            $("#EventDetails").html(modalBody);
-
         })
     },
     // Loads Admin jobs pages

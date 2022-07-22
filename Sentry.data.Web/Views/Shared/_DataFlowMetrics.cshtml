@@ -1,4 +1,4 @@
-﻿@model DataFlowMetricsModel
+﻿@model DatasetSelectionModel
 @{
     ViewBag.Title = "_AdminTest";
 }
@@ -7,8 +7,8 @@
 <div class="d-inline-block">
     <!-- Data Set Dropdown Menu-->
     <h3>Datasets</h3>
-    @Html.DropDownListFor(m => m.DatasetsList,
-                          new SelectList(Model.DatasetsList, "Value", "Text"),
+    @Html.DropDownListFor(m => m.AllDatasets,
+                          new SelectList(Model.AllDatasets, "Value", "Text"),
                           "Please select Dataset",
                           new
                           {
@@ -31,7 +31,7 @@
         <option value="-1">(Optional) Select a File</option>
     </select>
 </div>
-<button type="button" class="btn btn-primary waves-effect waves-light d-inline-block" id="submitButton" disabled data-url="@Url.Action("GetDataFlowMetricAccordionView", "DataFlowMetric")">Submit</button>
+<button type="button" class="btn btn-primary waves-effect waves-light d-inline-block" id="submitButton" disabled>Submit</button>
 <!--Partial View Area for the Accordion, not currently in use-->
 <div id="accordion-view-area">
 

@@ -48,34 +48,30 @@ namespace Sentry.data.Web.Controllers
 
             return View(myDict);
         }
+        private void InitDatasetSelectionList(DatasetSelectionModel model)
+        {
+            List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+            model.AllDatasets = new List<SelectListItem>();
+            foreach(DatasetDto dto in dtoList)
+            {
+                SelectListItem item = new SelectListItem();
+                item.Text = dto.DatasetName;
+                item.Value = dto.DatasetId.ToString();
+                model.AllDatasets.Add(item);
+            }
+        }
         public async Task<ActionResult> GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
             {
                 case "1":
-                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
-                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
-                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
-                    foreach(DatasetDto d in dtoList)
-                    {
-                        SelectListItem item = new SelectListItem();
-                        item.Text = d.DatasetName;
-                        item.Value = d.DatasetId.ToString();
-                        dataReprocessingModel.AllDatasets.Add(item);
-                    }
+                    DatasetSelectionModel dataReprocessingModel = new DatasetSelectionModel();
+                    InitDatasetSelectionList(dataReprocessingModel);     
                     return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
-                    DataFlowMetricsModel flowMetricsModel = new DataFlowMetricsModel();
-                    List<DatasetDto> dtoList2 = _datasetService.GetAllDatasetDto();
-                    flowMetricsModel.DatasetsList = new List<SelectListItem>();
-                    foreach (DatasetDto d in dtoList2)
-                    {
-                        SelectListItem item = new SelectListItem();
-                        item.Text = d.DatasetName;
-                        item.Value = d.DatasetId.ToString();
-                        flowMetricsModel.DatasetsList.Add(item);
-                    }
+                    DatasetSelectionModel flowMetricsModel = new DatasetSelectionModel();
+                    InitDatasetSelectionList(flowMetricsModel);
                     return PartialView("_DataFlowMetrics", flowMetricsModel);
                 case "3":
                     viewPath = "_AdminTest3";
