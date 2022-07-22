@@ -62,35 +62,35 @@ namespace Sentry.data.Core.Tests
             List<DeadSparkJobDto> deadSparkJobDtoList = jobService.GetDeadSparkJobDtos(-10);
 
             // Assert
-            Assert.AreEqual(deadSparkJobDtoList[0].SubmissionTime, DateTime.Today);
-            Assert.AreEqual(deadSparkJobDtoList[0].DatasetName, "DatasetName");
-            Assert.AreEqual(deadSparkJobDtoList[0].SchemaName, "SchemaName");
-            Assert.AreEqual(deadSparkJobDtoList[0].SourceKey, "SourceKey");
-            Assert.AreEqual(deadSparkJobDtoList[0].FlowExecutionGuid, "FlowExecutionGuid");
-            Assert.AreEqual(deadSparkJobDtoList[0].ReprocessingRequired, "Yes");
-            Assert.AreEqual(deadSparkJobDtoList[0].SubmissionID, 1);
-            Assert.AreEqual(deadSparkJobDtoList[0].SourceBucketName, "SourceBucketName");
-            Assert.AreEqual(deadSparkJobDtoList[0].BatchID, 1);
-            Assert.AreEqual(deadSparkJobDtoList[0].LivyAppID, "LivyAppID");
-            Assert.AreEqual(deadSparkJobDtoList[0].LivyDriverlogUrl, "LivyDriverlogUrl");
-            Assert.AreEqual(deadSparkJobDtoList[0].LivySparkUiUrl, "LivySparkUiUrl");
-            Assert.AreEqual(deadSparkJobDtoList[0].DatasetFileID, 1);
-            Assert.AreEqual(deadSparkJobDtoList[0].DataFlowStepID, 1);
+            Assert.AreEqual(DateTime.Today, deadSparkJobDtoList[0].SubmissionTime);
+            Assert.AreEqual("DatasetName", deadSparkJobDtoList[0].DatasetName);
+            Assert.AreEqual("SchemaName", deadSparkJobDtoList[0].SchemaName);
+            Assert.AreEqual("SourceKey", deadSparkJobDtoList[0].SourceKey);
+            Assert.AreEqual("FlowExecutionGuid", deadSparkJobDtoList[0].FlowExecutionGuid);
+            Assert.AreEqual("Yes", deadSparkJobDtoList[0].ReprocessingRequired);
+            Assert.AreEqual(1, deadSparkJobDtoList[0].SubmissionID);
+            Assert.AreEqual("SourceBucketName", deadSparkJobDtoList[0].SourceBucketName);
+            Assert.AreEqual(1, deadSparkJobDtoList[0].BatchID);
+            Assert.AreEqual("LivyAppID", deadSparkJobDtoList[0].LivyAppID);
+            Assert.AreEqual("LivyDriverlogUrl", deadSparkJobDtoList[0].LivyDriverlogUrl);
+            Assert.AreEqual("LivySparkUiUrl", deadSparkJobDtoList[0].LivySparkUiUrl);
+            Assert.AreEqual(1, deadSparkJobDtoList[0].DatasetFileID);
+            Assert.AreEqual(1, deadSparkJobDtoList[0].DataFlowStepID);
 
-            Assert.AreEqual(deadSparkJobDtoList[1].SubmissionTime, DateTime.Today);
-            Assert.AreEqual(deadSparkJobDtoList[1].DatasetName, "DatasetName");
-            Assert.AreEqual(deadSparkJobDtoList[1].SchemaName, "SchemaName");
-            Assert.AreEqual(deadSparkJobDtoList[1].SourceKey, "SourceKey");
-            Assert.AreEqual(deadSparkJobDtoList[1].FlowExecutionGuid, "FlowExecutionGuid");
-            Assert.AreEqual(deadSparkJobDtoList[1].ReprocessingRequired, "No");
-            Assert.AreEqual(deadSparkJobDtoList[1].SubmissionID, 2);
-            Assert.AreEqual(deadSparkJobDtoList[1].SourceBucketName, "SourceBucketName");
-            Assert.AreEqual(deadSparkJobDtoList[1].BatchID, 2);
-            Assert.AreEqual(deadSparkJobDtoList[1].LivyAppID, "LivyAppID");
-            Assert.AreEqual(deadSparkJobDtoList[1].LivyDriverlogUrl, "LivyDriverlogUrl");
-            Assert.AreEqual(deadSparkJobDtoList[1].LivySparkUiUrl, "LivySparkUiUrl");
-            Assert.AreEqual(deadSparkJobDtoList[1].DatasetFileID, 2);
-            Assert.AreEqual(deadSparkJobDtoList[1].DataFlowStepID, 2);
+            Assert.AreEqual(DateTime.Today, deadSparkJobDtoList[1].SubmissionTime);
+            Assert.AreEqual("DatasetName", deadSparkJobDtoList[1].DatasetName);
+            Assert.AreEqual("SchemaName", deadSparkJobDtoList[1].SchemaName);
+            Assert.AreEqual("SourceKey", deadSparkJobDtoList[1].SourceKey);
+            Assert.AreEqual("FlowExecutionGuid", deadSparkJobDtoList[1].FlowExecutionGuid);
+            Assert.AreEqual("No", deadSparkJobDtoList[1].ReprocessingRequired);
+            Assert.AreEqual(2, deadSparkJobDtoList[1].SubmissionID);
+            Assert.AreEqual("SourceBucketName", deadSparkJobDtoList[1].SourceBucketName);
+            Assert.AreEqual(2, deadSparkJobDtoList[1].BatchID);
+            Assert.AreEqual("LivyAppID", deadSparkJobDtoList[1].LivyAppID);
+            Assert.AreEqual("LivyDriverlogUrl", deadSparkJobDtoList[1].LivyDriverlogUrl);
+            Assert.AreEqual("LivySparkUiUrl", deadSparkJobDtoList[1].LivySparkUiUrl);
+            Assert.AreEqual(2, deadSparkJobDtoList[1].DatasetFileID);
+            Assert.AreEqual(2, deadSparkJobDtoList[1].DataFlowStepID);
         }
     }
 }
