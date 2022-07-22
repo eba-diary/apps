@@ -16,6 +16,9 @@
         //another option would be to on executeSearch, make ajax request to get the list of datasets that result from the query
         //then send that result back to another controller method that will load the partial view AND send the results to a controller method that will translate the results to the filters model
         //
+        //Option 2 is probably more performant than running query twice
+        //Can refactor the ResultView stuff again and probably take out the need for the Results() override
+        //put ResultView back in FilterSearchModel and check if not null to render it
         data.FilterSearch.completeFilterRetrieval(null)
     },
 
