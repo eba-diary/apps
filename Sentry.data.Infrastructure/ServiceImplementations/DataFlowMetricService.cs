@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure
             _dataFlowMetricProvider = dataFlowMetricProvider;
             _context = context;
         }
-         DataFlowMetricDto ToDto(DataFlowMetric entity)
+        private DataFlowMetricDto ToDto(DataFlowMetric entity)
         {
             return new DataFlowMetricDto()
             {
@@ -55,12 +55,7 @@ namespace Sentry.data.Infrastructure
         }
         private List<DataFlowMetricDto> GetMetricList(List<DataFlowMetric> entityList)
         {
-            List<DataFlowMetricDto> dataFlowMetricDtos = new List<DataFlowMetricDto>();
-            foreach(DataFlowMetric entity in entityList)
-            {
-                DataFlowMetricDto dto = ToDto(entity);
-                dataFlowMetricDtos.Add(dto);
-            }
+            List<DataFlowMetricDto> dataFlowMetricDtos = entityList.Select(x => ToDto(x)).ToList();
             return dataFlowMetricDtos;
         }
         public List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto)
@@ -68,80 +63,27 @@ namespace Sentry.data.Infrastructure
             List<DataFlowMetric> entityList = _dataFlowMetricProvider.GetDataFlowMetrics(searchDto);
             List<DataFlowMetricDto> dtoList = GetMetricList(entityList);
             List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
-            foreach(DataFlowMetricDto dto in dtoList)
+            var grouped = dtoList.GroupBy(x => x.FileName).ToList();
+            foreach(var group in grouped)
             {
-                if (fileGroups.Count == 0)
+                DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto()
                 {
-                    DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
-                    fileGroup.FileName = dto.FileName;
-                    fileGroup.DatasetFileId = dto.DatasetFileId;
-                    fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
-                    fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                    fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
-                    fileGroup.FlowEvents.Add(dto);
-                    fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
-                    fileGroups.Add(fileGroup);
-                }
-                else
-                {
-                    bool present = false;
-                    foreach(DataFileFlowMetricsDto fileGroup in fileGroups)
-                    {
-                        if (dto.FileName == fileGroup.FileName)
-                        {
-                            present = true;
-                            if(fileGroup.FirstEventTime > dto.MetricGeneratedDateTime)
-                            {
-                                fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
-                            }
-                            if(fileGroup.LastEventTime < dto.MetricGeneratedDateTime)
-                            {
-                                fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                            }
-                            fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
-                            fileGroup.FlowEvents.Add(dto);
-                        }
-                    }
-                    if (present == false)
-                    {
-                        DataFileFlowMetricsDto fileGroup = new DataFileFlowMetricsDto();
-                        fileGroup.FileName = dto.FileName;
-                        fileGroup.DatasetFileId = dto.DatasetFileId;
-                        fileGroup.FirstEventTime = dto.MetricGeneratedDateTime;
-                        fileGroup.LastEventTime = dto.MetricGeneratedDateTime;
-                        fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
-                        fileGroup.FlowEvents.Add(dto);
-                        fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
-                        fileGroups.Add(fileGroup);
-                    }
-                }
+                    FileName = group.Key,
+                    DatasetFileId = group.First().DatasetFileId,
+                    FirstEventTime = group.Min(x => x.MetricGeneratedDateTime),
+                    LastEventTime = group.Max(x => x.MetricGeneratedDateTime),
+                    FlowEvents = group.OrderByDescending(x => x.EventMetricId).ToList(),
+                };
+                fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
+                fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
+                DataFlowMetricDto mostRecentMetric = fileGroup.FlowEvents.First();
+                fileGroup.AllEventsPresent = mostRecentMetric.TotalFlowSteps == mostRecentMetric.CurrentFlowStep;
+                fileGroup.AllEventsComplete = mostRecentMetric.StatusCode == "C";
+                fileGroups.Add(fileGroup);
             }
-            List<DataFileFlowMetricsDto> sortedFileGroups = SortFlowMetrics(fileGroups);
-            GetFileFlowMetricsStatus(sortedFileGroups);
-            return sortedFileGroups;
-        }
-        public List<DataFileFlowMetricsDto> SortFlowMetrics(List<DataFileFlowMetricsDto> dtoList)
-        {
-            foreach(DataFileFlowMetricsDto dto in dtoList)
-            {
-                dto.FlowEvents.Sort();
-            }
-            dtoList.Sort();
-            return dtoList;
-        }
-        public void GetFileFlowMetricsStatus(List<DataFileFlowMetricsDto> SortedDtoList)
-        {
-            foreach(DataFileFlowMetricsDto dto in SortedDtoList)
-            {
-                if (dto.FlowEvents[0].StatusCode == "C")
-                {
-                    dto.AllEventsComplete = true;
-                }
-                if (dto.FlowEvents[0].CurrentFlowStep == dto.FlowEvents[0].TotalFlowSteps)
-                {
-                    dto.AllEventsPresent = true;
-                }
-            }
+            fileGroups = fileGroups.OrderByDescending(x => x.FirstEventTime).ToList();
+
+            return fileGroups;
         }
     }
 }
