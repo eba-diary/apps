@@ -58,10 +58,13 @@ namespace Sentry.data.Core.Tests
             DeadSparkJobService jobService = new DeadSparkJobService(mockProvider.Object);
 
 
+
             // Act
             List<DeadSparkJobDto> deadSparkJobDtoList = jobService.GetDeadSparkJobDtos(-10);
 
             // Assert
+            mockProvider.VerifyAll();
+
             Assert.AreEqual(DateTime.Today, deadSparkJobDtoList[0].SubmissionTime);
             Assert.AreEqual("DatasetName", deadSparkJobDtoList[0].DatasetName);
             Assert.AreEqual("SchemaName", deadSparkJobDtoList[0].SchemaName);

@@ -71,6 +71,8 @@ namespace Sentry.data.Infrastructure.Tests
             List<DeadSparkJob> deadSparkJobList = deadJobProvider.GetDeadSparkJobs(-10);
 
             //Assert
+            mockExecuter.VerifyAll();
+
             Assert.AreEqual(DateTime.Today, deadSparkJobList[0].SubmissionCreated);
             Assert.AreEqual("DatasetName", deadSparkJobList[0].DatasetName);
             Assert.AreEqual("SchemaName", deadSparkJobList[0].SchemaName);
@@ -145,11 +147,14 @@ namespace Sentry.data.Infrastructure.Tests
 
 
             mockExecuter.Setup(e => e.ExecuteQuery(-10)).Returns(dataTable);
+            
 
             //Act
             List<DeadSparkJob> deadSparkJobList = deadJobProvider.GetDeadSparkJobs(-10);
 
             //Assert
+            mockExecuter.VerifyAll();
+
             Assert.AreEqual("DatasetName", deadSparkJobList[0].DatasetName);
             Assert.AreEqual("SchemaName", deadSparkJobList[0].SchemaName);
 

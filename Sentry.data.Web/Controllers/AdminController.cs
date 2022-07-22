@@ -52,17 +52,6 @@ namespace Sentry.data.Web.Controllers
             return View(myDict);
         }
 
-
-        [Route("Admin/ReprocessDeadSparkJobs")]
-        public ActionResult ReprocessDeadSparkJobs()
-        {
-            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(-10);
-
-            List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
-
-            return View(deadSparkJobModelList);
-        }
-
         [Route("Admin/GetDeadJobs/{timeCheck}")]
         [HttpGet]
         public ActionResult GetDeadJobs(int timeCheck)
