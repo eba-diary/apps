@@ -111,7 +111,7 @@ namespace Sentry.data.Core
 
             return summaryResults;
         }
-        private List<DatasetDto> GetDatasetDto(bool active)
+        private List<DatasetDto> GetDatasetDtos(bool active)
         {
             IQueryable<Dataset> datasetQueryable = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS");
             if (active)
@@ -132,11 +132,11 @@ namespace Sentry.data.Core
         }
         public List<DatasetDto> GetAllDatasetDto()
         {
-            return GetDatasetDto(false);
+            return GetDatasetDtos(false);
         } 
         public List<DatasetDto> GetAllActiveDatasetDto()
         {
-            return GetDatasetDto(true);
+            return GetDatasetDtos(true);
         }
 
         public IDictionary<int, string> GetDatasetList()
