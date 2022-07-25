@@ -36,6 +36,7 @@ namespace Sentry.data.Web.Controllers.WebApi
                 Url = supportLinkModel.Url,
             };
             SupportLinkService.AddSupportLink(supportLinkDto);
+            return Ok();
         }
 
         public IHttpActionResult DeleteSupportLink(int id)
