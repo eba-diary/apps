@@ -113,9 +113,14 @@ namespace Sentry.data.Core
         }
         private List<DatasetDto> GetDatasetDto(bool active)
         {
+            IQueryable<Dataset> datasetQueryable = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS");
             if (active)
             {
-                List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS" && x.ObjectStatus.Equals("Active")).FetchAllChildren(_datasetContext).ToList();
+                datasetQueryable = datasetQueryable.Where(x => x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+            }
+
+                List<Dataset> dsList = datasetQueryable.FetchAllChildren(_datasetContext).ToList();
+
                 List<DatasetDto> dtoList = new List<DatasetDto>();
                 foreach (Dataset ds in dsList)
                 {
@@ -124,19 +129,6 @@ namespace Sentry.data.Core
                     dtoList.Add(dto);
                 }
                 return dtoList;
-            }
-            else
-            {
-                List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
-                List<DatasetDto> dtoList = new List<DatasetDto>();
-                foreach (Dataset ds in dsList)
-                {
-                    DatasetDto dto = new DatasetDto();
-                    MapToDto(ds, dto);
-                    dtoList.Add(dto);
-                }
-                return dtoList;
-            }
         }
         public List<DatasetDto> GetAllDatasetDto()
         {

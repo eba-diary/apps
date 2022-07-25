@@ -48,9 +48,10 @@ namespace Sentry.data.Web.Controllers
 
             return View(myDict);
         }
-        private void InitDatasetSelectionList(DatasetSelectionModel model)
+        private DatasetSelectionModel GetDatasetSelectionModel()
         {
-            List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+            DatasetSelectionModel model = new DatasetSelectionModel();
+            List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
             model.AllDatasets = new List<SelectListItem>();
             foreach(DatasetDto dto in dtoList)
             {
@@ -59,6 +60,7 @@ namespace Sentry.data.Web.Controllers
                 item.Value = dto.DatasetId.ToString();
                 model.AllDatasets.Add(item);
             }
+            return model;
         }
         public async Task<ActionResult> GetAdminAction(string viewId)
         {
@@ -66,12 +68,10 @@ namespace Sentry.data.Web.Controllers
             switch (viewId)
             {
                 case "1":
-                    DatasetSelectionModel dataReprocessingModel = new DatasetSelectionModel();
-                    InitDatasetSelectionList(dataReprocessingModel);     
+                    DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();    
                     return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
-                    DatasetSelectionModel flowMetricsModel = new DatasetSelectionModel();
-                    InitDatasetSelectionList(flowMetricsModel);
+                    DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
                     return PartialView("_DataFlowMetrics", flowMetricsModel);
                 case "3":
                     viewPath = "_AdminTest3";

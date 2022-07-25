@@ -12,6 +12,7 @@ namespace Sentry.data.Core
         int CreateAndSaveNewDataset(DatasetDto dto);
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
+        List<DatasetDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
         void UpdateAndSaveDataset(DatasetDto dto);
