@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using Sentry.data.Web.Models.ApiModels.Admin;
 using Sentry.data.Core.Interfaces;
 using System.Web.Http;
+using Sentry.data.Core.DTO.Admin;
 
 namespace Sentry.data.Web.Controllers.WebApi
 {
@@ -27,7 +28,14 @@ namespace Sentry.data.Web.Controllers.WebApi
 
         public IHttpActionResult AddSupportLink(SupportLinkModel supportLinkModel)
         {
-
+            SupportLinkDto supportLinkDto = new SupportLinkDto()
+            {
+                SupportLinkId = supportLinkModel.SupportLinkId,
+                Name = supportLinkModel.Name,
+                Description = supportLinkModel.Description,
+                Url = supportLinkModel.Url,
+            };
+            SupportLinkService.AddSupportLink(supportLinkDto);
         }
 
         public IHttpActionResult DeleteSupportLink(int id)
