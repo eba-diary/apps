@@ -20,11 +20,22 @@ namespace Sentry.data.Web.Controllers.WebApi
             _supportLinkService = supportLinkService;
         }
 
-        public IHttpActionResult AddSupportLink()
+        private ISupportLink SupportLinkService
+        {
+            get { return _supportLinkService; }
+        }
+
+        public IHttpActionResult AddSupportLink(SupportLinkModel supportLinkModel)
+        {
+
+        }
 
         public IHttpActionResult DeleteSupportLink(int id)
         {
+            try
+            {
 
+            }
         }
 
         public ActionResult Index()
