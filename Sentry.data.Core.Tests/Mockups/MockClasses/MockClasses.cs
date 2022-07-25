@@ -286,8 +286,10 @@ namespace Sentry.data.Core.Tests
                 FileKey = "test/key/file.txt",
                 FileBucket = "test-bucket-name",
                 ETag = "etag-string-value",
-                OriginalFileName = "a",
+                OriginalFileName = "zzztest0614.csv",
                 ObjectStatus = ObjectStatusEnum.Active
+                
+                
             };
 
             return df;
@@ -901,6 +903,6 @@ namespace Sentry.data.Core.Tests
             }
             return security;
         }
-
+                                  
     }
 }

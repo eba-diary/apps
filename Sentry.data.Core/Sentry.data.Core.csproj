@@ -402,6 +402,7 @@
     <Compile Include="Interfaces\InfrastructureEventing\IInevRestClient.cs" />
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
+    <Compile Include="Interfaces\IJobScheduler.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
     <Compile Include="Interfaces\IQuartermasterService.cs" />
