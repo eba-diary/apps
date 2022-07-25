@@ -28,5 +28,16 @@ namespace Sentry.data.Core
         public string SelectedApprover { get; set; }
         public string SaidKeyCode { get; set; }
         public bool IsAddingPermission { get; set; }
+        public AccessRequestType Type { get; set; }
+        public string AwsArn { get; set; }
+        public AccessScope Scope { get; set; }
+        public string TicketId { get; set; }
+        public bool IsSystemGenerated { get; set; }
+
+
+        public string ConsumeDatasetGroupName { get; set; }
+        public string ProducerDatasetGroupName { get; set; }
+        public string ConsumeAssetGroupName { get; set; }
+        public string ProducerAssetGroupName { get; set; }
     }
 }

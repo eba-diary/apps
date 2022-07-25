@@ -8,12 +8,11 @@ namespace Sentry.data.Web
 {
     public static class DatasetExtensions
     {
-
-        public static Core.DatasetDto ToDto(this DatasetModel model)
+        public static DatasetDto ToDto(this DatasetModel model)
         {
-            if (model == null) { return new Core.DatasetDto(); }
+            if (model == null) { return new DatasetDto(); }
 
-            return new Core.DatasetDto()
+            return new DatasetDto()
             {
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
@@ -23,6 +22,7 @@ namespace Sentry.data.Web
                 DatasetInformation = model.DatasetInformation,
                 PrimaryContactId = model.PrimaryContactId,
                 PrimaryContactName = model.PrimaryContactName,
+                AlternateContactEmail = model.AlternateContactEmail,
                 CreationUserId = model.CreationUserId,
                 UploadUserId = model.UploadUserId,
                 DatasetDtm = DateTime.Now,
@@ -45,17 +45,17 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<DatasetInfoModel> ToApiModel(this List<Core.DatasetDto> dtoList)
+        public static List<DatasetInfoModel> ToApiModel(this List<DatasetDto> dtoList)
         {
             List<DatasetInfoModel> modelList = new List<DatasetInfoModel>();
-            foreach (Core.DatasetDto dto in dtoList)
+            foreach (DatasetDto dto in dtoList)
             {                
                 modelList.Add(dto.ToApiModel());
             }
             return modelList;
         }
 
-        public static DatasetInfoModel ToApiModel(this Core.DatasetDto dto)
+        public static DatasetInfoModel ToApiModel(this DatasetDto dto)
         {
             return new DatasetInfoModel()
             {
@@ -67,10 +67,21 @@ namespace Sentry.data.Web
                 IsSecure = dto.IsSecured,
                 PrimaryContactName = dto.PrimaryContactName,
                 PrimarContactEmail = dto.PrimaryContactEmail,
+                AlternateContactEmail = dto.AlternateContactEmail,
                 ObjectStatus = dto.ObjectStatus.GetDescription().ToUpper(),
                 SAIDAssetKeyCode = dto.SAIDAssetKeyCode,
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType
+            };
+        }
+
+        public static DatasetFileConfigSchemaModel ToModel(this DatasetFileConfigSchemaDto dto)
+        {
+            return new DatasetFileConfigSchemaModel()
+            {
+                ConfigId = dto.ConfigId,
+                SchemaId = dto.SchemaId,
+                SchemaName = dto.SchemaName
             };
         }
     }

@@ -2490,10 +2490,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
     max-width: 100%;
 }
 
-
-#UploadModal {
-}
-
 @keyframes blink {
     from, to {
         opacity: 1
@@ -3043,4 +3039,8 @@ table.dsc-blue-table th {
 
 .dataset-disable-stuff {
     pointer-events: none;
+}
+
+.font-style-normal {
+    font-style: normal !important;
 }

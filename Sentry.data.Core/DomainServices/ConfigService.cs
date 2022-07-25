@@ -211,6 +211,24 @@ namespace Sentry.data.Core
                     throw new NotImplementedException();
             }
 
+            if (auth != null && auth.Is<OAuthAuthentication>())
+            {
+                if (String.IsNullOrWhiteSpace(dto.ClientId))
+                {
+                    errors.Add("OAuth requires a Client ID.");
+                }
+                
+                if (String.IsNullOrWhiteSpace(dto.ClientPrivateId))
+                {
+                    errors.Add("OAuth requires a Client Private ID.");
+                }
+
+                if (String.IsNullOrWhiteSpace(dto.TokenUrl))
+                {
+                    errors.Add("OAuth requires a Token URL.");
+                }
+            }
+
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
                 errors.Add("Contact is requried.");
@@ -474,7 +492,7 @@ namespace Sentry.data.Core
             return ar;
         }
 
-        public string RequestAccessToDataSource(AccessRequest request)
+        public async Task<string> RequestAccessToDataSource(AccessRequest request)
         {
 
             DataSource ds = _datasetContext.GetById<DataSource>(request.SecurableObjectId);
@@ -501,7 +519,7 @@ namespace Sentry.data.Core
 
                 request.BusinessReason = sb.ToString();
 
-                return _securityService.RequestPermission(request);
+                return await _securityService.RequestPermission(request);
             }
 
             return string.Empty;
@@ -1267,7 +1285,7 @@ namespace Sentry.data.Core
             dto.SchemaRootPath = dfc.Schema?.SchemaRootPath;
             dto.ParquetStorageBucket = dfc.Schema?.ParquetStorageBucket;
             dto.ParquetStoragePrefix = dfc.Schema?.ParquetStoragePrefix;
-            dto.SnowflakeStage = dfc.Schema?.SnowflakeStage;
+            dto.ConsumptionDetails = dfc.Schema?.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList();
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

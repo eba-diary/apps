@@ -1,36 +1,43 @@
 ﻿@model Sentry.data.Web.SuccessModel
 
-@{ 
+@{
     ViewData["Title"] = "Success";
 }
 
 @Html.AntiForgeryToken()
 @*<div class="form-horizontal">
-    <div class="form-group">
-        @Html.DisplayFor(model => model.Message, new { @class = "form-control offset-sm-2 col-sm-8"})
-    </div>
-</div>*@
+        <div class="form-group">
+            @Html.DisplayFor(model => model.Message, new { @class = "form-control offset-sm-2 col-sm-8"})
+        </div>
+    </div>*@
 <div class="form-horizontal">
     <div class="form-group">
         <div class="sentry-error-container">
-            
+
             @{
                 if ((!Model.WasSuccessful))
-                { <p><strong><em class="fa fa-exclamation-triangle fa-3x text-danger">@Model.Title</em></strong></p>
-                      <p>@Model.Message</p><br />
-                      <p>We apologize for the inconvenience.</p>
-                      <p>If you need assistance, please contact <a href="mailto:DSCSupport@sentry.com">Site Administration</a>.</p>
+                {
+                    <h1 class="error-icon pt-0">Oops!</h1>
+                    <h4 class="pt-0">@Model.Title</h4>
+                    <p>
+                        @Model.Message
+                    </p>
+                    <p>We apologize for the inconvenience.</p>
+                    <p>If you need assistance, please contact <a href="mailto:DSCSupport@sentry.com"> DSC Administration</a>.</p>
                 }
                 else
-                {<p>@Model.Title</p><br /> 
+                {
+                    <h1 class="success-icon pt-0">Success!</h1>
+                    <h4 class="pt-0">
+                        @Model.Title
+                    </h4>
                     if ((!String.IsNullOrEmpty(Model.Message)))
-                    {<p>@Model.Message</p>
+                    {
+                        <p>@Model.Message</p>
                     }
                 }
             }
-            @*We apologize for the inconvenience.<br />
-            If you need assistance,
-            please contact <a href="mailto:DataArchitecture@sentry.com">Data Architecture</a>.*@
+
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>

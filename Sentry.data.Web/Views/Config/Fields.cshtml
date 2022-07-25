@@ -149,7 +149,7 @@
                                     <input class="scale" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.DECIMAL_SCALE_DEFAULT.ToString()" />
                                 </div>
                                 <div class="">
-                                    <span>1234.56 = Precision:6  Scale:2</span>
+                                    <span>1234.56 = Precision:6 Scale:2, Length = Precision</span>
                                 </div>
                             </div>
                         </div>
@@ -168,8 +168,8 @@
 
                         <div class="showLength d-inline">
                             <div class="fieldsFieldToggleable" data-bind="visible: ShowFieldLength">
-                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
-                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() === 'VARCHAR' && DataType() !== 'DECIMAL', value: Length" placeholder="default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
+                                <input class="fieldlength" data-bind="visible: ShowFieldLength && DataType() !== 'VARCHAR' && DataType() !== 'DECIMAL', value: Length" placeholder="Specify length" data-toggle="tooltip" data-placement="top" title="Length - default = @Sentry.data.Core.GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT.ToString()" />
                             </div>
                         </div>
 
@@ -311,13 +311,31 @@
             self.Name.subscribe(        function () { self.UpdateRow() });
             self.FieldGuid.subscribe(   function () { self.UpdateRow() });
             self.Description.subscribe( function () { self.UpdateRow() });
-            self.DataType.subscribe(    function () { self.UpdateRow() });
+            self.DataType.subscribe(    function () { self.UpdateDataType() });
             self.ArrayType.subscribe(   function () { self.UpdateRow() });
-            self.Precision.subscribe(   function () { self.UpdateRow() });
+            self.Precision.subscribe(   function () { self.UpdatePrecision() });
             self.Scale.subscribe(       function () { self.UpdateRow() });
             self.Format.subscribe(      function () { self.UpdateRow() });
             self.IsArray.subscribe(     function () { self.UpdateRow() });
             self.Length.subscribe(      function () { self.UpdateRow() });
+
+            self.UpdatePrecision = function () {
+                if (parent.IsFixedWidth()) {
+                    self.SetLengthToPrecision();
+                }
+                self.UpdateRow();
+            }
+
+            self.UpdateDataType = function () {
+                if (self.DataType() === 'DECIMAL' && parent.IsFixedWidth()) {
+                    self.SetLengthToPrecision();
+                }
+                self.UpdateRow();
+            }
+
+            self.SetLengthToPrecision = function () {
+                self.Length(self.Precision());
+            }
 
             self.UpdateRow = function () {
                 var a = JSON.stringify(ko.toJS(self), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
@@ -760,8 +778,7 @@
                             for (let i = 0; i < len; i++) {
 
                                 var e = returnedData.Errors[i];
-                                message = message + 'field:' + e.Id + '  ' + e.Description;
-
+                                message = message + ' | Field: ' + e.Id + ' ' + e.Description;
                             }
 
                             //show modal with error message

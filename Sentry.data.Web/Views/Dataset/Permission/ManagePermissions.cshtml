@@ -10,12 +10,19 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-12 pl-0">
+        <div class="col-11 pl-0">
             <!-- Dataset Name and Request Access-->
             <h2 class="pt-2 mb-1" value="@Model.DatasetId" id="DatasetHeader">
-                @Model.DatasetName - Manage Permissions
+                <em id="ManagePermissionDatasetName" class="font-style-normal">@Model.DatasetName</em> - Manage Permissions
             </h2>
-            
+        </div>
+        <div class="col-1 pr-0">
+            <div class="text-right">
+                <a class="btn px-3"
+                   id="RequestAccessButton" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Request Additional Access">
+                    <em class="fas fa-user-plus dsc-icon-button mr-0 sentry-dark-blue-text align-middle" id=""></em>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -52,12 +59,13 @@
                     {
                         foreach (var permission in pair.Value)
                         {
-                            <tr>
-                                <td>@permission.Scope</td>
-                                <td>@permission.Identity</td>
-                                <td>@permission.PermissionDescription</td>
-                                <td>@permission.PermissionStatus</td>
-                                <td></td>
+                            <tr id="@permission.TicketId">
+                                <td class="permissionScope">@permission.Scope</td>
+                                <td class="permissionIdentity">@permission.Identity</td>
+                                <td class="permissionDescription">@permission.PermissionDescription</td>
+                                <td class="permissionStatus"><span title="Change #@permission.TicketId">@permission.PermissionStatus</span></td>
+                                <td class="permissionCode d-none">@permission.Code </td>
+                                <td>@if (!permission.IsSystemGenerated && !(permission.PermissionStatus != "Active")) { <em class="far fa-trash-alt removePermissionIcon"></em> }</td>
                             </tr>
                         }
                     }
@@ -74,6 +82,7 @@
 
     <!-- Request Inheritance Modal -->
     @Html.Partial("Permission/_RequestInheritanceModal", Model.InheritanceRequest)
+    @Html.Partial("Permission/_RemovePermissionModal", Model.RemovePermissionRequest)
 
 </div>
 

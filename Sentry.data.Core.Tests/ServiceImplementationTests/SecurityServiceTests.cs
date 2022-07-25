@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Rhino.Mocks;
+using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
@@ -38,8 +42,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -68,6 +72,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsTrue(us.CanViewData);
+            Assert.IsTrue(us.CanDeleteDatasetFile);
         }
 
         [TestMethod]
@@ -80,8 +85,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -110,6 +115,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(us.CanEditReport);
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsFalse(us.CanViewData);
+            Assert.IsTrue(us.CanDeleteDatasetFile);
         }
 
         [TestMethod]
@@ -143,7 +149,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
             SecurityPermission viewFullDatasetPermission1 = BuildBasePermission(ticket1, CanViewFullDataset(), true);
-            ticket1.Permissions.Add(viewFullDatasetPermission1);
+            ticket1.AddedPermissions.Add(viewFullDatasetPermission1);
             security.Tickets.Add(ticket1);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -217,6 +223,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsTrue(us.CanViewData);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -244,6 +251,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(us.CanEditReport);
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsTrue(us.CanViewData);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -266,6 +274,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -288,6 +297,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanEditDataset);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         #endregion
@@ -313,6 +323,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
         /// <summary>
         /// Even though the user has the Modify Dataset permission, they should not be able to manage schema because did not request the permission and are not owner.
@@ -334,6 +345,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         /// <summary>
@@ -358,6 +370,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsFalse(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         [TestMethod]
@@ -379,7 +392,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, "MyServiceAccountGroup");
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanManageSchema(), true);
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
@@ -403,6 +416,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
 
         }
 
@@ -418,7 +432,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurity = BuildBaseSecurity();
             var parentTicket = BuildBaseTicket(parentSecurity, "MyServiceAccountGroup");
             var parentPermission = BuildBasePermission(parentTicket, CanManageSchema(), true);
-            parentTicket.Permissions.Add(parentPermission);
+            parentTicket.AddedPermissions.Add(parentPermission);
             parentSecurity.Tickets.Add(parentTicket);
             var parentSecurable = new Asset() { Security = parentSecurity };
 
@@ -426,7 +440,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, string.Empty);
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, InheritParentPermissions(), true);
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
@@ -448,6 +462,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanManageSchema);
+            Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         #endregion
@@ -464,7 +479,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), false);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -494,7 +509,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -524,7 +539,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -554,7 +569,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -584,7 +599,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -654,7 +669,7 @@ namespace Sentry.data.Core.Tests
             SecurityTicket ticket = BuildBaseTicket(security, "MyAdGroupName");
             SecurityPermission previewPermission = BuildBasePermission(ticket, CanPreviewDataset(), true);
 
-            ticket.Permissions.Add(previewPermission);
+            ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -682,8 +697,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), true);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -717,8 +732,8 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
             SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), true);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket2.Permissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket2.AddedPermissions.Add(previewPermission2);
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
@@ -752,9 +767,9 @@ namespace Sentry.data.Core.Tests
             SecurityPermission previewPermission2 = BuildBasePermission(ticket1, CanQueryDataset(), true);
             SecurityPermission previewPermission3 = BuildBasePermission(ticket1, CanUploadToDataset(), true);
 
-            ticket1.Permissions.Add(previewPermission1);
-            ticket1.Permissions.Add(previewPermission2);
-            ticket1.Permissions.Add(previewPermission3);
+            ticket1.AddedPermissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission2);
+            ticket1.AddedPermissions.Add(previewPermission3);
             security.Tickets.Add(ticket1);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -789,7 +804,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurity = BuildBaseSecurity();
             var parentTicket = BuildBaseTicket(parentSecurity, "MyServiceAccountGroup");
             var parentPermission = BuildBasePermission(parentTicket, CanPreviewDataset(), true);
-            parentTicket.Permissions.Add(parentPermission);
+            parentTicket.AddedPermissions.Add(parentPermission);
             parentSecurity.Tickets.Add(parentTicket);
             var parentSecurable = new Asset() { Security = parentSecurity };
 
@@ -797,7 +812,7 @@ namespace Sentry.data.Core.Tests
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, string.Empty);
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, InheritParentPermissions(), approvalStatus);
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
@@ -1050,7 +1065,7 @@ namespace Sentry.data.Core.Tests
             ticket1.GrantPermissionToUserId = "999999";
             SecurityPermission previewPermission1 = BuildBasePermission(ticket1, new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS }, true);
 
-            ticket1.Permissions.Add(previewPermission1);
+            ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
             ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
@@ -1166,7 +1181,7 @@ namespace Sentry.data.Core.Tests
             var ds = new Dataset() { DataClassification = DataClassificationType.InternalUseOnly };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
@@ -1191,7 +1206,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewFullDataset);
@@ -1211,7 +1226,7 @@ namespace Sentry.data.Core.Tests
             var ds = new Dataset() { DataClassification = DataClassificationType.InternalUseOnly };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanModifyNotifications);
@@ -1236,7 +1251,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanPreviewDataset);
@@ -1262,7 +1277,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsFalse(us.CanViewData);
@@ -1288,7 +1303,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1313,7 +1328,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1338,7 +1353,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsFalse(us.CanViewData);
@@ -1363,7 +1378,7 @@ namespace Sentry.data.Core.Tests
             ds.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources" } };
 
             // Act
-            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds);
+            SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, ds, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1385,7 +1400,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsFalse(us.CanUploadToDataset);
@@ -1404,7 +1419,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
@@ -1423,7 +1438,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanManageSchema);
@@ -1442,7 +1457,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1461,7 +1476,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanViewData);
@@ -1609,7 +1624,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
-            security.Tickets.First().Permissions.First().IsEnabled = false;
+            security.Tickets.First().AddedPermissions.First().IsEnabled = false;
             var securable = new Mock<ISecurable>();
             securable.Setup(s => s.Security).Returns(security);
 
@@ -1625,7 +1640,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
-            security.Tickets.First().Permissions.First().IsEnabled = false;
+            security.Tickets.First().AddedPermissions.First().IsEnabled = false;
             var securable = new Mock<ISecurable>();
             securable.Setup(s => s.Security).Returns(security);
 
@@ -1641,8 +1656,8 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var security = MockClasses.MockSecurity(new[] { PermissionCodes.CAN_MANAGE_SCHEMA, PermissionCodes.S3_ACCESS });
-            security.Tickets.First().Permissions.First().IsEnabled = false;
-            security.Tickets.First().Permissions.First().RemovedDate = DateTime.Now;
+            security.Tickets.First().AddedPermissions.First().IsEnabled = false;
+            security.Tickets.First().AddedPermissions.First().RemovedDate = DateTime.Now;
             var securable = new Mock<ISecurable>();
             securable.Setup(s => s.Security).Returns(security);
 
@@ -1667,13 +1682,13 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
 
             // Assert
-            Assert.AreEqual(2,actual.Count());
+            Assert.AreEqual(2, actual.Count());
         }
 
         [TestMethod]
@@ -1686,13 +1701,215 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
 
             // Assert
             Assert.AreEqual(4, actual.Count()); //2 from parent and 2 from itself
+        }
+
+        #endregion
+
+        #region ApproveTicket
+
+        /// <summary>
+        /// Tests that when a security ticket is approved, and none of the associated permissions
+        /// are for a dataset, no Infrastructure Event is published.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ApproveTicket_NoDatasetPermissions()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var inevService = new Mock<IInevService>();
+            var ticket = new SecurityTicket()
+            {
+                AddedPermissions = new List<SecurityPermission>() {
+                    new SecurityPermission() {
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATA_ASSET } } },
+                RemovedPermissions = new List<SecurityPermission>(),
+                ParentSecurity = new Security()
+                {
+                    SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
+                }
+            };
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
+
+            //Act
+            await service.ApproveTicket(ticket, "");
+
+            //Assert
+            inevService.VerifyNoOtherCalls();
+        }
+
+        /// <summary>
+        /// Tests that when a security ticket is approved, and the dataset associated with the security ticket
+        /// can't be found, no Infrastructure Event is published.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ApproveTicket_DatasetPermissions_NoDataset()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var inevService = new Mock<IInevService>();
+            var ticket = new SecurityTicket()
+            {
+                AddedPermissions = new List<SecurityPermission>() {
+                    new SecurityPermission() {
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } },
+                RemovedPermissions = new List<SecurityPermission>(),
+                ParentSecurity = new Security()
+                {
+                    SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
+                }
+            };
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
+
+            //Act
+            await Assert.ThrowsExceptionAsync<DatasetNotFoundException>(() => service.ApproveTicket(ticket, ""));
+
+            //Assert
+            inevService.VerifyNoOtherCalls();
+        }
+
+        /// <summary>
+        /// Tests that when a security ticket is approved, if there are dataset permissions associated with the
+        /// security ticket, and the dataset can be found, then the Infrastructure Event is published
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ApproveTicket_DatasetPermissions_WithDataset()
+        {
+            //Arrange
+            var ticket = new SecurityTicket()
+            {
+                AddedPermissions = new List<SecurityPermission>() {
+                    new SecurityPermission() {
+                        Permission = new Permission() { SecurableObject = SecurableEntityName.DATASET } } },
+                RemovedPermissions = new List<SecurityPermission>(),
+                ParentSecurity = new Security()
+                {
+                    SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
+                }
+            };
+            var dataset = new Dataset() { Security = new Security() { Tickets = new List<SecurityTicket>() { ticket } } };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns((new List<Dataset>() { dataset }).AsQueryable());
+            var inevService = new Mock<IInevService>();
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
+
+            //Act
+            await service.ApproveTicket(ticket, "");
+
+            //Assert
+            inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>()));
+        }
+
+        #endregion
+
+        #region "GetDefaultSecurityGroupDtos"
+        [TestMethod]
+        public void GetDefaultSecurityGroupDtos_Test()
+        {
+            //Arrange
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Asset = new Asset() { SaidKeyCode = "ABCD" } };
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
+
+            //Act
+            var groupDtos = securityService.GetDefaultSecurityGroupDtos(ds);
+
+            //Assert
+            Assert.AreEqual(4, groupDtos.Count(g => g.SaidAssetCode == "ABCD")); //4 groups total for the asset
+            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr)); //2 producer groups
+            Assert.AreEqual(2, groupDtos.Count(g => g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr)); //2 consumer groups
+            Assert.AreEqual(2, groupDtos.Count(g => !g.IsAssetLevelGroup())); //2 dataset-level groups
+            Assert.AreEqual(2, groupDtos.Count(g => g.IsAssetLevelGroup())); //2 asset-level groups
+        }
+        #endregion
+
+        #region "CreateDefaultSecurityForDataset"
+
+        [TestMethod]
+        public async Task CreateDefaultSecurityForDataset_Internal_Test()
+        {
+            //Arrange
+            var security = new Security() { SecurityId = Guid.NewGuid() };
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
+            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
+            var consumerPermissions = new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } };
+            var datasetTickets = new List<SecurityTicket>().AsEnumerable();
+            var assetTickets = new List<SecurityTicket>().AsEnumerable();
+
+            var obsidianService = new Mock<IObsidianService>();
+            obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(false);
+            var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Security).Returns((new List<Security>() { security }).AsQueryable());
+            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object) 
+                { CallBase = true }; //call the real method for anything not explicitely .Setup()
+            securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+
+            //Act
+            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, null, datasetTickets, assetTickets);
+
+            //Assert
+            adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(2)); //verify the AD group attempted to be created
+            securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(2)); //verify a ticket was built
+            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.AtMost(2)); //verify the ticket was approved
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.AtMost(2)); 
+        }
+
+        #endregion
+
+        #region "GetProducerPermissions / GetConsumerPermissions"
+
+        [TestMethod]
+        public void GetConsumerPermissions_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_UPLOAD_TO_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS, SecurableObject = SecurableEntityName.DATA_ASSET }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetConsumerPermissions();
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
+            Assert.AreEqual(PermissionCodes.CAN_VIEW_FULL_DATASET, actual[0].PermissionCode);
+        }
+
+        [TestMethod]
+        public void GetProducerPermissions_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_UPLOAD_TO_DATASET, SecurableObject = SecurableEntityName.DATASET },
+                new Permission() { PermissionCode = PermissionCodes.CAN_MODIFY_NOTIFICATIONS, SecurableObject = SecurableEntityName.DATA_ASSET }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetProducerPermissions();
+
+            //Assert
+            Assert.AreEqual(2, actual.Count);
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_VIEW_FULL_DATASET));
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_UPLOAD_TO_DATASET));
         }
 
         #endregion
@@ -1724,7 +1941,7 @@ namespace Sentry.data.Core.Tests
                 SecurityTicketId = Guid.NewGuid(),
                 TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
                 TicketId = "C00123456",
-                Permissions = new List<SecurityPermission>()
+                AddedPermissions = new List<SecurityPermission>()
             };
         }
 

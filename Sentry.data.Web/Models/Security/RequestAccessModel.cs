@@ -1,4 +1,5 @@
 ﻿
+using Sentry.data.Core;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -37,5 +38,10 @@ namespace Sentry.data.Web
         public List<SelectListItem> AllApprovers { get; set; }
         public string SaidKeyCode { get; set; }
         public bool IsAddingPermission { get; set; }
+        public AccessRequestType Type { get; set; }
+        [DisplayName("AWS IAM Role ARN")]
+        public string AwsArn { get; set; }
+        public AccessScope Scope { get; set; }
+        public string TicketId { get; set; }
     }
 }

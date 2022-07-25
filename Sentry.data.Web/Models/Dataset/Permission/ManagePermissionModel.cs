@@ -14,11 +14,19 @@ namespace Sentry.data.Web
             Identity = securablePermission.Identity;
             PermissionDescription = securablePermission.SecurityPermission.Permission.PermissionDescription;
             PermissionStatus = securablePermission.SecurityPermission.IsEnabled ? "Active" : "Pending";
+            TicketId = securablePermission.TicketId;
+            Code = securablePermission.SecurityPermission.Permission.PermissionCode;
+            IsSystemGenerated = securablePermission.IsSystemGenerated;
         }
+
+        public ManagePermissionModel() { }
 
         public string Scope { get; set; }
         public string Identity { get; set; }
         public string PermissionDescription { get; set; }
         public string PermissionStatus { get; set; }
+        public string TicketId { get; set; }
+        public string Code { get; set; }
+        public bool IsSystemGenerated { get; set; }
     }
 }

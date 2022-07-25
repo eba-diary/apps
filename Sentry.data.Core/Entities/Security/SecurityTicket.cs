@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Script.Serialization;
 using Sentry.Core;
+using Sentry.data.Core.Entities.Security;
 
 namespace Sentry.data.Core
 {
@@ -26,13 +28,63 @@ namespace Sentry.data.Core
         public virtual bool IsSecuredAtUserLevel { get; set; }
         public virtual string GrantPermissionToUserId { get; set; }
         public virtual string AwsArn { get; set; }
-
         public virtual Security ParentSecurity { get; set; }
 
-        public virtual IList<SecurityPermission> Permissions { get; set; }
+        public virtual IList<SecurityPermission> AddedPermissions { get; set; }
+        public virtual IList<SecurityPermission> RemovedPermissions { get; set; }
 
         public virtual string SaidKeyCode { get; set; }
 
+        public virtual bool IsSystemGenerated { get; set; }
+
+        /// <summary>
+        /// Retrieves the Identity (user/group/role) that this SecurityTicket applies to
+        /// </summary>
+        public virtual string Identity
+        { 
+            get
+            {
+                if (AdGroupName != null)
+                {
+                    return AdGroupName;
+                }
+                else if (GrantPermissionToUserId != null)
+                {
+                    return GrantPermissionToUserId;
+                }
+                else if (AwsArn != null)
+                {
+                    return AwsArn;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the Identity Type of the Identity
+        /// (one of <see cref="GlobalConstants.IdentityType"/>) that this SecurityTicket applies to
+        /// </summary>
+        public virtual string IdentityType
+        {
+            get
+            {
+                if (AdGroupName != null || GrantPermissionToUserId != null)
+                {
+                    return GlobalConstants.IdentityType.AD;
+                }
+                else if (AwsArn != null)
+                {
+                    return GlobalConstants.IdentityType.AWS_IAM;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         public virtual ValidationResults ValidateForDelete()
         {
@@ -59,12 +111,16 @@ namespace Sentry.data.Core
             {
                 vr.Add("TicketStatus", "Ticket Status is required");
             }
-            if(Permissions == null || Permissions.Count == 0)
+            if(IsAddingPermission && (AddedPermissions == null || AddedPermissions.Count == 0))
             {
                 vr.Add("Permissions", "Permissions are required on the ticket");
             }
 
             return vr; 
+        }
+        public virtual SecurityTicketSimple ToSimple()
+        {
+            return new SecurityTicketSimple(this);
         }
     }
 }

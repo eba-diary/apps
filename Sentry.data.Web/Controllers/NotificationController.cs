@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
@@ -96,7 +97,7 @@ namespace Sentry.data.Web.Controllers
             return View("ModifyNotification",model);
         }
 
-        public JsonResult GetNotificationInfoForGrid([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetNotificationInfoForGrid(DataTablesRequest dtRequest)
         {
             List<NotificationModel> files = _notificationService.GetAllNotifications().ToWeb();
             DataTablesQueryableAdapter<NotificationModel> dtqa = new DataTablesQueryableAdapter<NotificationModel>(files.AsQueryable(), dtRequest);
@@ -118,10 +119,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(NotificationAccessRequestModel model)
+        public async Task<ActionResult> SubmitAccessRequest(NotificationAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _notificationService.RequestAccess(ar);
+            string ticketId = await _notificationService.RequestAccess(ar);
 
             if (string.IsNullOrEmpty(ticketId))
             {

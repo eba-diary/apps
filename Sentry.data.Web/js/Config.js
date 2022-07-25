@@ -208,8 +208,12 @@ data.Config = {
         data.Config.DatasetScopeTypeInit($("#DatasetScopeTypeID"));
 
         $("#FileType").materialSelect();
-        $("#DatasetScopeTypeID").materialSelect();
-        $("#FileExtensionID").materialSelect();
+        if (!$("#DatasetScopeTypeReadonly").length) {
+            $("#DatasetScopeTypeID").materialSelect();
+        }
+        if (!$("#FileExtensionReadonly").length) {
+            $("#FileExtensionID").materialSelect();
+        }
     },
 
     DatasetScopeTypeInit: function (element) {

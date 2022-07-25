@@ -109,11 +109,6 @@ namespace Sentry.data.Web
                 SchemaRootPath = model.SchemaRootPath,
                 ParquetStorageBucket = model.ParquetStorageBucket,
                 ParquetStoragePrefix = model.ParquetStoragePrefix,
-                SnowflakeStage = model.SnowflakeStage,
-                SnowflakeDatabase = model.SnowflakeDatabase,
-                SnowflakeWarehouse = model.SnowflakeWarehouse,
-                SnowflakeSchema = model.SnowflakeSchema,
-                SnowflakeTable = model.SnowflakeTable
             };
         }
 
@@ -140,11 +135,6 @@ namespace Sentry.data.Web
                 SchemaRootPath = model.SchemaRootPath,
                 ParquetStorageBucket = model.ParquetStorageBucket,
                 ParquetStoragePrefix = model.ParquetStoragePrefix,
-                SnowflakeStage = model.SnowflakeStage,
-                SnowflakeWarehouse = model.SnowflakeWarehouse,
-                SnowflakeDatabase = model.SnowflakeDatabase,
-                SnowflakeSchema = model.SnowflakeSchema,
-                SnowflakeTable = model.SnowflakeTable
             };
         }
 
@@ -195,58 +185,108 @@ namespace Sentry.data.Web
 
         public static SchemaInfoModel ToSchemaModel(this Core.DatasetFileConfigDto dto)
         {
-            Core.FileSchemaDto schemaDto = dto.Schema;
-            return new SchemaInfoModel()
+            var model = new SchemaInfoModel();
+            model.PopulateSchemaModelBase(dto);
+
+            //Flatten the consumption details down to a single Snowflake consumption detail, as this API expects
+            //If the old "Category" schema parquet snowflake consumption data exists, return that
+            var consumptionDetail = dto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault(s => s.SnowflakeType == SnowflakeConsumptionType.CategorySchemaParquet);
+            //if the old doesn't exist, then return the new
+            if (consumptionDetail == null)
             {
-                ConfigId = dto.ConfigId,
-                Name = schemaDto.Name,
-                SchemaId = schemaDto.SchemaId,
-                SchemaEntity_NME = schemaDto.SchemaEntity_NME,
-                Description = schemaDto.Description,
-                StorageCode = schemaDto.StorageCode,
-                Format = schemaDto.FileExtensionName,
-                CurrentView = schemaDto.CreateCurrentView,
-                Delimiter = schemaDto.Delimiter,
-                HasHeader = schemaDto.HasHeader,
-                IsTrackableSchema = dto.IsTrackableSchema,
-                HiveTable = schemaDto.HiveTable,
-                HiveDatabase = schemaDto.HiveDatabase,
-                HiveTableStatus = schemaDto.HiveStatus,
-                HiveLocation = schemaDto.HiveLocation,
-                Options = new List<string>()
-                {
-                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
-                    "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString(),
-                    "CLA2472_EMRSend|" + schemaDto.CLA2472_EMRSend.ToString(),
-                    "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString(),
-                    "CLA3014_LoadDataToSnowflake|" + schemaDto.CLA3014_LoadDataToSnowflake.ToString()
-                },
-                DeleteInd = schemaDto.DeleteInd,
-                SnowflakeDatabase = schemaDto.SnowflakeDatabase,
-                SnowflakeSchema = schemaDto.SnowflakeSchema,
-                SnowflakeTable = schemaDto.SnowflakeTable,
-                SnowflakeStatus = schemaDto.SnowflakeStatus,
-                ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper(),
-                SchemaRootPath = schemaDto.SchemaRootPath?.Split(','),
-                HasDataFlow = dto.HasDataFlow,
-                ParquetStorageBucket = schemaDto.ParquetStorageBucket,
-                ParquetStoragePrefix = schemaDto.ParquetStoragePrefix,
-                SnowflakeStage = schemaDto.SnowflakeStage,
-                SnowflakeWarehouse = schemaDto.SnowflakeWarehouse
+                consumptionDetail = dto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault(s => s.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet);
+            }
+
+            model.SnowflakeDatabase = consumptionDetail.SnowflakeDatabase;
+            model.SnowflakeSchema = consumptionDetail.SnowflakeSchema;
+            model.SnowflakeTable = consumptionDetail.SnowflakeTable;
+            model.SnowflakeStatus = consumptionDetail.SnowflakeStatus;
+            model.SnowflakeStage = consumptionDetail.SnowflakeStage;
+            model.SnowflakeWarehouse = consumptionDetail.SnowflakeWarehouse;
+
+            return model;
+        }
+
+        public static Models.ApiModels.Schema20220609.SchemaInfoModel ToSchemaModel20220609(this Core.DatasetFileConfigDto dto)
+        {
+            var model = new Models.ApiModels.Schema20220609.SchemaInfoModel();
+            model.PopulateSchemaModelBase(dto);
+            model.ConsumptionDetails = dto.Schema.ConsumptionDetails.Select(c => c.Accept(new Models.ApiModels.Schema20220609.SchemaConsumptionModelTransformer())).ToList();
+            return model;
+        }
+
+        private static void PopulateSchemaModelBase(this SchemaInfoModelBase model, Core.DatasetFileConfigDto dto)
+        {
+            Core.FileSchemaDto schemaDto = dto.Schema;
+            model.ConfigId = dto.ConfigId;
+            model.Name = schemaDto.Name;
+            model.SchemaId = schemaDto.SchemaId;
+            model.SchemaEntity_NME = schemaDto.SchemaEntity_NME;
+            model.Description = schemaDto.Description;
+            model.StorageCode = schemaDto.StorageCode;
+            model.Format = schemaDto.FileExtensionName;
+            model.CurrentView = schemaDto.CreateCurrentView;
+            model.Delimiter = schemaDto.Delimiter;
+            model.HasHeader = schemaDto.HasHeader;
+            model.IsTrackableSchema = dto.IsTrackableSchema;
+            model.HiveTable = schemaDto.HiveTable;
+            model.HiveDatabase = schemaDto.HiveDatabase;
+            model.HiveTableStatus = schemaDto.HiveStatus;
+            model.HiveLocation = schemaDto.HiveLocation;
+            model.Options = new List<string>()
+            {
+                "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString(),
+                "CLA1580_StructureHive|" + schemaDto.CLA1580_StructureHive.ToString(),
+                "CLA2472_EMRSend|" + schemaDto.CLA2472_EMRSend.ToString(),
+                "CLA1286_KafkaFlag|" + schemaDto.CLA1286_KafkaFlag.ToString(),
+                "CLA3014_LoadDataToSnowflake|" + schemaDto.CLA3014_LoadDataToSnowflake.ToString()
             };
+            model.DeleteInd = schemaDto.DeleteInd;
+            model.ObjectStatus = schemaDto.ObjectStatus.GetDescription().ToUpper();
+            model.SchemaRootPath = schemaDto.SchemaRootPath?.Split(',');
+            model.HasDataFlow = dto.HasDataFlow;
+            model.ParquetStorageBucket = schemaDto.ParquetStorageBucket;
+            model.ParquetStoragePrefix = schemaDto.ParquetStoragePrefix;            
         }
 
         public static List<SchemaInfoModel> ToSchemaModel(this List<Core.DatasetFileConfigDto> dtoList)
         {
-            List<SchemaInfoModel> modelList = new List<SchemaInfoModel>();
-            foreach (Core.DatasetFileConfigDto dto in dtoList)
-            {
-                modelList.Add(dto.ToSchemaModel());
-            }
-            return modelList;
+            return dtoList.Select(dto => dto.ToSchemaModel()).ToList();
+        }
+
+        public static List<Models.ApiModels.Schema20220609.SchemaInfoModel> ToSchemaModel20220609(this List<Core.DatasetFileConfigDto> dtoList)
+        {
+            return dtoList.Select(dto => dto.ToSchemaModel20220609()).ToList();
         }
 
         public static FileSchemaDto ToDto(this SchemaInfoModel mdl, int datasetId, Func<string, int> extIdLookup)
+        {
+            var dto = ((SchemaInfoModelBase)mdl).ToDto(datasetId, extIdLookup);
+            //the old SchemaInfoModel doesn't hold the SchemaConsumptionId - so we just put the data we have into a SchemaConsumptionSnowflakeDto as-is -
+            //it will be up to the SchemaService implementation to translate this to the correct SchemaConsumption record
+            dto.ConsumptionDetails = new List<SchemaConsumptionDto>() {
+                    new SchemaConsumptionSnowflakeDto()
+                    {
+                        SnowflakeDatabase = mdl.SnowflakeDatabase,
+                        SnowflakeSchema = mdl.SnowflakeSchema,
+                        SnowflakeTable = mdl.SnowflakeTable,
+                        SnowflakeStatus = mdl.SnowflakeStatus,
+                        SnowflakeStage = mdl.SnowflakeStage,
+                        SnowflakeWarehouse = mdl.SnowflakeWarehouse,
+                        SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet //assume that the legacy SchemaInfoModel is referring to the legacy Snowflake type
+                    }
+                };
+            return dto;
+        }
+
+        public static FileSchemaDto ToDto(this Models.ApiModels.Schema20220609.SchemaInfoModel mdl, int datasetId, Func<string, int> extIdLookup)
+        {
+            var dto = ((SchemaInfoModelBase)mdl).ToDto(datasetId, extIdLookup);
+            dto.ConsumptionDetails = mdl.ConsumptionDetails.Select(c => c.Accept(new Models.ApiModels.Schema20220609.SchemaConsumptionModelTransformer())).ToList();
+            return dto;
+        }
+
+        private static FileSchemaDto ToDto(this SchemaInfoModelBase mdl, int datasetId, Func<string, int> extIdLookup)
         {
             return new FileSchemaDto()
             {
@@ -272,15 +312,9 @@ namespace Sentry.data.Web
                 HiveLocation = mdl.HiveLocation,
                 HiveStatus = mdl.HiveTableStatus,
                 StorageCode = mdl.StorageCode,
-                SnowflakeDatabase = mdl.SnowflakeDatabase,
-                SnowflakeTable = mdl.SnowflakeTable,
-                SnowflakeSchema = mdl.SnowflakeSchema,
-                SnowflakeStatus = mdl.SnowflakeStatus,
                 SchemaRootPath = mdl.SchemaRootPath != null ? string.Join(",", mdl.SchemaRootPath) : null,
                 ParquetStorageBucket = mdl.ParquetStorageBucket,
                 ParquetStoragePrefix = mdl.ParquetStoragePrefix,
-                SnowflakeStage = mdl.SnowflakeStage,
-                SnowflakeWarehouse = mdl.SnowflakeWarehouse
             };
         }
 

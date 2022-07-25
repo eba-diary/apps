@@ -360,8 +360,6 @@ namespace Sentry.data.Core
             IList<bool> changes = new List<bool>();
             JObject whatPropertiesChanged = new JObject();
 
-            changes.Add(TryUpdate(() => schema.Name, () => dto.Name, (x) => schema.Name = x));
-
             changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
 
             changes.Add(TryUpdate(() => schema.CreateCurrentView, () => dto.CreateCurrentView, 
@@ -402,12 +400,25 @@ namespace Sentry.data.Core
                         schema.ParquetStoragePrefix = x;
                         whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
                     }));
-                changes.Add(TryUpdate(() => schema.SnowflakeStage, () => dto.SnowflakeStage,
-                    (x) =>
+
+                if (dto.ConsumptionDetails != null)
+                {
+                    foreach (var consumptionDetailDto in dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
                     {
-                        schema.SnowflakeStage = x;
-                        whatPropertiesChanged.Add(nameof(schema.SnowflakeStage).ToLower(), string.IsNullOrEmpty(x) ? null : x.ToLower());
-                    }));
+                        SchemaConsumptionSnowflake consumptionDetail;
+                        if (consumptionDetailDto.SchemaConsumptionId == 0)
+                        {
+                            //this is logic to account for the fact that we're still supporting the v2 API that doesn't provide a SchemaConsumptionId
+                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SnowflakeType == consumptionDetailDto.SnowflakeType);
+                        }
+                        else
+                        {
+                            //this is how the logic should work for the v20220609 API
+                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
+                        }
+                        changes.Add(TryUpdate(() => consumptionDetail.SnowflakeStage, () => consumptionDetailDto.SnowflakeStage, (x) => consumptionDetail.SnowflakeStage = x));
+                    }
+                }
             }
 
             if (changes.Any(x => x))
@@ -633,38 +644,42 @@ namespace Sentry.data.Core
             }
 
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
-            
-            //OVERRIDE Database in lower environments where snowflake data doesn't exist to always hit qual
-            string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
-            if (snowDatabase != String.Empty)
-            {
-                schemaDto.SnowflakeDatabase = snowDatabase;
-            }
-
-            string vwVersion = "vw_" + schemaDto.SnowflakeTable;
-            bool tableExists = _snowProvider.CheckIfExists(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion);     //Does table exist
-            //If table does not exist
-            if (!tableExists)
-            {
-                throw new HiveTableViewNotFoundException("Table or view not found");
-            }
-
-            //Query table for rows
-            System.Data.DataTable result = _snowProvider.GetTopNRows(schemaDto.SnowflakeDatabase, schemaDto.SnowflakeSchema, vwVersion, rows);    
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
-            Dictionary<string, object> dicRow = null;
-            foreach (System.Data.DataRow dr in result.Rows)
+            var snowConsumption = schemaDto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault();
+            if (snowConsumption != null)
             {
-                dicRow = new Dictionary<string, object>();
-                foreach (System.Data.DataColumn col in result.Columns)
-                {
-                    string colName = col.ColumnName;
-                    dicRow.Add(colName, dr[col]);
-                }
-                dicRows.Add(dicRow);
-            }
 
+                //OVERRIDE Database in lower environments where snowflake data doesn't exist to always hit qual
+                string snowDatabase = Config.GetHostSetting("SnowDatabaseOverride");
+                if (snowDatabase != string.Empty)
+                {
+                    snowConsumption.SnowflakeDatabase = snowDatabase;
+                }
+
+                string vwVersion = "vw_" + snowConsumption.SnowflakeTable;
+                bool tableExists = _snowProvider.CheckIfExists(snowConsumption.SnowflakeDatabase, snowConsumption.SnowflakeSchema, vwVersion);     //Does table exist
+                                                                                                                                       //If table does not exist
+                if (!tableExists)
+                {
+                    throw new HiveTableViewNotFoundException("Table or view not found");
+                }
+
+                //Query table for rows
+                System.Data.DataTable result = _snowProvider.GetTopNRows(snowConsumption.SnowflakeDatabase, snowConsumption.SnowflakeSchema, vwVersion, rows);
+
+                Dictionary<string, object> dicRow = null;
+                foreach (System.Data.DataRow dr in result.Rows)
+                {
+                    dicRow = new Dictionary<string, object>();
+                    foreach (System.Data.DataColumn col in result.Columns)
+                    {
+                        string colName = col.ColumnName;
+                        dicRow.Add(colName, dr[col]);
+                    }
+                    dicRows.Add(dicRow);
+                }
+            }
             return dicRows;
         }
 
@@ -881,10 +896,6 @@ namespace Sentry.data.Core
                 LastUpdatedDTM = DateTime.Now,
                 DeleteIssueDTM = DateTime.MaxValue,
                 CreateCurrentView = dto.CreateCurrentView,
-                SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources),
-                SnowflakeTable = FormateSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormateSnowflakeTableNamePart(dto.Name),
-                SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                 CLA1396_NewEtlColumns = dto.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = dto.CLA1580_StructureHive,
                 CLA2472_EMRSend = dto.CLA2472_EMRSend,
@@ -897,10 +908,21 @@ namespace Sentry.data.Core
                                         : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
                 ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
                                         ? GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
-                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode),
-                SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
-                SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
 
+            };
+            schema.ConsumptionDetails = new List<SchemaConsumption>()
+            {
+                new SchemaConsumptionSnowflake()
+                {
+                    Schema = schema,
+                    SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
+                    SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                    SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                }
             };
             _datasetContext.Add(schema);
 
@@ -932,10 +954,6 @@ namespace Sentry.data.Core
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 FileExtensionName = scm.Extension.Name,
-                SnowflakeDatabase = scm.SnowflakeDatabase,
-                SnowflakeTable = scm.SnowflakeTable,
-                SnowflakeSchema = scm.SnowflakeSchema,
-                SnowflakeStatus = scm.SnowflakeStatus,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
@@ -944,8 +962,7 @@ namespace Sentry.data.Core
                 SchemaRootPath = scm.SchemaRootPath,
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
-                SnowflakeStage = scm.SnowflakeStage,
-                SnowflakeWarehouse = scm.SnowflakeWarehouse
+                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList()
             };
 
         }
@@ -970,10 +987,15 @@ namespace Sentry.data.Core
             return dbName;
         }
 
-        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources)
+        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources, string datasetShortName)
         {
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            {
+                return datasetShortName;
+            }
             return (isHumanResources)? "HR" : cat.Name.ToUpper();
         }
+        
 
         /// <summary>
         /// Generates appropriate bucket after evaluating various variables
@@ -1022,7 +1044,7 @@ namespace Sentry.data.Core
             return prefix;
         }
 
-        private string FormateSnowflakeTableNamePart(string part)
+        private string FormatSnowflakeTableNamePart(string part)
         {
             return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
         }
@@ -1078,15 +1100,14 @@ namespace Sentry.data.Core
             }
         }
 
-        public void Validate(int schemaId, List<BaseFieldDto> fieldDtoList)
+        public void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
             MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
             Logger.Debug($"schemaservice start method <{mBase.Name.ToLower()}>");
 
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
-            ValidationResults errors = new ValidationResults();
 
-            errors.MergeInResults(Validate(schema, fieldDtoList));
+            ValidationResults errors = ValidateCleanedFields(schema.Extension.Name, fieldDtoList);
 
             if (!errors.IsValid())
             {
@@ -1094,6 +1115,28 @@ namespace Sentry.data.Core
             }
 
             Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
+        }
+
+        private ValidationResults ValidateCleanedFields(string extensionName, List<BaseFieldDto> fieldDtoList)
+        {
+            //STEP 1:  Look for clones (duplicates) and add to results
+            ValidationResults results = CloneWars(fieldDtoList);
+
+            //STEP 2:  go through all fields and look for validation errors
+            foreach (BaseFieldDto fieldDto in fieldDtoList)
+            {
+                fieldDto.Clean(extensionName);
+                ValidationResults fieldValidationResults = fieldDto.Validate(extensionName);
+                results.MergeInResults(fieldValidationResults);
+
+                //recursively call validate again to validate all child fields of parent
+                if (fieldDto.ChildFields.Any())
+                {
+                    results.MergeInResults(ValidateCleanedFields(extensionName, fieldDto.ChildFields));
+                }
+            }
+
+            return results;
         }
 
         //look at fieldDtoList and returns a list of duplicates at that level only
@@ -1120,27 +1163,6 @@ namespace Sentry.data.Core
                 cloneDetails.ToList().ForEach(x => results.Add(x.OrdinalPosition.ToString(), $"({x.Name}) cannot be duplicated. "));
             }
 
-            return results;
-        }
-
-        private ValidationResults Validate(FileSchema scm, List<BaseFieldDto> fieldDtoList)
-        {
-            //STEP 1:  Look for clones (duplicates) and add to results
-            ValidationResults results = CloneWars(fieldDtoList);
-
-            //STEP 2:  go through all fields and look for validation errors
-            foreach (BaseFieldDto fieldDto in fieldDtoList)
-            {
-                ValidationResults fieldValidationResults = fieldDto.Validate(scm.Extension.Name);
-                results.MergeInResults(fieldValidationResults);
-
-                //recursively call validate again to validate all child fields of parent
-                if (fieldDto.ChildFields.Any())
-                {
-                    results.MergeInResults(Validate(scm, fieldDto.ChildFields));
-                }
-            }
-            
             return results;
         }
     }

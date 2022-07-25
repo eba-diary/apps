@@ -180,11 +180,10 @@
                 <div>
                     <div class="row">
                         <div class="col-lg-12" style="margin-left: 20px">
-                            <select class="form-control" style="margin:1em !important;"
-                                    id="datasetConfigList" name="filterSelector">
-                                @foreach (var schema in Model.DatasetFileConfigNames)
+                            <select class="form-control" style="margin:1em !important;" id="datasetConfigList" name="filterSelector">
+                                @foreach (var schema in Model.DatasetFileConfigSchemas)
                                 {
-                                    <option value="@schema.Key">@schema.Value</option>
+                                    <option value="@schema.ConfigId" data-id="@schema.SchemaId">@schema.SchemaName</option>
                                 }
                             </select>
                         </div>
@@ -225,28 +224,69 @@
 
                     <hr class="datasetMetadataBoxHr" />
 
+                    
                     <div class="row w-100">
-                        <div class="col">
-                            <h5 class="@textColor pt-1">SAID Asset</h5>
-                            <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
-                        </div>
-                        <div class="col">
-                            <h5 class="@textColor pt-1">Contact</h5>
-                            <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
-                        </div>
+
+                        @if (!@Model.CLA1130_SHOW_ALTERNATE_EMAIL)
+                        {
+                            //ORIGINAL WAY IT LOOKED, DELETE THIS WHOLE CODE BLOCK WHEN REMOVING FEATURE FLAG
+                            <div class="col">
+                                <h5 class="@textColor pt-1">SAID Asset</h5>
+                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
+                            </div>
+
+                            <div class="col">
+                                <h5 class="@textColor pt-1">Contact</h5>
+                                <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
+                            </div>
+
+                        }
+                        else
+                        {
+                            //NEW WAY IT lOOKS WITH FEATURE ON, LEAVE THIS CODE WHEN REMOVING FEATURE FLAG
+                            <div class="col">
+                                <h5 class="@textColor pt-1">Contact</h5>
+                                <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
+                            </div>
+
+                            <div class="col">
+
+                                <h5 class="@textColor pt-1">Alternative Email</h5>
+                                @if (@Model.AlternateContactEmail != null)
+                                {
+                                    string emailAddress = "mailto:" + @Model.AlternateContactEmail;
+                                    <p class="ds-format-email">
+                                        <a href="@emailAddress">@Model.AlternateContactEmail</a>
+                                    </p>
+                                }
+
+                            </div>
+                        }
+
                     </div>
 
                     <hr class="datasetMetadataBoxHr" />
 
                     <div class="row w-100">
+
+                        @if (@Model.CLA1130_SHOW_ALTERNATE_EMAIL)
+                        {
+                            //LEAVE THIS CODE WHEN REMOVING FEATURE FLAG
+                            <div class="col">
+                                <h5 class="@textColor pt-1">SAID Asset</h5>
+                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
+                            </div>
+                        }
+
                         <div class="col">
-                            <h5 class="@textColor pt-1">Data Classification</h5>
+                            <h5 class="@textColor pt-1">Classification</h5>
                             <p>@Model.DataClassificationDescription</p>
                         </div>
                         <div class="col">
                             <h5 class="@textColor pt-1">Environment</h5>
                             <p>@Model.NamedEnvironment</p>
                         </div>
+
                     </div>
 
                 </div>
@@ -330,6 +370,10 @@ else
                 {
                     <div id="tabSchemaAbout"></div>
                 }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
 
             <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
@@ -337,15 +381,31 @@ else
                 {
                     <div id="tabSchemaColumns"></div>
                 }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
-            @if (Model.HasDataAccess)
-            {
-                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+
+            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                @if (Model.HasDataAccess)
+                {
                     <div id="tabDataPreview"></div>
-                </div>
-            }
+                }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Full Dataset");
+                }
+            </div>
             <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                <div id="tabDataFiles"></div>
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabDataFiles"></div>
+                }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
             </div>
             @if (Model.DisplaySchemaSearch)
             {

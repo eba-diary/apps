@@ -227,6 +227,8 @@ namespace Sentry.data.Web.Controllers
                 dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
                 dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
+                dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
+                dfcm.FileExtensionReadonly = dfcm.ExtensionList.Where(s => s.Value == dfcm.FileExtensionID.ToString()).Select(n => n.Text).FirstOrDefault();
 
                 //ViewBag.ModifyType = "Edit";
 
@@ -257,7 +259,7 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
-
+            edfc.DatasetScopeReadonly = edfc.AllDatasetScopeTypes.Where(s => s.Value == edfc.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
             ViewBag.ModifyType = "Edit";
 
             return PartialView("_EditConfigFile", edfc);
@@ -527,6 +529,7 @@ namespace Sentry.data.Web.Controllers
             return View("CreateDataSource", dsm);
         }
 
+        [Route("Config/HeaderEntryRow")]
         public ActionResult HeaderEntryRow()
         {
             return PartialView("_Headers");
@@ -685,6 +688,8 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [Route("Config/AuthenticationByType/")]
+
         public JsonResult AuthenticationByType(string sourceType)
         {
             return Json(AuthenticationTypesByType(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -722,6 +727,7 @@ namespace Sentry.data.Web.Controllers
             return Json(temp, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("Config/AuthTypeDescription/")]
         public JsonResult AuthTypeDescription(int AuthID)
         {
             var temp = _datasetContext.AuthTypes.Where(x => x.AuthID == AuthID).Select(x => x.Description).FirstOrDefault();
@@ -780,7 +786,7 @@ namespace Sentry.data.Web.Controllers
             {
                 List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
-                _schemaService.Validate(schemaId, schemaRowsDto);
+                _schemaService.ValidateCleanedFields(schemaId, schemaRowsDto);
                 _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
 
             }
@@ -790,7 +796,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (ValidationException vEx)
             {
-                return Json(new { Success = false, Message = "Failed schema validation.  ", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
+                return Json(new { Success = false, Message = "Failed schema validation. ", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -810,7 +816,7 @@ namespace Sentry.data.Web.Controllers
                 List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
                 dtoList.Add(schemaRow.ToDto(false));
 
-                _schemaService.Validate(schemaId, dtoList);
+                _schemaService.ValidateCleanedFields(schemaId, dtoList);
 
                 return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
             }
@@ -1021,10 +1027,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(DataSourceAccessRequestModel model)
+        public async Task<ActionResult> SubmitAccessRequest(DataSourceAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = _configService.RequestAccessToDataSource(ar);
+            string ticketId = await _configService.RequestAccessToDataSource(ar);
 
             return string.IsNullOrEmpty(ticketId) 
                 ? PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false)) 

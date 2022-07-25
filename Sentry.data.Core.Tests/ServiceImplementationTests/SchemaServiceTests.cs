@@ -2298,13 +2298,13 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto dto = new FileSchemaDto()
             {
                 Name = "Name-NewValue",
-                SnowflakeStage = "SnowflakeStage-NewValue",
+                ConsumptionDetails = new List<SchemaConsumptionDto>() { new SchemaConsumptionSnowflakeDto() { SchemaConsumptionId = 1, SnowflakeStage = "SnowflakeStage-NewValue" } },
                 FileExtensionId = 1
             };
 
             FileSchema schema = new FileSchema()
             {
-                SnowflakeStage = "SnowflakeStage-OriginalValue",
+                ConsumptionDetails = new List<SchemaConsumption>() { new SchemaConsumptionSnowflake() { SchemaConsumptionId = 1, SnowflakeStage = "SnowflakeStage-OriginalValue" } },
                 Extension = new FileExtension() { Id = 2 }
             };
 
@@ -2327,14 +2327,14 @@ namespace Sentry.data.Core.Tests
             //ACT
             schemaService.UpdateSchema(dto, schema);
 
-            var snowstage = dto.SnowflakeStage == schema.SnowflakeStage;
+            var snowstage = dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().First().SnowflakeStage == schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First().SnowflakeStage;
 
             //ASSERT
             Assert.AreEqual(snowstage, AllowUpdateFlag);
         }
 
         [TestMethod]
-        public void Validate_1_BaseFieldDtos_Success()
+        public void ValidateCleanedFields_1_BaseFieldDtos_Success()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
             FileSchema fileSchema = new FileSchema()
@@ -2371,17 +2371,26 @@ namespace Sentry.data.Core.Tests
                             Length = "10"
                         }) 
                     } 
-                }
+                },
+                new IntegerFieldDto(new SchemaRow()
+                {
+                    Name = "IntegerField",
+                    Position = 1,
+                    Length = "10"
+                })
             };
             
             //verifying that exception does not get thrown
-            service.Validate(1, dtos);
+            service.ValidateCleanedFields(1, dtos);
 
             datasetContext.VerifyAll();
+
+            //verify integer was cleaned
+            Assert.AreEqual(0, dtos.Last().Length);
         }
 
         [TestMethod]
-        public void Validate_1_BaseFieldDtos_Duplicates_ValidationResults()
+        public void ValidateCleanedFields_1_BaseFieldDtos_Duplicates_ValidationResults()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
             FileSchema fileSchema = new FileSchema()
@@ -2411,7 +2420,7 @@ namespace Sentry.data.Core.Tests
             };
 
             //verifying that exception does not get thrown
-            ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.Validate(1, dtos));
+            ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.ValidateCleanedFields(1, dtos));
 
             Assert.AreEqual("Validation errors occurred: (VarcharField) cannot be duplicated. , (VarcharField) cannot be duplicated. ", exception.Message);
             Assert.AreEqual(2, exception.ValidationResults.GetAll().Count);
@@ -2420,7 +2429,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void Validate_1_BaseFieldDtos_DtoValidations_ValidationResults()
+        public void ValidateCleanedFields_1_BaseFieldDtos_DtoValidations_ValidationResults()
         {
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
             FileSchema fileSchema = new FileSchema()
@@ -2461,7 +2470,7 @@ namespace Sentry.data.Core.Tests
             };
 
             //verifying that exception does not get thrown
-            ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.Validate(1, dtos));
+            ValidationException exception = Assert.ThrowsException<ValidationException>(() => service.ValidateCleanedFields(1, dtos));
 
             Assert.AreEqual("Validation errors occurred: Field name (1Varchar Field) must start with a letter or underscore, Field name (1Varchar Field) can only contain letters, underscores, digits (0-9), and dollar signs (\"$\"), Field name (Child Varchar Field) can only contain letters, underscores, digits (0-9), and dollar signs (\"$\")", exception.Message);
             Assert.AreEqual(3, exception.ValidationResults.GetAll().Count);
@@ -2681,10 +2690,6 @@ namespace Sentry.data.Core.Tests
                 SchemaId = 88,
                 StorageCode = "1000002",
                 UpdatedBy = "072984",
-                SnowflakeDatabase = "",
-                SnowflakeTable = "",
-                SnowflakeSchema = "",
-                SnowflakeStatus = "Available",
                 CLA1396_NewEtlColumns = false,
                 CLA1580_StructureHive = false,
                 Revisions = new List<SchemaRevision>()

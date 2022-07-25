@@ -34,7 +34,8 @@ namespace Sentry.data.Web
                 FileTypeId = model.FileTypeId,
                 GetLatest = model.GetLatest,
                 TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
-                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList()
+                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList(),
+                AlternateContactEmail = model.AlternateContactEmail
             };
 
             ImagesToDto(model, dto);
