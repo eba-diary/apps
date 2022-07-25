@@ -6,18 +6,24 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Web.Models.ApiModels.Admin;
+using Sentry.data.Core.Interfaces;
 
 namespace Sentry.data.Web.Controllers.WebApi
 {
-    public class AdminController : BaseWebApiController
+    public class AdminController : Controller
     {
-        private readonly IDatasetContext _datasetContext;
+        private readonly ISupportLink _supportLinkService;
 
-        public AdminController(IDatasetContext datasetContext)
+        public AdminController(ISupportLink supportLinkService)
         {
-            _datasetContext = datasetContext;
+            _supportLinkService = supportLinkService;
         }
 
-        
+        public IHttpActionResult
+
+        public ActionResult Index()
+        {
+            return View();
+        }
     }
 }
