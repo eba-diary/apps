@@ -47,7 +47,8 @@ namespace Sentry.data.Web
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
                 SelectedApprover = model.SelectedApprover,
                 SaidKeyCode = model.SaidKeyCode,
-                IsAddingPermission = model.IsAddingPermission
+                IsAddingPermission = model.IsAddingPermission,
+                TicketId = model.TicketId
             };
         }
 
@@ -91,7 +92,11 @@ namespace Sentry.data.Web
                 AllPermissions = core.Permissions.ToModel(),
                 AllApprovers = Utility.BuildSelectListitem(core.ApproverList, "Select an approver"),
                 DatasetName = core.SecurableObjectName,
-                SaidKeyCode = core.SaidKeyCode
+                SaidKeyCode = core.SaidKeyCode,
+                ConsumeDatasetGroupName = core.ConsumeDatasetGroupName,
+                ProducerDatasetGroupName = core.ProducerDatasetGroupName,
+                ConsumeAssetGroupName = core.ConsumeAssetGroupName,
+                ProducerAssetGroupName = core.ProducerAssetGroupName
             };
         }
 

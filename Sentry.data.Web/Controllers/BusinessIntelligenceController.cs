@@ -20,17 +20,20 @@ namespace Sentry.data.Web.Controllers
         private readonly IBusinessIntelligenceService _businessIntelligenceService;
         private readonly IEventService _eventService;
         private readonly ITagService _tagService;
+        private readonly IDataFeatures _featureFlags;
 
         public BusinessIntelligenceController(
             IDatasetContext datasetContext,
             IBusinessIntelligenceService businessIntelligenceService,
             IEventService eventService,
-            ITagService tagService)
+            ITagService tagService,
+            IDataFeatures featureFlags)
         {
             _datasetContext = datasetContext;
             _businessIntelligenceService = businessIntelligenceService;
             _eventService = eventService;
             _tagService = tagService;
+            _featureFlags = featureFlags;
         }
 
 
@@ -52,7 +55,8 @@ namespace Sentry.data.Web.Controllers
                 DatasetId = 0,
                 BusinessObjectsEnumValue = (int)ReportType.BusinessObjects,
                 CreationUserId = SharedContext.CurrentUser.AssociateId,
-                UploadUserId = SharedContext.CurrentUser.AssociateId
+                UploadUserId = SharedContext.CurrentUser.AssociateId,
+                CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue()          //REMOVE WHEN TURNED ON LATER
             };
 
             ReportUtility.SetupLists(_datasetContext, cdm);
@@ -76,6 +80,9 @@ namespace Sentry.data.Web.Controllers
             {
                 BusinessIntelligenceDto dto = _businessIntelligenceService.GetBusinessIntelligenceDto(id);
                 BusinessIntelligenceModel model = new BusinessIntelligenceModel(dto);
+                model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();          //REMOVE WHEN TURNED ON LATER
+
+
                 ReportUtility.SetupLists(_datasetContext, model);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Report Edit Page", dto.DatasetId);
@@ -93,11 +100,15 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
         {
+
+            crm.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();          //REMOVE WHEN TURNED ON LATER
+
             AddCoreValidationExceptionsToModel(crm.Validate());
 
             if (ModelState.IsValid)
             {
                 BusinessIntelligenceDto dto = crm.ToDto();
+                
                 AddCoreValidationExceptionsToModel(_businessIntelligenceService.Validate(dto));
                 if (ModelState.IsValid)
                 {
@@ -156,6 +167,7 @@ namespace Sentry.data.Web.Controllers
         {
             BusinessIntelligenceDetailDto dto = _businessIntelligenceService.GetBusinessIntelligenceDetailDto(id);
             BusinessIntelligenceDetailModel model = new BusinessIntelligenceDetailModel(dto);
+            model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Business Intelligence Detail Page", dto.DatasetId);
             return View(model);

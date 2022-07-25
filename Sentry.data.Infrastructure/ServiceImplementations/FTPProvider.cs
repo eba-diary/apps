@@ -35,36 +35,14 @@ namespace Sentry.data.Infrastructure
         private FtpWebRequest CreateDwnldRequest(string url, NetworkCredential creds)
         {
             string methodName = $"{nameof(FtpProvider).ToLower()}_{nameof(CreateDwnldRequest).ToLower()}";
-            Logger.Debug($"{methodName} Method Start");
-
-            
+            Logger.Debug($"{methodName} Method Start");            
 
             FtpWebRequest req = (FtpWebRequest)WebRequest.Create(url);
 
-            NetworkCredential proxyCredentials;
-            string proxyUrl;
-
-            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                Logger.Debug($"{methodName} using edge proxy: true");
-                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                proxyCredentials = new NetworkCredential(userName, password);
+                req.Proxy = webProxy;
             }
-            else
-            {
-                Logger.Debug($"{methodName} using edge proxy: false");
-                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-            }
-
-            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
-
-            req.Proxy = new WebProxy(proxyUrl)
-            {
-                Credentials = proxyCredentials
-            };
 
             Logger.Debug($"{methodName} externalUser: {creds.UserName}");
 

@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.GrantPermissionToUserId, (m) => m.Column("GrantPermissionToUser_ID"));
             this.Property((x) => x.AwsArn);
 
-            this.Bag(x => x.Permissions, (m) =>
+            this.Bag(x => x.AddedPermissions, (m) =>
             {
                 m.Inverse(true);
                 m.Table("SecurityPermission");
@@ -47,7 +47,19 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_AddedSecurityPermission_SecurityTicket");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(SecurityPermission))));
-
+            
+            this.Bag(x => x.RemovedPermissions, (m) =>
+            {
+                m.Inverse(true);
+                m.Table("SecurityPermission");
+                m.Cascade(Cascade.All);
+                m.Fetch(CollectionFetchMode.Select);
+                m.Key((k) =>
+                {
+                    k.Column("RemovedFromTicket_ID");
+                    k.ForeignKey("FK_RemovedSecurityPermission_SecurityTicket");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(SecurityPermission))));
 
             this.ManyToOne(x => x.ParentSecurity, m =>
             {
