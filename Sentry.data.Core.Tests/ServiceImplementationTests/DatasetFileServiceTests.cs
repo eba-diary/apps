@@ -720,7 +720,7 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileA, dataFileB, dataFileC }.AsQueryable);
 
             var messagePublisher = new Mock<IMessagePublisher>();
-            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object,null);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null);
 
 
             //ENSURE MARKING Deleted WORKS
@@ -759,7 +759,7 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileA}.AsQueryable);
 
             var messagePublisher = new Mock<IMessagePublisher>();
-            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null);
 
 
             //ENSURE MARKING Deleted WORKS
