@@ -21,11 +21,11 @@ namespace Sentry.data.Infrastructure
         public List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();
-            must.AddMatch<DataFlowMetric>(x => x.DatasetId, dto.DatasetToSearch);
-            must.AddMatch<DataFlowMetric>(x => x.SchemaId, dto.SchemaToSearch);
-            if(dto.FileToSearch != "-1")
+            must.AddMatch<DataFlowMetric>(x => x.DatasetId, dto.DatasetId.ToString());
+            must.AddMatch<DataFlowMetric>(x => x.SchemaId, dto.SchemaId.ToString());
+            if(dto.DatasetFileId != -1)
             {
-                must.AddMatch<DataFlowMetric>(x => x.DatasetFileId, dto.FileToSearch);
+                must.AddMatch<DataFlowMetric>(x => x.DatasetFileId, dto.DatasetFileId.ToString()); ;
             }
             BoolQuery boolQuery = new BoolQuery();
             boolQuery.Must = must;

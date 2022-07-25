@@ -67,13 +67,14 @@ data.Admin = {
             dataType: "Json",
             dataSrc: "Records",
             success: function (data) {
+                $("#fileDropdown").materialSelect({ destroy: true });
                 var s = '<option value="-1"id="defaultFileSelection"> (Optional) Select a File</option>';
                 for (var d of data.Records) {
                     s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
                 }
                 $("#fileDropdown").html(s);
                 $("#defaultFileSelection").prop("disabled", true);
-                $("#fileDropdown").materialSelect("destroy");
+                $("#fileDropdown").materialSelect();
             }
         })
     },
@@ -137,13 +138,20 @@ data.Admin = {
         }
     },
     GetFlowEvents: function (data) {
-        console.log(data)
         var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partition</th><th>Run Instance Guid</th><th>Event Contents</th></tr>';
         for (var flowEvent of data.FlowEvents) {
             s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td>' + flowEvent.RunInstanceGuid + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent=' + flowEvent.EventContents + '>View Contents</a></td></tr>'
         }
         s += '</table>';
         return s;
+    },
+    ActivateDeactivateSubmitButton: function () {
+        if ($("#AllDatasets").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
+            $("#submitButton").prop("disabled", false);
+        }
+        else {
+            $("#submitButton").prop("disabled", true);
+        }
     },
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
@@ -231,12 +239,7 @@ data.Admin = {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
             }
-            if ($("#AllDatasets").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
-                $("#submitButton").prop("disabled", false);
-            }
-            else {
-                $("#submitButton").prop("disabled", true);
-            }
+            data.Admin.ActivateDeactivateSubmitButton();
 
         });
         $("#schemaDropdown").change(function (event) {
@@ -246,12 +249,7 @@ data.Admin = {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.GetFileDropdown(url);
             }
-            if ($("#AllDatasets").find(":selected").val != "" && $("#schemaDropdown").find(":selected").val != "-1") {
-                $("#submitButton").prop("disabled", false);
-            }
-            else {
-                $("#submitButton").prop("disabled", true);
-            }
+            data.Admin.ActivateDeactivateSubmitButton();
         });
         $("#EventContentModal").on("show.bs.modal", function (event) {
             var link = $(event.relatedTarget);

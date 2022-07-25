@@ -417,11 +417,13 @@
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
+    <Compile Include="Extensions\DataFlowMetricExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
     <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
