@@ -29,5 +29,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3718_Authorization { get; }
         IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE { get; }
         IFeatureFlag<bool> CLA4152_UploadFileFromUI { get; }
+        IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
+        IFeatureFlag<bool> CLA4310_UseHttpClient { get; }
     }
 }

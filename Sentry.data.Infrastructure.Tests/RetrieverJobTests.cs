@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Polly;
 using Polly.Registry;
 using RestSharp;
 using Rhino.Mocks;
@@ -65,8 +66,7 @@ namespace Sentry.data.Infrastructure.Tests
             //Arrange
             /*Setup Polly Policy*/
             var policyRegistry = new PolicyRegistry();
-            GoogleApiProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<GoogleApiProviderPolicy>(policyRegistry);
-            pollyPolicyLivy.Register();
+            policyRegistry.Add(PollyPolicyKeys.GoogleAPiProviderPolicy, Policy.NoOp());
 
             ///
             /// Setup provider

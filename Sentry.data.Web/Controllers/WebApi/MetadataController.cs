@@ -850,7 +850,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     {
                         Name = item.Item1.Name,
                         Id = item.Item1.Id,
-                        DetailUrl = $"DataFlow/{item.Item1.Id}/Detail",
+                        DetailUrl = $"{Sentry.Configuration.Config.GetHostSetting("SentryDataBaseUrl")}/DataFlow/{item.Item1.Id}/Detail",
                         PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1),
                         ObjectStatus = item.Item1.ObjectStatus,
                         DeleteIssuer = item.Item1.DeleteIssuer,

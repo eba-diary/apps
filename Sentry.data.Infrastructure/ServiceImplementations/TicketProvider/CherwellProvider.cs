@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
 
                 AddApproversToTicket(newBusPublicObId, model);
 
-                ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.APPROVAL, GlobalConstants.CherwellChangeStatusOrder.APPROVAL);
+                ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.WAITING_FOR_APPROVAL, GlobalConstants.CherwellChangeStatusOrder.WAITING_FOR_APPROVAL);
 
                 return newBusPublicObId;
             }
@@ -529,11 +529,11 @@ namespace Sentry.data.Infrastructure
                 default:
                     if (model.IsAddingPermission)
                     {
-                        sb.Append($"Please grant the {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} within Data.sentry.com. <br>");
+                        sb.Append($"Please grant {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} Data.sentry.com. <br>");
                     }
                     else
                     {
-                        sb.Append($"Please remove the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+                        sb.Append($"Please remove the following permissions to {model.SecurableObjectName} Data.sentry.com. <br>");
                     }
                     sb.Append($"<br>");
                     if (!string.IsNullOrEmpty(model.SaidKeyCode))

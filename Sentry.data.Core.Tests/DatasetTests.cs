@@ -136,6 +136,16 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.AdminDataPermissionsAreExplicit);
         }
 
+        [TestCategory("DatasetTests")]
+        [TestMethod]
+        public void Reports_can_be_created_with_no_ShortName()
+        {
+            Dataset dataset1 = GetMockBIReportData();
+            dataset1.ShortName = null;
+            var vr = dataset1.ValidateForSave();
+            Assert.IsTrue(vr.IsValid());
+        }
+
         public Dataset GetMockDatasetData()
         {
             Dataset ds = new Dataset()
@@ -144,7 +154,7 @@ namespace Sentry.data.Core.Tests
                 DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } },
                 DatasetName = "Claim Dataset",
                 ShortName = "ClaimDataset",
-                DatasetDesc = "Test Claim Datasaet",
+                DatasetDesc = "Test Claim Dataset",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = "Creater_User",
                 UploadUserName = "Upload_User",
@@ -153,7 +163,36 @@ namespace Sentry.data.Core.Tests
                 ChangedDtm = System.DateTime.Now.AddYears(-12),
                 S3Key = null,
                 DatasetFiles = null,
-                DatasetFileConfigs = null
+                DatasetFileConfigs = null,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            };
+
+            return ds;
+        }
+
+
+        public Dataset GetMockBIReportData()
+        {
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 0,
+                DatasetName = "Andrews Excel Spreadsheet",
+                DatasetDesc = "This is such a cool spreadsheet - you should check it out",
+                DatasetCategories = new List<Category>() { new Category() { Name = "Claim" } },
+                BusinessUnits = new List<BusinessUnit>() { new BusinessUnit() { Name = "Claims" } },
+                DatasetFunctions = new List<DatasetFunction>() { new DatasetFunction() { Name = "Operations" } },
+                DatasetInformation = "Specific Information regarding datasetfile consumption",
+                CreationUserName = "Creater_User",
+                UploadUserName = "Upload_User",
+                OriginationCode = "Internal",
+                DatasetDtm = System.DateTime.Now.AddYears(-13),
+                ChangedDtm = System.DateTime.Now.AddYears(-12),
+                S3Key = null,
+                DatasetFiles = null,
+                DatasetFileConfigs = null,
+                Metadata = new DatasetMetadata() { ReportMetadata = new ReportMetadata() { 
+                    Location = @"\\sentry.com\share\O_IS\Sysarch\Visual Studio\Visual Studio license confirmation history.xlsx" } },
+                DatasetType = GlobalConstants.DataEntityCodes.REPORT
             };
 
             return ds;

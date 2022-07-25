@@ -100,22 +100,6 @@ namespace Sentry.data.Core
             return error;
         }
 
-        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
-        {
-            try
-            {
-                //UPDATE OBJECTSTATUS
-                dbList.ForEach(f => f.ObjectStatus = status);
-                _datasetContext.SaveChanges();
-            }
-            catch (System.Exception ex)
-            {
-                //log list of Ids by exception
-                string msg = "Error marking DatasetFile rows as Deleted";
-                Logger.Error(msg, ex);
-                throw;
-            }
-        }
 
         public UserSecurity GetUserSecurityForDatasetFile(int datasetId)
         {
@@ -232,41 +216,79 @@ namespace Sentry.data.Core
         private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
             //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent and ERROR HANDLING
-            string[] idList = dbList.Select(s => s.DatasetFileId.ToString()).ToArray();
+            int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
 
             try
             {
                 //CHUNK INTO 10 id's PER MESSAGE
-                string[] buffer;
+                int[] buffer;
                 for (int i = 0; i < idList.Length; i += 10)
                 {
                     int chunk = (idList.Length - i < 10) ? idList.Length - i : 10;          //ENSURE LAST CHUNK ONLY HAS WHAT REMAINS
-                    buffer = new string[chunk];
-                    Array.Copy(idList, i, buffer, 0, chunk);
+                    buffer = new int[chunk];
+                    Array.Copy(idList, i, buffer, 0, chunk );
 
-                    S3DeleteFilesModel model = CreateS3DeleteFilesModel(datasetId, schemaId, buffer);
-
+                    DeleteFilesRequestModel model = CreateDeleteFilesRequestModel(datasetId,schemaId,buffer);
+                    
                     //PUBLISH DSC DELETE EVENT
                     _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
                 }
             }
             catch (System.Exception ex)
             {
-                string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " +
-                            JsonConvert.SerializeObject(CreateS3DeleteFilesModel(datasetId, schemaId, idList));
-
+                string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " + 
+                            JsonConvert.SerializeObject(CreateDeleteFilesRequestModel(datasetId, schemaId, idList));
+                
                 Logger.Error(errorMsg, ex);
                 throw;
             }
         }
 
-        private S3DeleteFilesModel CreateS3DeleteFilesModel(int datasetId, int schemaId, string[] datasetFileIdList)
+
+        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
         {
-            S3DeleteFilesModel model = new S3DeleteFilesModel()
+            try
+            {
+                //UPDATE OBJECTSTATUS
+                dbList.ForEach(f => f.ObjectStatus = status);
+                _datasetContext.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                string msg = "Error marking DatasetFile rows as Deleted";
+                Logger.Error(msg, ex);
+                throw;
+            }
+        }
+
+        
+        public void UpdateObjectStatus(int[] idList, GlobalEnums.ObjectStatusEnum status)
+        {
+            try
+            {
+                if(idList != null)
+                {
+                    List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w => idList.Contains(w.DatasetFileId)).ToList();
+                    UpdateObjectStatus(dbList, status);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                string msg = "Error marking DatasetFile row as " + status.GetDescription();
+                Logger.Error(msg, ex);
+                throw;
+            }
+        }
+
+
+
+        private DeleteFilesRequestModel CreateDeleteFilesRequestModel(int datasetId, int schemaId, int[] datasetFileIdList)
+        {
+            DeleteFilesRequestModel model = new DeleteFilesRequestModel()
             {
                 DatasetID = datasetId,
                 SchemaID = schemaId,
-                RequestGUID = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
+                RequestGUID = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff"),
                 DatasetFileIdList = datasetFileIdList
             };
 
