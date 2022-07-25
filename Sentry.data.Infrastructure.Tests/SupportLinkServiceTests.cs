@@ -15,8 +15,19 @@ namespace Sentry.data.Infrastructure.Tests
         public void TestAddSupportLink()
         {
             // Arrange
-            var supportLinksList = new List<SupportLink>();
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.Add(It.IsAny<SupportLink>())).Callback<SupportLink>(x =>
+            {
+                Assert.AreEqual(12, x.SupportLinkId);
+                Assert.AreEqual("New Link", x.Name);
+                Assert.AreEqual("This is the new link", x.Description);
+                Assert.AreEqual("New Link Url", x.Url);
+            });
+
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            SupportLinkService supportLinkService = new SupportLinkService(datasetContext.Object);
+
             SupportLinkDto supportLinkDto = new SupportLinkDto()
             {
                 SupportLinkId = 12,
@@ -24,60 +35,47 @@ namespace Sentry.data.Infrastructure.Tests
                 Description = "This is the new link",
                 Url = "New Link Url"
             };
-            context.Setup(f => f.SupportLinks).Returns(supportLinksList.AsQueryable());
-            
+
             // Act
-            var supportLinkService = new SupportLinkService(context.Object);
             supportLinkService.AddSupportLink(supportLinkDto);
 
             // Assert
-            Assert.AreEqual(1, supportLinksList.Count);
-            Assert.AreEqual(12, supportLinksList[0].SupportLinkId);
-            Assert.AreEqual("New Link", supportLinksList[0].Name);
-            Assert.AreEqual("This is the new link", supportLinksList[0].Description);
-            Assert.AreEqual("New Link Url", supportLinksList[0].Url);
+            datasetContext.VerifyAll();
         }
 
 
         [TestMethod]
         public void TestRemoveSupportLink()
         {
-
             // Arrange
-            var context = new Mock<IDatasetContext>();
-            var supportLinksList = new List<SupportLink>();
-            SupportLinkDto supportLinkDto1 = new SupportLinkDto()
-            {
-                SupportLinkId = 12,
-                Name = "New Link",
-                Description = "This is the new link",
-                Url = "New Link Url"
-            };
-            SupportLinkDto supportLinkDto2 = new SupportLinkDto()
+            SupportLink supportLink1 = new SupportLink()
             {
                 SupportLinkId = 13,
-                Name = "New Link Two",
-                Description = "This is the 2nd new link",
-                Url = "New Link Url Two"
+                Name = "Remove New Link",
+                Description = "This is the remove link",
+                Url = "New Link Url to remove"
             };
 
-            context.Setup(F => F.SupportLinks).Returns(supportLinksList.AsQueryable());
+            List<SupportLink> supportLinksList = new List<SupportLink>();
+            supportLinksList.Add(supportLink1);
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.SupportLinks).Returns(supportLinksList.AsQueryable());
+            datasetContext.Setup(x => x.Remove(It.IsAny<SupportLink>())).Callback<SupportLink>(x =>
+            {
+                Assert.AreEqual(13, x.SupportLinkId);
+                Assert.AreEqual("Remove New Link", x.Name);
+                Assert.AreEqual("This is the remove link", x.Description);
+                Assert.AreEqual("New Link Url to remove", x.Url);
+            }); 
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            SupportLinkService supportLinkService = new SupportLinkService(datasetContext.Object);
 
             // Act
-            var supportLinkService = new SupportLinkService(context.Object);
-            supportLinkService.AddSupportLink(supportLinkDto1);
-            supportLinkService.AddSupportLink(supportLinkDto2);
-
-            supportLinkService.RemoveSupportLink(12);
+            supportLinkService.RemoveSupportLink(13);
 
             // Assert
-            Assert.AreEqual(1, supportLinksList.Count);
-            Assert.AreEqual(13, supportLinksList[0].SupportLinkId);
-            Assert.AreEqual("New Link Two", supportLinksList[0].Name);
-            Assert.AreEqual("This is the 2nd new link", supportLinksList[0].Description);
-            Assert.AreEqual("New Link Url Two", supportLinksList[0].Url);
-            context.VerifyAll();
-
+            datasetContext.VerifyAll();
         }
     }
 }
