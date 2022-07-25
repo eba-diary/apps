@@ -85,13 +85,13 @@ namespace Sentry.data.Infrastructure
 
         bool IMessageHandler<string>.HandleComplete()
         {
-            Logger.Info("DfsEventHandlerComplete");
+            Logger.Info("SparkConverterEventHandlerComplete");
             return true;
         }
 
         void IMessageHandler<string>.Init()
         {
-            Logger.Info("DfsEventHandlerInitialized");
+            Logger.Info("SparkConverterHandlerInitialized");
         }
     }
 }

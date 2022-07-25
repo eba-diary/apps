@@ -60,7 +60,6 @@ namespace Sentry.data.Core
         }
         public virtual string GetStorageCode()
         {
-            FileSchema s = Schema as FileSchema;
             if (Schema is FileSchema scm)
             {
                 return scm.StorageCode;

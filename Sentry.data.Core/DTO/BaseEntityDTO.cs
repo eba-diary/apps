@@ -27,6 +27,7 @@ namespace Sentry.data.Core
         public List<string> ContactIds { get; set; }
         public List<ContactInfoDto> ContactDetails { get; set; }
         public List<ImageDto> Images { get; set; }
+        public string AlternateContactEmail { get; set; }
 
 
         //shared details
