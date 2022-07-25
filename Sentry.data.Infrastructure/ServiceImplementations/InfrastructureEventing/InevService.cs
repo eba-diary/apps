@@ -130,7 +130,7 @@ namespace Sentry.data.Infrastructure
             {
                 Action = ticket.IsAddingPermission ? DatasetPermissionsUpdatedDto.ChangesDto.ACTION_ADD : DatasetPermissionsUpdatedDto.ChangesDto.ACTION_REMOVE,
                 RequestedBy = ticket.RequestedById.ToString(),
-                Permissions = ticket.Permissions.Select(p =>
+                Permissions = ticket.AddedPermissions.Select(p =>
                     new DatasetPermissionsUpdatedDto.PermissionDto()
                     {
                         Identity = ticket.Identity,

@@ -1,7 +1,6 @@
 ﻿@model Sentry.data.Web.BusinessIntelligenceModel
 
 <h2>@ViewData["Title"]</h2>
-<div id="informationPanel"></div>
 
 @using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post, new { @id = "BusinessIntelligenceForm", @enctype = "multipart/form-data" }))
 {
@@ -11,6 +10,9 @@
 
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
+
+    @*This DIV is required for JQuery to add hidden input values to*@
+    <div id="informationPanel"></div>
 
     <h4 class="pt-2">Information</h4>
 
@@ -26,7 +28,8 @@
     @* Name *@
     <div class="md-form">
         @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control" } })
-        @Html.Label("Exhibit Name", htmlAttributes: new { @class = "" })
+        @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.DatasetName) ? "active" : "" })
+
 
         @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
     </div>
@@ -35,7 +38,6 @@
     <div class="md-form mb-0">
         @Html.TextAreaFor(model => model.DatasetDesc, new { @class = "md-textarea w-100" })
         @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "" })
-
         @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
         <span class="text-muted">
             <em>This description will be shown on the Exhibit Search Page.</em>
@@ -43,7 +45,7 @@
     </div>
     @* Categories *@
     <div>
-        @Html.DropDownListFor(model => model.DatasetCategoryIds, Model.AllCategories, new { @class = "mdb-select md-form", multiple = "true" })
+        @Html.ListBoxFor(model => model.DatasetCategoryIds, Model.AllCategories, new { @class = "mdb-select md-form", multiple = "true" })
         @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "mdb-main-label" })
         @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
     </div>
@@ -51,14 +53,14 @@
 
     @* Business Unit *@
     <div>
-        @Html.DropDownListFor(model => model.DatasetBusinessUnitIds, Model.AllBusinessUnits, new { @class = "mdb-select md-form", multiple = "true" })
+        @Html.ListBoxFor(model => model.DatasetBusinessUnitIds, Model.AllBusinessUnits, new { @class = "mdb-select md-form", multiple = "true" })
         @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "mdb-main-label" })
         @Html.ValidationMessageFor((model) => model.DatasetBusinessUnitIds, "", new { @class = "text-danger" })
     </div>
 
     @* Function *@
     <div>
-        @Html.DropDownListFor(model => model.DatasetFunctionIds, Model.AllDatasetFunctions, new { @class = "mdb-select md-form", multiple = "true" })
+        @Html.ListBoxFor(model => model.DatasetFunctionIds, Model.AllDatasetFunctions, new { @class = "mdb-select md-form", multiple = "true" })
         @Html.LabelFor((model) => model.DatasetFunctionIds, new { @class = "mdb-main-label" })
         @Html.ValidationMessageFor((model) => model.DatasetFunctionIds, "", new { @class = "text-danger" })
     </div>
@@ -85,6 +87,7 @@
         @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "" })
         @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
     </div>
+
     <div class="md-form urlDescription">
         <label class="control-label"></label>
         <span class="text-muted">
@@ -122,7 +125,31 @@
             }
         </div>
     </div>
-    <br />
+
+
+    <div>
+
+        @if (Model.CLA1130_SHOW_ALTERNATE_EMAIL)        //JUST REMOVE THIS LINE WHEN FEATURE GOES LIVE
+        {
+            <div class="md-form">
+                @Html.EditorFor(model => model.AlternateContactEmail, new { htmlAttributes = new { @class = "form-control", @type = "email" } })
+                @Html.LabelFor(model => model.AlternateContactEmail, htmlAttributes: new { @class = !String.IsNullOrEmpty(Model.AlternateContactEmail) ? "active" : "" })
+                @Html.ValidationMessageFor(model => model.AlternateContactEmail, "", new { @class = "text-danger" })
+            </div>
+            <span class="text-muted">
+                <em>Email Address like a Distribution List or Alternate Contact.</em>
+            </span>
+        }
+        <br />
+        <br />
+
+    </div>
+
+
+
+
+
+
 
     @* Thumbnails *@
     <div class="form-group">
@@ -175,7 +202,6 @@
     <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
     <script>
         $(function () {
-            $('#DatasetCategoryIds').materialSelect();
             data.Report.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
         });
     </script>

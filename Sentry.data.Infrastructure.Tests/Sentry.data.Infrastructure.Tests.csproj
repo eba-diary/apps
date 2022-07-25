@@ -94,6 +94,9 @@
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.FeatureFlags.1.0.4\lib\net452\Sentry.FeatureFlags.dll</HintPath>
+    </Reference>
     <Reference Include="Sentry.NHibernate, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.NHibernate.1.1.0\lib\net452\Sentry.NHibernate.dll</HintPath>
     </Reference>
@@ -120,6 +123,7 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
@@ -140,6 +144,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ConfluentConnectorProviderTests.cs" />
     <Compile Include="ApacheLivyProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RetrieverJobTests.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="EventServiceTests.cs" />
     <Compile Include="SparkConverterStatusEventHandlerTests.cs" />
     <Compile Include="FilterSearchServiceTests.cs" />
+    <Compile Include="FileDeleteEventHandlerTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +164,18 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="ExpectedJSON\ConfluentConnectors.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnectors_Names.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnector_Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnector_Status.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +187,9 @@
       <Project>{c766d10b-0008-4cc8-a0c0-5818e5ee464a}</Project>
       <Name>Sentry.data.Infrastructure</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

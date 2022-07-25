@@ -5,12 +5,14 @@ using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
+using RestSharp.Authenticators;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
+using Sentry.data.Infrastructure.ServiceImplementations;
 using Sentry.Messaging.Common;
 using System;
 using System.Linq;
@@ -107,6 +109,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
             registry.For<IMessageHandler<string>>().Add<SparkConverterEventService>();
+            registry.For<IMessageHandler<string>>().Add<FileDeleteEventService>();
 
             //Wire up Obsidian provider
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
@@ -139,6 +142,7 @@ namespace Sentry.data.Infrastructure
 
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
+            registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
@@ -171,6 +175,15 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
 
+            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().
+                Ctor<RestSharp.IRestClient>().Is(new RestSharp.RestClient()
+                {
+                    BaseUrl = new Uri(Configuration.Config.GetHostSetting("SecBotUrl")),
+                    Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
+                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+                }).
+                AlwaysUnique();
+
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();
             registry.For<IReadOnlyPolicyRegistry<string>>().Singleton().Use(pollyRegistry);
@@ -178,6 +191,7 @@ namespace Sentry.data.Infrastructure
 
             //register polly policies
             registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<ConfluentConnectorProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
@@ -192,6 +206,18 @@ namespace Sentry.data.Infrastructure
             registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
                 .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
+
+
+            //establish httpclient specific to ConfluentConnectorProvider
+            var confluentConnectorClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            confluentConnectorClient.DefaultRequestHeaders.Accept.Clear();
+            confluentConnectorClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            confluentConnectorClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            var confluentConnectorHttpClientProvider = new HttpClientProvider(confluentConnectorClient);
+
+            registry.For<IKafkaConnectorProvider>().Singleton().Use<ConfluentConnectorProvider>().
+                Ctor<IHttpClientProvider>().Is(confluentConnectorHttpClientProvider).Ctor<string>("baseUrl").Is(Configuration.Config.GetHostSetting("ConfluentConnectorApi"));
+
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
