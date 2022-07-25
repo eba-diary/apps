@@ -81,19 +81,22 @@
     }
 </ul>
 
-<div class="float-right mt-4">
-    <ul class="pagination">
-        <li class="page-item">
-            <a class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</a>
-        </li>
-        <li class="page-item"><a class="page-link waves-effect" href="#">1</a></li>
-        <li class="page-item active"><a class="page-link waves-effect" href="#">2</a></li>
-        <li class="page-item"><a class="page-link waves-effect" href="#">3</a></li>
-        <li class="page-item"><a class="page-link waves-effect" href="#">4</a></li>
-        <li class="page-item disabled"><a class="page-link waves-effect" href="#">...</a></li>
-        <li class="page-item"><a class="page-link waves-effect" href="#">7</a></li>
-        <li class="page-item">
-            <a class="page-link next waves-effect" href="#" aria-label="Next">Next</a>
-        </li>
-    </ul>
-</div>
+@if (Model.PageItems?.Any() == true)
+{
+    <div class="float-right mt-4">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link previous waves-effect @(Model.PageItems.First().IsActive ? "disabled" : "")" href="#" aria-label="Previous">Previous</a>
+            </li>
+
+            @foreach (PageItemModel item in Model.PageItems)
+            {
+                <li class="page-item tile-page-item @(item.IsActive ? "active" : "") @(item.IsDisabled ? "disabled" : "")" data-page="@item.PageNumber"><a class="page-link waves-effect" href="#">@item.PageNumber</a></li>
+            }
+
+            <li class="page-item">
+                <a class="page-link next waves-effect @(Model.PageItems.Last().IsActive ? "disabled" : "")" href="#" aria-label="Next">Next</a>
+            </li>
+        </ul>
+    </div>
+}

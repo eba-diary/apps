@@ -478,5 +478,10 @@
             public const string SEARCHDATASETS = "SearchDatasets";
             public const string DATASETSUMMARY = "DatasetSummaryMetadata";
         }
+
+        public static class Pagination
+        {
+            public const string ELLIPSIS = "...";
+        }
     }
 }

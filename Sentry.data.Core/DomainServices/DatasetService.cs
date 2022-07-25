@@ -609,9 +609,11 @@ namespace Sentry.data.Core
                                                                       !x.IsBundled);
         }
 
-        public List<DatasetTileDto> SearchDatasets(DatasetSearchDto datasetSearchDto)
+        public DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto)
         {
             List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
+            List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
+            int totalResults = 0;
 
             try
             {
@@ -646,6 +648,12 @@ namespace Sentry.data.Core
 
                 IEnumerable<DatasetTileDto> dtoEnumerable;
 
+                //filter
+                //get total results
+
+                //get new filters
+
+                //order
                 if (datasetSearchDto.OrderByDescending)
                 {
                     dtoEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
@@ -662,7 +670,16 @@ namespace Sentry.data.Core
                 Logger.Error("Error searching datasets", ex);
             }
 
-            return datasetTileDtos;
+            DatasetSearchResultDto resultDto = new DatasetSearchResultDto()
+            {
+                PageSize = datasetSearchDto.PageSize,
+                PageNumber = datasetSearchDto.PageNumber,
+                Tiles = datasetTileDtos,
+                FilterCategories = filterCategories,
+                TotalResults = totalResults
+            };
+
+            return resultDto;
         }
 
         #region "private functions"

@@ -5,25 +5,35 @@
     },
 
     executeSearch: function () {
-        data.FilterSearch.completeSearch(0, 0, 0);
-        //use jquery load function
-        //in callback, get the counts for result information from hidden elements
+        this.executeSearch(1, true);
+    },
+
+    executeSearch: function (pageNumber, reloadFilters) {
+        //build search request
+        var request = data.FilterSearch.buildSearchRequest();
+        request.PageNumber = pageNumber;
+        request.PageSize = $("#tile-result-page-size").val();
+        request.SortBy = $("#tile-result-sort").val();
+
+        //get tiles
+        $.post("/DatasetSearch/GetTileResultsModel/", request, function (tileResultsModel) {
+            //load result view
+            $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
+                data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
+            });
+
+            if (reloadFilters) {
+                data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
+            }
+        });
     },
 
     buildFilter: function () {
-
-        //one option is to have the separate controller method to get the categories and run the group queries on the datasets to build the filters model
-        //another option would be to on executeSearch, make ajax request to get the list of datasets that result from the query
-        //then send that result back to another controller method that will load the partial view AND send the results to a controller method that will translate the results to the filters model
-        //
-        //Option 2 is probably more performant than running query twice
-        //Can refactor the ResultView stuff again and probably take out the need for the Results() override
-        //put ResultView back in FilterSearchModel and check if not null to render it
-        data.FilterSearch.completeFilterRetrieval(null)
+        //executeSearch is handling both result and filter creation
     },
 
     retrieveResultConfig: function () {
-
+        //no result config yet, might use for saving the sort by and page size
     },
 
     initUI: function () {
@@ -63,10 +73,12 @@
         });
 
         //sort by change
-
+        //call executeSearch(1, false);
 
         //page size change
+        //call executeSearch(1, false);
 
         //page change
+        //call executeSearch($(".tile-page-item.active").data("page"), false);
     }
 }

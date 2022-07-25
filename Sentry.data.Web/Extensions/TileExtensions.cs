@@ -1,14 +1,28 @@
 ﻿using Sentry.data.Core;
-using System;
+using Sentry.data.Web.Helpers;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Sentry.data.Web
 {
     public static class TileExtensions
     {
-        public static List<TileModel> ToModel(this List<DatasetTileDto> dtos)
+        public static TileResultsModel ToModel(this DatasetSearchResultDto dto, int selectedSortByValue)
+        {
+            TileResultsModel model = new TileResultsModel()
+            {
+                TotalResults = dto.TotalResults,
+                Tiles = dto.Tiles.ToModel(),
+                FilterCategories = dto.FilterCategories.ToModel(),
+                PageSizeOptions = Utility.BuildTilePageSizeOptions(dto.PageSize.ToString()),
+                SortByOptions = Utility.BuildDatasetSortByOptions(selectedSortByValue),
+                PageItems = Utility.BuildPageItemList(dto.TotalResults)
+            };
+
+            return model;
+        }
+
+        private static List<TileModel> ToModel(this List<DatasetTileDto> dtos)
         {
             return dtos.Select(x => x.ToModel()).ToList();
         }

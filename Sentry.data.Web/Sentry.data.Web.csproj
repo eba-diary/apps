@@ -448,6 +448,7 @@
     <Compile Include="Models\Search\SaveSearchModel.cs" />
     <Compile Include="Models\Search\TileModel.cs" />
     <Compile Include="Models\Search\TileResultsModel.cs" />
+    <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
@@ -1208,6 +1209,7 @@
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
     <Content Include="Views\Search\TileResults.cshtml" />
+    <Content Include="Views\Search\Tiles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

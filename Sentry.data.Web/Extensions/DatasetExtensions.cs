@@ -85,41 +85,5 @@ namespace Sentry.data.Web
                 SchemaName = dto.SchemaName
             };
         }
-
-        public static DatasetSearchDto ToDto(this DatasetSearchModel model)
-        {
-            DatasetSearchDto dto = new DatasetSearchDto()
-            {
-                PageSize = model.PageSize,
-                PageNumber = model.PageNumber
-            };
-
-            switch ((DatasetSortByOption)model.SortBy)
-            {
-                case DatasetSortByOption.Alphabetical:
-                    dto.OrderByField = x => x.Name;
-                    break;
-                case DatasetSortByOption.Favorites:
-                    dto.OrderByField = x => x.IsFavorite;
-                    dto.OrderByDescending = true;
-                    break;
-                case DatasetSortByOption.MostAccessed:
-                    dto.OrderByField = x => x.PageViews;
-                    dto.OrderByDescending = true;
-                    break;
-                case DatasetSortByOption.RecentlyAdded:
-                    dto.OrderByField = x => x.CreatedDateTime;
-                    dto.OrderByDescending = true;
-                    break;
-                case DatasetSortByOption.RecentlyUpdated:
-                    dto.OrderByField = x => x.LastUpdated;
-                    dto.OrderByDescending = true;
-                    break;
-                default:
-                    break;
-            }
-
-            return dto;
-        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Nest;
+using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
@@ -42,20 +43,30 @@ namespace Sentry.data.Web.Controllers
         [ChildActionOnly]
         public override ActionResult Results()
         {
-            DatasetSearchModel datasetSearchModel = new DatasetSearchModel()
-            {
-                PageNumber = 1,
-                PageSize = 10,
-                SortBy = 1
-            };
-
             TileResultsModel tileResultsModel = new TileResultsModel()
             {
-                PageSizeOptions = Utility.BuildTilePageSizeOptions(),
+                PageSizeOptions = Utility.BuildTilePageSizeOptions("10"),
                 SortByOptions = Utility.BuildDatasetSortByOptions(),
-                Tiles = GetTileModels(datasetSearchModel)
+                Tiles = new List<TileModel>(),
+                PageItems = new List<PageItemModel>()
             };
 
+            return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
+        }
+
+        [HttpPost]
+        public JsonResult GetTileResultsModel(DatasetSearchModel datasetSearchModel)
+        {
+            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
+            DatasetSearchResultDto resultDto = _datasetService.SearchDatasets(datasetSearchDto);
+            TileResultsModel tileModels = resultDto.ToModel(datasetSearchModel.SortBy);
+
+            return Json(tileModels);
+        }
+
+        [HttpPost]
+        public ActionResult TileResults(TileResultsModel tileResultsModel)
+        {
             return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
 
@@ -68,14 +79,6 @@ namespace Sentry.data.Web.Controllers
                 IconPath = "~/Images/Icons/DatasetsBlue.svg",
                 DefaultSearch = searchModel
             };
-        }
-
-        private List<TileModel> GetTileModels(DatasetSearchModel searchModel)
-        {
-            DatasetSearchDto datasetSearchDto = searchModel.ToDto();
-            List<DatasetTileDto> dtos = _datasetService.SearchDatasets(datasetSearchDto);
-            List<TileModel> models = dtos.ToModel();
-            return models;
         }
     }
 }
