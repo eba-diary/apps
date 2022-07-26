@@ -41,7 +41,7 @@ namespace Sentry.data.Web.Controllers.WebApi
                 }
             }
             SupportLinkDto supportLinkDto = new SupportLinkDto();
-            supportLinkDto = AdminExtensions.ToDto.Add(supportLinkDto, supportLinkDto);
+            //supportLinkDto = AdminExtensions.ToDto.Add(supportLinkDto, supportLinkDto);
             SupportLinkDto supportLinkDto = new SupportLinkDto()
             {
                 SupportLinkId = supportLinkModel.SupportLinkId,
@@ -51,14 +51,12 @@ namespace Sentry.data.Web.Controllers.WebApi
             };
             SupportLinkService.AddSupportLink(supportLinkDto);
             // if true return ok otherwise return content has a bad request
+            return Ok();
         }
 
         public IHttpActionResult DeleteSupportLink(int id)
         {
-            try
-            {
-
-            }
+            return Ok();
         }
 
         public ActionResult Index()
