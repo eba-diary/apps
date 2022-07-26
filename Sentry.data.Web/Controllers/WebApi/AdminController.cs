@@ -12,7 +12,7 @@ using Sentry.data.Core.DTO.Admin;
 
 namespace Sentry.data.Web.Controllers.WebApi
 {
-    public class AdminController : Controller
+    public class AdminController : BaseWebApiController
     {
         private readonly ISupportLink _supportLinkService;
 
@@ -28,6 +28,10 @@ namespace Sentry.data.Web.Controllers.WebApi
 
         public IHttpActionResult AddSupportLink(SupportLinkModel supportLinkModel)
         {
+            if(supportLinkModel.Name == null || supportLinkModel.Url == null)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Invalid parameters passed");
+            }
             SupportLinkDto supportLinkDto = new SupportLinkDto()
             {
                 SupportLinkId = supportLinkModel.SupportLinkId,
@@ -36,7 +40,7 @@ namespace Sentry.data.Web.Controllers.WebApi
                 Url = supportLinkModel.Url,
             };
             SupportLinkService.AddSupportLink(supportLinkDto);
-            return Ok();
+            // if true return ok otherwise return content has a bad request
         }
 
         public IHttpActionResult DeleteSupportLink(int id)
