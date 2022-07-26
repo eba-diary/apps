@@ -53,34 +53,15 @@ namespace Sentry.data.Infrastructure
                 baseUri = baseUri.Remove(place, Find.Length).Insert(place, Replace);
             }
 
-            NetworkCredential proxyCredentials;
-            string proxyUrl;
-
-            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
-            {
-                Logger.Debug($"{methodName} using edge proxy: true");
-                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                proxyCredentials = new NetworkCredential(userName, password);
-            }
-            else
-            {
-                Logger.Debug($"{methodName} using edge proxy: false");
-                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-            }
-
-            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
-
             _client = new RestClient
             {
-                BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(proxyUrl)
-                {
-                    Credentials = proxyCredentials
-                }
+                BaseUrl = new Uri(baseUri)
             };
+
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
+            {
+                _client.Proxy = webProxy;
+            }
 
             Logger.Debug($"{methodName} Method End");
         }
@@ -131,7 +112,7 @@ namespace Sentry.data.Infrastructure
 
             FindTargetJob();
 
-            SetTargetPath(resp.ParseContentType());
+            SetTargetPath(ParseContentType(resp.ContentType));
                 
             /*
                 * Google API will not return compressed files, therefore, no need to check whether job
@@ -275,31 +256,11 @@ namespace Sentry.data.Infrastructure
 
             if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
-                NetworkCredential proxyCredentials;
-                string proxyUrl;
-
-                if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+                var httpHandler = new System.Net.Http.HttpClientHandler();
+                if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
                 {
-                    string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                    string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                    proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                    proxyCredentials = new NetworkCredential(userName, password);
+                    httpHandler.Proxy = webProxy;
                 }
-                else
-                {
-                    proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                    proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-                }
-
-                Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
-
-                var httpHandler = new System.Net.Http.HttpClientHandler()
-                {
-                    Proxy = new WebProxy(proxyUrl)
-                    {
-                        Credentials = proxyCredentials
-                    }
-                };
 
                 var httpClient = new System.Net.Http.HttpClient(httpHandler);
 
@@ -362,9 +323,9 @@ namespace Sentry.data.Infrastructure
 
             byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
 
-            _ = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            string privateKey = EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
 
-            byte[] keyBytes = Convert.FromBase64String(EncryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
+            byte[] keyBytes = Convert.FromBase64String(privateKey);
 
             var asymmetricKeyParameter = PrivateKeyFactory.CreateKey(keyBytes);
             var rsaKeyParameter = (RsaKeyParameters)asymmetricKeyParameter;

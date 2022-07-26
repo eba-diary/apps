@@ -828,7 +828,7 @@ namespace Sentry.data.Core.Tests
                 {
                     SecurityId = new Guid("16FBB09F-52E7-4DA7-9724-A9EB011824AE")
                 },
-                Permissions = BuildMockSecurityPermissions()
+                AddedPermissions = BuildMockSecurityPermissions()
             };
         }
 

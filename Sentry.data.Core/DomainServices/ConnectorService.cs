@@ -54,7 +54,15 @@ namespace Sentry.data.Core
         /// <returns>Specified JSON Connector config object</returns>
         public async Task<JObject> GetS3ConnectorConfigJSONAsync(string connectorName)
         {
-            return await _connectorProvider.GetS3ConnectorConfigAsync(connectorName);
+            JObject configJObj = await _connectorProvider.GetS3ConnectorConfigAsync(connectorName);
+
+            // Remove sensitive key
+            configJObj.Remove("s3.proxy.password");
+
+            // Order object by ascending for readability purposes
+            JObject returnObj = new JObject(configJObj.Properties().OrderBy(p => p.Name));
+
+            return returnObj;
         }
     }
 }

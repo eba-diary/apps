@@ -30,7 +30,8 @@ namespace Sentry.data.Infrastructure
             {
                 new HiveMetadataService(),
                 new SnowflakeEventService(),
-                new SparkConverterEventService()
+                new SparkConverterEventService(),
+                new FileDeleteEventService()
             };
 
             return handlers;
