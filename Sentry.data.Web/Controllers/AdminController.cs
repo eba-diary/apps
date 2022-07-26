@@ -58,7 +58,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
         {
-            // Convert tim
+            // Conver selectedDate string to a DateTime object
             DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
             List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
