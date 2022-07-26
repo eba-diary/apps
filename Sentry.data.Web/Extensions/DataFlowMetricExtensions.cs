@@ -18,13 +18,25 @@ namespace Sentry.data.Web
             };
             return dto;
         }
-        public static DataFlowMetricGroupModel ToModel(List<DataFileFlowMetricsDto> fileGroups)
+        public static List<DataFlowMetricGroupModel> ToModels(List<DataFileFlowMetricsDto> fileGroups)
         {
-            DataFlowMetricGroupModel model = new DataFlowMetricGroupModel()
+            List<DataFlowMetricGroupModel> models = new List<DataFlowMetricGroupModel>();
+            foreach(DataFileFlowMetricsDto fileGroup in fileGroups)
             {
-                DataFlowMetricGroups = fileGroups,
-            };
-            return model;
+                models.Add(new DataFlowMetricGroupModel()
+                {
+                    DatasetFileId = fileGroup.DatasetFileId,
+                    FileName = fileGroup.FileName,
+                    FirstEventTime = fileGroup.FirstEventTime,
+                    LastEventTime = fileGroup.LastEventTime,
+                    Duration = fileGroup.Duration,
+                    FlowEvents = fileGroup.FlowEvents,
+                    AllEventsPresent = fileGroup.AllEventsPresent,
+                    AllEventsComplete = fileGroup.AllEventsComplete,
+                    TargetCode = fileGroup.TargetCode,
+                });
+            }
+            return models;
         }
     }
 }

@@ -260,9 +260,9 @@ data.Admin = {
         })
         $("#submitButton").click(function (event) {
             var dto = new Object();
-            dto.FileToSearch = $("#fileDropdown").find(":selected").val();
-            dto.DatasetToSearch = $("#AllDatasets").find(":selected").val();
-            dto.SchemaToSearch = $("#schemaDropdown").find(":selected").val();
+            dto.DatasetFileId = $("#fileDropdown").find(":selected").val();
+            dto.DatasetId = $("#AllDatasets").find(":selected").val();
+            dto.SchemaId = $("#schemaDropdown").find(":selected").val();
             var table = $('#metricGroupsTable').DataTable({
                 destroy: true,
                 ajax: {
@@ -342,11 +342,6 @@ data.Admin = {
                     icon.removeClass('fa-plus')
                 }
             });
-            /*
-             * Below is related to the accordion partial view, which is not currently used
-            var url = $(this).data("url");
-            $("#accordion-view-area").load(url);
-            */
         })
     },
     // Loads Admin jobs pages

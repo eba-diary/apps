@@ -20,11 +20,13 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult PopulateTable(DataFlowMetricSearchModel searchModel)
         {
+            searchModel.DatasetId = 464;
+            searchModel.SchemaId = 1946;
+            searchModel.DatasetFileId = -1;
             DataFlowMetricSearchDto searchDto = DataFlowMetricExtensions.ToDto(searchModel);
             List<DataFileFlowMetricsDto> fileGroups = _dataFlowMetricService.GetFileMetricGroups(searchDto);
-            DataFlowMetricGroupModel dataFlowMetricGroupModel = DataFlowMetricExtensions.ToModel(fileGroups);
-            dataFlowMetricGroupModel.DataFlowMetricGroups = fileGroups;
-            JsonResult result = Json(dataFlowMetricGroupModel.DataFlowMetricGroups, JsonRequestBehavior.AllowGet);
+            List<DataFlowMetricGroupModel> dataFlowMetricGroupModels = DataFlowMetricExtensions.ToModels(fileGroups);
+            JsonResult result = Json(dataFlowMetricGroupModels, JsonRequestBehavior.AllowGet);
             return result;
         }
     }
