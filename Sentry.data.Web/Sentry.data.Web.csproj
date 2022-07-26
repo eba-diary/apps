@@ -436,6 +436,7 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
     <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />

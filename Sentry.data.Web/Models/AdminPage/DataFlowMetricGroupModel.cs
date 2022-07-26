@@ -13,7 +13,7 @@ namespace Sentry.data.Web
         public DateTime FirstEventTime { get; set; }
         public DateTime LastEventTime { get; set; }
         public string Duration { get; set; }
-        public List<DataFlowMetricDto> FlowEvents { get; set; }
+        public List<DataFlowMetricModel> FlowEvents { get; set; }
         public bool AllEventsPresent { get; set; }
         public bool AllEventsComplete { get; set; }
         public string TargetCode { get; set; }
