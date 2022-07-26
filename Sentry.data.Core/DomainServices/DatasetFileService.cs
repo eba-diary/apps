@@ -1,16 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
-using Hangfire;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers.Paginate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core.Interfaces;
 
@@ -110,22 +105,6 @@ namespace Sentry.data.Core
             return error;
         }
 
-        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
-        {
-            try
-            {
-                //UPDATE OBJECTSTATUS
-                dbList.ForEach(f => f.ObjectStatus = status);
-                _datasetContext.SaveChanges();
-            }
-            catch (System.Exception ex)
-            {
-                //log list of Ids by exception
-                string msg = "Error marking DatasetFile rows as Deleted";
-                Logger.Error(msg, ex);
-                throw;
-            }
-        }
 
         public UserSecurity GetUserSecurityForDatasetFile(int datasetId)
         {
@@ -162,28 +141,30 @@ namespace Sentry.data.Core
          */
         public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
-            bool successfullySubmitted = true;
+            bool submittedSuccessful = true;
 
-            try
+            int batchSize = 100;
+            int counter = 1;
+            List<int> batch = datasetFileIds.Take(batchSize).ToList();
+            int tempDatasetFileId = -1;
+            while (batch.Any())
             {
-                int batchSize = 100;
-                int counter = 1;
-                List<int> batch = datasetFileIds.Take(batchSize).ToList();
-
-                while (batch.Any())
+                try
                 {
-                    _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, batch), TimeSpan.FromSeconds(30 * counter)); // this is returning null
-                    counter++;
-                    batch = batch.Skip(batchSize*counter).Take(batchSize).ToList();
+                    foreach (int id in batch)
+                    {
+                        tempDatasetFileId = id;
+                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter));
+                    }
+                } catch (Exception ex)
+                {
+                    submittedSuccessful = false;
+                    Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
                 }
+                counter++;    
+                batch = batch.Skip(batchSize * counter).ToList();  
             }
-            catch (System.Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                successfullySubmitted = false;
-            }
-
-            return successfullySubmitted;
+            return submittedSuccessful;
         }
 
         #region PrivateMethods
@@ -272,41 +253,79 @@ namespace Sentry.data.Core
         private void DeleteS3(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
             //CONVERT LIST TO GENERIC ARRAY IN PREP FOR PublishDSCEvent and ERROR HANDLING
-            string[] idList = dbList.Select(s => s.DatasetFileId.ToString()).ToArray();
+            int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
 
             try
             {
                 //CHUNK INTO 10 id's PER MESSAGE
-                string[] buffer;
+                int[] buffer;
                 for (int i = 0; i < idList.Length; i += 10)
                 {
                     int chunk = (idList.Length - i < 10) ? idList.Length - i : 10;          //ENSURE LAST CHUNK ONLY HAS WHAT REMAINS
-                    buffer = new string[chunk];
-                    Array.Copy(idList, i, buffer, 0, chunk);
+                    buffer = new int[chunk];
+                    Array.Copy(idList, i, buffer, 0, chunk );
 
-                    S3DeleteFilesModel model = CreateS3DeleteFilesModel(datasetId, schemaId, buffer);
-
+                    DeleteFilesRequestModel model = CreateDeleteFilesRequestModel(datasetId,schemaId,buffer);
+                    
                     //PUBLISH DSC DELETE EVENT
                     _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
                 }
             }
             catch (System.Exception ex)
             {
-                string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " +
-                            JsonConvert.SerializeObject(CreateS3DeleteFilesModel(datasetId, schemaId, idList));
-
+                string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " + 
+                            JsonConvert.SerializeObject(CreateDeleteFilesRequestModel(datasetId, schemaId, idList));
+                
                 Logger.Error(errorMsg, ex);
                 throw;
             }
         }
 
-        private S3DeleteFilesModel CreateS3DeleteFilesModel(int datasetId, int schemaId, string[] datasetFileIdList)
+
+        public void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status)
         {
-            S3DeleteFilesModel model = new S3DeleteFilesModel()
+            try
+            {
+                //UPDATE OBJECTSTATUS
+                dbList.ForEach(f => f.ObjectStatus = status);
+                _datasetContext.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                string msg = "Error marking DatasetFile rows as Deleted";
+                Logger.Error(msg, ex);
+                throw;
+            }
+        }
+
+        
+        public void UpdateObjectStatus(int[] idList, GlobalEnums.ObjectStatusEnum status)
+        {
+            try
+            {
+                if(idList != null)
+                {
+                    List<DatasetFile> dbList = _datasetContext.DatasetFileStatusAll.Where(w => idList.Contains(w.DatasetFileId)).ToList();
+                    UpdateObjectStatus(dbList, status);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                string msg = "Error marking DatasetFile row as " + status.GetDescription();
+                Logger.Error(msg, ex);
+                throw;
+            }
+        }
+
+
+
+        private DeleteFilesRequestModel CreateDeleteFilesRequestModel(int datasetId, int schemaId, int[] datasetFileIdList)
+        {
+            DeleteFilesRequestModel model = new DeleteFilesRequestModel()
             {
                 DatasetID = datasetId,
                 SchemaID = schemaId,
-                RequestGUID = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
+                RequestGUID = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff"),
                 DatasetFileIdList = datasetFileIdList
             };
 
@@ -318,42 +337,50 @@ namespace Sentry.data.Core
          * @param int stepid
          * @param int[] datasetFileIds
         */
-        private bool ReprocessDatasetFile(int stepId, List<int> datasetFileIds)
+        private void ReprocessDatasetFile(int stepId, int datasetFileId)
         {
             try
             {
-                //List<DatasetFile> datasetFiles = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileIds).ToList();
                 DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
-                string triggerFileLocation, triggerFileContent;
-                foreach (int id in datasetFileIds)
+                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+                KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
+                if (response.Key == null || response.Value == null)
                 {
-                    DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == id).FirstOrDefault();
-                    triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
-                    if (triggerFileLocation != null)
+                    string errorMessage = "";
+                    if (response.Key == null)
                     {
-                        triggerFileContent = GetSourceBucketAndSourceKey(datasetFile);
-                        if (triggerFileContent != null)
-                        {
-                            _s3ServiceProvider.UploadDataFile(triggerFileLocation, triggerFileContent);
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
+
                     }
-                    else
+                    else if (response.Value == null)
                     {
-                        return false;
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
+
                     }
+                    throw new Exception(errorMessage);
+                }
+                else
+                {
+                    _s3ServiceProvider.UploadDataFile(response.Key, response.Value);
                 }
             } catch (Exception ex)
             {
-                // the case when reprocessing fails
-                Console.WriteLine(ex.Message);
-                return false;
+                Logger.Error("Reprocessig failed ", ex);
+                throw; // this will be caught in hangfire indicating failed job
             }
             
-            return true;
+        }
+
+        /*
+         * Creating a wrapper method to incorporate both the helper methods GetTriggerFileLocation and GetSourceBucketAndSourceKey
+         */
+        private KeyValuePair<string, string> GetTriggerFileLocationAndSourceBucketKey(DataFlowStep dataFlowStep, DatasetFile datasetFile)
+        {
+            string triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
+            string sourceBucketKey = GetSourceBucketAndSourceKey(datasetFile);
+            KeyValuePair<string, string> result = new KeyValuePair<string, string>(triggerFileLocation, sourceBucketKey);
+            return result;
         }
 
         /*

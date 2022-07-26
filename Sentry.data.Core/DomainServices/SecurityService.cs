@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
+using Hangfire;
+using Sentry.data.Core.DTO.Security;
 
 namespace Sentry.data.Core
 {
@@ -21,14 +23,27 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IInevService _inevService;
         private readonly IQuartermasterService _quartermasterService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IObsidianService _obsidianService;
+        private readonly IAdSecurityAdminProvider _adSecurityAdminProvider;
 
-        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider, IDataFeatures dataFeatures, IInevService inevService, IQuartermasterService quartermasterService)
+        public SecurityService(IDatasetContext datasetContext,
+                               IBaseTicketProvider baseTicketProvider,
+                               IDataFeatures dataFeatures,
+                               IInevService inevService,
+                               IQuartermasterService quartermasterService,
+                               IBackgroundJobClient backgroundJobClient,
+                               IObsidianService obsidianService,
+                               IAdSecurityAdminProvider adSecurityAdminProvider)
         {
             _datasetContext = datasetContext;
             _baseTicketProvider = baseTicketProvider;
             _dataFeatures = dataFeatures;
             _inevService = inevService;
             _quartermasterService = quartermasterService;
+            _backgroundJobClient = backgroundJobClient;
+            _obsidianService = obsidianService;
+            _adSecurityAdminProvider = adSecurityAdminProvider;
         }
 
         public async Task<string> RequestPermission(AccessRequest model)
@@ -36,33 +51,9 @@ namespace Sentry.data.Core
             string ticketId = _baseTicketProvider.CreateChangeTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
-                Security security = _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
+                Security security = model.Scope.Equals(AccessScope.Asset) ? GetSecurityForAsset(model.SecurableObjectName) : _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
 
-                SecurityTicket ticket = new SecurityTicket()
-                {
-                    TicketId = ticketId,
-                    AdGroupName = model.AdGroupName,
-                    GrantPermissionToUserId = model.PermissionForUserId,
-                    TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
-                    RequestedById = model.RequestorsId,
-                    RequestedDate = model.RequestedDate,
-                    IsAddingPermission = model.IsAddingPermission,
-                    IsRemovingPermission = !model.IsAddingPermission,
-                    ParentSecurity = security,
-                    Permissions = new List<SecurityPermission>(),
-                    AwsArn = model.AwsArn
-                };
-
-                foreach (Permission perm in model.Permissions)
-                {
-                    ticket.Permissions.Add(new SecurityPermission()
-                    {
-                        AddedDate = DateTime.Now,
-                        Permission = perm,
-                        AddedFromTicket = ticket,
-                        IsEnabled = false
-                    });
-                }
+                SecurityTicket ticket = model.IsAddingPermission ? BuildAddingPermissionTicket(ticketId, model, security) : BuildRemovingPermissionTicket(ticketId, model, security);
 
                 security.Tickets.Add(ticket);
 
@@ -73,6 +64,72 @@ namespace Sentry.data.Core
                 return ticketId;
             }
             return string.Empty;
+        }
+
+        public virtual SecurityTicket BuildAddingPermissionTicket(string ticketId, AccessRequest model, Security security)
+        {
+            SecurityTicket ticket = new SecurityTicket()
+            {
+                TicketId = ticketId,
+                AdGroupName = model.AdGroupName,
+                GrantPermissionToUserId = model.PermissionForUserId,
+                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                RequestedById = model.RequestorsId,
+                RequestedDate = model.RequestedDate,
+                IsAddingPermission = model.IsAddingPermission,
+                IsRemovingPermission = !model.IsAddingPermission,
+                ParentSecurity = security,
+                AddedPermissions = new List<SecurityPermission>(),
+                RemovedPermissions = new List<SecurityPermission>(),
+                AwsArn = model.AwsArn,
+                IsSystemGenerated = model.IsSystemGenerated
+            };
+
+            foreach (Permission perm in model.Permissions)
+            {
+                ticket.AddedPermissions.Add(new SecurityPermission()
+                {
+                    AddedDate = DateTime.Now,
+                    Permission = perm,
+                    AddedFromTicket = ticket,
+                    IsEnabled = false
+                });
+            }
+            return ticket;
+        }
+
+        public SecurityTicket BuildRemovingPermissionTicket(string ticketId, AccessRequest model, Security security)
+        {
+            SecurityTicket ticket = new SecurityTicket()
+            {
+                TicketId = ticketId,
+                AdGroupName = model.AdGroupName,
+                GrantPermissionToUserId = model.PermissionForUserId,
+                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                RequestedById = model.RequestorsId,
+                RequestedDate = model.RequestedDate,
+                IsAddingPermission = model.IsAddingPermission,
+                IsRemovingPermission = !model.IsAddingPermission,
+                ParentSecurity = security,
+                AddedPermissions = new List<SecurityPermission>(),
+                RemovedPermissions = new List<SecurityPermission>(),
+                AwsArn = model.AwsArn
+            };
+
+            foreach (Permission permission in model.Permissions)
+            {
+                SecurityTicket ticketForPermCode = security.Tickets.FirstOrDefault(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == permission.PermissionCode && p.IsEnabled && p.AddedFromTicket.TicketId == model.TicketId));
+                SecurityPermission toRemove = ticketForPermCode.AddedPermissions.First(p => p.Permission.PermissionCode == permission.PermissionCode);
+                toRemove.RemovedFromTicket = ticket;
+                ticket.AddedPermissions.Add(toRemove);
+            }
+
+            return ticket;
+        }
+
+        public Security GetSecurityForAsset(string keycode)
+        {
+            return _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(keycode)).Security;
         }
 
         /// <summary>
@@ -118,7 +175,7 @@ namespace Sentry.data.Core
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
             {
                 //build a adGroupName and  List(of permissionCode) anonymous obj.
-                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.adGroup != null).ToList();
+                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.AddedPermissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.adGroup != null).ToList();
                 //loop through the dictionary to see if the user is part of the group, if so grab the permissions.
                 foreach (var item in adGroups)
                 {
@@ -129,7 +186,7 @@ namespace Sentry.data.Core
                 }
 
                 //build a userId and  List(of permissionCode) anonymous obj.
-                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.userId != null).ToList();
+                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.AddedPermissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.userId != null).ToList();
                 //loop through the dictionary to see if the user is the user on the ticket, if so grab the permissions.
                 foreach (var item in userGroups)
                 {
@@ -163,6 +220,7 @@ namespace Sentry.data.Core
             us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
             us.CanManageSchema = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
             us.CanViewData = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (!securable.AdminDataPermissionsAreExplicit && IsAdmin);
+            us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, _dataFeatures);
 
             return us;
         }
@@ -205,7 +263,7 @@ namespace Sentry.data.Core
                 //filter the list down to only those that apply to this user (either by group membership or by direct ID)
                 userPermissions.AddRange(
                     tickets.Where(t => (t.AdGroupName != null && user.IsInGroup(t.AdGroupName)) || t.GrantPermissionToUserId == user.AssociateId)
-                        .SelectMany(g => g.Permissions)
+                        .SelectMany(g => g.AddedPermissions)
                         .Select(p => p.Permission.PermissionCode)
                 );
             }
@@ -232,12 +290,12 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
         {
-            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.TicketStatus.Equals(HpsmTicketStatus.PENDING));
+            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(GlobalConstants.HpsmTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
             if (inheritanceTicket != null && inheritanceTicket.TicketId != null)
             {
                 return inheritanceTicket;
             }
-            inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
+            inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.AddedPermissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
             return inheritanceTicket;
         }
 
@@ -247,7 +305,7 @@ namespace Sentry.data.Core
         /// </summary>
         internal static bool DoesSecurableInheritFromParent(ISecurable securable)
         {
-            var inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.Permissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
+            var inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.AddedPermissions.Any(p => p.IsEnabled && p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS));
             return (inheritanceTicket != null && securable.Parent != null);
         }
 
@@ -259,7 +317,7 @@ namespace Sentry.data.Core
         internal static IEnumerable<SecurityTicket> GetSecurityTicketsForSecurable(ISecurable securable, bool includePending = false)
         {
             var whereClause = includePending ? (Func<SecurityPermission, bool>)(y => y.RemovedDate == null) : (y => y.IsEnabled);
-            var tickets = securable.Security.Tickets.Select(t => { t.Permissions = t.Permissions.Where(whereClause).ToList(); return t; }).Where(t => t.Permissions.Any());
+            var tickets = securable.Security.Tickets.Select(t => { t.AddedPermissions = t.AddedPermissions.Where(whereClause).ToList(); return t; }).Where(t => t.AddedPermissions.Any());
             return tickets;
         }
 
@@ -286,8 +344,8 @@ namespace Sentry.data.Core
                 //exclude the "Inherit Parent" permission
                 results.AddRange(
                     tickets
-                    .Where(t => !t.Permissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.IsAddingPermission)
-                    .SelectMany(t => t.Permissions.Select(p => new SecurablePermission
+                    .Where(t => !t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && t.IsAddingPermission)
+                    .SelectMany(t => t.AddedPermissions.Select(p => new SecurablePermission
                     {
                         Scope = SecurablePermissionScope.Self,
                         ScopeSecurity = securable.Security,
@@ -427,7 +485,7 @@ namespace Sentry.data.Core
         {
             if (securable.Security?.Tickets != null)
             {
-                var groups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).ToList();
+                var groups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.AddedPermissions.Where(y => y.IsEnabled).ToList() }).ToList();
                 return groups.Select(s => s.adGroup).Distinct().Count();
             }
             else
@@ -439,47 +497,121 @@ namespace Sentry.data.Core
         /// <summary>
         /// A ticket in Cherwell has been approved
         /// </summary>
-        public async Task ApproveTicket(SecurityTicket ticket, string approveId)
+        public virtual async Task ApproveTicket(SecurityTicket ticket, string approveId)
         {
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
             ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.COMPLETED;
-
-            ticket.Permissions.ToList().ForEach(x =>
+            if (ticket.IsAddingPermission)
             {
-                x.IsEnabled = true;
-                x.EnabledDate = DateTime.Now;
-            });
-
-            if(ticket.Permissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
-            {
-                BuildS3RequestAssistance(ticket);
+                ticket.AddedPermissions.ToList().ForEach(x =>
+                {
+                    x.IsEnabled = true;
+                    x.EnabledDate = DateTime.Now;
+                });
             }
+            else
+            {
+                List<SecurityPermission> toRemove = _datasetContext.SecurityPermission.Where(p => p.RemovedFromTicket == ticket).ToList();
+                toRemove.ForEach(x =>
+                {
+                    x.IsEnabled = false;
+                    x.RemovedDate = DateTime.Now;
+                });
+            }
+
+            EvaluateApprovedTicketForS3Inheritance(ticket);
+
+            EvaluateApprovedTicketForS3Access(ticket);
 
             await PublishDatasetPermissionsUpdatedInfrastructureEvent(ticket);
 
         }
 
+        private void EvaluateApprovedTicketForS3Access(SecurityTicket ticket)
+        {
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS))
+            {
+                try
+                {
+                    if (ticket.ParentSecurity.SecurableEntityName.Equals(GlobalConstants.SecurableEntityName.DATASET))
+                    {
+                        BuildS3RequestAssistance(ticket);
+                    }
+                    else //Asset
+                    {
+                        string keycode = _datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode;
+                        List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(keycode) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+                        BuildS3RequestAssistance(datasets, ticket);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Sentry.Common.Logging.Logger.Fatal("Failed creating S3 Jira Request for Cherwell #" + ticket.TicketId, e);
+                }
+            }
+        }
+
+        private void EvaluateApprovedTicketForS3Inheritance(SecurityTicket ticket)
+        {
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+            {
+                //we can assume the securable here is a dataset currently, an asset doesn't have anything to inherit from
+                Dataset dataset = _datasetContext.Datasets.FirstOrDefault(ds => ds.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId));
+                Asset asset = _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(dataset.Asset.SaidKeyCode));
+                List<SecurityTicket> inheritedTickets = _datasetContext.SecurityTicket.Where(t => t.ParentSecurity.SecurityId.Equals(asset.Security.SecurityId)).ToList();
+                //fallback and catchup code
+                bool inheritanceStatus = ticket.IsAddingPermission;
+
+                foreach (SecurityTicket inheritedTicket in inheritedTickets)
+                {
+                    inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
+                    inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
+                    if (inheritedTicket.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS && p.IsEnabled))
+                    {
+                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
+                    }
+                }
+            }
+        }
+
         private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
         {
+
             //If the SecurityTicket just approved includes dataset permissions
-            if (_dataFeatures.CLA3718_Authorization.GetValue() &&
-                ticket.Permissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET))
+            if (_dataFeatures.CLA3718_Authorization.GetValue() && (ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET) || ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.ASSET)))
             {
-                //lookup the dataset this ticket is for
-                var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
-                if (dataset == null)
+                if (ticket.ParentSecurity.SecurableEntityName.Equals(GlobalConstants.SecurableEntityName.DATASET))
                 {
-                    throw new DatasetNotFoundException($"Could not find a dataset with SecurityTicket ID '{ticket.TicketId}' attached.");
+                    //lookup the dataset this ticket is for
+                    var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+                    if (dataset == null)
+                    {
+                        throw new DatasetNotFoundException($"Could not find a dataset with SecurityTicket ID '{ticket.TicketId}' attached.");
+                    }
+                    //publish an Infrastructure Event that dataset permissions have changed
+                    await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
                 }
-                //publish an Infrastructure Event that dataset permissions have changed
-                await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
+                else
+                {
+                    string keycode = _datasetContext.Assets.FirstOrDefault(a => a.Security.SecurityId.Equals(ticket.ParentSecurity.SecurityId)).SaidKeyCode;
+                    List<Dataset> datasets = _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(keycode) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+                    foreach(Dataset dataset in datasets)
+                    {
+                        await _inevService.PublishDatasetPermissionsUpdated(dataset, ticket, GetSecurablePermissions(dataset));
+                    }
+                }
             }
         }
 
         public void BuildS3RequestAssistance(SecurityTicket ticket)
         {
             var dataset = _datasetContext.Datasets.Where(d => d.Security.Tickets.Contains(ticket)).FirstOrDefault();
+            BuildS3TicketForDatasetAndTicket(dataset, ticket);
+        }
+
+        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket)
+        {
             string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
             string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
             StringBuilder sb = new StringBuilder();
@@ -510,6 +642,14 @@ namespace Sentry.data.Core
             _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), "", summary, issueType, customFields);
         }
 
+        public void BuildS3RequestAssistance(IList<Dataset> datasets, SecurityTicket ticket)
+        {
+            foreach(Dataset dataset in datasets)
+            {
+                BuildS3TicketForDatasetAndTicket(dataset, ticket);
+            }
+        }
+
         /// <summary>
         /// A ticket in Cherwell has been denied
         /// </summary>
@@ -519,6 +659,155 @@ namespace Sentry.data.Core
             ticket.RejectedDate = DateTime.Now;
             ticket.RejectedReason = rejectedReason;
             ticket.TicketStatus = status;
+        }
+
+        /// <summary>
+        /// Enqueues a Hangfire job that will create new AD security groups,
+        /// and create the default Security Tickets in the database for them
+        /// </summary>
+        /// <param name="ds">The Dataset that was just created</param>
+        public void EnqueueCreateDefaultSecurityForDataset(int datasetId)
+        {
+            _backgroundJobClient.Enqueue<SecurityService>(s => s.CreateDefaultSecurityForDataset(datasetId));
+        }
+
+        /// <summary>
+        /// Enqueues datasets to run the create default security job. 
+        /// </summary>
+        /// <param name="datasetIdsList">List of datasets to enqueue</param>
+        public void EnqueueCreateDefaultSecurityForDatasetList(int[] datasetIdList)
+        {
+            foreach(int datasetId in datasetIdList)
+            {
+                EnqueueCreateDefaultSecurityForDataset(datasetId);
+            }
+        }
+
+        /// <summary>
+        /// This method orchestrates creating new AD security groups,
+        /// and creating the default SecurityTickets in the database for them.
+        /// It is only run from the Goldeneye Service as a Hangfire job, 
+        /// *not* from the web server directly 
+        /// (web server won't have permissions to call SecBot API - called by 
+        /// _adSecurityAdminProvider.CreateAdSecurityGroupAsync())
+        /// </summary>
+        /// <param name="ds">The dataset to create the groups for</param>
+        public Task CreateDefaultSecurityForDataset(int datasetId)
+        {
+            //lookup the dataset
+            var ds = _datasetContext.GetById<Dataset>(datasetId);
+            if (ds == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(datasetId), $"Dataset with ID \"{datasetId}\" could not be found.");
+            }
+
+            // This "wrapping" of the async portion of this method is required so that the error checking above runs immediately.
+            // See https://sonarqube.sentry.com/coding_rules?open=csharpsquid%3AS4457&rule_key=csharpsquid%3AS4457
+            return CreateDefaultSecurityForDatasetAsync();
+            async Task CreateDefaultSecurityForDatasetAsync()
+            {
+                //enumerate the 4 AD groups we're going to create
+                var groups = GetDefaultSecurityGroupDtos(ds);
+
+                //get the list of permissions consumers and producers will be granted
+                var consumerPermissions = GetConsumerPermissions();
+                var producerPermissions = GetProducerPermissions();
+
+                //get the list of existing security tickets for this dataset and asset
+                var datasetTickets = GetSecurityTicketsForSecurable(ds, false);
+                var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, false);
+
+                //actually create the AD groups
+                await CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, producerPermissions, datasetTickets, assetTickets);
+            }
+
+        }
+
+        internal async Task CreateDefaultSecurityForDataset_Internal(Dataset ds, List<AdSecurityGroupDto> groups, List<Permission> consumerPermissions, List<Permission> producerPermissions, IEnumerable<SecurityTicket> datasetTickets, IEnumerable<SecurityTicket> assetTickets)
+        {
+            foreach (var group in groups)
+            {
+                //create the group in AD (if it doesn't already exist)
+                if (!_obsidianService.DoesGroupExist(group.GetGroupName()))
+                {
+                    await _adSecurityAdminProvider.CreateAdSecurityGroupAsync(group);
+                }
+
+                //create the security ticket that grants this group consumer or producer permissions (if it doesn't already exist)
+                if (!datasetTickets.Any(t => t.AdGroupName == group.GetGroupName()) && !assetTickets.Any(t => t.AdGroupName == group.GetGroupName()))
+                {
+                    var accessRequest = new AccessRequest()
+                    {
+                        AdGroupName = group.GetGroupName(),
+                        SecurityId = group.IsAssetLevelGroup() ? ds.Asset.Security.SecurityId : ds.Security.SecurityId,
+                        RequestorsId = Environment.UserName,
+                        RequestedDate = DateTime.Now,
+                        IsAddingPermission = true,
+                        Permissions = group.GroupType == AdSecurityGroupType.Cnsmr ? consumerPermissions : producerPermissions,
+                        IsSystemGenerated = true
+                    };
+                    var security = group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security;
+                    var securityTicket = BuildAddingPermissionTicket("DEFAULT_SECURITY", accessRequest, security);
+                    _datasetContext.Add(securityTicket);
+                    await ApproveTicket(securityTicket, Environment.UserName);
+                    _datasetContext.SaveChanges();
+                }
+            }
+            if(!(ds.DataClassification == DataClassificationType.HighlySensitive || ds.IsSecured))
+            {
+                var accessRequest = new AccessRequest()
+                {
+                    SecurityId = ds.Security.SecurityId,
+                    RequestorsId = Environment.UserName,
+                    RequestedDate = DateTime.Now,
+                    IsAddingPermission = true,
+                    Permissions = new List<Permission>() { _datasetContext.Permission.FirstOrDefault(p => p.PermissionCode.Equals(GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS))},
+                    IsSystemGenerated = true
+                };
+                var security = ds.Security;
+                var securityTicket = BuildAddingPermissionTicket("DEFAULT_SECURITY_INHERITANCE", accessRequest, security);
+                _datasetContext.Add(securityTicket);
+                await ApproveTicket(securityTicket, Environment.UserName);
+                _datasetContext.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Get a list of what the Default Security Groups should be for this dataset
+        /// </summary>
+        public List<AdSecurityGroupDto> GetDefaultSecurityGroupDtos(Dataset ds)
+        {
+            var envType = ds.NamedEnvironmentType == NamedEnvironmentType.Prod ? AdSecurityGroupEnvironmentType.P : AdSecurityGroupEnvironmentType.NP;
+            return new List<AdSecurityGroupDto> {
+                AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, envType),
+                AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Prdcr, envType),
+                AdSecurityGroupDto.NewAssetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, envType),
+                AdSecurityGroupDto.NewAssetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Prdcr, envType)
+            };
+        }
+
+        internal List<Permission> GetProducerPermissions()
+        {
+            var producerPermissionCodes = new List<string>() {
+                PermissionCodes.CAN_UPLOAD_TO_DATASET,
+                PermissionCodes.CAN_MANAGE_SCHEMA
+            };
+            var producerPermissions = _datasetContext.Permission.Where(x => producerPermissionCodes.Contains(x.PermissionCode) &&
+                                                             x.SecurableObject == SecurableEntityName.DATASET).ToList();
+            producerPermissions.AddRange(GetConsumerPermissions());
+            return producerPermissions;
+        }
+
+        internal List<Permission> GetConsumerPermissions()
+        {
+            var consumerPermissionCodes = new List<string>() {
+                PermissionCodes.CAN_PREVIEW_DATASET,
+                PermissionCodes.CAN_VIEW_FULL_DATASET,
+                PermissionCodes.CAN_QUERY_DATASET,
+                PermissionCodes.SNOWFLAKE_ACCESS
+            };
+            return _datasetContext.Permission.Where(x => consumerPermissionCodes.Contains(x.PermissionCode) &&
+                                                         x.SecurableObject == SecurableEntityName.DATASET).ToList();
         }
     }
 }

@@ -15,6 +15,7 @@
             public const string VERSION_DATAFLOW = VERSION + "/dataflow";
             public const string VERSION_TAG = VERSION + "/tags";
             public const string VERSION_DATAFILE = VERSION + "/datafile";
+            public const string VERSION_AUTH = VERSION + "/auth";
         }
     }
 }

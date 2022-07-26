@@ -1,14 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using Amazon.Runtime.Internal;
+using Newtonsoft.Json;
 using Polly;
 using RestSharp;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mime;
 
 namespace Sentry.data.Infrastructure
 {
@@ -103,6 +106,7 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
+            
 
             _request.Resource = _uri.ToString();
         }
@@ -114,38 +118,45 @@ namespace Sentry.data.Infrastructure
             string methodName = $"{nameof(BaseHttpsProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
             Logger.Debug($"{methodName} Method Start");
 
-            NetworkCredential proxyCredentials;
-            string proxyUrl;
+            RestClient client = new RestClient();
 
-            if (_dataFeatures.CLA3819_EgressEdgeMigration.GetValue())
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                Logger.Debug($"{methodName} using edge proxy: true");
-                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
-                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
-                proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
-                proxyCredentials = new NetworkCredential(userName, password);
+                client.Proxy = webProxy;
             }
-            else
-            {
-                Logger.Debug($"{methodName} using edge proxy: false");
-                proxyUrl = Configuration.Config.GetHostSetting("WebProxyUrl");
-                proxyCredentials = CredentialCache.DefaultNetworkCredentials;
-            }
-            Logger.Debug($"{methodName} proxyUser: {proxyCredentials.UserName}");
-
-            RestClient client = new RestClient
-            {
-                Proxy = new WebProxy(proxyUrl)
-                {
-                    Credentials = proxyCredentials
-                }
-            };
 
             _request.ResponseWriter = (responseStream) => responseStream.CopyTo(targetStream);
 
             client.DownloadData(_request);
 
             Logger.Debug($"{methodName} Method End");
+        }
+
+        public static string ParseContentType(string contentType)
+        {
+            //Mime types
+            //https://technet.microsoft.com/en-us/library/cc995276.aspx
+            //https://www.iana.org/assignments/media-types/media-types.xhtml
+
+            Logger.Info($"incoming_contenttype - {contentType}");
+
+            var content = new ContentType(contentType);
+
+            using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+            {
+                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
+
+                MediaTypeExtension extensions = _datasetContext.MediaTypeExtensions.Where(w => w.Key == content.MediaType).FirstOrDefault();
+
+                if (extensions == null)
+                {
+                    Logger.Warn($"Detected new MediaType ({content.MediaType}), defaulting to txt");
+                    return "txt";
+                }
+
+                Logger.Info($"detected_mediatype - {extensions.Value}");
+                return extensions.Value;
+            }
         }
 
         public abstract List<IRestResponse> SendPagingRequest();

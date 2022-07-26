@@ -12,17 +12,17 @@ using System.Linq.Expressions;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class DatasetService : IDatasetService, IEntityService
+    public class DatasetService : IDatasetService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly IUserService _userService;
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
-        private readonly IAWSLambdaProvider _awsLambdaProvider;
         private readonly IQuartermasterService _quartermasterService;
         private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
@@ -30,7 +30,7 @@ namespace Sentry.data.Core
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             IUserService userService, IConfigService configService, 
-                            ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider,
+                            ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
                             IDataFeatures featureFlags)
         {
@@ -39,7 +39,6 @@ namespace Sentry.data.Core
             _userService = userService;
             _configService = configService;
             _schemaService = schemaService;
-            _awsLambdaProvider = awsLambdaProvider;
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
@@ -140,6 +139,16 @@ namespace Sentry.data.Core
             return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset)).Select(ds => ds.DatasetName).ToList();
         }
 
+        public List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset)
+        {
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).Select(ds => ds.DatasetName).ToList();
+        }
+
+        public List<Dataset> GetInheritanceEnabledDatasetsForAsset(string asset)
+        {
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+        }
+
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
@@ -164,7 +173,7 @@ namespace Sentry.data.Core
 
         public SecurityTicket GetLatestInheritanceTicket(int datasetId)
         {
-            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault());
+            return _securityService.GetSecurableInheritanceTicket(_datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).LastOrDefault());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)
@@ -181,7 +190,7 @@ namespace Sentry.data.Core
         {
             //get all datasets where the there is a CanQueryData permission on the security
             //OR all public datasets (no security object)
-            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET && x.CanDisplay);
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == DataEntityCodes.DATASET && x.CanDisplay);
 
             query.FetchMany(x => x.DatasetCategories).ToFuture();
             List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
@@ -216,13 +225,20 @@ namespace Sentry.data.Core
                 SaidKeyCode = ds.Asset.SaidKeyCode
             };
 
+            //determine the names of the default security groups
+            var securityGroups = _securityService.GetDefaultSecurityGroupDtos(ds);
+            ar.ConsumeDatasetGroupName = securityGroups.First(g => !g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
+            ar.ProducerDatasetGroupName = securityGroups.First(g => !g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
+            ar.ConsumeAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
+            ar.ProducerAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
+
             Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
             if (!_featureFlags.CLA3718_Authorization.GetValue())
             {
                 //These permissions have been added as part of CLA-3718, but we don't want them visible on the existing UI when the feature flag is disabled
-                featureFlagPermissionRestrictions = x => x.PermissionCode != GlobalConstants.PermissionCodes.S3_ACCESS
-                    && x.PermissionCode != GlobalConstants.PermissionCodes.SNOWFLAKE_ACCESS
-                    && x.PermissionCode != GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS;
+                featureFlagPermissionRestrictions = x => x.PermissionCode != PermissionCodes.S3_ACCESS
+                    && x.PermissionCode != PermissionCodes.SNOWFLAKE_ACCESS
+                    && x.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS;
             } else
             {
                 featureFlagPermissionRestrictions = x => true;
@@ -230,8 +246,8 @@ namespace Sentry.data.Core
 
             //Set permission list based on if Dataset is secured (restricted)
             ar.Permissions = !ds.IsSecured
-                ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
-                : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
+                ? _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET && x.PermissionCode == PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
+                : _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
 
             List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
@@ -260,7 +276,7 @@ namespace Sentry.data.Core
                 request.RequestedDate = DateTime.Now;
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
-                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                                                                                                                x.SecurableObject == SecurableEntityName.DATASET).ToList();
                 request = BuildPermissionsForRequestType(request);
                 return await _securityService.RequestPermission(request);
             }
@@ -291,10 +307,10 @@ namespace Sentry.data.Core
             switch (request.Type)
             {
                 case AccessRequestType.AwsArn:
-                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS).First());
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == PermissionCodes.S3_ACCESS).First());
                     break;
                 case AccessRequestType.RemovePermission:
-                    request.Permissions.Add(_datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).FirstOrDefault());
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) && x.SecurableObject == SecurableEntityName.DATASET).FirstOrDefault());
                     break;
                 default:
                     break;
@@ -315,6 +331,12 @@ namespace Sentry.data.Core
             _configService.CreateAndSaveDatasetFileConfig(configDto);
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
+
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
+            }
 
             return ds.DatasetId;
         }
@@ -356,7 +378,7 @@ namespace Sentry.data.Core
             }
             if (ds.Security == null)
             {
-                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                ds.Security = new Security(SecurableEntityName.DATASET)
                 {
                     CreatedById = _userService.GetCurrentUser().AssociateId
                 };
@@ -389,6 +411,7 @@ namespace Sentry.data.Core
 
             ds.IsSecured = dto.IsSecured;
 
+            ds.AlternateContactEmail = dto.AlternateContactEmail;
 
             _datasetContext.SaveChanges();
         }
@@ -400,7 +423,7 @@ namespace Sentry.data.Core
         {
             if (ds.DatasetName != dto.DatasetName)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.NAME_IS_IDEMPOTENT, "Dataset Name cannot be changed");
+                throw new ValidationException(ValidationErrors.NAME_IS_IDEMPOTENT, "Dataset Name cannot be changed");
             }
             if (ds.ShortName != dto.ShortName)
             {
@@ -408,15 +431,15 @@ namespace Sentry.data.Core
             }
             if (ds.Asset.SaidKeyCode != dto.SAIDAssetKeyCode)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.SAID_ASSET_IDEMPOTENT, "Dataset Asset cannot be changed");
+                throw new ValidationException(ValidationErrors.SAID_ASSET_IDEMPOTENT, "Dataset Asset cannot be changed");
             }
             if (ds.NamedEnvironment != dto.NamedEnvironment)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_IDEMPOTENT, "Dataset Named Environment cannot be changed");
+                throw new ValidationException(ValidationErrors.NAMED_ENVIRONMENT_IDEMPOTENT, "Dataset Named Environment cannot be changed");
             }
             if (ds.NamedEnvironmentType != dto.NamedEnvironmentType)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
+                throw new ValidationException(ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
             }
         }
 
@@ -516,7 +539,7 @@ namespace Sentry.data.Core
 
             if (String.IsNullOrWhiteSpace(dto.SAIDAssetKeyCode))
             {
-                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
+                results.Add(ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
             }
 
             if (dto.OriginationId == 0)
@@ -526,6 +549,13 @@ namespace Sentry.data.Core
 
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
+
+
+            //VALIDATE EMAIL ADDRESS
+            if (!ValidationHelper.IsDSCEmailValid(dto.AlternateContactEmail))
+            {
+                results.Add(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid, "Alternate Contact Email must be valid sentry.com email address");
+            }
 
             return new ValidationException(results);
         }
@@ -547,14 +577,14 @@ namespace Sentry.data.Core
 
         private void ValidateDatasetName(DatasetDto dto, ValidationResults results)
         {
-            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
+            if (string.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
             {
                 results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
             }
             else //if name, make sure it is not duplicate
             {
                 if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                                                             w.DatasetType == DataEntityCodes.DATASET && w.NamedEnvironment == dto.NamedEnvironment))
                 {
                     results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
                 }
@@ -577,8 +607,12 @@ namespace Sentry.data.Core
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, "Short Name must be 12 characters or less");
                 }
+                if (dto.ShortName == SecurityConstants.ASSET_LEVEL_GROUP_NAME)
+                {
+                    results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, $"Short Name cannot be \"{SecurityConstants.ASSET_LEVEL_GROUP_NAME}\"");
+                }
                 if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
-                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
+                    d.DatasetType == DataEntityCodes.DATASET && d.NamedEnvironment == dto.NamedEnvironment && dto.DatasetId != d.DatasetId))
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
                 }
@@ -661,7 +695,7 @@ namespace Sentry.data.Core
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
                 DatasetDtm = dto.DatasetDtm,
                 ChangedDtm = dto.ChangedDtm,
-                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetType = DataEntityCodes.DATASET,
                 DataClassification = dto.DataClassification,
                 IsSecured = dto.IsSecured,
                 CanDisplay = true,
@@ -672,7 +706,8 @@ namespace Sentry.data.Core
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
                 Asset = asset,
                 NamedEnvironment = dto.NamedEnvironment,
-                NamedEnvironmentType = dto.NamedEnvironmentType
+                NamedEnvironmentType = dto.NamedEnvironmentType,
+                AlternateContactEmail = dto.AlternateContactEmail
             };
 
             switch (dto.DataClassification)
@@ -691,7 +726,7 @@ namespace Sentry.data.Core
             //All datasets get a Security entry regardless if restricted
             //  this allows security process for internally managed permissions
             //  which do not require dataset to be restricted (i.e. CanManageSchema).
-            ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+            ds.Security = new Security(SecurableEntityName.DATASET)
             {
                 CreatedById = _userService.GetCurrentUser().AssociateId
             };
@@ -712,7 +747,7 @@ namespace Sentry.data.Core
                 asset = new Asset()
                 {
                     SaidKeyCode = saidAssetKeyCode,
-                    Security = new Security(GlobalConstants.SecurableEntityName.ASSET)
+                    Security = new Security(SecurableEntityName.ASSET)
                     {
                         CreatedById = _userService.GetCurrentUser().AssociateId
                     }
@@ -766,6 +801,7 @@ namespace Sentry.data.Core
             dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
+            dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
 
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
@@ -780,7 +816,7 @@ namespace Sentry.data.Core
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
             dto.DatasetFileConfigSchemas = ds.DatasetFileConfigs.Where(w => !w.DeleteInd).Select(x => x.ToDatasetFileConfigSchemaDto()).ToList();
-            dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
+            dto.DatasetScopeTypeNames = ds.DatasetScopeType().ToDictionary(x => x.Name, y => y.Description);
             dto.DatasetFileCount = ds.DatasetFiles.Count();
             dto.OriginationCode = ds.OriginationCode;
             dto.DataClassificationDescription = ds.DataClassification.GetDescription();
@@ -792,33 +828,6 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
-        }
-
-        private string GeneratePreviewLambdaTriggerEvent(string bucket, DatasetFile dsf)
-        {
-            S3LamdaEvent lambdaEvent = new S3LamdaEvent()
-            {
-                Records = new List<S3ObjectEvent>()
-                {
-                    new S3ObjectEvent()
-                    {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
-                        {
-                            bucket = new Bucket()
-                            {
-                                name = bucket
-                            },
-                            Object = new data.Core.Entities.S3.Object()
-                            {
-                                key = dsf.FileLocation
-                            }
-                        }
-                    }
-                }
-            };
-
-            return JsonConvert.SerializeObject(lambdaEvent);
         }
         #endregion
 
