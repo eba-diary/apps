@@ -337,7 +337,7 @@ namespace Sentry.data.Core
          * @param int stepid
          * @param int[] datasetFileIds
         */
-        private void ReprocessDatasetFile(int stepId, int datasetFileId)
+        public void ReprocessDatasetFile(int stepId, int datasetFileId)
         {
             try
             {
