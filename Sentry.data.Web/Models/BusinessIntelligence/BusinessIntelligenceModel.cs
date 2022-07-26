@@ -24,7 +24,10 @@ namespace Sentry.data.Web
             BusinessObjectsEnumValue = (int)ReportType.BusinessObjects;
         }
 
-
+        [Required]
+        [MaxLength(1024)]
+        [DisplayName("Exhibit Name")]
+        public override string DatasetName { get; set; }
 
         [Required]
         [DisplayName("Report Location")]

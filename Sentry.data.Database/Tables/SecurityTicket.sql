@@ -2,9 +2,9 @@
 (
 	[SecurityTicket_ID] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY, 
     [Ticket_ID] VARCHAR(64) NOT NULL, 
-    [RequestedBy_ID] VARCHAR(16) NOT NULL, 
-    [ApprovedBy_ID] VARCHAR(16) NULL, 
-    [RejectedBy_ID] VARCHAR(16) NULL, 
+    [RequestedBy_ID] VARCHAR(32) NOT NULL, 
+    [ApprovedBy_ID] VARCHAR(32) NULL, 
+    [RejectedBy_ID] VARCHAR(32) NULL, 
     [Requested_DTM] DATETIME NOT NULL, 
     [Approved_DTM] DATETIME NULL, 
     [Rejected_DTM] DATETIME NULL, 

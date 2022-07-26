@@ -65,7 +65,7 @@
                                 <td class="permissionDescription">@permission.PermissionDescription</td>
                                 <td class="permissionStatus"><span title="Change #@permission.TicketId">@permission.PermissionStatus</span></td>
                                 <td class="permissionCode d-none">@permission.Code </td>
-                                <td>@if (!permission.IsSystemGenerated) { <em class="far fa-trash-alt removePermissionIcon"></em> }</td>
+                                <td>@if (!permission.IsSystemGenerated && !(permission.PermissionStatus != "Active")) { <em class="far fa-trash-alt removePermissionIcon"></em> }</td>
                             </tr>
                         }
                     }

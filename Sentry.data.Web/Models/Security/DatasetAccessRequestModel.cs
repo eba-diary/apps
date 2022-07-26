@@ -12,5 +12,10 @@ namespace Sentry.data.Web
         public string AdGroupName { get; set; }
 
         public List<SelectListItem> AllAdGroups { get; set; }
+
+        public string ConsumeDatasetGroupName { get; set; }
+        public string ProducerDatasetGroupName { get; set; }
+        public string ConsumeAssetGroupName { get; set; }
+        public string ProducerAssetGroupName { get; set; }
     }
 }

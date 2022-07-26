@@ -1176,6 +1176,7 @@ namespace Sentry.data.Core
             dto.DataFlowId = step.DataFlow.Id;
         }
 
+
         private void MapToDto(SchemaMap map, SchemaMapDto dto)
         {
             dto.Id = map.Id;

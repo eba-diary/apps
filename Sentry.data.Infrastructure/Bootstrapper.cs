@@ -5,12 +5,14 @@ using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
+using RestSharp.Authenticators;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
+using Sentry.data.Infrastructure.ServiceImplementations;
 using Sentry.Messaging.Common;
 using System;
 using System.Linq;
@@ -107,6 +109,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();
             registry.For<IMessageHandler<string>>().Add<SparkConverterEventService>();
+            registry.For<IMessageHandler<string>>().Add<FileDeleteEventService>();
 
             //Wire up Obsidian provider
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
@@ -117,7 +120,7 @@ namespace Sentry.data.Infrastructure
                 Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
-
+            
             registry.For<IDataFeatures>().Singleton().Use<FeatureFlags.DataFeatures>();
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
@@ -128,6 +131,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
+            registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
@@ -171,6 +175,15 @@ namespace Sentry.data.Infrastructure
             registry.For<Sentry.data.Core.Interfaces.InfrastructureEventing.IClient>().Singleton().Use<InfrastructureEventing.Client>().
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
+
+            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().
+                Ctor<RestSharp.IRestClient>().Is(new RestSharp.RestClient()
+                {
+                    BaseUrl = new Uri(Configuration.Config.GetHostSetting("SecBotUrl")),
+                    Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
+                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+                }).
+                AlwaysUnique();
 
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();

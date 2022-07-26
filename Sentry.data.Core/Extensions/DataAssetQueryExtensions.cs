@@ -12,7 +12,7 @@ namespace Sentry.data.Core
         {
             var security = datasetContext.Security.Where(s => query.Any(d => s.SecurityId == d.Security.SecurityId));
             var tickets = datasetContext.SecurityTicket.Where(t => security.Any(s => t.ParentSecurity.SecurityId == s.SecurityId));
-            tickets.FetchMany(x => x.Permissions).ThenFetch(p => p.Permission).ToFuture();
+            tickets.FetchMany(x => x.AddedPermissions).ThenFetch(p => p.Permission).ToFuture();
             var tree = query.Fetch(d => d.Security).ThenFetchMany(s => s.Tickets).ToFuture();
 
             return tree.ToList();
