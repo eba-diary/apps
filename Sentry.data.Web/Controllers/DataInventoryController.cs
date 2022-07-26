@@ -136,13 +136,13 @@ namespace Sentry.data.Web.Controllers
                 {
                     new FilterCategoryModel()
                     {
-                        CategoryName = FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionModel>()
                         {
                             new FilterCategoryOptionModel()
                             {
                                 OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
-                                ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true
                             }
                         }
@@ -157,7 +157,7 @@ namespace Sentry.data.Web.Controllers
             {
                 RemoveSensitive(searchModel);
 
-                FilterCategoryModel category = new FilterCategoryModel() { CategoryName = FilterCategoryNames.SENSITIVE };
+                FilterCategoryModel category = new FilterCategoryModel() { CategoryName = FilterCategoryNames.DataInventory.SENSITIVE };
                 category.CategoryOptions.Add(new FilterCategoryOptionModel() { OptionValue = "false", Selected = true, ParentCategoryName = category.CategoryName });
 
                 searchModel.FilterCategories.Add(category);
@@ -166,7 +166,7 @@ namespace Sentry.data.Web.Controllers
 
         private void RemoveSensitive(FilterSearchModel searchModel)
         {
-            searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.SENSITIVE);
+            searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.DataInventory.SENSITIVE);
         }
 
         protected bool CanViewSensitive()

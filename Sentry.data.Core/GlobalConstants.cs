@@ -414,17 +414,27 @@
 
         public static class FilterCategoryNames
         {
-            public const string ASSET = "Asset";
-            public const string COLLECTIONNAME = "Collection Name";
-            public const string COLUMN = "Column";
-            public const string DATATYPE = "Datatype";
-            public const string DATABASE = "Database";
-            public const string NULLABLE = "Nullable";
-            public const string SENSITIVE = "Sensitive";
-            public const string ENVIRONMENT = "Environment";
-            public const string SERVER = "Server";
-            public const string SOURCETYPE = "Source Type";
-            public const string COLLECTIONTYPE = "Collection Type";
+            public static class DataInventory
+            {
+                public const string ASSET = "Asset";
+                public const string COLLECTIONNAME = "Collection Name";
+                public const string COLUMN = "Column";
+                public const string DATATYPE = "Datatype";
+                public const string DATABASE = "Database";
+                public const string NULLABLE = "Nullable";
+                public const string SENSITIVE = "Sensitive";
+                public const string ENVIRONMENT = "Environment";
+                public const string SERVER = "Server";
+                public const string SOURCETYPE = "Source Type";
+                public const string COLLECTIONTYPE = "Collection Type";
+            }
+
+            public static class Dataset
+            {
+                public const string FAVORITE = "Favorite";
+                public const string CATEGORY = "Category";
+                public const string SECURED = "Secured";
+            }
         }
 
         public static class FilterCategoryOptions
@@ -482,6 +492,7 @@
         public static class Pagination
         {
             public const string ELLIPSIS = "...";
+            public const int MAX_PAGE_OPTIONS = 6;
         }
     }
 }

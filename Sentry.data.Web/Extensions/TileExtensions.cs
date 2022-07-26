@@ -7,7 +7,7 @@ namespace Sentry.data.Web
 {
     public static class TileExtensions
     {
-        public static TileResultsModel ToModel(this DatasetSearchResultDto dto, int selectedSortByValue)
+        public static TileResultsModel ToModel(this DatasetSearchResultDto dto, int selectedSortByValue, int selectedPageNumber)
         {
             TileResultsModel model = new TileResultsModel()
             {
@@ -16,7 +16,7 @@ namespace Sentry.data.Web
                 FilterCategories = dto.FilterCategories.ToModel(),
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(dto.PageSize.ToString()),
                 SortByOptions = Utility.BuildDatasetSortByOptions(selectedSortByValue),
-                PageItems = Utility.BuildPageItemList(dto.TotalResults)
+                PageItems = Utility.BuildPageItemList(dto.TotalResults, dto.PageSize, selectedPageNumber)
             };
 
             return model;

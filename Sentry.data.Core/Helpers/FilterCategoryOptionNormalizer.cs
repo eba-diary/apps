@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         private static readonly Lazy<Dictionary<string, Dictionary<string, string>>> _config = new Lazy<Dictionary<string, Dictionary<string, string>>>(() => new Dictionary<string, Dictionary<string, string>>() 
         {
             { 
-                FilterCategoryNames.ENVIRONMENT, new Dictionary<string, string>()
+                FilterCategoryNames.DataInventory.ENVIRONMENT, new Dictionary<string, string>()
                 {
                     { FilterCategoryOptions.ENVIRONMENT_PROD, "Prod" },
                     { FilterCategoryOptions.ENVIRONMENT_NONPROD, "NonProd" }

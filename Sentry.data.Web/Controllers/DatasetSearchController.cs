@@ -59,7 +59,7 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
             DatasetSearchResultDto resultDto = _datasetService.SearchDatasets(datasetSearchDto);
-            TileResultsModel tileModels = resultDto.ToModel(datasetSearchModel.SortBy);
+            TileResultsModel tileModels = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber);
 
             return Json(tileModels);
         }

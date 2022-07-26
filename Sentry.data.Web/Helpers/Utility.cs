@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Helpers
@@ -388,8 +389,41 @@ namespace Sentry.data.Web.Helpers
             return sortOptions;
         }
 
-        public static List<PageItemModel> BuildPageItemList(int totalResults)
+        public static List<PageItemModel> BuildPageItemList(int totalResults, int pageSize, int selectedPage)
         {
+            int numberOfPages = (totalResults + pageSize - 1) / pageSize;
+
+            int frontPageNumbers = numberOfPages - 1;
+            bool useEllipsis = false;
+
+            if (numberOfPages > Pagination.MAX_PAGE_OPTIONS)
+            {
+                frontPageNumbers = Pagination.MAX_PAGE_OPTIONS - 2;
+                useEllipsis = true;
+            }
+
+            List<PageItemModel> pageItems = new List<PageItemModel>();
+
+            for (int i = 1; i <= frontPageNumbers ; i++)
+            {
+                pageItems.Add(new PageItemModel()
+                {
+                    IsActive = i == selectedPage,
+                    PageNumber = i.ToString()
+                });
+            }
+
+            if (useEllipsis)
+            {
+                pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
+            }
+
+            pageItems.Add(new PageItemModel()
+            {
+                IsActive = numberOfPages == selectedPage,
+                PageNumber = numberOfPages.ToString()
+            });
+
             return new List<PageItemModel>();
         }
 

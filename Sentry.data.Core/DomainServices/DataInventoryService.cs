@@ -86,7 +86,7 @@ namespace Sentry.data.Core
         {
             if (string.Equals(category, "said", StringComparison.OrdinalIgnoreCase))
             {
-                category = FilterCategoryNames.ASSET;
+                category = FilterCategoryNames.DataInventory.ASSET;
             }
             
             return CustomAttributeHelper.TryGetFilterCategoryName<DataInventory>(category, out categoryName);

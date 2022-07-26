@@ -42,12 +42,12 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(1, result.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = result.FilterCategories.First();
-            Assert.AreEqual(GlobalConstants.FilterCategoryNames.ENVIRONMENT, categoryDto.CategoryName);
+            Assert.AreEqual(GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT, categoryDto.CategoryName);
             Assert.AreEqual(1, categoryDto.CategoryOptions.Count);
 
             FilterCategoryOptionDto optionDto = categoryDto.CategoryOptions.First();
             Assert.AreEqual(GlobalConstants.FilterCategoryOptions.ENVIRONMENT_PROD, optionDto.OptionValue);
-            Assert.AreEqual(GlobalConstants.FilterCategoryNames.ENVIRONMENT, optionDto.ParentCategoryName);
+            Assert.AreEqual(GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT, optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
             Assert.AreEqual(0, optionDto.ResultCount);
 
@@ -154,13 +154,13 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     new FilterCategoryDto()
                     {
-                        CategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = GlobalConstants.FilterCategoryOptions.ENVIRONMENT_PROD,
-                                ParentCategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true,
                                 ResultCount = 0
                             }
@@ -217,13 +217,13 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     new FilterCategoryDto()
                     {
-                        CategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = GlobalConstants.FilterCategoryOptions.ENVIRONMENT_NONPROD,
-                                ParentCategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true,
                                 ResultCount = 0
                             }
