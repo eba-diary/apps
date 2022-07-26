@@ -123,7 +123,7 @@ namespace Sentry.data.Infrastructure
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
 
-            registry.For<ILdClient>().Singleton().Use(new LdClientFactory().BuildLdClient());
+            registry.For<ILdClient>().Singleton().Use(LdClientFactory.BuildLdClient());
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();

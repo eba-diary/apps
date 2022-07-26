@@ -1,5 +1,4 @@
-﻿using LaunchDarkly.Sdk.Server;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Repo;
 using Sentry.FeatureFlags.Sql;
@@ -12,8 +11,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 {
     /// <summary>
     /// Feature Flag class for DSC - this class holds all the feature flags that the application needs to evaluate
-    /// This class is registered as a singleton in the bootstrapper so that everyone that requests this class gets the same copy
-    /// This is needed so that there's only one LdClient instance for the entire application
     /// </summary>
     public class DataFeatures : IDataFeatures
     {
