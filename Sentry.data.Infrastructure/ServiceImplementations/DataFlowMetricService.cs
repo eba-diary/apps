@@ -70,13 +70,13 @@ namespace Sentry.data.Infrastructure
                 {
                     FileName = group.Key,
                     DatasetFileId = group.First().DatasetFileId,
-                    FirstEventTime = group.Min(x => x.MetricGeneratedDateTime),
-                    LastEventTime = group.Max(x => x.MetricGeneratedDateTime),
                     FlowEvents = group.OrderByDescending(x => x.EventMetricId).ToList(),
                 };
+                DataFlowMetricDto mostRecentMetric = fileGroup.FlowEvents.First();
+                fileGroup.FirstEventTime = group.Where(x => x.RunInstanceGuid == mostRecentMetric.RunInstanceGuid).Min(x => x.MetricGeneratedDateTime);
+                fileGroup.LastEventTime = group.Where(x => x.RunInstanceGuid == mostRecentMetric.RunInstanceGuid).Max(x => x.MetricGeneratedDateTime);
                 fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                 fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
-                DataFlowMetricDto mostRecentMetric = fileGroup.FlowEvents.First();
                 fileGroup.AllEventsPresent = mostRecentMetric.TotalFlowSteps == mostRecentMetric.CurrentFlowStep;
                 fileGroup.AllEventsComplete = mostRecentMetric.StatusCode == "C";
                 fileGroups.Add(fileGroup);
