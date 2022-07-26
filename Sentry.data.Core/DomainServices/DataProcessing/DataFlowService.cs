@@ -143,7 +143,7 @@ namespace Sentry.data.Core
         /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
         /// </remarks>
         /// 
-        [AutomaticRetry(Attempts = 10)]
+        [AutomaticRetry(Attempts = 0)]
         public void UpgradeDataFlow(int producerDataFlowId)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(UpgradeDataFlow).ToLower()}";

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core.Interfaces;
+using Hangfire;
 
 namespace Sentry.data.Core
 {
@@ -337,6 +338,7 @@ namespace Sentry.data.Core
          * @param int stepid
          * @param int[] datasetFileIds
         */
+        [AutomaticRetry(Attempts = 0)]
         public void ReprocessDatasetFile(int stepId, int datasetFileId)
         {
             try
