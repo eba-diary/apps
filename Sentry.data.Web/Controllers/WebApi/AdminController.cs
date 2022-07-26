@@ -9,6 +9,7 @@ using Sentry.data.Web.Models.ApiModels.Admin;
 using Sentry.data.Core.Interfaces;
 using System.Web.Http;
 using Sentry.data.Core.DTO.Admin;
+using Sentry.data.Web.Extensions;
 
 namespace Sentry.data.Web.Controllers.WebApi
 {
@@ -30,8 +31,17 @@ namespace Sentry.data.Web.Controllers.WebApi
         {
             if(supportLinkModel.Name == null || supportLinkModel.Url == null)
             {
-                return Content(System.Net.HttpStatusCode.BadRequest, "Invalid parameters passed");
+                if(supportLinkModel.Name == null)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest, $"Name was not submitted");
+                }
+                if(supportLinkModel.Url == null)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest, "Url was not submitted");
+                }
             }
+            SupportLinkDto supportLinkDto = new SupportLinkDto();
+            supportLinkDto = AdminExtensions.ToDto.Add(supportLinkDto, supportLinkDto);
             SupportLinkDto supportLinkDto = new SupportLinkDto()
             {
                 SupportLinkId = supportLinkModel.SupportLinkId,

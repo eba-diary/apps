@@ -23,7 +23,7 @@ namespace Sentry.data.Core.Tests
                 DatasetId = 1000,
                 DatasetCategories = MockCategories(),
                 DatasetName = "Claim Dataset",
-                DatasetDesc = "Test Claim Dataset"
+                DatasetDesc = "Test Claim Dataset",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = user != null ? user.DisplayName : "Nye, Bill",
                 UploadUserName = user != null ? user.DisplayName : "Nye, Bill",
