@@ -9,10 +9,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace Sentry.data.Core
 {
@@ -646,9 +648,31 @@ namespace Sentry.data.Core
                     _cache.Set(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
                 }
 
-                IEnumerable<DatasetTileDto> dtoEnumerable;
+                IEnumerable<DatasetTileDto> dtoEnumerable = datasetTileDtos;
 
                 //filter
+                if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
+                {
+                    dtoEnumerable = dtoEnumerable.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText));
+                }
+
+                foreach (FilterCategoryDto categoryDto in datasetSearchDto.FilterCategories)
+                {
+                    if (CustomAttributeHelper.TryGetFilterSearchFieldProperty<DatasetTileDto>(categoryDto.CategoryName, out PropertyInfo propertyInfo))
+                    {
+                        //x => categoryDto.GetSelectedValues().Contains(x.PropertyFromCategoryName)
+                        ParameterExpression parameter = Expression.Parameter(typeof(DatasetTileDto));
+                        Expression.Call(typeof(List<string>).GetMethod("Contains"), Expression.Constant(categoryDto.)
+                        foreach (string value in categoryDto.GetSelectedValues())
+                        {
+                            //x => x.PropertyFromCategoryName == value
+                            BinaryExpression body = Expression.Equal(Expression.Property(parameter, propertyInfo.Name), Expression.Constant(value));
+}
+
+
+                        Expression.Lambda<Func<DatasetTileDto, bool>>(body, new[] { parameter });
+                    }
+                }
                 //get total results
 
                 //get new filters

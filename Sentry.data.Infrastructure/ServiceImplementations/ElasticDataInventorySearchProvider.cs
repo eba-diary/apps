@@ -274,7 +274,7 @@ namespace Sentry.data.Infrastructure
                 filter.Add(new TermsQuery()
                 {
                     Field = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName),
-                    Terms = category.CategoryOptions.Where(x => x.Selected).Select(x => x.OptionValue)
+                    Terms = category.GetSelectedValues()
                 });
             }
 
