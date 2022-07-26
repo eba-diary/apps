@@ -85,18 +85,19 @@
 }
 
 .filter-search-container {
-    width: 300px;
+    min-width: 275px;
+    max-width: 275px;
 }
 
 .filter-search-result-count-container {
     text-align: right;
 }
 
-    .filter-search-result-count-container span {
-        color: #003da5;
-        font-weight: bold;
-        font-family: sans-serif;
-    }
+#filter-search-total, #filter-search-page-size, #filter-search-returned-total {
+    color: #003da5;
+    font-weight: bold;
+    font-family: sans-serif;
+}
 
 .filter-search-total-results {
     font-size: 1.25em;

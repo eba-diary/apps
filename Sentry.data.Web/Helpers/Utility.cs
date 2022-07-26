@@ -335,20 +335,62 @@ namespace Sentry.data.Web.Helpers
 
             return rj;
         }
+        public static List<SelectListItem> BuildTilePageSizeOptions(string selectedValue)
+        {
+            return new List<SelectListItem>()
+            {
+                new SelectListItem()
+                {
+                    Value = "10",
+                    Text = "10",
+                    Selected = selectedValue == "10"
+                },
+                new SelectListItem()
+                {
+                    Value = "25",
+                    Text = "25",
+                    Selected = selectedValue == "25"
+                },
+                new SelectListItem()
+                {
+                    Value = "100",
+                    Text = "100",
+                    Selected = selectedValue == "100"
+                },
+                new SelectListItem()
+                {
+                    Value = "All",
+                    Text = "All",
+                    Selected = selectedValue == "All"
+                },
+            };
+        }
+
         public static List<SelectListItem> BuildDatasetSortByOptions()
+        {
+            return BuildDatasetSortByOptions(0);
+        }
+
+        public static List<SelectListItem> BuildDatasetSortByOptions(int selectedValue)
         {
             List<SelectListItem> sortOptions = new List<SelectListItem>();
 
-            foreach(DatasetSortByOption item in Enum.GetValues(typeof(DatasetSortByOption)))
+            foreach (DatasetSortByOption item in Enum.GetValues(typeof(DatasetSortByOption)))
             {
                 sortOptions.Add(new SelectListItem
                 {
                     Text = item.GetDescription(),
-                    Value = ((int)item).ToString()
+                    Value = ((int)item).ToString(),
+                    Selected = (int)item == selectedValue
                 });
             }
 
             return sortOptions;
+        }
+
+        public static List<PageItemModel> BuildPageItemList(int totalResults)
+        {
+            return new List<PageItemModel>();
         }
 
         public static List<SelectListItem> BuildSelectListitem(List<KeyValuePair<string,string>> list, string defaultText)

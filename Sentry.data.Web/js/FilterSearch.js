@@ -173,7 +173,7 @@
             data.Favorites.toggleFavorite(element, "SavedSearch", function () {
                 $(element).removeClass("display-none");
                 $("#favoriteSpinner_" + id).addClass("display-none");
-            }, data.FilterSearch.showToast);
+            });
         });
 
         $(document).on("click", ".saved-search-edit", function (e) {
@@ -295,7 +295,12 @@
             $(".filter-search-results-container").slideDown();
 
             $("#filter-search-total").text(totalResultCount.toLocaleString("en-US"));
-            $("#filter-search-returned-total").text(returnedResultCount.toLocaleString("en-US"));
+
+            if (totalResultCount > returnedResultCount) {
+                $("#filter-search-count-of").removeClass("d-none");
+                $("#filter-search-returned-total").text(returnedResultCount.toLocaleString("en-US"));
+            }
+            
             data.FilterSearch.setPageInfo(1, pageSize < returnedResultCount ? pageSize : returnedResultCount);
             $(".filter-search-result-count-container").slideDown();
         }

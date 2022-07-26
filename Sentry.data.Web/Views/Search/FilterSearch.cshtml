@@ -3,7 +3,7 @@
 @{
     ViewBag.Fluid = true;
     ViewBag.Title = Model.PageTitle;
-    string jsControllerName = "data." + Model.SearchType;
+    string jsControllerName = "data." + Model.SearchType + "Search";
 }
 
 <div class="search-head-wrapper">
@@ -13,9 +13,12 @@
             <h1 class="filter-search-page-title">@Model.PageTitle</h1>
         </div>
 
-        <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
-            <em class="icon-info-solid dsc-blue-text"></em>
-        </a>
+        @if (!string.IsNullOrEmpty(Model.InfoLink))
+        {
+            <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
+                <em class="icon-info-solid dsc-blue-text"></em>
+            </a>
+        }
     </div>
 
     <div class="filter-search-box-and-save">
@@ -36,7 +39,7 @@
     <div class="filter-search-container">
         <div class="filter-search-result-count-container display-none">
             <div class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</div>
-            <div>Showing <span id="filter-search-page-size"></span> of <span id="filter-search-returned-total"></span></div>
+            <div>Showing <span id="filter-search-page-size"></span> <span id="filter-search-count-of d-none">of</span> <span id="filter-search-returned-total"></span></div>
         </div>
 
         <div class="filter-search-title-container bottom-border">
@@ -69,7 +72,9 @@
     </div>
 
     <div class="filter-search-results-container display-none">
-        @Html.Partial(Model.ResultView)
+        @{
+            Html.RenderAction("Results");
+        }
     </div>
 
 </div>

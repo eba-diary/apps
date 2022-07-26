@@ -36,5 +36,6 @@ namespace Sentry.data.Core
         Task<string> RequestAccessRemoval(AccessRequest request);
 
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
+        DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto);
     }
 }

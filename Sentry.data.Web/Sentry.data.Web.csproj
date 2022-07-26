@@ -430,7 +430,10 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="Controllers\BaseSearchableController.cs" />
+    <Compile Include="Controllers\BusinessIntelligenceSearchController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
+    <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
@@ -438,6 +441,7 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="Extensions\TileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
@@ -451,6 +455,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\Dataset\DatasetSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RemovePermissionModel.cs" />
@@ -462,6 +467,9 @@
     <Compile Include="Models\Search\SavedSearchOptionModel.cs" />
     <Compile Include="Models\Search\SavedSearchDropdownModel.cs" />
     <Compile Include="Models\Search\SaveSearchModel.cs" />
+    <Compile Include="Models\Search\TileModel.cs" />
+    <Compile Include="Models\Search\TileResultsModel.cs" />
+    <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
@@ -871,7 +879,8 @@
     <Content Include="Images\presence.png" />
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\DataFlow.js" />
-    <Content Include="js\DataInventory.js" />
+    <Content Include="js\DataInventorySearch.js" />
+    <Content Include="js\DatasetsSearch.js" />
     <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
@@ -1219,6 +1228,8 @@
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
+    <Content Include="Views\Search\TileResults.cshtml" />
+    <Content Include="Views\Search\Tiles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1989,6 +2000,9 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\Auth\" />
     <Folder Include="Views\BaseDataInventory\" />
+    <Folder Include="Views\BaseSearchable\" />
+    <Folder Include="Views\BusinessIntelligenceSearch\" />
+    <Folder Include="Views\DatasetSearch\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />

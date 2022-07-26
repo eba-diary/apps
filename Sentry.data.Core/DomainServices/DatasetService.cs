@@ -24,7 +24,7 @@ namespace Sentry.data.Core
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IQuartermasterService _quartermasterService;
-        private readonly ObjectCache cache = MemoryCache.Default;
+        private readonly ObjectCache _cache;
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
 
@@ -32,7 +32,7 @@ namespace Sentry.data.Core
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
-                            IDataFeatures featureFlags)
+                            IDataFeatures featureFlags, ObjectCache cache)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -42,6 +42,7 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
+            _cache = cache;
         }
 
         public DatasetDto GetDatasetDto(int id)
@@ -72,7 +73,7 @@ namespace Sentry.data.Core
 
         public List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO()
         {
-            List<DatasetSummaryMetadataDTO> summaryResults = cache["DatasetSummaryMetadata"] as List<DatasetSummaryMetadataDTO>;
+            List<DatasetSummaryMetadataDTO> summaryResults = _cache[CacheKeys.DATASETSUMMARY] as List<DatasetSummaryMetadataDTO>;
 
             if (summaryResults == null)
             {
@@ -105,7 +106,7 @@ namespace Sentry.data.Core
                 }
 
                 //Assign result list to cache object
-                cache.Set("DatasetSummaryMetadata", summaryResults, policy);
+                _cache.Set(CacheKeys.DATASETSUMMARY, summaryResults, policy);
             }
 
             return summaryResults;
@@ -560,6 +561,128 @@ namespace Sentry.data.Core
             return new ValidationException(results);
         }
 
+        public List<Dataset> GetDatasetMarkedDeleted()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
+            return dsList;
+        }
+
+        public string SetDatasetFavorite(int datasetId, string associateId)
+        {
+            try
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == associateId))
+                {
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = associateId,
+                        Created = DateTime.Now
+                    };
+
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully added favorite.";
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully removed favorite.";
+                }
+            }
+            catch (Exception)
+            {
+                _datasetContext.Clear();
+                throw;
+            }
+        }
+
+        public IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId)
+        {
+            return _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileConfig.ConfigId == configId && 
+                                                                      x.ParentDatasetFileId == null &&
+                                                                      !x.IsBundled);
+        }
+
+        public DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto)
+        {
+            List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
+            List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
+            int totalResults = 0;
+
+            try
+            {
+                if (_cache.Contains(CacheKeys.SEARCHDATASETS))
+                {
+                    datasetTileDtos = _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
+                }
+                else
+                {
+                    List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
+                                                                                       w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
+                                                                      FetchAllChildren(_datasetContext);
+
+                    string associateId = _userService.GetCurrentUser().AssociateId;
+                    List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
+
+                    //map to DatasetTileDto
+                    foreach (Dataset dataset in datasets)
+                    {
+                        DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+
+                        DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                        datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                        datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
+                        datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+
+                        datasetTileDtos.Add(datasetTileDto);
+                    }
+
+                    _cache.Set(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
+                }
+
+                IEnumerable<DatasetTileDto> dtoEnumerable;
+
+                //filter
+                //get total results
+
+                //get new filters
+
+                //order
+                if (datasetSearchDto.OrderByDescending)
+                {
+                    dtoEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
+                }
+                else
+                {
+                    dtoEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
+                }
+
+                datasetTileDtos = dtoEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error searching datasets", ex);
+            }
+
+            DatasetSearchResultDto resultDto = new DatasetSearchResultDto()
+            {
+                PageSize = datasetSearchDto.PageSize,
+                PageNumber = datasetSearchDto.PageNumber,
+                Tiles = datasetTileDtos,
+                FilterCategories = filterCategories,
+                TotalResults = totalResults
+            };
+
+            return resultDto;
+        }
+
+        #region "private functions"
         private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
         {
             if (dto.DatasetCategoryIds == null)
@@ -619,55 +742,6 @@ namespace Sentry.data.Core
             }
         }
 
-        public List<Dataset> GetDatasetMarkedDeleted()
-        {
-            List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
-            return dsList;
-        }
-
-        public string SetDatasetFavorite(int datasetId, string associateId)
-        {
-            try
-            {
-                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
-                if (!ds.Favorities.Any(w => w.UserId == associateId))
-                {
-                    Favorite f = new Favorite()
-                    {
-                        DatasetId = ds.DatasetId,
-                        UserId = associateId,
-                        Created = DateTime.Now
-                    };
-
-                    _datasetContext.Merge(f);
-                    _datasetContext.SaveChanges();
-
-                    return "Successfully added favorite.";
-                }
-                else
-                {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
-                    _datasetContext.SaveChanges();
-
-                    return "Successfully removed favorite.";
-                }
-            }
-            catch (Exception)
-            {
-                _datasetContext.Clear();
-                throw;
-            }
-        }
-
-        public IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId)
-        {
-            return _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileConfig.ConfigId == configId && 
-                                                                      x.ParentDatasetFileId == null &&
-                                                                      !x.IsBundled);
-        }
-
-        #region "private functions"
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
             ds.CanDisplay = false;
