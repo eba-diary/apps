@@ -12,42 +12,7 @@ namespace Sentry.data.Web.Tests
 {
     public static class MockClasses
     {
-        public static DataFlowMetric MockDataFlowMetricEntity()
-        {
-            DataFlowMetric entity = new DataFlowMetric
-            {
-                QueryMadeDateTime = DateTime.Now,
-                SchemaId = 0,
-                EventContents = "contents",
-                MaxExecutionOrder = 0,
-                FileModifiedDateTime = DateTime.Now,
-                OriginalFileName = "name",
-                DatasetId = 0,
-                ExecutionOrder = 0,
-                DataActionId = 0,
-                DataFlowId = 0,
-                Partition = 0,
-                DataActionTypeId = 0,
-                MessageKey = 0,
-                Duration = 0,
-                Offset = 0,
-                DataFlowName = "name",
-                DataFlowStepId = 0,
-                FlowExecutionGuid = "guid",
-                FileSize = 0,
-                EventMetricId = 0,
-                StorageCode = "code",
-                FileCreatedDateTime = DateTime.Now,
-                RunInstanceGuid = 0,
-                FileName = "name",
-                SaidKeyCode = "code",
-                EventMetricCreatedDateTime = DateTime.Now,
-                DatesetFileId = 0,
-                ProcessStartDateTime = DateTime.Now,
-                StatusCode = "code"
-            };
-            return entity;
-        }
+
         public static Dataset MockDataset(IApplicationUser user = null, Boolean addConfig = false)
         {
             Dataset ds = new Dataset()
