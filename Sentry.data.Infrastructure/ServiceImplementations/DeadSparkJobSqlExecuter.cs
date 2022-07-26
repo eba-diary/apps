@@ -13,7 +13,7 @@ namespace Sentry.data.Infrastructure
             throw new System.NotSupportedException();
         }
 
-        public DataTable ExecuteQuery(int timeCreated)
+        public DataTable ExecuteQuery(DateTime timeCreated)
         {
             //connect to database
             using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DatabaseConnectionString")))
@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
                 command.Parameters["@JobID"].Value = Configuration.Config.GetHostSetting("DeadDataSparkJobID");
 
                 //add parameter for time window of jobs created (@TimeCreated) 
-                command.Parameters.AddWithValue("@TimeCreated", System.Data.SqlDbType.Int);
+                command.Parameters.AddWithValue("@TimeCreated", System.Data.SqlDbType.DateTime);
                 command.Parameters["@TimeCreated"].Value = timeCreated;
 
                 DataTable dataTable = new DataTable();

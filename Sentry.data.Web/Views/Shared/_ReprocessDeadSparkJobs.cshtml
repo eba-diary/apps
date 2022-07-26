@@ -1,4 +1,4 @@
-﻿
+﻿@model ReprocessDeadSparkJobModel
 @{
     ViewBag.Title = "_AdminTest";
 }
@@ -14,9 +14,14 @@
     <h1>Reprocess Dead Spark Jobs</h1>
     <input type="checkbox">
     <div class="form-inline">
-        <div class="form-group mx-sm-3 mb-2">
-            <label for="jobCreationCheck" class="sr-only">Hours in past to check</label>
-            <input type="number" min="0" class="form-control" id="jobCreationCheck" placeholder="Hours in past to check">
+        <div class="md-form">
+            @Html.TextBoxFor(x => x.currentDate, "{0:yyyy-MM-ddTHH:mm:ss}", new
+                       {
+                           @class = "form-control",
+                           required = "required",
+                           @type = "datetime-local",
+                           @id = "datetime-picker"
+                       })
         </div>
         <button id="timeCheck" class="btn btn-primary mb-2">Check for Dead Jobs</button>
     </div>

@@ -176,17 +176,23 @@ data.Admin = {
     },
 
     RetrieveDeadSparkJobListButton: function () {
+
+        // Get all dead spark jobs within chosen time span
         $("#timeCheck").click(function () {
 
-            var time = $("#jobCreationCheck").val();
+            // Retrieve seleced date
+            var selectedDate = $('#datetime-picker').val();
 
-            if (time > 720 || time < 0) {
-                data.Dataset.makeToast("error", `Input must be greater than zero and less than 720`);
-                $("#jobCreationCheck").val(0);
+            // Calculate hours between current date and selected date
+            var timeCheck = Math.floor(Math.abs((new Date() - new Date(selectedDate)) / 36e5)) + 1;
+
+            // Check if selected date is within a month (720hrs) of current date
+            if (timeCheck > 720 || timeCheck < 0) {
+                data.Dataset.makeToast("error", `Date selected must be within a month of current date`);
             } else {
                 $.ajax({
                     type: "GET",
-                    url: "Admin/GetDeadJobs/"+time,
+                    url: "Admin/GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
                     dataType: "html",
                     success: function (msg) {
                         $("#deadJobTable").html(msg);

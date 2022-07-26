@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -8,6 +9,6 @@ namespace Sentry.data.Core
     {
         void ExecuteCommand(object parameter);
 
-        DataTable ExecuteQuery(int timeCreated);
+        DataTable ExecuteQuery(DateTime timeCreated);
     }
 }

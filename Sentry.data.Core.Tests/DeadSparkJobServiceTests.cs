@@ -54,13 +54,13 @@ namespace Sentry.data.Core.Tests
                 DataFlowStepID = 2
             });
 
-            mockProvider.Setup(e => e.GetDeadSparkJobs(-10)).Returns(deadSparkJobsSetupList);
+            mockProvider.Setup(e => e.GetDeadSparkJobs(DateTime.Today)).Returns(deadSparkJobsSetupList);
             DeadSparkJobService jobService = new DeadSparkJobService(mockProvider.Object);
 
 
 
             // Act
-            List<DeadSparkJobDto> deadSparkJobDtoList = jobService.GetDeadSparkJobDtos(-10);
+            List<DeadSparkJobDto> deadSparkJobDtoList = jobService.GetDeadSparkJobDtos(DateTime.Today);
 
             // Assert
             mockProvider.VerifyAll();

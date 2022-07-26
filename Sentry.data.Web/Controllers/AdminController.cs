@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -52,13 +54,14 @@ namespace Sentry.data.Web.Controllers
             return View(myDict);
         }
 
-        [Route("Admin/GetDeadJobs/{timeCheck}")]
+        [Route("Admin/GetDeadJobs/{selectedDate?}")]
         [HttpGet]
-        public ActionResult GetDeadJobs(int timeCheck)
+        public ActionResult GetDeadJobs(string selectedDate)
         {
-            timeCheck *= -1;
+            // Convert tim
+            DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
-            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(timeCheck);
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
 
             List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
 
@@ -96,8 +99,8 @@ namespace Sentry.data.Web.Controllers
 
                     return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
                 case "6":
-                    viewPath = "_ReprocessDeadSparkJobs";
-                    break;
+                    ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
+                    return PartialView("_ReprocessDeadSparkJobs", reprocessDeadSparkJobModel);
             }
 
             return PartialView(viewPath);

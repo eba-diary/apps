@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[usp_GetDeadJobs] @JobID INT, @TimeCreated INT = -10
+﻿CREATE PROCEDURE [dbo].[usp_GetDeadJobs] @JobID INT, @TimeCreated datetime
 
 AS
 
@@ -22,7 +22,7 @@ TEST = 262
 select distinct Submission,History_Id
 into #Submissions
 from JobHistory
-where State = 'Dead' and Job_ID = @JobID and Created > DATEADD(Hour, @TimeCreated, GETDATE())
+where State = 'Dead' and Job_ID = @JobID and Created > @TimeCreated
 order by History_Id DESC
 
 SELECT * FROM #Submissions 

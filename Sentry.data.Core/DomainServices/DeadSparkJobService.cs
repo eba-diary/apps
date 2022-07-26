@@ -15,7 +15,7 @@ namespace Sentry.data.Core
             _deadJobProvider = deadJobProvider;
         }  
 
-        public List<DeadSparkJobDto> GetDeadSparkJobDtos(int timeCreated)
+        public List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime timeCreated)
         {
             List<DeadSparkJob> deadSparkJobList = _deadJobProvider.GetDeadSparkJobs(timeCreated);
 

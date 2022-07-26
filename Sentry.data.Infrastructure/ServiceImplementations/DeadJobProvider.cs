@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
             _dbExecuter = dbExecuter;
         }
 
-        public List<DeadSparkJob> GetDeadSparkJobs(int timeCreated)
+        public List<DeadSparkJob> GetDeadSparkJobs(DateTime timeCreated)
         {
             DataTable dataTable = _dbExecuter.ExecuteQuery(timeCreated);
 
