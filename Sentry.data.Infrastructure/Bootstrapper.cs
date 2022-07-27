@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using LaunchDarkly.Sdk.Server.Interfaces;
 using Nest;
 using NHibernate;
 using NHibernate.Cfg;
@@ -10,6 +11,7 @@ using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
+using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
 using Sentry.data.Infrastructure.ServiceImplementations;
@@ -81,7 +83,7 @@ namespace Sentry.data.Infrastructure
                 scanner.AssemblyContainingType<IDataFeedContext>();
                 scanner.AssemblyContainingType<MetadataRepositoryProvider>();
                 scanner.AssemblyContainingType<IMetadataRepositoryProvider>();
-                scanner.AddAllTypesOf<IDataSource>();
+                scanner.AddAllTypesOf<Core.IDataSource>();
                 scanner.WithDefaultConventions();
             });
 
@@ -121,7 +123,7 @@ namespace Sentry.data.Infrastructure
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
 
-            registry.For<IDataFeatures>().Singleton().Use<FeatureFlags.DataFeatures>();
+            registry.For<ILdClient>().Singleton().Use(LdClientFactory.BuildLdClient());
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();

@@ -11,10 +11,12 @@ namespace Sentry.data.Web.Helpers
     public class NamedEnvironmentBuilder
     {
         private readonly IQuartermasterService _quartermasterService;
+        private readonly IDataFeatures _dataFeatures;
 
-        public NamedEnvironmentBuilder(IQuartermasterService quartermasterService)
+        public NamedEnvironmentBuilder(IQuartermasterService quartermasterService, IDataFeatures dataFeatures)
         {
             _quartermasterService = quartermasterService;
+            _dataFeatures = dataFeatures;
         }
 
         /// <summary>
@@ -24,13 +26,13 @@ namespace Sentry.data.Web.Helpers
         /// </summary>
         /// <param name="saidAssetKeyCode">SAID Asset key code</param>
         /// <param name="namedEnvironment">If a named environment has already been selected by the user; otherwise leave blank</param>
-        public async Task<(List<SelectListItem> namedEnvironmentList, List<SelectListItem> namedEnvironmentTypeList)> BuildNamedEnvironmentDropDowns(string saidAssetKeyCode, string namedEnvironment)
+        public async Task<(List<SelectListItem> namedEnvironmentList, List<SelectListItem> namedEnvironmentTypeList)> BuildNamedEnvironmentDropDownsAsync(string saidAssetKeyCode, string namedEnvironment)
         {
             //if no keyCode has been selected yet, skip the call to Quartermaster
             List<NamedEnvironmentDto> qNamedEnvironmentList = new List<NamedEnvironmentDto>();
             if (!string.IsNullOrWhiteSpace(saidAssetKeyCode))
             {
-                qNamedEnvironmentList = await _quartermasterService.GetNamedEnvironmentsAsync(saidAssetKeyCode).ConfigureAwait(true);
+                qNamedEnvironmentList = await _quartermasterService.GetNamedEnvironmentsAsync(saidAssetKeyCode);
             }
 
             List<SelectListItem> namedEnvironmentList = BuildNamedEnvironmentDropDown(namedEnvironment, qNamedEnvironmentList);
@@ -61,13 +63,13 @@ namespace Sentry.data.Web.Helpers
         /// </summary>
         /// <param name="namedEnvironment">What Named Environment is selected</param>
         /// <param name="qNamedEnvironmentList">The list of Environments from Quartermaster</param>
-        public static List<SelectListItem> BuildNamedEnvironmentTypeDropDown(string namedEnvironment, List<NamedEnvironmentDto> qNamedEnvironmentList)
+        public List<SelectListItem> BuildNamedEnvironmentTypeDropDown(string namedEnvironment, List<NamedEnvironmentDto> qNamedEnvironmentList)
         {
             //figure out the correct NamedEnvironmentType for the selected NamedEnvironment
             string namedEnvironmentType = NamedEnvironmentType.NonProd.ToString();
 
             //if an Environment Type filter is configured, create the filter and default to that environment type
-            var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
+            var environmentTypeFilter = _dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue();
             Func<string, bool> filter = envType => true;
             if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
             {
