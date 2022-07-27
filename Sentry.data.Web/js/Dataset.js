@@ -643,7 +643,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        data.Dataset.showDataPreviewError(msg);
+                        data.Dataset.showDataPreviewError(msg.responseJSON);
                         $('#dataSection').hide();
                     }
                 }
@@ -653,13 +653,13 @@ data.Dataset = {
                 if (error.status == 404 && error.responseText == "Schema not found") {
                     $('#dataSection').hide();
                 }
-                data.Dataset.showDataPreviewError(error);
+                data.Dataset.showDataPreviewError(error.responseJSON);
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
         }).fail(function (error) {
-            data.Dataset.showDataPreviewError(error);
+            data.Dataset.showDataPreviewError(error.responseJSON);
         });
 
     },
