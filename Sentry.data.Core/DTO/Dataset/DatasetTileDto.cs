@@ -4,7 +4,7 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class DatasetTileDto
+    public class DatasetTileDto : IFilterSearchable
     {
         public string Id { get; set; }
         public string Name { get; set; }

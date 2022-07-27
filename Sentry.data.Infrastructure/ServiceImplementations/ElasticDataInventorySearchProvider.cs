@@ -325,6 +325,8 @@ namespace Sentry.data.Infrastructure
         {
             FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
 
+            List<FilterCategoryOptionDto> previousCategoryOptions = requestFilters?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions;
+
             foreach (var bucket in buckets)
             {
                 string bucketKey = bucket.KeyAsString ?? bucket.Key;
@@ -333,12 +335,11 @@ namespace Sentry.data.Infrastructure
                     OptionValue = bucketKey,
                     ResultCount = bucket.DocCount.GetValueOrDefault(),
                     ParentCategoryName = categoryName,
-                    Selected = requestFilters?.Any(x => x.CategoryName == categoryName && x.CategoryOptions?.Any(o => o.OptionValue == bucketKey && o.Selected) == true) == true
+                    Selected = previousCategoryOptions.HasSelectedValueOf(bucketKey)
                 });
             }
 
-            List<FilterCategoryOptionDto> selectedOptionsWithNoResults = requestFilters?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions?.Where(x => x.Selected && !categoryDto.CategoryOptions.Any(o => o.OptionValue == x.OptionValue)).ToList();
-            if (selectedOptionsWithNoResults?.Any() == true)
+            if (previousCategoryOptions.TryGetSelectedOptionsWithNoResultsIn(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
             {
                 categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
             }

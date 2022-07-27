@@ -380,6 +380,7 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\Entities\IFilterSearchable.cs" />
     <Compile Include="Interfaces\IAdSecurityAdminProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />

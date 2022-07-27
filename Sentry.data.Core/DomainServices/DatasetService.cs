@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Caching;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
@@ -613,100 +615,86 @@ namespace Sentry.data.Core
 
         public DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto)
         {
-            List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
-            List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
-            int totalResults = 0;
+            DatasetSearchResultDto resultDto = new DatasetSearchResultDto()
+            {
+                PageSize = datasetSearchDto.PageSize,
+                PageNumber = datasetSearchDto.PageNumber
+            };
 
             try
             {
-                if (_cache.Contains(CacheKeys.SEARCHDATASETS))
-                {
-                    datasetTileDtos = _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
-                }
-                else
-                {
-                    List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
-                                                                                       w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
-                                                                      FetchAllChildren(_datasetContext);
+                IEnumerable<DatasetTileDto> dtos = GetDatasetTileDtos();
 
-                    string associateId = _userService.GetCurrentUser().AssociateId;
-                    List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
-
-                    //map to DatasetTileDto
-                    foreach (Dataset dataset in datasets)
-                    {
-                        DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
-
-                        DatasetTileDto datasetTileDto = dataset.ToTileDto();
-                        datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-                        datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
-                        datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
-
-                        datasetTileDtos.Add(datasetTileDto);
-                    }
-
-                    _cache.Set(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
-                }
-
-                IEnumerable<DatasetTileDto> dtoEnumerable = datasetTileDtos;
-
-                //filter
                 if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
                 {
-                    dtoEnumerable = dtoEnumerable.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText));
-                }
+                    dtos = dtos.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText));
+                }                
+                                
+                List<DatasetTileDto> allResults = dtos.FilterBy(datasetSearchDto.FilterCategories).ToList();
 
-                foreach (FilterCategoryDto categoryDto in datasetSearchDto.FilterCategories)
-                {
-                    if (CustomAttributeHelper.TryGetFilterSearchFieldProperty<DatasetTileDto>(categoryDto.CategoryName, out PropertyInfo propertyInfo))
-                    {
-                        //x => categoryDto.GetSelectedValues().Contains(x.PropertyFromCategoryName)
-                        ParameterExpression parameter = Expression.Parameter(typeof(DatasetTileDto));
-                        Expression.Call(typeof(List<string>).GetMethod("Contains"), Expression.Constant(categoryDto.)
-                        foreach (string value in categoryDto.GetSelectedValues())
-                        {
-                            //x => x.PropertyFromCategoryName == value
-                            BinaryExpression body = Expression.Equal(Expression.Property(parameter, propertyInfo.Name), Expression.Constant(value));
-}
-
-
-                        Expression.Lambda<Func<DatasetTileDto, bool>>(body, new[] { parameter });
-                    }
-                }
-                //get total results
-
-                //get new filters
-
-                //order
-                if (datasetSearchDto.OrderByDescending)
-                {
-                    dtoEnumerable = datasetTileDtos.OrderByDescending(datasetSearchDto.OrderByField);
-                }
-                else
-                {
-                    dtoEnumerable = datasetTileDtos.OrderBy(datasetSearchDto.OrderByField);
-                }
-
-                datasetTileDtos = dtoEnumerable.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize).ToList();
+                resultDto.TotalResults = allResults.Count;
+                resultDto.Tiles = ApplyPaging(allResults, datasetSearchDto);
+                resultDto.FilterCategories = allResults.CreateFilters(datasetSearchDto.FilterCategories);
             }
             catch (Exception ex)
             {
                 Logger.Error("Error searching datasets", ex);
             }
 
-            DatasetSearchResultDto resultDto = new DatasetSearchResultDto()
-            {
-                PageSize = datasetSearchDto.PageSize,
-                PageNumber = datasetSearchDto.PageNumber,
-                Tiles = datasetTileDtos,
-                FilterCategories = filterCategories,
-                TotalResults = totalResults
-            };
-
             return resultDto;
         }
 
         #region "private functions"
+        private IEnumerable<DatasetTileDto> GetDatasetTileDtos()
+        {
+            if (_cache.Contains(CacheKeys.SEARCHDATASETS))
+            {
+                return _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
+            }
+            else
+            {
+                List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
+                                                                                   w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
+                                                                  FetchAllChildren(_datasetContext);
+
+                string associateId = _userService.GetCurrentUser().AssociateId;
+                List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
+
+                List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
+
+                //map to DatasetTileDto
+                foreach (Dataset dataset in datasets)
+                {
+                    DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+
+                    DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                    datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                    datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
+                    datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+
+                    datasetTileDtos.Add(datasetTileDto);
+                }
+
+                _cache.Set(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
+
+                return datasetTileDtos;
+            }
+        }
+
+        private List<DatasetTileDto> ApplyPaging(IEnumerable<DatasetTileDto> dtos, DatasetSearchDto datasetSearchDto)
+        {
+            if (datasetSearchDto.OrderByDescending)
+            {
+                dtos = dtos.OrderByDescending(datasetSearchDto.OrderByField);
+            }
+            else
+            {
+                dtos = dtos.OrderBy(datasetSearchDto.OrderByField);
+            }
+
+            return dtos.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize).ToList();
+        }
+
         private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
         {
             if (dto.DatasetCategoryIds == null)
