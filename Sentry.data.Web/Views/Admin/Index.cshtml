@@ -21,8 +21,58 @@
     <div class="col-lg-10">
         <div id="partial-view-test">
 
+            <h1>My Links</h1>
+
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#exampleModal" id="addLinkButton">
+                Add Link
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add Support Link</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="card form-wrapper" id="toggleDiv">
+                                <div class="card-body">
+                                    <h3 class="card-title">Add Information</h3>
+
+                                    <form class="bs-component">
+                                        <div class="md-form">
+                                            <input type="text" id="name" class="form-control" required />
+                                            <label for="name" class="">Enter Your Name</label>
+                                        </div>
+                                        <div class="md-form">
+                                            <label for="description" class="">Enter Description</label>
+                                            <input type="text" id="description" class="form-control" />
+
+                                        </div>
+                                        <div class="bs-component">
+                                            <label for="url">Enter an https:// URL:</label>
+                                            <input type="url" id="url" class="form-control" placeholder="https://example.com" required />
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary waves-effect waves-light">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <br />
             <div class="list-group">
-                <h1>My Links</h1>
                 <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
                 <a href="#" class="list-group-item">Morbi leo risus</a>
                 <a href="#" class="list-group-item">Porta ac consectetur ac</a>
@@ -37,29 +87,7 @@
             <button type="button" class="btn btn-outline-danger">Delete Link</button>
 
 
-            <div class="card form-wrapper" id="toggleDiv">
-                <div class="card-body">
-                    <h3 class="card-title">Add Information</h3>
-
-                    <form class="bs-component">
-                        <div class="md-form">
-                            <input type="text" id="name" class="form-control" required />
-                            <label for="name" class="">Enter Your Name</label>
-                        </div>
-                        <div class="md-form">
-                            <label for="description" class="">Enter Description</label>
-                            <input type="text" id="description" class="form-control" />
-
-                        </div>
-                        <div class="bs-component">
-                            <label for="url">Enter an https:// URL:</label>
-                            <input type="url" id="url" class="form-control" placeholder="https://example.com" required />
-                        </div>
-                        <button type="button" class="btn btn-primary waves-effect waves-light">Submit</button>
-
-                    </form>
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>
@@ -84,7 +112,10 @@
 }
 
 <style>
-    #toggleDiv{
-        width: 50%;
+    #addLinkButton{
+        position: relative;
+        top: 0;
+        right: 1;
+
     }
 </style>

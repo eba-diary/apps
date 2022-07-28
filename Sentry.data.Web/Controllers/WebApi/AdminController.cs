@@ -40,28 +40,31 @@ namespace Sentry.data.Web.Controllers.WebApi
                     return Content(System.Net.HttpStatusCode.BadRequest, "Url was not submitted");
                 }
             }
-            SupportLinkDto supportLinkDto = new SupportLinkDto();
-            //supportLinkDto = AdminExtensions.ToDto.Add(supportLinkDto, supportLinkDto);
-            SupportLinkDto supportLinkDto = new SupportLinkDto()
+            SupportLinkDto supportLinkDto = supportLinkModel.ToDto();
+            try
             {
-                SupportLinkId = supportLinkModel.SupportLinkId,
-                Name = supportLinkModel.Name,
-                Description = supportLinkModel.Description,
-                Url = supportLinkModel.Url,
-            };
-            SupportLinkService.AddSupportLink(supportLinkDto);
-            // if true return ok otherwise return content has a bad request
+                SupportLinkService.AddSupportLink(supportLinkDto);
+            } catch (Exception ex)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError, "Error occured when adding support link to database");
+            }
+            
             return Ok();
         }
 
         public IHttpActionResult DeleteSupportLink(int id)
         {
+            try
+            {
+                SupportLinkService.RemoveSupportLink(id);
+            } catch (Exception ex)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest, "Error occured when removing support link to database");
+            }
+
             return Ok();
         }
 
-        public ActionResult Index()
-        {
-            return View();
-        }
+       
     }
 }
