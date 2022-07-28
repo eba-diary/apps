@@ -643,7 +643,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        data.Dataset.showDataPreviewError();
+                        data.Dataset.showDataPreviewError(msg.responseJSON);
                         $('#dataSection').hide();
                     }
                 }
@@ -653,14 +653,13 @@ data.Dataset = {
                 if (error.status == 404 && error.responseText == "Schema not found") {
                     $('#dataSection').hide();
                 }
-
-                data.Dataset.showDataPreviewError();
+                data.Dataset.showDataPreviewError(error.responseJSON);
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
-        }).fail(function () {
-            data.Dataset.showDataPreviewError();
+        }).fail(function (error) {
+            data.Dataset.showDataPreviewError(error.responseJSON);
         });
 
     },
@@ -2686,9 +2685,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
     },
 
-    showDataPreviewError() {
-        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-        $("#DataPreviewNoRows").removeClass("d-none");
+    showDataPreviewError(message) {
+        if (message == 'Column metadata not added') {
+            $("#DataPreviewNoRows").html("<p>No columns added to schema</p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
+        else if (message == "Table or view not found") {
+            $("#DataPreviewNoRows").html("<p>Snowflake table or view was not found - please contact <a href='mailto: DSCSupport@sentry.com'>DSC Support</a></p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
+        else {
+            $("#DataPreviewNoRows").html("<p>No rows returned</p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
     },
 
     makeToast: function (severity, message) {
