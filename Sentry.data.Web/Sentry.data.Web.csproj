@@ -428,11 +428,13 @@
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />
@@ -449,6 +451,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
@@ -1228,6 +1231,8 @@
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
+    <Content Include="Views\Shared\_DeadJobTable.cshtml" />
+    <Content Include="Views\Shared\_ReprocessDeadSparkJobs.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
