@@ -661,7 +661,7 @@ namespace Sentry.data.Infrastructure
             return fileVersionId;
         }
 
-        private string PutObject(string sourceFilePath, string targetBucket, string targetKey)
+        private string PutObject(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
             string fileVersionId = null;
             try
@@ -672,6 +672,19 @@ namespace Sentry.data.Infrastructure
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
+
+                if(keyValuePairs != null)
+                {
+                    foreach(KeyValuePair<string, string> keyValuePair in keyValuePairs)
+                    {
+                        Tag tag = new Tag()
+                        {
+                            Key = keyValuePair.Key,
+                            Value = keyValuePair.Value,
+                        };
+                        poReq.TagSet.Add(tag);
+                    }
+                }
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
