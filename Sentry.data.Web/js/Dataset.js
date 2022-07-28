@@ -2608,6 +2608,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#AccessRequestValidationMessage").removeClass("d-none");
             }
         });
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
+        });
+        $("#RequestAccessConsumeCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessConsumeEntitlement").text());
+        });
     },
 
     validateRequestAccessModal() {
@@ -2742,5 +2748,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
 
         toastr[severity](message);
+    },
+
+    copyTextToClipboard: function (text) {
+        navigator.clipboard.writeText(text);
+        data.Dataset.makeToast("success","Copied " + text + " to clipboard")
     }
 };
