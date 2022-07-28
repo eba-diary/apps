@@ -200,6 +200,7 @@ data.Dataset = {
             //},
 
             columns: [
+                { data: "OrdinalPosition", className: "OrdinalPosition" },
                 {
                     data: "Name", className: "Name",
                     render: function (d, type, row, meta) {
@@ -228,7 +229,7 @@ data.Dataset = {
                 [20, 100, 500]
             ],
 
-            order: [0, 'desc'],
+            order: [0, 'asc'],
 
             //style for columnVisibility and paging to show
             //dom: 'B',
@@ -274,6 +275,7 @@ data.Dataset = {
                 { column_number: 4, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 5, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 7, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
             ],
                 {
                     filters_tr_index: 1
@@ -927,6 +929,9 @@ data.Dataset = {
                     $("#IsSecured").parents('.md-form').hide();
                     break;
                 case "2":
+                    if (!$("#IsSecured").is(':checked')) {
+                        $("#IsSecured").next().click();
+                    }
                     $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
                         'identifiable information, and is intended for limited, specific use by a workgroup, ' +
                         'department, or group of individuals with a legitimate need to know. Disclosure or ' +
