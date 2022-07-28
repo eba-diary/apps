@@ -4,99 +4,103 @@
     ViewBag.Fluid = true;
 }
 
-<div>
-    @* page size *@
-    <div class="float-left md-form">
-        @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
-        <label class="mdb-main-label">Page Size</label>
+<div class="ml-3">
+    <div>
+        @* page size *@
+        <div class="float-left mt-4">
+            @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Page Size</label>
+        </div>
+
+        @* sort *@
+        <div class="float-right mt-4 tile-mr">
+            @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Sort By</label>
+        </div>
     </div>
 
-    @* sort *@
-    <div class="float-right md-form">
-        @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
-        <label class="mdb-main-label">Sort By</label>
-    </div>
-</div>
-
-<ul id="tile-results" class="list-unstyled">
-    @foreach (TileModel tile in Model.Tiles)
-    {
-        //convert to use User Favorites
-        <li class="tile-result borderSide_@tile.Color boxShadowSm @(tile.Status == "Active" ? "tile-active" : "")" data-id="@tile.Id" title="@tile.TileTitle">
-            <div class="category-type-wrap">
-                <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
-                <div class="category-type categoryBanner-@tile.Color" title="@tile.Category">
-                    <span>@tile.Category</span>
-                </div>
-            </div>
-
-            <div class="dataset-list-content">
-                @foreach (string type in tile.ReportTypes)
-                {
-                    <div class="extension bg_gray @type">
-                        <span>@type</span>
+    <ul id="tile-results" class="list-unstyled">
+        @foreach (TileModel tile in Model.Tiles)
+        {
+            //convert to use User Favorites
+            <li class="tile-result tile-mr borderSide_@tile.Color boxShadowSm @(tile.Status == "Active" ? "tile-active" : "")" data-id="@tile.Id" title="@tile.TileTitle">
+                <div class="category-type-wrap">
+                    <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
+                    <div class="category-type categoryBanner-@tile.Color" title="@tile.Category">
+                        <span>@tile.Category</span>
                     </div>
-                }
-
-                <span class="search-dataset-name">@tile.Name @(tile.Status != "Active" ? "(Pending Delete)" : "")</span>
-
-                @if (tile.IsSecured)
-                {
-                    <em class="fas fa-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></em>
-                }
-            </div>
-
-            <div class="dataset-list-content tile-description" title="@tile.Description">@tile.Description</div>
-
-            <div class="dataset-list-content dataset-detail-content-info">
-                <div class="dataset-detail-content-info-row">
-                    <span class="bold ownerDate dsc-@tile.Color-text">Last Activity Date:</span>
-                    <span>@tile.LastUpdated</span>
                 </div>
 
-                @if (tile.IsReport)
-                {
-                    <div class="SentryOwner col-lg-12 dataset-detail-content-info-row">
-                        <span class="bold dataset-detail-contact-label dsc-@tile.Color-text">Refresh Frequency:</span>
-                        <span class="info-detail">@tile.UpdateFrequency</span>
-                    </div>
-
-                    <div class="contacts col-lg-10 dataset-detail-content-info-row">
-                        <span class="bold dataset-detail-contact-label dsc-@tile.Color-text">Contact:</span>
-                        <div class="info-detail">
-                            <span class="info-detail">@tile.ContactNames</span>
-                            @if (!string.IsNullOrEmpty(tile.AdditionalContactNames))
-                            {
-                                <span class="moreContacts info-detail" title="@tile.AdditionalContactNames"> and @tile.AdditionalContactNames.Count().ToString() more</span>
-                            }
+                <div class="dataset-list-content">
+                    @foreach (string type in tile.ReportTypes)
+                    {
+                        <div class="extension bg_gray @type">
+                            <span>@type</span>
                         </div>
+                    }
+
+                    <span class="search-dataset-name">@tile.Name @(tile.Status != "Active" ? "(Pending Delete)" : "")</span>
+
+                    @if (tile.IsSecured)
+                    {
+                        <em class="fas fa-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></em>
+                    }
+                </div>
+
+                <div class="dataset-list-content tile-description" title="@tile.Description">@tile.Description</div>
+
+                <div class="dataset-list-content dataset-detail-content-info">
+                    <div class="dataset-detail-content-info-row">
+                        <span class="bold ownerDate dsc-@tile.Color-text">Last Activity Date:</span>
+                        <span>@tile.LastUpdated</span>
                     </div>
 
-                    <div class="col-lg-2 dataset-detail-content-info-row">
-                        <a href="#" class="home-tile-link-bi disregardParentClick" title="Click to view details">View Details ></a>
-                    </div>
+                    @if (tile.IsReport)
+                    {
+                        <div class="SentryOwner col-lg-12 dataset-detail-content-info-row">
+                            <span class="bold dataset-detail-contact-label dsc-@tile.Color-text">Refresh Frequency:</span>
+                            <span class="info-detail">@tile.UpdateFrequency</span>
+                        </div>
+
+                        <div class="contacts col-lg-10 dataset-detail-content-info-row">
+                            <span class="bold dataset-detail-contact-label dsc-@tile.Color-text">Contact:</span>
+                            <div class="info-detail">
+                                <span class="info-detail">@tile.ContactNames</span>
+                                @if (!string.IsNullOrEmpty(tile.AdditionalContactNames))
+                                {
+                                    <span class="moreContacts info-detail" title="@tile.AdditionalContactNames"> and @tile.AdditionalContactNames.Count().ToString() more</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 dataset-detail-content-info-row">
+                            <a href="#" class="home-tile-link-bi disregardParentClick" title="Click to view details">View Details ></a>
+                        </div>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+
+    @if (Model.PageItems?.Any() == true)
+    {
+        <div class="float-right mt-4 tile-mr">
+            <ul class="pagination">
+                <li class="page-item @(Model.PageItems.First().IsActive ? "disabled" : "")" id="tile-page-previous">
+                    <span class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</span>
+                </li>
+
+                @foreach (PageItemModel item in Model.PageItems)
+                {
+                    <li class="page-item tile-page-number @(item.IsActive ? "active" : "") @(item.IsDisabled ? "disabled" : "")" data-page="@item.PageNumber">
+                        <span class="page-link waves-effect" href="#">@item.PageNumber</span>
+                    </li>
                 }
-            </div>
-        </li>
+
+                <li class="page-item @(Model.PageItems.Last().IsActive ? "disabled" : "")" id="tile-page-next">
+                    <span class="page-link next waves-effect" href="#" aria-label="Next">Next</span>
+                </li>
+            </ul>
+        </div>
     }
-</ul>
-
-@if (Model.PageItems?.Any() == true)
-{
-    <div class="float-right mt-4">
-        <ul class="pagination">
-            <li class="page-item">
-                <a class="page-link previous waves-effect @(Model.PageItems.First().IsActive ? "disabled" : "")" href="#" aria-label="Previous">Previous</a>
-            </li>
-
-            @foreach (PageItemModel item in Model.PageItems)
-            {
-                <li class="page-item tile-page-item @(item.IsActive ? "active" : "") @(item.IsDisabled ? "disabled" : "")" data-page="@item.PageNumber"><a class="page-link waves-effect" href="#">@item.PageNumber</a></li>
-            }
-
-            <li class="page-item">
-                <a class="page-link next waves-effect @(Model.PageItems.Last().IsActive ? "disabled" : "")" href="#" aria-label="Next">Next</a>
-            </li>
-        </ul>
-    </div>
-}
+</div>

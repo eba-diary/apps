@@ -54,7 +54,7 @@ namespace Sentry.data.Core
                     List<string> selectedValues = categoryDto.GetSelectedValues();
                     MethodInfo contains = selectedValues.GetType().GetMethod(nameof(selectedValues.Contains));
 
-                    MethodCallExpression body = Expression.Call(Expression.Constant(selectedValues), contains, ToStringProperty(parameter, propertyInfo.Name));
+                    MethodCallExpression body = Expression.Call(Expression.Constant(selectedValues), contains, ToStringProperty(parameter, propertyInfo));
                     Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(body, new[] { parameter });
                     enumerable = enumerable.Where(lambda.Compile());
                 }
@@ -69,7 +69,15 @@ namespace Sentry.data.Core
 
             List<PropertyInfo> filterableProperties = CustomAttributeHelper.GetPropertiesWithAttribute<T, FilterSearchField>().ToList();
 
-            Task<FilterCategoryDto>[] tasks = filterableProperties.Select(x => CreateFilterCategoryAsync(results, previousFilters, x)).ToArray();
+            List<Task<FilterCategoryDto>> tasks = filterableProperties.Select(x => CreateFilterCategoryAsync(results, previousFilters, x)).ToList();
+
+            //Task.WaitAll(tasks.ToArray());
+
+            //foreach (Task<FilterCategoryDto> task in tasks)
+            //{
+            //    filterCategories.Add(task.Result);
+            //}
+
             filterCategories.AddRange(tasks.Where(x => x.Result.CategoryOptions.Any()).Select(x => x.Result).ToList());
 
             return filterCategories;
@@ -95,7 +103,7 @@ namespace Sentry.data.Core
                 FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = filterAttribute.FilterCategoryName };
 
                 ParameterExpression parameter = Expression.Parameter(typeof(T));
-                Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo.Name), parameter);
+                Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);
 
                 List<IGrouping<string, T>> categoryOptions = results.GroupBy(groupByExpression.Compile()).ToList();
 
@@ -120,13 +128,13 @@ namespace Sentry.data.Core
                 }
 
                 return categoryDto;
-            });
+            }).ConfigureAwait(false);
         }
 
-        private static MethodCallExpression ToStringProperty(ParameterExpression parameter, string propertyName)
+        private static MethodCallExpression ToStringProperty(ParameterExpression parameter, PropertyInfo propertyInfo)
         {
-            MethodInfo toString = typeof(string).GetMethod("ToString");
-            return Expression.Call(Expression.Property(parameter, propertyName), toString);
+            MethodInfo toString = propertyInfo.PropertyType.GetMethod("ToString", Type.EmptyTypes);
+            return Expression.Call(Expression.Property(parameter, propertyInfo.Name), toString);
         }
         #endregion
     }

@@ -627,7 +627,7 @@ namespace Sentry.data.Core
 
                 if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
                 {
-                    dtos = dtos.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText));
+                    dtos = dtos.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText.ToLower()));
                 }                
                                 
                 List<DatasetTileDto> allResults = dtos.FilterBy(datasetSearchDto.FilterCategories).ToList();

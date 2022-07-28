@@ -424,7 +424,7 @@ namespace Sentry.data.Web.Helpers
                 PageNumber = numberOfPages.ToString()
             });
 
-            return new List<PageItemModel>();
+            return pageItems;
         }
 
         public static List<SelectListItem> BuildSelectListitem(List<KeyValuePair<string,string>> list, string defaultText)

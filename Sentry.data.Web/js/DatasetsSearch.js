@@ -1,31 +1,41 @@
 ﻿data.DatasetsSearch = {
     init: function () {
+        this.executeSearch();
         this.initUI();
         this.initEvents();
     },
 
     executeSearch: function () {
-        this.executeSearch(1, true);
+        data.DatasetsSearch.executeDatasetSearch(1, true);
     },
 
-    executeSearch: function (pageNumber, reloadFilters) {
+    executeDatasetSearch: function (pageNumber, reloadFilters) {
         //build search request
-        var request = data.FilterSearch.buildSearchRequest();
-        request.PageNumber = pageNumber;
-        request.PageSize = $("#tile-result-page-size").val();
-        request.SortBy = $("#tile-result-sort").val();
+        var lastPageNumber = 1;
 
-        //get tiles
-        $.post("/DatasetSearch/GetTileResultsModel/", request, function (tileResultsModel) {
-            //load result view
-            $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
-                data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
+        if ($("#tile-page-next").length) {
+            lastPageNumber = parseInt($("#tile-page-next").prev().data("page"));
+        }
+
+        if (pageNumber > 0 && pageNumber <= lastPageNumber) {
+            var request = data.FilterSearch.buildSearchRequest();
+            request.PageNumber = pageNumber;
+            request.PageSize = $("#tile-result-page-size").val();
+            request.SortBy = $("#tile-result-sort").val();
+
+            //get tiles
+            $.post("/DatasetSearch/GetTileResultsModel/", request, function (tileResultsModel) {
+                //load result view
+                $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
+                    data.DatasetsSearch.initUI();
+                    data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
+                });
+
+                if (reloadFilters) {
+                    data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
+                }
             });
-
-            if (reloadFilters) {
-                data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
-            }
-        });
+        }
     },
 
     buildFilter: function () {
@@ -72,13 +82,36 @@
             //data.Favorites.toggleFavorite(this, "Dataset", function () { })
         });
 
-        //sort by change
-        //call executeSearch(1, false);
+        //sort by change event
+        $(document).on("change", "#tile-result-sort", function (e) {
+            console.log("sort click");
+            data.DatasetsSearch.executeDatasetSearch(1, false);
+        });
 
-        //page size change
-        //call executeSearch(1, false);
+        //page size change event
+        $(document).on("change", "#tile-result-page-size", function (e) {
+            console.log("size click");
+            data.DatasetsSearch.executeDatasetSearch(1, false);
+        });
 
-        //page change
-        //call executeSearch($(".tile-page-item.active").data("page"), false);
+        //page change events
+        $(document).on("click", "#tile-page-previous", function (e) {
+            console.log("prev click");
+            var previous = parseInt($(".tile-page-number.active").data("page"))--;
+            data.DatasetsSearch.executeDatasetSearch(previous, false);
+        });
+
+        $(document).on("click", "#tile-page-next", function (e) {
+            console.log("next click");
+            var next = parseInt($(".tile-page-number.active").data("page"))++;
+            data.DatasetsSearch.executeDatasetSearch(next, false);
+        });
+
+        $(document).on("click", ".tile-page-number", function (e) {
+            if (!$(this).hasClass("active")) {
+                console.log("number click");
+                data.DatasetsSearch.executeDatasetSearch(parseInt($(this).data("page")), false)
+            }
+        });
     }
 }

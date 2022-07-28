@@ -59,9 +59,9 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
             DatasetSearchResultDto resultDto = _datasetService.SearchDatasets(datasetSearchDto);
-            TileResultsModel tileModels = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber);
+            TileResultsModel tileResultsModel = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber);
 
-            return Json(tileModels);
+            return Json(tileResultsModel);
         }
 
         [HttpPost]
@@ -74,7 +74,7 @@ namespace Sentry.data.Web.Controllers
         {
             return new FilterSearchConfigModel()
             {
-                PageTitle = "Dataset",
+                PageTitle = "Datasets",
                 SearchType = SearchType.DATASET_SEARCH,
                 IconPath = "~/Images/Icons/DatasetsBlue.svg",
                 DefaultSearch = searchModel

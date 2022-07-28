@@ -148,14 +148,14 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     clear: both;
 }
 
 .tile-result {
-    width: 33%;
+    width: calc((100% / 3) - 0.75%);
     position: relative;
-    margin-top: 0.6%;
+    margin-bottom: 0.75%;
     padding: 0.5em;
     background-color: #FFFFFF;
 }
@@ -173,4 +173,8 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.tile-mr {
+    margin-right: 0.75%;
 }

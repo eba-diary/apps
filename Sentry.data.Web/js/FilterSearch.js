@@ -297,8 +297,11 @@
             $("#filter-search-total").text(totalResultCount.toLocaleString("en-US"));
 
             if (totalResultCount > returnedResultCount) {
-                $("#filter-search-count-of").removeClass("d-none");
+                $("#filter-search-returned-subset").removeClass("d-none");
                 $("#filter-search-returned-total").text(returnedResultCount.toLocaleString("en-US"));
+            }
+            else {
+                $("#filter-search-returned-subset").addClass("d-none");
             }
             
             data.FilterSearch.setPageInfo(1, pageSize < returnedResultCount ? pageSize : returnedResultCount);

@@ -16,7 +16,7 @@ namespace Sentry.data.Web
         public bool IsSecured { get; set; }
         public string LastUpdated { get; set; }
         public bool IsReport { get; set; }
-        public List<string> ReportTypes { get; set; }
+        public List<string> ReportTypes { get; set; } = new List<string>();
         public string UpdateFrequency { get; set; }
         public string ContactNames { get; set; }
         public string AdditionalContactNames { get; set; }
