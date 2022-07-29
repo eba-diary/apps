@@ -142,6 +142,7 @@ namespace Sentry.data.Core
         /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
         /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
         /// </remarks>
+        /// 
         [AutomaticRetry(Attempts = 0)]
         public void UpgradeDataFlow(int producerDataFlowId)
         {

@@ -1,0 +1,38 @@
+﻿@model ReprocessDeadSparkJobModel
+@{
+    ViewBag.Title = "_AdminTest";
+}
+
+<script>
+    $(document).ready(function () {
+        data.Admin.RetrieveDeadSparkJobListButton();
+    });
+</script>
+
+<!--Page Header-->
+<div class="d-inline-block">
+    <h1>Reprocess Dead Spark Jobs</h1>
+    <input type="checkbox">
+    <div class="form-inline">
+        <div class="md-form">
+            @Html.TextBoxFor(x => x.currentDate, "{0:yyyy-MM-ddTHH:mm:ss}", new
+                       {
+                           @class = "form-control",
+                           required = "required",
+                           @type = "datetime-local",
+                           @id = "datetime-picker"
+                       })
+        </div>
+        <button id="timeCheck" class="btn btn-primary mb-2">Check for Dead Jobs</button>
+    </div>
+</div>
+
+<br />
+<br />
+<br />
+
+<!--Table-->
+
+<div id="deadJobTable"></div>
+
+

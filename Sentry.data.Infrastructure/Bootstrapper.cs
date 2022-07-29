@@ -141,7 +141,9 @@ namespace Sentry.data.Infrastructure
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
+            registry.For<IDeadJobProvider>().Add<DeadJobProvider>().Ctor<IDbExecuter>().Is(new DeadSparkJobSqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
+            registry.For<IDeadSparkJobService>().Use<DeadSparkJobService>();
             registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
             // Choose the parameterless constructor.

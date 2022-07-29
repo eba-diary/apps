@@ -364,6 +364,7 @@
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\HangfireJobScheduler.cs" />
+    <Compile Include="ServiceImplementations\DeadSparkJobSqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataInventorySqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />
@@ -404,6 +405,7 @@
     <Compile Include="ServiceImplementations\Messaging\FileDeleteEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
+    <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
