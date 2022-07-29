@@ -71,13 +71,6 @@ namespace Sentry.data.Core
 
             List<Task<FilterCategoryDto>> tasks = filterableProperties.Select(x => CreateFilterCategoryAsync(results, previousFilters, x)).ToList();
 
-            //Task.WaitAll(tasks.ToArray());
-
-            //foreach (Task<FilterCategoryDto> task in tasks)
-            //{
-            //    filterCategories.Add(task.Result);
-            //}
-
             filterCategories.AddRange(tasks.Where(x => x.Result.CategoryOptions.Any()).Select(x => x.Result).ToList());
 
             return filterCategories;

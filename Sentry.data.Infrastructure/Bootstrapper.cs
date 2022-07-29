@@ -194,9 +194,6 @@ namespace Sentry.data.Infrastructure
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
 
-            //memory cache
-            registry.For<ObjectCache>().Singleton().Use(() => new MemoryCache("DatasetCache", null));
-
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             apacheLivyClient.DefaultRequestHeaders.Accept.Clear();

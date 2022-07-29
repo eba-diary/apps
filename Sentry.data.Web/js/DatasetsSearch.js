@@ -49,6 +49,7 @@
     initUI: function () {
         $('#tile-result-page-size').materialSelect();
         $('#tile-result-sort').materialSelect();
+        $('#tile-result-layout').materialSelect();
     },
 
     initEvents: function () {

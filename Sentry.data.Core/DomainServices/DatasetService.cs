@@ -28,7 +28,7 @@ namespace Sentry.data.Core
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IQuartermasterService _quartermasterService;
-        private readonly ObjectCache _cache;
+        private readonly ObjectCache _cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
 
@@ -36,7 +36,7 @@ namespace Sentry.data.Core
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
-                            IDataFeatures featureFlags, ObjectCache cache)
+                            IDataFeatures featureFlags)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -46,7 +46,6 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
-            _cache = cache;
         }
 
         public DatasetDto GetDatasetDto(int id)
@@ -89,12 +88,12 @@ namespace Sentry.data.Core
 
                 //Pull summarized metadata from datasetfile table
                 summaryResults = _datasetContext.DatasetFileStatusActive.GroupBy(g => new { g.Dataset })
-                .Select(s => new DatasetSummaryMetadataDTO
-                {
-                    DatasetId = s.Key.Dataset.DatasetId,
-                    FileCount = s.Count(),
-                    Max_Created_DTM = s.Max(m => m.CreatedDTM)
-                }).ToList();
+                    .Select(s => new DatasetSummaryMetadataDTO
+                    {
+                        DatasetId = s.Key.Dataset.DatasetId,
+                        FileCount = s.Count(),
+                        Max_Created_DTM = s.Max(m => m.CreatedDTM)
+                    }).ToList();
 
                 //pull summarized metadata from events table
                 var eventlist = _datasetContext.Events
@@ -647,38 +646,28 @@ namespace Sentry.data.Core
         #region "private functions"
         private IEnumerable<DatasetTileDto> GetDatasetTileDtos()
         {
-            if (_cache.Contains(CacheKeys.SEARCHDATASETS))
+            List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET && w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).FetchAllChildren(_datasetContext);
+
+            string associateId = _userService.GetCurrentUser().AssociateId;
+            List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
+
+            //map to DatasetTileDto
+            foreach (Dataset dataset in datasets)
             {
-                return _cache.Get(CacheKeys.SEARCHDATASETS) as List<DatasetTileDto>;
+                //DatasetSummaryMetadataDTO summary = datasetSummariesTask.Result.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
+
+                //calculate last updated from dataset.DataFiles if any
+                //remove page views from dto and the sort options altogether
+
+                DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
+                datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+
+                datasetTileDtos.Add(datasetTileDto);
             }
-            else
-            {
-                List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET &&
-                                                                                   w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
-                                                                  FetchAllChildren(_datasetContext);
 
-                string associateId = _userService.GetCurrentUser().AssociateId;
-                List<DatasetSummaryMetadataDTO> datasetSummaries = GetDatasetSummaryMetadataDTO();
-
-                List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
-
-                //map to DatasetTileDto
-                foreach (Dataset dataset in datasets)
-                {
-                    DatasetSummaryMetadataDTO summary = datasetSummaries.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
-
-                    DatasetTileDto datasetTileDto = dataset.ToTileDto();
-                    datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-                    datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
-                    datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
-
-                    datasetTileDtos.Add(datasetTileDto);
-                }
-
-                _cache.Set(CacheKeys.SEARCHDATASETS, datasetTileDtos, DateTime.Now.AddMinutes(10));
-
-                return datasetTileDtos;
-            }
+            return datasetTileDtos;
         }
 
         private List<DatasetTileDto> ApplyPaging(IEnumerable<DatasetTileDto> dtos, DatasetSearchDto datasetSearchDto)

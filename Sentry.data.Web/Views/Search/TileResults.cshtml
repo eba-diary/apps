@@ -4,19 +4,28 @@
     ViewBag.Fluid = true;
 }
 
-<div class="ml-3">
-    <div>
-        @* page size *@
-        <div class="float-left mt-4">
-            @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
-            <label class="mdb-main-label">Page Size</label>
-        </div>
-
+<div class="tile-result-content ml-3">
+    <div class="tile-result-options mt-4 tile-mr">
         @* sort *@
-        <div class="float-right mt-4 tile-mr">
+        <div class="mr-2">
             @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
             <label class="mdb-main-label">Sort By</label>
         </div>
+
+        @* layout *@
+        <div>
+            <select class="mdb-select" id="tile-result-layout">
+                <option value="1">Grid</option>
+                <option value="2">List</option>
+            </select>
+            <label class="mdb-main-label">Layout</label>
+        </div>
+    </div>
+
+    @* page size *@
+    <div class="mt-4">
+        @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
+        <label class="mdb-main-label">Page Size</label>
     </div>
 
     <ul id="tile-results" class="list-unstyled">
@@ -84,7 +93,7 @@
 
     @if (Model.PageItems?.Any() == true)
     {
-        <div class="float-right mt-4 tile-mr">
+        <div class="tile-mr">
             <ul class="pagination">
                 <li class="page-item @(Model.PageItems.First().IsActive ? "disabled" : "")" id="tile-page-previous">
                     <span class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</span>

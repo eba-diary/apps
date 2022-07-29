@@ -178,3 +178,14 @@
 .tile-mr {
     margin-right: 0.75%;
 }
+
+.tile-result-content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.tile-result-options {
+    display: flex;
+}
