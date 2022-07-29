@@ -245,7 +245,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="dataSet"></param>
         public string UploadDataFile(string sourceFilePath, string targetKey)
         {
-            return UploadDataFile(sourceFilePath, RootBucket, targetKey);
+            return UploadDataFile(sourceFilePath, RootBucket, targetKey, null);
         }
 
         /// <summary>
@@ -255,11 +255,11 @@ namespace Sentry.data.Infrastructure
         /// <param name="sourceFilePath"></param>
         /// <param name="targetKey"></param>
         /// <param name="dataSet"></param>
-        public string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey)
+        public string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
             System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
 
-            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetBucket, targetKey) : PutObject(sourceFilePath, targetBucket, targetKey);
+            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetBucket, targetKey, keyValuePairs) : PutObject(sourceFilePath, targetBucket, targetKey, keyValuePairs);
         }
 
         /// <summary>
@@ -361,12 +361,12 @@ namespace Sentry.data.Infrastructure
             return ((incomingLength / partSize) > (partLimit * .95));            
         }        
 
-        public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey)
+        public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
             List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
             string fileVersionId = null;
             
-            string uploadId = StartUpload(targetBucket, targetKey);
+            string uploadId = StartUpload(targetBucket, targetKey, keyValuePairs);
 
             long contentLength = new FileInfo(sourceFilePath).Length;
 
@@ -439,13 +439,27 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="uniqueKey"></param>
         /// <returns></returns>
-        public string StartUpload(string bucket, string uniqueKey)
+        public string StartUpload(string bucket, string uniqueKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
             mReq.BucketName = bucket;
             mReq.Key = uniqueKey;
             mReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
             mReq.CannedACL = GetCannedAcl();
+
+            if(keyValuePairs != null)
+            {
+                foreach (KeyValuePair<string, string> keyValuePair in keyValuePairs)
+                {
+                    Tag tag = new Tag()
+                    {
+                        Key = keyValuePair.Key,
+                        Value = keyValuePair.Value,
+                    };
+                    mReq.TagSet.Add(tag);
+                }
+            }
+
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
 
             Sentry.Common.Logging.Logger.Debug($"Initiated MultipartUpload UploadID: {mRsp.UploadId}");
@@ -513,7 +527,7 @@ namespace Sentry.data.Infrastructure
         {
             List<CopyPartResponse> copyPartResponses = new List<CopyPartResponse>();
 
-            string uploadId = StartUpload(targetBucket, targetKey);
+            string uploadId = StartUpload(targetBucket, targetKey, null);
 
             try
             {
@@ -672,7 +686,7 @@ namespace Sentry.data.Infrastructure
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
-
+                
                 if(keyValuePairs != null)
                 {
                     foreach(KeyValuePair<string, string> keyValuePair in keyValuePairs)
@@ -685,7 +699,7 @@ namespace Sentry.data.Infrastructure
                         poReq.TagSet.Add(tag);
                     }
                 }
-
+                
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
                 PutObjectResponse poRsp = S3Client.PutObject(poReq);

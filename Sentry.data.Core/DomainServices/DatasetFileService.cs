@@ -125,7 +125,7 @@ namespace Sentry.data.Core
                 DataFlowStep dropStep = dataFlow?.Steps.FirstOrDefault(x => x.DataAction_Type_Id == DataActionType.ProducerS3Drop);
                 if (dropStep != null)
                 {
-                    _s3ServiceProvider.UploadDataFile(uploadDatasetFileDto.FileInputStream, dropStep.TriggerBucket, dropStep.TriggerKey + uploadDatasetFileDto.FileName);
+                    _s3ServiceProvider.UploadDataFile(uploadDatasetFileDto.FileInputStream, dropStep.TriggerBucket, dropStep.TriggerKey + uploadDatasetFileDto.FileName, null);
                 }
                 else
                 {
@@ -213,8 +213,10 @@ namespace Sentry.data.Core
 
                     string targetBucket = dataFlowStep.TargetBucket;
                   
+                    List<KeyValuePair<string, string>> keyValuePairs = new List<KeyValuePair<string, string>>();
+                    keyValuePairs.Add(response);
                     //_s3ServiceProvider.UploadDataFile(response.Key, response.Value);
-                    _s3ServiceProvider.UploadDataFile(stream, targetBucket, response.Key);
+                    _s3ServiceProvider.UploadDataFile(stream, targetBucket, response.Key, keyValuePairs);
                 }
             }
             catch (Exception ex)

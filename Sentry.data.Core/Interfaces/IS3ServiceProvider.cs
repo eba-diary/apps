@@ -33,7 +33,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         string UploadDataFile(Stream inputstream, string targetKey);
 
-        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey);
+        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         void TransferUtlityUploadStream(string category, string filename, Stream stream);
 
