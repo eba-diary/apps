@@ -25,7 +25,7 @@ from JobHistory
 where State = 'Dead' and Job_ID = @JobID and Created > @TimeCreated
 order by History_Id DESC
 
-SELECT * FROM #Submissions 
+/* SELECT * FROM #Submissions */
 
 select
 subs.Submission_ID,
@@ -47,7 +47,7 @@ join #Submissions selectedSubs on
     subs.Submission_ID = selectedSubs.Submission
 order by subs.Submission_ID DESC
 
-SELECT * FROM #tempSubs 
+/* SELECT * FROM #tempSubs */
 
 select
 subs.Submission_ID,
@@ -68,7 +68,7 @@ join JobHistory hist on
     subs.Submission_ID = hist.Submission
 order by subs.Created DESC, hist.History_Id DESC
 
-SELECT * FROM #tempSubmissionDetails
+/* SELECT * FROM #tempSubmissionDetails */
 
 select 
 ROW_NUMBER() OVER(PARTITION BY Dataset_ID,Schema_ID,BatchId ORDER BY History_Id DESC) AS RowNumber,
@@ -77,7 +77,7 @@ REVERSE(SUBSTRING(REVERSE(TargetKey), CHARINDEX('.',REVERSE(TargetKey),0) + 1, 1
 into #TempSubmissionDetails_RowNum
 from #tempSubmissionDetails
 
-SELECT * FROM #TempSubmissionDetails_RowNum
+/* SELECT * FROM #TempSubmissionDetails_RowNum */
 
 select 
 ROW_NUMBER() OVER(PARTITION BY TSD_Num.Submission_Id ORDER BY EM.EventMetricsId DESC) AS RowNumber,
@@ -93,7 +93,7 @@ where
 	TSD_Num.RowNumber = 1
 	and DFS.DataAction_Type_Id = 5
 
-SELECT * FROM #EventMetadata where RowNumber = 1 
+/* SELECT * FROM #EventMetadata where RowNumber = 1 */
 
 select
 TSD.Submission_id,
