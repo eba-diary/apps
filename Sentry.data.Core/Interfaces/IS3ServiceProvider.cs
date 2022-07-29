@@ -58,7 +58,7 @@ namespace Sentry.data.Core
         #endregion
         void DeleteMulitpleS3Keys(List<string> keys);
 
-        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey);
+        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         string GetDatasetDownloadUrl(string key, string bucket = null, string versionId = null, string fileName = null);
 
@@ -82,7 +82,7 @@ namespace Sentry.data.Core
 
         Stream GetObject(string key, string versionId = null);
 
-        string StartUpload(string bucket, string uniqueKey);
+        string StartUpload(string bucket, string uniqueKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         List<string> FindObject(string keyPrefix);
 
