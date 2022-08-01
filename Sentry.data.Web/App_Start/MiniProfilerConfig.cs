@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using StackExchange.Profiling;
+﻿using StackExchange.Profiling;
 using System.Collections.Generic;
+using Sentry.Profiling.AspNet;
+using StackExchange.Profiling.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -12,21 +12,9 @@ namespace Sentry.data.Web
         ///</summary>
         public static void RegisterMiniProfilerSettings()
         {
-#if DEBUG
-            //Wire up profiling for view rendering - in debug mode only
-            var copy = ViewEngines.Engines.ToList();
-            ViewEngines.Engines.Clear();
-            foreach (IViewEngine asset in copy)
-            {
-                ViewEngines.Engines.Add(new ProfilingViewEngine(asset));
-            }
-#endif
-
-            //Wire up SQL Formatter
-            MiniProfiler.Settings.SqlFormatter = new StackExchange.Profiling.SqlFormatters.SqlServerFormatter();
 
             //Paths that shouldn't be profiled(e.g.css, js, images)
-            List<string> ignored = MiniProfiler.Settings.IgnoredPaths.ToList();
+            HashSet<string> ignored = MiniProfiler.DefaultOptions.IgnoredPaths;
             ignored.Add("WebResource.axd");
             ignored.Add("/Content/");
             ignored.Add("/Images/");
@@ -35,15 +23,32 @@ namespace Sentry.data.Web
             ignored.Add("/fonts/");
             ignored.Add("/_status/");
 
-            MiniProfiler.Settings.IgnoredPaths = ignored.ToArray();
-            MiniProfiler.Settings.PopupRenderPosition = RenderPosition.Left;
-            MiniProfiler.Settings.PopupMaxTracesToShow = 10;
-            MiniProfiler.Settings.RouteBasePath = "~/profiler/";
+            StackExchange.Profiling.MiniProfiler.Configure(new MiniProfilerOptions
+            {
+                RouteBasePath = "~/profiler",
+                PopupRenderPosition = RenderPosition.Left,
+                PopupMaxTracesToShow = 10,
+                ResultsAuthorize = request => request.IsLocal,
+                StackMaxLength = 256,
+                SqlFormatter = new StackExchange.Profiling.SqlFormatters.SqlServerFormatter(),
+                ShowControls = true,
+                ProfilerProvider = new MiniProfilerRequestProvider()
 
-            MiniProfiler.Settings.ExcludeAssembly("NHibernate");
-            MiniProfiler.Settings.ExcludeMethod("Flush");
-            MiniProfiler.Settings.StackMaxLength = 256;
-            MiniProfiler.Settings.ShowControls = true;
+            })
+                .IgnorePath("WebResource.axd")
+                .IgnorePath("/Content/")
+                .IgnorePath("/Images/")
+                .IgnorePath("/Scripts/")
+                .IgnorePath("/js/")
+                .IgnorePath("/fonts/")
+                .IgnorePath("/_status/")
+                .ExcludeAssembly("NHibernate")
+                .ExcludeMethod("Flush")
+#if DEBUG
+                .AddViewProfiling()
+#endif
+            ;
+
         }
 
     }

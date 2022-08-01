@@ -3,6 +3,7 @@ using Moq;
 using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static Sentry.data.Core.Tests.BaseCoreUnitTest;
 
 namespace Sentry.data.Core.Tests
 {
@@ -20,7 +21,7 @@ namespace Sentry.data.Core.Tests
             var quartermasterClient = new Mock<IClient>();
             var namedEnvironmentList = new List<NamedEnvironment>();
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted10>()).Result).Returns(namedEnvironmentList);
-            var quartermasterService = new QuartermasterService(quartermasterClient.Object);
+            var quartermasterService = new QuartermasterService(quartermasterClient.Object, new MockDataFeatures());
 
             // Act
             var result = await quartermasterService.VerifyNamedEnvironmentAsync("ABCD", "FOO", GlobalEnums.NamedEnvironmentType.NonProd);
@@ -41,7 +42,7 @@ namespace Sentry.data.Core.Tests
             var quartermasterClient = new Mock<IClient>();
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted10>()).Result).Returns(namedEnvironmentList);
-            var quartermasterService = new QuartermasterService(quartermasterClient.Object);
+            var quartermasterService = new QuartermasterService(quartermasterClient.Object, new MockDataFeatures());
 
             // Act
             var result = await quartermasterService.VerifyNamedEnvironmentAsync("ABCD", "FOO", GlobalEnums.NamedEnvironmentType.NonProd);
@@ -62,7 +63,7 @@ namespace Sentry.data.Core.Tests
             var quartermasterClient = new Mock<IClient>();
             var namedEnvironmentList = new[] { new NamedEnvironment() { Name = "TEST", Environmenttype = "NonProd" } };
             quartermasterClient.Setup(f => f.NamedEnvironmentsGet2Async(It.IsAny<string>(), It.IsAny<ShowDeleted10>()).Result).Returns(namedEnvironmentList);
-            var quartermasterService = new QuartermasterService(quartermasterClient.Object);
+            var quartermasterService = new QuartermasterService(quartermasterClient.Object, new MockDataFeatures());
 
             // Act
             var result = await quartermasterService.VerifyNamedEnvironmentAsync("ABCD", "TEST", GlobalEnums.NamedEnvironmentType.Prod);
