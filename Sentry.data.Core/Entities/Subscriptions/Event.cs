@@ -23,5 +23,6 @@ namespace Sentry.data.Core
         public virtual string Search { get; set; }
         public virtual Notification Notification { get; set; }
         public virtual int? SchemaId { get; set; }
+        public virtual string DeleteDetail { get; set; }
     }
 }

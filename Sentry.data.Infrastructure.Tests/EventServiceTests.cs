@@ -112,6 +112,113 @@ namespace Sentry.data.Infrastructure.Tests
             mockRepository.VerifyAll();
         }
 
+
+
+        [TestMethod]
+        public void PublishEventByDatasetFileDelete_DATASETFILE_DELETE_S3_Created()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+
+            EventType eventType = new EventType() { Description = GlobalConstants.EventType.DATASETFILE_DELETE_S3 };
+            context.SetupGet(x => x.EventTypes).Returns(new List<EventType>() { eventType }.AsQueryable());
+
+            Dataset ds = new Dataset() { DatasetId = 1, DatasetFileConfigs = new List<DatasetFileConfig>() { new DatasetFileConfig() { ConfigId = 1, Schema = new FileSchema() { SchemaId = 1 } } } };
+            context.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+           
+            Status status = new Status() { Description = GlobalConstants.Statuses.SUCCESS };
+            context.SetupGet(x => x.EventStatus).Returns(new List<Status>() { status }.AsQueryable());
+
+            Mock<IApplicationUser> user = mockRepository.Create<IApplicationUser>();
+            user.SetupGet(x => x.AssociateId).Returns("000000");
+
+            Mock<IUserService> userService = mockRepository.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(user.Object);
+
+            context.Setup(x => x.Add(It.IsAny<Event>())).Callback<Event>(x =>
+            {
+                StringAssert.Contains(x.Reason, GlobalConstants.EventType.DATASETFILE_DELETE_S3);
+                Assert.IsNotNull(x.Dataset);
+                Assert.AreEqual("000000", x.UserWhoStartedEvent);
+                Assert.AreEqual(eventType, x.EventType);
+                Assert.AreEqual(status, x.Status);
+                Assert.IsNotNull(x.DataConfig);
+                Assert.IsNull(x.DataFile);
+                Assert.IsNull(x.DataAsset);
+                Assert.AreEqual(1,x.SchemaId);
+                Assert.IsNull(x.Line_CDE);
+                Assert.IsNull(x.Search);
+                Assert.IsNull(x.Notification);
+                Assert.IsFalse(x.IsProcessed);
+                Assert.IsNotNull(x.DeleteDetail);
+            });
+            context.Setup(x => x.SaveChanges(true));
+            context.Setup(x => x.Dispose());
+
+            Mock<IInstanceGenerator> contextGenerator = mockRepository.Create<IInstanceGenerator>();
+            contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
+
+            EventService eventService = new EventService(contextGenerator.Object, userService.Object);
+            eventService.PublishEventByDatasetFileDelete(GlobalConstants.EventType.DATASETFILE_DELETE_S3, GlobalConstants.EventType.DATASETFILE_DELETE_S3, 1,1,"test").Wait();
+
+            mockRepository.VerifyAll();
+        }
+
+
+        [TestMethod]
+        public void PublishEventByDatasetFileDelete_DATASETFILE_UPDATE_OBJECT_STATUS_Created()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+
+            EventType eventType = new EventType() { Description = GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS };
+            context.SetupGet(x => x.EventTypes).Returns(new List<EventType>() { eventType }.AsQueryable());
+
+            //Dataset ds = new Dataset() { DatasetId = 1, DatasetFileConfigs = new List<DatasetFileConfig>() { new DatasetFileConfig() { ConfigId = 1, Schema = new FileSchema() { SchemaId = 1 } } } };
+            //context.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+
+            Status status = new Status() { Description = GlobalConstants.Statuses.SUCCESS };
+            context.SetupGet(x => x.EventStatus).Returns(new List<Status>() { status }.AsQueryable());
+
+            Mock<IApplicationUser> user = mockRepository.Create<IApplicationUser>();
+            user.SetupGet(x => x.AssociateId).Returns("000000");
+
+            Mock<IUserService> userService = mockRepository.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(user.Object);
+
+            context.Setup(x => x.Add(It.IsAny<Event>())).Callback<Event>(x =>
+            {
+                StringAssert.Contains(x.Reason, GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS);
+                Assert.IsNull(x.Dataset);
+                Assert.AreEqual("000000", x.UserWhoStartedEvent);
+                Assert.AreEqual(eventType, x.EventType);
+                Assert.AreEqual(status, x.Status);
+                Assert.IsNull(x.DataConfig);
+                Assert.IsNull(x.DataFile);
+                Assert.IsNull(x.DataAsset);
+                Assert.IsNull(x.SchemaId);
+                Assert.IsNull(x.Line_CDE);
+                Assert.IsNull(x.Search);
+                Assert.IsNull(x.Notification);
+                Assert.IsFalse(x.IsProcessed);
+                Assert.IsNotNull(x.DeleteDetail);
+            });
+            context.Setup(x => x.SaveChanges(true));
+            context.Setup(x => x.Dispose());
+
+            Mock<IInstanceGenerator> contextGenerator = mockRepository.Create<IInstanceGenerator>();
+            contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
+
+            EventService eventService = new EventService(contextGenerator.Object, userService.Object);
+            eventService.PublishEventByDatasetFileDelete(GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS, GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS, "test").Wait();
+
+            mockRepository.VerifyAll();
+        }
+
+
+
         [TestMethod]
         public void PublishSuccessEventByDatasetId_ViewedDataset_Event()
         {
