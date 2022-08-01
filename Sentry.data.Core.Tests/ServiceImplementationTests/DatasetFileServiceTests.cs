@@ -527,12 +527,18 @@ namespace Sentry.data.Core.Tests
             DatasetFile dataFileC = MockClasses.MockDatasetFileC(ds, dfc, user1.Object);
             Schema schema = MockClasses.MockFileSchema();
 
-
             var context = new Mock<IDatasetContext>();
             context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileA, dataFileB,dataFileC }.AsQueryable);
             var messagePublisher = new Mock<IMessagePublisher>();
-            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null);
 
+            //SETUP EVENT SERVICE CALLS
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            Mock<IInstanceGenerator> contextGenerator = mockRepository.Create<IInstanceGenerator>();
+            contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
+            var eventService = new Mock<IEventService>();
+            eventService.Setup(e => e.PublishEventByDatasetFileDelete(null, null, null));
+
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, eventService.Object);
 
             DeleteFilesParamDto dto = new DeleteFilesParamDto();
             dto.UserFileIdList = new int[] { 3000 };
@@ -569,8 +575,16 @@ namespace Sentry.data.Core.Tests
 
             var context = new Mock<IDatasetContext>();
             var messagePublisher = new Mock<IMessagePublisher>();
-            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null);
 
+
+            //SETUP EVENT SERVICE CALLS
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            Mock<IInstanceGenerator> contextGenerator = mockRepository.Create<IInstanceGenerator>();
+            contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
+            var eventService = new Mock<IEventService>();
+            eventService.Setup(e => e.PublishEventByDatasetFileDelete(null, null, null));
+
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, eventService.Object);
 
             List<DatasetFile> dbList = new List<DatasetFile>();
             dbList.Add(dataFileA);
@@ -656,9 +670,17 @@ namespace Sentry.data.Core.Tests
 
             var context = new Mock<IDatasetContext>();
             context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileA, dataFileB, dataFileC }.AsQueryable);
-
             var messagePublisher = new Mock<IMessagePublisher>();
-            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object,null, null);
+
+            //SETUP EVENT SERVICE CALLS
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            Mock<IInstanceGenerator> contextGenerator = mockRepository.Create<IInstanceGenerator>();
+            contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
+            var eventService = new Mock<IEventService>();
+            eventService.Setup(e => e.PublishEventByDatasetFileDelete(null, null, null));
+
+
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object,null, eventService.Object);
 
 
             //ENSURE MARKING Deleted WORKS
@@ -696,8 +718,17 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.SetupGet(d => d.DatasetFileStatusAll).Returns(new List<DatasetFile>() { dataFileA}.AsQueryable);
 
+
+            //SETUP EVENT SERVICE CALLS
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            Mock<IInstanceGenerator> contextGenerator = mockRepository.Create<IInstanceGenerator>();
+            contextGenerator.Setup(x => x.GenerateInstance<IDatasetContext>()).Returns(context.Object);
+            var eventService = new Mock<IEventService>();
+            eventService.Setup(e => e.PublishEventByDatasetFileDelete(null,null,null));
+
+
             var messagePublisher = new Mock<IMessagePublisher>();
-            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, eventService.Object);
 
 
             //ENSURE MARKING Deleted WORKS
