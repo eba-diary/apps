@@ -285,6 +285,7 @@
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="GlobalEnums\ConnectorState.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
+    <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />
