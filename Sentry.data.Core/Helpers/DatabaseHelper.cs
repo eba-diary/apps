@@ -19,7 +19,7 @@ namespace Sentry.data.Core.Helpers
         {
             if (row != null)
             {
-                return row.ToString();
+                return row.ToString().Trim();
             }
 
             return string.Empty;
