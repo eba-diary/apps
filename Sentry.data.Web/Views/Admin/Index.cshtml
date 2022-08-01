@@ -20,20 +20,20 @@
     </div>
     <div class="col-lg-10">
         <div id="partial-view-test">
-
             <h1>My Links</h1>
 
+            
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#exampleModal" id="addLinkButton">
+            <button type="button" class="btn btn-primary waves-effect waves-light float-lg-right" data-toggle="modal" data-target="#exampleModal">
                 Add Link
             </button>
-
+          <!--  using (Html.BeginForm("SupportLinkForm", "Config", FormMethod.Post)) -->
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Add Support Link</h5>
+                            <h5 class="m    odal-title" id="exampleModalLabel">Add Support Link</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>
@@ -83,14 +83,15 @@
 
 
 
-            <button type="button" class="btn btn-outline-primary waves-effect" id="toggleBtn">Add Link</button>
+
             <button type="button" class="btn btn-outline-danger">Delete Link</button>
 
 
-            
+
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     @Scripts.Render("~/bundles/dataTables")
@@ -111,12 +112,3 @@
 
     </script>
 }
-
-<style>
-    #addLinkButton{
-        position: relative;
-        top: 0;
-        right: 1;
-
-    }
-</style>

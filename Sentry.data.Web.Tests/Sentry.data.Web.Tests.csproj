@@ -220,10 +220,6 @@
       <Project>{c766d10b-0008-4cc8-a0c0-5818e5ee464a}</Project>
       <Name>Sentry.data.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sentry.data.Web\Sentry.data.Web.csproj">
-      <Project>{42C330E1-E605-487F-979D-635597D1C88D}</Project>
-      <Name>Sentry.data.Web</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
