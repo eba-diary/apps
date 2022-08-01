@@ -14,10 +14,12 @@ namespace Sentry.data.Core
     public class QuartermasterService:IQuartermasterService
     {
         private readonly IClient _quartermasterClient;
+        private readonly IDataFeatures _dataFeatures;
 
-        public QuartermasterService(IClient quartermasterClient)
+        public QuartermasterService(IClient quartermasterClient, IDataFeatures dataFeatures)
         {
-            this._quartermasterClient = quartermasterClient;
+            _quartermasterClient = quartermasterClient;
+            _dataFeatures = dataFeatures;
         }
 
         /// <summary>
@@ -42,17 +44,17 @@ namespace Sentry.data.Core
 
             if (results.GetAll().Count == 0)
             {
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False).ConfigureAwait(false)).ToList();
+                var namedEnvironmentList = (await GetNamedEnvironmentsAsync(saidAssetKeyCode)).ToList();
                 if (namedEnvironmentList.Any())
                 {
-                    if (!namedEnvironmentList.Any(e => e.Name == namedEnvironment))
+                    if (!namedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
                     {
                         results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}.");
                     }
-                    else if (namedEnvironmentList.First(e => e.Name == namedEnvironment).Environmenttype != namedEnvironmentType.ToString())
+                    else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
                     {
-                        var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.Name == namedEnvironment).Environmenttype;
-                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
+                        var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
+                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType.ToString()}\")");
                     }
                 }
             }
@@ -77,12 +79,12 @@ namespace Sentry.data.Core
             async Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsInternalAsync()
             {
                 //call Quartermaster to get list of named environments for this asset
-                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False).ConfigureAwait(false)).ToList();
+                var namedEnvironmentList = (await _quartermasterClient.NamedEnvironmentsGet2Async(saidAssetKeyCode, ShowDeleted10.False)).ToList();
                 namedEnvironmentList = namedEnvironmentList.OrderBy(n => n.Name).ToList();
 
-                //grab a config setting to see if we need to filter the named environments by a certain named environment type
-                //if the config setting for "QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
-                var environmentTypeFilter = Configuration.Config.GetHostSetting("QuartermasterNamedEnvironmentTypeFilter");
+                //grab a feature flag to see if we need to filter the named environments by a certain named environment type
+                //if the feature flag setting for "CLA4260_QuartermasterNamedEnvironmentTypeFilter" is blank, no filter will be applied
+                var environmentTypeFilter = _dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue();
                 Func<NamedEnvironment, bool> filter = env => true;
                 if (!string.IsNullOrWhiteSpace(environmentTypeFilter))
                 {

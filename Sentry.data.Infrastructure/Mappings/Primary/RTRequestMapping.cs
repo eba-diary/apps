@@ -35,6 +35,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("SourceType_ID");
                 m.ForeignKey("FK_RT_Request_RT_Source_Types");
                 m.Class(typeof(RTSourceTypes));
+                m.Insert(false);
+                m.Update(false);
             });
 
             this.ManyToOne(x => x.Endpoint, m =>
@@ -42,6 +44,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("APIEndpoint_ID");
                 m.ForeignKey("FK_RT_Request_RT_API_Endpoints");
                 m.Class(typeof(RTAPIEndpoints));
+                m.Insert(false);
+                m.Update(false);
             });
 
             //this.Bag(x => x.Parameters, m =>

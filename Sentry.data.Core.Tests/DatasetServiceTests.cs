@@ -47,7 +47,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
@@ -90,7 +90,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetNameDuplicate));
@@ -125,7 +125,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
@@ -162,7 +162,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
@@ -199,7 +199,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
@@ -226,7 +226,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 1); //should have at least two errors - short name invalid regex, and from short name being > 12 chars
@@ -253,7 +253,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count >= 1); 
@@ -290,7 +290,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
@@ -329,7 +329,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameDuplicate));
@@ -370,7 +370,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count == 0);

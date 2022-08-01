@@ -1,4 +1,7 @@
-﻿@{
+﻿@using StackExchange.Profiling;
+@using StackExchange.Profiling.Mvc;
+
+@{
     //bool isSubPage = (ViewData["menu"] == null || (bool)ViewData["menu"] == true) ? true : false;
     bool isFluid = (ViewData["fluid"] == null || (bool)ViewData["fluid"] == false) ? false : true;
 }
@@ -73,7 +76,7 @@
 
     @RenderSection("Scripts", false)
 
-    @StackExchange.Profiling.MiniProfiler.RenderIncludes()
+    @StackExchange.Profiling.MiniProfiler.Current.RenderIncludes()
 
 </body>
 
