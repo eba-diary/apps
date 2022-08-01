@@ -215,7 +215,6 @@ namespace Sentry.data.Core
                   
                     List<KeyValuePair<string, string>> keyValuePairs = new List<KeyValuePair<string, string>>();
                     keyValuePairs.Add(response);
-                    //_s3ServiceProvider.UploadDataFile(response.Key, response.Value);
                     _s3ServiceProvider.UploadDataFile(stream, targetBucket, response.Key, keyValuePairs);
                 }
             }
