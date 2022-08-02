@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure
             _dataFlowMetricProvider = dataFlowMetricProvider;
             _context = context;
         }
-        private DataFlowMetricDto ToDto(DataFlowMetric entity)
+        private DataFlowMetricDto MapToDto(DataFlowMetric entity)
         {
             return new DataFlowMetricDto()
             {
@@ -55,7 +55,7 @@ namespace Sentry.data.Infrastructure
         }
         private List<DataFlowMetricDto> GetMetricList(List<DataFlowMetric> entityList)
         {
-            List<DataFlowMetricDto> dataFlowMetricDtos = entityList.Select(x => ToDto(x)).ToList();
+            List<DataFlowMetricDto> dataFlowMetricDtos = entityList.Select(x => MapToDto(x)).ToList();
             return dataFlowMetricDtos;
         }
         public List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto)

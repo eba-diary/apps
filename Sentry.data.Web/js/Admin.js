@@ -120,7 +120,9 @@ data.Admin = {
                 $("#flowStepsDropdown").materialSelect({ destroy: true });
                 var s = '<option value="-1">Please Select a Flow Step</option>';
                 for (var d of data[0].steps) {
-                    s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
+                    if (d.ActionName == "Raw Storage") {
+                        s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
+                    }
                 }
                 $("#flowStepsDropdown").html(s);
                 $("#flowStepsDropdown").materialSelect();
