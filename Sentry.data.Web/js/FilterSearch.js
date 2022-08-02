@@ -54,61 +54,21 @@
         //clear single badge
         $(document).on("click", "[id^='clearOption_']", function (e) {
             e.preventDefault();
-
-            //hide the badge container if no badges left
-            data.FilterSearch.hideBadgeContainer(false);
-
-            //uncheck the category option that was removed
-            var optionId = $(this).attr("id").replace("clearOption_", "");
-            data.FilterSearch.setOptionCheckbox(optionId, false);
-
-            //hide the clicked badge
-            $(this).addClass("display-none");
-
+            data.FilterSearch.handleBadgeClear($(this));
             data.FilterSearch.showHideApplyFilter();
         });
 
         //select category option
         $(document).on("change", ".filter-search-category-option-checkbox", function (e) {
             e.preventDefault();
-
-            var id = this.id.replace('modal_', '');
-
-            var badge = $("#clearOption_" + id);
-
-            if (this.checked) {
-                //making sure both modal and filter checkbox gets checked
-                data.FilterSearch.setOptionCheckbox(id, true);
-
-                badge.removeClass("display-none");
-                data.FilterSearch.showBadgeContainer();
-            }
-            else {
-                //making sure both modal and filter checkbox gets unchecked
-                data.FilterSearch.setOptionCheckbox(id, false);
-
-                data.FilterSearch.hideBadgeContainer(false);
-                badge.addClass("display-none");
-            }
-
+            data.FilterSearch.handleCheckboxChange(this, true);
             data.FilterSearch.showHideApplyFilter();
         });
 
         //clear all badges
         $(document).on("click", "#filter-search-clear", function (e) {
             e.preventDefault();
-
-            data.FilterSearch.hideBadgeContainer(true);
-
-            $("[id^='clearOption_']:visible").each(function () {
-                $(this).addClass("display-none");
-            });
-            
-            $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
-                $(this).prop('checked', false);
-            });
-
-            data.FilterSearch.clearActiveSavedSearch();
+            data.FilterSearch.handleClearAll();
             data.FilterSearch.showHideApplyFilter();
         });
 
@@ -221,6 +181,32 @@
         });
     },
 
+    handleBadgeClear: function (element) {
+        //hide the badge container if no badges left
+        data.FilterSearch.hideBadgeContainer(false);
+
+        //uncheck the category option that was removed
+        var optionId = element.attr("id").replace("clearOption_", "");
+        data.FilterSearch.setOptionCheckbox(optionId, false);
+
+        //hide the clicked badge
+        element.addClass("display-none");
+    },
+
+    handleClearAll: function () {
+        data.FilterSearch.hideBadgeContainer(true);
+
+        $("[id^='clearOption_']:visible").each(function () {
+            $(this).addClass("display-none");
+        });
+
+        $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
+            $(this).prop('checked', false);
+        });
+
+        data.FilterSearch.clearActiveSavedSearch();
+    },
+
     setOptionCheckbox: function (id, checked) {
         $("#" + id).prop('checked', checked);
         $("#modal_" + id).prop('checked', checked);
@@ -244,6 +230,27 @@
     showBadgeContainer: function () {
         $(".filter-search-active-options-container").slideDown();
         $("#filter-search-clear").removeClass("display-none");
+    },
+
+    handleCheckboxChange: function (element) {
+        var id = element.id.replace('modal_', '');
+
+        var badge = $("#clearOption_" + id);
+
+        if (element.checked) {
+            //making sure both modal and filter checkbox gets checked
+            data.FilterSearch.setOptionCheckbox(id, true);
+
+            badge.removeClass("display-none");
+            data.FilterSearch.showBadgeContainer();
+        }
+        else {
+            //making sure both modal and filter checkbox gets unchecked
+            data.FilterSearch.setOptionCheckbox(id, false);
+
+            data.FilterSearch.hideBadgeContainer(false);
+            badge.addClass("display-none");
+        }
     },
 
     showHideApplyFilter: function () {
@@ -292,6 +299,7 @@
         $(".filter-search-save-search-container").removeClass("display-none");
 
         if (totalResultCount > 0) {
+            $(".filter-search-results-none").addClass("display-none");
             $(".filter-search-results-container").slideDown();
 
             $("#filter-search-total").text(totalResultCount.toLocaleString("en-US"));
@@ -303,12 +311,13 @@
             else {
                 $("#filter-search-returned-subset").addClass("d-none");
             }
-            
+
             data.FilterSearch.setPageInfo(1, pageSize < returnedResultCount ? pageSize : returnedResultCount);
             $(".filter-search-result-count-container").slideDown();
         }
         else {
             $(".filter-search-results-none").removeClass("display-none");
+            $(".filter-search-results-container").hide();
         }
     },
 

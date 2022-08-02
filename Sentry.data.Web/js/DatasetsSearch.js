@@ -1,55 +1,90 @@
 ﻿data.DatasetsSearch = {
+
+    searchableDatasets: null,
+    currentFilters: null,
+
     init: function () {
-        this.executeSearch();
-        this.initUI();
-        this.initEvents();
+        data.DatasetsSearch.executeSearch();
+        data.DatasetsSearch.initEvents();
+    },
+
+    buildFilter: function () {
+        //required for FilterSearch.js
+        //filters are being calculated only on a text search
+    },
+
+    retrieveResultConfig: function () {
+        //required for FilterSearch.js
+        //no result config yet, might use for saving the sort by and page size
     },
 
     executeSearch: function () {
-        data.DatasetsSearch.executeDatasetSearch(1, true);
+        $.post("/DatasetSearch/SearchableDatasets/", data.FilterSearch.buildSearchRequest(), function (response) {
+            data.DatasetsSearch.searchableDatasets = response
+            data.DatasetsSearch.executeDatasetSearch(1, false);
+            data.DatasetsSearch.getTileFilters();
+        });
     },
 
-    executeDatasetSearch: function (pageNumber, reloadFilters) {
-        //build search request
+    executeDatasetSearch: function (pageNumber, refreshFilters) {
         var lastPageNumber = 1;
+
+        var lastPage = $("#tile-page-next").prev();
+        console.log(lastPage);
+        console.log(lastPage.data("page"));
 
         if ($("#tile-page-next").length) {
             lastPageNumber = parseInt($("#tile-page-next").prev().data("page"));
         }
 
         if (pageNumber > 0 && pageNumber <= lastPageNumber) {
-            var request = data.FilterSearch.buildSearchRequest();
-            request.PageNumber = pageNumber;
-            request.PageSize = $("#tile-result-page-size").val();
-            request.SortBy = $("#tile-result-sort").val();
+            var request = data.DatasetsSearch.buildDatasetSearchRequest(pageNumber);
 
             //get tiles
-            $.post("/DatasetSearch/GetTileResultsModel/", request, function (tileResultsModel) {
+            $.post("/DatasetSearch/TileResultsModel/", request, function (tileResultsModel) {
+                if (refreshFilters) {
+                    var filterRequest = {
+                        CurrentFilterCategories: data.DatasetsSearch.currentFilters,
+                        ResultFilterCategories: tileResultsModel.FilterCategories
+                    };
+
+                    //load updated filter counts
+                    $.post("/DatasetSearch/RefreshFilters/", filterRequest, (filters) => data.FilterSearch.completeFilterRetrieval(filters));
+                }
+
                 //load result view
                 $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
                     data.DatasetsSearch.initUI();
                     data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
                 });
-
-                if (reloadFilters) {
-                    data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
-                }
             });
         }
     },
 
-    buildFilter: function () {
-        //executeSearch is handling both result and filter creation
+    getTileFilters: function () {
+        $.post("/DatasetSearch/TileFilters/", data.DatasetsSearch.buildDatasetSearchRequest(1), function (filters) {
+            data.DatasetsSearch.currentFilters = filters;
+            data.FilterSearch.completeFilterRetrieval(filters);
+    });
     },
 
-    retrieveResultConfig: function () {
-        //no result config yet, might use for saving the sort by and page size
+    buildDatasetSearchRequest: function (pageNumber) {
+        var request = data.FilterSearch.buildSearchRequest();
+        request.SearchableTiles = data.DatasetsSearch.searchableDatasets;
+        request.PageNumber = pageNumber;
+        request.PageSize = $("#tile-result-page-size").val();
+        request.SortBy = $("#tile-result-sort").val();
+        request.Layout = $("#tile-result-layout").val();
+
+        return request;
     },
 
     initUI: function () {
         $('#tile-result-page-size').materialSelect();
         $('#tile-result-sort').materialSelect();
         $('#tile-result-layout').materialSelect();
+
+        data.DatasetsSearch.setLayout();
     },
 
     initEvents: function () {
@@ -84,35 +119,57 @@
         });
 
         //sort by change event
-        $(document).on("change", "#tile-result-sort", function (e) {
-            console.log("sort click");
-            data.DatasetsSearch.executeDatasetSearch(1, false);
-        });
-
-        //page size change event
-        $(document).on("change", "#tile-result-page-size", function (e) {
-            console.log("size click");
-            data.DatasetsSearch.executeDatasetSearch(1, false);
-        });
+        $(document).on("change", "#tile-result-layout", data.DatasetsSearch.setLayout);
 
         //page change events
-        $(document).on("click", "#tile-page-previous", function (e) {
-            console.log("prev click");
+        $(document).on("click", "#tile-page-previous", function () {
             var previous = parseInt($(".tile-page-number.active").data("page"))--;
             data.DatasetsSearch.executeDatasetSearch(previous, false);
         });
 
-        $(document).on("click", "#tile-page-next", function (e) {
-            console.log("next click");
+        $(document).on("click", "#tile-page-next", function () {
             var next = parseInt($(".tile-page-number.active").data("page"))++;
             data.DatasetsSearch.executeDatasetSearch(next, false);
         });
 
-        $(document).on("click", ".tile-page-number", function (e) {
+        $(document).on("click", ".tile-page-number", function () {
             if (!$(this).hasClass("active")) {
-                console.log("number click");
                 data.DatasetsSearch.executeDatasetSearch(parseInt($(this).data("page")), false)
             }
         });
+
+        //page size change event
+        $(document).on("change", "#tile-result-page-size", () => data.DatasetsSearch.executeDatasetSearch(1, false));
+
+        //sort by change event
+        $(document).on("change", "#tile-result-sort", () => data.DatasetsSearch.executeDatasetSearch(1, false));
+
+        //select category option
+        $(document).off("change", ".filter-search-category-option-checkbox");
+        $(document).on("change", ".filter-search-category-option-checkbox", function () {
+            data.FilterSearch.handleCheckboxChange(this);
+            data.DatasetsSearch.executeDatasetSearch(1, true);
+        });
+
+        //filters cleared
+        $(document).off("click", "#filter-search-clear");
+        $(document).on("click", "#filter-search-clear", function () {
+            data.FilterSearch.handleClearAll();
+            data.DatasetsSearch.executeDatasetSearch(1, true);
+        });
+
+        $(document).off("click", "[id^='clearOption_']");
+        $(document).on("click", "[id^='clearOption_']", function () {
+            data.FilterSearch.handleBadgeClear($(this));
+            data.DatasetsSearch.executeDatasetSearch(1, true);
+        });
+    },
+
+    setLayout: function () {
+        $("#tile-result-layout option").each(function () {
+            $(".tile-result").removeClass(`tile-result-layout-${$(this).val()}`);
+        });
+
+        $(".tile-result").addClass(`tile-result-layout-${$("#tile-result-layout").val()}`)
     }
 }

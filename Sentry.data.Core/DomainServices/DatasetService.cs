@@ -7,6 +7,7 @@ using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -622,13 +623,7 @@ namespace Sentry.data.Core
 
             try
             {
-                IEnumerable<DatasetTileDto> dtos = GetDatasetTileDtos();
-
-                if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
-                {
-                    dtos = dtos.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText.ToLower()));
-                }                
-                                
+                IEnumerable<DatasetTileDto> dtos = SearchDatasetTileDtos(datasetSearchDto);
                 List<DatasetTileDto> allResults = dtos.FilterBy(datasetSearchDto.FilterCategories).ToList();
 
                 resultDto.TotalResults = allResults.Count;
@@ -643,6 +638,18 @@ namespace Sentry.data.Core
             return resultDto;
         }
 
+        public IEnumerable<DatasetTileDto> SearchDatasetTileDtos(DatasetSearchDto datasetSearchDto)
+        {
+            IEnumerable<DatasetTileDto> dtos = datasetSearchDto.SearchableTiles ?? GetDatasetTileDtos();
+
+            if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
+            {
+                dtos = dtos.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText.ToLower()));
+            }
+
+            return dtos;
+        }
+
         #region "private functions"
         private IEnumerable<DatasetTileDto> GetDatasetTileDtos()
         {
@@ -654,15 +661,18 @@ namespace Sentry.data.Core
             //map to DatasetTileDto
             foreach (Dataset dataset in datasets)
             {
-                //DatasetSummaryMetadataDTO summary = datasetSummariesTask.Result.FirstOrDefault(w => w.DatasetId == dataset.DatasetId);
-
-                //calculate last updated from dataset.DataFiles if any
-                //remove page views from dto and the sort options altogether
-
                 DatasetTileDto datasetTileDto = dataset.ToTileDto();
                 datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-                datasetTileDto.LastUpdated = summary != null ? summary.Max_Created_DTM : dataset.ChangedDtm;
-                datasetTileDto.PageViews = summary != null ? summary.ViewCount : 0;
+
+                datasetTileDto.LastActivityDateTime = dataset.ChangedDtm;
+                if (dataset.DatasetFiles?.Any() == true)
+                {
+                    DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
+                    if (lastFileDate > datasetTileDto.LastActivityDateTime)
+                    {
+                        datasetTileDto.LastActivityDateTime = lastFileDate;
+                    }
+                }
 
                 datasetTileDtos.Add(datasetTileDto);
             }

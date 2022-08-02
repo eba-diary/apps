@@ -2,6 +2,7 @@
 
 @{
     IEnumerable<FilterCategoryModel> orderedModel = Model.Where(x => x.CategoryOptions.Count > 1 || x.CategoryOptions.All(a => a.Selected)).OrderBy(x => x.CategoryName);
+    List<FilterCategoryOptionModel> allOptions = orderedModel.SelectMany(x => x.CategoryOptions).ToList();
 }
 
 @functions
@@ -19,7 +20,7 @@
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
             <div class="form-group mb-0">
-                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
+                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" disabled="@(option.ResultCount == 0 && !option.Selected)" value="@option.OptionValue" checked="@option.Selected">
                 <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
                     @SafeValue(option.OptionValue)
                     <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
@@ -29,8 +30,8 @@
     }
 }
 
-<div class="filter-search-active-options-container bottom-border display-none">
-    @foreach (FilterCategoryOptionModel option in orderedModel.SelectMany(x => x.CategoryOptions.OrderByDescending(o => o.ResultCount).ToList()))
+<div class="filter-search-active-options-container bottom-border @(allOptions.Any(x => x.Selected) ? "" : "display-none")">
+    @foreach (FilterCategoryOptionModel option in allOptions)
     {
         <button type="button" class="btn btn-default btn-sm filter-search-active-option-close display-none" id="clearOption_@option.OptionId" title="@option.ParentCategoryName">
             <span class="active-option-close-symbol">&#x2715</span>
@@ -44,7 +45,6 @@
     {
         foreach (FilterCategoryModel category in orderedModel)
         {
-            IEnumerable<FilterCategoryOptionModel> options = category.CategoryOptions.OrderByDescending(o => o.ResultCount);
             string safeName = category.CategoryName.Replace(" ", "_").Replace("/", "_");
             string categoryTypeId = "categoryType_" + safeName;
             string categoryMoreId = "categoryMore_" + safeName;
@@ -53,16 +53,16 @@
             <div class="filter-search-category-container bottom-border">
                 <div class="filter-search-category-head" id="@categoryTypeId">
                     <span class="filter-search-category-head-name">@category.CategoryName</span>
-                    <em class="filter-search-category-head-icon fas fa-chevron-down" id="icon_@categoryTypeId"></em>
+                    <em class="filter-search-category-head-icon fas fa-chevron-@(category.DefaultCategoryOpen ? "up" : "down")" id="icon_@categoryTypeId"></em>
                 </div>
 
-                <div class="filter-search-category-options display-none" id="hide_@categoryTypeId">
+                <div class="filter-search-category-options @(category.DefaultCategoryOpen ? "" : "display-none")" id="hide_@categoryTypeId">
                     <ul class="list-unstyled">
-                        @DisplayCategoryOptions(options.Take(visibleOptionCount))
+                        @DisplayCategoryOptions(category.CategoryOptions.Take(visibleOptionCount))
 
                         <li class="display-none" id="hidden_@categoryMoreId">
                             <ul class="notNested">
-                                @DisplayCategoryOptions(options.Skip(visibleOptionCount))
+                                @DisplayCategoryOptions(category.CategoryOptions.Skip(visibleOptionCount))
                             </ul>
                         </li>
                     </ul>

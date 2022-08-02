@@ -274,6 +274,7 @@
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
     <Compile Include="GlobalEnums\IntervalType.cs" />
+    <Compile Include="GlobalEnums\LayoutOption.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />

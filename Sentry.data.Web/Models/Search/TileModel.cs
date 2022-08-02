@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
@@ -14,7 +15,8 @@ namespace Sentry.data.Web
         public string Category { get; set; }
         public string Color { get; set; }
         public bool IsSecured { get; set; }
-        public string LastUpdated { get; set; }
+        public string LastActivityDateTime { get; set; }
+        public string CreatedDateTime { get; set; }
         public bool IsReport { get; set; }
         public List<string> ReportTypes { get; set; } = new List<string>();
         public string UpdateFrequency { get; set; }

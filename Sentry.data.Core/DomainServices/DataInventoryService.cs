@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core

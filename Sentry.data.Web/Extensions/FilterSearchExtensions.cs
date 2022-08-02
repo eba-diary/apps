@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -56,21 +58,27 @@ namespace Sentry.data.Web
             {
                 SearchName = dto.SearchName,
                 SearchText = dto.SearchText,
-                FilterCategories = dto.FilterCategories.ToModel()
+                FilterCategories = dto.FilterCategories.ToModels()
             };
         }
 
-        public static List<FilterCategoryModel> ToModel(this List<FilterCategoryDto> dtos)
+        public static List<FilterCategoryModel> ToModels(this List<FilterCategoryDto> dtos)
         {
-            return dtos?.Select(x => x.ToModel()).ToList();
+            return dtos?.Select(x => x.ToModel(new List<string>())).ToList();
         }
 
-        public static FilterCategoryModel ToModel(this FilterCategoryDto dto)
+        public static List<FilterCategoryModel> ToModels(this List<FilterCategoryDto> dtos, List<string> openCategories)
+        {
+            return dtos?.Select(x => x.ToModel(openCategories)).ToList();
+        }
+
+        private static FilterCategoryModel ToModel(this FilterCategoryDto dto, List<string> openCategories)
         {
             return new FilterCategoryModel()
             {
                 CategoryName = dto.CategoryName,
-                CategoryOptions = dto.CategoryOptions?.Select(x => x.ToModel()).ToList()
+                CategoryOptions = dto.CategoryOptions?.Select(x => x.ToModel()).ToList(),
+                DefaultCategoryOpen = openCategories.Contains("*") || openCategories.Contains(dto.CategoryName)
             };
         }
 
@@ -100,7 +108,8 @@ namespace Sentry.data.Web
             DatasetSearchDto dto = new DatasetSearchDto()
             {
                 PageSize = model.PageSize,
-                PageNumber = model.PageNumber
+                PageNumber = model.PageNumber,
+                SearchableTiles = model.SearchableTiles.ToDatasetTileDtos()
             };
 
             switch ((DatasetSortByOption)model.SortBy)
@@ -112,16 +121,12 @@ namespace Sentry.data.Web
                     dto.OrderByField = x => x.IsFavorite;
                     dto.OrderByDescending = true;
                     break;
-                case DatasetSortByOption.MostAccessed:
-                    dto.OrderByField = x => x.PageViews;
-                    dto.OrderByDescending = true;
-                    break;
                 case DatasetSortByOption.RecentlyAdded:
                     dto.OrderByField = x => x.CreatedDateTime;
                     dto.OrderByDescending = true;
                     break;
                 case DatasetSortByOption.RecentlyUpdated:
-                    dto.OrderByField = x => x.LastUpdated;
+                    dto.OrderByField = x => x.LastActivityDateTime;
                     dto.OrderByDescending = true;
                     break;
                 default:
@@ -131,6 +136,28 @@ namespace Sentry.data.Web
             MapToParentDto(model, dto);
 
             return dto;
+        }
+
+        public static List<DatasetTileDto> ToDatasetTileDtos(this List<TileModel> models)
+        {
+            return models?.Select(x => x.ToDatasetTileDto()).ToList();
+        }
+
+        private static DatasetTileDto ToDatasetTileDto(this TileModel model)
+        {
+            return new DatasetTileDto()
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Description = model.Description,
+                Status = EnumHelper.GetByDescription<ObjectStatusEnum>(model.Status),
+                IsFavorite = model.IsFavorite,
+                Category = model.Category,
+                Color = model.Color,
+                IsSecured = model.IsSecured,
+                LastActivityDateTime = DateTime.Parse(model.LastActivityDateTime),
+                CreatedDateTime = DateTime.Parse(model.CreatedDateTime)
+            };
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)

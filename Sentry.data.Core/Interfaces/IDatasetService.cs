@@ -37,5 +37,6 @@ namespace Sentry.data.Core
 
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
         DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto);
+        IEnumerable<DatasetTileDto> SearchDatasetTileDtos(DatasetSearchDto datasetSearchDto);
     }
 }

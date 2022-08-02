@@ -149,15 +149,22 @@
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: flex-start;
-    clear: both;
+    width: 100%;
 }
 
 .tile-result {
-    width: calc((100% / 3) - 0.75%);
     position: relative;
     margin-bottom: 0.75%;
     padding: 0.5em;
     background-color: #FFFFFF;
+}
+
+.tile-result-layout-0 {
+    width: calc((100% / 3) - 0.75%);
+}
+
+.tile-result-layout-1 {
+    width: 100%;
 }
 
 .tile-active:hover {

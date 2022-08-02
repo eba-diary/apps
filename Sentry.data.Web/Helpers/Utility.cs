@@ -369,24 +369,25 @@ namespace Sentry.data.Web.Helpers
 
         public static List<SelectListItem> BuildDatasetSortByOptions()
         {
-            return BuildDatasetSortByOptions(0);
+            return BuildSelectListFromEnum<DatasetSortByOption>(0);
         }
 
-        public static List<SelectListItem> BuildDatasetSortByOptions(int selectedValue)
+        public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
         {
-            List<SelectListItem> sortOptions = new List<SelectListItem>();
+            List<SelectListItem> options = new List<SelectListItem>();
 
-            foreach (DatasetSortByOption item in Enum.GetValues(typeof(DatasetSortByOption)))
+            foreach (T item in Enum.GetValues(typeof(T)))
             {
-                sortOptions.Add(new SelectListItem
+                int value = (int)Convert.ChangeType(item, item.GetTypeCode());
+                options.Add(new SelectListItem
                 {
                     Text = item.GetDescription(),
-                    Value = ((int)item).ToString(),
-                    Selected = (int)item == selectedValue
+                    Value = value.ToString(),
+                    Selected = value == selectedValue
                 });
             }
 
-            return sortOptions;
+            return options;
         }
 
         public static List<PageItemModel> BuildPageItemList(int totalResults, int pageSize, int selectedPage)
@@ -418,11 +419,14 @@ namespace Sentry.data.Web.Helpers
                 pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
             }
 
-            pageItems.Add(new PageItemModel()
+            if (numberOfPages > 0)
             {
-                IsActive = numberOfPages == selectedPage,
-                PageNumber = numberOfPages.ToString()
-            });
+                pageItems.Add(new PageItemModel()
+                {
+                    IsActive = numberOfPages == selectedPage,
+                    PageNumber = numberOfPages.ToString()
+                });
+            }
 
             return pageItems;
         }

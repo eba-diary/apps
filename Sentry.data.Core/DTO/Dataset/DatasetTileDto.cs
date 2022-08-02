@@ -17,8 +17,7 @@ namespace Sentry.data.Core
         public string Color { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.SECURED)]
         public bool IsSecured { get; set; }
-        public int PageViews { get; set; }
-        public DateTime LastUpdated { get; set; }
+        public DateTime LastActivityDateTime { get; set; }
         public DateTime CreatedDateTime { get; set; }
     }
 }

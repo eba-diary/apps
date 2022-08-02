@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -8,5 +9,6 @@ namespace Sentry.data.Core
         public int PageNumber { get; set; }
         public Func<DatasetTileDto, object> OrderByField { get; set; }
         public bool OrderByDescending { get; set; }
+        public List<DatasetTileDto> SearchableTiles { get; set; }
     }
 }
