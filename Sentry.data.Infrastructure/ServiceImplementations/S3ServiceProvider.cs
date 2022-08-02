@@ -449,6 +449,7 @@ namespace Sentry.data.Infrastructure
 
             if(keyValuePairs != null)
             {
+                // using private helper method
                 UploadTag(mReq, null, keyValuePairs);
             }
 
