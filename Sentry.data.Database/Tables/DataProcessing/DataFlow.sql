@@ -14,7 +14,7 @@
     [UserDropLocationBucket] VARCHAR(1000) NULL, 
     [UserDropLocationPrefix] VARCHAR(1000) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
-    [NamedEnvironmentType] VARCHAR(25) NULL, 
+    [NamedEnvironmentType] VARCHAR(25) NOT NULL, 
     [IngestionType] INT NULL, 
     [IsDecompressionRequired] BIT NULL, 
     [CompressionType] INT NULL, 

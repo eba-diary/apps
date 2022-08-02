@@ -59,46 +59,5 @@ namespace Sentry.data.Web.WebApi.Controllers
         ////public void Delete(int id)
         ////{
         ////}
-
-        /// <summary>
-        /// Create new dataflow (v3) for each dataflow provided
-        /// </summary>
-        /// <param name="idList"></param>
-        /// <returns></returns>
-        [ApiVersionBegin(WebAPI.Version.v2)]
-        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [Route("updatedataflows")]
-        [HttpPost]
-        public IHttpActionResult UpdateDataFlows(int[] idList)
-        {
-            DataFlowService.UpgradeDataFlows(idList);
-
-            return Ok();
-        }
-
-        /// <summary>
-        /// Delete each dataflow associated with id(s) provided
-        /// </summary>
-        /// <param name="idList"></param>
-        /// <returns></returns>
-        [ApiVersionBegin(WebAPI.Version.v2)]
-        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [Route("deletedataflows")]
-        [HttpPost]
-        public IHttpActionResult DeleteDataFlows(int[] idList)
-        {
-
-            bool isSuccessful = DataApplicaitonService.DeleteDataFlow_Queue(idList.ToList(), _userService.GetCurrentUser().AssociateId, true);
-
-            if (!isSuccessful)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError, "Unable to queue all deletes");
-            }
-            return Ok();
-        }
     }
 }

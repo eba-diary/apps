@@ -68,11 +68,6 @@ namespace Sentry.data.Core
             {
                 newSchema = CreateSchema(schemaDto);
 
-                if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                {
-                    _dataFlowService.CreateDataFlowForSchema(newSchema);
-                }
-
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -903,13 +898,8 @@ namespace Sentry.data.Core
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus,
                 SchemaRootPath = dto.SchemaRootPath,
-                ParquetStorageBucket = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                                        ? GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName())
-                                        : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
-                ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                                        ? GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
-                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
-
+                ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
+                ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
             };
             schema.ConsumptionDetails = new List<SchemaConsumption>()
             {
@@ -920,7 +910,7 @@ namespace Sentry.data.Core
                     SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
                     SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                    SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
+                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
                 }
             };
@@ -1026,20 +1016,12 @@ namespace Sentry.data.Core
 
             string prefix;
 
-            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            if (string.IsNullOrEmpty(namedEnvironment))
             {
-                if (string.IsNullOrEmpty(namedEnvironment))
-                {
-                    throw new ArgumentNullException("namedEnvironment", "Named environment is required to generate parquet storage prefix");
-                }
-
-                prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{namedEnvironment.ToUpper()}/{storageCode}";
-            }
-            else
-            {
-                prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{storageCode}";
+                throw new ArgumentNullException("namedEnvironment", "Named environment is required to generate parquet storage prefix");
             }
 
+            prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{namedEnvironment.ToUpper()}/{storageCode}";
 
             return prefix;
         }

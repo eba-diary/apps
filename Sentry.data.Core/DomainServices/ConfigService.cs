@@ -1356,20 +1356,17 @@ namespace Sentry.data.Core
                 externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList));
             }
 
-            if (_featureFlags.CLA3332_ConsolidatedDataFlows.GetValue())
+            //Get DataFlow id which populates data to schema
+            int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
+            if (schemaDataFlowId != 0)
             {
-                //Get DataFlow id which populates data to schema
-                int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
-                if (schemaDataFlowId != 0)
+                DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
+                List<RetrieverJob> schemaFlowRetrieverJobList = new List<RetrieverJob>();
+                if (schemaFlowDto != null)
                 {
-                    DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
-                    List<RetrieverJob> schemaFlowRetrieverJobList = new List<RetrieverJob>();
-                    if (schemaFlowDto != null)
-                    {
-                        schemaFlowRetrieverJobList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaDataFlowId).ToList());
-                    }
-                    externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(schemaFlowDto, schemaFlowRetrieverJobList));
+                    schemaFlowRetrieverJobList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaDataFlowId).ToList());
                 }
+                externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(schemaFlowDto, schemaFlowRetrieverJobList));
             }
 
             return externalJobList;

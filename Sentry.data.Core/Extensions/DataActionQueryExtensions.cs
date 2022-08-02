@@ -26,13 +26,9 @@ namespace Sentry.data.Core
             {
                 result = query.GetHrAction();
             }
-            else if (query is IQueryable<ProducerS3DropAction>)
-            {
-                result = dataFeatures.CLA3240_UseDropLocationV2.GetValue() ? query.GetDlstAction() : query.GetDataAction();
-            }
             else
             {
-                result = dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() ? query.GetDlstAction() : query.GetDataAction();
+                result = query.GetDlstAction();
             }
 
             Logger.Info("Method <GetAction> Ended");

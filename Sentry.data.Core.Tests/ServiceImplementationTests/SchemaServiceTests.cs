@@ -1706,28 +1706,10 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void SchemaService_GenerateParquetStoragePrefix_ConsolidatedDataFlow_False()
-        {
-            // Arrange
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null, null);
-
-
-            // Act
-            var result = schemaService.GenerateParquetStoragePrefix("DATA", "DEV", "123456");
-
-            // Assert
-            Assert.AreEqual($"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/DATA/123456", result, false);
-        }
-
-        [TestMethod]
         public void SchemaService_GenerateParquetStoragePrefix_ConsolidatedDataFlow_True()
         {
             // Arrange
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null, null);
 
@@ -1744,7 +1726,6 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null, null);
 
@@ -1767,7 +1748,6 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures, null, null, null, null);
 

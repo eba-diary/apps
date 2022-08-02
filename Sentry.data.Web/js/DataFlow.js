@@ -1,6 +1,5 @@
 ﻿data.DataFlow = {
 
-    CLA3332_ConsolidatedDataFlows: false,
     Orig_Dataset_Selection: 0,
     Orig_Schema_Selection: 0,
 
@@ -315,13 +314,9 @@
                     return item.ObjectStatus === "ACTIVE";
                 });
 
-                //If feature flag is enabled, only show schemas that don't have a DataFlow
-                // or SchemaId matches the original schema selection
-                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
-                    filter = filter.filter(function (item) {
-                        return item.SchemaId === data.DataFlow.Orig_Schema_Selection || item.HasDataFlow === false;
-                    });
-                }
+                filter = filter.filter(function (item) {
+                    return item.SchemaId === data.DataFlow.Orig_Schema_Selection || item.HasDataFlow === false;
+                });
 
                 //Make list sorted by schema name
                 var sortedResults = filter.sort(
@@ -411,12 +406,8 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
-                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
-                    var curVal = datasetId;
-                }
-                else {
-                    var curVal = parseInt(cur.val());
-                }
+
+                var curVal = datasetId;
 
                 cur.html(newSubItems);
 

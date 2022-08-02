@@ -48,13 +48,6 @@ namespace Sentry.data.Core
         DataFlowStep GetDataFlowStepForDataFlowByActionType(int dataFlowId, DataActionType actionType);
 
         /// <summary>
-        /// Will create an upgraded dataflow (single dataflow configuration) from existing
-        ///   producer dataflow metadata
-        /// </summary>
-        /// <param name="producerDataFlowIds"></param>
-        void UpgradeDataFlows(int[] producerDataFlowIds);
-
-        /// <summary>
         /// For the list of dataflow ids provided, this will set ObjectStatus appropriately based on logicDelete flag.
         /// In addition,
         ///   will find any retrieverjobs, associated with specified dataflow, and 
@@ -108,6 +101,6 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
-        int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true);
+        int UpdateandSaveDataFlow(DataFlowDto dfDto);
     }
 }

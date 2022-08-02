@@ -28,8 +28,6 @@ namespace Sentry.data.Web
         public bool IsDeleted { get; set; }
 
         public string Index { get; set; }
-        public bool CLA3332_ConsolidatedDataFlows { get; set; }
-
         public IEnumerable<SelectListItem> AllDatasets { get; set; }
         public IEnumerable<SelectListItem> AllSchemas { get; set; }
 

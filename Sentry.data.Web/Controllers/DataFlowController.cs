@@ -101,12 +101,10 @@ namespace Sentry.data.Web.Controllers
             SchemaMapModel schemaModel = new SchemaMapModel
             {
                 SelectedDataset = 0,
-                CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
             };
             model.SchemaMaps.Add(schemaModel);
             
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
@@ -152,14 +150,7 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
-            foreach (SchemaMapModel smm in model.SchemaMaps)
-            {
-                smm.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
-            }
-
             return View("DataFlowForm", model);
-
         }
 
         [HttpPost]
@@ -183,11 +174,8 @@ namespace Sentry.data.Web.Controllers
                      *   a single schema.  Therefore, refactor dataset\schema selection to be directly on DataFlowModel
                      *   (https://jira.sentry.com/browse/CLA-3507).
                     */
-                    if (DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                    {
-                        dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
-                        dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
-                    }
+                    dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
+                    dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
 
                     int newFlowId = 0;
 
@@ -268,11 +256,9 @@ namespace Sentry.data.Web.Controllers
                 foreach (SchemaMapModel mapModel in model.SchemaMaps)
                 {
                     SetSchemaModelLists(mapModel);
-                    mapModel.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
                 }
             }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
