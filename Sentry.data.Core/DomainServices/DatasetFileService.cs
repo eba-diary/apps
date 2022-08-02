@@ -201,6 +201,7 @@ namespace Sentry.data.Core
                 }
                 else
                 {
+                    // implementation of a stream --> this will have to be refactored later
                     var stream = new MemoryStream();
                     using (var streamWriter = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true))
                     using (var jsonWriter = new JsonTextWriter(streamWriter))
