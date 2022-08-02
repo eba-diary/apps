@@ -273,6 +273,11 @@ namespace Sentry.data.Infrastructure
             return UploadDataFile(inputstream, RootBucket, targetKey, null);
         }
 
+        public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey)
+        {
+            return UploadDataFile(inputStream, targetBucket, targetKey, null);
+        }
+
         public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
             string fileVersionId = PutObject(inputStream, targetBucket, targetKey, keyValuePairs);
