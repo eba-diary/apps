@@ -57,18 +57,10 @@ namespace Sentry.data.Infrastructure.Tests
             {
 
             };
-            DataFlowMetric entity3 = new DataFlowMetric()
-            {
 
-            };
-            DataFlowMetric entity4 = new DataFlowMetric()
-            {
-
-            };
             entityList.Add(entity1);
             entityList.Add(entity2);
-            entityList.Add(entity3);
-            entityList.Add(entity4);
+
 
             stubDataFlowMetricProvider.Setup(x => x.GetDataFlowMetrics(It.IsAny<DataFlowMetricSearchDto>())).Returns(entityList);
             DataFlowMetricSearchDto searchDto = new DataFlowMetricSearchDto();

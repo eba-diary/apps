@@ -29,8 +29,7 @@ data.Admin = {
 
     // creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
-        var url = "../../api/v2/metadata/dataset/" + datasetId + "/schema";
-        return url;
+        return "../../api/v2/metadata/dataset/" + datasetId + "/schema";
     },
 
     // creates schema dropdown for selected dataset
@@ -56,8 +55,7 @@ data.Admin = {
     },
     // creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
-        var url = "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
-        return url;
+        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
     },
 
     GetFileDropdown: function (url) {
@@ -105,8 +103,7 @@ data.Admin = {
     },
 
     GetFlowStepUrl: function (schemaId) {
-        var url = "../../api/v2/dataflow?schemaId=" + schemaId;
-        return url;
+        return "../../api/v2/dataflow?schemaId=" + schemaId;
     },
      
     // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
