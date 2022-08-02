@@ -250,6 +250,19 @@ namespace Sentry.data.Infrastructure
 
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.  Target bucket will be
+        /// defaulted to DSC root bucket.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
+        /// <param name="targetBucket"></param>
+        /// <param name="targetKey"></param>
+        public string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey)
+        {
+            return UploadDataFile(sourceFilePath, targetBucket, targetKey, null);
+        }
+
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
         /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
         /// </summary>
         /// <param name="sourceFilePath"></param>
@@ -261,6 +274,8 @@ namespace Sentry.data.Infrastructure
 
             return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetBucket, targetKey, keyValuePairs) : PutObject(sourceFilePath, targetBucket, targetKey, keyValuePairs);
         }
+
+        
 
         /// <summary>
         /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
@@ -278,9 +293,9 @@ namespace Sentry.data.Infrastructure
             return UploadDataFile(inputStream, targetBucket, targetKey, null);
         }
 
-        public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
+        public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> tagContent)
         {
-            string fileVersionId = PutObject(inputStream, targetBucket, targetKey, keyValuePairs);
+            string fileVersionId = PutObject(inputStream, targetBucket, targetKey, tagContent);
             return fileVersionId;
         }
 

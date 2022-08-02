@@ -183,16 +183,16 @@ namespace Sentry.data.Core
                 DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
                 DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
-                KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
-                if (response.Key == null || response.Value == null)
+                KeyValuePair<string, string> triggerFileLocationAndContent = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
+                if (triggerFileLocationAndContent.Key == null || triggerFileLocationAndContent.Value == null)
                 {
                     string errorMessage = "";
-                    if (response.Key == null)
+                    if (triggerFileLocationAndContent.Key == null)
                     {
                         errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
 
                     }
-                    else if (response.Value == null)
+                    else if (triggerFileLocationAndContent.Value == null)
                     {
                         errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
 
@@ -201,23 +201,25 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    // implementation of a stream --> this will have to be refactored later
-                    var stream = new MemoryStream();
-                    using (var streamWriter = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true))
-                    using (var jsonWriter = new JsonTextWriter(streamWriter))
+
+                    List<KeyValuePair<string, string>> tagContent = new List<KeyValuePair<string, string>>()
                     {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(jsonWriter, response.Value);
-                        streamWriter.Flush();
-                        stream.Seek(0, SeekOrigin.Begin);
+                        new KeyValuePair<string, string>("Content", "Trigger"),
+                    };
+                    string targetBucket = dataFlowStep.TargetBucket;
+
+                    using (MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(triggerFileLocationAndContent.Value)))
+                    {
+                        _s3ServiceProvider.UploadDataFile(stream, targetBucket, triggerFileLocationAndContent.Key, tagContent);
                     }
 
-                    string targetBucket = dataFlowStep.TargetBucket;
-                  
-                    List<KeyValuePair<string, string>> keyValuePairs = new List<KeyValuePair<string, string>>();
-                    keyValuePairs.Add(response);
-                    _s3ServiceProvider.UploadDataFile(stream, targetBucket, response.Key, keyValuePairs);
+                    
+                    
+
                 }
+
+
+            
             }
             catch (Exception ex)
             {
