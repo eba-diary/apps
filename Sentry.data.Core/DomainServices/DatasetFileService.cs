@@ -213,9 +213,6 @@ namespace Sentry.data.Core
                         _s3ServiceProvider.UploadDataFile(stream, targetBucket, triggerFileLocationAndContent.Key, tagContent);
                     }
 
-                    
-                    
-
                 }
 
 
