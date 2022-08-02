@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         /// <param name="sourceFilePath"></param>
         /// <param name="targetKey"></param>
         /// <param name="dataSet"></param>
-        string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey);
+        string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
@@ -33,7 +33,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         string UploadDataFile(Stream inputstream, string targetKey);
 
-        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
+        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey);
 
         void TransferUtlityUploadStream(string category, string filename, Stream stream);
 
