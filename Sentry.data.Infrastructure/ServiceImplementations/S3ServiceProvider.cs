@@ -275,7 +275,7 @@ namespace Sentry.data.Infrastructure
 
         public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
-            string fileVersionId = PutObject(inputStream, targetBucket, targetKey);
+            string fileVersionId = PutObject(inputStream, targetBucket, targetKey, keyValuePairs);
             return fileVersionId;
         }
 
@@ -637,7 +637,7 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region PutObject
-        private string PutObject(Stream filestream, string targetBucket, string targetKey)
+        private string PutObject(Stream filestream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
         {
             string fileVersionId;
             try
@@ -649,6 +649,19 @@ namespace Sentry.data.Infrastructure
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.AutoCloseStream = true;
                 poReq.CannedACL = GetCannedAcl();
+
+                if (keyValuePairs != null)
+                {
+                    foreach (KeyValuePair<string, string> keyValuePair in keyValuePairs)
+                    {
+                        Tag tag = new Tag()
+                        {
+                            Key = keyValuePair.Key,
+                            Value = keyValuePair.Value,
+                        };
+                        poReq.TagSet.Add(tag);
+                    }
+                }
 
                 Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
@@ -686,10 +699,10 @@ namespace Sentry.data.Infrastructure
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
-                
-                if(keyValuePairs != null)
+
+                if (keyValuePairs != null)
                 {
-                    foreach(KeyValuePair<string, string> keyValuePair in keyValuePairs)
+                    foreach (KeyValuePair<string, string> keyValuePair in keyValuePairs)
                     {
                         Tag tag = new Tag()
                         {
@@ -699,7 +712,7 @@ namespace Sentry.data.Infrastructure
                         poReq.TagSet.Add(tag);
                     }
                 }
-                
+
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
                 PutObjectResponse poRsp = S3Client.PutObject(poReq);
