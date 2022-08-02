@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -52,6 +53,7 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetSelectionModel model = new DatasetSelectionModel();
             List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
+            dtoList.OrderByDescending(x => x.DatasetName);
             model.AllDatasets = new List<SelectListItem>();
             foreach(DatasetDto dto in dtoList)
             {

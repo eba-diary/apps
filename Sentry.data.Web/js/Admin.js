@@ -30,7 +30,6 @@ data.Admin = {
     // creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
         var url = "../../api/v2/metadata/dataset/" + datasetId + "/schema";
-        console.log(url);
         return url;
     },
 
@@ -41,6 +40,9 @@ data.Admin = {
             url: url,
             success: function (data) {
                 $("#schemaDropdown").materialSelect({ destroy: true });
+                data.sort(function (a, b) {
+                    return ((a.Name < b.Name) ? -1 : ((a.Name > b.Name) ? 1 : 0));
+                });
                 var s = '<option value="-1"  id = "defaultSchemaSelection">Please Select a Schema</option>';
                 for (var d of data) {
                     s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
@@ -52,11 +54,9 @@ data.Admin = {
             }
         });
     },
-
     // creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
         var url = "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000";
-        console.log(url);
         return url;
     },
 
@@ -106,8 +106,6 @@ data.Admin = {
 
     GetFlowStepUrl: function (schemaId) {
         var url = "../../api/v2/dataflow?schemaId=" + schemaId;
-        console.log(url);
-      // need to see new api url structure before continuing
         return url;
     },
      
