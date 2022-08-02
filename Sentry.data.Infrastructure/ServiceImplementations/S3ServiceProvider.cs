@@ -361,12 +361,12 @@ namespace Sentry.data.Infrastructure
             return ((incomingLength / partSize) > (partLimit * .95));            
         }        
 
-        public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
+        public string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs)
         {
             List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
             string fileVersionId = null;
             
-            string uploadId = StartUpload(targetBucket, targetKey, keyValuePairs);
+            string uploadId = StartUpload(targetBucket, targetKey, UploadTagKeyValuePairs);
 
             long contentLength = new FileInfo(sourceFilePath).Length;
 
@@ -449,15 +449,7 @@ namespace Sentry.data.Infrastructure
 
             if(keyValuePairs != null)
             {
-                foreach (KeyValuePair<string, string> keyValuePair in keyValuePairs)
-                {
-                    Tag tag = new Tag()
-                    {
-                        Key = keyValuePair.Key,
-                        Value = keyValuePair.Value,
-                    };
-                    mReq.TagSet.Add(tag);
-                }
+                UploadTag(mReq, null, keyValuePairs);
             }
 
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
@@ -637,7 +629,7 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region PutObject
-        private string PutObject(Stream filestream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
+        private string PutObject(Stream filestream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs)
         {
             string fileVersionId;
             try
@@ -650,17 +642,9 @@ namespace Sentry.data.Infrastructure
                 poReq.AutoCloseStream = true;
                 poReq.CannedACL = GetCannedAcl();
 
-                if (keyValuePairs != null)
+                if (UploadTagKeyValuePairs != null)
                 {
-                    foreach (KeyValuePair<string, string> keyValuePair in keyValuePairs)
-                    {
-                        Tag tag = new Tag()
-                        {
-                            Key = keyValuePair.Key,
-                            Value = keyValuePair.Value,
-                        };
-                        poReq.TagSet.Add(tag);
-                    }
+                    UploadTag(null, poReq, UploadTagKeyValuePairs);
                 }
 
                 Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
@@ -688,7 +672,7 @@ namespace Sentry.data.Infrastructure
             return fileVersionId;
         }
 
-        private string PutObject(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs)
+        private string PutObject(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs)
         {
             string fileVersionId = null;
             try
@@ -700,17 +684,9 @@ namespace Sentry.data.Infrastructure
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
 
-                if (keyValuePairs != null)
+                if (UploadTagKeyValuePairs != null)
                 {
-                    foreach (KeyValuePair<string, string> keyValuePair in keyValuePairs)
-                    {
-                        Tag tag = new Tag()
-                        {
-                            Key = keyValuePair.Key,
-                            Value = keyValuePair.Value,
-                        };
-                        poReq.TagSet.Add(tag);
-                    }
+                    UploadTag(null, poReq, UploadTagKeyValuePairs);
                 }
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
@@ -1294,6 +1270,36 @@ namespace Sentry.data.Infrastructure
 
             return keyVersionList;
         }
+
+        private void UploadTag(InitiateMultipartUploadRequest mReq, PutObjectRequest poReq, List<KeyValuePair<string, string>>tagKeyValuePairs)
+        {
+            if (poReq == null)
+            {
+                foreach (KeyValuePair<string, string> keyValuePair in tagKeyValuePairs)
+                {
+                    Tag tag = new Tag()
+                    {
+                        Key = keyValuePair.Key,
+                        Value = keyValuePair.Value
+                    };
+                    mReq.TagSet.Add(tag);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, string> keyValuePair in tagKeyValuePairs)
+                {
+                    Tag tag = new Tag()
+                    {
+                        Key = keyValuePair.Key,
+                        Value = keyValuePair.Value
+                    };
+                    poReq.TagSet.Add(tag);
+                }
+            }
+            
+        }
+
         #endregion
 
     }

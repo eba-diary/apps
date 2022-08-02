@@ -197,7 +197,7 @@ namespace Sentry.data.Core
                         errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
 
                     }
-                    throw new Exception(errorMessage);
+                    throw new ArgumentNullException(errorMessage);
                 }
                 else
                 {
