@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using LaunchDarkly.Sdk.Server.Interfaces;
 using Nest;
 using NHibernate;
 using NHibernate.Cfg;
@@ -10,6 +11,7 @@ using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
+using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
 using Sentry.data.Infrastructure.ServiceImplementations;
@@ -81,7 +83,7 @@ namespace Sentry.data.Infrastructure
                 scanner.AssemblyContainingType<IDataFeedContext>();
                 scanner.AssemblyContainingType<MetadataRepositoryProvider>();
                 scanner.AssemblyContainingType<IMetadataRepositoryProvider>();
-                scanner.AddAllTypesOf<IDataSource>();
+                scanner.AddAllTypesOf<Core.IDataSource>();
                 scanner.WithDefaultConventions();
             });
 
@@ -120,8 +122,8 @@ namespace Sentry.data.Infrastructure
                 Sentry.Configuration.Config.GetHostSetting("ServiceAccountPassword")
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
-            
-            registry.For<IDataFeatures>().Singleton().Use<FeatureFlags.DataFeatures>();
+
+            registry.For<ILdClient>().Singleton().Use(LdClientFactory.BuildLdClient());
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
@@ -142,7 +144,9 @@ namespace Sentry.data.Infrastructure
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
+            registry.For<IDeadJobProvider>().Add<DeadJobProvider>().Ctor<IDbExecuter>().Is(new DeadSparkJobSqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
+            registry.For<IDeadSparkJobService>().Use<DeadSparkJobService>();
             registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
             // Choose the parameterless constructor.
@@ -241,7 +245,7 @@ namespace Sentry.data.Infrastructure
             {
                 db.ConnectionString = Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString");
                 db.Dialect<MsSql2008Dialect>();
-                db.Driver<StackExchange.Profiling.NHibernate.Drivers.MiniProfilerSql2008ClientDriver>();
+                db.Driver<Sentry.Profiling.NHibernate.Drivers.MiniProfilerSql2008ClientDriver>();
             });
 
             //Configure the NHibernate mappings

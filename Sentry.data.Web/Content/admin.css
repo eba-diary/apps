@@ -22,3 +22,18 @@
     padding-top: 10px;
     padding-bottom: 0px;
 }
+
+
+.table-checkbox {
+    position: unset !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+#deadJobs tbody{
+  word-break:break-word;
+}
+
+table#deadJobs td.dropdown-control {
+    cursor:pointer;
+}

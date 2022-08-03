@@ -77,7 +77,7 @@ namespace Sentry.data.Infrastructure
 
                     try
                     {
-                        GetResponseIntoFileStream(job, tempFile);
+                        GetResponseAndUploadToS3(job, tempFile);
                     }
                     catch (Exception ex)
                     {
@@ -89,25 +89,6 @@ namespace Sentry.data.Infrastructure
                         {
                             File.Delete(tempFile);
                         }
-                    }
-
-                    S3ServiceProvider s3Service = new S3ServiceProvider();
-                    string targetkey = _targetPath;
-
-                    string versionId;
-                    //Need to handle both a retrieverjob target (legacy platform) and 
-                    //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
-                    //  as targets.
-                    // If _targetStep not null,
-                    //    Utilizing Trigger bucket since we want to trigger the targetStep identified
-                    versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
-
-                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
-
-                    //Cleanup temp file if exists
-                    if (File.Exists(tempFile))
-                    {
-                        File.Delete(tempFile);
                     }
                 }
                 else 
@@ -440,6 +421,29 @@ namespace Sentry.data.Infrastructure
                 }
             }
             SetTargetPath(ParseContentType(response.Content.Headers.ContentType.ToString()));
+        }
+
+        private async Task GetResponseAndUploadToS3(RetrieverJob job, string tempFile)
+        {
+            await GetResponseIntoFileStream(job, tempFile);
+            S3ServiceProvider s3Service = new S3ServiceProvider();
+            string targetkey = _targetPath;
+
+            string versionId;
+            //Need to handle both a retrieverjob target (legacy platform) and 
+            //  S3Drop or ProducerS3Drop (new processing platform) data flow steps
+            //  as targets.
+            // If _targetStep not null,
+            //    Utilizing Trigger bucket since we want to trigger the targetStep identified
+            versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
+
+            _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+
+            //Cleanup temp file if exists
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
         }
     }
 }

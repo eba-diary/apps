@@ -180,7 +180,7 @@ namespace Sentry.data.Core
             result.DatasetName = ds.DatasetName;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
-            result.Approvers = _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).Result;
+            result.Approvers = _saidService.GetAllProdCustByKeyCodeAsync(ds.Asset.SaidKeyCode).Result;
             result.InheritanceTicket = _securityService.GetSecurableInheritanceTicket(ds);
             return result;
         }
@@ -263,7 +263,7 @@ namespace Sentry.data.Core
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET && x.PermissionCode == PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
                 : _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCodeAsync(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
@@ -531,7 +531,7 @@ namespace Sentry.data.Core
             return result;
         }
 
-        public async Task<ValidationException> Validate(DatasetDto dto)
+        public async Task<ValidationException> ValidateAsync(DatasetDto dto)
         {
             ValidationResults results = new ValidationResults();
 
@@ -562,8 +562,7 @@ namespace Sentry.data.Core
             }
 
             //Validate the Named Environment selection using the QuartermasterService
-            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
-
+            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType));
 
             //VALIDATE EMAIL ADDRESS
             if (!ValidationHelper.IsDSCEmailValid(dto.AlternateContactEmail))

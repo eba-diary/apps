@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -13,11 +15,13 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
+        private readonly IDeadSparkJobService _deadSparkJobService;
 
-        public AdminController(IKafkaConnectorService connectorService, IDatasetService datasetService)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
+            _deadSparkJobService = deadSparkJobService;
         }
 
         [HttpPost]
@@ -46,9 +50,25 @@ namespace Sentry.data.Web.Controllers
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
             myDict.Add("5", "Connector Status");
+            myDict.Add("6", "Reprocess Dead Jobs");
 
             return View(myDict);
         }
+
+        [Route("Admin/GetDeadJobs/{selectedDate?}")]
+        [HttpGet]
+        public ActionResult GetDeadJobs(string selectedDate)
+        {
+            // Conver selectedDate string to a DateTime object
+            DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
+
+            List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
+
+            return PartialView("_DeadJobTable", deadSparkJobModelList);
+        }
+
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
             DatasetSelectionModel model = new DatasetSelectionModel();
@@ -85,6 +105,9 @@ namespace Sentry.data.Web.Controllers
                     List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
 
                     return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
+                case "6":
+                    ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
+                    return PartialView("_ReprocessDeadSparkJobs", reprocessDeadSparkJobModel);
             }
 
             return PartialView(viewPath);
