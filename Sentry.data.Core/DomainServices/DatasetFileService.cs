@@ -190,12 +190,10 @@ namespace Sentry.data.Core
                     if (triggerFileLocationAndContent.Key == null)
                     {
                         errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
-
                     }
                     else if (triggerFileLocationAndContent.Value == null)
                     {
                         errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
-
                     }
                     throw new ArgumentNullException(errorMessage);
                 }
