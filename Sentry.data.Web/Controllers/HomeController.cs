@@ -42,7 +42,8 @@ namespace Sentry.data.Web.Controllers
                 Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
                 DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
-                CLA2838_DSC_ANOUNCEMENTS = _featureFlags.CLA2838_DSC_ANOUNCEMENTS.GetValue()
+                CLA2838_DSC_ANOUNCEMENTS = _featureFlags.CLA2838_DSC_ANOUNCEMENTS.GetValue(),
+                DirectToSearchPages = _featureFlags.CLA3756_UpdateSearchPages.GetValue()
             };
 
             Event e = new Event()

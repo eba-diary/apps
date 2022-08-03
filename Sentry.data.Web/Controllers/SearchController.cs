@@ -29,15 +29,7 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
         }
 
-        // GET: Search
-        public ActionResult Index()
-        {
-            return View();
-        }
-
         // GET: Search/Datasets/searchParms
-        [Route("Search/{searchType?}/Index")]
-        [Route("Search/{searchType?}/")]
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
             SearchIndexModel model = new SearchIndexModel();

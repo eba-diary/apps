@@ -23,7 +23,14 @@
                             The Business Intelligence area provides easy access to numerous exhibits and dashboards that are created at Sentry.
                             We encourage the use of this information to promote collaboration and inform decision making.
                         </p>
-                        <a href="/BusinessIntelligence" class="home-tile-link-bi">View Business Intelligence &gt;</a>
+                        @if (Model.DirectToSearchPages)
+                        {
+                            <a href="/Search/BusinessIntelligence" class="home-tile-link-bi">View Business Intelligence &gt;</a>
+                        }
+                        else
+                        {
+                            <a href="/BusinessIntelligence" class="home-tile-link-bi">View Business Intelligence &gt;</a>
+                        }
                     </div>
                 </div>
 
@@ -36,7 +43,14 @@
                         <p>
                             Do you use or produce a dataset that may be useful to others? View or upload the details here.
                         </p>
-                        <a href="/Dataset" class="home-tile-link-ds">View Datasets &gt;</a>
+                        @if (Model.DirectToSearchPages)
+                        {
+                            <a href="/Search/Datasets" class="home-tile-link-ds">View Datasets &gt;</a>
+                        }
+                        else
+                        {
+                            <a href="/Dataset" class="home-tile-link-ds">View Datasets &gt;</a>
+                        }
                     </div>
                 </div>
 

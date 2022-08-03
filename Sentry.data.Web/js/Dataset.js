@@ -1515,7 +1515,7 @@ data.Dataset = {
 
     CancelLink: function (id) {
         if (id === undefined || id === 0) {
-            return "/Dataset/Index";
+            return "/Search/Datasets";
         } else {
             return "/Dataset/Detail/" + encodeURIComponent(id);
         }

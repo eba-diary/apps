@@ -207,7 +207,7 @@ data.Report = {
 
     DeleteDataset: function (id) {
 
-        var returnUrl = "/BusinessIntelligence/Index";
+        var returnUrl = "/Search/BusinessIntelligence";
         $.ajax({
             url: "/BusinessIntelligence/Delete/" + encodeURI(id),
             method: "POST",
@@ -236,7 +236,7 @@ data.Report = {
 
     CancelLink: function (id) {
         if (id === undefined || id === 0) {
-            return "/BusinessIntelligence/Index";
+            return "/Search/BusinessIntelligence";
         } else {
             return "/BusinessIntelligence/Detail/" + encodeURIComponent(id);
         }

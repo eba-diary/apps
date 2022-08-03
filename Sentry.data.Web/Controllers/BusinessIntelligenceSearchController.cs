@@ -1,4 +1,6 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,35 +10,16 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class BusinessIntelligenceSearchController : BaseSearchableController
+    public class BusinessIntelligenceSearchController : TileSearchController
     {
         public BusinessIntelligenceSearchController(IFilterSearchService filterSearchService) : base(filterSearchService)
         {
             
         }
 
-        //[Route("Search/BusinessIntelligence")]
-        //[Route("BusinessIntelligence/Search")]
-        //public ActionResult Search()
-        //{
-        //    //validate user has permissions
-        //    if (!SharedContext.CurrentUser.CanViewReports)
-        //    {
-        //        return View("Forbidden");
-        //    }
-
-        //    ViewBag.Title = "Business Intelligence";
-        //    SearchIndexModel model = new SearchIndexModel()
-        //    {
-        //        SearchType = GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH
-        //    };
-
-        //    return View(model);
-        //}
-
-        public override ActionResult Results()
+        public ActionResult Search(string savedSearch = null)
         {
-            throw new NotImplementedException();
+            return GetBaseTileSearch(SearchType.BUSINESS_INTELLIGENCE_SEARCH, SharedContext.CurrentUser.CanViewReports, savedSearch);
         }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)

@@ -39,6 +39,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4152_UploadFileFromUI { get; }
         public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
         public IFeatureFlag<bool> CLA4310_UseHttpClient { get; }
+        public IFeatureFlag<bool> CLA3756_UpdateSearchPages { get; }
 
 
         public DataFeatures(UserService userService)
@@ -66,6 +67,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4152_UploadFileFromUI = new BooleanFeatureFlagAmbientContext("CLA4152_UploadFileFromUI", false, LdClient, () => LdUser);
             CLA1130_SHOW_ALTERNATE_EMAIL = new BooleanFeatureFlagAmbientContext("CLA1130_SHOW_ALTERNATE_EMAIL", false, LdClient, () => LdUser);
             CLA4310_UseHttpClient = new BooleanFeatureFlagAmbientContext("CLA4310_UseHttpClient", false, LdClient, () => LdUser);
+            CLA3756_UpdateSearchPages = new BooleanFeatureFlagAmbientContext("CLA3756_UpdateSearchPages", false, LdClient, () => LdUser);
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class DatasetSearchController : BaseSearchableController
+    public class DatasetSearchController : TileSearchController
     {
         private readonly IDatasetService _datasetService;
 
@@ -17,39 +17,9 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
         }
 
-        //[Route("Search/Dataset")]
-        //[Route("Dataset/Search")]
         public ActionResult Search(string savedSearch = null)
         {
-            //validate user has permissions
-            if (!SharedContext.CurrentUser.CanViewDataset)
-            {
-                return View("Forbidden");
-            }
-
-            if (TryGetSavedSearch(SearchType.DATASET_SEARCH, savedSearch, out ActionResult view))
-            {
-                return view;
-            }
-
-            FilterSearchModel model = new FilterSearchModel();
-
-            return GetFilterSearchView(model);
-        }
-
-        [ChildActionOnly]
-        public override ActionResult Results()
-        {
-            TileResultsModel tileResultsModel = new TileResultsModel()
-            {
-                PageSizeOptions = Utility.BuildTilePageSizeOptions("10"),
-                SortByOptions = Utility.BuildDatasetSortByOptions(),
-                Tiles = new List<TileModel>(),
-                PageItems = new List<PageItemModel>(),
-                LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(0)
-            };
-
-            return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
+            return GetBaseTileSearch(SearchType.DATASET_SEARCH, SharedContext.CurrentUser.CanViewDataset, savedSearch);
         }
 
         [HttpPost]
