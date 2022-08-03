@@ -95,7 +95,15 @@ data.Admin = {
             success: function (data) {
                 $("#schemaDropdown").materialSelect({ destroy: true });
                 data.sort(function (a, b) {
-                    return ((a.Name < b.Name) ? -1 : ((a.Name > b.Name) ? 1 : 0));
+                    if (a.Name < b.Name) {
+                        return -1;
+                    }
+                    else if (a.Name > b.Name) {
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
                 });
                 var s = '<option value="-1"  id = "defaultSchemaSelection">Please Select a Schema</option>';
                 for (var d of data) {
