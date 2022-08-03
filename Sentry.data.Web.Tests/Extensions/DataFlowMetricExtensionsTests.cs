@@ -19,27 +19,28 @@ namespace Sentry.data.Web.Tests.Extensions
             DataFileFlowMetricsDto dto = new DataFileFlowMetricsDto()
             {
                 DatasetFileId = 1,
-                FileName = "",
+                FileName = "filename",
                 FirstEventTime = time,
                 LastEventTime = time,
-                Duration = "",
+                Duration = "100",
                 AllEventsPresent = true,
                 AllEventsComplete = true,
-                TargetCode = ""
+                TargetCode = "targetcode"
 
             };
             List<DataFileFlowMetricsDto> dtoList = new List<DataFileFlowMetricsDto>() { dto };
             //act
             List<DataFlowMetricGroupModel> models = dtoList.ToModels();
+            DataFlowMetricGroupModel model = models[0];
             //assert
-            Assert.AreEqual(1, models[0].DatasetFileId);
-            Assert.AreEqual("", models[0].FileName);
-            Assert.AreEqual(time, models[0].FirstEventTime);
-            Assert.AreEqual(time, models[0].LastEventTime);
-            Assert.AreEqual("", models[0].Duration);
-            Assert.AreEqual(true, models[0].AllEventsPresent);
-            Assert.AreEqual(true, models[0].AllEventsComplete);
-            Assert.AreEqual("", models[0].TargetCode);
+            Assert.AreEqual(1, model.DatasetFileId);
+            Assert.AreEqual("filename", model.FileName);
+            Assert.AreEqual(time, model.FirstEventTime);
+            Assert.AreEqual(time, model.LastEventTime);
+            Assert.AreEqual("100", model.Duration);
+            Assert.AreEqual(true, model.AllEventsPresent);
+            Assert.AreEqual(true, model.AllEventsComplete);
+            Assert.AreEqual("targetcode", model.TargetCode);
         }
         [TestMethod]
         public void DataFileFlowMetricDtoList_ToModels_EmptyInput()
@@ -61,7 +62,7 @@ namespace Sentry.data.Web.Tests.Extensions
                 {
                 QueryMadeDateTime = time,
                 SchemaId = 1,
-                EventContents = "",
+                EventContents = "contents",
                 TotalFlowSteps = 5,
                 FileModifiedDateTime = time,
                 OriginalFileName = "name",
@@ -71,57 +72,58 @@ namespace Sentry.data.Web.Tests.Extensions
                 DataFlowId = 1,
                 Partition = 1,
                 DataActionTypeId = 1,
-                MessageKey = "",
+                MessageKey = "messagekey",
                 Duration = 1,
                 Offset = 1,
-                DataFlowName = "",
+                DataFlowName = "flowname",
                 DataFlowStepId = 1,
-                FlowExecutionGuid = "",
+                FlowExecutionGuid = "executionguid",
                 FileSize = 1,
                 EventMetricId = 1,
-                StorageCode = "",
+                StorageCode = "storagecode",
                 FileCreatedDateTime = time,
-                RunInstanceGuid = "",
-                FileName = "name",
-                SaidKeyCode = "",
+                RunInstanceGuid = "instanceguid",
+                FileName = "filename",
+                SaidKeyCode = "keycode",
                 MetricGeneratedDateTime = time,
                 DatasetFileId = 1,
                 ProcessStartDateTime = time,
-                StatusCode = "",
+                StatusCode = "statuscode",
                 }
             };
             //act
             List<DataFlowMetricModel> models = dtoList.ToModels();
+            DataFlowMetricModel model = models[0];
             //assert
-            Assert.AreEqual(time, models[0].QueryMadeDateTime);
-            Assert.AreEqual(1, models[0].SchemaId);
-            Assert.AreEqual("", models[0].EventContents);
-            Assert.AreEqual(5, models[0].TotalFlowSteps);
-            Assert.AreEqual(time, models[0].FileModifiedDateTime);
-            Assert.AreEqual("name", models[0].OriginalFileName);
-            Assert.AreEqual(1, models[0].DatasetId);
-            Assert.AreEqual(5, models[0].CurrentFlowStep);
-            Assert.AreEqual(1, models[0].DataActionId);
-            Assert.AreEqual(1, models[0].DataFlowId);
-            Assert.AreEqual(1, models[0].Partition);
-            Assert.AreEqual(1, models[0].DataActionTypeId);
-            Assert.AreEqual("", models[0].MessageKey);
-            Assert.AreEqual(1, models[0].Duration);
-            Assert.AreEqual(1, models[0].Offset);
-            Assert.AreEqual("", models[0].DataFlowName);
-            Assert.AreEqual(1, models[0].DataFlowStepId);
-            Assert.AreEqual("", models[0].FlowExecutionGuid);
-            Assert.AreEqual(1, models[0].FileSize);
-            Assert.AreEqual(1, models[0].EventMetricId);
-            Assert.AreEqual("", models[0].StorageCode);
-            Assert.AreEqual(time, models[0].FileCreatedDateTime);
-            Assert.AreEqual("", models[0].RunInstanceGuid);
-            Assert.AreEqual("name", models[0].FileName);
-            Assert.AreEqual("", models[0].SaidKeyCode);
-            Assert.AreEqual(time, models[0].MetricGeneratedDateTime);
-            Assert.AreEqual(1, models[0].DatasetFileId);
-            Assert.AreEqual(time, models[0].ProcessStartDateTime);
-            Assert.AreEqual("", models[0].StatusCode);
+            Assert.AreEqual(time, model.QueryMadeDateTime);
+            Assert.AreEqual(1, model.SchemaId);
+            Assert.AreEqual("contents", model.EventContents);
+            Assert.AreEqual(5, model.TotalFlowSteps);
+            Assert.AreEqual(time, model.FileModifiedDateTime);
+            Assert.AreEqual("name", model.OriginalFileName);
+            Assert.AreEqual(1, model.DatasetId);
+            Assert.AreEqual(5, model.CurrentFlowStep);
+            Assert.AreEqual(1, model.DataActionId);
+            Assert.AreEqual(1, model.DataFlowId);
+            Assert.AreEqual(1, model.Partition);
+            Assert.AreEqual(1, model.DataActionTypeId);
+            Assert.AreEqual("messagekey", model.MessageKey);
+            Assert.AreEqual(1, model.Duration);
+            Assert.AreEqual(1, model.Offset);
+            Assert.AreEqual("flowname", model.DataFlowName);
+            Assert.AreEqual(1, model.DataFlowStepId);
+            Assert.AreEqual("executionguid", model.FlowExecutionGuid);
+            Assert.AreEqual(1, model.FileSize);
+            Assert.AreEqual(1, model.EventMetricId);
+            Assert.AreEqual("storagecode", model.StorageCode);
+            Assert.AreEqual(time, model.FileCreatedDateTime);
+            Assert.AreEqual("instanceguid", model.RunInstanceGuid);
+            Assert.AreEqual("filename", model.FileName);
+            Assert.AreEqual("keycode", model.SaidKeyCode);
+            Assert.AreEqual(time, model.MetricGeneratedDateTime);
+            Assert.AreEqual(1, model.DatasetFileId);
+            Assert.AreEqual(time, model.ProcessStartDateTime);
+            Assert.AreEqual("statuscode", model.StatusCode);
         }
         [TestMethod]
         public void DataFlowMetricDtoList_ToModels_EmptyInput()

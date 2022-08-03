@@ -36,12 +36,13 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFileFlowMetricsDto> fileGroups = dataFlowMetricService.GetFileMetricGroups(searchDto);
             //assert
             Assert.AreEqual(0, fileGroups.Count);
+            stubIDatasetContext.VerifyAll();
+            stubDataFlowMetricProvider.VerifyAll();
         }
         [TestMethod]
         public void GetDataFileFlowMetrics_GroupMappings()
         {
             //arrange
-            var stubIElasticContext = new Mock<IElasticContext>();
             var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
             var stubIDatasetContext = new Mock<IDatasetContext>();
 
@@ -82,21 +83,23 @@ namespace Sentry.data.Infrastructure.Tests
             DataFlowMetricSearchDto searchDto = new DataFlowMetricSearchDto();
             //act
             List<DataFileFlowMetricsDto> fileGroups = dataFlowMetricService.GetFileMetricGroups(searchDto);
+            DataFileFlowMetricsDto fileGroup = fileGroups[0];
             //assert
-            Assert.AreEqual(entity2.EventMetricCreatedDateTime, fileGroups[0].FirstEventTime);
-            Assert.AreEqual(entity1.EventMetricCreatedDateTime, fileGroups[0].LastEventTime);
-            Assert.AreEqual(entity1.FileName, fileGroups[0].FileName);
-            Assert.AreEqual(entity1.DatasetFileId, fileGroups[0].DatasetFileId);
-            Assert.AreEqual((entity1.EventMetricCreatedDateTime - entity2.EventMetricCreatedDateTime).TotalSeconds.ToString(), fileGroups[0].Duration);
-            Assert.AreEqual(true, fileGroups[0].AllEventsComplete);
-            Assert.AreEqual(true, fileGroups[0].AllEventsPresent);
-            Assert.AreEqual(2, fileGroups[0].FlowEvents.Count);
+            Assert.AreEqual(entity2.EventMetricCreatedDateTime, fileGroup.FirstEventTime);
+            Assert.AreEqual(entity1.EventMetricCreatedDateTime, fileGroup.LastEventTime);
+            Assert.AreEqual(entity1.FileName, fileGroup.FileName);
+            Assert.AreEqual(entity1.DatasetFileId, fileGroup.DatasetFileId);
+            Assert.AreEqual("0.009", fileGroup.Duration);
+            Assert.IsTrue(fileGroup.AllEventsComplete);
+            Assert.IsTrue(fileGroup.AllEventsPresent);
+            Assert.AreEqual(2, fileGroup.FlowEvents.Count);
+            stubIDatasetContext.VerifyAll();
+            stubDataFlowMetricProvider.VerifyAll();
         }
         [TestMethod]
         public void GetDataFileFlowMetrics_GroupOrder()
         {
             //arrange
-            var stubIElasticContext = new Mock<IElasticContext>();
             var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
             var stubIDatasetContext = new Mock<IDatasetContext>();
 
@@ -140,12 +143,13 @@ namespace Sentry.data.Infrastructure.Tests
             //assert
             Assert.AreEqual(entity1.FileName, fileGroups[0].FileName);
             Assert.AreEqual(entity2.FileName, fileGroups[1].FileName);
+            stubIDatasetContext.VerifyAll();
+            stubDataFlowMetricProvider.VerifyAll();
         }
         [TestMethod]
         public void GetDataFileFlowMetrics_EventMappings()
         {
             //arrange
-            var stubIElasticContext = new Mock<IElasticContext>();
             var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
             var stubIDatasetContext = new Mock<IDatasetContext>();
 
@@ -159,7 +163,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 QueryMadeDateTime = time,
                 SchemaId = 1,
-                EventContents = "",
+                EventContents = "contents",
                 MaxExecutionOrder = 5,
                 FileModifiedDateTime = time,
                 OriginalFileName = "name",
@@ -169,66 +173,68 @@ namespace Sentry.data.Infrastructure.Tests
                 DataFlowId = 1,
                 Partition = 1,
                 DataActionTypeId = 1,
-                MessageKey = "",
+                MessageKey = "message",
                 Duration = 1,
                 Offset = 1,
-                DataFlowName = "",
+                DataFlowName = "flowname",
                 DataFlowStepId = 1,
-                FlowExecutionGuid = "",
+                FlowExecutionGuid = "executionguid",
                 FileSize = 1,
                 EventMetricId = 1,
-                StorageCode = "",
+                StorageCode = "storagecode",
                 FileCreatedDateTime = time,
-                RunInstanceGuid = "",
+                RunInstanceGuid = "instanceguid",
                 FileName = "name",
-                SaidKeyCode = "",
+                SaidKeyCode = "keycode",
                 EventMetricCreatedDateTime = time,
                 DatasetFileId = 1,
                 ProcessStartDateTime = time,
-                StatusCode = "",
+                StatusCode = "statuscode",
             };
             entityList.Add(entity1);
             DataFlowMetricSearchDto searchDto = new DataFlowMetricSearchDto();
             stubDataFlowMetricProvider.Setup(x => x.GetDataFlowMetrics(It.IsAny<DataFlowMetricSearchDto>())).Returns(entityList);
             //act
             List<DataFileFlowMetricsDto> fileGroups = dataFlowMetricService.GetFileMetricGroups(searchDto);
+            DataFlowMetricDto metricDto = fileGroups[0].FlowEvents[0];
             //assert
-            Assert.AreEqual(time, fileGroups[0].FlowEvents[0].QueryMadeDateTime);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].SchemaId);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].EventContents);
-            Assert.AreEqual(5, fileGroups[0].FlowEvents[0].TotalFlowSteps);
-            Assert.AreEqual(time, fileGroups[0].FlowEvents[0].FileModifiedDateTime);
-            Assert.AreEqual("name", fileGroups[0].FlowEvents[0].OriginalFileName);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].DatasetId);
-            Assert.AreEqual(5, fileGroups[0].FlowEvents[0].CurrentFlowStep);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].DataActionId);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].DataFlowId);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].Partition);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].DataActionTypeId);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].MessageKey);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].Duration);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].Offset);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].DataFlowName);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].DataFlowStepId);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].FlowExecutionGuid);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].FileSize);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].EventMetricId);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].StorageCode);
-            Assert.AreEqual(time, fileGroups[0].FlowEvents[0].FileCreatedDateTime);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].RunInstanceGuid);
-            Assert.AreEqual("name", fileGroups[0].FlowEvents[0].FileName);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].SaidKeyCode);
-            Assert.AreEqual(time, fileGroups[0].FlowEvents[0].MetricGeneratedDateTime);
-            Assert.AreEqual(1, fileGroups[0].FlowEvents[0].DatasetFileId);
-            Assert.AreEqual(time, fileGroups[0].FlowEvents[0].ProcessStartDateTime);
-            Assert.AreEqual("", fileGroups[0].FlowEvents[0].StatusCode);
+            Assert.AreEqual(time, metricDto.QueryMadeDateTime);
+            Assert.AreEqual(1, metricDto.SchemaId);
+            Assert.AreEqual("contents", metricDto.EventContents);
+            Assert.AreEqual(5, metricDto.TotalFlowSteps);
+            Assert.AreEqual(time, metricDto.FileModifiedDateTime);
+            Assert.AreEqual("name", metricDto.OriginalFileName);
+            Assert.AreEqual(1, metricDto.DatasetId);
+            Assert.AreEqual(5, metricDto.CurrentFlowStep);
+            Assert.AreEqual(1, metricDto.DataActionId);
+            Assert.AreEqual(1, metricDto.DataFlowId);
+            Assert.AreEqual(1, metricDto.Partition);
+            Assert.AreEqual(1, metricDto.DataActionTypeId);
+            Assert.AreEqual("message", metricDto.MessageKey);
+            Assert.AreEqual(1, metricDto.Duration);
+            Assert.AreEqual(1, metricDto.Offset);
+            Assert.AreEqual("flowname", metricDto.DataFlowName);
+            Assert.AreEqual(1, metricDto.DataFlowStepId);
+            Assert.AreEqual("executionguid", metricDto.FlowExecutionGuid);
+            Assert.AreEqual(1, metricDto.FileSize);
+            Assert.AreEqual(1, metricDto.EventMetricId);
+            Assert.AreEqual("storagecode", metricDto.StorageCode);
+            Assert.AreEqual(time, metricDto.FileCreatedDateTime);
+            Assert.AreEqual("instanceguid", metricDto.RunInstanceGuid);
+            Assert.AreEqual("name", metricDto.FileName);
+            Assert.AreEqual("keycode", metricDto.SaidKeyCode);
+            Assert.AreEqual(time, metricDto.MetricGeneratedDateTime);
+            Assert.AreEqual(1, metricDto.DatasetFileId);
+            Assert.AreEqual(time, metricDto.ProcessStartDateTime);
+            Assert.AreEqual("statuscode", metricDto.StatusCode);
+            stubIDatasetContext.VerifyAll();
+            stubDataFlowMetricProvider.VerifyAll();
 
         }
         [TestMethod]
         public void GetDataFileFlowMetrics_EventOrder()
         {
             //arrange
-            var stubIElasticContext = new Mock<IElasticContext>();
             var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
             var stubIDatasetContext = new Mock<IDatasetContext>();
 
@@ -263,10 +269,13 @@ namespace Sentry.data.Infrastructure.Tests
             DataFlowMetricSearchDto searchDto = new DataFlowMetricSearchDto();
             //act
             List<DataFileFlowMetricsDto> fileGroups = dataFlowMetricService.GetFileMetricGroups(searchDto);
+            DataFileFlowMetricsDto fileGroup = fileGroups[0];
             //assert
-            Assert.AreEqual(entity3.EventMetricId, fileGroups[0].FlowEvents[0].EventMetricId);
-            Assert.AreEqual(entity1.EventMetricId, fileGroups[0].FlowEvents[1].EventMetricId);
-            Assert.AreEqual(entity2.EventMetricId, fileGroups[0].FlowEvents[2].EventMetricId);
+            Assert.AreEqual(entity3.EventMetricId, fileGroup.FlowEvents[0].EventMetricId);
+            Assert.AreEqual(entity1.EventMetricId, fileGroup.FlowEvents[1].EventMetricId);
+            Assert.AreEqual(entity2.EventMetricId, fileGroup.FlowEvents[2].EventMetricId);
+            stubIDatasetContext.VerifyAll();
+            stubDataFlowMetricProvider.VerifyAll();
         }
       
       
