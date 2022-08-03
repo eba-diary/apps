@@ -27,7 +27,7 @@ namespace Sentry.data.Web.Controllers.WebApi
             get { return _supportLinkService; }
         }
 
-        public IHttpActionResult AddSupportLink(SupportLinkModel supportLinkModel)
+        public IHttpActionResult AddSupportLink(SupportLinkModel supportLinkModel) 
         {
             if(supportLinkModel.Name == null || supportLinkModel.Url == null)
             {
