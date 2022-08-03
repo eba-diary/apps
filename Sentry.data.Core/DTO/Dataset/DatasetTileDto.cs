@@ -10,12 +10,12 @@ namespace Sentry.data.Core
         public string Name { get; set; }
         public string Description { get; set; }
         public ObjectStatusEnum Status { get; set; }
-        [FilterSearchField(FilterCategoryNames.Dataset.FAVORITE)]
+        [FilterSearchField(FilterCategoryNames.Dataset.FAVORITE, hideResultCounts:true)]
         public bool IsFavorite { get; set; }
-        [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY)]
+        [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, defaultOpen: true)]
         public string Category { get; set; }
         public string Color { get; set; }
-        [FilterSearchField(FilterCategoryNames.Dataset.SECURED)]
+        [FilterSearchField(FilterCategoryNames.Dataset.SECURED, hideResultCounts: true)]
         public bool IsSecured { get; set; }
         public DateTime LastActivityDateTime { get; set; }
         public DateTime CreatedDateTime { get; set; }

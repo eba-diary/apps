@@ -1,12 +1,8 @@
-﻿using Nest;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Caching;
-using System.Web;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -79,35 +75,9 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
             List<FilterCategoryDto> filterCategoryDtos = datasetSearchDto.SearchableTiles.CreateFilters(datasetSearchDto.FilterCategories);
-            List<FilterCategoryModel> filterCategoryModels = filterCategoryDtos.ToModels(new List<string>() { "*" });
+            List<FilterCategoryModel> filterCategoryModels = filterCategoryDtos.ToModels();
 
             return Json(filterCategoryModels);
-        }
-
-        [HttpPost]
-        public JsonResult RefreshFilters(FilterCategoriesRefreshModel refreshModel)
-        {
-            foreach (FilterCategoryModel filterCategory in refreshModel.CurrentFilterCategories)
-            {
-                FilterCategoryModel resultCategory = refreshModel.ResultFilterCategories.FirstOrDefault(x => x.CategoryName == filterCategory.CategoryName);
-                bool hasSelectedOption = resultCategory?.CategoryOptions.Any(x => x.Selected) == true;
-
-                foreach (FilterCategoryOptionModel categoryOption in filterCategory.CategoryOptions)
-                {
-                    FilterCategoryOptionModel resultCategoryOption = resultCategory?.CategoryOptions?.FirstOrDefault(x => x.OptionValue == categoryOption.OptionValue);
-                    if (resultCategoryOption != null)
-                    {
-                        categoryOption.ResultCount = resultCategoryOption.ResultCount;
-                        categoryOption.Selected = resultCategoryOption.Selected;
-                    }
-                    else if (!hasSelectedOption)
-                    {
-                        categoryOption.ResultCount = 0;
-                    }
-                }
-            }
-
-            return Json(refreshModel.CurrentFilterCategories);
         }
 
         [HttpPost]

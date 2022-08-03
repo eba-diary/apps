@@ -628,7 +628,6 @@ namespace Sentry.data.Core
 
                 resultDto.TotalResults = allResults.Count;
                 resultDto.Tiles = ApplyPaging(allResults, datasetSearchDto);
-                resultDto.FilterCategories = allResults.CreateFilters(datasetSearchDto.FilterCategories);
             }
             catch (Exception ex)
             {

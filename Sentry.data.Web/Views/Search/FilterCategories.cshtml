@@ -14,16 +14,19 @@
     }
 }
 
-@helper DisplayCategoryOptions(IEnumerable<FilterCategoryOptionModel> options)
+@helper DisplayCategoryOptions(IEnumerable<FilterCategoryOptionModel> options, bool hideCounts)
 {
     foreach (FilterCategoryOptionModel option in options.ToList())
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
             <div class="form-group mb-0">
-                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" disabled="@(option.ResultCount == 0 && !option.Selected)" value="@option.OptionValue" checked="@option.Selected">
+                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
                 <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
                     @SafeValue(option.OptionValue)
-                    <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
+                    @if (!hideCounts)
+                    {
+                        <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
+                    }
                 </label>                
             </div>
         </li>
@@ -58,11 +61,11 @@
 
                 <div class="filter-search-category-options @(category.DefaultCategoryOpen ? "" : "display-none")" id="hide_@categoryTypeId">
                     <ul class="list-unstyled">
-                        @DisplayCategoryOptions(category.CategoryOptions.Take(visibleOptionCount))
+                        @DisplayCategoryOptions(category.CategoryOptions.Take(visibleOptionCount), category.HideResultCounts)
 
                         <li class="display-none" id="hidden_@categoryMoreId">
                             <ul class="notNested">
-                                @DisplayCategoryOptions(category.CategoryOptions.Skip(visibleOptionCount))
+                                @DisplayCategoryOptions(category.CategoryOptions.Skip(visibleOptionCount), category.HideResultCounts)
                             </ul>
                         </li>
                     </ul>

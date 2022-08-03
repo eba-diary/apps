@@ -93,7 +93,12 @@ namespace Sentry.data.Core
             return await Task.Run(() =>
             {
                 FilterSearchField filterAttribute = propertyInfo.GetCustomAttribute<FilterSearchField>();
-                FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = filterAttribute.FilterCategoryName };
+                FilterCategoryDto categoryDto = new FilterCategoryDto() 
+                { 
+                    CategoryName = filterAttribute.FilterCategoryName,
+                    DefaultCategoryOpen = filterAttribute.DefaultOpen,
+                    HideResultCounts = filterAttribute.HideResultCounts
+                };
 
                 ParameterExpression parameter = Expression.Parameter(typeof(T));
                 Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);

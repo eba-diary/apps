@@ -10,7 +10,6 @@ namespace Sentry.data.Web
         public List<SelectListItem> LayoutOptions { get; set; }
         public List<TileModel> Tiles { get; set;}
         public List<PageItemModel> PageItems { get; set; }
-        public List<FilterCategoryModel> FilterCategories { get; set; }
         public int TotalResults { get; set; }
     }
 }

@@ -64,21 +64,17 @@ namespace Sentry.data.Web
 
         public static List<FilterCategoryModel> ToModels(this List<FilterCategoryDto> dtos)
         {
-            return dtos?.Select(x => x.ToModel(new List<string>())).ToList();
+            return dtos?.Select(x => x.ToModel()).ToList();
         }
 
-        public static List<FilterCategoryModel> ToModels(this List<FilterCategoryDto> dtos, List<string> openCategories)
-        {
-            return dtos?.Select(x => x.ToModel(openCategories)).ToList();
-        }
-
-        private static FilterCategoryModel ToModel(this FilterCategoryDto dto, List<string> openCategories)
+        private static FilterCategoryModel ToModel(this FilterCategoryDto dto)
         {
             return new FilterCategoryModel()
             {
                 CategoryName = dto.CategoryName,
                 CategoryOptions = dto.CategoryOptions?.Select(x => x.ToModel()).ToList(),
-                DefaultCategoryOpen = openCategories.Contains("*") || openCategories.Contains(dto.CategoryName)
+                DefaultCategoryOpen = dto.DefaultCategoryOpen,
+                HideResultCounts = dto.HideResultCounts
             };
         }
 

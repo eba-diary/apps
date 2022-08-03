@@ -14,7 +14,6 @@ namespace Sentry.data.Web
             {
                 TotalResults = dto.TotalResults,
                 Tiles = dto.Tiles.ToModels(),
-                FilterCategories = dto.FilterCategories.ToModels(),
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(dto.PageSize.ToString()),
                 SortByOptions = Utility.BuildSelectListFromEnum<DatasetSortByOption>(selectedSortByValue).Where(x => x.Value != ((int)DatasetSortByOption.MostAccessed).ToString()).ToList(),
                 PageItems = Utility.BuildPageItemList(dto.TotalResults, dto.PageSize, selectedPageNumber),
