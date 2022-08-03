@@ -59,7 +59,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
         {
-            // Conver selectedDate string to a DateTime object
+            // Convert selectedDate string to a DateTime object
             DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
             List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
@@ -68,7 +68,7 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
-
+        //method for generating a dataset selection model, which contains a list of all Active datasets
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
             DatasetSelectionModel model = new DatasetSelectionModel();

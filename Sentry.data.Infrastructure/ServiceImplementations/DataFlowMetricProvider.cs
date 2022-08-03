@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure
         {
             _elasticContext = elasticContext;
         }
-
+        //returns list of data flow metrics matching searchdto criteria
         public List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto)
         {
             List<QueryContainer> must = new List<QueryContainer>();

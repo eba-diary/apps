@@ -17,6 +17,7 @@ namespace Sentry.data.Infrastructure
             _dataFlowMetricProvider = dataFlowMetricProvider;
             _context = context;
         }
+        // converts dataflowmetric into dto to be split into groups based on datasetfileid
         private DataFlowMetricDto MapToDto(DataFlowMetric entity)
         {
             return new DataFlowMetricDto()
@@ -53,6 +54,7 @@ namespace Sentry.data.Infrastructure
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
             };
         }
+        //Takes search dto with DatasetId, SchemaId, and an optional DatasetFileId, returns elastic result with all matching flow events and divides them into groups based on fileId
         public List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto)
         {
             List<DataFlowMetric> entityList = _dataFlowMetricProvider.GetDataFlowMetrics(searchDto);
