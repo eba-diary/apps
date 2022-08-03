@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using Sentry.data.Core.Interfaces;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Sentry.data.Core.Tests
 {
@@ -822,11 +823,20 @@ namespace Sentry.data.Core.Tests
 
             // Act
             bool result = datasetFileService.ScheduleReprocessing(stepId, datasetFileIds);
-
+            
             // Assert
             context.VerifyAll();
             scheduler.VerifyAll();
-            s3serviceprovider.Verify(d => d.UploadDataFile("TriggerKey/20220614171525000/zzztest0614.csv.trg", "{\"SourceBucket\":\"my-bucket-name\",\"SourceKey\":\"raw/CRVS/PROD/8921001/2022/7/5/20220614171525000/zzztest0614.csv\"}"), Times.Exactly(2));
+
+            MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes("raw/CRVS/PROD/8921001/2022/7/5/20220705201728000/Structured_AgentEvent_20220705031726670.json"));
+            KeyValuePair<string, string> tagContent = new KeyValuePair<string, string>("Content", "Trigger");
+           
+            List<KeyValuePair<string, string>> tagContentList = new List<KeyValuePair<string, string>>();
+            tagContentList.Add(tagContent);
+
+            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<KeyValuePair<string, string>>>()), Times.Exactly(2));
+            
+            
             Assert.IsTrue(result);
         }
 

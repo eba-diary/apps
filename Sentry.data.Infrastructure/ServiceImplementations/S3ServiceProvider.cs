@@ -470,11 +470,14 @@ namespace Sentry.data.Infrastructure
             if(keyValuePairs != null)
             {
                 // using private helper method
+                ConvertToTags(keyValuePairs).ForEach(x => mReq.TagSet.Add(x));
+                /*
                 List<Tag> tags = ConvertToTags(keyValuePairs);
                 foreach (Tag tag in tags)
                 {
                     mReq.TagSet.Add(tag);
                 }
+                */
             }
 
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
@@ -1304,6 +1307,12 @@ namespace Sentry.data.Infrastructure
         internal List<Tag> ConvertToTags(List<KeyValuePair<string, string>>tagKeyValuePairs)
         {
             List<Tag> resultTags = new List<Tag>();
+
+            if(tagKeyValuePairs.Count == 0)
+            {
+                return resultTags;
+            }
+
             foreach (KeyValuePair<string, string> keyValuePair in tagKeyValuePairs)
             {
                 Tag tag = new Tag()
