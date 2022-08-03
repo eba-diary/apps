@@ -53,15 +53,10 @@ namespace Sentry.data.Infrastructure
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
             };
         }
-        private List<DataFlowMetricDto> GetMetricList(List<DataFlowMetric> entityList)
-        {
-            List<DataFlowMetricDto> dataFlowMetricDtos = entityList.Select(x => MapToDto(x)).ToList();
-            return dataFlowMetricDtos;
-        }
         public List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto)
         {
             List<DataFlowMetric> entityList = _dataFlowMetricProvider.GetDataFlowMetrics(searchDto);
-            List<DataFlowMetricDto> dtoList = GetMetricList(entityList);
+            List<DataFlowMetricDto> dtoList = entityList.Select(x => MapToDto(x)).ToList();
             List<DataFileFlowMetricsDto> fileGroups = new List<DataFileFlowMetricsDto>();
             var grouped = dtoList.GroupBy(x => x.FileName).ToList();
             foreach(var group in grouped)
