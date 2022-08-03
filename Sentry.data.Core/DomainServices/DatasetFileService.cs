@@ -167,6 +167,7 @@ namespace Sentry.data.Core
                 counter++;    
                 batch = batch.Skip(batchSize * counter).ToList();  
             }
+
             return submittedSuccessful;
         }
 
