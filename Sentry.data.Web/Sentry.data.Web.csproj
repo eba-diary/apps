@@ -415,6 +415,7 @@
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
@@ -423,6 +424,8 @@
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />
+    <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
+    <Compile Include="Models\AdminPage\BaseAuditModel.cs" />
     <Compile Include="Models\AdminPage\DataReprocessingModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileReprocessModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
@@ -1208,6 +1211,9 @@
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_DataFileReprocessing.cshtml" />
+    <Content Include="Views\Shared\_NonParquetFilesTable.cshtml" />
+    <Content Include="Views\Shared\_RawqueryParquetAudit.cshtml" />
+    <Content Include="Views\Shared\_RowCountCompareTable.cshtml" />
     <Content Include="Views\Shared\_AdminTest2.cshtml" />
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />

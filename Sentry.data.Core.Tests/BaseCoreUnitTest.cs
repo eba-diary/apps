@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Rhino.Mocks;
+using Sentry.data.Core.Interfaces;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Mock;

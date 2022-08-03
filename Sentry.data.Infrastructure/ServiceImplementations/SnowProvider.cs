@@ -11,8 +11,6 @@ namespace Sentry.data.Infrastructure
 {
     public class SnowProvider : ISnowProvider
     {
-
-
         public System.Data.DataTable GetTopNRows(string db, string schema, string table, int rows)
         {
             string q = BuildSelectQuery(db, schema, table, rows);
@@ -32,6 +30,14 @@ namespace Sentry.data.Infrastructure
             {
                 return false;
             }
+        }
+
+        public System.Data.DataTable GetExceptRows(string db, string schema, string table)
+        {
+            string q1 = $"SELECT \"ETL_FILE_NAME_ONLY\" FROM(SELECT \"ETL_FILE_NAME_ONLY\" FROM \"{db}\".\"{schema}\".\"{table}\" EXCEPT ";
+            string q2 = $"SELECT \"ETL_FILE_NAME_ONLY\" FROM \"DATA_QUAL\".\"{schema}\".\"VW_{table}\")";
+
+            return ExecuteQuery(q1+q2);
         }
 
         private string BuildSelectQuery(string db, string schema, string table, int rows)

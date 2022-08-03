@@ -205,7 +205,7 @@
       <Name>Sentry.data.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Web\Sentry.data.Web.csproj">
-      <Project>{42C330E1-E605-487F-979D-635597D1C88D}</Project>
+      <Project>{42c330e1-e605-487f-979d-635597d1c88d}</Project>
       <Name>Sentry.data.Web</Name>
     </ProjectReference>
   </ItemGroup>

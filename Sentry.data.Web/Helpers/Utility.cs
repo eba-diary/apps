@@ -203,6 +203,39 @@ namespace Sentry.data.Web.Helpers
             return items.OrderBy(o => o.Value);
         }
 
+        public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
+        {
+            List<SelectListItem> options = new List<SelectListItem>();
+            foreach (T item in Enum.GetValues(typeof(T)))
+            {
+                int value = (int)Convert.ChangeType(item, item.GetTypeCode());
+                options.Add(new SelectListItem
+                {
+                    Text = item.GetDescription(),
+                    Value = value.ToString(),
+                    Selected = value == selectedValue
+                });
+            }
+
+            return options;
+        }
+
+        public static T FindEnumFromId<T>(int enumId) where T : Enum
+        {
+            foreach (T item in Enum.GetValues(typeof(T)))
+            {
+                int value = (int)Convert.ChangeType(item, item.GetTypeCode());
+
+                if (value == enumId)
+                {
+                    return item;
+                }
+            }
+
+            // Return default Enum if one is not found with the corresponding Id parameter.
+            return default(T);
+        }
+
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });

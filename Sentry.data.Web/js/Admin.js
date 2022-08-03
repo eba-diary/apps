@@ -118,6 +118,114 @@ data.Admin = {
             $("#reprocessButton").prop("disabled", true);
         }
     },
+    // activate or deactivate reprocess button based on input list of checked boxes
+    ActivateDeactivateReprocessButton: function () {
+        var checkedBoxes = $(".select-all-target:checkbox:checked");
+        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100) {
+            $("#auditReprocessButton").prop("disabled", false);
+        }
+        else {
+            $("#auditReprocessButton").prop("disabled", true);
+        }
+    },
+
+    AuditReprocessButton: function () {
+        // activate or deactivate button
+        $("#AuditTable").on("click", ".generic-checkbox", function () {
+            data.Admin.ActivateDeactivateReprocessButton();
+        });
+
+        $("#auditReprocessButton").click(function () {
+            let flowStep = $("#AuditTable").data("schema-group");
+
+            var filesToReprocess = [];
+
+            $(".select-all-target:checkbox:checked").each(function () {
+                filesToReprocess.push($(this).data("file-id"));
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "../../api/v2/datafile/DataFile/Reprocess",
+                contentType: "application/json",
+                data: JSON.stringify({ DataFlowStepId: flowStep, DatasetFileIds: filesToReprocess }),
+                success: function () {
+                    data.Dataset.makeToast("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
+                },
+                error: function () {
+                    data.Dataset.makeToast("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
+                }
+
+            })
+        });
+    },
+
+    AuditInit: function () {
+        $("#AllDatasets").materialSelect();
+        $("#AllAuditTypes").materialSelect();
+        $("#AllAuditSearchTypes").materialSelect();
+        $("#schemaDropdown").materialSelect()
+        $("#AllDatasets").change(function (event) {
+            var datasetId = $("#AllDatasets").find(":selected").val();
+            if (datasetId != "") {
+                var url = data.Admin.GetSchemaUrl(datasetId);
+                data.Admin.GetSchemaDropdown(url);
+            }
+        });
+
+        $("AllAuditTypes").change(function () {
+
+        });
+
+        $("#auditSearchButton").click(function () {
+            var schemaId = $("#schemaDropdown").find(":selected").val();
+            var datasetId = $("#AllDatasets").find(":selected").val();
+            var auditId = $("#AllAuditTypes").find(":selected").val();
+            if (schemaId != "" && datasetId != "" && auditId != "") {
+                $.ajax({
+                    type: "POST",
+                    url: "Admin/GetAuditTableResults",
+                    contentType: "application/json",
+                    data: JSON.stringify({ "schemaId": schemaId, "datasetId": datasetId, "auditId": auditId }),
+                    success: function (result) {
+                        $("#AuditResultTable").html(result);
+                    },
+                    error: function () {
+                        data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
+                    }
+                })
+            }
+        });
+    },
+
+    AuditTableInit: function () {
+        $('#AuditTable').DataTable({
+            columnDefs: [
+                {
+                    targets: [0],
+                    orderable: false
+                }
+            ],
+            drawCallback: function () {
+                $('#data-file-select-all').prop('checked', false);
+                $('.select-all-target').prop('checked', false);
+            }
+        });
+
+        $("#data-file-select-all").click(function (event) {
+            var selectAllCheckbox = $(this);
+            if (selectAllCheckbox.is(":checked")) {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $(".select-all-target").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+    },
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect();
