@@ -4,6 +4,7 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -45,7 +46,7 @@ namespace Sentry.data.Web.Controllers
             new Dictionary<string, string>();
 
             myDict.Add("1", "Reprocess Data Files");
-            myDict.Add("2", "File Processing Logs");
+            myDict.Add("2", "Data Flow Metrics");
             myDict.Add("3", "Parquet Null Rows");
             myDict.Add("4", "General Raw Query Parquet");
             myDict.Add("5", "Connector Status");
@@ -58,7 +59,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
         {
-            // Conver selectedDate string to a DateTime object
+            // Convert selectedDate string to a DateTime object
             DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
             List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
@@ -67,27 +68,33 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
-
+        //method for generating a dataset selection model, which contains a list of all Active datasets
+        private DatasetSelectionModel GetDatasetSelectionModel()
+        {
+            DatasetSelectionModel model = new DatasetSelectionModel();
+            List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
+            dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
+            model.AllDatasets = new List<SelectListItem>();
+            foreach(DatasetDto dto in dtoList)
+            {
+                SelectListItem item = new SelectListItem();
+                item.Text = dto.DatasetName;
+                item.Value = dto.DatasetId.ToString();
+                model.AllDatasets.Add(item);
+            }
+            return model;
+        }
         public async Task<ActionResult> GetAdminAction(string viewId)
         {
             string viewPath = "";
             switch (viewId)
             {
                 case "1":
-                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
-                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
-                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
-                    foreach(DatasetDto d in dtoList)
-                    {
-                        SelectListItem item = new SelectListItem();
-                        item.Text = d.DatasetName;
-                        item.Value = d.DatasetId.ToString();
-                        dataReprocessingModel.AllDatasets.Add(item);
-                    }
+                    DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();    
                     return PartialView("_DataFileReprocessing", dataReprocessingModel);
                 case "2":
-                    viewPath = "_AdminTest3";
-                    break;
+                    DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
+                    return PartialView("_DataFlowMetrics", flowMetricsModel);
                 case "3":
                     viewPath = "_AdminTest3";
                     break;

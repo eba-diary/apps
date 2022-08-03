@@ -431,6 +431,7 @@
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\DataFlowMetricController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
@@ -438,15 +439,19 @@
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
+    <Compile Include="Extensions\DataFlowMetricExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
+    <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
     <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />
-    <Compile Include="Models\AdminPage\DataReprocessingModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileReprocessModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
@@ -1240,6 +1245,7 @@
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
     <Content Include="Views\Shared\_DeadJobTable.cshtml" />
     <Content Include="Views\Shared\_ReprocessDeadSparkJobs.cshtml" />
+    <Content Include="Views\Shared\_DataFlowMetrics.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

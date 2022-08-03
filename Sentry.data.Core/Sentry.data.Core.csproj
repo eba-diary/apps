@@ -164,6 +164,9 @@
     <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFlowMetricDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryAssetCategoriesDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryCategoryDto.cs" />
@@ -216,6 +219,7 @@
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="Entities\DataFlowMetrics\DataFlowMetric.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
@@ -395,6 +399,8 @@
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
     <Compile Include="Interfaces\IDeadJobProvider.cs" />
+    <Compile Include="Interfaces\IDataFlowMetricProvider.cs" />
+    <Compile Include="Interfaces\IDataFlowMetricService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
