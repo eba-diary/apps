@@ -470,7 +470,11 @@ namespace Sentry.data.Infrastructure
             if(keyValuePairs != null)
             {
                 // using private helper method
-                UploadTag(mReq, null, keyValuePairs);
+                List<Tag> tags = ConvertToTags(keyValuePairs);
+                foreach (Tag tag in tags)
+                {
+                    mReq.TagSet.Add(tag);
+                }
             }
 
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
@@ -665,7 +669,11 @@ namespace Sentry.data.Infrastructure
 
                 if (UploadTagKeyValuePairs != null)
                 {
-                    UploadTag(null, poReq, UploadTagKeyValuePairs);
+                    List<Tag> tags = ConvertToTags(UploadTagKeyValuePairs);
+                    foreach(Tag tag in tags)
+                    {
+                        poReq.TagSet.Add(tag);
+                    }
                 }
 
                 Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
@@ -705,9 +713,10 @@ namespace Sentry.data.Infrastructure
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 poReq.CannedACL = GetCannedAcl();
 
-                if (UploadTagKeyValuePairs != null)
+                List<Tag> tags = ConvertToTags(UploadTagKeyValuePairs);
+                foreach (Tag tag in tags)
                 {
-                    UploadTag(null, poReq, UploadTagKeyValuePairs);
+                    poReq.TagSet.Add(tag);
                 }
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
@@ -1292,33 +1301,19 @@ namespace Sentry.data.Infrastructure
             return keyVersionList;
         }
 
-        private void UploadTag(InitiateMultipartUploadRequest mReq, PutObjectRequest poReq, List<KeyValuePair<string, string>>tagKeyValuePairs)
+        internal List<Tag> ConvertToTags(List<KeyValuePair<string, string>>tagKeyValuePairs)
         {
-            if (poReq == null)
+            List<Tag> resultTags = new List<Tag>();
+            foreach (KeyValuePair<string, string> keyValuePair in tagKeyValuePairs)
             {
-                foreach (KeyValuePair<string, string> keyValuePair in tagKeyValuePairs)
+                Tag tag = new Tag()
                 {
-                    Tag tag = new Tag()
-                    {
-                        Key = keyValuePair.Key,
-                        Value = keyValuePair.Value
-                    };
-                    mReq.TagSet.Add(tag);
-                }
+                    Key = keyValuePair.Key,
+                    Value = keyValuePair.Value
+                };
+                resultTags.Add(tag);
             }
-            else
-            {
-                foreach (KeyValuePair<string, string> keyValuePair in tagKeyValuePairs)
-                {
-                    Tag tag = new Tag()
-                    {
-                        Key = keyValuePair.Key,
-                        Value = keyValuePair.Value
-                    };
-                    poReq.TagSet.Add(tag);
-                }
-            }
-            
+            return resultTags;
         }
 
         #endregion
