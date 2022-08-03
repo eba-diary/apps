@@ -73,7 +73,7 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetSelectionModel model = new DatasetSelectionModel();
             List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
-            dtoList.OrderByDescending(x => x.DatasetName);
+            dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
             model.AllDatasets = new List<SelectListItem>();
             foreach(DatasetDto dto in dtoList)
             {
