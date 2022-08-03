@@ -27,8 +27,6 @@ namespace Sentry.data.Infrastructure.Tests
 
             DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(stubDataFlowMetricProvider.Object, stubIDatasetContext.Object);
 
-            List<DataFlowStep> flowSteps = new List<DataFlowStep>();
-            stubIDatasetContext.Setup(x => x.DataFlowStep).Returns(flowSteps.AsQueryable());
             List<DataFlowMetric> entityList = new List<DataFlowMetric>();
             stubDataFlowMetricProvider.Setup(x => x.GetDataFlowMetrics(It.IsAny<DataFlowMetricSearchDto>())).Returns(entityList);
             DataFlowMetricSearchDto searchDto = new DataFlowMetricSearchDto();
@@ -36,7 +34,6 @@ namespace Sentry.data.Infrastructure.Tests
             List<DataFileFlowMetricsDto> fileGroups = dataFlowMetricService.GetFileMetricGroups(searchDto);
             //assert
             Assert.AreEqual(0, fileGroups.Count);
-            stubIDatasetContext.VerifyAll();
             stubDataFlowMetricProvider.VerifyAll();
         }
         [TestMethod]
