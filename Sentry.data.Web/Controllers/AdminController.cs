@@ -74,25 +74,25 @@ namespace Sentry.data.Web.Controllers
         {
             return View();
         }
-        public ActionResult ReprocessDataFiles()
+        public ActionResult DataFileReprocessing()
         {
             DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();
-            return View("_DataFileReprocessing", dataReprocessingModel);
+            return View(dataReprocessingModel);
         }
         public ActionResult DataFlowMetrics()
         {
             DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
-            return View("_DataFlowMetrics", flowMetricsModel);
+            return View(flowMetricsModel);
         }
         public async Task<ActionResult> ConnectorStatus()
         {
             List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
-            return View("_ConnectorStatus", connectorDtos.MapToModelList());
+            return View(connectorDtos.MapToModelList());
         }
         public ActionResult ReprocessDeadSparkJobs()
         {
             ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
-            return View("_ReprocessDeadSparkJobs", reprocessDeadSparkJobModel);
+            return View(reprocessDeadSparkJobModel);
         }
        
     }
