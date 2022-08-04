@@ -1,23 +1,21 @@
-﻿using LaunchDarkly.Sdk.Server;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.FeatureFlags;
 using Sentry.FeatureFlags.Repo;
 using Sentry.FeatureFlags.Sql;
 using Sentry.FeatureFlags.LaunchDarkly;
 using System;
 using System.Linq;
+using LaunchDarkly.Sdk.Server.Interfaces;
 
 namespace Sentry.data.Infrastructure.FeatureFlags
 {
     /// <summary>
     /// Feature Flag class for DSC - this class holds all the feature flags that the application needs to evaluate
-    /// This class is registered as a singleton in the bootstrapper so that everyone that requests this class gets the same copy
-    /// This is needed so that there's only one LdClient instance for the entire application
     /// </summary>
-    public class DataFeatures : IDataFeatures, IDisposable
+    public class DataFeatures : IDataFeatures
     {
         private readonly UserService _userService;
-        private readonly LdClient LdClient;
+        private readonly ILdClient _ldClient;
 
         // LaunchDarkly feature flags - property definitions
         public IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage { get; }
@@ -39,33 +37,35 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4152_UploadFileFromUI { get; }
         public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
         public IFeatureFlag<bool> CLA4310_UseHttpClient { get; }
+        public IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; }
 
 
-        public DataFeatures(UserService userService)
+        public DataFeatures(UserService userService, ILdClient ldClient)
         {
             _userService = userService;
-            LdClient = new LdClientFactory().BuildLdClient();
+            _ldClient = ldClient;
 
             // LaunchDarkly feature flags - property initialization
-            CLA1656_DataFlowEdit_ViewEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_ViewEditPage", false, LdClient, () => LdUser);
-            CLA1656_DataFlowEdit_SubmitEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_SubmitEditPage", false, LdClient, () => LdUser);
-            CLA3329_Expose_HR_Category = new BooleanFeatureFlagAmbientContext("CLA3329_Expose_HR_Category", false, LdClient, () => LdUser);
-            CLA2838_DSC_ANOUNCEMENTS = new BooleanFeatureFlagAmbientContext("CLA2838_DSC_ANOUNCEMENTS", false, LdClient, () => LdUser);
-            CLA3332_ConsolidatedDataFlows = new BooleanFeatureFlagAmbientContext("CLA3332_ConsolidatedDataFlows", false, LdClient, () => LdUser);
-            CLA3497_UniqueLivySessionName = new BooleanFeatureFlagAmbientContext("CLA3497_UniqueLivySessionName", false, LdClient, () => LdUser);
-            CLA3550_DATA_INVENTORY_NEW_COLUMNS = new BooleanFeatureFlagAmbientContext("CLA3550_DATA_INVENTORY_NEW_COLUMNS", false, LdClient, () => LdUser);
-            CLA3541_Dataset_Details_Tabs = new BooleanFeatureFlagAmbientContext("CLA3541_DatasetDetailsTabs", false, LdClient, () => LdUser);
-            CLA3240_UseDropLocationV2 = new BooleanFeatureFlagAmbientContext("CLA3240_UseDropLocationV2", false, LdClient, () => LdUser);
-            CLA3605_AllowSchemaParquetUpdate = new BooleanFeatureFlagAmbientContext("CLA3605_AllowSchemaParquetUpdate", false, LdClient, () => LdUser);
-            CLA3637_EXPOSE_INV_CATEGORY = new BooleanFeatureFlagAmbientContext("CLA3637_EXPOSE_INV_CATEGORY", false, LdClient, () => LdUser);
-            CLA3553_SchemaSearch = new BooleanFeatureFlagAmbientContext("CLA3553_SchemaSearch", false, LdClient, () => LdUser);
-            CLA3882_DSC_NOTIFICATION_SUBCATEGORY = new BooleanFeatureFlagAmbientContext("CLA3882_DSC_NOTIFICATION_SUBCATEGORY", false, LdClient, () => LdUser);
-            CLA3861_RefactorGetUserSecurity = new BooleanFeatureFlagAmbientContext("CLA3861_RefactorGetUserSecurity", false, LdClient, () => LdUser);
-            CLA3718_Authorization = new BooleanFeatureFlagAmbientContext("CLA3718_Authorization", false, LdClient, () => LdUser);
-            CLA4049_ALLOW_S3_FILES_DELETE = new BooleanFeatureFlagAmbientContext("CLA4049_ALLOW_S3_FILES_DELETE", false, LdClient, () => LdUser);
-            CLA4152_UploadFileFromUI = new BooleanFeatureFlagAmbientContext("CLA4152_UploadFileFromUI", false, LdClient, () => LdUser);
-            CLA1130_SHOW_ALTERNATE_EMAIL = new BooleanFeatureFlagAmbientContext("CLA1130_SHOW_ALTERNATE_EMAIL", false, LdClient, () => LdUser);
-            CLA4310_UseHttpClient = new BooleanFeatureFlagAmbientContext("CLA4310_UseHttpClient", false, LdClient, () => LdUser);
+            CLA1656_DataFlowEdit_ViewEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_ViewEditPage", false, _ldClient, () => LdUser);
+            CLA1656_DataFlowEdit_SubmitEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_SubmitEditPage", false, _ldClient, () => LdUser);
+            CLA3329_Expose_HR_Category = new BooleanFeatureFlagAmbientContext("CLA3329_Expose_HR_Category", false, _ldClient, () => LdUser);
+            CLA2838_DSC_ANOUNCEMENTS = new BooleanFeatureFlagAmbientContext("CLA2838_DSC_ANOUNCEMENTS", false, _ldClient, () => LdUser);
+            CLA3332_ConsolidatedDataFlows = new BooleanFeatureFlagAmbientContext("CLA3332_ConsolidatedDataFlows", false, _ldClient, () => LdUser);
+            CLA3497_UniqueLivySessionName = new BooleanFeatureFlagAmbientContext("CLA3497_UniqueLivySessionName", false, _ldClient, () => LdUser);
+            CLA3550_DATA_INVENTORY_NEW_COLUMNS = new BooleanFeatureFlagAmbientContext("CLA3550_DATA_INVENTORY_NEW_COLUMNS", false, _ldClient, () => LdUser);
+            CLA3541_Dataset_Details_Tabs = new BooleanFeatureFlagAmbientContext("CLA3541_DatasetDetailsTabs", false, _ldClient, () => LdUser);
+            CLA3240_UseDropLocationV2 = new BooleanFeatureFlagAmbientContext("CLA3240_UseDropLocationV2", false, _ldClient, () => LdUser);
+            CLA3605_AllowSchemaParquetUpdate = new BooleanFeatureFlagAmbientContext("CLA3605_AllowSchemaParquetUpdate", false, _ldClient, () => LdUser);
+            CLA3637_EXPOSE_INV_CATEGORY = new BooleanFeatureFlagAmbientContext("CLA3637_EXPOSE_INV_CATEGORY", false, _ldClient, () => LdUser);
+            CLA3553_SchemaSearch = new BooleanFeatureFlagAmbientContext("CLA3553_SchemaSearch", false, _ldClient, () => LdUser);
+            CLA3882_DSC_NOTIFICATION_SUBCATEGORY = new BooleanFeatureFlagAmbientContext("CLA3882_DSC_NOTIFICATION_SUBCATEGORY", false, _ldClient, () => LdUser);
+            CLA3861_RefactorGetUserSecurity = new BooleanFeatureFlagAmbientContext("CLA3861_RefactorGetUserSecurity", false, _ldClient, () => LdUser);
+            CLA3718_Authorization = new BooleanFeatureFlagAmbientContext("CLA3718_Authorization", false, _ldClient, () => LdUser);
+            CLA4049_ALLOW_S3_FILES_DELETE = new BooleanFeatureFlagAmbientContext("CLA4049_ALLOW_S3_FILES_DELETE", false, _ldClient, () => LdUser);
+            CLA4152_UploadFileFromUI = new BooleanFeatureFlagAmbientContext("CLA4152_UploadFileFromUI", false, _ldClient, () => LdUser);
+            CLA1130_SHOW_ALTERNATE_EMAIL = new BooleanFeatureFlagAmbientContext("CLA1130_SHOW_ALTERNATE_EMAIL", false, _ldClient, () => LdUser);
+            CLA4310_UseHttpClient = new BooleanFeatureFlagAmbientContext("CLA4310_UseHttpClient", false, _ldClient, () => LdUser);
+            CLA4260_QuartermasterNamedEnvironmentTypeFilter = new StringFeatureFlagAmbientContext("CLA4260_QuartermasterNamedEnvironmentTypeFilter", "Prod", _ldClient, () => LdUser);
         }
 
         /// <summary>
@@ -114,32 +114,5 @@ namespace Sentry.data.Infrastructure.FeatureFlags
 
         #endregion
 
-        #region IDisposable
-        // Flag: Has Dispose already been called?
-        bool disposed;
-
-        // Public implementation of Dispose pattern callable by consumers.
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // Protected implementation of Dispose pattern.
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                LdClient.Flush();
-            }
-
-            disposed = true;
-        }
-        #endregion
     }
 }
