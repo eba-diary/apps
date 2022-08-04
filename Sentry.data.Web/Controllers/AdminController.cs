@@ -69,6 +69,7 @@ namespace Sentry.data.Web.Controllers
             }
             return model;
         }
+        //below methods all return admin page views
         public ActionResult Index()
         {
             return View();
