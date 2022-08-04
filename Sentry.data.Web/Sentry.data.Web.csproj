@@ -1234,18 +1234,19 @@
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
-    <Content Include="Views\Admin\Index.cshtml" />
-    <Content Include="Views\Shared\_DataFileReprocessing.cshtml" />
+    <Content Include="Views\Shared\_AdminLayout.cshtml" />
+    <Content Include="Views\Admin\_DataFileReprocessing.cshtml" />
     <Content Include="Views\Shared\_AdminTest2.cshtml" />
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />
-    <Content Include="Views\Shared\_ConnectorStatus.cshtml" />
+    <Content Include="Views\Admin\_ConnectorStatus.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
     <Content Include="Views\Shared\_DeadJobTable.cshtml" />
-    <Content Include="Views\Shared\_ReprocessDeadSparkJobs.cshtml" />
-    <Content Include="Views\Shared\_DataFlowMetrics.cshtml" />
+    <Content Include="Views\Admin\_ReprocessDeadSparkJobs.cshtml" />
+    <Content Include="Views\Admin\_DataFlowMetrics.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

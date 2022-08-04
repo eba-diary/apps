@@ -216,7 +216,7 @@ data.Admin = {
             } else {
                 $.ajax({
                     type: "GET",
-                    url: "Admin/GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
+                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
                     dataType: "html",
                     success: function (msg) {
                         $("#deadJobTable").html(msg);
@@ -495,15 +495,6 @@ data.Admin = {
             });
         })
     },
-    // Loads Admin jobs pages
-
-    AdminPageInit: function () {
-        $(".load-partial-view").click(function (event) {
-            event.preventDefault();
-            var url = $(this).data("url");
-            $("#partial-view-test").load(url);
-        });
-    },
 
     SetupConnectorFilterTableInit: function () {
         $(document).ready(function () {
@@ -525,7 +516,7 @@ data.Admin = {
 
             $.ajax({
                 type: "POST",
-                url: `Admin/${actionUrl}`,
+                url: `${actionUrl}`,
                 traditional: true,
                 dataType: "json",
                 data: { ConnectorId: connectorName },
