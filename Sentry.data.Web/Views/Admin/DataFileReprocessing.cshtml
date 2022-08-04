@@ -2,6 +2,7 @@
 @model DatasetSelectionModel
 @{
     ViewBag.Title = "_AdminTest";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <div class="d-inline-block">
     <h1>Reprocess Data Files</h1>
@@ -57,12 +58,14 @@
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton" disabled>Reprocess Selected</button>
 
-<script>
-    $(function () {
-        data.Admin.ReprocessInit();
-    });
+    <script>
+        $(function () {
+            data.Admin.ReprocessInit();
+        });
 
 
-    
-</script>
+
+    </script>
+
+
 

@@ -40,21 +40,6 @@ namespace Sentry.data.Web.Controllers
             return Content(json, "application/json");
         }
 
-        public ActionResult Index()
-        {
-            Dictionary<string, string> myDict =
-            new Dictionary<string, string>();
-
-            myDict.Add("1", "Reprocess Data Files");
-            myDict.Add("2", "Data Flow Metrics");
-            myDict.Add("3", "Parquet Null Rows");
-            myDict.Add("4", "General Raw Query Parquet");
-            myDict.Add("5", "Connector Status");
-            myDict.Add("6", "Reprocess Dead Jobs");
-
-            return View(myDict);
-        }
-
         [Route("Admin/GetDeadJobs/{selectedDate?}")]
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
@@ -84,33 +69,31 @@ namespace Sentry.data.Web.Controllers
             }
             return model;
         }
-        public async Task<ActionResult> GetAdminAction(string viewId)
+        //below methods all return admin page views
+        public ActionResult Index()
         {
-            string viewPath = "";
-            switch (viewId)
-            {
-                case "1":
-                    DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();    
-                    return PartialView("_DataFileReprocessing", dataReprocessingModel);
-                case "2":
-                    DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
-                    return PartialView("_DataFlowMetrics", flowMetricsModel);
-                case "3":
-                    viewPath = "_AdminTest3";
-                    break;
-                case "4":
-                    viewPath = "_AdminTest4";
-                    break;
-                case "5":
-                    List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
-
-                    return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
-                case "6":
-                    ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
-                    return PartialView("_ReprocessDeadSparkJobs", reprocessDeadSparkJobModel);
-            }
-
-            return PartialView(viewPath);
+            return View();
         }
+        public ActionResult DataFileReprocessing()
+        {
+            DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();
+            return View(dataReprocessingModel);
+        }
+        public ActionResult DataFlowMetrics()
+        {
+            DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
+            return View(flowMetricsModel);
+        }
+        public async Task<ActionResult> ConnectorStatus()
+        {
+            List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
+            return View(connectorDtos.MapToModelList());
+        }
+        public ActionResult ReprocessDeadSparkJobs()
+        {
+            ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
+            return View(reprocessDeadSparkJobModel);
+        }
+       
     }
 }
