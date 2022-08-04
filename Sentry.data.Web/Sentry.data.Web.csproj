@@ -1247,6 +1247,7 @@
     <Content Include="Views\Admin\_ReprocessDeadSparkJobs.cshtml" />
     <Content Include="Views\Admin\_DataFlowMetrics.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Shared\_AdminSideNav.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

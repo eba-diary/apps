@@ -9,16 +9,7 @@
 
 @Html.Action("GetHeader", "Layout")
 <div class="row">
-    <div class="card form-wrapper col-lg-2 side-nav-wrapper" id="sideNav">
-        <div class="card-body">
-            <h2 class="card-title">Admin Actions</h2>
-            <a href="@Url.Action("ReprocessDataFiles", "Admin")"><h4>Reprocess Data Files</h4></a>
-            <a href="@Url.Action("DataFlowMetrics", "Admin")"><h4>Data Flow Metrics</h4></a>
-            <a href="@Url.Action("ConnectorStatus","Admin")"><h4>Connector Status</h4></a>
-            <a href="@Url.Action("ReprocessDeadSparkJobs", "Admin")"><h4>Reprocess Dead Jobs</h4></a>
-
-        </div>
-    </div>
+    @RenderPage("~/Views/Shared/_AdminSideNav.cshtml")
     <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
