@@ -11,6 +11,8 @@ namespace Sentry.data.Core
         Task PublishSuccessEventByDataAsset(string eventType, string reason, int dataAssetId, string lineCde, string search);
         Task PublishSuccessEventByNotificationId(string eventType, string reason, Notification notification);
         Task PublishSuccessEventBySchemaId(string eventType, string reason, int datasetId, int schemaId);
+        Task PublishEventByDatasetFileDelete(string eventType, string reason, int datasetId, int schemaId, string deleteDetail);
+        Task PublishEventByDatasetFileDelete(string eventType, string reason,string deleteDetail);
 
     }
 }
