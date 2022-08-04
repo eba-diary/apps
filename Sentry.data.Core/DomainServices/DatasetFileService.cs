@@ -143,7 +143,6 @@ namespace Sentry.data.Core
         public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
         {
             bool submittedSuccessful = true;
-
             int batchSize = 100;
             int counter = 1;
             List<int> batch = datasetFileIds.Take(batchSize).ToList();
