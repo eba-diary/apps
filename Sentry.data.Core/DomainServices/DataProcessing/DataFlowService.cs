@@ -339,6 +339,16 @@ namespace Sentry.data.Core
 
             DataFlow newDataFlow = CreateDataFlow(dfDto);
 
+            /*
+             *  Logically delete the existing dataflow
+             *    This will take care of deleting any existing 
+             *    retriever jobs and removing them from hangfire
+             *  WallEService will eventually set the objects
+             *    to a deleted status after a set period of time    
+             */
+
+            Delete(dfDto.Id, _userService.GetCurrentUser(), false);
+
             _datasetContext.SaveChanges();
 
             Logger.Info($"{methodName} Method Start");
