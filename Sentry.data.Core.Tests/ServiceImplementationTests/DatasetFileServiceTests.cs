@@ -792,23 +792,25 @@ namespace Sentry.data.Core.Tests
             DatasetFile datasetFile = MockClasses.MockDatasetFile(dataset, datasetFileConfig, user.Object);
             datasetFile.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
             datasetFile.FileBucket = "my-bucket-name1";
-            datasetFile.FlowExecutionGuid = "20220614171525000";
-            datasetFile.OriginalFileName = "zzztest0614.csv";
+            datasetFile.FlowExecutionGuid = "202435326745400";
+            datasetFile.OriginalFileName = "zzztest1853.csv";
             datasetFile.DatasetFileId = 3000;
 
             DatasetFile datasetFile2 = MockClasses.MockDatasetFile(dataset, datasetFileConfig, user.Object);
-            datasetFile.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
-            datasetFile.FileBucket = "my-bucket-name2";
-            datasetFile.FlowExecutionGuid = "20220614171525000";
-            datasetFile.OriginalFileName = "zzztest0614.csv";
-            datasetFile.DatasetFileId = 3001;
+            datasetFile2.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
+            datasetFile2.FileBucket = "my-bucket-name2";
+            datasetFile2.FlowExecutionGuid = "2435756478523456";
+            datasetFile2.OriginalFileName = "zzztest4568.csv";
+            datasetFile2.DatasetFileId = 3001;
 
+            
             DataFlowStep dataFlowStep = new DataFlowStep()
             {
                 TriggerKey = "TriggerKey/",
                 Id = 2
             };
 
+            
             var context = new Mock<IDatasetContext>();
             var scheduler = new Mock<IJobScheduler>();
             var s3serviceprovider = new Mock<IS3ServiceProvider>();
@@ -836,11 +838,87 @@ namespace Sentry.data.Core.Tests
             context.VerifyAll();
             scheduler.VerifyAll();
 
-            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), "TriggerKey/20211209133645/zzztest0614.csv.trg", It.IsAny<List<KeyValuePair<string, string>>>()), Times.Once());
-            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), "TriggerKey/20220614171525000/zzztest0614.csv.trg", It.IsAny<List<KeyValuePair<string, string>>>()), Times.Once());
+            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), "TriggerKey/202435326745400/zzztest1853.csv.trg", It.IsAny<List<KeyValuePair<string, string>>>()), Times.Once());
+            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), "TriggerKey/2435756478523456/zzztest4568.csv.trg", It.IsAny<List<KeyValuePair<string, string>>>()), Times.Once());
 
             Assert.IsTrue(result);
         }
 
+        
+        [TestMethod]
+        public void CheckingBatchImplementation()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+
+            List<DatasetFile> datasetFileList = new List<DatasetFile>();
+            List<DataFlowStep> dataFlowStepList = new List<DataFlowStep>();
+
+            int stepId = 2;
+
+            
+            Dataset dataset = new Dataset();
+
+            FileSchema fileSchema = MockClasses.MockFileSchema();
+
+            DatasetFileConfig datasetFileConfig = MockClasses.MockDataFileConfig(schema: fileSchema);
+
+            // list of 101 datasetFileIds to test batch logic in schedule reprocessing
+            List<int> datasetFileIds = new List<int>();
+            for (int i = 3000; i <= 3100; i++)
+            {
+                datasetFileIds.Add(i);
+
+                DatasetFile datasetFile = MockClasses.MockDatasetFile(dataset, datasetFileConfig, user.Object);
+                datasetFile.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
+                datasetFile.FileBucket = "my-bucket-name2";
+                datasetFile.FlowExecutionGuid = "2435756478523456";
+                datasetFile.OriginalFileName = "zzztest4568.csv";
+                datasetFile.DatasetFileId = i;
+                datasetFileList.Add(datasetFile);
+            }
+
+            DataFlowStep dataFlowStep = new DataFlowStep()
+            {
+                TriggerKey = "TriggerKey/",
+                Id = 2
+            };
+
+
+            var context = new Mock<IDatasetContext>();
+            var scheduler = new Mock<IJobScheduler>();
+            var s3serviceprovider = new Mock<IS3ServiceProvider>();
+
+            dataFlowStepList.Add(dataFlowStep);
+
+            context.Setup(d => d.DatasetFileStatusActive).Returns(datasetFileList.AsQueryable());
+            context.Setup(d => d.DataFlowStep).Returns(dataFlowStepList.AsQueryable());
+
+            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, scheduler.Object);
+            
+            scheduler.Setup(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.IsAny<TimeSpan>())).Returns(" ").Callback<Expression<Action<DatasetFileService>>, TimeSpan>(
+                (w, t) =>
+                {
+                    Action<DatasetFileService> action = w.Compile();
+                    action.Invoke(datasetFileService);
+                });
+            
+            // Act
+            bool result = datasetFileService.ScheduleReprocessing(stepId, datasetFileIds);
+
+            // Assert
+            context.VerifyAll();
+            scheduler.VerifyAll();
+            scheduler.Verify(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.Is<TimeSpan>((q) => q.TotalSeconds == 30)), Times.Exactly(100));
+            scheduler.Verify(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.Is<TimeSpan>((q) => q.TotalSeconds == 60)), Times.Once());
+            
+            Assert.IsTrue(result);
+
+        }
+        
+        
     }
 }

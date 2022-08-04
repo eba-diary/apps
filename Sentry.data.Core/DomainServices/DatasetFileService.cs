@@ -154,10 +154,10 @@ namespace Sentry.data.Core
             {
                 try
                 {
+                    var timeDelay = 30 * counter; 
                     foreach (int id in batch)
                     {
-                        tempDatasetFileId = id;
-                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter));
+                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(timeDelay));
                     }
                 } catch (Exception ex)
                 {
@@ -165,7 +165,8 @@ namespace Sentry.data.Core
                     Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
                 }
                 counter++;    
-                batch = batch.Skip(batchSize * counter).ToList();  
+                //batch = batch.Skip(batchSize * counter).ToList();  
+                batch = datasetFileIds.Skip(batchSize * (counter - 1)).ToList();
             }
 
             return submittedSuccessful;
