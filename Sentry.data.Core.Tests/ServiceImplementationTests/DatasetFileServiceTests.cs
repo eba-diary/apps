@@ -781,7 +781,7 @@ namespace Sentry.data.Core.Tests
             List<DataFlowStep> dataFlowStepList = new List<DataFlowStep>();
 
             int stepId = 2;
-            List<int> datasetFileIds = new List<int> { 3000, 3000 };
+            List<int> datasetFileIds = new List<int> { 3000, 3001};
 
             Dataset dataset = new Dataset();
 
@@ -791,10 +791,17 @@ namespace Sentry.data.Core.Tests
 
             DatasetFile datasetFile = MockClasses.MockDatasetFile(dataset, datasetFileConfig, user.Object);
             datasetFile.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
-            datasetFile.FileBucket = "my-bucket-name";
+            datasetFile.FileBucket = "my-bucket-name1";
             datasetFile.FlowExecutionGuid = "20220614171525000";
             datasetFile.OriginalFileName = "zzztest0614.csv";
             datasetFile.DatasetFileId = 3000;
+
+            DatasetFile datasetFile2 = MockClasses.MockDatasetFile(dataset, datasetFileConfig, user.Object);
+            datasetFile.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
+            datasetFile.FileBucket = "my-bucket-name2";
+            datasetFile.FlowExecutionGuid = "20220614171525000";
+            datasetFile.OriginalFileName = "zzztest0614.csv";
+            datasetFile.DatasetFileId = 3001;
 
             DataFlowStep dataFlowStep = new DataFlowStep()
             {
@@ -807,6 +814,7 @@ namespace Sentry.data.Core.Tests
             var s3serviceprovider = new Mock<IS3ServiceProvider>();
 
             datasetFileList.Add(datasetFile);
+            datasetFileList.Add(datasetFile2);
             dataFlowStepList.Add(dataFlowStep);
 
             context.Setup(d => d.DatasetFileStatusActive).Returns(datasetFileList.AsQueryable());
@@ -828,15 +836,9 @@ namespace Sentry.data.Core.Tests
             context.VerifyAll();
             scheduler.VerifyAll();
 
-            MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes("raw/CRVS/PROD/8921001/2022/7/5/20220705201728000/Structured_AgentEvent_20220705031726670.json"));
-            KeyValuePair<string, string> tagContent = new KeyValuePair<string, string>("Content", "Trigger");
-           
-            List<KeyValuePair<string, string>> tagContentList = new List<KeyValuePair<string, string>>();
-            tagContentList.Add(tagContent);
+            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), "TriggerKey/20211209133645/zzztest0614.csv.trg", It.IsAny<List<KeyValuePair<string, string>>>()), Times.Once());
+            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), "TriggerKey/20220614171525000/zzztest0614.csv.trg", It.IsAny<List<KeyValuePair<string, string>>>()), Times.Once());
 
-            s3serviceprovider.Verify(d => d.UploadDataFile(It.IsAny<MemoryStream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<KeyValuePair<string, string>>>()), Times.Exactly(2));
-            
-            
             Assert.IsTrue(result);
         }
 

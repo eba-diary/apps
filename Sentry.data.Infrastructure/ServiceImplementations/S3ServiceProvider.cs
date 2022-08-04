@@ -1308,7 +1308,7 @@ namespace Sentry.data.Infrastructure
         {
             List<Tag> resultTags = new List<Tag>();
 
-            if(tagKeyValuePairs.Count == 0)
+            if(tagKeyValuePairs == null)
             {
                 return resultTags;
             }
