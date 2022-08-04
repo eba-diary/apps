@@ -47,6 +47,18 @@ namespace Sentry.data.Infrastructure
             await SaveEvent(eventType, new Event() { Reason = reason, Dataset = datasetId, SchemaId = schemaId }).ConfigureAwait(false);
         }
 
+        public async Task PublishEventByDatasetFileDelete(string eventType, string reason, int datasetId, int schemaId, string deleteDetail)
+        {
+            await SaveEvent(eventType, new Event() { Reason = reason, Dataset = datasetId, SchemaId = schemaId, DeleteDetail = deleteDetail }).ConfigureAwait(false);
+        }
+
+        public async Task PublishEventByDatasetFileDelete(string eventType, string reason, string deleteDetail)
+        {
+            await SaveEvent(eventType, new Event() { Reason = reason,  DeleteDetail = deleteDetail }).ConfigureAwait(false);
+        }
+
+
+
         private Task SaveEvent(string eventType, Event evt)
         {
             string associateId = _userService.GetCurrentUser().AssociateId;
@@ -123,6 +135,14 @@ namespace Sentry.data.Infrastructure
                     evt.Reason = $"Data has been added under {ds.DatasetName} ";
                 }
                 
+            }
+            else if(evt.EventType.Description == GlobalConstants.EventType.DATASETFILE_DELETE_S3)
+            {
+                evt.Reason = $"{GlobalConstants.EventType.DATASETFILE_DELETE_S3} step has been submitted successfully belonging to {ds.DatasetName}.";
+            }
+            else if (evt.EventType.Description == GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS)
+            {
+                evt.Reason = $"{GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS} step has been completed successfully.";
             }
         }
     }

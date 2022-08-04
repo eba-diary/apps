@@ -447,7 +447,7 @@ namespace Sentry.data.Web.Controllers
 
                 dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
                 {
-                    Text = m.DatasetName,
+                    Text = $"{m.DatasetName} ({m.Asset.SaidKeyCode} - {m.NamedEnvironment})",
                     Value = m.DatasetId.ToString(),
                     Group = curGroup,
                     Selected = (m.DatasetId == model.SelectedDataset)
