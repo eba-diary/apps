@@ -928,7 +928,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(d => d.DatasetFileStatusActive).Returns(datasetFileList.AsQueryable());
             context.Setup(d => d.DataFlowStep).Returns(dataFlowStepList.AsQueryable());
 
-            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, scheduler.Object);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, null, scheduler.Object);
             
             scheduler.Setup(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.IsAny<TimeSpan>())).Returns(" ").Callback<Expression<Action<DatasetFileService>>, TimeSpan>(
                 (w, t) =>
