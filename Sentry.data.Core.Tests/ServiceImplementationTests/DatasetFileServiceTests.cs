@@ -916,7 +916,6 @@ namespace Sentry.data.Core.Tests
             scheduler.Verify(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.Is<TimeSpan>((q) => q.TotalSeconds == 60)), Times.Once());
             
             Assert.IsTrue(result);
-
         }
         
         
