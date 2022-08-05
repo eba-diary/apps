@@ -871,10 +871,8 @@ data.Dataset = {
 
         $("#DatasetName").on('keyup', function () {
             let datasetNameWoSpecialChars = $("#DatasetName")[0].value.replace(/[^0-9a-zA-Z]/g, "");
-            if (datasetNameWoSpecialChars.length <= 12) {
-                $("#ShortName")[0].value = datasetNameWoSpecialChars;
-                $("label[for=ShortName]").addClass("active");
-            }
+            $("#ShortName")[0].value = datasetNameWoSpecialChars.slice(0, 12);
+            $("label[for=ShortName]").addClass("active");
         })
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
@@ -2608,6 +2606,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#AccessRequestValidationMessage").removeClass("d-none");
             }
         });
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
+        });
+        $("#RequestAccessConsumeCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessConsumeEntitlement").text());
+        });
     },
 
     validateRequestAccessModal() {
@@ -2742,5 +2746,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
 
         toastr[severity](message);
+    },
+
+    copyTextToClipboard: function (text) {
+        navigator.clipboard.writeText(text);
+        data.Dataset.makeToast("success","Copied " + text + " to clipboard")
     }
 };
