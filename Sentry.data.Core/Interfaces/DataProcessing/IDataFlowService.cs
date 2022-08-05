@@ -103,7 +103,7 @@ namespace Sentry.data.Core
         /// <exception cref="ArgumentNullException"
         /// <returns></returns>
         List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
-        Task<ValidationException> Validate(DataFlowDto dfDto);
+        Task<ValidationException> ValidateAsync(DataFlowDto dfDto);
         List<SchemaMapDetailDto> GetMappedSchemaByDataFlow(int dataflowId);
 
         /// <summary>

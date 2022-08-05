@@ -40,7 +40,7 @@ namespace Sentry.data.Core.Tests
             var dataFlow = new DataFlowDto() { Name = "Foo" };
 
             // Act
-            var result = await dataFlowService.Validate(dataFlow);
+            var result = await dataFlowService.ValidateAsync(dataFlow);
 
             // Assert
             Assert.AreEqual(1, result.ValidationResults.GetAll().Count);
@@ -67,7 +67,7 @@ namespace Sentry.data.Core.Tests
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.NonProd };
 
             // Act
-            var result = await dataFlowService.Validate(dataFlow);
+            var result = await dataFlowService.ValidateAsync(dataFlow);
 
             // Assert
             Assert.AreEqual(0, result.ValidationResults.GetAll().Count);

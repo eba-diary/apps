@@ -8,10 +8,11 @@ namespace Sentry.data.Core
 {
     public interface IDatasetService : IEntityService
     {
-        Task<ValidationException> Validate(DatasetDto dto);
+        Task<ValidationException> ValidateAsync(DatasetDto dto);
         int CreateAndSaveNewDataset(DatasetDto dto);
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
+        List<DatasetDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
         void UpdateAndSaveDataset(DatasetDto dto);

@@ -483,7 +483,7 @@ namespace Sentry.data.Core
                 SecurableObjectName = ds.Name
             };
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.KeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCodeAsync(ds.KeyCode).ConfigureAwait(false);
             foreach (SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));

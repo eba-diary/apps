@@ -1,0 +1,58 @@
+﻿@model List<DeadSparkJobModel>
+@{
+    ViewBag.Title = "_AdminTest";
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        data.Admin.DeadJobTableInit();
+        data.Admin.ReprocessDeadJobs();
+    });
+</script>
+
+<table id="deadJobs" aria-label="table of all dead jobs" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col"><input type="checkbox" id="data-file-select-all" class="form-check-input"><label for="data-file-select-all" class="form-check-label">Select All Jobs</label></th>
+            <th scope="col">Submission Time</th>
+            <th scope="col">Dataset Name</th>
+            <th scope="col">Reprocessing Required</th>
+            <th scope="col">Schema Name</th>
+            <th scope="col">Source Key</th>
+            <th scope="col">Flow Execution Guid</th>
+            <th scope="col">Submission Id</th>
+            <th scope="col">Batch ID</th>
+            <th scope="col">Livy App Id</th>
+            <th scope="col">Livy Driver Log Url</th>
+            <th scope="col">Livy Spark Ui Url</th>
+            <th scope="col">Dataset File Id</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (DeadSparkJobModel job in Model)
+        {
+        <tr data-file-id="@job.SubmissionID">
+            <td class="dropdown-toggle-col"><em id="dropdown-toggle-@job.SubmissionID" class="fas fa-plus"></em></td>
+            <td><input data-file-id="@job.DatasetFileID" data-group-id="@(String.Format("{0}/{1}/{2}", job.DatasetName, job.SchemaName, job.DataFlowStepID))" type="checkbox" id=@(job.SubmissionID.ToString() + "InputId") class="select-all-target form-check-input"><label for=@(job.SubmissionID.ToString() + "InputId") class="form-check-label"></label></td>
+            <td>@job.SubmissionTime</td>
+            <td>@job.DatasetName</td>
+            <td>@job.ReprocessingRequired</td>
+            <td>@job.SchemaName</td>
+            <td>@job.SourceKey</td>
+            <td>@job.FlowExecutionGuid</td>
+            <td>@job.SubmissionTime</td>
+            <td>@job.BatchID</td>
+            <td>@job.LivyAppID</td>
+            <td>@job.LivyDriverlogUrl</td>
+            <td>@job.LivySparkUiUrl</td>
+            <td>@job.DatasetFileID</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<!--Reprocess button-->
+<button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton">Reprocess Selected</button>
+

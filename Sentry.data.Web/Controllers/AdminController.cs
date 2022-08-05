@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -12,11 +15,13 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
+        private readonly IDeadSparkJobService _deadSparkJobService;
 
-        public AdminController(IKafkaConnectorService connectorService, IDatasetService datasetService)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
+            _deadSparkJobService = deadSparkJobService;
         }
 
         [HttpPost]
@@ -35,52 +40,60 @@ namespace Sentry.data.Web.Controllers
             return Content(json, "application/json");
         }
 
+        [Route("Admin/GetDeadJobs/{selectedDate?}")]
+        [HttpGet]
+        public ActionResult GetDeadJobs(string selectedDate)
+        {
+            // Convert selectedDate string to a DateTime object
+            DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
+
+            List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
+
+            return PartialView("_DeadJobTable", deadSparkJobModelList);
+        }
+        //method for generating a dataset selection model, which contains a list of all Active datasets
+        private DatasetSelectionModel GetDatasetSelectionModel()
+        {
+            DatasetSelectionModel model = new DatasetSelectionModel();
+            List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
+            dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
+            model.AllDatasets = new List<SelectListItem>();
+            foreach(DatasetDto dto in dtoList)
+            {
+                SelectListItem item = new SelectListItem();
+                item.Text = dto.DatasetName;
+                item.Value = dto.DatasetId.ToString();
+                model.AllDatasets.Add(item);
+            }
+            return model;
+        }
+        //below methods all return admin page views
         public ActionResult Index()
         {
-            Dictionary<string, string> myDict =
-            new Dictionary<string, string>();
-
-            myDict.Add("1", "Reprocess Data Files");
-            myDict.Add("2", "File Processing Logs");
-            myDict.Add("3", "Parquet Null Rows");
-            myDict.Add("4", "General Raw Query Parquet");
-            myDict.Add("5", "Connector Status");
-
-            return View(myDict);
+            return View();
         }
-        public async Task<ActionResult> GetAdminAction(string viewId)
+        public ActionResult DataFileReprocessing()
         {
-            string viewPath = "";
-            switch (viewId)
-            {
-                case "1":
-                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
-                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
-                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
-                    foreach(DatasetDto d in dtoList)
-                    {
-                        SelectListItem item = new SelectListItem();
-                        item.Text = d.DatasetName;
-                        item.Value = d.DatasetId.ToString();
-                        dataReprocessingModel.AllDatasets.Add(item);
-                    }
-                    return PartialView("_DataFileReprocessing", dataReprocessingModel);
-                case "2":
-                    viewPath = "_AdminTest2";
-                    break;
-                case "3":
-                    viewPath = "_AdminTest3";
-                    break;
-                case "4":
-                    viewPath = "_AdminTest4";
-                    break;
-                case "5":
-                    List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
-
-                    return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
-            }
-
-            return PartialView(viewPath);
+            DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();
+            return View(dataReprocessingModel);
         }
+        public ActionResult DataFlowMetrics()
+        {
+            DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
+            return View(flowMetricsModel);
+        }
+        public async Task<ActionResult> ConnectorStatus()
+        {
+            List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
+            return View(connectorDtos.MapToModelList());
+        }
+        public ActionResult ReprocessDeadSparkJobs()
+        {
+            ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
+            return View(reprocessDeadSparkJobModel);
+        }
+       
     }
 }

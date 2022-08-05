@@ -22,15 +22,17 @@ namespace Sentry.data.Core
         private readonly IUserService _userService;
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IEventService _eventService;
         private readonly IJobScheduler _jobScheduler;
 
-        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IJobScheduler jobScheduler)
+        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IEventService eventService, IJobScheduler jobScheduler)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _eventService = eventService;
             _jobScheduler = jobScheduler;
         }
 
@@ -324,10 +326,14 @@ namespace Sentry.data.Core
                     Array.Copy(idList, i, buffer, 0, chunk );
 
                     DeleteFilesRequestModel model = CreateDeleteFilesRequestModel(datasetId,schemaId,buffer);
-                    
+
                     //PUBLISH DSC DELETE EVENT
                     _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
                 }
+
+                //PREP FOR EVENT
+                string deleteDetail = JsonConvert.SerializeObject(idList);
+                _eventService.PublishEventByDatasetFileDelete(GlobalConstants.EventType.DATASETFILE_DELETE_S3, $"{GlobalConstants.EventType.DATASETFILE_DELETE_S3} submitted successfully", datasetId, schemaId, deleteDetail);
             }
             catch (System.Exception ex)
             {
@@ -347,6 +353,11 @@ namespace Sentry.data.Core
                 //UPDATE OBJECTSTATUS
                 dbList.ForEach(f => f.ObjectStatus = status);
                 _datasetContext.SaveChanges();
+
+                //PREP FOR EVENT
+                int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
+                string deleteDetail = JsonConvert.SerializeObject(idList);
+                _eventService.PublishEventByDatasetFileDelete(GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS, $"{GlobalConstants.EventType.DATASETFILE_UPDATE_OBJECT_STATUS} completed successfully", deleteDetail);
             }
             catch (System.Exception ex)
             {

@@ -46,7 +46,6 @@ namespace Sentry.data.Core.Tests
 
             return ds;
         }
-
         public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
         {
             List<DatasetDto> dtoList = new List<DatasetDto>();

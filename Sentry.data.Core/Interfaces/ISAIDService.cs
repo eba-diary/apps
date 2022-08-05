@@ -6,8 +6,8 @@ namespace Sentry.data.Core.Interfaces
 {
     public interface ISAIDService
     {
-        Task<SAIDAsset> GetAssetByKeyCode(string keyCode);
-        Task<List<SAIDAsset>> GetAllAssets();
-        Task<List<SAIDRole>> GetAllProdCustByKeyCode(string keyCode);
+        Task<SAIDAsset> GetAssetByKeyCodeAsync(string keyCode);
+        Task<List<SAIDAsset>> GetAllAssetsAsync();
+        Task<List<SAIDRole>> GetAllProdCustByKeyCodeAsync(string keyCode);
     }
 }

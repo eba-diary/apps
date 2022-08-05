@@ -10,3 +10,24 @@
     width: 400px;
     height: 30px;
 }
+.admin-logs-dropdown 
+{
+    width: 400px;
+    height: 30px;
+}
+.table-checkbox {
+    position: unset !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+#deadJobs tbody{
+  word-break:break-word;
+}
+
+table#deadJobs td.dropdown-control {
+    cursor:pointer;
+}
+table#metricGroupsTable td.dt-control {
+    cursor: pointer;
+}

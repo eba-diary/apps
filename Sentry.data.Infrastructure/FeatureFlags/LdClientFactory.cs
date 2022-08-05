@@ -9,12 +9,12 @@ namespace Sentry.data.Infrastructure.FeatureFlags
     /// <summary>
     /// Class containing methods to instantiate the LaunchDarkly client class
     /// </summary>
-    public class LdClientFactory
+    public static class LdClientFactory
     {
 
         //This method is responsible for building the LaunchDarkly client that will be used.
         //That client should be re-used for your entire app, so this method should only be called once.
-        public LdClient BuildLdClient()
+        public static LdClient BuildLdClient()
         {
             var configBuilder = LaunchDarkly.Sdk.Server.Configuration.Builder(Configuration.Config.GetHostSetting("LaunchDarklyEnvironmentKey"))
                 .Logging(LdLog4net.Adapter);
