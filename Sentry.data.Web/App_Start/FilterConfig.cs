@@ -19,9 +19,6 @@ namespace Sentry.data.Web
             //Static content that goes through the content helper controller will still be cached, since it's programatically overridden there
             filters.Add(new NoCacheAttribute());
 
-            //Adding a profiling filter so that MiniProfiler will auto wire up to controller actions
-            filters.Add(new ProfilingActionFilterAttribute());
-
             //This filter ensures that the BaseController.SharedContext and ViewData.SharedContext is populated
             filters.Add(new InjectSharedContextAttribute());
         }

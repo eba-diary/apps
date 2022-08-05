@@ -32,6 +32,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("APIParameter_ID");
                 m.ForeignKey("FK_RT_Request_Parameters_RT_APIParameters");
                 m.Class(typeof(RTAPIParameters));
+                m.Update(false);
+                m.Insert(false);
             });
         }
     }

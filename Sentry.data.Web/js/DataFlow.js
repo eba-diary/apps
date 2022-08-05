@@ -237,6 +237,7 @@
     },
 
     DatasetFormSubmitInit: function () {
+        $("#IsSecured").removeAttr("disabled");
         $.ajax({
             url: "/Dataset/DatasetForm",
             method: "POST",
