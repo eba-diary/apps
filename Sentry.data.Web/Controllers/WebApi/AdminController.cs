@@ -29,6 +29,7 @@ namespace Sentry.data.Web.Controllers.WebApi
 
         public IHttpActionResult AddSupportLink(SupportLinkModel supportLinkModel) 
         {
+            // the case when name or url is null
             if(supportLinkModel.Name == null || supportLinkModel.Url == null)
             {
                 if(supportLinkModel.Name == null)
