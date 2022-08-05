@@ -165,7 +165,6 @@ namespace Sentry.data.Core
                     Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
                 }
                 counter++;    
-                //batch = batch.Skip(batchSize * counter).ToList();  
                 batch = datasetFileIds.Skip(batchSize * (counter - 1)).ToList();
             }
 
