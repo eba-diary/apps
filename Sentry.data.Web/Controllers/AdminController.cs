@@ -75,10 +75,15 @@ namespace Sentry.data.Web.Controllers
 
             model.AllDatasets = new List<SelectListItem>();
 
+            model.AllDatasets.Add(new SelectListItem() { Disabled=true, Text = "Please select Dataset", Value="-1"});
             dtoTestList.ForEach(d => model.AllDatasets.Add(new SelectListItem { Text = d.DatasetName, Value = d.DatasetId.ToString() }));
 
             model.AllAuditTypes = Utility.BuildSelectListFromEnum<AuditType>(0);
+            model.AllAuditTypes.Insert(0, new SelectListItem() { Disabled = true, Text = "Please select Audit Type", Value = "-1" });
+
             model.AllAuditSearchTypes = Utility.BuildSelectListFromEnum<AuditSearchType>(0);
+            model.AllAuditSearchTypes.Insert(0, new SelectListItem() { Disabled = true, Text = "Please select a Search Type", Value = "-1" });
+
 
             return model;
         }

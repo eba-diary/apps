@@ -10,3 +10,12 @@
     width: 400px;
     height: 30px;
 }
+
+.audit-search-selection.hidden {
+    display: none !important;
+}
+
+.audit-search-selection.active {
+    display: inline-block !important;
+}
+

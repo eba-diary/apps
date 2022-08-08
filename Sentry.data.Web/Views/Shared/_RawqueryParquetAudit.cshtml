@@ -8,62 +8,89 @@
 
 
 <div class="row">
-    <div class="d-inline-block col-lg">
-        <!-- Data Set Dropdown Menu-->
-        <h3>Audit Type</h3>
-        @Html.DropDownListFor(m => m.AllAuditTypes,
-                              new SelectList(Model.AllAuditTypes, "Value", "Text"),
-                              "Please select audit type",
-                              new
-                              {
-                                  @class = "admin-audit-dropdown",
-                                  @style = "display: none",
-                                  @searchable = "Search Available Audit Types"
-                              })
-    </div>
-
-    <div class="d-inline-block col">
-        <!-- Data Set Dropdown Menu-->
-        <h3>Search Types</h3>
-        @Html.DropDownListFor(m => m.AllAuditSearchTypes,
-                              new SelectList(Model.AllAuditSearchTypes, "Value", "Text"),
-                              "Please select audit search type",
-                              new
-                              {
-                                  @class = "admin-audit-dropdown",
-                                  @style = "display: none",
-                                  @searchable = "Search Available Search Types"
-                              })
-    </div>
-
     <div class="d-inline-block col">
         <h3>Datasets</h3>
-        @Html.DropDownListFor(m => m.AllDatasets,
-                              new SelectList(Model.AllDatasets, "Value", "Text"),
-                              "Please select Dataset",
-                              new
-                              {
-                                  @class = "admin-audit-dropdown",
-                                  @style = "display: none",
-                                  @searchable = "Search Available Datasets"
-                              })
+        <div class="md-form">
+            @Html.DropDownListFor(m => m.AllDatasets,
+                                  new SelectList(Model.AllDatasets, "Value", "Text"),
+                                  new
+                                  {
+                                      @class = "active admin-audit-dropdown",
+                                      @style = "display: none",
+                                      @searchable = "Search Available Datasets"
+                                  })
+        </div>
 
     </div>
     <!-- Schema Dropdown Menu-->
     <div class="d-inline-block col">
         <h3>Schema</h3>
-        <select class="mbd-select admin-audit-dropdown" id="schemaDropdown" style="display: none">
-            <option value="-1">Please Select a Schema</option>
-            <!--populated asyncronously via ajax-->
-        </select>
+        <div class="md-form">
+            <select class="mbd-select active admin-audit-dropdown" data-stop-refresh='true' id="schemaDropdown" style="display: none">
+                <option value="-1">Please Select a Schema</option>
+                <!--populated asyncronously via ajax-->
+            </select>
+        </div>
+    </div>
+
+    <div class="d-inline-block active col-lg">
+        <!-- Data Set Dropdown Menu-->
+        <h3>Audit Type</h3>
+
+        <div class="md-form">
+            @Html.DropDownListFor(m => m.AllAuditTypes,
+                                  new SelectList(Model.AllAuditTypes, "Value", "Text"),
+                                  new
+                                  {
+                                      @class = "active admin-audit-dropdown",
+                                      @style = "display: none",
+                                      @searchable = "Search Available Audit Types"
+                                  })
+
+        </div>
     </div>
 
     <div class="d-inline-block col">
+        <!-- Data Set Dropdown Menu-->
+        <h3>Search Types</h3>
 
+        <div class="md-form">
+            @Html.DropDownListFor(m => m.AllAuditSearchTypes,
+                                  new SelectList(Model.AllAuditSearchTypes, "Value", "Text"),
+                                  new
+                                  {
+                                      @class = "active admin-audit-dropdown",
+                                      @style = "display: none",
+                                      @searchable = "Search Available Search Types"
+                                  })
+        </div>
+    </div>
+
+    <div id="audit-selection-0" class="audit-search-selection hidden col">
+        <h3>Date</h3>
+        <div class="md-form">
+            @Html.TextBoxFor(x => x.currentDate, "{0:yyyy-MM-ddTHH:mm:ss}", new
+                       {
+                           @class = "admin-audit-dropdown form-control",
+                           required = "required",
+                           @type = "datetime-local",
+                           @id = "datetime-picker"
+                       })
+        </div>
+    </div>
+
+    <div id="audit-selection-1" class="audit-search-selection hidden col">
+        <h3>File Select</h3>
+        <div class="md-form">
+            <select class="mbd-select admin-audit-dropdown" data-stop-refresh='true' id="datasetFileDropdown" style="display: none">
+                <option value="-1">Please Select a File</option>
+                <!--populated asyncronously via ajax-->
+            </select>
+        </div>
     </div>
 </div>
 
-<button type="button" class="btn btn-primary waves-effect waves-light" id="auditSearchButton">Search</button>
+<button type="button" class="btn btn-primary waves-effect waves-light" id="auditSearchButton" disabled>Search</button>
 
 <br />
 <br />
@@ -86,6 +113,10 @@
 <script>
     $(function () {
         data.Admin.AuditInit();
+
+        $('select.admin-audit-dropdown.active option[value=-1]').each(function () {
+            $(this).prop('disabled', true);
+        });
     });
 </script>
 
