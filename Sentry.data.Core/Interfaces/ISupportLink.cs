@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.data.Core.DTO.Admin;
 
-namespace Sentry.data.Core.Interfaces
+namespace Sentry.data.Core
 {
     public interface ISupportLink
     {

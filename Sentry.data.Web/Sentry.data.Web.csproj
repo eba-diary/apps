@@ -434,7 +434,6 @@
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
-    <Compile Include="Controllers\WebApi\AdminController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
