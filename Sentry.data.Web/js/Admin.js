@@ -204,6 +204,12 @@ data.Admin = {
         // Get all dead spark jobs within chosen time span
         $("#timeCheck").click(function () {
 
+            // Ensure table parent div is empty
+            $("#deadJobTable").html("");
+
+            // Show spinner 
+            $("#tab-spinner").show();
+
             // Retrieve seleced date
             var selectedDate = $('#datetime-picker').val();
 
@@ -219,10 +225,15 @@ data.Admin = {
                     url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
                     dataType: "html",
                     success: function (msg) {
+                        // Append table to parent div
                         $("#deadJobTable").html(msg);
                     },
                     error: function (req, status, error) {
                         alert("Error try again");
+                    },
+                    complete: function (msg) {
+                        // Hide spinner
+                        $("#tab-spinner").hide();
                     }
                 });
             }
