@@ -1,6 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using Sentry.data.Core.DTO.Admin;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.ApiModels.Admin;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,12 +19,19 @@ namespace Sentry.data.Web.Controllers
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
         private readonly IDeadSparkJobService _deadSparkJobService;
+        private readonly ISupportLink _supportLinkService;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLink supportLinkService)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
             _deadSparkJobService = deadSparkJobService;
+            _supportLinkService = supportLinkService;
+        }
+
+        private ISupportLink SupportLinkService
+        {
+            get { return _supportLinkService; }
         }
 
         [HttpPost]
@@ -105,5 +116,46 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView(viewPath);
         }
+
+        public ActionResult AddSupportLink(SupportLinkModel supportLinkModel)
+        {
+            // the case when name or url is null
+            if(supportLinkModel.Name == null || supportLinkModel.Url == null)
+            {
+                if(supportLinkModel.Name == null)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Name was not submitted");
+                }
+                if(supportLinkModel.Url == null)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Url was not submitted");
+                }
+            }
+
+            SupportLinkDto supportLinkDto = supportLinkModel.ToDto();
+            try
+            {
+                SupportLinkService.AddSupportLink(supportLinkDto);
+            } catch(Exception ex)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Error occured when adding Support Link to database");
+            }
+
+            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was added successfully");
+        }
+
+        public ActionResult DeleteSupportLink(int id)
+        {
+            try
+            {
+                SupportLinkService.RemoveSupportLink(id);
+            } catch(Exception ex)
+            {
+                return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Error occured when removing Support Link to database");
+            }
+
+            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was removed successfully");
+        }
+        
     }
 }
