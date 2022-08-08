@@ -181,7 +181,7 @@ data.Admin = {
         $("#timeCheck").click(function () {
 
             // Ensure table parent div is empty
-            $("#deadJobTable").remove();
+            $("#deadJobTable").html("");
 
             // Show spinner 
             $("#tab-spinner").show();
