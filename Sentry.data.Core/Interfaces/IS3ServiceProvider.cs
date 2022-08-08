@@ -14,6 +14,16 @@ namespace Sentry.data.Core
         /// <param name="sourceFilePath"></param>
         /// <param name="targetKey"></param>
         /// <param name="dataSet"></param>
+        string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
+
+
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
+        /// <param name="targetBucket"></param>
+        /// <param name="targetKey"></param>
         string UploadDataFile(string sourceFilePath, string targetBucket, string targetKey);
 
         /// <summary>
@@ -33,7 +43,24 @@ namespace Sentry.data.Core
         /// <returns></returns>
         string UploadDataFile(Stream inputstream, string targetKey);
 
-        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey);
+        /// <summary>
+        /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
+        /// </summary>
+        /// <param name="inputstream"></param>
+        /// <param name="targetBucket"></param>
+        /// <param name="targetKey"></param>
+        /// <returns></returns>
+        string UploadDataFile(Stream inputstream, string targetBucket, string targetKey);
+
+        /// <summary>
+        /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
+        /// </summary>
+        /// <param name="inputstream"></param>
+        /// <param name="targetBucket"></param>
+        /// <param name="targetKey"></param>
+        /// <param name="keyValuePairs"></param>
+        /// <returns></returns>
+        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         void TransferUtlityUploadStream(string category, string filename, Stream stream);
 
@@ -58,7 +85,7 @@ namespace Sentry.data.Core
         #endregion
         void DeleteMulitpleS3Keys(List<string> keys);
 
-        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey);
+        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         string GetDatasetDownloadUrl(string key, string bucket = null, string versionId = null, string fileName = null);
 
@@ -82,7 +109,7 @@ namespace Sentry.data.Core
 
         Stream GetObject(string key, string versionId = null);
 
-        string StartUpload(string bucket, string uniqueKey);
+        string StartUpload(string bucket, string uniqueKey, List<KeyValuePair<string, string>> keyValuePairs);
 
         List<string> FindObject(string keyPrefix);
 

@@ -9,6 +9,8 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core.Interfaces;
 using Hangfire;
+using System.IO;
+using System.Text;
 
 namespace Sentry.data.Core
 {
@@ -154,10 +156,10 @@ namespace Sentry.data.Core
             {
                 try
                 {
+                    var timeDelay = 30 * counter; 
                     foreach (int id in batch)
                     {
-                        tempDatasetFileId = id;
-                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(30 * counter));
+                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(timeDelay));
                     }
                 } catch (Exception ex)
                 {
@@ -165,9 +167,64 @@ namespace Sentry.data.Core
                     Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
                 }
                 counter++;    
-                batch = batch.Skip(batchSize * counter).ToList();  
+                batch = datasetFileIds.Skip(batchSize * (counter - 1)).ToList();
             }
+
             return submittedSuccessful;
+        }
+
+        /* 
+         * Implementation of reprocessing
+         * @param int stepid
+         * @param int[] datasetFileIds
+        */
+        [AutomaticRetry(Attempts = 0)]
+        public void ReprocessDatasetFile(int stepId, int datasetFileId)
+        {
+            try
+            {
+                DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+                KeyValuePair<string, string> triggerFileLocationAndContent = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
+                if (triggerFileLocationAndContent.Key == null || triggerFileLocationAndContent.Value == null)
+                {
+                    string errorMessage = "";
+                    if (triggerFileLocationAndContent.Key == null)
+                    {
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
+                    }
+                    else if (triggerFileLocationAndContent.Value == null)
+                    {
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
+                    }
+                    throw new ArgumentNullException(errorMessage);
+                }
+                else
+                {
+
+                    List<KeyValuePair<string, string>> tagContent = new List<KeyValuePair<string, string>>()
+                    {
+                        new KeyValuePair<string, string>("Content", "Trigger"),
+                    };
+                    string targetBucket = dataFlowStep.TargetBucket;
+
+                    using (MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(triggerFileLocationAndContent.Value)))
+                    {
+                        _s3ServiceProvider.UploadDataFile(stream, targetBucket, triggerFileLocationAndContent.Key, tagContent);
+                    }
+
+                }
+
+
+            
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Reprocessig failed ", ex);
+                throw; // this will be caught in hangfire indicating failed job
+            }
+
         }
 
         #region PrivateMethods
@@ -344,46 +401,7 @@ namespace Sentry.data.Core
             return model;
         }
 
-        /* 
-         * Implementation of reprocessing
-         * @param int stepid
-         * @param int[] datasetFileIds
-        */
-        [AutomaticRetry(Attempts = 0)]
-        public void ReprocessDatasetFile(int stepId, int datasetFileId)
-        {
-            try
-            {
-                DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
-                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
-
-                KeyValuePair<string, string> response = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
-                if (response.Key == null || response.Value == null)
-                {
-                    string errorMessage = "";
-                    if (response.Key == null)
-                    {
-                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
-
-                    }
-                    else if (response.Value == null)
-                    {
-                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
-
-                    }
-                    throw new Exception(errorMessage);
-                }
-                else
-                {
-                    _s3ServiceProvider.UploadDataFile(response.Key, response.Value);
-                }
-            } catch (Exception ex)
-            {
-                Logger.Error("Reprocessig failed ", ex);
-                throw; // this will be caught in hangfire indicating failed job
-            }
-            
-        }
+        
 
         /*
          * Creating a wrapper method to incorporate both the helper methods GetTriggerFileLocation and GetSourceBucketAndSourceKey
