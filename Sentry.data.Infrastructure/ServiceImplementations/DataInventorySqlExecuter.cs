@@ -1,4 +1,7 @@
 ﻿using Sentry.data.Core;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Sentry.data.Infrastructure
@@ -17,6 +20,11 @@ namespace Sentry.data.Infrastructure
                 connection.Open();
                 command.ExecuteNonQuery();
             }
+        }
+
+        public DataTable ExecuteQuery(DateTime timeCreated)
+        {
+            throw new System.NotSupportedException();
         }
     }
 }

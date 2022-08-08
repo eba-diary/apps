@@ -14,12 +14,17 @@ namespace Sentry.data.Infrastructure
 
         public HttpClientProvider(HttpClient httpClient)
         {
-            _httpClient = httpClient;            
+            _httpClient = httpClient;
         }
 
         public virtual Task<HttpResponseMessage> GetAsync(string requestUri)
         {
             return _httpClient.GetAsync(requestUri);
+        }
+        
+        public virtual Task<HttpResponseMessage> GetAsync(string requestUri, HttpCompletionOption httpCompletionOption)
+        {
+            return _httpClient.GetAsync(requestUri, httpCompletionOption);
         }
         public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content)
         {

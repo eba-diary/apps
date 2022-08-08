@@ -142,6 +142,7 @@ namespace Sentry.data.Core
         /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
         /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
         /// </remarks>
+        /// 
         [AutomaticRetry(Attempts = 0)]
         public void UpgradeDataFlow(int producerDataFlowId)
         {
@@ -802,7 +803,7 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public async Task<ValidationException> Validate(DataFlowDto dfDto)
+        public async Task<ValidationException> ValidateAsync(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
             if (dfDto.Id == 0 &&_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))
@@ -1175,6 +1176,7 @@ namespace Sentry.data.Core
             dto.TargetPrefix = step.TargetPrefix;
             dto.DataFlowId = step.DataFlow.Id;
         }
+
 
         private void MapToDto(SchemaMap map, SchemaMapDto dto)
         {

@@ -19,7 +19,6 @@ namespace Sentry.data.Core.Tests
         /// - Test that the DatasetService.Validate() method correctly identifies a duplicate Dataset name
         /// and responds with the correct validation result.
         /// </summary>
-
         [TestCategory("Core DatasetService")]
         [TestMethod]
         public async Task Validate_DuplicateName_NoNamedEnvironments()
@@ -29,7 +28,8 @@ namespace Sentry.data.Core.Tests
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
-                DatasetCategories = new List<Category> { new Category() { Id=1 } }
+                DatasetCategories = new List<Category> { new Category() { Id=1 } },
+                NamedEnvironment = "PROD"
             } };
             context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
@@ -37,22 +37,175 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null,null);
             var dataset = new DatasetDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
-                DatasetCategoryIds = new List<int> { 1 }
+                DatasetCategoryIds = new List<int> { 1 },
+                NamedEnvironment = "PROD"
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetNameDuplicate));
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameRequired));
         }
+
+
+        /// <summary>
+        /// Test that the DatasetService.Validate() method will not raise a "Duplicate Dataset" validation error
+        /// when datasets are named the same, as long as they're for different Named Environments
+        /// </summary>
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_DuplicateName_ButInDifferentEnvironments()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                ShortName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategories = new List<Category> { new Category() { Id=1 } },
+                NamedEnvironment = "QUAL"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                ShortName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                NamedEnvironment = "PROD"
+            };
+
+            // Act
+            var result = await datasetService.ValidateAsync(dataset);
+
+            // Assert
+            Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetNameDuplicate));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_AlternateContactEmailIsNotSentry()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                AlternateContactEmail = "jeb@gmail.com"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                AlternateContactEmail = "jeb@gmail.com"
+
+            };
+
+            // Act
+            var result = await datasetService.ValidateAsync(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
+        }
+
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_AlternateContactEmailIsInvalid()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                AlternateContactEmail = "jeb@@@@@gmail.com"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                AlternateContactEmail = "jeb@@@@@gmail.com"
+
+            };
+
+            // Act
+            var result = await datasetService.ValidateAsync(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
+        }
+
+
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_AlternateContactEmailIsValid()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                AlternateContactEmail = "jeb@sentry.com"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                AlternateContactEmail = "jeb@sentry.com"
+            };
+
+            // Act
+            var result = await datasetService.ValidateAsync(dataset);
+
+            // Assert
+            Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid));
+        }
+
+
 
         [TestCategory("Core DatasetService")]
         [TestMethod]
@@ -63,7 +216,7 @@ namespace Sentry.data.Core.Tests
             var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
             var dataset = new DatasetDto()
             {
                 DatasetName = "Foo",
@@ -73,10 +226,37 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 1); //should have at least two errors - short name invalid regex, and from short name being > 12 chars
+            Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
+        }
+
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_ShortName_Default()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetName = "Foo",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                ShortName = GlobalConstants.SecurityConstants.ASSET_LEVEL_GROUP_NAME
+            };
+
+            // Act
+            var result = await datasetService.ValidateAsync(dataset);
+
+            // Assert
+            Assert.IsTrue(result.ValidationResults.GetAll().Count >= 1); 
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameInvalid));
         }
 
@@ -99,7 +279,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
             var dataset = new DatasetDto()
             {
                 DatasetId = 0,
@@ -110,11 +290,49 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count > 0);
             Assert.IsTrue(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameDuplicate));
+        }
+
+        [TestCategory("Core DatasetService")]
+        [TestMethod]
+        public async Task Validate_ShortName_Duplicate_ButInDifferentEnvironments()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+            var datasets = new[] { new Dataset() {
+                DatasetId = 17,
+                DatasetName = "Foo",
+                ShortName = "Andrew",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategories = new List<Category> { new Category() { Id=1 } },
+                NamedEnvironment = "QUAL"
+            } };
+            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
+            var dataset = new DatasetDto()
+            {
+                DatasetId = 0,
+                DatasetName = "FooBar",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetCategoryIds = new List<int> { 1 },
+                ShortName = "Andrew",
+                NamedEnvironment = "PROD"
+            };
+
+            // Act
+            var result = await datasetService.ValidateAsync(dataset);
+
+            // Assert
+            Assert.IsFalse(result.ValidationResults.Contains(Dataset.ValidationErrors.datasetShortNameDuplicate));
         }
 
         [TestCategory("Core DatasetService")]
@@ -138,7 +356,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, quartermasterService.Object, null, null);
+            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
             var dataset = new DatasetDto()
             {
                 DatasetId = 1000,
@@ -152,7 +370,7 @@ namespace Sentry.data.Core.Tests
             };
 
             // Act
-            var result = await datasetService.Validate(dataset);
+            var result = await datasetService.ValidateAsync(dataset);
 
             // Assert
             Assert.IsTrue(result.ValidationResults.GetAll().Count == 0);
@@ -500,7 +718,7 @@ namespace Sentry.data.Core.Tests
             var ds = MockClasses.MockDataset(null, true, false);
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Datasets).Returns((new[] { ds }).AsQueryable());
-            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, null, new Mock<ISAIDService>().Object, null);
+            var datasetService = new DatasetService(context.Object, new Mock<ISecurityService>().Object, null, null, null, null, new Mock<ISAIDService>().Object, null, null);
 
             // Act
             var actual = datasetService.GetDatasetPermissions(ds.DatasetId);

@@ -22,7 +22,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             _assetClient = assetClient;
         }
 
-        public async Task<SAIDAsset> GetAssetByKeyCode(string keyCode)
+        public async Task<SAIDAsset> GetAssetByKeyCodeAsync(string keyCode)
         {
             SlimAssetEntity fromAsset = await _assetClient.GetAssetByKeyCodeAsync(keyCode, true).ConfigureAwait(false);
 
@@ -36,9 +36,9 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         /// </summary>
         /// <param name="keyCode">SAID Asset Keycode</param>
         /// <returns></returns>
-        public async Task<List<SAIDRole>> GetAllProdCustByKeyCode(string keyCode)
+        public async Task<List<SAIDRole>> GetAllProdCustByKeyCodeAsync(string keyCode)
         {
-            SAIDAsset asset = await GetAssetByKeyCode(keyCode).ConfigureAwait(false);
+            SAIDAsset asset = await GetAssetByKeyCodeAsync(keyCode).ConfigureAwait(false);
             List<SAIDRole> prodCusts = new List<SAIDRole>();
             foreach(SAIDRole role in asset.Roles)
             {
@@ -50,7 +50,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             return prodCusts;
         }
 
-        public async Task<List<SAIDAsset>> GetAllAssets()
+        public async Task<List<SAIDAsset>> GetAllAssetsAsync()
         {
             /* We are caching the list of all SAID assets for two reasons:
              *  1.) The call to retrieve the list takes longer than we would like

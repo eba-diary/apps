@@ -14,6 +14,8 @@ namespace Sentry.data.Core.GlobalEnums
         [Description("Deleted")]
         Deleted = 3,
         [Description("Disabled")]
-        Disabled = 4
+        Disabled = 4,
+        [Description("Pending Delete Failure")]
+        Pending_Delete_Failure = 5
     }
 }

@@ -116,12 +116,13 @@ namespace Sentry.data.Web.Controllers
                 ConfigFileName = "Default",
                 ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                 UploadUserId = SharedContext.CurrentUser.AssociateId,
+                CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue()          //REMOVE WHEN TURNED ON LATER
             };
 
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
             cdm.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -143,10 +144,12 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetDto dto = _datasetService.GetDatasetDto(id);
                 DatasetModel model = new DatasetModel(dto);
+                model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();          //REMOVE WHEN TURNED ON LATER
+
                 Utility.SetupLists(_datasetContext, model);
                 model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
-                var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
+                var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
                 model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
                 model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
                 model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -194,13 +197,14 @@ namespace Sentry.data.Web.Controllers
             DatasetModel cdm = new DatasetModel()
             {
                 UploadUserId = SharedContext.CurrentUser.AssociateId,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
+                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
+                CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue()        //REMOVE WHEN TURNED ON LATER
             };
 
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(cdm.SAIDAssetKeyCode, cdm.NamedEnvironment);
             cdm.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             cdm.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             cdm.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -221,7 +225,7 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironment = namedEnvironment
             };
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(assetKeyCode, namedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(assetKeyCode, namedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -232,7 +236,7 @@ namespace Sentry.data.Web.Controllers
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
         {
             List<SelectListItem> output = new List<SelectListItem>();
-            List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
+            List<SAIDAsset> assetList = await _saidService.GetAllAssetsAsync();
 
             if (String.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
             {
@@ -272,7 +276,7 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(_configService.Validate(schemaDto));
             }
 
-            AddCoreValidationExceptionsToModel(await _datasetService.Validate(dto));
+            AddCoreValidationExceptionsToModel(await _datasetService.ValidateAsync(dto));
 
             if (ModelState.IsValid)
             {
@@ -302,11 +306,13 @@ namespace Sentry.data.Web.Controllers
                 model.CategoryNames = model.AllCategories.Where(cat => model.DatasetCategoryIds.Contains(int.Parse(cat.Value))).Select(cat => cat.Text).ToList();
             }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
             
+            model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();         //REMOVE WHEN TURNED ON LATER
+
             return PartialView("_DatasetCreateEdit", model);
         }
 
@@ -328,7 +334,8 @@ namespace Sentry.data.Web.Controllers
                     DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
                     ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
                     DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile,
-                    DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue()
+                    DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue(),
+                    CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue()         //REMOVE WHEN TURNED ON LATER
                 };
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
@@ -746,7 +753,7 @@ namespace Sentry.data.Web.Controllers
         {
             var perms = _datasetService.GetDatasetPermissions(datasetId);
             var model = new ManagePermissionsModel(perms);
-            model.RemovePermissionRequest.DatasetNamesForAsset = _datasetService.GetDatasetNamesForAsset(perms.DatasetSaidKeyCode);
+            model.RemovePermissionRequest.DatasetNamesForAsset = _datasetService.GetInheritanceEnabledDatasetNamesForAsset(perms.DatasetSaidKeyCode);
             return View("Permission/ManagePermissions", model);
         }
 
@@ -1405,6 +1412,9 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case Dataset.ValidationErrors.datasetOriginationRequired:
                         ModelState.AddModelError(nameof(DatasetModel.OriginationID), vr.Description);
+                        break;
+                    case Dataset.ValidationErrors.datasetAlternateContactEmailFormatInvalid:
+                        ModelState.AddModelError(nameof(DatasetModel.AlternateContactEmail), vr.Description);
                         break;
                     default:
                         ModelState.AddModelError(string.Empty, vr.Description);

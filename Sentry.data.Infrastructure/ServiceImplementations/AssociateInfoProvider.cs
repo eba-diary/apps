@@ -21,43 +21,29 @@ namespace Sentry.data.Infrastructure
             //    Sentry.Configuration.Config.GetHostSetting("CrossDomainUserID"),
             //    Sentry.Configuration.Config.GetHostSetting("CrossDomainUserPassword"));
 
-            PopulateCacheIfNeeded();
-        }
-
-        private void OnLoadCacheComplete(IAsyncResult result)
-        {
-            IAssociatesServiceClient service = (IAssociatesServiceClient)result.AsyncState;
-            service.EndLoadLocalCache(result);
-            _localCacheProcessing = false;
+            var associateCacheOptions = new AssociatesCacheOptions
+            {
+                SuccessCallback = () =>
+                {
+                    Sentry.Common.Logging.Logger.Info("Associate Cache has been loaded");
+                },
+                ExceptionCallback = (ex, retryCount) =>
+                {
+                    Sentry.Common.Logging.Logger.Error($"There was an error loading the associate cache. Retry count: {retryCount}", ex);
+                },
+                IncludeInactive = true
+            };
+            _associateService.LoadLocalCacheWithRetry(associateCacheOptions);
         }
 
         public Associate GetAssociateInfo(string associateId)
         {
-            PopulateCacheIfNeeded();
-
             return _associateService.GetAssociateById(associateId, true);
         }
 
         public Associate GetAssociateInfoByName(string associateName)
         {
-            PopulateCacheIfNeeded();
-
             return _associateService.GetAssociatesByName(associateName, true).First();
-        }
-
-        private void PopulateCacheIfNeeded()
-        {
-            if (_associateService.HasLocalCache == false && _localCacheProcessing == false)
-            {
-                lock (_lockObject)
-                {
-                    if (_associateService.HasLocalCache == false && _localCacheProcessing == false)
-                    {
-                        _associateService.BeginLoadLocalCache(OnLoadCacheComplete, _associateService, true);
-                        _localCacheProcessing = true;
-                    }
-                }
-            }
         }
     }
 }

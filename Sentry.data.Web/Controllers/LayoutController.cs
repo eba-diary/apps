@@ -53,7 +53,7 @@ namespace Sentry.data.Web.Controllers
             }
                         
             headerModel.EnvironmentName = Sentry.Configuration.Config.GetHostSetting("EnvironmentName");
-            headerModel.AssociatePhotoUrl = "http://sentryphoto.sentry.com/associate/" + SharedContext.CurrentUser.AssociateId + "/height/25px";
+            headerModel.AssociatePhotoUrl = Sentry.Configuration.Config.GetHostSetting("SentryPhotoUrl").Replace("{AssociateId}", SharedContext.CurrentUser.AssociateId);
 
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
             ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();

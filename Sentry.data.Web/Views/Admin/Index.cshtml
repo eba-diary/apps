@@ -1,34 +1,14 @@
-﻿
-@model Dictionary<string, string>
-@{
+﻿@{
     ViewBag.Title = "Admin";
+    Layout = Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewBag.Fluid = true;
 }
 
+<!DOCTYPE html>
 
-<div class="row">
-    <div class="card form-wrapper col-lg-2 side-nav-wrapper" id="sideNav">
-        <div class="card-body">
-            <h2 class="card-title">Admin Page</h2>
-
-            @foreach (var key in Model.Keys)
-            {
-                <a href="#" data-url='@Url.Action("GetAdminAction", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
-
-            }
-        </div>
-    </div>
-    <div class="col-lg-10">
-        <div id="partial-view-test"></div>
-    </div>
-</div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/dataTables")
-    @Styles.Render("~/bundles/css/dataTables")
-    <script>
-        $(function () {
-            data.Admin.AdminPageInit();
-        });
-    </script>
-}
+<html>
+<body>
+    <h1>Welcome to the Admin Page!</h1>
+    <h4>There's plenty of space here for anything else you want.</h4>
+</body>
+</html>

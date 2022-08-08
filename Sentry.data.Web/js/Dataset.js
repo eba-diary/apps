@@ -200,6 +200,7 @@ data.Dataset = {
             //},
 
             columns: [
+                { data: "OrdinalPosition", className: "OrdinalPosition" },
                 {
                     data: "Name", className: "Name",
                     render: function (d, type, row, meta) {
@@ -228,7 +229,7 @@ data.Dataset = {
                 [20, 100, 500]
             ],
 
-            order: [0, 'desc'],
+            order: [0, 'asc'],
 
             //style for columnVisibility and paging to show
             //dom: 'B',
@@ -274,6 +275,7 @@ data.Dataset = {
                 { column_number: 4, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 5, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
                 { column_number: 6, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
+                { column_number: 7, filter_type: 'text', style_class: 'form-control', filter_reset_button_text: false, filter_delay: 500 },
             ],
                 {
                     filters_tr_index: 1
@@ -641,7 +643,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        data.Dataset.showDataPreviewError();
+                        data.Dataset.showDataPreviewError(msg.responseJSON);
                         $('#dataSection').hide();
                     }
                 }
@@ -651,14 +653,13 @@ data.Dataset = {
                 if (error.status == 404 && error.responseText == "Schema not found") {
                     $('#dataSection').hide();
                 }
-
-                data.Dataset.showDataPreviewError();
+                data.Dataset.showDataPreviewError(error.responseJSON);
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
-        }).fail(function () {
-            data.Dataset.showDataPreviewError();
+        }).fail(function (error) {
+            data.Dataset.showDataPreviewError(error.responseJSON);
         });
 
     },
@@ -812,6 +813,7 @@ data.Dataset = {
     },
 
     FormSubmitInit: function () {
+        $("#IsSecured").removeAttr("disabled");
         $.ajax({
             url: "/Dataset/DatasetForm",
             method: "POST",
@@ -869,10 +871,8 @@ data.Dataset = {
 
         $("#DatasetName").on('keyup', function () {
             let datasetNameWoSpecialChars = $("#DatasetName")[0].value.replace(/[^0-9a-zA-Z]/g, "");
-            if (datasetNameWoSpecialChars.length <= 12) {
-                $("#ShortName")[0].value = datasetNameWoSpecialChars;
-                $("label[for=ShortName]").addClass("active");
-            }
+            $("#ShortName")[0].value = datasetNameWoSpecialChars.slice(0, 12);
+            $("label[for=ShortName]").addClass("active");
         })
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
@@ -916,17 +916,22 @@ data.Dataset = {
         }
 
         $("#DataClassification").change(function () {
+            let securedInput = $("#IsSecured");
+            securedInput.removeAttr("disabled");
             switch ($("#DataClassification").val()) {
-                case "1":
+                case "1"://Restricted
                     $('#dataClassInfo').text('“Restricted” information is proprietary and has significant business value for Sentry. ' +
                         'Unauthorized disclosure or dissemination could result in severe damage to Sentry.  Examples of restricted data include secret contracts or trade secrets.  ' +
                         'This information must be limited to only the few associates that require access to it.  If it is shared, accessed, or altered without the permission ' +
                         'of the Information Owner, Information Security must be notified immediately.  Designating information as Restricted involves significant ' +
                         'costs to Sentry.  For this reason, Information Owners making classification decisions must balance the damage that could result from ' +
                         'unauthorized access to or disclosure of the information against the cost of additional hardware, software or services required to protect it.');
-                    $("#IsSecured").parents('.md-form').hide();
                     break;
-                case "2":
+                case "2"://Highly Sensitive
+                    if (!securedInput.is(':checked')) { //make sure it is checked
+                        securedInput.next().click();
+                    }
+                    securedInput.attr("disabled", ""); //lock it
                     $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
                         'identifiable information, and is intended for limited, specific use by a workgroup, ' +
                         'department, or group of individuals with a legitimate need to know. Disclosure or ' +
@@ -937,21 +942,22 @@ data.Dataset = {
                         'numbers), and user passwords. This information must be limited to need to know ' +
                         'access. If it is shared, accessed, or altered without the permission of the ' +
                         'Information Owner, Information Security must be notified immediately.');
-                    $("#IsSecured").parents('.md-form').hide();
                     break;
-                case "3":
+                case "3"://Internal
                     $('#dataClassInfo').text('“Internal Use Only” information can be disclosed or disseminated to Sentry ' +
                         'associates, but will only be shared with other individuals or organizations when a ' +
                         'non - disclosure agreement is in place and management has approved for legitimate ' +
                         'business reasons.  Examples include items such as email correspondence, internal ' +
                         'documentation that is available to all associates.');
-                    $("#IsSecured").parents('.md-form').show();
                     break;
-                case "4":
+                case "4"://Public
+                    if (securedInput.is(':checked')) { //make sure it is not checked
+                        securedInput.next().click();
+                    }
+                    securedInput.attr("disabled", ""); //lock it
                     $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
                         'content, audience, or time of publication.  Examples are datasets that were generated by the Federal or State Governments like the Federal Motor Carrier Safety Administration or NOAA Weather Data.  ' +
                         'These datasets can be freely shared throughout Sentry.');
-                    $("#IsSecured").parents('.md-form').hide();
                     break;
             }
         }).change();
@@ -2393,6 +2399,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         });
         $("#inheritanceModalSubmit").click(function () {
             if (data.Dataset.validateInheritanceModal()) {
+                $("#InheritanceLoading").removeClass('d-none');
+                $("#InheritanceModalBody").addClass('d-none');
+                $("#InheritanceModalFooter").addClass('d-none');
                 $.ajax({
                     type: 'POST',
                     data: $("#InheritanceRequestForm").serialize(),
@@ -2400,6 +2409,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                     success: function (data) {
                         //handle result data
                         $("#inheritanceModal").modal('hide');
+                        $("#InheritanceLoading").addClass('d-none');
+                        $("#InheritanceModalBody").removeClass('d-none');
+                        $("#InheritanceModalFooter").removeClass('d-none');
                     }
                 });
             }
@@ -2423,19 +2435,18 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     permissionInheritanceSwitchInit(result) {
         var inheritance = $("#inheritanceSwitch").attr("value");
-        switch (inheritance) {
-            case "Active":
-                $('#inheritanceSwitchInput').prop('checked', true);
-                $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
-                $("#Inheritance_IsAddingPermission").val(false);
-                break;
-            case "Pending":
-                $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
-                break
-            default: //we treat default the same as "DISABLED"
-                $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
-                $('#inheritanceSwitchInput').prop('checked', false);
-                $("#Inheritance_IsAddingPermission").val(true);
+        if (inheritance == "Completed" && result.InheritanceActive) {
+            $('#inheritanceSwitchInput').prop('checked', true);
+            $("#addRemoveInheritanceMessage").text("Request Remove Inheritance");
+            $("#Inheritance_IsAddingPermission").val(false);
+        }
+        else if (inheritance == 'Pending') {
+            $("#inheritanceSwitch").html('<p>Inheritance change pending. See ticket ' + result.TicketId + '.</p>');
+        }
+        else {
+            $("#addRemoveInheritanceMessage").text("Request Add Inheritance");
+            $('#inheritanceSwitchInput').prop('checked', false);
+            $("#Inheritance_IsAddingPermission").val(true);
         }
     },
 
@@ -2459,13 +2470,16 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         });
         $("#removePermissionModalSubmit").click(function () {
             if (data.Dataset.validateRemovePermissionModal()) {
+                $("#RemovePermissionLoading").removeClass("d-none");
+                $("#RemovePermissionModalForm").addClass("d-none");
+                $("#RemovePermissionModalButtons").addClass("d-none");
+
                 $.ajax({
                     type: 'POST',
                     data: $("#RemovePermissionRequestForm").serialize(),
                     url: '/Dataset/SubmitRemovePermissionRequest',
                     success: function (data) {
-                        $("#RemovePermissionModalForm").addClass("d-none");
-                        $("#RemovePermissionModalButtons").addClass("d-none");
+                        $("#RemovePermissionLoading").addClass("d-none");
                         $("#RemovePermissionRequestResult").html(data);
                         $("#RemovePermissionRequestResult").removeClass("d-none");
                     }
@@ -2522,18 +2536,25 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     initRequestAccessWorkflow() {
+        let consumeDatasetGroupName = $("#consumeDatasetGroupName").text();
+        let producerDatasetGroupName = $("#producerDatasetGroupName").text();
+        let consumeAssetGroupName = $("#consumeAssetGroupName").text();
+        let producerAssetGroupName = $("#producerAssetGroupName").text();
+
         data.Dataset.addRequestAccessBreadcrumb("Access To", "#RequestAccessToSection")
         $("#RequestAccessToDatasetBtn").click(function (e) {
             var datasetName = $("#RequestAccessDatasetName").text();
             $("#RequestAccess_Scope").val('0')
             data.Dataset.editActiveRequestAccessBreadcrumb(datasetName);
-            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
+            $("#RequestAccessConsumeEntitlement").text(consumeDatasetGroupName);
+            $("#RequestAccessManageEntitlement").text(producerDatasetGroupName);
             data.Dataset.onAccessToSelection(e);
         });
         $("#RequestAccessToAssetBtn").click(function (e) {
             $("#RequestAccess_Scope").val('1')
             data.Dataset.editActiveRequestAccessBreadcrumb(e.target.value);
-            $("#RequestAccessConsumeEntitlement").text("Placeholder Entitlement");
+            $("#RequestAccessConsumeEntitlement").text(consumeAssetGroupName);
+            $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
             data.Dataset.onAccessToSelection(e);
         });
         $("#RequestAccessTypeConsumeBtn").click(function (e) {
@@ -2547,7 +2568,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.editActiveRequestAccessBreadcrumb("Manage");
             data.Dataset.requestAccessCleanActiveBreadcrumb();
             data.Dataset.addRequestAccessBreadcrumb("Manage Request", "#RequestAccessManageTypeSection");
-            $("#RequestAccessManageEntitlement").text("Placeholder Entitlement");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessManageTypeSection").removeClass("d-none");
         });
@@ -2585,6 +2605,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             else {
                 $("#AccessRequestValidationMessage").removeClass("d-none");
             }
+        });
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
+        });
+        $("#RequestAccessConsumeCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessConsumeEntitlement").text());
         });
     },
 
@@ -2661,9 +2687,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
     },
 
-    showDataPreviewError() {
-        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-        $("#DataPreviewNoRows").removeClass("d-none");
+    showDataPreviewError(message) {
+        if (message == 'Column metadata not added') {
+            $("#DataPreviewNoRows").html("<p>No columns added to schema</p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
+        else if (message == "Table or view not found") {
+            $("#DataPreviewNoRows").html("<p>Snowflake table or view was not found - please contact <a href='mailto: DSCSupport@sentry.com'>DSC Support</a></p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
+        else {
+            $("#DataPreviewNoRows").html("<p>No rows returned</p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
     },
 
     makeToast: function (severity, message) {
@@ -2708,5 +2744,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
 
         toastr[severity](message);
+    },
+
+    copyTextToClipboard: function (text) {
+        navigator.clipboard.writeText(text);
+        data.Dataset.makeToast("success","Copied " + text + " to clipboard")
     }
 };

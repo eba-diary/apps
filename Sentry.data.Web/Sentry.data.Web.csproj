@@ -65,13 +65,13 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.3.106.18\lib\net45\AWSSDK.Core.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.Core.3.7.12.6\lib\net45\AWSSDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.S3.3.3.110.64\lib\net45\AWSSDK.S3.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.S3.3.7.9.22\lib\net45\AWSSDK.S3.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.SecurityToken, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.SecurityToken.3.3.104.72\lib\net45\AWSSDK.SecurityToken.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.SecurityToken.3.7.1.171\lib\net45\AWSSDK.SecurityToken.dll</HintPath>
     </Reference>
     <Reference Include="BeginCollectionItem, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\BeginCollectionItem.1.2.1.0\lib\net35\BeginCollectionItem.dll</HintPath>
@@ -214,9 +214,14 @@
       <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MiniProfiler, Version=3.2.0.157, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
-      <HintPath>..\packages\MiniProfiler.3.2.0.157\lib\net40\MiniProfiler.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MiniProfiler, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniProfiler.4.2.22\lib\net461\MiniProfiler.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniProfiler.Mvc5, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniProfiler.Mvc5.4.2.22\lib\net461\MiniProfiler.Mvc5.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniProfiler.Shared, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniProfiler.Shared.4.2.22\lib\net461\MiniProfiler.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Namotion.Reflection, Version=1.0.11.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
       <HintPath>..\packages\Namotion.Reflection.1.0.11\lib\net45\Namotion.Reflection.dll</HintPath>
@@ -239,9 +244,11 @@
     <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.106.6.9\lib\net452\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Associates.1.3.0\lib\net35\Sentry.Associates.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Sentry.Associates, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Associates.3.0.3\lib\netstandard2.0\Sentry.Associates.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.Associates.Abstractions, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Associates.Abstractions.2.0.2\lib\netstandard2.0\Sentry.Associates.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Common.1.6.0-beta-02\lib\net452\Sentry.Common.dll</HintPath>
@@ -249,8 +256,8 @@
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Configuration.3.0.0\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Core.1.1.0\lib\net452\Sentry.Core.dll</HintPath>
+    <Reference Include="Sentry.Core, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Core.2.1.1\lib\netstandard2.0\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.DataTables, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry_DataTables_ServerSide.1.5.0\lib\net472\Sentry.DataTables.dll</HintPath>
@@ -260,6 +267,9 @@
     </Reference>
     <Reference Include="Sentry.FeatureFlags.LaunchDarkly, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.FeatureFlags.LaunchDarkly.2.0.1\lib\net452\Sentry.FeatureFlags.LaunchDarkly.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.Profiling.AspNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Profiling.AspNet.1.0.0\lib\net472\Sentry.Profiling.AspNet.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Smarts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Smarts.2.1.3\lib\net40\Sentry.Smarts.dll</HintPath>
@@ -294,6 +304,7 @@
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.12.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.6.12.0\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
@@ -322,6 +333,15 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Http, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ServiceModel.Http.4.8.1\lib\net461\System.ServiceModel.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Primitives, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ServiceModel.Primitives.4.8.1\lib\net461\System.ServiceModel.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceModel.Security, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ServiceModel.Security.4.8.1\lib\net461\System.ServiceModel.Security.dll</HintPath>
+    </Reference>
     <Reference Include="System.Text.Encoding.CodePages, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encoding.CodePages.5.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
@@ -339,6 +359,7 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -403,7 +424,6 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
-    <Compile Include="App_Start\ProfilingViewEngine.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
@@ -411,22 +431,28 @@
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\DataFlowMetricController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
+    <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
+    <Compile Include="Extensions\DataFlowMetricExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
+    <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
+    <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />
-    <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
-    <Compile Include="Models\AdminPage\BaseAuditModel.cs" />
-    <Compile Include="Models\AdminPage\DataReprocessingModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileReprocessModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
@@ -439,6 +465,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
@@ -540,7 +567,6 @@
     <Compile Include="Filters\BypassAntiForgeryAttribute.cs" />
     <Compile Include="Filters\InjectSharedContextAttribute.cs" />
     <Compile Include="Filters\NoCacheAttribute.cs" />
-    <Compile Include="Filters\ProfilingActionFilterAttribute.cs" />
     <Compile Include="Filters\WebAPI\AntiForgeryAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -1214,13 +1240,20 @@
     <Content Include="Views\Shared\_NonParquetFilesTable.cshtml" />
     <Content Include="Views\Shared\_RawqueryParquetAudit.cshtml" />
     <Content Include="Views\Shared\_RowCountCompareTable.cshtml" />
+    <Content Include="Views\Shared\_AdminLayout.cshtml" />
+    <Content Include="Views\Admin\DataFileReprocessing.cshtml" />
     <Content Include="Views\Shared\_AdminTest2.cshtml" />
     <Content Include="Views\Shared\_AdminTest4.cshtml" />
     <Content Include="Views\Shared\_AdminTest3.cshtml" />
-    <Content Include="Views\Shared\_ConnectorStatus.cshtml" />
+    <Content Include="Views\Admin\ConnectorStatus.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
+    <Content Include="Views\Shared\_DeadJobTable.cshtml" />
+    <Content Include="Views\Admin\ReprocessDeadSparkJobs.cshtml" />
+    <Content Include="Views\Admin\DataFlowMetrics.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Shared\_AdminSideNav.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1989,6 +2022,7 @@
     <Folder Include="Views\AccessRequest\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\Alert\" />
+    <Folder Include="Views\Auth\" />
     <Folder Include="Views\BaseDataInventory\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
@@ -2018,8 +2052,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\AWSSDK.S3.3.3.110.64\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.3.104.72\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
+    <Analyzer Include="..\packages\AWSSDK.S3.3.7.9.22\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
+    <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.7.1.171\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\Google.Protobuf.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CFG.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
