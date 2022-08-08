@@ -269,7 +269,7 @@ namespace Sentry.data.Core
             {
                 IApplicationUser user = _userService.GetCurrentUser();
                 
-                request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : request.SecurableObjectName;
+                request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : ds.DatasetName;
                 request.SecurableObjectId = request.Scope == AccessScope.Asset ? ds.Asset.AssetId : request.SecurableObjectId;
                 request.SecurityId = ds.Security.SecurityId;
                 request.SaidKeyCode = ds.Asset.SaidKeyCode;

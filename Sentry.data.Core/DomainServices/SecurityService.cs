@@ -121,7 +121,7 @@ namespace Sentry.data.Core
                 SecurityTicket ticketForPermCode = security.Tickets.FirstOrDefault(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == permission.PermissionCode && p.IsEnabled && p.AddedFromTicket.TicketId == model.TicketId));
                 SecurityPermission toRemove = ticketForPermCode.AddedPermissions.First(p => p.Permission.PermissionCode == permission.PermissionCode);
                 toRemove.RemovedFromTicket = ticket;
-                ticket.AddedPermissions.Add(toRemove);
+                ticket.RemovedPermissions.Add(toRemove);
             }
 
             return ticket;
@@ -578,9 +578,10 @@ namespace Sentry.data.Core
 
         private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
         {
-
-            //If the SecurityTicket just approved includes dataset permissions
-            if (_dataFeatures.CLA3718_Authorization.GetValue() && (ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET) || ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.ASSET)))
+            //If the SecurityTicket just approved includes dataset/asset permissions
+            if (_dataFeatures.CLA3718_Authorization.GetValue() && 
+                (ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET || p.Permission.SecurableObject == SecurableEntityName.ASSET) ||
+                ticket.RemovedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET || p.Permission.SecurableObject == SecurableEntityName.ASSET)))
             {
                 if (ticket.ParentSecurity.SecurableEntityName.Equals(SecurableEntityName.DATASET))
                 {
