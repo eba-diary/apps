@@ -89,6 +89,10 @@
             public const string NOTIFICATION_DSC_NEWS_PYTHON = "Python";
             public const string NOTIFICATION_DSC_NEWS_SAS = "SAS";
             public const string NOTIFICATION_DSC_NEWS_ANALYTICS = "Analytics";
+
+            //EVENT TYPES FOR DELETE S3 RELATED
+            public const string DATASETFILE_DELETE_S3 = "DatasetFileDeleteS3";
+            public const string DATASETFILE_UPDATE_OBJECT_STATUS = "DatasetFileUpdateObjectStatus";
         }
 
         public static class Statuses

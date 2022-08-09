@@ -203,10 +203,10 @@ namespace Sentry.data.Core
                 us.CanPreviewDataset = true;
                 us.CanQueryDataset = true;
                 us.CanViewFullDataset = true;
-                us.CanUploadToDataset = IsOwner || IsAdmin;
                 us.CanModifyNotifications = false;
                 us.CanUseDataSource = true;
                 us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
+                us.CanUploadToDataset = us.CanManageSchema;
                 us.CanViewData = true;
                 return us;
             }
@@ -412,11 +412,11 @@ namespace Sentry.data.Core
             us.CanPreviewDataset = true;
             us.CanQueryDataset = true;
             us.CanViewFullDataset = true;
-            us.CanUploadToDataset = IsOwner || IsAdmin;
             us.CanModifyNotifications = false;
             us.CanUseDataSource = true;
             us.CanViewData = true;
             us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
+            us.CanUploadToDataset = us.CanManageSchema;
             us.CanModifyDataflow = false; /* Dataflows should always be marked as secure */
             MergeParentSecurity(us, parentSecurity);
 
@@ -475,7 +475,7 @@ namespace Sentry.data.Core
 
         private static bool CanDeleteDatasetFile(UserSecurity us, IDataFeatures features)
         {
-            return us.CanEditDataset && us.CanManageSchema && features.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
+            return us.CanManageSchema && features.CLA4049_ALLOW_S3_FILES_DELETE.GetValue();
         }
 
         /// <summary>

@@ -415,7 +415,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanManageSchema);
-            Assert.IsFalse(us.CanDeleteDatasetFile);
+            Assert.IsTrue(us.CanDeleteDatasetFile);
 
         }
 
@@ -461,7 +461,7 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanManageSchema);
-            Assert.IsFalse(us.CanDeleteDatasetFile);
+            Assert.IsTrue(us.CanDeleteDatasetFile);
         }
 
         #endregion

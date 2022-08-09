@@ -631,7 +631,7 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public async Task<ValidationException> Validate(DataFlowDto dfDto)
+        public async Task<ValidationException> ValidateAsync(DataFlowDto dfDto)
         {
             ValidationResults results = new ValidationResults();
             if (dfDto.Id == 0 &&_datasetContext.DataFlow.Any(w => w.Name == dfDto.Name))

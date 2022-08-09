@@ -27,12 +27,14 @@ namespace Sentry.data.Core
         private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
+        private readonly IDatasetFileService _datasetFileService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
-                            IDataFeatures featureFlags)
+                            IDataFeatures featureFlags,
+                            IDatasetFileService datasetFileService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -42,6 +44,7 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
+            _datasetFileService = datasetFileService;
         }
 
         public DatasetDto GetDatasetDto(int id)
@@ -141,12 +144,12 @@ namespace Sentry.data.Core
 
         public List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset)
         {
-            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).Select(ds => ds.DatasetName).ToList();
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).Select(ds => ds.DatasetName).ToList();
         }
 
         public List<Dataset> GetInheritanceEnabledDatasetsForAsset(string asset)
         {
-            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
+            return _datasetContext.Datasets.Where(ds => ds.Asset.SaidKeyCode.Equals(asset) && ds.Security.Tickets.Any(t => t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS && p.IsEnabled))).ToList();
         }
 
         public UserSecurity GetUserSecurityForDataset(int datasetId)
@@ -166,7 +169,7 @@ namespace Sentry.data.Core
             result.DatasetName = ds.DatasetName;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
-            result.Approvers = _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).Result;
+            result.Approvers = _saidService.GetAllProdCustByKeyCodeAsync(ds.Asset.SaidKeyCode).Result;
             result.InheritanceTicket = _securityService.GetSecurableInheritanceTicket(ds);
             return result;
         }
@@ -190,7 +193,7 @@ namespace Sentry.data.Core
         {
             //get all datasets where the there is a CanQueryData permission on the security
             //OR all public datasets (no security object)
-            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET && x.CanDisplay);
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == DataEntityCodes.DATASET && x.CanDisplay);
 
             query.FetchMany(x => x.DatasetCategories).ToFuture();
             List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
@@ -236,9 +239,9 @@ namespace Sentry.data.Core
             if (!_featureFlags.CLA3718_Authorization.GetValue())
             {
                 //These permissions have been added as part of CLA-3718, but we don't want them visible on the existing UI when the feature flag is disabled
-                featureFlagPermissionRestrictions = x => x.PermissionCode != GlobalConstants.PermissionCodes.S3_ACCESS
-                    && x.PermissionCode != GlobalConstants.PermissionCodes.SNOWFLAKE_ACCESS
-                    && x.PermissionCode != GlobalConstants.PermissionCodes.INHERIT_PARENT_PERMISSIONS;
+                featureFlagPermissionRestrictions = x => x.PermissionCode != PermissionCodes.S3_ACCESS
+                    && x.PermissionCode != PermissionCodes.SNOWFLAKE_ACCESS
+                    && x.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS;
             } else
             {
                 featureFlagPermissionRestrictions = x => true;
@@ -246,10 +249,10 @@ namespace Sentry.data.Core
 
             //Set permission list based on if Dataset is secured (restricted)
             ar.Permissions = !ds.IsSecured
-                ? _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET && x.PermissionCode == GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
-                : _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
+                ? _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET && x.PermissionCode == PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
+                : _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCode(ds.Asset.SaidKeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCodeAsync(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
@@ -276,7 +279,7 @@ namespace Sentry.data.Core
                 request.RequestedDate = DateTime.Now;
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
-                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                                                                                                                x.SecurableObject == SecurableEntityName.DATASET).ToList();
                 request = BuildPermissionsForRequestType(request);
                 return await _securityService.RequestPermission(request);
             }
@@ -307,10 +310,10 @@ namespace Sentry.data.Core
             switch (request.Type)
             {
                 case AccessRequestType.AwsArn:
-                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == GlobalConstants.PermissionCodes.S3_ACCESS).First());
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == PermissionCodes.S3_ACCESS).First());
                     break;
                 case AccessRequestType.RemovePermission:
-                    request.Permissions.Add(_datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) && x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).FirstOrDefault());
+                    request.Permissions.Add(_datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) && x.SecurableObject == SecurableEntityName.DATASET).FirstOrDefault());
                     break;
                 default:
                     break;
@@ -378,7 +381,7 @@ namespace Sentry.data.Core
             }
             if (ds.Security == null)
             {
-                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                ds.Security = new Security(SecurableEntityName.DATASET)
                 {
                     CreatedById = _userService.GetCurrentUser().AssociateId
                 };
@@ -423,7 +426,7 @@ namespace Sentry.data.Core
         {
             if (ds.DatasetName != dto.DatasetName)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.NAME_IS_IDEMPOTENT, "Dataset Name cannot be changed");
+                throw new ValidationException(ValidationErrors.NAME_IS_IDEMPOTENT, "Dataset Name cannot be changed");
             }
             if (ds.ShortName != dto.ShortName)
             {
@@ -431,15 +434,15 @@ namespace Sentry.data.Core
             }
             if (ds.Asset.SaidKeyCode != dto.SAIDAssetKeyCode)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.SAID_ASSET_IDEMPOTENT, "Dataset Asset cannot be changed");
+                throw new ValidationException(ValidationErrors.SAID_ASSET_IDEMPOTENT, "Dataset Asset cannot be changed");
             }
             if (ds.NamedEnvironment != dto.NamedEnvironment)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_IDEMPOTENT, "Dataset Named Environment cannot be changed");
+                throw new ValidationException(ValidationErrors.NAMED_ENVIRONMENT_IDEMPOTENT, "Dataset Named Environment cannot be changed");
             }
             if (ds.NamedEnvironmentType != dto.NamedEnvironmentType)
             {
-                throw new ValidationException(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
+                throw new ValidationException(ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
             }
         }
 
@@ -483,6 +486,7 @@ namespace Sentry.data.Core
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
                         _configService.Delete(config.ConfigId, user ?? _userService.GetCurrentUser(), logicalDelete);
+                        DeleteDatasetFiles(ds.DatasetId, config.Schema.SchemaId);       //DELETE DATASETFILES UNDER SCHEMA
                     }
                 }
                 catch (Exception ex)
@@ -490,7 +494,6 @@ namespace Sentry.data.Core
                     Logger.Error($"datasetservice-delete-logical failed", ex);
                     result = false;
                 }
-                    
             }
             else
             {
@@ -517,7 +520,9 @@ namespace Sentry.data.Core
             return result;
         }
 
-        public async Task<ValidationException> Validate(DatasetDto dto)
+       
+
+        public async Task<ValidationException> ValidateAsync(DatasetDto dto)
         {
             ValidationResults results = new ValidationResults();
 
@@ -539,7 +544,7 @@ namespace Sentry.data.Core
 
             if (String.IsNullOrWhiteSpace(dto.SAIDAssetKeyCode))
             {
-                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
+                results.Add(ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset is required.");
             }
 
             if (dto.OriginationId == 0)
@@ -548,8 +553,7 @@ namespace Sentry.data.Core
             }
 
             //Validate the Named Environment selection using the QuartermasterService
-            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType).ConfigureAwait(false));
-
+            results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dto.SAIDAssetKeyCode, dto.NamedEnvironment, dto.NamedEnvironmentType));
 
             //VALIDATE EMAIL ADDRESS
             if (!ValidationHelper.IsDSCEmailValid(dto.AlternateContactEmail))
@@ -577,14 +581,14 @@ namespace Sentry.data.Core
 
         private void ValidateDatasetName(DatasetDto dto, ValidationResults results)
         {
-            if (String.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
+            if (string.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
             {
                 results.Add(Dataset.ValidationErrors.datasetNameRequired, "Dataset Name is required");
             }
             else //if name, make sure it is not duplicate
             {
                 if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetType == GlobalConstants.DataEntityCodes.DATASET))
+                                                             w.DatasetType == DataEntityCodes.DATASET && w.NamedEnvironment == dto.NamedEnvironment))
                 {
                     results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
                 }
@@ -612,7 +616,7 @@ namespace Sentry.data.Core
                     results.Add(Dataset.ValidationErrors.datasetShortNameInvalid, $"Short Name cannot be \"{SecurityConstants.ASSET_LEVEL_GROUP_NAME}\"");
                 }
                 if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
-                    d.DatasetType == GlobalConstants.DataEntityCodes.DATASET && dto.DatasetId != d.DatasetId))
+                    d.DatasetType == DataEntityCodes.DATASET && d.NamedEnvironment == dto.NamedEnvironment && dto.DatasetId != d.DatasetId))
                 {
                     results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
                 }
@@ -668,6 +672,27 @@ namespace Sentry.data.Core
         }
 
         #region "private functions"
+
+        private void DeleteDatasetFiles(int datasetId, int schemaId)
+        {
+            //DO NOT DELETE IF FEATURE IS OFF
+            if (!_featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            {
+                return;
+            }
+
+            //GET ALL DATASETFILE IDS FOR SCHEMA
+            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusActive.Where(w => w.Schema.SchemaId == schemaId).ToList();
+
+            //DELETE ALL FILES IN LIST
+            if (dbList != null && dbList.Count > 0)
+            {
+                int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
+                DeleteFilesParamDto dto = new DeleteFilesParamDto() { UserFileIdList = idList };
+                _datasetFileService.Delete(datasetId, schemaId, dto);
+            }
+        }
+
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
             ds.CanDisplay = false;
@@ -695,7 +720,7 @@ namespace Sentry.data.Core
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
                 DatasetDtm = dto.DatasetDtm,
                 ChangedDtm = dto.ChangedDtm,
-                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
+                DatasetType = DataEntityCodes.DATASET,
                 DataClassification = dto.DataClassification,
                 IsSecured = dto.IsSecured,
                 CanDisplay = true,
@@ -726,7 +751,7 @@ namespace Sentry.data.Core
             //All datasets get a Security entry regardless if restricted
             //  this allows security process for internally managed permissions
             //  which do not require dataset to be restricted (i.e. CanManageSchema).
-            ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+            ds.Security = new Security(SecurableEntityName.DATASET)
             {
                 CreatedById = _userService.GetCurrentUser().AssociateId
             };
@@ -747,7 +772,7 @@ namespace Sentry.data.Core
                 asset = new Asset()
                 {
                     SaidKeyCode = saidAssetKeyCode,
-                    Security = new Security(GlobalConstants.SecurableEntityName.ASSET)
+                    Security = new Security(SecurableEntityName.ASSET)
                     {
                         CreatedById = _userService.GetCurrentUser().AssociateId
                     }

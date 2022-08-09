@@ -31,6 +31,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("CLType_ID");
                 m.ForeignKey("FK_ConsumptionLayerComponent_ConsumptionLayerType");
                 m.Class(typeof(ConsumptionLayerType));
+                m.Insert(false);
+                m.Update(false);
             });
 
             this.Bag(x => x.ComponentElements, m =>
