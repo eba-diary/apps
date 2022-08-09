@@ -485,28 +485,27 @@ data.Admin = {
                     }
                 ],
             });
-
-            // Add event listener for opening and closing details
-            $('#metricGroupsTable').on('click', 'td.dt-control', function () {
-                var tr = $(this).closest('tr');
-                var row = table.row(tr);
-                var icon = $(this).closest('tr').find("#expand-collapse-icon");
-
-                if (row.child.isShown()) {
-                    // This row is already open - close it
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    icon.addClass('fa-plus')
-                    icon.removeClass('fa-minus')
-                } else {
-                    // Open this row
-                    row.child(data.Admin.GetFlowEvents(row.data())).show();
-                    tr.addClass('shown');
-                    icon.addClass('fa-minus')
-                    icon.removeClass('fa-plus')
-                }
-            });
         })
+        // Add event listener for opening and closing details
+        $('#metricGroupsTable').on('click', 'td.dt-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            var icon = $(this).closest('tr').find("#expand-collapse-icon");
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+                icon.addClass('fa-plus')
+                icon.removeClass('fa-minus')
+            } else {
+                // Open this row
+                row.child(data.Admin.GetFlowEvents(row.data())).show();
+                tr.addClass('shown');
+                icon.addClass('fa-minus')
+                icon.removeClass('fa-plus')
+            }
+        });
     },
 
     SetupConnectorFilterTableInit: function () {
