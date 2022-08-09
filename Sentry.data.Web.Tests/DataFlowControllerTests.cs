@@ -26,7 +26,7 @@ namespace Sentry.data.Web.Tests
             
             //Act
             DataFlowDto dto = dataFlowController.ModelToDto(flowModel);
-            DataFlowDto toBeSearilalized = dto;
+            DataFlowDto toBeSearilalized = JsonConvert.DeserializeObject<DataFlowDto>(JsonConvert.SerializeObject(dto));
             toBeSearilalized.DFQuestionnaire = null;
 
             //Assert
@@ -44,9 +44,11 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(flowModel.NamedEnvironment, dto.NamedEnvironment, "NamedEnvironment");
             Assert.AreEqual(flowModel.NamedEnvironmentType, dto.NamedEnvironmentType, "NamedEnvironmentType");
             Assert.AreEqual(flowModel.PrimaryContactId, dto.PrimaryContactId, "PrimaryContactId");
-            Assert.AreEqual(flowModel.SchemaMaps[0], dto.SchemaMap, "SchemaMap");
-            Assert.AreEqual(flowModel.RetrieverJob, dto.RetrieverJob, "RetrieverJob");
-            Assert.AreEqual(JsonConvert.SerializeObject(toBeSearilalized), dto.DFQuestionnaire, "DFQuestionnaire");            
+            Assert.IsNotNull(dto.RetrieverJob, "RetrieverJob");
+            Assert.AreEqual(JsonConvert.SerializeObject(toBeSearilalized), dto.DFQuestionnaire, "DFQuestionnaire");
+
+            Assert.AreEqual(1, dto.SchemaMap.Count, "Schema Maps Count");
+            Assert.AreEqual(flowModel.SchemaMaps[0].SelectedSchema, dto.SchemaMap[0].SchemaId, "SchemaMap.SchemaId");
         }
     }
 }

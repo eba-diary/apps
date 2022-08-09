@@ -1494,7 +1494,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanModifyDataflow);
@@ -1513,7 +1513,7 @@ namespace Sentry.data.Core.Tests
             var us = new UserSecurity();
 
             // Act
-            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, null);
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
 
             // Assert
             Assert.IsTrue(us.CanModifyDataflow);

@@ -803,7 +803,7 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironmentType = model.NamedEnvironmentType,
                 // Propagate primary contact otherwise specify current user
                 PrimaryContactId = (model.PrimaryContactId) ?? _userService.GetCurrentUser().AssociateId,
-                IsSecured = model.IsSecured
+                IsSecured = true
             };
 
             if (model.SchemaMaps != null)

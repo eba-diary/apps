@@ -417,7 +417,7 @@ namespace Sentry.data.Core
             us.CanViewData = true;
             us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
             us.CanUploadToDataset = us.CanManageSchema;
-            us.CanModifyDataflow = false; /* Dataflows should always be marked as secure */
+            us.CanModifyDataflow = IsOwner || IsAdmin;
             MergeParentSecurity(us, parentSecurity);
 
             us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);

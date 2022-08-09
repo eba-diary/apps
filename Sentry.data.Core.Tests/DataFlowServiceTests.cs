@@ -1151,7 +1151,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(flowDto.Name,                       flow.Name,                              $"{nameof(DataFlow.Name)} mappping failed");
             Assert.AreEqual(flowDto.CreatedBy,                  flow.CreatedBy,                         $"{nameof(DataFlow.CreatedBy)} mappping failed");
             Assert.AreEqual(flowDto.DFQuestionnaire,            flow.Questionnaire,                     $"{nameof(DataFlow.Questionnaire)} mappping failed");
-            Assert.AreEqual(schema.StorageCode,                 flow.FlowStorageCode,                   $"{nameof(DataFlow.FlowStorageCode)} mappping failed");
             Assert.AreEqual(flowDto.SaidKeyCode,                flow.SaidKeyCode,                       $"{nameof(DataFlow.SaidKeyCode)} mappping failed");
             Assert.AreEqual(flowDto.ObjectStatus,               GlobalEnums.ObjectStatusEnum.Active,    $"{nameof(DataFlow.ObjectStatus)} mappping failed");
             Assert.AreEqual(flowDto.DeleteIssuer,               flow.DeleteIssuer,                      $"{nameof(DataFlow.DeleteIssuer)} mappping failed");
@@ -1165,9 +1164,10 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(flowDto.NamedEnvironmentType,       flow.NamedEnvironmentType,              $"{nameof(DataFlow.NamedEnvironmentType)} mappping failed");
             Assert.AreEqual(flowDto.PrimaryContactId,           flow.PrimaryContactId,                  $"{nameof(DataFlow.PrimaryContactId)} mappping failed");
             Assert.AreEqual(flowDto.IsSecured,                  flow.IsSecured,                         $"{nameof(DataFlow.IsSecured)} mappping failed");
+            Assert.AreEqual(flowDto.DatasetId,                  schemaMapDto.DatasetId,                 $"{nameof(DataFlow.DatasetId)} mappping failed");
+            Assert.AreEqual(flowDto.SchemaId,                   schemaMapDto.SchemaId,                  $"{nameof(DataFlow.SchemaId)} mappping failed");
+            Assert.AreEqual(schema.StorageCode,                 flow.FlowStorageCode,                   $"{nameof(DataFlow.FlowStorageCode)} mappping failed");
             Assert.AreEqual(mockDataFlow.Security,              flow.Security,                          $"{nameof(DataFlow.Security)} mappping failed");
-            Assert.AreEqual(mockDataFlow.DatasetId,             schemaMapDto.DatasetId,                 $"{nameof(DataFlow.DatasetId)} mappping failed");
-            Assert.AreEqual(mockDataFlow.SchemaId,              schemaMapDto.SchemaId,                  $"{nameof(DataFlow.SchemaId)} mappping failed");
         }
 
         [TestCategory("Core DataFlowService")]
