@@ -461,9 +461,10 @@
             public const string XML = "XML";
             public const string JSON = "JSON";
             public const string DELIMITED = "DELIMITED";
-            public const string ANY = "ANY";
+            public const string ANY = "ANY"; //deprecated
             public const string CSV = "CSV";
             public const string TXT = "TXT";
+            public const string XLSX = "XLSX"; //deprecated
         }
 
         public static class DeleteFileResponseStatus
