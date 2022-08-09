@@ -7,6 +7,7 @@ using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Interfaces.DscRest;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.QueryableAdapter;
@@ -47,6 +48,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IElasticContext _elasticContext;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
         private readonly IDatasetFileService _datasetFileService;
+        private readonly Sentry.data.Core.Interfaces.DscRest.IMetadataClient metadataClient;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -64,7 +66,8 @@ namespace Sentry.data.Web.Controllers
             NamedEnvironmentBuilder namedEnvironmentBuilder,
             IElasticContext elasticContext,
             Lazy<IDataApplicationService> dataApplicationService,
-            IDatasetFileService datasetFileService)
+            IDatasetFileService datasetFileService,
+            Core.Interfaces.DscRest.IMetadataClient metadataClient)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -82,6 +85,7 @@ namespace Sentry.data.Web.Controllers
             _elasticContext = elasticContext;
             _dataApplicationService = dataApplicationService;
             _datasetFileService = datasetFileService;
+            this.metadataClient = metadataClient;
         }
 
         private IDataApplicationService DataApplicationService
@@ -409,6 +413,16 @@ namespace Sentry.data.Web.Controllers
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Schema Search Tab", id);
                     return;
             }
+        }
+        
+        [HttpGet]
+        [Route("Dataset/Detail/Test")]
+        public async Task<ActionResult> TestMethod()
+        {
+            var x = true;
+            var output = await metadataClient.GetSchema20220609Async(328,560);
+            var snowflakeDetails = (SchemaConsumptionSnowflakeModel)output.ConsumptionDetails.First();
+            return HttpNotFound("Invalid Dataset Id");
         }
 
         [HttpGet]
