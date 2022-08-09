@@ -914,7 +914,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(null, user);
 
             //ASSERT
-            Assert.IsFalse(us.CanModifyDataflow);
+            Assert.IsTrue(us.CanModifyDataflow);
         }
 
         /// <summary>
