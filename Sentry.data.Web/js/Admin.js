@@ -219,6 +219,8 @@ data.Admin = {
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck > 720 || timeCheck < 0) {
                 data.Dataset.makeToast("error", `Date selected must be within a month of current date`);
+
+                $("#tab-spinner").hide();
             } else {
                 $.ajax({
                     type: "GET",
