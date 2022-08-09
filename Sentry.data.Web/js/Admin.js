@@ -427,7 +427,7 @@ data.Admin = {
             dto.DatasetFileId = $("#fileDropdown").find(":selected").val();
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
             dto.SchemaId = $("#schemaDropdown").find(":selected").val();
-            var table = $('#metricGroupsTable').DataTable({
+            $('#metricGroupsTable').DataTable({
                 destroy: true,
                 ajax: {
                     type: "POST",
@@ -488,6 +488,7 @@ data.Admin = {
         })
         // Add event listener for opening and closing details
         $('#metricGroupsTable').on('click', 'td.dt-control', function () {
+            var table = $('#metricGroupsTable');
             var tr = $(this).closest('tr');
             var row = table.row(tr);
             var icon = $(this).closest('tr').find("#expand-collapse-icon");
