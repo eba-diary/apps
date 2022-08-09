@@ -477,7 +477,7 @@ data.Admin = {
                                 return '<center><em class="fas fa-clock"></em></center>';
                             }
                             else {
-                                return '<center><em class="fas fa-circle-x" style="color: red"></em></center>';
+                                return '<center><em class="fas fa-times-circle" style="color: red"></em></center>';
                             }
                         }
                     }
