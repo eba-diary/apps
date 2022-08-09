@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
-using Sentry.Core;
+﻿using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -47,7 +45,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
 
         #region ISecurableImplementation
         public virtual bool IsSecured { get; set; } = true;
-        public virtual Security Security { get; set; }
+        public virtual Core.Security Security { get; set; }
         public virtual string PrimaryContactId { get; set; }
 
         public virtual bool AdminDataPermissionsAreExplicit { get; set; }
