@@ -586,11 +586,10 @@ namespace Sentry.data.Core
                 IsPreProcessingRequired = dto.IsPreProcessingRequired,
                 PreProcessingOption = (int)dto.PreProcessingOption,
                 NamedEnvironment = dto.NamedEnvironment,
-                NamedEnvironmentType = dto.NamedEnvironmentType
+                NamedEnvironmentType = dto.NamedEnvironmentType,
+                DatasetId = dto.SchemaMap.First().DatasetId,
+                SchemaId = dto.SchemaMap.First().SchemaId
             };
-
-            df.DatasetId = dto.SchemaMap.First().DatasetId;
-            df.SchemaId = dto.SchemaMap.First().SchemaId;
 
             _datasetContext.Add(df);
 
