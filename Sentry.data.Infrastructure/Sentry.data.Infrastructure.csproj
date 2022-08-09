@@ -393,7 +393,6 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\FtpDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleAPIDataFlowProvider.cs" />
-    <Compile Include="ServiceImplementations\DscRestClient.cs" />
     <Compile Include="ServiceImplementations\ElasticDataInventorySearchProvider.cs" />
     <Compile Include="ServiceImplementations\ElasticSchemaSearchProvider.cs" />
     <Compile Include="ServiceImplementations\FilterSearchService.cs" />

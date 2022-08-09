@@ -164,11 +164,6 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(qClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("QuartermasterServiceBaseUrl"));
 
-            var dscClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
-            registry.For<Sentry.data.Core.Interfaces.DscRest.IMetadataClient>().Singleton().Use<DscRest.MetadataClient>().
-                Ctor<HttpClient>().Is(dscClient).
-                SetProperty((c) => c.BaseUrl = "https://datatest.sentry.com");
-
             //register Inev client
             var inevClient = new HttpClient(new HttpClientHandler()
             {

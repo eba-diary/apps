@@ -382,7 +382,6 @@
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
-    <Compile Include="Interfaces\IDscRestClient.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
