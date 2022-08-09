@@ -129,12 +129,11 @@ data.Admin = {
             dataSrc: "Records",
             success: function (data) {
                 $("#fileDropdown").materialSelect({ destroy: true });
-                var s = '<option value="-1"id="defaultFileSelection"> (Optional) Select a File</option>';
+                var s = '<option value="-1"id="defaultFileSelection">All Files</option>';
                 for (var d of data.Records) {
                     s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
                 }
                 $("#fileDropdown").html(s);
-                $("#defaultFileSelection").prop("disabled", true);
                 $("#fileDropdown").materialSelect();
             }
         })
