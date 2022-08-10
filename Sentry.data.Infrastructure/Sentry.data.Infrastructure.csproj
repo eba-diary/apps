@@ -377,6 +377,8 @@
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataFlowMetricProvider.cs" />
+    <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
     <Compile Include="ServiceImplementations\HangfireJobScheduler.cs" />
     <Compile Include="ServiceImplementations\DeadSparkJobSqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataInventorySqlExecuter.cs" />

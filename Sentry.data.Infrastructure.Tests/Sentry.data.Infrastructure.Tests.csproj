@@ -163,6 +163,7 @@
     <Compile Include="ConfluentConnectorProviderTests.cs" />
     <Compile Include="DeadJobProviderTests.cs" />
     <Compile Include="ApacheLivyProviderTests.cs" />
+    <Compile Include="DataFlowMetricServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="ElasticDataInventorySearchProviderTests.cs" />

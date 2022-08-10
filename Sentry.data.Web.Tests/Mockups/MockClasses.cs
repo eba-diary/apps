@@ -12,6 +12,7 @@ namespace Sentry.data.Web.Tests
 {
     public static class MockClasses
     {
+
         public static Dataset MockDataset(IApplicationUser user = null, Boolean addConfig = false)
         {
             Dataset ds = new Dataset()
@@ -480,6 +481,7 @@ namespace Sentry.data.Web.Tests
             datasetSubscriptions.Add(subscription);
             return datasetSubscriptions;
         }
+
 
         public static Event MockEvent()
         {

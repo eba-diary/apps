@@ -27,12 +27,14 @@ namespace Sentry.data.Core
         private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
+        private readonly IDatasetFileService _datasetFileService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
-                            IDataFeatures featureFlags)
+                            IDataFeatures featureFlags,
+                            IDatasetFileService datasetFileService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -42,6 +44,7 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _saidService = saidService;
             _featureFlags = featureFlags;
+            _datasetFileService = datasetFileService;
         }
 
         public DatasetDto GetDatasetDto(int id)
@@ -110,19 +113,33 @@ namespace Sentry.data.Core
 
             return summaryResults;
         }
+        private List<DatasetDto> GetDatasetDtos(bool active)
+        {
+            IQueryable<Dataset> datasetQueryable = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS");
+            if (active)
+            {
+                datasetQueryable = datasetQueryable.Where(x => x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+            }
 
+                List<Dataset> dsList = datasetQueryable.FetchAllChildren(_datasetContext).ToList();
+
+                List<DatasetDto> dtoList = new List<DatasetDto>();
+                foreach (Dataset ds in dsList)
+                {
+                    DatasetDto dto = new DatasetDto();
+                    MapToDto(ds, dto);
+                    dtoList.Add(dto);
+                }
+                return dtoList;
+        }
         public List<DatasetDto> GetAllDatasetDto()
         {
-            List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
-            List<DatasetDto> dtoList = new List<DatasetDto>();
-            foreach (Dataset ds in dsList)
-            {
-                DatasetDto dto = new DatasetDto();
-                MapToDto(ds, dto);
-                dtoList.Add(dto);
-            }
-            return dtoList;
+            return GetDatasetDtos(false);
         } 
+        public List<DatasetDto> GetAllActiveDatasetDto()
+        {
+            return GetDatasetDtos(true);
+        }
 
         public IDictionary<int, string> GetDatasetList()
         {
@@ -483,6 +500,7 @@ namespace Sentry.data.Core
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
                     {
                         _configService.Delete(config.ConfigId, user ?? _userService.GetCurrentUser(), logicalDelete);
+                        DeleteDatasetFiles(ds.DatasetId, config.Schema.SchemaId);       //DELETE DATASETFILES UNDER SCHEMA
                     }
                 }
                 catch (Exception ex)
@@ -490,7 +508,6 @@ namespace Sentry.data.Core
                     Logger.Error($"datasetservice-delete-logical failed", ex);
                     result = false;
                 }
-                    
             }
             else
             {
@@ -516,6 +533,8 @@ namespace Sentry.data.Core
 
             return result;
         }
+
+       
 
         public async Task<ValidationException> ValidateAsync(DatasetDto dto)
         {
@@ -667,6 +686,27 @@ namespace Sentry.data.Core
         }
 
         #region "private functions"
+
+        private void DeleteDatasetFiles(int datasetId, int schemaId)
+        {
+            //DO NOT DELETE IF FEATURE IS OFF
+            if (!_featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            {
+                return;
+            }
+
+            //GET ALL DATASETFILE IDS FOR SCHEMA
+            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusActive.Where(w => w.Schema.SchemaId == schemaId).ToList();
+
+            //DELETE ALL FILES IN LIST
+            if (dbList != null && dbList.Count > 0)
+            {
+                int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
+                DeleteFilesParamDto dto = new DeleteFilesParamDto() { UserFileIdList = idList };
+                _datasetFileService.Delete(datasetId, schemaId, dto);
+            }
+        }
+
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
             ds.CanDisplay = false;

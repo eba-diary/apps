@@ -1,121 +1,14 @@
-﻿
-@model Dictionary<string, string>
-@{
+﻿@{
     ViewBag.Title = "Admin";
+    Layout = Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewBag.Fluid = true;
 }
 
-<div class="row">
-    <div class="card form-wrapper col-lg-2 side-nav-wrapper" id="sideNav">
-        <div class="card-body">
-            <h2 class="card-title">Admin Page</h2>
+<!DOCTYPE html>
 
-            @foreach (var key in Model.Keys)
-            {
-                <a href="#" data-url='@Url.Action("GetAdminAction", "Admin", new { viewId = key })' class="load-partial-view"><h4>@Model[key]</h4></a>
-
-            }
-        </div>
-    </div>
-    <div class="col-lg-10">
-        <div id="partial-view-test">
-            <h1>My Links</h1>
-
-
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary waves-effect waves-light float-lg-right" data-toggle="modal" data-target="#exampleModal">
-                Add Link
-            </button>
-            <!--  using (Html.BeginForm("SupportLinkForm", "Config", FormMethod.Post)) -->
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel"></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="card form-wrapper" id="toggleDiv">
-                                <div class="card-body">
-
-                                   
-                                    <!--
-                                    <h3 class="card-title">Add Support Link</h3>
-
-                                    <div class="md-form">
-
-                                        <input type="text" id="name" class="form-control" required />
-                                        <label for="name" class="">Enter Link Name</label>
-
-                                    </div>
-                                    <div class="md-form">
-
-                                        <label for="description" class="">Enter Description For Link</label>
-                                        <input type="text" id="description" class="form-control" />
-
-                                    </div>
-                                    <div class="bs-component">
-
-
-                                        <label for="url">Enter an https:// URL:</label>
-                                        <input type="url" id="url" class="form-control" placeholder="https://example.com" required />
-
-                                    </div>
-                                    -->
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary waves-effect waves-light">Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <br />
-            <div class="list-group">
-                <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
-                <a href="#" class="list-group-item">Morbi leo risus</a>
-                <a href="#" class="list-group-item">Porta ac consectetur ac</a>
-                <a href="#" class="list-group-item">Vestibulum at eros</a>
-            </div>
-
-
-
-
-
-
-            <button type="button" class="btn btn-outline-danger">Delete Link</button>
-
-
-
-        </div>
-    </div>
-</div>
-
-
-@section Scripts {
-    @Scripts.Render("~/bundles/dataTables")
-    @Styles.Render("~/bundles/css/dataTables")
-
-    <script>
-        $(function () {
-            data.Admin.AdminPageInit();
-        });
-
-        $(function () {
-            $("#toggleBtn").click(function () {
-                $("#toggleDiv").toggle();
-            });
-        });
-
-
-
-    </script>
-}
+<html>
+<body>
+    <h1>Welcome to the Admin Page!</h1>
+    <h4>There's plenty of space here for anything else you want.</h4>
+</body>
+</html>

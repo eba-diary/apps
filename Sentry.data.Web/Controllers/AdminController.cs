@@ -8,6 +8,7 @@ using Sentry.data.Web.Models.ApiModels.Admin;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -50,26 +51,11 @@ namespace Sentry.data.Web.Controllers
             return Content(json, "application/json");
         }
 
-        public ActionResult Index()
-        {
-            Dictionary<string, string> myDict =
-            new Dictionary<string, string>();
-
-            myDict.Add("1", "Reprocess Data Files");
-            myDict.Add("2", "File Processing Logs");
-            myDict.Add("3", "Parquet Null Rows");
-            myDict.Add("4", "General Raw Query Parquet");
-            myDict.Add("5", "Connector Status");
-            myDict.Add("6", "Reprocess Dead Jobs");
-
-            return View(myDict);
-        }
-
         [Route("Admin/GetDeadJobs/{selectedDate?}")]
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
         {
-            // Conver selectedDate string to a DateTime object
+            // Convert selectedDate string to a DateTime object
             DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
             List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
@@ -78,84 +64,47 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
-
-        public async Task<ActionResult> GetAdminAction(string viewId)
+        //method for generating a dataset selection model, which contains a list of all Active datasets
+        private DatasetSelectionModel GetDatasetSelectionModel()
         {
-            string viewPath = "";
-            switch (viewId)
+            DatasetSelectionModel model = new DatasetSelectionModel();
+            List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
+            dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
+            model.AllDatasets = new List<SelectListItem>();
+            foreach(DatasetDto dto in dtoList)
             {
-                case "1":
-                    List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
-                    DataReprocessingModel dataReprocessingModel = new DataReprocessingModel();
-                    dataReprocessingModel.AllDatasets = new List<SelectListItem>();
-                    foreach(DatasetDto d in dtoList)
-                    {
-                        SelectListItem item = new SelectListItem();
-                        item.Text = d.DatasetName;
-                        item.Value = d.DatasetId.ToString();
-                        dataReprocessingModel.AllDatasets.Add(item);
-                    }
-                    return PartialView("_DataFileReprocessing", dataReprocessingModel);
-                case "2":
-                    viewPath = "_AdminTest3";
-                    break;
-                case "3":
-                    viewPath = "_AdminTest3";
-                    break;
-                case "4":
-                    viewPath = "_AdminTest4";
-                    break;
-                case "5":
-                    List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
-
-                    return PartialView("_ConnectorStatus", connectorDtos.MapToModelList());
-                case "6":
-                    ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
-                    return PartialView("_ReprocessDeadSparkJobs", reprocessDeadSparkJobModel);
+                SelectListItem item = new SelectListItem();
+                item.Text = dto.DatasetName;
+                item.Value = dto.DatasetId.ToString();
+                model.AllDatasets.Add(item);
             }
-
-            return PartialView(viewPath);
+            return model;
         }
-
-        public ActionResult AddSupportLink(SupportLinkModel supportLinkModel)
+        //below methods all return admin page views
+        public ActionResult Index()
         {
-            // the case when name or url is null
-            if(supportLinkModel.Name == null || supportLinkModel.Url == null)
-            {
-                if(supportLinkModel.Name == null)
-                {
-                    return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Name was not submitted");
-                }
-                if(supportLinkModel.Url == null)
-                {
-                    return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Url was not submitted");
-                }
-            }
-
-            SupportLinkDto supportLinkDto = supportLinkModel.ToDto();
-            try
-            {
-                SupportLinkService.AddSupportLink(supportLinkDto);
-            } catch(Exception ex)
-            {
-                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Error occured when adding Support Link to database");
-            }
-
-            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was added successfully");
+            return View();
         }
-
-        public ActionResult DeleteSupportLink(int id)
+        public ActionResult DataFileReprocessing()
         {
-            try
-            {
-                SupportLinkService.RemoveSupportLink(id);
-            } catch(Exception ex)
-            {
-                return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Error occured when removing Support Link to database");
-            }
-
-            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was removed successfully");
+            DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();
+            return View(dataReprocessingModel);
         }
-        
+        public ActionResult DataFlowMetrics()
+        {
+            DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
+            return View(flowMetricsModel);
+        }
+        public async Task<ActionResult> ConnectorStatus()
+        {
+            List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
+            return View(connectorDtos.MapToModelList());
+        }
+        public ActionResult ReprocessDeadSparkJobs()
+        {
+            ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
+            return View(reprocessDeadSparkJobModel);
+        }
+       
     }
 }

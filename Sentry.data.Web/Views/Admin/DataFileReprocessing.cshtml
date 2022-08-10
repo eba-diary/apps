@@ -1,7 +1,8 @@
 ﻿
-@model DataReprocessingModel
+@model DatasetSelectionModel
 @{
     ViewBag.Title = "_AdminTest";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 <div class="d-inline-block">
     <h1>Reprocess Data Files</h1>
@@ -21,7 +22,7 @@
 <!-- Schema Dropdown Menu-->
 <div class="d-inline-block">
     <h3>Schema</h3>
-    <select class="mbd-select admin-reprocess-dropdown" id="schemaDropdown" style="display: none">
+    <select class="mbd-select admin-reprocess-dropdown" id="schemaDropdown" style="display: none" data-stop-refresh="true">
         <option value="-1">Please Select a Schema</option>
         <!--populated asyncronously via ajax-->
     </select>
@@ -29,7 +30,7 @@
 <!-- Flow Steps Dropdown Menu-->
 <div class="d-inline-block">
     <h3>Flow Steps</h3>
-    <select class="mbd-select admin-reprocess-dropdown" id="flowStepsDropdown" style="display: none">
+    <select class="mbd-select admin-reprocess-dropdown" id="flowStepsDropdown" style="display: none" data-stop-refresh="true">
         <option value="-1">Please Select a Flow Step</option>
     </select>
 </div>
@@ -57,12 +58,14 @@
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton" disabled>Reprocess Selected</button>
 
-<script>
-    $(function () {
-        data.Admin.ReprocessInit();
-    });
+    <script>
+        $(function () {
+            data.Admin.ReprocessInit();
+        });
 
 
-    
-</script>
+
+    </script>
+
+
 

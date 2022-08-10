@@ -185,6 +185,7 @@
     <Compile Include="DatasetContextTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="DomainModelUnitTests.cs" />
+    <Compile Include="Extensions\DataFlowMetricExtensionsTests.cs" />
     <Compile Include="Extensions\ExtensionUnitTests.cs" />
     <Compile Include="Extensions\DatasetFileExtensionsTests.cs" />
     <Compile Include="LiveDatabaseUnitTests.cs" />
