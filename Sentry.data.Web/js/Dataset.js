@@ -2412,6 +2412,8 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                         $("#InheritanceLoading").addClass('d-none');
                         $("#InheritanceModalBody").removeClass('d-none');
                         $("#InheritanceModalFooter").removeClass('d-none');
+                        //show the user if their request was submitted successfully
+                        Sentry.ShowModalCustom("", data);
                     }
                 });
             }

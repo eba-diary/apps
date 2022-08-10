@@ -171,6 +171,7 @@
     <Compile Include="SparkConverterStatusEventHandlerTests.cs" />
     <Compile Include="FilterSearchServiceTests.cs" />
     <Compile Include="FileDeleteEventHandlerTests.cs" />
+    <Compile Include="InevServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
