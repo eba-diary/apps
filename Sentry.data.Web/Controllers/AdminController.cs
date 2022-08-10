@@ -123,11 +123,6 @@ namespace Sentry.data.Web.Controllers
         // removes a support link from the link farm
         public ActionResult RemoveSupportLink(int id)
         {
-            if (id == null)
-            {
-                return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Id was not submitted");
-            }
-
             try
             {
                 _supportLinkService.RemoveSupportLink(id);
