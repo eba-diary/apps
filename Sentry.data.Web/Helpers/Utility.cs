@@ -125,9 +125,9 @@ namespace Sentry.data.Web.Helpers
             if (model.FileExtensionId == 0)
             {
                 dFileExtensions = _datasetContext.FileExtensions
+                    .Where(fe => fe.Name != GlobalConstants.ExtensionNames.XLSX && fe.Name != GlobalConstants.ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains(GlobalConstants.ExtensionNames.ANY),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
@@ -135,6 +135,7 @@ namespace Sentry.data.Web.Helpers
             else
             {
                 dFileExtensions = _datasetContext.FileExtensions
+                    .Where(fe => fe.Name != GlobalConstants.ExtensionNames.XLSX && fe.Name != GlobalConstants.ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
                     .Select((c) => new SelectListItem
                     {
                         Selected = c.Id == model.FileExtensionId,
@@ -265,9 +266,11 @@ namespace Sentry.data.Web.Helpers
         {
 
             IEnumerable<SelectListItem> dFileExtensions;
+
             if (id == -1)
             {
                 dFileExtensions = _datasetContext.FileExtensions
+                    .Where(fe => fe.Name != GlobalConstants.ExtensionNames.XLSX && fe.Name != GlobalConstants.ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
                     .Select((c) => new SelectListItem
                     {
                         Selected = c.Name.Contains(GlobalConstants.ExtensionNames.ANY) ? true : false,
@@ -278,6 +281,7 @@ namespace Sentry.data.Web.Helpers
             else
             {
                 dFileExtensions = _datasetContext.FileExtensions
+                    .Where(fe => fe.Name != GlobalConstants.ExtensionNames.XLSX && fe.Name != GlobalConstants.ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
                     .Select((c) => new SelectListItem
                     {
                         Selected = c.Id == id ? true : false,
