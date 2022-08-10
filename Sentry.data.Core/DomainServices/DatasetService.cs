@@ -283,7 +283,7 @@ namespace Sentry.data.Core
             {
                 IApplicationUser user = _userService.GetCurrentUser();
                 
-                request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : request.SecurableObjectName;
+                request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : ds.DatasetName;
                 request.SecurableObjectId = request.Scope == AccessScope.Asset ? ds.Asset.AssetId : request.SecurableObjectId;
                 request.SecurityId = ds.Security.SecurityId;
                 request.SaidKeyCode = ds.Asset.SaidKeyCode;
@@ -604,7 +604,7 @@ namespace Sentry.data.Core
                 if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
                                                              w.DatasetType == DataEntityCodes.DATASET && w.NamedEnvironment == dto.NamedEnvironment))
                 {
-                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists");
+                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists for that named environment");
                 }
             }
         }
@@ -632,7 +632,7 @@ namespace Sentry.data.Core
                 if (_datasetContext.Datasets.Any(d => d.ShortName == dto.ShortName && 
                     d.DatasetType == DataEntityCodes.DATASET && d.NamedEnvironment == dto.NamedEnvironment && dto.DatasetId != d.DatasetId))
                 {
-                    results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "That Short Name is already in use by another Dataset");
+                    results.Add(Dataset.ValidationErrors.datasetShortNameDuplicate, "Short Name is already in use by another Dataset in that named environment");
                 }
             }
         }
