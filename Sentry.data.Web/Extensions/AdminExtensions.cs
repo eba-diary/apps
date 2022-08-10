@@ -1,5 +1,4 @@
 ﻿using Sentry.data.Core.DTO.Admin;
-using Sentry.data.Web.Models.ApiModels.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;

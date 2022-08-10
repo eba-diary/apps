@@ -15,6 +15,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             Table("SupportLink");
             Cache((c) => c.Usage(CacheUsage.ReadWrite));
+
             Id(x => x.SupportLinkId, x =>
             {
                 x.Column("SupportLinkId");

@@ -1,0 +1,26 @@
+﻿
+@model SupportLinkWrapper
+@{
+    ViewBag.Title = "_AdminTest";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div id="linkList">
+    <h1>My Links</h1>
+
+    <div class="list-group">
+        @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
+        {
+            <a href="@supportLinkModel.Url" target="_blank" class="list-group-item">@supportLinkModel.Name</a>
+        }
+    </div> <br />
+    <button type="button" class="btn btn-outline-danger">Delete Link</button>
+
+</div>
+
+ 
+<style>
+    #linkList{
+        width: 80%;
+        margin: auto;
+    }
+</style>

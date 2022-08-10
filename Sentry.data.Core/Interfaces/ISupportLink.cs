@@ -11,5 +11,6 @@ namespace Sentry.data.Core
     {
         void AddSupportLink(SupportLinkDto supportLinkDto);
         void RemoveSupportLink(int id);
+        List<SupportLinkDto> GetSupportLinks();
     }
 }
