@@ -566,11 +566,9 @@ namespace Sentry.data.Core
 
                 foreach (SecurityTicket inheritedTicket in inheritedTickets)
                 {
-                    inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
-                    inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
                     if (inheritedTicket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.S3_ACCESS && p.IsEnabled))
                     {
-                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
+                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket, inheritanceStatus);
                     }
                 }
             }
@@ -612,10 +610,10 @@ namespace Sentry.data.Core
             BuildS3TicketForDatasetAndTicket(dataset, ticket);
         }
 
-        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket)
+        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
             string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
-            string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
+            string summary = "S3 Access " + (ticket.IsAddingPermission && isAddingPermission ? "Request" : "Removal");
             StringBuilder sb = new StringBuilder();
             string issueType = "Request";
 
