@@ -566,10 +566,10 @@ data.Dataset = {
             console.log(result.ConsumptionDetails);
             $.each(result.ConsumptionDetails, function (arrayPosition, consumptionDetail) {
                 if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet" || consumptionDetail.SnowflakeType == "CategorySchemaParquet") {
-                    var layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".vw_" + consumptionDetail.SnowflakeTable;
+                    var layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
                     self.vm.FullyQualifiedSnowflakeViews.push(layer);
                     if (currentView) {
-                        self.vm.FullyQualifiedSnowflakeViews.push(layer + "_cur");
+                        self.vm.FullyQualifiedSnowflakeViews.push(layer + "_CUR");
                     }
                 }
             });
