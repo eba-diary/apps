@@ -394,6 +394,7 @@ data.Admin = {
     },
     //loads dataflow metric page events
     DataFlowMetricsInit: function () {
+        var table;
         $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect();
         $("#fileDropdown").materialSelect();
@@ -427,7 +428,7 @@ data.Admin = {
             dto.DatasetFileId = $("#fileDropdown").find(":selected").val();
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
             dto.SchemaId = $("#schemaDropdown").find(":selected").val();
-            $('#metricGroupsTable').DataTable({
+            table = $('#metricGroupsTable').DataTable({
                 destroy: true,
                 ajax: {
                     type: "POST",
@@ -488,7 +489,6 @@ data.Admin = {
         })
         // Add event listener for opening and closing details
         $('#metricGroupsTable').on('click', 'td.dt-control', function () {
-            var table = $('#metricGroupsTable');
             var tr = $(this).closest('tr');
             var row = table.row(tr);
             var icon = $(this).closest('tr').find("#expand-collapse-icon");
