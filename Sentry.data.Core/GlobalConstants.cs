@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System;
+
+namespace Sentry.data.Core
 {
     public static class GlobalConstants
     {        
@@ -461,9 +463,11 @@
             public const string XML = "XML";
             public const string JSON = "JSON";
             public const string DELIMITED = "DELIMITED";
+            [Obsolete]
             public const string ANY = "ANY"; //deprecated
             public const string CSV = "CSV";
             public const string TXT = "TXT";
+            [Obsolete]
             public const string XLSX = "XLSX"; //deprecated
         }
 
