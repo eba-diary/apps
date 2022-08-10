@@ -713,8 +713,8 @@ namespace Sentry.data.Core
                 var permissions = GetDefaultPermissions();
 
                 //get the list of existing security tickets for this dataset and asset
-                var datasetTickets = GetSecurityTicketsForSecurable(ds, false);
-                var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, false);
+                var datasetTickets = GetSecurityTicketsForSecurable(ds, true);
+                var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, true);
 
                 //actually create the AD groups
                 await CreateDefaultSecurityForDataset_Internal(ds, groups, permissions, datasetTickets, assetTickets);
