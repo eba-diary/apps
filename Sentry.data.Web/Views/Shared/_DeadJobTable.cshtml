@@ -33,24 +33,24 @@
     <tbody>
         @foreach (DeadSparkJobModel job in Model)
         {
-        <tr data-file-id="@job.SubmissionID">
-            <td class="dropdown-toggle-col"><em id="dropdown-toggle-@job.SubmissionID" class="fas fa-plus"></em></td>
-            <td><input data-file-id="@job.DatasetFileID" data-group-id="@(String.Format("{0}/{1}/{2}", job.DatasetName, job.SchemaName, job.DataFlowStepID))" type="checkbox" id=@(job.SubmissionID.ToString() + "InputId") class="select-all-target form-check-input"><label for=@(job.SubmissionID.ToString() + "InputId") class="form-check-label"></label></td>
-            <td>@job.SubmissionTime</td>
-            <td>@job.DatasetName</td>
-            <td>@job.ReprocessingRequired</td>
-            <td>@job.SchemaName</td>
-            <td>@job.SourceKey</td>
-            <td>@job.FlowExecutionGuid</td>
-            <td>@job.SubmissionTime</td>
-            <td>@job.BatchID</td>
-            <td>@job.LivyAppID</td>
-            <td>@job.LivyDriverlogUrl</td>
-            <td>@job.LivySparkUiUrl</td>
-            <td>@job.DatasetFileID</td>
-        </tr>
-        }
-    </tbody>
+            <tr data-file-id=@job.SubmissionID>
+                <td class="dropdown-toggle-col"><em id=@("dropdown-toggle-" + job.SubmissionID) class="fas fa-plus"></em></td>
+                <td><input data-file-id=@job.DatasetFileID data-group-id="@(String.Format("{0}/{1}/{2}", job.DatasetName, job.SchemaName, job.DataFlowStepID))" type="checkbox" id=@(job.SubmissionID + "-select-input") class="select-all-target form-check-input"><label for=@(job.SubmissionID + "-select-input") class="form-check-label"></label></td>
+                <td>@job.SubmissionTime</td>
+                <td>@job.DatasetName</td>
+                <td>@job.ReprocessingRequired</td>
+                <td>@job.SchemaName</td>
+                <td>@job.SourceKey</td>
+                <td>@job.FlowExecutionGuid</td>
+                <td>@job.SubmissionTime</td>
+                <td>@job.BatchID</td>
+                <td>@job.LivyAppID</td>
+                <td>@job.LivyDriverlogUrl</td>
+                <td>@job.LivySparkUiUrl</td>
+                <td>@job.DatasetFileID</td>
+            </tr>
+            }
+        </tbody>
 </table>
 
 <!--Reprocess button-->

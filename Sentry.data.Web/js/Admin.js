@@ -129,12 +129,11 @@ data.Admin = {
             dataSrc: "Records",
             success: function (data) {
                 $("#fileDropdown").materialSelect({ destroy: true });
-                var s = '<option value="-1"id="defaultFileSelection"> (Optional) Select a File</option>';
+                var s = '<option value="-1"id="defaultFileSelection">All Files</option>';
                 for (var d of data.Records) {
                     s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
                 }
                 $("#fileDropdown").html(s);
-                $("#defaultFileSelection").prop("disabled", true);
                 $("#fileDropdown").materialSelect();
             }
         })
@@ -219,6 +218,8 @@ data.Admin = {
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck > 720 || timeCheck < 0) {
                 data.Dataset.makeToast("error", `Date selected must be within a month of current date`);
+
+                $("#tab-spinner").hide();
             } else {
                 $.ajax({
                     type: "GET",
@@ -477,7 +478,7 @@ data.Admin = {
                                 return '<center><em class="fas fa-clock"></em></center>';
                             }
                             else {
-                                return '<center><em class="fas fa-circle-x" style="color: red"></em></center>';
+                                return '<center><em class="fas fa-times-circle" style="color: red"></em></center>';
                             }
                         }
                     }

@@ -31,3 +31,7 @@ table#deadJobs td.dropdown-control {
 table#metricGroupsTable td.dt-control {
     cursor: pointer;
 }
+.metricsButton{
+    margin-top:20px;
+    margin-bottom:20px;
+}
