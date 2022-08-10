@@ -1551,7 +1551,7 @@ namespace Sentry.data.Core.Tests
             await service.ApproveTicket(ticket, "");
 
             //Assert
-            inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>()));
+            inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>(), It.IsAny<IList<SecurablePermission>>()));
         }
 
         #endregion
@@ -1578,14 +1578,19 @@ namespace Sentry.data.Core.Tests
 
         #region "CreateDefaultSecurityForDataset"
 
+        /// <summary>
+        /// Verify that if a Consumer permission is requested as part of <see cref="SecurityService.CreateDefaultSecurityForDataset_Internal(Dataset, List{AdSecurityGroupDto}, SecurityService.DefaultPermissions, IEnumerable{SecurityTicket}, IEnumerable{SecurityTicket})"/>
+        /// that it is auto-approved.
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
-        public async Task CreateDefaultSecurityForDataset_Internal_Test()
+        public async Task CreateDefaultSecurityForDataset_Internal_Consumer_Test()
         {
             //Arrange
-            var security = new Security() { SecurityId = Guid.NewGuid() };
+            var security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
             var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
-            var consumerPermissions = new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } };
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } }, null );
             var datasetTickets = new List<SecurityTicket>().AsEnumerable();
             var assetTickets = new List<SecurityTicket>().AsEnumerable();
 
@@ -1593,19 +1598,55 @@ namespace Sentry.data.Core.Tests
             obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(false);
             var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
             var context = new Mock<IDatasetContext>();
-            context.Setup(c => c.Security).Returns((new List<Security>() { security }).AsQueryable());
+            context.Setup(c => c.Security).Returns(new List<Security>() { security }.AsQueryable());
             var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object) 
                 { CallBase = true }; //call the real method for anything not explicitely .Setup()
             securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
             //Act
-            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, null, datasetTickets, assetTickets);
+            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, defaultPermissions, datasetTickets, assetTickets);
 
             //Assert
             adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(2)); //verify the AD group attempted to be created
             securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(2)); //verify a ticket was built
             securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.AtMost(2)); //verify the ticket was approved
-            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.AtMost(2)); 
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(4));
+        }
+
+        /// <summary>
+        /// Verify that if a Snowflake permission is requested as part of <see cref="SecurityService.CreateDefaultSecurityForDataset_Internal(Dataset, List{AdSecurityGroupDto}, SecurityService.DefaultPermissions, IEnumerable{SecurityTicket}, IEnumerable{SecurityTicket})"/>
+        /// that it's NOT auto-approved.
+        /// </summary>
+        [TestMethod]
+        public async Task CreateDefaultSecurityForDataset_Internal_Snowflake_Test()
+        {
+            //Arrange
+            var security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" }, DataClassification = DataClassificationType.HighlySensitive };
+            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.SNOWFLAKE_ACCESS, SecurableObject = SecurableEntityName.DATASET } });
+            var datasetTickets = new List<SecurityTicket>().AsEnumerable();
+            var assetTickets = new List<SecurityTicket>().AsEnumerable();
+
+            var obsidianService = new Mock<IObsidianService>();
+            obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(false);
+            var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
+            var inevService = new Mock<IInevService>();
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Security).Returns(new List<Security> { security }.AsQueryable());
+            context.Setup(c => c.Datasets).Returns(new List<Dataset> { ds }.AsQueryable());
+            var securityService = new Mock<SecurityService>(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, obsidianService.Object, adSecurityAdminProvider.Object)
+                { CallBase = true }; //call the real method for anything not explicitely .Setup()
+            securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+
+            //Act
+            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, defaultPermissions, datasetTickets, assetTickets);
+
+            //Assert
+            adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(1)); //verify the AD group attempted to be created
+            securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(1)); //verify a ticket was built
+            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.Never); //verify the ticket was NOT approved
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(2));
         }
 
         #endregion
@@ -1655,6 +1696,26 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(2, actual.Count);
             Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_VIEW_FULL_DATASET));
             Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_UPLOAD_TO_DATASET));
+        }
+
+        [TestMethod]
+        public void GetSnowflakePermissions_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.SNOWFLAKE_ACCESS, SecurableObject = SecurableEntityName.DATASET }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetSnowflakePermissions();
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS));
         }
 
         #endregion
