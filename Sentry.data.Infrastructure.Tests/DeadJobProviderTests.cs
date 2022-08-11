@@ -77,7 +77,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("DatasetName", deadSparkJobList[0].DatasetName);
             Assert.AreEqual("SchemaName", deadSparkJobList[0].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobList[0].SourceKey);
-            Assert.AreEqual("FlowExecutionGuid", deadSparkJobList[0].ExecutionGuid);
+            Assert.AreEqual("FlowExecutionGuid", deadSparkJobList[0].FlowExecutionGuid);
             Assert.AreEqual("_SUCCESS/TargetKey", deadSparkJobList[0].TargetKey);
             Assert.AreEqual(1, deadSparkJobList[0].SubmissionID);
             Assert.AreEqual("SourceBucketName", deadSparkJobList[0].SourceBucketName);
@@ -92,7 +92,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("DatasetName", deadSparkJobList[1].DatasetName);
             Assert.AreEqual("SchemaName", deadSparkJobList[1].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobList[1].SourceKey);
-            Assert.AreEqual("FlowExecutionGuid", deadSparkJobList[1].ExecutionGuid);
+            Assert.AreEqual("FlowExecutionGuid", deadSparkJobList[1].FlowExecutionGuid);
             Assert.AreEqual("TargetKey", deadSparkJobList[1].TargetKey);
             Assert.AreEqual(2, deadSparkJobList[1].SubmissionID);
             Assert.AreEqual("SourceBucketName", deadSparkJobList[1].SourceBucketName);

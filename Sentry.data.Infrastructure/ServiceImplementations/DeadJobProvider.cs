@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
                     deadSparkJob.LivySparkUiUrl =       DatabaseHelper.SafeDatabaseString(row["LivySparkUiUrl"]);
                     deadSparkJob.TriggerKey =           DatabaseHelper.SafeDatabaseString(row["TriggerKey"]);
                     deadSparkJob.TriggerBucket =        DatabaseHelper.SafeDatabaseString(row["TriggerBucket"]);
-                    deadSparkJob.ExecutionGuid =        DatabaseHelper.SafeDatabaseString(row["ExecutionGuid"]);
+                    deadSparkJob.FlowExecutionGuid =    DatabaseHelper.SafeDatabaseString(row["FlowExecutionGuid"]);
 
                     deadSparkJobList.Add(deadSparkJob);
                 }
