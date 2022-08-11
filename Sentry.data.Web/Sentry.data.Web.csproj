@@ -438,6 +438,7 @@
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
+    <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
     <Compile Include="Extensions\DataFlowMetricExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
@@ -449,6 +450,8 @@
     <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
     <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
     <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
+    <Compile Include="Models\AdminPage\SupportLinkWrapper.cs" />
+    <Compile Include="Models\AdminPage\SupportLinkModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
     <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />
@@ -1248,6 +1251,7 @@
     <Content Include="Views\Admin\DataFlowMetrics.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_AdminSideNav.cshtml" />
+    <Content Include="Views\Admin\SupportLinks.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -2011,6 +2015,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Helpers\Validation\" />
     <Folder Include="Images\Home\" />
+    <Folder Include="Models\ApiModels\Admin\" />
     <Folder Include="Models\Dataset\ApiModels\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\AccessRequest\" />

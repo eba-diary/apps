@@ -172,6 +172,7 @@
     <Compile Include="FilterSearchServiceTests.cs" />
     <Compile Include="FileDeleteEventHandlerTests.cs" />
     <Compile Include="InevServiceTests.cs" />
+    <Compile Include="SupportLinkServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
