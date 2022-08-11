@@ -304,7 +304,7 @@
     PopulateSchemas(datasetId, schemaId, targetElement) {
         var scmSpinner = $(targetElement).parent().parent().find('.schemaSpinner');
         var createSchemaLink = targetElement.parent().parent().find('#CreateSchema');
-        if (datasetId !== null && datasetId !== 0) {
+        if (datasetId !== null && datasetId !== 0 && datasetId !== "0") {
             var curVal = schemaId;
             $.getJSON("/api/v2/metadata/dataset/" + String(datasetId) + "/schema", function (result) {
                 var subItems;
@@ -377,6 +377,8 @@
             var sortedResult = result.sort(
                 firstBy("Category")
                     .thenBy("Name")
+                    .thenBy("SAIDAssetKeyCode")
+                    .thenBy("NamedEnvironment")
             );
 
             newSubItems += "<option value='0'>Select Dataset</option>";
@@ -396,7 +398,7 @@
                 }
 
                 //Add option item
-                newSubItems += "<option value='" + item.Id + "'>" + item.Name + "</option>";
+                newSubItems += "<option value='" + item.Id + "'>" + item.Name + " (" + item.SAIDAssetKeyCode + " - " + item.NamedEnvironment + ")</option>";
 
                 //close out group after last interation
                 if (index === (datasetCount - 1)) {
@@ -433,7 +435,6 @@
 
                 Sentry.InjectSpinner(curRow.find('.schemaSpinner'), 30);
                 data.DataFlow.PopulateSchemas(datasetChangeDatasetId, null, schemaSelectionDropDown);
-
             });
 
             $('#CreateDataset').click(function () {
