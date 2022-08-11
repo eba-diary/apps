@@ -71,52 +71,7 @@ namespace Sentry.data.Web
             return new DFModel(dto) { };
         }
 
-        public static Core.DataFlowDto ToDto(this DataFlowModel model)
-        {
-            Core.DataFlowDto dto = new Core.DataFlowDto
-            {
-                Id = model.DataFlowId,
-                Name = model.Name,
-                SaidKeyCode = model.SAIDAssetKeyCode,
-                CreatedBy = model.CreatedBy,
-                CreateDTM = model.CreatedDTM,
-                IngestionType = model.IngestionTypeSelection,
-                IsCompressed = model.IsCompressed,
-                IsPreProcessingRequired = model.IsPreProcessingRequired,
-                PreProcessingOption = model.PreProcessingSelection,
-                ObjectStatus = model.ObjectStatus,
-                FlowStorageCode = model.StorageCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType
-            };
-
-            if (model.SchemaMaps != null)
-            {
-                dto.SchemaMap = model.SchemaMaps.ToDto();
-            }
-
-            if (model.RetrieverJob != null)
-            {
-                dto.RetrieverJob = model.RetrieverJob.ToDto();
-            }
-
-            if (model.IsCompressed)
-            {
-                CompressionJobDto cDto = model.CompressionJob.First().ToDto();
-                dto.CompressionJob = cDto;
-                dto.CompressionType = (int)cDto.CompressionType;
-            }
-            else
-            {
-                dto.CompressionType = null;
-            }
-
-            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
-
-            return dto;
-        }
-
-        private static Core.CompressionJobDto ToDto(this CompressionModel model)
+        public static Core.CompressionJobDto ToDto(this CompressionModel model)
         {
             return new Core.CompressionJobDto()
             {

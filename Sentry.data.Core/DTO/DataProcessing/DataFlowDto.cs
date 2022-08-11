@@ -34,5 +34,8 @@ namespace Sentry.data.Core
         public DateTime DeleteIssueDTM { get; set; }
         public string NamedEnvironment { get; set; }
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public string PrimaryContactId { get; set; }
+        public bool IsSecured { get; set; }
+        public UserSecurity Security { get; set; }
     }
 }
