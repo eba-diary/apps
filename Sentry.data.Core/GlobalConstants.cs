@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System;
+
+namespace Sentry.data.Core
 {
     public static class GlobalConstants
     {        
@@ -398,6 +400,8 @@
         {
             public const string DATASET_STAGE = "SENTRY_DATASET";       //OLD STAGE NAME
             public const string PARQUET_STAGE = "DLST_PARQUET";         //NEW STAGE NAME
+            public const string RAWQUERY_STAGE = "DLST_RAWQUERY";
+            public const string RAW_STAGE = "DLST_RAW";
         }
 
         public static class SnowflakeWarehouse
@@ -461,9 +465,12 @@
             public const string XML = "XML";
             public const string JSON = "JSON";
             public const string DELIMITED = "DELIMITED";
-            public const string ANY = "ANY";
+            [Obsolete]
+            public const string ANY = "ANY"; //deprecated
             public const string CSV = "CSV";
             public const string TXT = "TXT";
+            [Obsolete]
+            public const string XLSX = "XLSX"; //deprecated
         }
 
         public static class DeleteFileResponseStatus
