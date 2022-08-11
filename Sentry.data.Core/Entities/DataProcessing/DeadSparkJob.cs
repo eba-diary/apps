@@ -26,6 +26,7 @@ namespace Sentry.data.Core
         public string TriggerKey { get; set; }
         public string TriggerBucket { get; set; }
         public string FlowExecutionGuid { get; set; }
+        public string RunInstanceGuid { get; set; }
         public int DatasetID { get; set; }
         public int SchemaID { get; set; }
         public int DatasetFileID { get; set; }

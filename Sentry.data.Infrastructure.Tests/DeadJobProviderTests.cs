@@ -41,7 +41,8 @@ namespace Sentry.data.Infrastructure.Tests
             dataTable.Columns.Add("Hour of Day");
             dataTable.Columns.Add("TriggerKey");
             dataTable.Columns.Add("TriggerBucket");
-            dataTable.Columns.Add("ExecutionGuid");
+            dataTable.Columns.Add("FlowExecutionGuid");
+            dataTable.Columns.Add("RunInstanceGuid");
             dataTable.Columns.Add("Dataset_ID");
             dataTable.Columns.Add("Schema_ID");
             dataTable.Columns.Add("DatasetFile_ID");
@@ -53,7 +54,7 @@ namespace Sentry.data.Infrastructure.Tests
                 "_SUCCESS/TargetKey", 1, "Dead", 
                 "LivyAppID", "LivyDriverlogUrl", "LivySparkUiUrl", 
                 1, 1, "TriggerKey",
-                "TriggerBucket", "FlowExecutionGuid", 1,
+                "TriggerBucket", "FlowExecutionGuid", "RunInstanceGuid", 1,
                 1, 1, 1, 1);
 
             dataTable.Rows.Add(2, DateTime.Today, "DatasetName",
@@ -61,7 +62,7 @@ namespace Sentry.data.Infrastructure.Tests
                 "TargetKey", 2, "Dead",
                 "LivyAppID", "LivyDriverlogUrl", "LivySparkUiUrl",
                 2, 2, "TriggerKey",
-                "TriggerBucket", "FlowExecutionGuid", 2,
+                "TriggerBucket", "FlowExecutionGuid", "RunInstanceGuid", 2,
                 2, 2, 2, 2);
 
 
@@ -78,6 +79,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("SchemaName", deadSparkJobList[0].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobList[0].SourceKey);
             Assert.AreEqual("FlowExecutionGuid", deadSparkJobList[0].FlowExecutionGuid);
+            Assert.AreEqual("RunInstanceGuid", deadSparkJobList[0].RunInstanceGuid);
             Assert.AreEqual("_SUCCESS/TargetKey", deadSparkJobList[0].TargetKey);
             Assert.AreEqual(1, deadSparkJobList[0].SubmissionID);
             Assert.AreEqual("SourceBucketName", deadSparkJobList[0].SourceBucketName);
@@ -93,6 +95,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("SchemaName", deadSparkJobList[1].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobList[1].SourceKey);
             Assert.AreEqual("FlowExecutionGuid", deadSparkJobList[1].FlowExecutionGuid);
+            Assert.AreEqual("RunInstanceGuid", deadSparkJobList[1].RunInstanceGuid);
             Assert.AreEqual("TargetKey", deadSparkJobList[1].TargetKey);
             Assert.AreEqual(2, deadSparkJobList[1].SubmissionID);
             Assert.AreEqual("SourceBucketName", deadSparkJobList[1].SourceBucketName);
@@ -130,7 +133,8 @@ namespace Sentry.data.Infrastructure.Tests
             dataTable.Columns.Add("Hour of Day");
             dataTable.Columns.Add("TriggerKey");
             dataTable.Columns.Add("TriggerBucket");
-            dataTable.Columns.Add("ExecutionGuid");
+            dataTable.Columns.Add("FlowExecutionGuid");
+            dataTable.Columns.Add("RunInstanceGuid");
             dataTable.Columns.Add("Dataset_ID");
             dataTable.Columns.Add("Schema_ID");
             dataTable.Columns.Add("DatasetFile_ID");
@@ -142,7 +146,7 @@ namespace Sentry.data.Infrastructure.Tests
                 "_SUCCESS/TargetKey", 1, "Dead",
                 "LivyAppID", "LivyDriverlogUrl", "LivySparkUiUrl",
                 1, 1, "TriggerKey",
-                "TriggerBucket", "FlowExecutionGuid", 1,
+                "TriggerBucket", "FlowExecutionGuid", "RunInstanceGuid", 1,
                 1, 1, 1, 1);
 
 

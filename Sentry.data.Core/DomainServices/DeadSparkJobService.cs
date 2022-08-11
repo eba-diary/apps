@@ -33,6 +33,7 @@ namespace Sentry.data.Core
                 SchemaName = deadSparkJob.SchemaName,
                 SourceKey = deadSparkJob.SourceKey,
                 FlowExecutionGuid = deadSparkJob.FlowExecutionGuid,
+                RunInstanceGuid = deadSparkJob.RunInstanceGuid,
                 ReprocessingRequired = isReprocessingRequired,
                 SubmissionID = deadSparkJob.SubmissionID,
                 SourceBucketName = deadSparkJob.SourceBucketName,

@@ -28,6 +28,7 @@ namespace Sentry.data.Web
                 SchemaName = deadSparkJobDto.SchemaName,
                 SourceKey = deadSparkJobDto.SourceKey,
                 FlowExecutionGuid = deadSparkJobDto.FlowExecutionGuid,
+                RunInstanceGuid = deadSparkJobDto.RunInstanceGuid,
                 ReprocessingRequired = deadSparkJobDto.ReprocessingRequired,
                 SubmissionID = deadSparkJobDto.SubmissionID,
                 SourceBucketName = deadSparkJobDto.SourceBucketName,

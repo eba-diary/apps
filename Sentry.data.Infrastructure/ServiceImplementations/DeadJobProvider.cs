@@ -28,8 +28,6 @@ namespace Sentry.data.Infrastructure
             return MapToEntity(dataTable);
         }
 
-        
-
         private List<DeadSparkJob> MapToEntity(DataTable dataTable)
         {
             List<DeadSparkJob> deadSparkJobList = new List<DeadSparkJob>();
@@ -62,6 +60,7 @@ namespace Sentry.data.Infrastructure
                     deadSparkJob.TriggerKey =           DatabaseHelper.SafeDatabaseString(row["TriggerKey"]);
                     deadSparkJob.TriggerBucket =        DatabaseHelper.SafeDatabaseString(row["TriggerBucket"]);
                     deadSparkJob.FlowExecutionGuid =    DatabaseHelper.SafeDatabaseString(row["FlowExecutionGuid"]);
+                    deadSparkJob.RunInstanceGuid =      DatabaseHelper.SafeDatabaseString(row["RunInstanceGuid"]);
 
                     deadSparkJobList.Add(deadSparkJob);
                 }
