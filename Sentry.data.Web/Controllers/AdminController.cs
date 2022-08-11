@@ -20,9 +20,9 @@ namespace Sentry.data.Web.Controllers
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
         private readonly IDeadSparkJobService _deadSparkJobService;
-        private readonly ISupportLink _supportLinkService;
+        private readonly ISupportLinkService _supportLinkService;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLink supportLinkService)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
@@ -30,11 +30,7 @@ namespace Sentry.data.Web.Controllers
             _supportLinkService = supportLinkService;
         }
 
-        private ISupportLink SupportLinkService
-        {
-            get { return _supportLinkService; }
-        }
-
+      
         [HttpPost]
         public async Task<JObject> GetConnectorConfig(string ConnectorId)
         {
@@ -64,7 +60,7 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
-        //method for generating a dataset selectio,n model, which contains a list of all Active datasets
+        //method for generating a dataset selection model, which contains a list of all Active datasets
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
             DatasetSelectionModel model = new DatasetSelectionModel();

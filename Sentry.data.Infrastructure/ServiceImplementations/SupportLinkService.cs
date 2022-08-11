@@ -10,7 +10,7 @@ using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
-    public class SupportLinkService : ISupportLink
+    public class SupportLinkService : ISupportLinkService
     {
         private readonly IDatasetContext _datasetContext;
 
@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure
                 _datasetContext.Add(supportLink);
                 _datasetContext.SaveChanges();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Logger.Error($"Error adding SupportLink with id {supportLinkDto.SupportLinkId} with Name {supportLinkDto.Name} Description {supportLinkDto.Description} and Url {supportLinkDto.Url}");
                 throw;

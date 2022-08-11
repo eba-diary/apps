@@ -1,5 +1,4 @@
-﻿using Sentry.data.Core.DTO.Admin;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -105,27 +104,6 @@ namespace Sentry.data.Web
             return modelList;
         }
 
-        public static SupportLinkDto ToDto(this SupportLinkModel supportLinkModel)
-        {
-            SupportLinkDto dto = new SupportLinkDto()
-            {
-                Name = supportLinkModel.Name,
-                Description = supportLinkModel.Description,
-                Url = supportLinkModel.Url,
-            };
-            return dto;
-        }
-
-        public static SupportLinkModel ToModel(this SupportLinkDto supportLinkDto)
-        {
-            SupportLinkModel model = new SupportLinkModel()
-            {
-                Name = supportLinkDto.Name,
-                Description = supportLinkDto.Description,
-                Url = supportLinkDto.Url,
-            };
-            return model;
-        }
         public static ContactInfoModel ToModel(this Core.ContactInfoDto dto)
         {
             return new ContactInfoModel()

@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core.DTO.Admin;
+﻿using Sentry.data.Core;
+using Sentry.data.Core.DTO.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,15 +9,29 @@ namespace Sentry.data.Web.Extensions
 {
     public static class AdminExtensions
     {
-        public static SupportLinkDto ToDto(this SupportLinkModel model)
+
+        public static SupportLinkDto ToDto(this SupportLinkModel supportLinkModel)
         {
-            return new SupportLinkDto()
+            SupportLinkDto dto = new SupportLinkDto()
             {
-                SupportLinkId = model.SupportLinkId,
-                Name = model.Name,
-                Description = model.Description,
-                Url = model.Url,
+                Name = supportLinkModel.Name,
+                Description = supportLinkModel.Description,
+                Url = supportLinkModel.Url,
             };
+            return dto;
+        }
+
+        public static SupportLinkModel ToModel(this SupportLinkDto supportLinkDto)
+        {
+            SupportLinkModel model = new SupportLinkModel()
+            {
+                Name = supportLinkDto.Name,
+                Description = supportLinkDto.Description,
+                Url = supportLinkDto.Url,
+            };
+            return model;
         }
     }
+
+
 }

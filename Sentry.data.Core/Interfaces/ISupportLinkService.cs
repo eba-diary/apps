@@ -7,7 +7,7 @@ using Sentry.data.Core.DTO.Admin;
 
 namespace Sentry.data.Core
 {
-    public interface ISupportLink
+    public interface ISupportLinkService
     {
         void AddSupportLink(SupportLinkDto supportLinkDto);
         void RemoveSupportLink(int id);
