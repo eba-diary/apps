@@ -2,9 +2,11 @@
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -43,27 +45,43 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetAuditTableResults(int datasetId, int schemaId, int auditId)
+        public ActionResult GetAuditTableResults(int datasetId, int schemaId, int auditId, int searchTypeId, string selectedDate, string datasetFileId)
         {
+            // find audit and search enum types 
             AuditType auditType = Utility.FindEnumFromId<AuditType>(auditId);
+
+            AuditSearchType auditSearchType = Utility.FindEnumFromId<AuditSearchType>(searchTypeId);
 
             BaseAuditModel tableModel = new BaseAuditModel();
 
             tableModel.DataFlowStepId = 1;
 
+
+            string queryParameter = "";
+
+            switch (auditSearchType)
+            {
+                case AuditSearchType.dateSelect: 
+                    queryParameter = selectedDate; 
+                    break;
+                case AuditSearchType.fileName: 
+                    queryParameter = datasetFileId; 
+                    break;
+            }
+            
             string viewPath = "";
 
             switch (auditType)
             {
                 case AuditType.NonParquetFiles:
-                    tableModel = _auditSerivce.GetExceptRows(datasetId, schemaId).MapToModel();
+                    tableModel =_auditSerivce.GetExceptRows(datasetId, schemaId, queryParameter, auditSearchType).MapToModel();
                     viewPath = "_NonParquetFilesTable";
                     break;
                 case AuditType.RowCountCompare:
-                    tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId).MapToCompareModel();
+                    tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, queryParameter, auditSearchType).MapToCompareModel();
                     viewPath = "_RowCountCompareTable";
                     break;
-            } 
+            }
 
             return PartialView(viewPath, tableModel);
         }
@@ -88,11 +106,10 @@ namespace Sentry.data.Web.Controllers
             model.AllAuditSearchTypes = Utility.BuildSelectListFromEnum<AuditSearchType>(0);
             model.AllAuditSearchTypes.Insert(0, new SelectListItem() { Disabled = true, Text = "Please select a Search Type", Value = "-1" });
 
-
             return model;
         }
 
-        public ActionResult Index()
+        
         [Route("Admin/GetDeadJobs/{selectedDate?}")]
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
@@ -106,6 +123,7 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
+
         //method for generating a dataset selection model, which contains a list of all Active datasets
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
@@ -148,5 +166,10 @@ namespace Sentry.data.Web.Controllers
             return View(reprocessDeadSparkJobModel);
         }
        
+        public ActionResult RawqueryParquetAudit()
+        {
+            AuditSelectionModel model = GetAuditSelectionModel();
+            return View(model);
+        }
     }
 }

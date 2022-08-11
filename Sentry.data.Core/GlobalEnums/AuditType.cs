@@ -6,7 +6,7 @@ namespace Sentry.data.Core
     {
         [Description("Find All Non-Parquet Files")]
         NonParquetFiles = 0,
-        [Description("Compare Rawquery and Rarquet Row Count")]
+        [Description("Compare Rawquery and Parquet Record Count")]
         RowCountCompare = 1
     }
 }

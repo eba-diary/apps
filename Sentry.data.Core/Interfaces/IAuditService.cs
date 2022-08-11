@@ -7,8 +7,7 @@ namespace Sentry.data.Core
 {
     public interface IAuditService
     {
-        BaseAuditDto GetExceptRows(int datasetId, int schemaId);
-
-        BaseAuditDto GetRowCountCompare(int datasetId, int schemaId);
+        BaseAuditDto GetExceptRows(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType);
+        BaseAuditDto GetRowCountCompare(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType);
     }
 }

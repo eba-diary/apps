@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Sentry.data.Core
             _dataFlowService = dataFlowService;
         }
 
-        public BaseAuditDto GetExceptRows(int datasetId, int schemaId)
+        public BaseAuditDto GetExceptRows(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
             DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
@@ -72,7 +73,7 @@ namespace Sentry.data.Core
             return baseAuditDto;
         }
 
-        public BaseAuditDto GetRowCountCompare(int datasetId, int schemaId)
+        public BaseAuditDto GetRowCountCompare(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
             DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
@@ -96,12 +97,14 @@ namespace Sentry.data.Core
             DataTable dataTable = new DataTable();
 
             dataTable.Columns.Add("ETL_FILE_NAME_ONLY");
-            dataTable.Rows.Add("INVOICE20210924010017_20211025015625530.xml.json");
-            dataTable.Rows.Add("INVOICE007_20210616193749403.xml.json");
-            dataTable.Rows.Add("INVOICE20210609082824_20220429174008000.xml.json");
-            dataTable.Rows.Add("INVOICE010_20210622135943928.xml.json");
-            dataTable.Rows.Add("INVOICE009_20210622123632273.xml.json");
-            dataTable.Rows.Add("INVOICE011_20210622142521337.xml.json");
+            dataTable.Columns.Add("PAR_COUNT");
+            dataTable.Columns.Add("RAW_COUNT");
+            dataTable.Rows.Add("INVOICE20210924010017_20211025015625530.xml.json", 45, 63);
+            dataTable.Rows.Add("INVOICE007_20210616193749403.xml.json", 29,20);
+            dataTable.Rows.Add("INVOICE20210609082824_20220429174008000.xml.json", 34,23);
+            dataTable.Rows.Add("INVOICE010_20210622135943928.xml.json", 0,2);
+            dataTable.Rows.Add("INVOICE009_20210622123632273.xml.json", 8,3);
+            dataTable.Rows.Add("INVOICE011_20210622142521337.xml.json", 21,17);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto() { DataFlowStepId = 1 };
 
@@ -113,7 +116,13 @@ namespace Sentry.data.Core
             {
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    auditDtos.Add(new CompareAuditDto() { DatasetFileId = resultId, DatasetFileName = row["ETL_FILE_NAME_ONLY"].ToString(), ParquetRowCount = 10, RawqueryRowCount = 10 });
+                    auditDtos.Add(new CompareAuditDto() { 
+                        DatasetFileId = resultId, 
+                        DatasetFileName = row["ETL_FILE_NAME_ONLY"].ToString(), 
+                        ParquetRowCount = DatabaseHelper.SafeDatabaseInt(row["PAR_COUNT"]), 
+                        RawqueryRowCount = DatabaseHelper.SafeDatabaseInt(row["RAW_COUNT"])
+                    });
+
                     resultId++;
                 }
             }

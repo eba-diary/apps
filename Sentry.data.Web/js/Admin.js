@@ -115,6 +115,7 @@ data.Admin = {
                 $("#schemaDropdown").materialSelect();
             }
         });
+    },
 
     // creates dataset file dropdown for selected dataset
     GetDatasetFileDropdown: function (url, isBaseInit) {
@@ -170,6 +171,7 @@ data.Admin = {
             }
         })
     },
+
     //generates table with datafiles from selected dataset and schema
     PopulateTable: function (url) {
         $("#results").DataTable({
@@ -227,6 +229,7 @@ data.Admin = {
         }
         else {
             $("#reprocessButton").prop("disabled", true);
+        }
     },
 
     // activate or deactivate reprocess button based on input list of checked boxes
@@ -351,21 +354,41 @@ data.Admin = {
         });
 
         $("#auditSearchButton").click(function () {
-            var elementStatus = true;
-            var elementState = true;
+            var datasetId = $("#AllDatasets").find(":selected").val();
+            var schemaId = $("#schemaDropdown").find(":selected").val();
+            var auditId = $("#AllAuditTypes").find(":selected").val();
 
-            $.ajax({
-                type: "POST",
-                url: "Admin/GetAuditTableResults",
-                contentType: "application/json",
-                data: JSON.stringify({ "schemaId": schemaId, "datasetId": datasetId, "auditId": auditId }),
-                success: function (result) {
-                    $("#AuditResultTable").html(result);
-                },
-                error: function () {
-                    data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
-                }
-            }) 
+            let searchTypeId = $("#AllAuditSearchTypes").find(":selected").val();
+
+            var searchParameter;
+
+            var postCheck = true;
+
+            switch (searchTypeId) {
+                case "0":
+                    searchParameter = $("#datetime-picker").val();
+
+                    postCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+                    break;
+                case "1":
+                    searchParameter = $("#datasetFileDropdown").find(":selected").val();
+                    postCheck = true;
+            }
+
+            if (postCheck) {
+                $.ajax({
+                    type: "POST",
+                    url: "GetAuditTableResults",
+                    contentType: "application/json",
+                    data: JSON.stringify({ "datasetId": datasetId, "schemaId": schemaId, "auditId": auditId, "searchTypeId": searchTypeId, "searchParameter": searchParameter }),
+                    success: function (result) {
+                        $("#AuditResultTable").html(result);
+                    },
+                    error: function () {
+                        data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
+                    }
+                })
+            }
         });
     },
 
@@ -412,13 +435,10 @@ data.Admin = {
             // Retrieve seleced date
             var selectedDate = $('#datetime-picker').val();
 
-            // Calculate hours between current date and selected date
-            var timeCheck = Math.floor(Math.abs((new Date() - new Date(selectedDate)) / 36e5)) + 1;
+            timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
 
             // Check if selected date is within a month (720hrs) of current date
-            if (timeCheck > 720 || timeCheck < 0) {
-                data.Dataset.makeToast("error", `Date selected must be within a month of current date`);
-            } else {
+            if (timeCheck) {
                 $.ajax({
                     type: "GET",
                     url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
@@ -437,6 +457,18 @@ data.Admin = {
                 });
             }
         });
+    },
+
+    ReprocessJobDateRangeCheck: function (selectedDate, rangeMax) {
+        // Calculate hours between current date and selected date
+        var dateRangeToHours = Math.floor(Math.abs((new Date() - new Date(selectedDate)) / 36e5)) + 1;
+
+        if (dateRangeToHours > rangeMax || dateRangeToHours < 0) {
+            data.Dataset.makeToast("error", `Date selected must be within ${dateRangeToHours/24} day(s) before current date`);
+            return false;
+        } 
+
+        return true;
     },
 
     // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
@@ -496,17 +528,17 @@ data.Admin = {
                 });
             };
         });
-        }
     },
 
     GetFlowEvents: function (data) {
         var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partition</th><th>Run Instance Guid</th><th>Event Contents</th></tr>';
         for (var flowEvent of data.FlowEvents) {
-            s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td>' + flowEvent.RunInstanceGuid + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent=' + flowEvent.EventContents + '>View Contents</a></td></tr>'
+            s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td>' + flowEvent.RunInstanceGuid + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent=' + flowEvent.EventContents + '>View Contents</a></td></tr>';
         }
         s += '</table>';
         return s;
     },
+
     ActivateDeactivateSubmitButton: function () {
         if ($("#AllDatasets").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
             $("#submitButton").prop("disabled", false);
@@ -515,6 +547,7 @@ data.Admin = {
             $("#submitButton").prop("disabled", true);
         }
     },
+
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect();
