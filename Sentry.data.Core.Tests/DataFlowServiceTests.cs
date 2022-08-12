@@ -714,7 +714,6 @@ namespace Sentry.data.Core.Tests
             mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
 
             var mockDataFeatures = new Mock<IDataFeatures>();
-            mockDataFeatures.Setup(s => s.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, null, mockDataFeatures.Object, null);
 
@@ -766,7 +765,6 @@ namespace Sentry.data.Core.Tests
             mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
 
             var mockDataFeatures = new Mock<IDataFeatures>();
-            mockDataFeatures.Setup(s => s.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, null, mockDataFeatures.Object, null);
 
