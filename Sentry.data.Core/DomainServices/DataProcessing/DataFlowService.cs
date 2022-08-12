@@ -595,7 +595,7 @@ namespace Sentry.data.Core
                 //  (i.e. CanManageDataflow)
                 Security = (dto.Id == 0)
                                 ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
-                                : _datasetContext.GetById<DataFlow>(dto.Id).Security
+                                : _datasetContext.GetById<DataFlow>(dto.Id).Security,
                 DatasetId = dto.SchemaMap.First().DatasetId,
                 SchemaId = dto.SchemaMap.First().SchemaId
             };
