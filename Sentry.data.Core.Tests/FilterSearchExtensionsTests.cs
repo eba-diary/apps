@@ -90,7 +90,7 @@ namespace Sentry.data.Core.Tests
         #region Helpers
         private string GetFilterCategoriesJson()
         {
-            return @"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]";
+            return @"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}],""DefaultCategoryOpen"":false,""HideResultCounts"":false}]";
         }
 
         private string GetResultConfigurationJson()

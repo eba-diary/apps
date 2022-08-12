@@ -132,7 +132,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("text search", x.SearchText);
                 Assert.AreEqual(GlobalConstants.SearchType.DATA_INVENTORY, x.SearchType);
                 Assert.AreEqual("000000", x.AssociateId);
-                Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", x.FilterCategoriesJson);
+                Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}],""DefaultCategoryOpen"":false,""HideResultCounts"":false}]", x.FilterCategoriesJson);
                 Assert.AreEqual(@"{""VisibleColumns"":[1,2,3]}", x.ResultConfigurationJson);
             });
             datasetContext.Setup(x => x.SaveChanges(true));
@@ -242,7 +242,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.AreEqual(GlobalConstants.SaveSearchResults.UPDATE, result);
             Assert.AreEqual("new search", savedSearch.SearchText);
-            Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", savedSearch.FilterCategoriesJson);
+            Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}],""DefaultCategoryOpen"":false,""HideResultCounts"":false}]", savedSearch.FilterCategoriesJson);
             Assert.AreEqual(@"{""VisibleColumns"":[2,3]}", savedSearch.ResultConfigurationJson);
         }
 
