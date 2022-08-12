@@ -12,6 +12,8 @@
         @Html.HiddenFor(x => x.DataFlowId);
         @Html.HiddenFor(x => x.StorageCode);
         @Html.HiddenFor(x => x.CreatedBy);
+        @Html.HiddenFor(x => x.PrimaryContactId);
+        @Html.HiddenFor(x => x.IsSecured);
 
         <div id="dataflow-home-wrapper" class="col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
@@ -53,7 +55,7 @@
         </div>
         <div class="compressionPanel" style="display:none;">
             <div class="md-form">
-                <h4>Is Your incoming data compressed?</h4>
+                <h4>Is your incoming data compressed?</h4>
                 <a data-toggle="tooltip" class="material-tooltip-main" title="Yes, if the file ends in .zip or .gzip.">
                     @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "mdb-select" })
                 </a>

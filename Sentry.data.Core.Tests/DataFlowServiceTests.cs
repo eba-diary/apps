@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
             var dataFlow = new DataFlowDto() { Name = "Foo" };
 
             // Act
-            var result = await dataFlowService.Validate(dataFlow);
+            var result = await dataFlowService.ValidateAsync(dataFlow);
 
             // Assert
             Assert.AreEqual(1, result.ValidationResults.GetAll().Count);
@@ -66,7 +66,7 @@ namespace Sentry.data.Core.Tests
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.NonProd };
 
             // Act
-            var result = await dataFlowService.Validate(dataFlow);
+            var result = await dataFlowService.ValidateAsync(dataFlow);
 
             // Assert
             Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
@@ -1110,5 +1110,115 @@ namespace Sentry.data.Core.Tests
             //Assert
             jobService.Verify(v => v.Delete(It.IsAny<List<int>>(), user.Object, false), Times.Once);
         }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void Map_DataFlowDto_to_DataFlow_for_Existing_Dataflow()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+
+            FileSchema schema = MockClasses.MockFileSchema();
+            List<FileSchema> schemaList = new List<FileSchema>() { schema };
+
+            var secObject = MockClasses.MockSecurity(new List<string>());
+            secObject.SecurityId = Guid.NewGuid();
+
+            var mockDataFlow = MockClasses.MockDataFlow();
+            mockDataFlow.Security = secObject;
+
+            var schemaMapDto = new SchemaMapDto() { DatasetId = 1, SchemaId = schema.SchemaId, Id = 99 };
+            var flowDto = MockClasses.MockDataFlowDto(mockDataFlow, schemaMapDto);
+
+            context.Setup(f => f.GetById<DataFlow>(It.IsAny<int>())).Returns(mockDataFlow);            
+            context.Setup(s => s.FileSchema).Returns(schemaList.AsQueryable());
+
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("123456");
+            var mockUserService = new Mock<IUserService>();
+            mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            var mockDataFeatures = new Mock<IDataFeatures>();
+            mockDataFeatures.Setup(s => s.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
+
+            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, null, mockDataFeatures.Object, null);
+
+            //Act
+            DataFlow flow = dataflowService.MapToDataFlow(flowDto);
+
+            //Assert
+
+            Assert.AreEqual(flowDto.Name,                       flow.Name,                              $"{nameof(DataFlow.Name)} mappping failed");
+            Assert.AreEqual(flowDto.CreatedBy,                  flow.CreatedBy,                         $"{nameof(DataFlow.CreatedBy)} mappping failed");
+            Assert.AreEqual(flowDto.DFQuestionnaire,            flow.Questionnaire,                     $"{nameof(DataFlow.Questionnaire)} mappping failed");
+            Assert.AreEqual(flowDto.SaidKeyCode,                flow.SaidKeyCode,                       $"{nameof(DataFlow.SaidKeyCode)} mappping failed");
+            Assert.AreEqual(flowDto.ObjectStatus,               GlobalEnums.ObjectStatusEnum.Active,    $"{nameof(DataFlow.ObjectStatus)} mappping failed");
+            Assert.AreEqual(flowDto.DeleteIssuer,               flow.DeleteIssuer,                      $"{nameof(DataFlow.DeleteIssuer)} mappping failed");
+            Assert.AreEqual(flowDto.DeleteIssueDTM,             DateTime.MaxValue,                      $"{nameof(DataFlow.DeleteIssueDTM)} mappping failed");
+            Assert.AreEqual(flowDto.IngestionType,              flow.IngestionType,                     $"{nameof(DataFlow.IngestionType)} mappping failed");
+            Assert.AreEqual(flowDto.IsCompressed,               flow.IsDecompressionRequired,           $"{nameof(DataFlow.IsDecompressionRequired)} mapping failed");
+            Assert.AreEqual(flowDto.CompressionType,            flow.CompressionType,                   $"{nameof(DataFlow.CompressionType)} mappping failed");
+            Assert.AreEqual(flowDto.IsPreProcessingRequired,    flow.IsPreProcessingRequired,           $"{nameof(DataFlow.IsPreProcessingRequired)} mappping failed");
+            Assert.AreEqual(flowDto.PreProcessingOption,        flow.PreProcessingOption,               $"{nameof(DataFlow.PreProcessingOption)} mappping failed");
+            Assert.AreEqual(flowDto.NamedEnvironment,           flow.NamedEnvironment,                  $"{nameof(DataFlow.NamedEnvironment)} mappping failed");
+            Assert.AreEqual(flowDto.NamedEnvironmentType,       flow.NamedEnvironmentType,              $"{nameof(DataFlow.NamedEnvironmentType)} mappping failed");
+            Assert.AreEqual(flowDto.PrimaryContactId,           flow.PrimaryContactId,                  $"{nameof(DataFlow.PrimaryContactId)} mappping failed");
+            Assert.AreEqual(flowDto.IsSecured,                  flow.IsSecured,                         $"{nameof(DataFlow.IsSecured)} mappping failed");
+            Assert.AreEqual(flowDto.DatasetId,                  schemaMapDto.DatasetId,                 $"{nameof(DataFlow.DatasetId)} mappping failed");
+            Assert.AreEqual(flowDto.SchemaId,                   schemaMapDto.SchemaId,                  $"{nameof(DataFlow.SchemaId)} mappping failed");
+            Assert.AreEqual(schema.StorageCode,                 flow.FlowStorageCode,                   $"{nameof(DataFlow.FlowStorageCode)} mappping failed");
+            Assert.AreEqual(mockDataFlow.Security,              flow.Security,                          $"{nameof(DataFlow.Security)} mappping failed");
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void Map_DataFlowDto_to_DataFlow_for_New_Dataflow()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+
+            FileSchema schema = MockClasses.MockFileSchema();
+            List<FileSchema> schemaList = new List<FileSchema>() { schema };
+
+            var schemaMapDto = new SchemaMapDto() { DatasetId = 1, SchemaId = schema.SchemaId, Id = 99 };
+            var flowDto = MockClasses.MockDataFlowDto(null, schemaMapDto);
+
+            context.Setup(s => s.FileSchema).Returns(schemaList.AsQueryable());
+
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("123456");
+            var mockUserService = new Mock<IUserService>();
+            mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            var mockDataFeatures = new Mock<IDataFeatures>();
+            mockDataFeatures.Setup(s => s.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
+
+            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, null, mockDataFeatures.Object, null);
+
+            //Act
+            DataFlow flow = dataflowService.MapToDataFlow(flowDto);
+
+            //Assert
+
+            Assert.AreEqual(flowDto.Name,                       flow.Name,                              $"{nameof(DataFlow.Name)} mappping failed");
+            Assert.AreEqual(flowDto.CreatedBy,                  flow.CreatedBy,                         $"{nameof(DataFlow.CreatedBy)} mappping failed");
+            Assert.AreEqual(flowDto.DFQuestionnaire,            flow.Questionnaire,                     $"{nameof(DataFlow.Questionnaire)} mappping failed");
+            Assert.AreEqual(schema.StorageCode,                 flow.FlowStorageCode,                   $"{nameof(DataFlow.FlowStorageCode)} mappping failed");
+            Assert.AreEqual(flowDto.SaidKeyCode,                flow.SaidKeyCode,                       $"{nameof(DataFlow.SaidKeyCode)} mappping failed");
+            Assert.AreEqual(flowDto.ObjectStatus,               GlobalEnums.ObjectStatusEnum.Active,    $"{nameof(DataFlow.ObjectStatus)} mappping failed");
+            Assert.AreEqual(flowDto.DeleteIssuer,               flow.DeleteIssuer,                      $"{nameof(DataFlow.DeleteIssuer)} mappping failed");
+            Assert.AreEqual(flowDto.DeleteIssueDTM,             DateTime.MaxValue,                      $"{nameof(DataFlow.DeleteIssueDTM)} mappping failed");
+            Assert.AreEqual(flowDto.IngestionType,              flow.IngestionType,                     $"{nameof(DataFlow.IngestionType)} mappping failed");
+            Assert.AreEqual(flowDto.IsCompressed,               flow.IsDecompressionRequired,           $"{nameof(DataFlow.IsDecompressionRequired)} mapping failed");
+            Assert.AreEqual(flowDto.CompressionType,            flow.CompressionType,                   $"{nameof(DataFlow.CompressionType)} mappping failed");
+            Assert.AreEqual(flowDto.IsPreProcessingRequired,    flow.IsPreProcessingRequired,           $"{nameof(DataFlow.IsPreProcessingRequired)} mappping failed");
+            Assert.AreEqual(flowDto.PreProcessingOption,        flow.PreProcessingOption,               $"{nameof(DataFlow.PreProcessingOption)} mappping failed");
+            Assert.AreEqual(flowDto.NamedEnvironment,           flow.NamedEnvironment,                  $"{nameof(DataFlow.NamedEnvironment)} mappping failed");
+            Assert.AreEqual(flowDto.NamedEnvironmentType,       flow.NamedEnvironmentType,              $"{nameof(DataFlow.NamedEnvironmentType)} mappping failed");
+            Assert.AreEqual(flowDto.PrimaryContactId,           flow.PrimaryContactId,                  $"{nameof(DataFlow.PrimaryContactId)} mappping failed");
+            Assert.AreEqual(flowDto.IsSecured,                  flow.IsSecured,                         $"{nameof(DataFlow.IsSecured)} mappping failed");
+            Assert.AreEqual(Guid.Empty,                         flow.Security.SecurityId,               $"{nameof(DataFlow.Security.SecurityId)} mappping failed");
+        }
+
     }
 }

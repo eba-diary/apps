@@ -145,6 +145,7 @@ div.dataTables_wrapper div.dataTables_filter input {
 
 .requestAccessButton {
     margin-bottom: 0.5rem !important;
+    font-size: 15px;
 }
 
 #RemovePermissionScopeContainer {

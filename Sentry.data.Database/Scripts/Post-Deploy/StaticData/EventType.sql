@@ -7,7 +7,8 @@
 				,@GroupBUSINESSAREA_DSC VARCHAR(25)					= 'BUSINESSAREA_DSC'
 				,@GroupBUSINESSAREA_DSC_RELEASENOTES VARCHAR(60)	= 'BUSINESSAREA_DSC_RELEASENOTES'
 				,@GroupBUSINESSAREA_DSC_NEWS VARCHAR(60)			= 'BUSINESSAREA_DSC_NEWS'
-				,@GroupDATA_INVENTORY VARCHAR(60)			= 'DATA_INVENTORY'
+				,@GroupDATA_INVENTORY VARCHAR(60)					= 'DATA_INVENTORY'
+				,@GroupDATASETFILE VARCHAR(60)						= 'DATASETFILE'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
@@ -80,7 +81,9 @@
 									(51, 'News SAS'						,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'SAS'					,'News'),
 									(52, 'News Analytics'				,1,1,@GroupBUSINESSAREA_DSC_NEWS				,'Analytics'			,'News'),
 
-									(53, 'DataInventoryQuery'			,3,0,@GroupDATA_INVENTORY				,'DataInventoryQuery'							,null)
+									(53, 'DataInventoryQuery'			,3,0,@GroupDATA_INVENTORY						,'DataInventoryQuery'							,null),
+									(54, 'DatasetFileDeleteS3'			,1,0,@GroupDATASETFILE							,'DatasetFileDeleteS3'							,null),
+									(55, 'DatasetFileUpdateObjectStatus',1,0,@GroupDATASETFILE							,'DatasetFileUpdateObjectStatus'				,null)
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE], [DisplayName], [ParentDescription]) 
 

@@ -1,4 +1,5 @@
-﻿using Sentry.Core;
+﻿using Newtonsoft.Json;
+using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Sentry.data.Web;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -23,12 +25,13 @@ namespace Sentry.data.Web.Controllers
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
         private readonly ISchemaService _schemaService;
+        private readonly IUserService _userService;
         private readonly Lazy<IDataFeatures> _dataFeatures;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService, Lazy<IDataFeatures> dataFeatures, 
-            NamedEnvironmentBuilder namedEnvironmentBuilder)
+            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService, Lazy<IDataFeatures> dataFeatures,
+            NamedEnvironmentBuilder namedEnvironmentBuilder, IUserService userService)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
@@ -38,6 +41,7 @@ namespace Sentry.data.Web.Controllers
             _schemaService = schemaService;
             _dataFeatures = dataFeatures;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
+            _userService = userService;
         }
 
         public IDataFeatures DataFeatures
@@ -108,7 +112,7 @@ namespace Sentry.data.Web.Controllers
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
             model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -147,7 +151,7 @@ namespace Sentry.data.Web.Controllers
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
             CreateDropDownSetup(model.RetrieverJob);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -169,9 +173,10 @@ namespace Sentry.data.Web.Controllers
 
             AddCoreValidationExceptionsToModel(model.Validate());
 
-            DataFlowDto dfDto = model.ToDto();
 
-            AddCoreValidationExceptionsToModel(await _dataFlowService.Validate(dfDto));
+            DataFlowDto dfDto = ModelToDto(model);
+
+            AddCoreValidationExceptionsToModel(await _dataFlowService.ValidateAsync(dfDto));
 
             try
             {
@@ -274,7 +279,7 @@ namespace Sentry.data.Web.Controllers
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
             model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(model.SAIDAssetKeyCode, model.NamedEnvironment);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList; 
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -359,7 +364,9 @@ namespace Sentry.data.Web.Controllers
                 SelectedDataset = dto.DatasetId,
                 SelectedSchema = dto.SchemaId,
                 NamedEnvironment = dto.NamedEnvironment,
-                NamedEnvironmentType = dto.NamedEnvironmentType
+                NamedEnvironmentType = dto.NamedEnvironmentType,
+                PrimaryContactId = dto.PrimaryContactId,
+                IsSecured = dto.IsSecured
             };
 
             if (dto.SchemaMap.Any())
@@ -447,7 +454,7 @@ namespace Sentry.data.Web.Controllers
 
                 dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
                 {
-                    Text = m.DatasetName,
+                    Text = $"{m.DatasetName} ({m.Asset.SaidKeyCode} - {m.NamedEnvironment})",
                     Value = m.DatasetId.ToString(),
                     Group = curGroup,
                     Selected = (m.DatasetId == model.SelectedDataset)
@@ -491,7 +498,7 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironment = namedEnvironment
             };
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDowns(assetKeyCode, namedEnvironment).ConfigureAwait(false);
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(assetKeyCode, namedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
@@ -560,7 +567,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> output = new List<SelectListItem>();
 
-            List<SAIDAsset> assetList = await _saidService.GetAllAssets().ConfigureAwait(false);
+            List<SAIDAsset> assetList = await _saidService.GetAllAssetsAsync();
 
             if (string.IsNullOrWhiteSpace(keyCode) || !assetList.Any(a => a.SaidKeyCode == keyCode))
             {
@@ -775,6 +782,54 @@ namespace Sentry.data.Web.Controllers
                         break;
                 }
             }
+        }
+
+        internal DataFlowDto ModelToDto(DataFlowModel model)
+        {
+            Core.DataFlowDto dto = new Core.DataFlowDto
+            {
+                Id = model.DataFlowId,
+                Name = model.Name,
+                SaidKeyCode = model.SAIDAssetKeyCode,
+                CreatedBy = model.CreatedBy,
+                CreateDTM = model.CreatedDTM,
+                IngestionType = model.IngestionTypeSelection,
+                IsCompressed = model.IsCompressed,
+                IsPreProcessingRequired = model.IsPreProcessingRequired,
+                PreProcessingOption = model.PreProcessingSelection,
+                ObjectStatus = model.ObjectStatus,
+                FlowStorageCode = model.StorageCode,
+                NamedEnvironment = model.NamedEnvironment,
+                NamedEnvironmentType = model.NamedEnvironmentType,
+                // Propagate primary contact otherwise specify current user
+                PrimaryContactId = (model.PrimaryContactId) ?? _userService.GetCurrentUser().AssociateId,
+                IsSecured = true
+            };
+
+            if (model.SchemaMaps != null)
+            {
+                dto.SchemaMap = model.SchemaMaps.ToDto();
+            }
+
+            if (model.RetrieverJob != null)
+            {
+                dto.RetrieverJob = model.RetrieverJob.ToDto();
+            }
+
+            if (model.IsCompressed)
+            {
+                CompressionJobDto cDto = model.CompressionJob.First().ToDto();
+                dto.CompressionJob = cDto;
+                dto.CompressionType = (int)cDto.CompressionType;
+            }
+            else
+            {
+                dto.CompressionType = null;
+            }
+
+            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
+
+            return dto;
         }
     }
 

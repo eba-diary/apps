@@ -9,6 +9,8 @@ namespace Sentry.data.Core
     public enum SnowflakeConsumptionType
     {
         CategorySchemaParquet,
-        DatasetSchemaParquet
+        DatasetSchemaParquet,
+        DatasetSchemaRaw,
+        DatasetSchemaRawQuery
     }
 }

@@ -521,11 +521,6 @@ data.Dataset = {
             self.vm.Downloads(result.Downloads);
             self.vm.Views(result.Views);
             self.vm.Description(result.Description);
-            self.vm.FullyQualifiedSnowflakeViews.removeAll();
-            $.each(result.SnowflakeViews, function (i, val) {
-                self.vm.FullyQualifiedSnowflakeViews.push(val);
-            });
-
 
             //Populate legacy retriever jobs
             self.vm.OtherJobs.removeAll();
@@ -558,8 +553,26 @@ data.Dataset = {
 
             data.Dataset.UpdateColumnSchema();
             data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
-
+            data.Dataset.UpdateConsumptionLayers();
             data.Dataset.tryUpdateSchemaSearchTab();
+        });
+    },
+
+    UpdateConsumptionLayers: function () {
+        var schemaUrl = "/api/v20220609/metadata/dataset/" + $('#RequestAccessButton').attr("data-id") + "/schema/" + self.vm.SchemaId;
+        self.vm.FullyQualifiedSnowflakeViews.removeAll();
+        $.get(schemaUrl, function (result) {
+            var currentView = result.CurrentView;
+            console.log(result.ConsumptionDetails);
+            $.each(result.ConsumptionDetails, function (arrayPosition, consumptionDetail) {
+                if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet" || consumptionDetail.SnowflakeType == "CategorySchemaParquet") {
+                    var layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
+                    self.vm.FullyQualifiedSnowflakeViews.push(layer);
+                    if (currentView) {
+                        self.vm.FullyQualifiedSnowflakeViews.push(layer + "_CUR");
+                    }
+                }
+            });
         });
     },
 
@@ -643,7 +656,7 @@ data.Dataset = {
                         }
                     }
                     else {
-                        data.Dataset.showDataPreviewError();
+                        data.Dataset.showDataPreviewError(msg.responseJSON);
                         $('#dataSection').hide();
                     }
                 }
@@ -653,14 +666,13 @@ data.Dataset = {
                 if (error.status == 404 && error.responseText == "Schema not found") {
                     $('#dataSection').hide();
                 }
-
-                data.Dataset.showDataPreviewError();
+                data.Dataset.showDataPreviewError(error.responseJSON);
             },
             complete: function () {
                 $("#tab-spinner").hide();
             }
-        }).fail(function () {
-            data.Dataset.showDataPreviewError();
+        }).fail(function (error) {
+            data.Dataset.showDataPreviewError(error.responseJSON);
         });
 
     },
@@ -814,6 +826,7 @@ data.Dataset = {
     },
 
     FormSubmitInit: function () {
+        $("#IsSecured").removeAttr("disabled");
         $.ajax({
             url: "/Dataset/DatasetForm",
             method: "POST",
@@ -871,10 +884,8 @@ data.Dataset = {
 
         $("#DatasetName").on('keyup', function () {
             let datasetNameWoSpecialChars = $("#DatasetName")[0].value.replace(/[^0-9a-zA-Z]/g, "");
-            if (datasetNameWoSpecialChars.length <= 12) {
-                $("#ShortName")[0].value = datasetNameWoSpecialChars;
-                $("label[for=ShortName]").addClass("active");
-            }
+            $("#ShortName")[0].value = datasetNameWoSpecialChars.slice(0, 12);
+            $("label[for=ShortName]").addClass("active");
         })
 
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
@@ -918,20 +929,22 @@ data.Dataset = {
         }
 
         $("#DataClassification").change(function () {
+            let securedInput = $("#IsSecured");
+            securedInput.removeAttr("disabled");
             switch ($("#DataClassification").val()) {
-                case "1":
+                case "1"://Restricted
                     $('#dataClassInfo').text('“Restricted” information is proprietary and has significant business value for Sentry. ' +
                         'Unauthorized disclosure or dissemination could result in severe damage to Sentry.  Examples of restricted data include secret contracts or trade secrets.  ' +
                         'This information must be limited to only the few associates that require access to it.  If it is shared, accessed, or altered without the permission ' +
                         'of the Information Owner, Information Security must be notified immediately.  Designating information as Restricted involves significant ' +
                         'costs to Sentry.  For this reason, Information Owners making classification decisions must balance the damage that could result from ' +
                         'unauthorized access to or disclosure of the information against the cost of additional hardware, software or services required to protect it.');
-                    $("#IsSecured").parents('.md-form').hide();
                     break;
-                case "2":
-                    if (!$("#IsSecured").is(':checked')) {
-                        $("#IsSecured").next().click();
+                case "2"://Highly Sensitive
+                    if (!securedInput.is(':checked')) { //make sure it is checked
+                        securedInput.next().click();
                     }
+                    securedInput.attr("disabled", ""); //lock it
                     $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
                         'identifiable information, and is intended for limited, specific use by a workgroup, ' +
                         'department, or group of individuals with a legitimate need to know. Disclosure or ' +
@@ -942,21 +955,22 @@ data.Dataset = {
                         'numbers), and user passwords. This information must be limited to need to know ' +
                         'access. If it is shared, accessed, or altered without the permission of the ' +
                         'Information Owner, Information Security must be notified immediately.');
-                    $("#IsSecured").parents('.md-form').hide();
                     break;
-                case "3":
+                case "3"://Internal
                     $('#dataClassInfo').text('“Internal Use Only” information can be disclosed or disseminated to Sentry ' +
                         'associates, but will only be shared with other individuals or organizations when a ' +
                         'non - disclosure agreement is in place and management has approved for legitimate ' +
                         'business reasons.  Examples include items such as email correspondence, internal ' +
                         'documentation that is available to all associates.');
-                    $("#IsSecured").parents('.md-form').show();
                     break;
-                case "4":
+                case "4"://Public
+                    if (securedInput.is(':checked')) { //make sure it is not checked
+                        securedInput.next().click();
+                    }
+                    securedInput.attr("disabled", ""); //lock it
                     $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
                         'content, audience, or time of publication.  Examples are datasets that were generated by the Federal or State Governments like the Federal Motor Carrier Safety Administration or NOAA Weather Data.  ' +
                         'These datasets can be freely shared throughout Sentry.');
-                    $("#IsSecured").parents('.md-form').hide();
                     break;
             }
         }).change();
@@ -2411,6 +2425,8 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                         $("#InheritanceLoading").addClass('d-none');
                         $("#InheritanceModalBody").removeClass('d-none');
                         $("#InheritanceModalFooter").removeClass('d-none');
+                        //show the user if their request was submitted successfully
+                        Sentry.ShowModalCustom("", data);
                     }
                 });
             }
@@ -2605,6 +2621,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 $("#AccessRequestValidationMessage").removeClass("d-none");
             }
         });
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
+        });
+        $("#RequestAccessConsumeCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessConsumeEntitlement").text());
+        });
     },
 
     validateRequestAccessModal() {
@@ -2682,9 +2704,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
     },
 
-    showDataPreviewError() {
-        $("#DataPreviewNoRows").html("<p> No rows returned </p>");
-        $("#DataPreviewNoRows").removeClass("d-none");
+    showDataPreviewError(message) {
+        if (message == 'Column metadata not added') {
+            $("#DataPreviewNoRows").html("<p>No columns added to schema</p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
+        else if (message == "Table or view not found") {
+            $("#DataPreviewNoRows").html("<p>Snowflake table or view was not found - please contact <a href='mailto: DSCSupport@sentry.com'>DSC Support</a></p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
+        else {
+            $("#DataPreviewNoRows").html("<p>No rows returned</p>");
+            $("#DataPreviewNoRows").removeClass("d-none");
+        }
     },
 
     makeToast: function (severity, message) {
@@ -2729,5 +2761,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
 
         toastr[severity](message);
+    },
+
+    copyTextToClipboard: function (text) {
+        navigator.clipboard.writeText(text);
+        data.Dataset.makeToast("success","Copied " + text + " to clipboard")
     }
 };

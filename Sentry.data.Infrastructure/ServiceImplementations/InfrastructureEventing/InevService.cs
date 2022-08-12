@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -47,13 +48,16 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="dataset">The dataset whose permissions were updated</param>
         /// <param name="ticket">The ticket that was just approved</param>
-        /// <param name="securablePermissions">The full list of securable permissions on this dataset</param>
-        public async Task PublishDatasetPermissionsUpdated(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> securablePermissions)
+        /// <param name="datasetPermissions">The full list of securable permissions on this dataset</param>
+        public async Task PublishDatasetPermissionsUpdated(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> datasetPermissions, IList<SecurablePermission> parentPermissions)
         {
-            var details = BuildDatasetPermissionsUpdatedDto(dataset, ticket, securablePermissions);
+            var details = BuildDatasetPermissionsUpdatedDto(dataset, ticket, datasetPermissions, parentPermissions);
             await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, details.ToDictionary(), dataset.DatasetId.ToString());
         }
 
+        /// <summary>
+        /// Check Infrastructure Eventing topics for notification that the DBA Portal created a Cherwell ticket for a Snowflake access request
+        /// </summary>
         public async Task CheckDbaPortalEvents()
         {
             try
@@ -75,11 +79,11 @@ namespace Sentry.data.Infrastructure
                     message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
                     message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
                     Guid toCompare = new Guid(messageTicketId);
-                    if (!String.IsNullOrEmpty(messageTicketId))
+                    if (!string.IsNullOrEmpty(messageTicketId))
                     {
                         sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
                         sourceTicket.TicketId = cherwellTicketId;
-                        _datasetContext.Merge<SecurityTicket>(sourceTicket);
+                        _datasetContext.Merge(sourceTicket);
                     }
                 }
                 _datasetContext.SaveChanges();
@@ -96,7 +100,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="dataset">The dataset whose permissions were updated</param>
         /// <param name="ticket">The ticket that was just approved</param>
         /// <param name="securablePermissions">The full list of securable permissions on this dataset</param>
-        private static DatasetPermissionsUpdatedDto BuildDatasetPermissionsUpdatedDto(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> securablePermissions)
+        private static DatasetPermissionsUpdatedDto BuildDatasetPermissionsUpdatedDto(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> datasetPermissions, IList<SecurablePermission> parentPermissions)
         {
 
             //if this dataset has any schemas defined, grab the Snowflake info from the first one
@@ -116,7 +120,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //get the dataset's full list of permissions
-            var permissions = securablePermissions.Select(p =>
+            var permissions = datasetPermissions.Select(p =>
                 new DatasetPermissionsUpdatedDto.PermissionDto()
                 {
                     Identity = p.Identity,
@@ -125,20 +129,8 @@ namespace Sentry.data.Infrastructure
                     Status = p.SecurityPermission.IsEnabled ? DatasetPermissionsUpdatedDto.PermissionDto.STATUS_ACTIVE : DatasetPermissionsUpdatedDto.PermissionDto.STATUS_REQUESTED
                 }).ToList();
 
-            //build up the changes specific to this ticket that was just approved
-            var changes = new DatasetPermissionsUpdatedDto.ChangesDto()
-            {
-                Action = ticket.IsAddingPermission ? DatasetPermissionsUpdatedDto.ChangesDto.ACTION_ADD : DatasetPermissionsUpdatedDto.ChangesDto.ACTION_REMOVE,
-                RequestedBy = ticket.RequestedById.ToString(),
-                Permissions = ticket.AddedPermissions.Select(p =>
-                    new DatasetPermissionsUpdatedDto.PermissionDto()
-                    {
-                        Identity = ticket.Identity,
-                        IdentityType = ticket.IdentityType,
-                        PermissionCode = p.Permission.PermissionCode,
-                        Status = p.IsEnabled ? DatasetPermissionsUpdatedDto.PermissionDto.STATUS_ACTIVE : DatasetPermissionsUpdatedDto.PermissionDto.STATUS_REQUESTED
-                    }).ToList(),
-            };
+            //build up the changes specific to this ticket
+            var changes = GetPermissionChanges(ticket, parentPermissions);
 
             //build the event details payload
             var details = new DatasetPermissionsUpdatedDto()
@@ -155,6 +147,95 @@ namespace Sentry.data.Infrastructure
             };
             return details;
         }
+
+        /// <summary>
+        /// Build up a <see cref="DatasetPermissionsUpdatedDto.ChangesDto"/> based on the current <paramref name="ticket"/>
+        /// </summary>
+        /// <param name="ticket">The SecurityTicket that has just been requested or approved</param>
+        /// <param name="parentActivePermissions">The permissions of the dataset's parent. These are needed because if inheritance was just removed, we need to publish that the parent's permissions no longer apply to the dataset.</param>
+        internal static DatasetPermissionsUpdatedDto.ChangesDto GetPermissionChanges(SecurityTicket ticket, IList<SecurablePermission> parentActivePermissions)
+        {
+            var changes = new DatasetPermissionsUpdatedDto.ChangesDto()
+            {
+                Action = ticket.IsAddingPermission ? DatasetPermissionsUpdatedDto.ChangesDto.ACTION_ADD : DatasetPermissionsUpdatedDto.ChangesDto.ACTION_REMOVE,
+                RequestedBy = ticket.RequestedById.ToString(),
+                Permissions = new List<DatasetPermissionsUpdatedDto.PermissionDto>()
+            };
+
+            //if the permission that was just added (and approved!) is to inherit its parent, then publish the parent's permissions
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && ticket.ApprovedDate.HasValue)
+            {
+                //get the inherited permissions out of the fullListOfPermissions
+                changes.Permissions.AddRange(
+                    GetNotInheritedPermissionDtoList(parentActivePermissions, p => GetPermissionStatus(p.SecurityPermission)));
+            }
+
+            //if the permission that was just removed (and approved!) is the parent inheritance, then publish that the parent's permissions have been disabled
+            if (ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) && ticket.ApprovedDate.HasValue)
+            {
+                //get the inherited permissions out of the fullListOfPermissions
+                changes.Permissions.AddRange(
+                    GetNotInheritedPermissionDtoList(parentActivePermissions, p => DatasetPermissionsUpdatedDto.PermissionDto.STATUS_DISABLED));
+            }
+
+            //if there are any added permissions (approved or just requested) other than the "inherit" permission
+            if (ticket.AddedPermissions.Any(p => p.Permission.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS))
+            {
+                //get the permissions directly tied to this ticket
+                changes.Permissions.AddRange(
+                    GetNotInheritedPermissionDtoList(ticket.AddedPermissions, ticket));
+            }
+
+            //if there are any removed permissions (that have been approved!) other than the "inherit" permission
+            if (ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS) && ticket.ApprovedDate.HasValue)
+            {
+                changes.Permissions.AddRange(
+                    GetNotInheritedPermissionDtoList(ticket.RemovedPermissions, ticket));
+            }
+
+            return changes;
+        }
+
+        private static List<DatasetPermissionsUpdatedDto.PermissionDto> GetNotInheritedPermissionDtoList(IList<SecurablePermission> permissions, Func<SecurablePermission, string> statusFunc)
+        {
+            return permissions.Where(p => p.SecurityPermission.Permission.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS).Select(p =>
+                new DatasetPermissionsUpdatedDto.PermissionDto()
+                {
+                    Identity = p.Identity,
+                    IdentityType = p.IdentityType,
+                    PermissionCode = p.SecurityPermission.Permission.PermissionCode,
+                    Status = statusFunc.Invoke(p)
+                }).ToList();
+        }
+
+        private static List<DatasetPermissionsUpdatedDto.PermissionDto> GetNotInheritedPermissionDtoList(IList<SecurityPermission> permissions, SecurityTicket ticket)
+        {
+            return permissions.Where(p => p.Permission.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS).Select(p =>
+                new DatasetPermissionsUpdatedDto.PermissionDto()
+                {
+                    Identity = ticket.Identity,
+                    IdentityType = ticket.IdentityType,
+                    PermissionCode = p.Permission.PermissionCode,
+                    Status = GetPermissionStatus(p)
+                }).ToList();
+        }
+
+        internal static string GetPermissionStatus(SecurityPermission securityPermission)
+        {
+            if (securityPermission.IsEnabled)
+            {
+                return DatasetPermissionsUpdatedDto.PermissionDto.STATUS_ACTIVE;
+            }
+            else if (securityPermission.RemovedDate.HasValue)
+            {
+                return DatasetPermissionsUpdatedDto.PermissionDto.STATUS_DISABLED;
+            }
+            else
+            {
+                return DatasetPermissionsUpdatedDto.PermissionDto.STATUS_REQUESTED;
+            }
+        }
+
 
         /// <summary>
         /// Publishes an event to Infrastructure Eventing

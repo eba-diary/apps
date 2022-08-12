@@ -9,13 +9,12 @@ using System.Web;
 namespace Sentry.data.Web.Models.ApiModels.Schema20220609
 {
     [JsonConverter(typeof(JsonSubtypes), nameof(SchemaConsumptionType))]
-    [JsonSubtypes.KnownSubType(typeof(SchemaConsumptionSnowflakeModel), nameof(SchemaConsumptionTypeEnum.Snowflake))]
+    [JsonSubtypes.KnownSubType(typeof(SchemaConsumptionSnowflakeModel), nameof(SchemaConsumptionTypeEnum.SchemaConsumptionSnowflakeModel))]
     public abstract class SchemaConsumptionModel
     {
         public int SchemaConsumptionId { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public abstract SchemaConsumptionTypeEnum SchemaConsumptionType { get; }
+        public virtual string SchemaConsumptionType { get; }
 
         /// <summary>
         /// Method to accept a visitor to this class hierarchy
