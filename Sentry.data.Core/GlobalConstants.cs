@@ -188,6 +188,7 @@ namespace Sentry.data.Core
             public const string DATASOURCE = "DataSource";
             public const string BUSINESSAREA = "BusinessArea"; 
             public const string ASSET = "Asset";
+            public const string DATAFLOW = "Dataflow";
         }
 
         public static class PermissionCodes
@@ -200,6 +201,7 @@ namespace Sentry.data.Core
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
             public const string CAN_MANAGE_SCHEMA = "CanManageSchema";
+            public const string CAN_MANAGE_DATAFLOW = "CanManageDataflow";
             public const string S3_ACCESS = "S3Access";
             public const string SNOWFLAKE_ACCESS = "SnowflakeAccess";
             public const string INHERIT_PARENT_PERMISSIONS = "InheritParentPermissions";

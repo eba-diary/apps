@@ -1,6 +1,7 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using NHibernate.Type;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 
@@ -63,6 +64,17 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.Column("DataFlow_Id");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(EventMetric))));
+
+            //ISecurable Mapping
+            this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
+            this.ManyToOne(x => x.Security, m =>
+            {
+                m.Column("Security_ID");
+                m.ForeignKey("FK_Dataset_Security");
+                m.Class(typeof(Security));
+                m.Cascade(Cascade.All);
+            });
         }
     }
 }

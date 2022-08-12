@@ -1015,4 +1015,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[IX_DatasetFile_FlowExecutionGuid]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2a511402-01cd-4598-b3f0-3ca917a699da" ChangeDateTime="06/14/2022 16:54:23">
+    <Property Name="ElementName" Value="[dbo].[DataFlow].[IsSecure]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFlow]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsSecured_IND" />
+  </Operation>
 </Operations>

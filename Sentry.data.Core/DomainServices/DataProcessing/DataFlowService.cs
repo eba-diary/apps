@@ -564,7 +564,7 @@ namespace Sentry.data.Core
             return df;
         }
 
-        private DataFlow MapToDataFlow(DataFlowDto dto)
+        internal DataFlow MapToDataFlow(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(MapToDataFlow).ToLower()}";
             Logger.Info($"{methodName} Method Start");
@@ -587,6 +587,15 @@ namespace Sentry.data.Core
                 PreProcessingOption = (int)dto.PreProcessingOption,
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType,
+                PrimaryContactId = dto.PrimaryContactId,
+                IsSecured = dto.IsSecured,
+
+                //All dataflows get a Security entry regardless
+                //  this allows security process for internally managed permissions
+                //  (i.e. CanManageDataflow)
+                Security = (dto.Id == 0)
+                                ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
+                                : _datasetContext.GetById<DataFlow>(dto.Id).Security
                 DatasetId = dto.SchemaMap.First().DatasetId,
                 SchemaId = dto.SchemaMap.First().SchemaId
             };
@@ -790,6 +799,9 @@ namespace Sentry.data.Core
             dto.SaidKeyCode = df.SaidKeyCode;
             dto.NamedEnvironment = df.NamedEnvironment;
             dto.NamedEnvironmentType = df.NamedEnvironmentType;
+            dto.PrimaryContactId = df.PrimaryContactId;
+            dto.IsSecured = df.IsSecured;
+            dto.Security = _securityService.GetUserSecurity(df, _userService.GetCurrentUser());
 
             if (dto.IsCompressed)
             {

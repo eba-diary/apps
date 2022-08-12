@@ -1,13 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
-using Sentry.Core;
+﻿using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public class DataFlow : IValidatable
+    public class DataFlow : IValidatable, ISecurable
     {
         public DataFlow()
         {
@@ -44,6 +42,16 @@ namespace Sentry.data.Core.Entities.DataProcessing
 
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
+
+        #region ISecurableImplementation
+        public virtual bool IsSecured { get; set; } = true;
+        public virtual Core.Security Security { get; set; }
+        public virtual string PrimaryContactId { get; set; }
+
+        public virtual bool AdminDataPermissionsAreExplicit { get; set; }
+
+        public virtual ISecurable Parent { get; set; }
+        #endregion
 
         public virtual ValidationResults ValidateForDelete()
         {
