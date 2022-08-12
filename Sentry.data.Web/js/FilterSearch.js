@@ -54,7 +54,7 @@
         //clear single badge
         $(document).on("click", "[id^='clearOption_']", function (e) {
             e.preventDefault();
-            data.FilterSearch.handleBadgeClear($(this));
+            data.FilterSearch.handleBadgeClear(this);
             data.FilterSearch.showHideApplyFilter();
         });
 
@@ -186,11 +186,11 @@
         data.FilterSearch.hideBadgeContainer(false);
 
         //uncheck the category option that was removed
-        var optionId = element.attr("id").replace("clearOption_", "");
+        var optionId = $.escapeSelector(element.id.replace("clearOption_", ""));
         data.FilterSearch.setOptionCheckbox(optionId, false);
 
         //hide the clicked badge
-        element.addClass("display-none");
+        $(element).addClass("display-none");
     },
 
     handleClearAll: function () {
@@ -233,7 +233,7 @@
     },
 
     handleCheckboxChange: function (element) {
-        var id = element.id.replace('modal_', '');
+        var id = $.escapeSelector(element.id.replace('modal_', ''));
 
         var badge = $("#clearOption_" + id);
 
@@ -358,7 +358,7 @@
 
             //show selected option badges
             selectedOptions.each(function () {
-                $('#clearOption_' + this.id).removeClass("display-none");
+                $('#clearOption_' + $.escapeSelector(this.id)).removeClass("display-none");
             });
 
             //show active options container if there are active options
@@ -418,7 +418,7 @@
             if (parts[0] != 'modal') {
                 var option = {
                     OptionValue: $(this).attr('value'),
-                    ParentCategoryName: parts[0].replace('-', ' '),
+                    ParentCategoryName: $(this).data('category'),
                     Selected: true
                 };
 

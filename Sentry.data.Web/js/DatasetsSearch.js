@@ -76,6 +76,7 @@ data.DatasetsSearch = {
         $(document).on("click", ".tile-result", function (e) {
             if ($(this).hasClass("tile-active")) {
                 var datasetId = $(this).data("id");
+                data.DatasetsSearch.setPreviousSearch();
                 window.location.href = "/Dataset/Detail/" + encodeURIComponent(datasetId);
             }
         });
@@ -107,13 +108,15 @@ data.DatasetsSearch = {
 
         //page change events
         $(document).on("click", "#tile-page-previous", function () {
-            var activePage = parseInt($(".tile-page-number.active").data("page"));
-            data.DatasetsSearch.executeDatasetSearch(activePage--);
+            var previousPage = parseInt($(".tile-page-number.active").data("page"));
+            previousPage--;
+            data.DatasetsSearch.executeDatasetSearch(previousPage);
         });
 
         $(document).on("click", "#tile-page-next", function () {
-            var activePage = parseInt($(".tile-page-number.active").data("page"));
-            data.DatasetsSearch.executeDatasetSearch(activePage++);
+            var nextPage = parseInt($(".tile-page-number.active").data("page"));
+            nextPage++;
+            data.DatasetsSearch.executeDatasetSearch(nextPage);
         });
 
         $(document).on("click", ".tile-page-number", function () {
@@ -144,7 +147,7 @@ data.DatasetsSearch = {
 
         $(document).off("click", "[id^='clearOption_']");
         $(document).on("click", "[id^='clearOption_']", function () {
-            data.FilterSearch.handleBadgeClear($(this));
+            data.FilterSearch.handleBadgeClear(this);
             data.DatasetsSearch.executeDatasetSearch(1);
         });
     },
@@ -155,5 +158,10 @@ data.DatasetsSearch = {
         });
 
         $(".tile-result").addClass(`tile-result-layout-${$("#tile-result-layout").val()}`)
+    },
+
+    setPreviousSearch: function () {
+        //set localStorage items for searchText, filteredIds, pageSelection, sortByVal, itemsToShow
+        //localStorage.setItem("key", "value");
     }
 }

@@ -1,29 +1,23 @@
 ﻿using System;
+using System.Web;
 
 namespace Sentry.data.Web
 {
     public class FilterCategoryOptionModel
     {
-        private string _id;
-        private string _fullId;
-
         public string OptionId
         {
             get 
             {
-                if (string.IsNullOrEmpty(_fullId))
-                {
-                    if (string.IsNullOrEmpty(_id))
-                    {
-                        _id = Guid.NewGuid().ToString();
-                    }
+                string id = HttpUtility.UrlEncode(OptionValue);
 
-                    return string.IsNullOrEmpty(ParentCategoryName) ? _id : ParentCategoryName.Replace(" ", "-") + "_" + _id;
+                if (!string.IsNullOrEmpty(ParentCategoryName))
+                {
+                    id = HttpUtility.UrlEncode(ParentCategoryName) + "_" + id;
                 }
 
-                return _fullId;
+                return id;
             }
-            set => _fullId = value;
         }
 
         public string OptionValue { get; set; }

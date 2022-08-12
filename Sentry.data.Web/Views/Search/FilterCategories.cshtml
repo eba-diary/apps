@@ -20,7 +20,7 @@
     {
         <li class="filter-search-category-option" title="@option.OptionValue">
             <div class="form-group mb-0">
-                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
+                <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" data-category="@option.ParentCategoryName" checked="@option.Selected">
                 <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
                     @SafeValue(option.OptionValue)
                     @if (!hideCounts)

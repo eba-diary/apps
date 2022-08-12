@@ -2290,7 +2290,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
             returnUrl += $.param(text);
-
         }
 
         if (localStorage.getItem("filteredIds") !== null) {
