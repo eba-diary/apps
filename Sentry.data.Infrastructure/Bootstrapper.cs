@@ -134,6 +134,7 @@ namespace Sentry.data.Infrastructure
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
             registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
+            registry.For<ISupportLinkService>().Singleton().Use<SupportLinkService>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));

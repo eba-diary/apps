@@ -1015,4 +1015,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[IX_DatasetFile_FlowExecutionGuid]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="efa62b5d-4c84-4f56-93d6-1af184c2b74a" ChangeDateTime="07/21/2022 18:13:07">
+    <Property Name="ElementName" Value="[dbo].[SupportLink].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SupportLink]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SupportLinkId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c1650460-6734-4984-88cc-efe24c46526f" ChangeDateTime="08/11/2022 15:26:25">
+    <Property Name="ElementName" Value="[dbo].[SupportLink].[SupportLinkId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SupportLink]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SupportLink_Id" />
+  </Operation>
 </Operations>

@@ -163,6 +163,7 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DTO\Admin\SupportLinkDto.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricDto.cs" />
@@ -220,6 +221,7 @@
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataFlowMetrics\DataFlowMetric.cs" />
+    <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
@@ -281,6 +283,7 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
@@ -415,6 +418,7 @@
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
     <Compile Include="Interfaces\IQuartermasterService.cs" />
