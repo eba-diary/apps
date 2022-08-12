@@ -165,7 +165,7 @@ BEGIN TRY
 
 	--select * from #TempDf 
 	update #TempDf Set PrimaryContact_ID = CreatedBy, IsSecured_IND = 1, Security_ID = NEWID()
-	where DatasetId = 0 and SchemaId = 0 and Security_Id is null
+	where (DatasetId = 0 or DatasetId is null) and (SchemaId = 0 or SchemaId is null) and Security_Id is null
 
 
 
