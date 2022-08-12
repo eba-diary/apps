@@ -60,6 +60,7 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
+
         //method for generating a dataset selection model, which contains a list of all Active datasets
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
