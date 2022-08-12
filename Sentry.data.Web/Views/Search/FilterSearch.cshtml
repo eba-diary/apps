@@ -6,7 +6,7 @@
     string jsControllerName = "data." + Model.SearchType + "Search";
 }
 
-<div class="search-head-wrapper">
+<div class="pt-4">
     <div class="text-center">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
@@ -22,15 +22,15 @@
     </div>
 
     <div class="filter-search-box-and-save">
-        <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
-            <span class="input-group-prepend filter-search-start sentry-blue white-text icon-search clickable display-none"></span>
-            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
-        </div>
-
         <div class="filter-search-save-search-container display-none">
             @{
                 Html.RenderAction("SavedSearches", "FilterSearch", new { searchType = Model.SearchType, activeSearchName = Model.DefaultSearch.SearchName });
             }
+        </div>
+
+        <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
+            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+            <span class="input-group-append filter-search-start sentry-blue white-text icon-search clickable display-none"></span>
         </div>
     </div>
 </div>

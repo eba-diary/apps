@@ -1,4 +1,5 @@
-﻿data.DatasetsSearch = {
+﻿// @ts-check
+data.DatasetsSearch = {
 
     searchableDatasets: null,
 
@@ -27,10 +28,6 @@
 
     executeDatasetSearch: function (pageNumber) {
         var lastPageNumber = 1;
-
-        var lastPage = $("#tile-page-next").prev();
-        console.log(lastPage);
-        console.log(lastPage.data("page"));
 
         if ($("#tile-page-next").length) {
             lastPageNumber = parseInt($("#tile-page-next").prev().data("page"));
@@ -110,13 +107,13 @@
 
         //page change events
         $(document).on("click", "#tile-page-previous", function () {
-            var previous = parseInt($(".tile-page-number.active").data("page"))--;
-            data.DatasetsSearch.executeDatasetSearch(previous);
+            var activePage = parseInt($(".tile-page-number.active").data("page"));
+            data.DatasetsSearch.executeDatasetSearch(activePage--);
         });
 
         $(document).on("click", "#tile-page-next", function () {
-            var next = parseInt($(".tile-page-number.active").data("page"))++;
-            data.DatasetsSearch.executeDatasetSearch(next);
+            var activePage = parseInt($(".tile-page-number.active").data("page"));
+            data.DatasetsSearch.executeDatasetSearch(activePage++);
         });
 
         $(document).on("click", ".tile-page-number", function () {
