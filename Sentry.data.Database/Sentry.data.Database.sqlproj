@@ -168,6 +168,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_04" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_06" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_15" />
     <Folder Include="Stored Procedure" />
   </ItemGroup>
   <ItemGroup>
@@ -317,6 +318,7 @@
     <Build Include="Tables\Schema\SchemaConsumption.sql" />
     <Build Include="Tables\Schema\SchemaConsumptionSnowflake.sql" />
     <Build Include="Tables\ApplicationConfigurationProperties.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_15\CLA3991_InitializeDataflowSecurity.sql" />
     <Build Include="Stored Procedure\usp_GetDeadJobs.sql" />
     <Build Include="Tables\SupportLink.sql" />
   </ItemGroup>

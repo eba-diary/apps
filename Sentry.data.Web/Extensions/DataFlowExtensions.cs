@@ -169,7 +169,7 @@ namespace Sentry.data.Web
             return dto;
         }
 
-        private static Core.CompressionJobDto ToDto(this CompressionModel model)
+        public static Core.CompressionJobDto ToDto(this CompressionModel model)
         {
             return new Core.CompressionJobDto()
             {

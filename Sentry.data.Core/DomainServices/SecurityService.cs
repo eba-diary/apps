@@ -393,7 +393,7 @@ namespace Sentry.data.Core
             us.CanCreateDataSource = user.CanModifyDataset || IsAdmin;
             us.ShowAdminControls = IsAdmin;
             us.CanCreateDataFlow = user.CanModifyDataset || IsAdmin;
-            us.CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin;
+            //us.CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin;
         }
 
         /// <summary>
@@ -418,6 +418,7 @@ namespace Sentry.data.Core
             us.CanViewData = true;
             us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
             us.CanUploadToDataset = us.CanManageSchema;
+            us.CanModifyDataflow = IsOwner || IsAdmin;
             MergeParentSecurity(us, parentSecurity);
 
             us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);
@@ -446,6 +447,7 @@ namespace Sentry.data.Core
             us.CanUseDataSource = userPermissions.Contains(PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
             us.CanManageSchema = userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
             us.CanViewData = userPermissions.Contains(PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (!securable.AdminDataPermissionsAreExplicit && IsAdmin);
+            us.CanModifyDataflow = userPermissions.Contains(PermissionCodes.CAN_MANAGE_DATAFLOW) || IsOwner || IsAdmin;
             MergeParentSecurity(us, parentSecurity);
 
             us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, features);
@@ -566,11 +568,9 @@ namespace Sentry.data.Core
 
                 foreach (SecurityTicket inheritedTicket in inheritedTickets)
                 {
-                    inheritedTicket.IsAddingPermission = inheritedTicket.IsAddingPermission && inheritanceStatus;
-                    inheritedTicket.IsRemovingPermission = !inheritedTicket.IsAddingPermission;
                     if (inheritedTicket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.S3_ACCESS && p.IsEnabled))
                     {
-                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket);
+                        BuildS3TicketForDatasetAndTicket(dataset, inheritedTicket, inheritanceStatus);
                     }
                 }
             }
@@ -612,10 +612,10 @@ namespace Sentry.data.Core
             BuildS3TicketForDatasetAndTicket(dataset, ticket);
         }
 
-        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket)
+        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
             string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
-            string summary = "S3 Access " + (ticket.IsAddingPermission ? "Request" : "Removal");
+            string summary = "S3 Access " + (ticket.IsAddingPermission && isAddingPermission ? "Request" : "Removal");
             StringBuilder sb = new StringBuilder();
             string issueType = "Request";
 
@@ -715,8 +715,8 @@ namespace Sentry.data.Core
                 var permissions = GetDefaultPermissions();
 
                 //get the list of existing security tickets for this dataset and asset
-                var datasetTickets = GetSecurityTicketsForSecurable(ds, false);
-                var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, false);
+                var datasetTickets = GetSecurityTicketsForSecurable(ds, true);
+                var assetTickets = GetSecurityTicketsForSecurable(ds.Asset, true);
 
                 //actually create the AD groups
                 await CreateDefaultSecurityForDataset_Internal(ds, groups, permissions, datasetTickets, assetTickets);

@@ -13,7 +13,8 @@
 									(8, 'CanManageSchema', 'Manage Schema', 'Access to manage schema within dataset', 'Dataset'),
 									(9, 'S3Access', 'S3 Access', 'Direct access to read this dataset from S3', 'Dataset'),
 									(10, 'SnowflakeAccess', 'Snowflake Access', 'Access to read this dataset from Snowflake', 'Dataset'),
-									(11, 'InheritParentPermissions', 'Inherit Parent Permissions', 'Indicates this dataset inherits permissions from the asset', 'Dataset')
+									(11, 'InheritParentPermissions', 'Inherit Parent Permissions', 'Indicates this dataset inherits permissions from the asset', 'Dataset'),
+									(12, 'CanManageDataflow', 'Manage Dataflow', 'Access to manage dataflow', 'Dataflow')
 									
 									--(7, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),
 									--(enter id here, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),

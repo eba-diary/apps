@@ -521,11 +521,6 @@ data.Dataset = {
             self.vm.Downloads(result.Downloads);
             self.vm.Views(result.Views);
             self.vm.Description(result.Description);
-            self.vm.FullyQualifiedSnowflakeViews.removeAll();
-            $.each(result.SnowflakeViews, function (i, val) {
-                self.vm.FullyQualifiedSnowflakeViews.push(val);
-            });
-
 
             //Populate legacy retriever jobs
             self.vm.OtherJobs.removeAll();
@@ -558,8 +553,26 @@ data.Dataset = {
 
             data.Dataset.UpdateColumnSchema();
             data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
-
+            data.Dataset.UpdateConsumptionLayers();
             data.Dataset.tryUpdateSchemaSearchTab();
+        });
+    },
+
+    UpdateConsumptionLayers: function () {
+        var schemaUrl = "/api/v20220609/metadata/dataset/" + $('#RequestAccessButton').attr("data-id") + "/schema/" + self.vm.SchemaId;
+        self.vm.FullyQualifiedSnowflakeViews.removeAll();
+        $.get(schemaUrl, function (result) {
+            var currentView = result.CurrentView;
+            console.log(result.ConsumptionDetails);
+            $.each(result.ConsumptionDetails, function (arrayPosition, consumptionDetail) {
+                if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet" || consumptionDetail.SnowflakeType == "CategorySchemaParquet") {
+                    var layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
+                    self.vm.FullyQualifiedSnowflakeViews.push(layer);
+                    if (currentView) {
+                        self.vm.FullyQualifiedSnowflakeViews.push(layer + "_CUR");
+                    }
+                }
+            });
         });
     },
 
