@@ -42,11 +42,11 @@ namespace Sentry.data.Web.Controllers
                 });
             }
             
-            return GetFilterSearchView(model);
+            return GetFilterSearchView(model, null);
         }
 
         [ChildActionOnly]
-        public override ActionResult Results()
+        public override ActionResult Results(Dictionary<string, string> parameters)
         {
             return PartialView("SearchResult");
         }

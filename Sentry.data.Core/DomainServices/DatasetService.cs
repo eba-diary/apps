@@ -694,7 +694,12 @@ namespace Sentry.data.Core
                 dtos = dtos.OrderBy(datasetSearchDto.OrderByField);
             }
 
-            return dtos.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize).ToList();
+            if (datasetSearchDto.PageSize > 0)
+            {
+                dtos = dtos.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize);
+            }
+
+            return dtos.ToList();
         }
 
         private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)

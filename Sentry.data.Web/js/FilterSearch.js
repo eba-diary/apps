@@ -440,7 +440,13 @@
     },
 
     setPageInfo: function (start, end) {
-        $("#filter-search-page-size").text(start.toLocaleString("en-US") + ' - ' + end.toLocaleString("en-US"));
+        if (end > 0) {
+            $(".filter-search-page-showing").removeClass("d-none");
+            $("#filter-search-page-size").text(start.toLocaleString("en-US") + ' - ' + end.toLocaleString("en-US"));
+        }
+        else {
+            $(".filter-search-page-showing").addClass("d-none");
+        }
     },
 
     buildSearchRequest: function () {

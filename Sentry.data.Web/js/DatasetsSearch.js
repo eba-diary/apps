@@ -4,7 +4,7 @@ data.DatasetsSearch = {
     searchableDatasets: null,
 
     init: function () {
-        data.DatasetsSearch.executeSearch();
+        data.DatasetsSearch.executeFullSearch(data.DatasetsSearch.getActivePage());
         data.DatasetsSearch.initEvents();
     },
 
@@ -19,9 +19,13 @@ data.DatasetsSearch = {
     },
 
     executeSearch: function () {
+        data.DatasetsSearch.executeFullSearch(1);
+    },
+
+    executeFullSearch: function (pageNumber) {
         $.post("/DatasetSearch/SearchableDatasets/", data.FilterSearch.buildSearchRequest(), function (response) {
             data.DatasetsSearch.searchableDatasets = response
-            data.DatasetsSearch.executeDatasetSearch(1);
+            data.DatasetsSearch.executeDatasetSearch(pageNumber);
             data.DatasetsSearch.getTileFilters();
         });
     },
@@ -108,13 +112,13 @@ data.DatasetsSearch = {
 
         //page change events
         $(document).on("click", "#tile-page-previous", function () {
-            var previousPage = parseInt($(".tile-page-number.active").data("page"));
+            var previousPage = data.DatasetsSearch.getActivePage();
             previousPage--;
             data.DatasetsSearch.executeDatasetSearch(previousPage);
         });
 
         $(document).on("click", "#tile-page-next", function () {
-            var nextPage = parseInt($(".tile-page-number.active").data("page"));
+            var nextPage = data.DatasetsSearch.getActivePage();
             nextPage++;
             data.DatasetsSearch.executeDatasetSearch(nextPage);
         });
@@ -160,8 +164,22 @@ data.DatasetsSearch = {
         $(".tile-result").addClass(`tile-result-layout-${$("#tile-result-layout").val()}`)
     },
 
+    getActivePage: function () {
+        return parseInt($(".tile-page-number.active").data("page"));
+    },
+
     setPreviousSearch: function () {
         //set localStorage items for searchText, filteredIds, pageSelection, sortByVal, itemsToShow
-        //localStorage.setItem("key", "value");
+        localStorage.setItem("searchText", $.trim($("#filter-search-text").val()));
+        localStorage.setItem("sortBy", $("#tile-result-sort").val());
+        localStorage.setItem("pageNumber", data.DatasetsSearch.getActivePage());
+        localStorage.setItem("pageSize", $("#tile-result-page-size").val());
+        localStorage.setItem("layout", $("#tile-result-layout").val());
+
+        var filters = [];
+        $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
+            filters.push(this.id);
+        });
+        localStorage.setItem("filters", JSON.stringify(filters));
     }
 }

@@ -346,27 +346,27 @@ namespace Sentry.data.Web.Helpers
             {
                 new SelectListItem()
                 {
-                    Value = "10",
-                    Text = "10",
-                    Selected = selectedValue == "10"
+                    Value = "15",
+                    Text = "15",
+                    Selected = selectedValue == "15"
                 },
                 new SelectListItem()
                 {
-                    Value = "25",
-                    Text = "25",
-                    Selected = selectedValue == "25"
+                    Value = "30",
+                    Text = "30",
+                    Selected = selectedValue == "30"
                 },
                 new SelectListItem()
                 {
-                    Value = "100",
-                    Text = "100",
-                    Selected = selectedValue == "100"
+                    Value = "90",
+                    Text = "90",
+                    Selected = selectedValue == "90"
                 },
                 new SelectListItem()
                 {
-                    Value = "All",
+                    Value = "-1",
                     Text = "All",
-                    Selected = selectedValue == "All"
+                    Selected = selectedValue == "-1"
                 },
             };
         }
@@ -396,7 +396,9 @@ namespace Sentry.data.Web.Helpers
 
         public static List<PageItemModel> BuildPageItemList(int totalResults, int pageSize, int selectedPage)
         {
-            int numberOfPages = (totalResults + pageSize - 1) / pageSize;
+            List<PageItemModel> pageItems = new List<PageItemModel>();
+
+            int numberOfPages = pageSize == -1 ? 1 : (totalResults + pageSize - 1) / pageSize;
 
             int frontPageNumbers = numberOfPages - 1;
             bool useEllipsis = false;
@@ -407,9 +409,7 @@ namespace Sentry.data.Web.Helpers
                 useEllipsis = true;
             }
 
-            List<PageItemModel> pageItems = new List<PageItemModel>();
-
-            for (int i = 1; i <= frontPageNumbers ; i++)
+            for (int i = 1; i <= frontPageNumbers; i++)
             {
                 pageItems.Add(new PageItemModel()
                 {

@@ -15,11 +15,6 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
         }
 
-        public ActionResult Search(string savedSearch = null)
-        {
-            return GetBaseTileSearch(SearchType.DATASET_SEARCH, SharedContext.CurrentUser.CanViewDataset, savedSearch);
-        }
-
         [HttpPost]
         public JsonResult SearchableDatasets(DatasetSearchModel datasetSearchModel)
         {
@@ -63,6 +58,16 @@ namespace Sentry.data.Web.Controllers
                 IconPath = "~/Images/Icons/DatasetsBlue.svg",
                 DefaultSearch = searchModel
             };
+        }
+
+        protected override bool HasPermission()
+        {
+            return SharedContext.CurrentUser.CanViewDataset;
+        }
+
+        protected override string GetSearchType()
+        {
+            return SearchType.DATASET_SEARCH;
         }
     }
 }

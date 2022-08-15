@@ -507,5 +507,13 @@ namespace Sentry.data.Core
             public const string ELLIPSIS = "...";
             public const int MAX_PAGE_OPTIONS = 6;
         }
+
+        public static class TileResultParameters
+        {
+            public const string SORTBY = "SortBy";
+            public const string PAGENUMBER = "PageNumber";
+            public const string PAGESIZE = "PageSize";
+            public const string LAYOUT = "Layout";
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -13,7 +14,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [ChildActionOnly]
-        public abstract ActionResult Results();
+        public abstract ActionResult Results(Dictionary<string, string> parameters);
         protected abstract FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel);
 
         protected bool TryGetSavedSearch(string searchType, string savedSearchName, out ActionResult actionResult)
@@ -23,7 +24,7 @@ namespace Sentry.data.Web.Controllers
                 SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(searchType, savedSearchName, SharedContext.CurrentUser.AssociateId);
                 if (savedSearchDto != null)
                 {
-                    actionResult = GetFilterSearchView(savedSearchDto.ToModel());
+                    actionResult = GetFilterSearchView(savedSearchDto.ToModel(), null);
                     return true;
                 }
             }
@@ -32,9 +33,10 @@ namespace Sentry.data.Web.Controllers
             return false;
         }
 
-        protected ActionResult GetFilterSearchView(FilterSearchModel searchModel)
+        protected ActionResult GetFilterSearchView(FilterSearchModel searchModel, Dictionary<string, string> resultParameters)
         {
             FilterSearchConfigModel configModel = GetFilterSearchConfigModel(searchModel);
+            configModel.ResultParameters = resultParameters;
             return View("~/Views/Search/FilterSearch.cshtml", configModel);
         }
     }

@@ -17,9 +17,14 @@ namespace Sentry.data.Web.Controllers
             
         }
 
-        public ActionResult Search(string savedSearch = null)
+        protected override bool HasPermission()
         {
-            return GetBaseTileSearch(SearchType.BUSINESS_INTELLIGENCE_SEARCH, SharedContext.CurrentUser.CanViewReports, savedSearch);
+            return SharedContext.CurrentUser.CanViewReports;
+        }
+
+        protected override string GetSearchType()
+        {
+            return SearchType.BUSINESS_INTELLIGENCE_SEARCH;
         }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)

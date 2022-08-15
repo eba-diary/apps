@@ -108,20 +108,20 @@ namespace Sentry.data.Web
                 SearchableTiles = model.SearchableTiles.ToDatasetTileDtos()
             };
 
-            switch ((DatasetSortByOption)model.SortBy)
+            switch ((TileSearchSortByOption)model.SortBy)
             {
-                case DatasetSortByOption.Alphabetical:
+                case TileSearchSortByOption.Alphabetical:
                     dto.OrderByField = x => x.Name;
                     break;
-                case DatasetSortByOption.Favorites:
+                case TileSearchSortByOption.Favorites:
                     dto.OrderByField = x => x.IsFavorite;
                     dto.OrderByDescending = true;
                     break;
-                case DatasetSortByOption.RecentlyAdded:
+                case TileSearchSortByOption.RecentlyAdded:
                     dto.OrderByField = x => x.CreatedDateTime;
                     dto.OrderByDescending = true;
                     break;
-                case DatasetSortByOption.RecentlyUpdated:
+                case TileSearchSortByOption.RecentlyUpdated:
                     dto.OrderByField = x => x.LastActivityDateTime;
                     dto.OrderByDescending = true;
                     break;

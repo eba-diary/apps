@@ -9,5 +9,6 @@ namespace Sentry.data.Web
         public string SearchType { get; set; }
         public string InfoLink { get; set; }
         public FilterSearchModel DefaultSearch { get; set; }
+        public Dictionary<string, string> ResultParameters { get; set; }
     }
 }

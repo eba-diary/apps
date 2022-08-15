@@ -336,7 +336,8 @@ namespace Sentry.data.Web.Controllers
                     ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
                     DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile,
                     DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue(),
-                    CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue()         //REMOVE WHEN TURNED ON LATER
+                    CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue(),         //REMOVE WHEN TURNED ON LATER
+                    UseUpdatedSearchPage = _featureFlags.CLA3756_UpdateSearchPages.GetValue()
                 };
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);
