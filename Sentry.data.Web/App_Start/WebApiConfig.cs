@@ -36,7 +36,10 @@ namespace Sentry.data.Web
                     c.DescribeAllEnumsAsStrings(camelCase: false);
 
                     c.DocumentFilter<CustomDocumentFilter>();
-                    c.DocumentFilter<PolymorphismDocumentFilter<SchemaConsumptionModel>>();
+
+                    //Once we upgrade to .NET 6, these custom classes will no longer be necessary
+                    //See https://stackoverflow.com/a/36200684/2768996
+                    c.DocumentFilter(() => new PolymorphismDocumentFilter<SchemaConsumptionModel>(nameof(SchemaConsumptionModel.SchemaConsumptionType)));
                     c.SchemaFilter<PolymorphismSchemaFilter<SchemaConsumptionModel>>();
 
                 })
@@ -92,6 +95,12 @@ namespace Sentry.data.Web
                 required = schema.required
             };
 
+            //remove the properties from the derived type that are inherited - some clients don't like them defined in both places
+            foreach (var prop in typeof(T).GetProperties())
+            {
+                clonedSchema.properties.Remove(prop.Name);
+            }
+
             //schemaRegistry.Definitions[typeof(T).Name]; does not work correctly in SwashBuckle
             var parentSchema = new Schema { @ref = "#/definitions/" + typeof(T).Name };
 
@@ -104,15 +113,18 @@ namespace Sentry.data.Web
 
     public class PolymorphismDocumentFilter<T> : IDocumentFilter
     {
+        private string discriminatorName;
+        public PolymorphismDocumentFilter(string discriminatorName) {
+            this.discriminatorName = discriminatorName;
+        }
+
         public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, System.Web.Http.Description.IApiExplorer apiExplorer)
         {
             RegisterSubClasses(schemaRegistry, typeof(T));
         }
 
-        private static void RegisterSubClasses(SchemaRegistry schemaRegistry, Type abstractType)
+        private void RegisterSubClasses(SchemaRegistry schemaRegistry, Type abstractType)
         {
-            const string discriminatorName = "SchemaConsumptionType";
-
             Schema parentSchema;
             if(schemaRegistry.Definitions.TryGetValue(abstractType.FriendlyId(), out parentSchema))
             {
