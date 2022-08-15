@@ -90,3 +90,4 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_02\CLA4099-Remove_New_Permissions_Accidentally_Available.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_04\CLA4126_Add_Short_Names_to_Datasets.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_06\CLA-4017-MoveSnowflakeColumnsToNewTable.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_01_16\CLA-4317-HistoryFixControlMTriggerName.sql

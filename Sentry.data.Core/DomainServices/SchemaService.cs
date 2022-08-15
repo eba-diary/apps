@@ -386,6 +386,10 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
+            //schema=EXISTING; dto=NEW; SETTER
+            changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
+
+
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
                 changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
@@ -428,6 +432,18 @@ namespace Sentry.data.Core
             }
 
             return whatPropertiesChanged;
+        }
+
+        private string GetControlMTrigger(FileSchemaDto dto)
+        {
+            string name = string.Empty;
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+            if(ds != null)
+            {
+                name = $"DATA_{ds.NamedEnvironment}_{ds.ShortName}_{dto.Name}_COMPLETED";
+            }
+            
+            return name;
         }
 
         private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
@@ -908,8 +924,10 @@ namespace Sentry.data.Core
                                         : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
                 ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
                                         ? GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
-                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
+                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode),
+                ControlMTriggerName = GetControlMTrigger(dto)
 
+                
             };
             schema.ConsumptionDetails = new List<SchemaConsumption>()
             {
@@ -962,7 +980,8 @@ namespace Sentry.data.Core
                 SchemaRootPath = scm.SchemaRootPath,
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
-                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList()
+                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
+                ControlMTriggerName = scm.ControlMTriggerName
             };
 
         }

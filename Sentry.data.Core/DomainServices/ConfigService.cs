@@ -1286,6 +1286,7 @@ namespace Sentry.data.Core
             dto.ParquetStorageBucket = dfc.Schema?.ParquetStorageBucket;
             dto.ParquetStoragePrefix = dfc.Schema?.ParquetStoragePrefix;
             dto.ConsumptionDetails = dfc.Schema?.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList();
+            dto.ControlMTriggerName = dfc.Schema?.ControlMTriggerName;
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

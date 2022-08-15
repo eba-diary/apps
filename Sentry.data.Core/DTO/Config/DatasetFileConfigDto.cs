@@ -40,5 +40,6 @@ namespace Sentry.data.Core
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
         public IList<SchemaConsumptionDto> ConsumptionDetails { get; set; }
+        public string ControlMTriggerName { get; set; }
     }
 }
