@@ -6,8 +6,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema20220609
 {
     public class SchemaConsumptionSnowflakeModel : SchemaConsumptionModel
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public override SchemaConsumptionTypeEnum SchemaConsumptionType => SchemaConsumptionTypeEnum.Snowflake;
+        public override string SchemaConsumptionType => nameof(SchemaConsumptionSnowflakeModel);
 
         public string SnowflakeWarehouse { get; set; }
         public string SnowflakeStage { get; set; }

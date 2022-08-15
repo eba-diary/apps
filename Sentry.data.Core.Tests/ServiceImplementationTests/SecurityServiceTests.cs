@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Rhino.Mocks;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
@@ -839,7 +839,7 @@ namespace Sentry.data.Core.Tests
 
         #region CanCreateDataflow
         /// <summary>
-        /// Can Preview Dataset.  no user available.
+        /// Can create dataflow, user is Admin.
         /// </summary>
         [TestMethod]
         public void Security_CanCreateDataflow_NullSecurable_Admin()
@@ -858,7 +858,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Can Preview Dataset.  no user available.
+        /// Non Admin, with no permissions, cannot create dataflow
         /// </summary>
         [TestMethod]
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_NoPermissions()
@@ -876,7 +876,7 @@ namespace Sentry.data.Core.Tests
         }
 
         /// <summary>
-        /// Can Preview Dataset.  no user available.
+        /// Non Admin, with Modify permissions, can create dataflow
         /// </summary>
         [TestMethod]
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_With_Modify_Permissions()
@@ -892,6 +892,161 @@ namespace Sentry.data.Core.Tests
 
             //ASSERT
             Assert.IsTrue(us.CanCreateDataFlow);
+        }
+        #endregion
+
+        #region CanEditDataflow
+        /// <summary>
+        /// Admin User, can edit dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_NullSecurable_Admin()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// Admin User, can edit dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_NullSecurable_User()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
+            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(false).Repeat.Any();
+
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(null, user);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_Securable_Admin()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Security security = BuildBaseSecurity(securableEntityName: SecurableEntityName.DATAFLOW);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(true);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyDataflow);           
+        }
+        
+        /// <summary>
+        /// User with no permissions cannot modify dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_Securable_User_With_No_Permissions()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// User with no permissions cannot modify dataflow
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_Securable_User_With_Permission()
+        {
+            //ARRAGE
+            Security security = BuildBaseSecurity(securableEntityName:SecurableEntityName.DATAFLOW);
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyServiceAccountGroup");
+            SecurityPermission dataflowPermission = BuildBasePermission(ticket1, CanManageDataflow(), true);
+            ticket1.AddedPermissions.Add(dataflowPermission);
+            security.Tickets.Add(ticket1);
+
+
+            //mock out securable and attach security object establihsed above
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
+
+
+
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [TestMethod]
+        public void Security_CanModifyDataflow_NonSecurable_NonAdmin()
+        {
+            //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+
+            var ss = _container.GetInstance<ISecurityService>();
+
+            //ACT
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
+
+            //ASSERT
+            Assert.IsFalse(us.CanModifyDataflow);
         }
         #endregion
 
@@ -968,6 +1123,48 @@ namespace Sentry.data.Core.Tests
         #endregion
 
         #region "BuildOutUserSecurityForSecuredEntity"
+        ///// <summary>
+        ///// Tests that the "Owner" of a dataflow can manage it, 
+        ///// even that permission hasn't been explicitely granted
+        ///// </summary>
+        //[TestMethod]
+        //public void BuildOutUserSecurityForSecuredEntity_CanModifyDataflow_Owner()
+        //{
+        //    // Arrange
+        //    var IsAdmin = false;
+        //    var IsOwner = true;
+        //    var userPermissions = new List<string>();
+        //    var us = new UserSecurity();
+        //    var df = new DataFlow();
+
+        //    // Act
+        //    SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, df);
+
+        //    // Assert
+        //    Assert.IsTrue(us.CanModifyDataflow);
+        //}
+
+        ///// <summary>
+        ///// Tests that an Admin can manage dataflow, 
+        ///// even that permission hasn't been explicitely granted
+        ///// </summary>
+        //[TestMethod]
+        //public void BuildOutUserSecurityForSecuredEntity_CanModifyDataflow_Admin()
+        //{
+        //    // Arrange
+        //    var IsAdmin = true;
+        //    var IsOwner = false;
+        //    var userPermissions = (new[] { PermissionCodes.CAN_PREVIEW_DATASET, PermissionCodes.CAN_VIEW_FULL_DATASET }).ToList();
+        //    var us = new UserSecurity();
+        //    var df = new DataFlow();
+
+        //    // Act
+        //    SecurityService.BuildOutUserSecurityForSecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, df);
+
+        //    // Assert
+        //    Assert.IsTrue(us.CanModifyDataflow);
+        //}
+
         /// <summary>
         /// Tests that the "Owner" of a dataset can manage its schema, 
         /// even that permission hasn't been explicitely granted
@@ -1283,6 +1480,63 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.IsTrue(us.CanViewData);
         }
+
+        /// <summary>
+        /// Tests that an owner of an unsecured dataflow can edit dataflow without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanModifyDataflow_Owner()
+        {
+            // Arrange
+            var IsAdmin = false;
+            var IsOwner = true;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
+
+            // Assert
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// Tests that an Admin can edit an unsecured dataflow without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanModifyDataflow_Admin()
+        {
+            // Arrange
+            var IsAdmin = true;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, new MockDataFeatures());
+
+            // Assert
+            Assert.IsTrue(us.CanModifyDataflow);
+        }
+
+        /// <summary>
+        /// Tests that a user cannot edit an unsecured dataflow without permission request
+        /// </summary>
+        [TestMethod]
+        public void BuildOutUserSecurityForUnsecuredEntity_CanModifyDataflow_user()
+        {
+            // Arrange
+            var IsAdmin = false;
+            var IsOwner = false;
+            var userPermissions = new List<string>();
+            var us = new UserSecurity();
+
+            // Act
+            SecurityService.BuildOutUserSecurityForUnsecuredEntity(IsAdmin, IsOwner, userPermissions, us, null, null);
+
+            // Assert
+            Assert.IsFalse(us.CanModifyDataflow);
+        }
         #endregion
 
         #region "BuildOutUserSecurityFromObsidian"
@@ -1551,7 +1805,7 @@ namespace Sentry.data.Core.Tests
             await service.ApproveTicket(ticket, "");
 
             //Assert
-            inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>()));
+            inevService.Verify(i => i.PublishDatasetPermissionsUpdated(dataset, ticket, It.IsAny<IList<SecurablePermission>>(), It.IsAny<IList<SecurablePermission>>()));
         }
 
         #endregion
@@ -1578,14 +1832,19 @@ namespace Sentry.data.Core.Tests
 
         #region "CreateDefaultSecurityForDataset"
 
+        /// <summary>
+        /// Verify that if a Consumer permission is requested as part of <see cref="SecurityService.CreateDefaultSecurityForDataset_Internal(Dataset, List{AdSecurityGroupDto}, SecurityService.DefaultPermissions, IEnumerable{SecurityTicket}, IEnumerable{SecurityTicket})"/>
+        /// that it is auto-approved.
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
-        public async Task CreateDefaultSecurityForDataset_Internal_Test()
+        public async Task CreateDefaultSecurityForDataset_Internal_Consumer_Test()
         {
             //Arrange
-            var security = new Security() { SecurityId = Guid.NewGuid() };
+            var security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
             var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
-            var consumerPermissions = new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } };
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } }, null );
             var datasetTickets = new List<SecurityTicket>().AsEnumerable();
             var assetTickets = new List<SecurityTicket>().AsEnumerable();
 
@@ -1593,19 +1852,55 @@ namespace Sentry.data.Core.Tests
             obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(false);
             var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
             var context = new Mock<IDatasetContext>();
-            context.Setup(c => c.Security).Returns((new List<Security>() { security }).AsQueryable());
+            context.Setup(c => c.Security).Returns(new List<Security>() { security }.AsQueryable());
             var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object) 
                 { CallBase = true }; //call the real method for anything not explicitely .Setup()
             securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
             //Act
-            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, consumerPermissions, null, datasetTickets, assetTickets);
+            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, defaultPermissions, datasetTickets, assetTickets);
 
             //Assert
             adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(2)); //verify the AD group attempted to be created
             securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(2)); //verify a ticket was built
             securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.AtMost(2)); //verify the ticket was approved
-            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.AtMost(2)); 
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(4));
+        }
+
+        /// <summary>
+        /// Verify that if a Snowflake permission is requested as part of <see cref="SecurityService.CreateDefaultSecurityForDataset_Internal(Dataset, List{AdSecurityGroupDto}, SecurityService.DefaultPermissions, IEnumerable{SecurityTicket}, IEnumerable{SecurityTicket})"/>
+        /// that it's NOT auto-approved.
+        /// </summary>
+        [TestMethod]
+        public async Task CreateDefaultSecurityForDataset_Internal_Snowflake_Test()
+        {
+            //Arrange
+            var security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" }, DataClassification = DataClassificationType.HighlySensitive };
+            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.SNOWFLAKE_ACCESS, SecurableObject = SecurableEntityName.DATASET } });
+            var datasetTickets = new List<SecurityTicket>().AsEnumerable();
+            var assetTickets = new List<SecurityTicket>().AsEnumerable();
+
+            var obsidianService = new Mock<IObsidianService>();
+            obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(false);
+            var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
+            var inevService = new Mock<IInevService>();
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Security).Returns(new List<Security> { security }.AsQueryable());
+            context.Setup(c => c.Datasets).Returns(new List<Dataset> { ds }.AsQueryable());
+            var securityService = new Mock<SecurityService>(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, obsidianService.Object, adSecurityAdminProvider.Object)
+                { CallBase = true }; //call the real method for anything not explicitely .Setup()
+            securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+
+            //Act
+            await securityService.Object.CreateDefaultSecurityForDataset_Internal(ds, groups, defaultPermissions, datasetTickets, assetTickets);
+
+            //Assert
+            adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(1)); //verify the AD group attempted to be created
+            securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(1)); //verify a ticket was built
+            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.Never); //verify the ticket was NOT approved
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(2));
         }
 
         #endregion
@@ -1657,10 +1952,32 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_UPLOAD_TO_DATASET));
         }
 
+        [TestMethod]
+        public void GetSnowflakePermissions_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.SNOWFLAKE_ACCESS, SecurableObject = SecurableEntityName.DATASET }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetSnowflakePermissions();
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS));
+        }
+
         #endregion
 
         #region "Private helpers"
-        private Security BuildBaseSecurity(string CreateById = null)
+        
+
+        private Security BuildBaseSecurity(string CreateById = null, string securableEntityName = SecurableEntityName.DATASET)
         {
             return new Security()
             {
@@ -1668,7 +1985,7 @@ namespace Sentry.data.Core.Tests
                 CreatedDate = DateTime.Now,
                 EnabledDate = DateTime.Now,
                 CreatedById = CreateById,
-                SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET,
+                SecurableEntityName = securableEntityName,
                 Tickets = new List<SecurityTicket>()
             };
         }
@@ -1752,6 +2069,17 @@ namespace Sentry.data.Core.Tests
                 PermissionDescription = "Can Manage Schema Description",
                 PermissionName = "Can Manage Schema Name",
                 SecurableObject = GlobalConstants.SecurableEntityName.DATASET
+            };
+        }
+
+        private Permission CanManageDataflow()
+        {
+            return new Permission()
+            {
+                PermissionCode = GlobalConstants.PermissionCodes.CAN_MANAGE_DATAFLOW,
+                PermissionDescription = "Can Manage DataFlow Description",
+                PermissionName = "Can Manage Dataflow Name",
+                SecurableObject = GlobalConstants.SecurableEntityName.DATAFLOW
             };
         }
 

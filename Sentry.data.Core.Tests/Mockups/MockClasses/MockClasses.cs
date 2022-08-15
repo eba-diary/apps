@@ -122,7 +122,8 @@ namespace Sentry.data.Core.Tests
             FileSchema fileSchema = new FileSchema()
             {
                 SchemaId = 23,
-                Name = "Test_Schema_23"
+                Name = "Test_Schema_23",
+                StorageCode = "199992"
             };
 
             return fileSchema;
@@ -900,6 +901,42 @@ namespace Sentry.data.Core.Tests
                 );
             }
             return security;
+        }
+
+        public static DataFlowDto MockDataFlowDto(DataFlow flow, SchemaMapDto schemaMapDto)
+        {
+            var flowDto = new DataFlowDto()
+            {
+                Id = (flow == null) ? 0 : flow.Id,
+                SchemaMap = new List<SchemaMapDto>() { schemaMapDto },
+                FlowGuid = Guid.Empty,
+                SaidKeyCode = "DATA",
+                DatasetId = 1,
+                SchemaId = 23,
+                Name = "TheFlowTest",
+                CreateDTM = DateTime.Now,
+                CreatedBy = "072984",
+                DFQuestionnaire = null,
+                IngestionType = 1,
+                RetrieverJob = null,
+                IsCompressed = false,
+                CompressionType = 0,
+                CompressionJob = null,
+                IsPreProcessingRequired = false,
+                PreProcessingOption = 0,
+                FlowStorageCode = "",
+                AssociatedJobs = null,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue,
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                PrimaryContactId = "072984",
+                IsSecured = true,
+                Security = null
+            };
+
+            return flowDto;
         }
 
     }
