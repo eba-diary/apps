@@ -8,39 +8,11 @@ namespace Sentry.data.Web.Controllers
 {
     public class DatasetSearchController : TileSearchController
     {
-        private readonly IDatasetService _datasetService;
+        private readonly ITileSearchService _tileSearchService;
 
-        public DatasetSearchController(IFilterSearchService filterSearchService, IDatasetService datasetService) : base(filterSearchService)
+        public DatasetSearchController(ITileSearchService tileSearchService, IFilterSearchService filterSearchService) : base(tileSearchService, filterSearchService)
         {
-            _datasetService = datasetService;
-        }
-
-        [HttpPost]
-        public JsonResult SearchableDatasets(DatasetSearchModel datasetSearchModel)
-        {
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
-            List<DatasetTileDto> datasetTileDtos = _datasetService.SearchDatasetTileDtos(datasetSearchDto).ToList();
-            List<TileModel> tileModels = datasetTileDtos.ToModels();
-            return Json(tileModels);
-        }
-
-        [HttpPost]
-        public JsonResult TileResultsModel(DatasetSearchModel datasetSearchModel)
-        {
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
-            DatasetSearchResultDto resultDto = _datasetService.SearchDatasets(datasetSearchDto);
-            TileResultsModel tileResultsModel = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber, datasetSearchModel.Layout);
-            return Json(tileResultsModel);
-        }
-
-        [HttpPost]
-        public JsonResult TileFilters(DatasetSearchModel datasetSearchModel)
-        {
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
-            List<FilterCategoryDto> filterCategoryDtos = datasetSearchDto.SearchableTiles.CreateFilters(datasetSearchDto.FilterCategories);
-            List<FilterCategoryModel> filterCategoryModels = filterCategoryDtos.ToModels();
-
-            return Json(filterCategoryModels);
+            _tileSearchService = tileSearchService;
         }
 
         [HttpPost]

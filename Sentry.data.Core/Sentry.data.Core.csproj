@@ -158,6 +158,8 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DomainServices\TileSearchService.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceTileDto.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryAssetCategoriesDto.cs" />
@@ -415,6 +417,7 @@
     <Compile Include="Interfaces\IBaseTicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
+    <Compile Include="Interfaces\ITileSearchService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />

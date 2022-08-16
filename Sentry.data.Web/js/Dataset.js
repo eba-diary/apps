@@ -2309,13 +2309,11 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
         var filters = JSON.parse(localStorage.getItem("filters"));
         if (filters.length) {
-            url = data.Dataset.AddParamDivider(url) + "filters=";
+            url = data.Dataset.AddParamDivider(url);
 
-            $.each(filters, function () {
-                url += this + ",";
-            });
-
-            url = url.replace(/,\s*$/, "");
+            url += filters.map(function (el) {
+                return 'filters=' + el;
+            }).join('&');
         }
 
         return url;

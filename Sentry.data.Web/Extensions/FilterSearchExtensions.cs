@@ -99,7 +99,7 @@ namespace Sentry.data.Web
             };
         }
 
-        public static DatasetSearchDto ToDto(this DatasetSearchModel model)
+        public static DatasetSearchDto ToDto(this TileSearchModel model)
         {
             DatasetSearchDto dto = new DatasetSearchDto()
             {
