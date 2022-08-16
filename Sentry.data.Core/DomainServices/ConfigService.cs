@@ -29,12 +29,13 @@ namespace Sentry.data.Core
         private Guid _guid;
         private string _bucket;
         private readonly ISAIDService _saidService;
+        private readonly IDatasetFileService _datasetFileService;
 
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService)
+            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService, IDatasetFileService datasetFileService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -48,6 +49,7 @@ namespace Sentry.data.Core
             _featureFlags = dataFeatures;
             _dataFlowService = dataFlowService;
             _saidService = saidService;
+            _datasetFileService = datasetFileService;
         }
 
         private IJobService JobService
@@ -615,6 +617,9 @@ namespace Sentry.data.Core
 
                     /* Mark schema object for delete */
                     MarkForDelete(scm);
+
+                    //DELETE ALL DATASETFILES UNDER SCHEMA BEING DELETED
+                    DeleteDatasetFiles(dfc.ParentDataset.DatasetId, scm.SchemaId);
                 }
                 catch (Exception ex)
                 {
@@ -986,6 +991,26 @@ namespace Sentry.data.Core
             scm.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             scm.DeleteIssueDTM = DateTime.Now;
             scm.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
+        }
+
+        private void DeleteDatasetFiles(int datasetId, int schemaId)
+        {
+            //DO NOT DELETE IF FEATURE IS OFF
+            if (!_featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            {
+                return;
+            }
+
+            //GET ALL DATASETFILE IDS FOR SCHEMA
+            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusActive.Where(w => w.Schema.SchemaId == schemaId).ToList();
+
+            //DELETE ALL FILES IN LIST
+            if (dbList != null && dbList.Count > 0)
+            {
+                int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
+                DeleteFilesParamDto dto = new DeleteFilesParamDto() { UserFileIdList = idList };
+                _datasetFileService.Delete(datasetId, schemaId, dto);
+            }
         }
 
         private void MapToDto(DataSource dsrc, DataSourceDto dto)

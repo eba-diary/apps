@@ -826,7 +826,7 @@ data.Dataset = {
     },
 
     FormSubmitInit: function () {
-        $("#IsSecured").removeAttr("disabled");
+        $("#DatasetFormContent #IsSecured").removeAttr("disabled");
         $.ajax({
             url: "/Dataset/DatasetForm",
             method: "POST",
@@ -911,7 +911,7 @@ data.Dataset = {
 
         $("#PrimaryContactName").assocAutocomplete({
             associateSelected: function (associate) {
-                $('#PrimaryContactId').val(associate.Id);
+                $('#DatasetFormContent #PrimaryContactId').val(associate.Id);
             },
             filterPermission: permissionFilter,
             minLength: 0,
@@ -929,7 +929,7 @@ data.Dataset = {
         }
 
         $("#DataClassification").change(function () {
-            let securedInput = $("#IsSecured");
+            let securedInput = $("#DatasetFormContent #IsSecured");
             securedInput.removeAttr("disabled");
             switch ($("#DataClassification").val()) {
                 case "1"://Restricted
