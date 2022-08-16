@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
-    public class DatasetSearchDto : FilterSearchDto
+    public class TileSearchDto<T> : FilterSearchDto
     {
         public int PageSize { get; set; }
         public int PageNumber { get; set; }
-        public Func<DatasetTileDto, object> OrderByField { get; set; }
         public bool OrderByDescending { get; set; }
-        public List<DatasetTileDto> SearchableTiles { get; set; }
+        public Func<T, object> OrderByField { get; set; }
+        public List<T> SearchableTiles { get; set; }
     }
 }

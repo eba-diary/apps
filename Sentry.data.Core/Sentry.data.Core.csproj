@@ -153,6 +153,7 @@
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
     <Compile Include="DomainServices\DatasetFileService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\DatasetTileSearchService.cs" />
     <Compile Include="DomainServices\JobService.cs" />
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
@@ -180,8 +181,6 @@
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
-    <Compile Include="DTO\Dataset\DatasetSearchDto.cs" />
-    <Compile Include="DTO\Dataset\DatasetSearchResultDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetTileDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
@@ -205,11 +204,13 @@
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
+    <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
     <Compile Include="DTO\Search\FilterSearchDto.cs" />
     <Compile Include="DTO\Search\SavedSearchDto.cs" />
     <Compile Include="DTO\Search\SavedSearchOptionDto.cs" />
+    <Compile Include="DTO\Search\TileSearchResultDto.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupDto.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />

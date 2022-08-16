@@ -99,9 +99,9 @@ namespace Sentry.data.Web
             };
         }
 
-        public static DatasetSearchDto ToDto(this TileSearchModel model)
+        public static TileSearchDto<DatasetTileDto> ToDto(this TileSearchModel model)
         {
-            DatasetSearchDto dto = new DatasetSearchDto()
+            TileSearchDto<DatasetTileDto> dto = new TileSearchDto<DatasetTileDto>()
             {
                 PageSize = model.PageSize,
                 PageNumber = model.PageNumber,

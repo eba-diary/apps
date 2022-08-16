@@ -145,6 +145,8 @@ namespace Sentry.data.Infrastructure
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
 
+            registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
+
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
             registry.For<IRecurringJobManager>().Singleton().Use<RecurringJobManager>().SelectConstructor(() => new RecurringJobManager());

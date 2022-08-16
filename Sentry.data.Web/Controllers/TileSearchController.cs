@@ -9,13 +9,10 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public abstract class TileSearchController<T> : BaseSearchableController where T : IFilterSearchable
+    public abstract class TileSearchController : BaseSearchableController
     {
-        private readonly ITileSearchService _tileSearchService;
-
-        protected TileSearchController(ITileSearchService tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService) 
+        protected TileSearchController(IFilterSearchService filterSearchService) : base(filterSearchService) 
         {
-            _tileSearchService = tileSearchService;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
@@ -73,31 +70,9 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult SearchableDatasets(TileSearchModel datasetSearchModel)
+        public ActionResult TileResults(TileResultsModel tileResultsModel)
         {
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
-            List<DatasetTileDto> datasetTileDtos = _tileSearchService.SearchDatasetTileDtos(datasetSearchDto).ToList();
-            List<TileModel> tileModels = datasetTileDtos.ToModels();
-            return Json(tileModels);
-        }
-
-        [HttpPost]
-        public JsonResult TileResultsModel(TileSearchModel datasetSearchModel)
-        {
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
-            DatasetSearchResultDto resultDto = _tileSearchService.SearchDatasets(datasetSearchDto);
-            TileResultsModel tileResultsModel = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber, datasetSearchModel.Layout);
-            return Json(tileResultsModel);
-        }
-
-        [HttpPost]
-        public JsonResult TileFilters(TileSearchModel datasetSearchModel)
-        {
-            DatasetSearchDto datasetSearchDto = datasetSearchModel.ToDto();
-            List<FilterCategoryDto> filterCategoryDtos = datasetSearchDto.SearchableTiles.CreateFilters(datasetSearchDto.FilterCategories);
-            List<FilterCategoryModel> filterCategoryModels = filterCategoryDtos.ToModels();
-
-            return Json(filterCategoryModels);
+            return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
 
         #region Abstract

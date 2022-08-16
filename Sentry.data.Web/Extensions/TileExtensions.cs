@@ -8,7 +8,7 @@ namespace Sentry.data.Web
 {
     public static class TileExtensions
     {
-        public static TileResultsModel ToModel(this DatasetSearchResultDto dto, int selectedSortByValue, int selectedPageNumber, int selectedLayout)
+        public static TileResultsModel ToModel(this TileSearchResultDto<DatasetTileDto> dto, int selectedSortByValue, int selectedPageNumber, int selectedLayout)
         {
             TileResultsModel model = new TileResultsModel()
             {

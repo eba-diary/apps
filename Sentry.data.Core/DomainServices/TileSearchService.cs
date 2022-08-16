@@ -2,24 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class TileSearchService : ITileSearchService
+    public abstract class TileSearchService<T> : ITileSearchService<T> where T : DatasetTileDto
     {
-        private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
 
-        public TileSearchService(IDatasetContext datasetContext, IUserService userService)
+        protected TileSearchService(IUserService userService)
         {
-            _datasetContext = datasetContext;
             _userService = userService;
         }
 
-        public DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto)
+        public TileSearchResultDto<T> SearchDatasets(TileSearchDto<T> datasetSearchDto)
         {
-            DatasetSearchResultDto resultDto = new DatasetSearchResultDto()
+            TileSearchResultDto<T> resultDto = new TileSearchResultDto<T>()
             {
                 PageSize = datasetSearchDto.PageSize,
                 PageNumber = datasetSearchDto.PageNumber
@@ -27,8 +24,8 @@ namespace Sentry.data.Core
 
             try
             {
-                IEnumerable<DatasetTileDto> dtos = SearchDatasetTileDtos(datasetSearchDto);
-                List<DatasetTileDto> allResults = dtos.FilterBy(datasetSearchDto.FilterCategories).ToList();
+                IEnumerable<T> dtos = SearchDatasetTileDtos(datasetSearchDto);
+                List<T> allResults = dtos.FilterBy(datasetSearchDto.FilterCategories).ToList();
 
                 resultDto.TotalResults = allResults.Count;
                 resultDto.Tiles = ApplyPaging(allResults, datasetSearchDto);
@@ -41,9 +38,9 @@ namespace Sentry.data.Core
             return resultDto;
         }
 
-        public IEnumerable<DatasetTileDto> SearchDatasetTileDtos(DatasetSearchDto datasetSearchDto)
+        public IEnumerable<T> SearchDatasetTileDtos(TileSearchDto<T> datasetSearchDto)
         {
-            IEnumerable<DatasetTileDto> dtos = datasetSearchDto.SearchableTiles ?? GetDatasetTileDtos();
+            IEnumerable<T> dtos = datasetSearchDto.SearchableTiles ?? GetDatasetTileDtos();
 
             if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
             {
@@ -53,18 +50,23 @@ namespace Sentry.data.Core
             return dtos;
         }
 
+        #region Abstract
+        protected abstract List<Dataset> GetDatasets();
+        protected abstract T MapToTileDto(Dataset dataset);
+        #endregion
+
         #region Private
-        private IEnumerable<DatasetTileDto> GetDatasetTileDtos()
+        private IEnumerable<T> GetDatasetTileDtos()
         {
-            List<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET && w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).FetchAllChildren(_datasetContext);
+            List<Dataset> datasets = GetDatasets();
 
             string associateId = _userService.GetCurrentUser().AssociateId;
-            List<DatasetTileDto> datasetTileDtos = new List<DatasetTileDto>();
+            List<T> datasetTileDtos = new List<T>();
 
             //map to DatasetTileDto
             foreach (Dataset dataset in datasets)
             {
-                DatasetTileDto datasetTileDto = dataset.ToTileDto();
+                T datasetTileDto = MapToTileDto(dataset);
                 datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
 
                 datasetTileDto.LastActivityDateTime = dataset.ChangedDtm;
@@ -83,7 +85,7 @@ namespace Sentry.data.Core
             return datasetTileDtos;
         }
 
-        private List<DatasetTileDto> ApplyPaging(IEnumerable<DatasetTileDto> dtos, DatasetSearchDto datasetSearchDto)
+        private List<T> ApplyPaging(IEnumerable<T> dtos, TileSearchDto<T> datasetSearchDto)
         {
             if (datasetSearchDto.OrderByDescending)
             {

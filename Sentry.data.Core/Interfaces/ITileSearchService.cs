@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public interface ITileSearchService
+    public interface ITileSearchService<T> where T : DatasetTileDto
     {
-        DatasetSearchResultDto SearchDatasets(DatasetSearchDto datasetSearchDto);
-        IEnumerable<DatasetTileDto> SearchDatasetTileDtos(DatasetSearchDto datasetSearchDto);
+        TileSearchResultDto<T> SearchDatasets(TileSearchDto<T> datasetSearchDto);
+        IEnumerable<T> SearchDatasetTileDtos(TileSearchDto<T> datasetSearchDto);
     }
 }

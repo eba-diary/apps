@@ -8,17 +8,39 @@ namespace Sentry.data.Web.Controllers
 {
     public class DatasetSearchController : TileSearchController
     {
-        private readonly ITileSearchService _tileSearchService;
+        private readonly ITileSearchService<DatasetTileDto> _tileSearchService;
 
-        public DatasetSearchController(ITileSearchService tileSearchService, IFilterSearchService filterSearchService) : base(tileSearchService, filterSearchService)
+        public DatasetSearchController(ITileSearchService<DatasetTileDto> tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
             _tileSearchService = tileSearchService;
         }
 
         [HttpPost]
-        public ActionResult TileResults(TileResultsModel tileResultsModel)
+        public JsonResult SearchableDatasets(TileSearchModel datasetSearchModel)
         {
-            return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
+            TileSearchDto<DatasetTileDto> datasetSearchDto = datasetSearchModel.ToDto();
+            List<DatasetTileDto> datasetTileDtos = _tileSearchService.SearchDatasetTileDtos(datasetSearchDto).ToList();
+            List<TileModel> tileModels = datasetTileDtos.ToModels();
+            return Json(tileModels);
+        }
+
+        [HttpPost]
+        public JsonResult TileResultsModel(TileSearchModel datasetSearchModel)
+        {
+            TileSearchDto<DatasetTileDto> datasetSearchDto = datasetSearchModel.ToDto();
+            TileSearchResultDto<DatasetTileDto> resultDto = _tileSearchService.SearchDatasets(datasetSearchDto);
+            TileResultsModel tileResultsModel = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber, datasetSearchModel.Layout);
+            return Json(tileResultsModel);
+        }
+
+        [HttpPost]
+        public JsonResult TileFilters(TileSearchModel datasetSearchModel)
+        {
+            TileSearchDto<DatasetTileDto> datasetSearchDto = datasetSearchModel.ToDto();
+            List<FilterCategoryDto> filterCategoryDtos = datasetSearchDto.SearchableTiles.CreateFilters(datasetSearchDto.FilterCategories);
+            List<FilterCategoryModel> filterCategoryModels = filterCategoryDtos.ToModels();
+
+            return Json(filterCategoryModels);
         }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
