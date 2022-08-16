@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
     public interface ITileSearchService<T> where T : DatasetTileDto
     {
-        TileSearchResultDto<T> SearchDatasets(TileSearchDto<T> datasetSearchDto);
-        IEnumerable<T> SearchDatasetTileDtos(TileSearchDto<T> datasetSearchDto);
+        TileSearchResultDto<T> SearchTiles(TileSearchDto<T> searchDto);
+        IEnumerable<T> SearchTileDtos(TileSearchDto<T> searchDto);
     }
 }

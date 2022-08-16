@@ -99,13 +99,12 @@ namespace Sentry.data.Web
             };
         }
 
-        public static TileSearchDto<DatasetTileDto> ToDto(this TileSearchModel model)
+        public static TileSearchDto<T> ToDto<T>(this TileSearchModel model) where T : DatasetTileDto
         {
-            TileSearchDto<DatasetTileDto> dto = new TileSearchDto<DatasetTileDto>()
+            TileSearchDto<T> dto = new TileSearchDto<T>()
             {
                 PageSize = model.PageSize,
-                PageNumber = model.PageNumber,
-                SearchableTiles = model.SearchableTiles.ToDatasetTileDtos()
+                PageNumber = model.PageNumber
             };
 
             switch ((TileSearchSortByOption)model.SortBy)
@@ -136,24 +135,60 @@ namespace Sentry.data.Web
 
         public static List<DatasetTileDto> ToDatasetTileDtos(this List<TileModel> models)
         {
-            return models?.Select(x => x.ToDatasetTileDto()).ToList();
+            List<DatasetTileDto> tileDtos = new List<DatasetTileDto>();
+
+            if (models?.Any() == true)
+            {
+                foreach (TileModel model in models)
+                {
+                    DatasetTileDto dto = new DatasetTileDto();
+                    MapToParentDto(model, dto);
+                    tileDtos.Add(dto);
+                }
+            }
+
+            return tileDtos;
         }
 
-        private static DatasetTileDto ToDatasetTileDto(this TileModel model)
+        public static List<BusinessIntelligenceTileDto> ToBusinessIntelligenceTileDtos(this List<TileModel> models)
         {
-            return new DatasetTileDto()
+            List<BusinessIntelligenceTileDto> tileDtos = new List<BusinessIntelligenceTileDto>();
+
+            if (models?.Any() == true)
             {
-                Id = model.Id,
-                Name = model.Name,
-                Description = model.Description,
-                Status = EnumHelper.GetByDescription<ObjectStatusEnum>(model.Status),
-                IsFavorite = model.IsFavorite,
-                Category = model.Category,
-                Color = model.Color,
-                IsSecured = model.IsSecured,
-                LastActivityDateTime = DateTime.Parse(model.LastActivityDateTime),
-                CreatedDateTime = DateTime.Parse(model.CreatedDateTime)
-            };
+                foreach (TileModel model in models)
+                {
+                    BusinessIntelligenceTileDto dto = new BusinessIntelligenceTileDto()
+                    {
+                        AbbreviatedCategories = model.AbbreviatedCategories,
+                        ReportType = model.ReportType,
+                        UpdateFrequency = model.UpdateFrequency,
+                        ContactNames = model.ContactNames,
+                        BusinessUnits = model.BusinessUnits,
+                        Functions = model.Functions,
+                        Tags = model.Tags
+                    };
+
+                    MapToParentDto(model, dto);
+                    tileDtos.Add(dto);
+                }
+            }
+
+            return tileDtos;
+        }
+
+        private static void MapToParentDto(TileModel model, DatasetTileDto dto)
+        {
+            dto.Id = model.Id;
+            dto.Name = model.Name;
+            dto.Description = model.Description;
+            dto.Status = EnumHelper.GetByDescription<ObjectStatusEnum>(model.Status);
+            dto.IsFavorite = model.IsFavorite;
+            dto.Categories = model.Categories;
+            dto.Color = model.Color;
+            dto.IsSecured = model.IsSecured;
+            dto.LastActivityDateTime = DateTime.Parse(model.LastActivityDateTime);
+            dto.CreatedDateTime = DateTime.Parse(model.CreatedDateTime);
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)

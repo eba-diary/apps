@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Nest;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Sentry.data.Core
@@ -10,31 +13,52 @@ namespace Sentry.data.Core
             return CommonExtensions.GenerateSASLibaryName(dsContext.GetById<Dataset>(dto.DatasetId));
         }
 
-        public static DatasetTileDto ToTileDto(this Dataset dataset)
+        public static DatasetTileDto ToDatasetTileDto(this Dataset dataset)
         {
-            DatasetTileDto datasetTileDto = new DatasetTileDto()
+            DatasetTileDto datasetTileDto = new DatasetTileDto();
+            MapToDatasetTileDto(dataset, datasetTileDto);
+            return datasetTileDto;
+        }
+
+        public static BusinessIntelligenceTileDto ToBusinessIntelligenceTileDto(this Dataset dataset)
+        {
+            BusinessIntelligenceTileDto biTileDto = new BusinessIntelligenceTileDto()
             {
-                Id = dataset.DatasetId.ToString(),
-                Name = dataset.DatasetName,
-                Description = dataset.DatasetDesc,
-                Status = dataset.ObjectStatus,
-                IsSecured = dataset.IsSecured,
-                CreatedDateTime = dataset.DatasetDtm,
-                Color = "darkgray"
+                UpdateFrequency = Enum.GetName(typeof(ReportFrequency), dataset.Metadata?.ReportMetadata?.Frequency) ?? "Not Specified",
+                ReportType = ((ReportType)dataset.DatasetFileConfigs.First().FileTypeId).ToString(),
+                BusinessUnits = dataset.BusinessUnits.Select(x => x.Name).ToList(),
+                Functions = dataset.DatasetFunctions.Select(x => x.Name).ToList(),
+                Tags = dataset.Tags.Select(x => x.Name).ToList(),
             };
 
             if (dataset.DatasetCategories?.Any() == true)
             {
-                List<string> catNameList = dataset.DatasetCategories.Select(x => !string.IsNullOrWhiteSpace(x.AbbreviatedName) ? x.AbbreviatedName : x.Name).ToList();
-                datasetTileDto.Category = string.Join(", ", catNameList);
+                biTileDto.AbbreviatedCategories = string.Join(", ", dataset.DatasetCategories.Select(x => !string.IsNullOrWhiteSpace(x.AbbreviatedName) ? x.AbbreviatedName : x.Name));
+            }
+
+            MapToDatasetTileDto(dataset, biTileDto);
+            return biTileDto;
+        }
+
+        private static void MapToDatasetTileDto(Dataset dataset, DatasetTileDto dto)
+        {
+            dto.Id = dataset.DatasetId.ToString();
+            dto.Name = dataset.DatasetName;
+            dto.Description = dataset.DatasetDesc;
+            dto.Status = dataset.ObjectStatus;
+            dto.IsSecured = dataset.IsSecured;
+            dto.CreatedDateTime = dataset.DatasetDtm;
+            dto.Color = "darkgray";
+
+            if (dataset.DatasetCategories?.Any() == true)
+            {
+                dto.Categories = dataset.DatasetCategories.Select(x => x.Name).ToList();
 
                 if (dataset.DatasetCategories.Count == 1)
                 {
-                    datasetTileDto.Color = dataset.DatasetCategories.First().Color;
+                    dto.Color = dataset.DatasetCategories.First().Color;
                 }
             }
-
-            return datasetTileDto;
         }
     }
 }

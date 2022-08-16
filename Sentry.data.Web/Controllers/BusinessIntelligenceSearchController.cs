@@ -1,20 +1,23 @@
 ﻿using Sentry.data.Core;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class BusinessIntelligenceSearchController : TileSearchController
+    public class BusinessIntelligenceSearchController : TileSearchController<BusinessIntelligenceTileDto>
     {
-        public BusinessIntelligenceSearchController(IFilterSearchService filterSearchService) : base(filterSearchService)
+        public BusinessIntelligenceSearchController(ITileSearchService<BusinessIntelligenceTileDto> tileSearchService, IFilterSearchService filterSearchService) : base(tileSearchService, filterSearchService) { }
+
+        protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
-            
+            return new FilterSearchConfigModel()
+            {
+                PageTitle = "Business Intelligence",
+                SearchType = SearchType.BUSINESS_INTELLIGENCE_SEARCH,
+                IconPath = "~/Images/Icons/Business IntelligenceBlue.svg",
+                DefaultSearch = searchModel
+            };
         }
 
         protected override bool HasPermission()
@@ -27,15 +30,14 @@ namespace Sentry.data.Web.Controllers
             return SearchType.BUSINESS_INTELLIGENCE_SEARCH;
         }
 
-        protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
+        protected override List<BusinessIntelligenceTileDto> MapToTileDtos(List<TileModel> tileModels)
         {
-            return new FilterSearchConfigModel()
-            {
-                PageTitle = "Business Intelligence",
-                SearchType = SearchType.BUSINESS_INTELLIGENCE_SEARCH,
-                IconPath = "~/Images/Icons/Business IntelligenceBlue.svg",
-                DefaultSearch = searchModel
-            };
+            return tileModels.ToBusinessIntelligenceTileDtos();
+        }
+
+        protected override List<TileModel> MapToTileModels(List<BusinessIntelligenceTileDto> tileDtos)
+        {
+            return tileDtos.ToModels();
         }
     }
 }

@@ -9,10 +9,13 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public abstract class TileSearchController : BaseSearchableController
+    public abstract class TileSearchController<T> : BaseSearchableController where T : DatasetTileDto
     {
-        protected TileSearchController(IFilterSearchService filterSearchService) : base(filterSearchService) 
+        private readonly ITileSearchService<T> _tileSearchService;
+
+        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
+            _tileSearchService = tileSearchService;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
@@ -70,6 +73,35 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
+        public JsonResult SearchableDatasets(TileSearchModel datasetSearchModel)
+        {
+            TileSearchDto<T> datasetSearchDto = MapToTileSearchDto(datasetSearchModel);
+            List<T> datasetTileDtos = _tileSearchService.SearchTileDtos(datasetSearchDto).ToList();
+            List<TileModel> tileModels = MapToTileModels(datasetTileDtos); // datasetTileDtos.ToModels();
+            return Json(tileModels);
+        }
+
+        [HttpPost]
+        public JsonResult TileResultsModel(TileSearchModel datasetSearchModel)
+        {
+            TileSearchDto<T> datasetSearchDto = MapToTileSearchDto(datasetSearchModel);
+            TileSearchResultDto<T> resultDto = _tileSearchService.SearchTiles(datasetSearchDto);
+            TileResultsModel tileResultsModel = resultDto.ToModel(datasetSearchModel.SortBy, datasetSearchModel.PageNumber, datasetSearchModel.Layout);
+            tileResultsModel.Tiles = MapToTileModels(resultDto.Tiles);
+            return Json(tileResultsModel);
+        }
+
+        [HttpPost]
+        public JsonResult TileFilters(TileSearchModel datasetSearchModel)
+        {
+            TileSearchDto<T> datasetSearchDto = MapToTileSearchDto(datasetSearchModel);
+            List<FilterCategoryDto> filterCategoryDtos = datasetSearchDto.SearchableTiles.CreateFilters(datasetSearchDto.FilterCategories);
+            List<FilterCategoryModel> filterCategoryModels = filterCategoryDtos.ToModels();
+
+            return Json(filterCategoryModels);
+        }
+
+        [HttpPost]
         public ActionResult TileResults(TileResultsModel tileResultsModel)
         {
             return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
@@ -78,6 +110,8 @@ namespace Sentry.data.Web.Controllers
         #region Abstract
         protected abstract bool HasPermission();
         protected abstract string GetSearchType();
+        protected abstract List<T> MapToTileDtos(List<TileModel> tileModels);
+        protected abstract List<TileModel> MapToTileModels(List<T> tileDtos);
         #endregion
 
         #region Private
@@ -115,6 +149,13 @@ namespace Sentry.data.Web.Controllers
             }
 
             return categories;
+        }
+
+        private TileSearchDto<T> MapToTileSearchDto(TileSearchModel datasetSearchModel)
+        {
+            TileSearchDto<T> datasetSearchDto = datasetSearchModel.ToDto<T>();
+            datasetSearchDto.SearchableTiles = MapToTileDtos(datasetSearchModel.SearchableTiles);
+            return datasetSearchDto;
         }
         #endregion
     }

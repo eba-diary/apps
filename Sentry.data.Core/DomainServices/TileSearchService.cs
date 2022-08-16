@@ -7,28 +7,30 @@ namespace Sentry.data.Core
 {
     public abstract class TileSearchService<T> : ITileSearchService<T> where T : DatasetTileDto
     {
+        protected readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
 
-        protected TileSearchService(IUserService userService)
+        protected TileSearchService(IDatasetContext datasetContext, IUserService userService)
         {
+            _datasetContext = datasetContext;
             _userService = userService;
         }
 
-        public TileSearchResultDto<T> SearchDatasets(TileSearchDto<T> datasetSearchDto)
+        public TileSearchResultDto<T> SearchTiles(TileSearchDto<T> searchDto)
         {
             TileSearchResultDto<T> resultDto = new TileSearchResultDto<T>()
             {
-                PageSize = datasetSearchDto.PageSize,
-                PageNumber = datasetSearchDto.PageNumber
+                PageSize = searchDto.PageSize,
+                PageNumber = searchDto.PageNumber
             };
 
             try
             {
-                IEnumerable<T> dtos = SearchDatasetTileDtos(datasetSearchDto);
-                List<T> allResults = dtos.FilterBy(datasetSearchDto.FilterCategories).ToList();
+                IEnumerable<T> dtos = SearchTileDtos(searchDto);
+                List<T> allResults = dtos.FilterBy(searchDto.FilterCategories).ToList();
 
                 resultDto.TotalResults = allResults.Count;
-                resultDto.Tiles = ApplyPaging(allResults, datasetSearchDto);
+                resultDto.Tiles = ApplyPaging(allResults, searchDto);
             }
             catch (Exception ex)
             {
@@ -38,67 +40,67 @@ namespace Sentry.data.Core
             return resultDto;
         }
 
-        public IEnumerable<T> SearchDatasetTileDtos(TileSearchDto<T> datasetSearchDto)
+        public IEnumerable<T> SearchTileDtos(TileSearchDto<T> searchDto)
         {
-            IEnumerable<T> dtos = datasetSearchDto.SearchableTiles ?? GetDatasetTileDtos();
+            IEnumerable<T> dtos = searchDto.SearchableTiles ?? GetTileDtos();
 
-            if (!string.IsNullOrWhiteSpace(datasetSearchDto.SearchText))
+            if (!string.IsNullOrWhiteSpace(searchDto.SearchText))
             {
-                dtos = dtos.Where(x => x.Name.ToLower().Contains(datasetSearchDto.SearchText.ToLower()));
+                dtos = dtos.Where(x => x.Name.ToLower().Contains(searchDto.SearchText.ToLower()));
             }
 
             return dtos;
         }
 
         #region Abstract
-        protected abstract List<Dataset> GetDatasets();
+        protected abstract IQueryable<Dataset> GetDatasets();
         protected abstract T MapToTileDto(Dataset dataset);
         #endregion
 
         #region Private
-        private IEnumerable<T> GetDatasetTileDtos()
+        private IEnumerable<T> GetTileDtos()
         {
-            List<Dataset> datasets = GetDatasets();
+            List<Dataset> datasets = GetDatasets().FetchAllChildren(_datasetContext);
 
             string associateId = _userService.GetCurrentUser().AssociateId;
-            List<T> datasetTileDtos = new List<T>();
+            List<T> tileDtos = new List<T>();
 
             //map to DatasetTileDto
             foreach (Dataset dataset in datasets)
             {
-                T datasetTileDto = MapToTileDto(dataset);
-                datasetTileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+                T tileDto = MapToTileDto(dataset);
+                tileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
 
-                datasetTileDto.LastActivityDateTime = dataset.ChangedDtm;
+                tileDto.LastActivityDateTime = dataset.ChangedDtm;
                 if (dataset.DatasetFiles?.Any() == true)
                 {
                     DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
-                    if (lastFileDate > datasetTileDto.LastActivityDateTime)
+                    if (lastFileDate > tileDto.LastActivityDateTime)
                     {
-                        datasetTileDto.LastActivityDateTime = lastFileDate;
+                        tileDto.LastActivityDateTime = lastFileDate;
                     }
                 }
 
-                datasetTileDtos.Add(datasetTileDto);
+                tileDtos.Add(tileDto);
             }
 
-            return datasetTileDtos;
+            return tileDtos;
         }
 
-        private List<T> ApplyPaging(IEnumerable<T> dtos, TileSearchDto<T> datasetSearchDto)
+        private List<T> ApplyPaging(IEnumerable<T> dtos, TileSearchDto<T> searchDto)
         {
-            if (datasetSearchDto.OrderByDescending)
+            if (searchDto.OrderByDescending)
             {
-                dtos = dtos.OrderByDescending(datasetSearchDto.OrderByField);
+                dtos = dtos.OrderByDescending(searchDto.OrderByField);
             }
             else
             {
-                dtos = dtos.OrderBy(datasetSearchDto.OrderByField);
+                dtos = dtos.OrderBy(searchDto.OrderByField);
             }
 
-            if (datasetSearchDto.PageSize > 0)
+            if (searchDto.PageSize > 0)
             {
-                dtos = dtos.Skip(datasetSearchDto.PageSize * (datasetSearchDto.PageNumber - 1)).Take(datasetSearchDto.PageSize);
+                dtos = dtos.Skip(searchDto.PageSize * (searchDto.PageNumber - 1)).Take(searchDto.PageSize);
             }
 
             return dtos.ToList();

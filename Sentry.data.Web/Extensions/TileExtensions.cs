@@ -8,12 +8,11 @@ namespace Sentry.data.Web
 {
     public static class TileExtensions
     {
-        public static TileResultsModel ToModel(this TileSearchResultDto<DatasetTileDto> dto, int selectedSortByValue, int selectedPageNumber, int selectedLayout)
+        public static TileResultsModel ToModel<T>(this TileSearchResultDto<T> dto, int selectedSortByValue, int selectedPageNumber, int selectedLayout)
         {
             TileResultsModel model = new TileResultsModel()
             {
                 TotalResults = dto.TotalResults,
-                Tiles = dto.Tiles.ToModels(),
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(dto.PageSize.ToString()),
                 SortByOptions = Utility.BuildSelectListFromEnum<TileSearchSortByOption>(selectedSortByValue),
                 PageItems = Utility.BuildPageItemList(dto.TotalResults, dto.PageSize, selectedPageNumber),
@@ -25,28 +24,63 @@ namespace Sentry.data.Web
 
         public static List<TileModel> ToModels(this List<DatasetTileDto> dtos)
         {
-            return dtos?.Select(x => x.ToModel()).ToList();
+            List<TileModel> tileModels = new List<TileModel>();
+
+            if (dtos?.Any() == true)
+            {
+                foreach (DatasetTileDto dto in dtos)
+                {
+                    TileModel model = new TileModel();
+                    MapToParentModel(dto, model);
+                    tileModels.Add(model);
+                }
+            }
+
+            return tileModels;
         }
 
-        private static TileModel ToModel(this DatasetTileDto dto)
+        public static List<TileModel> ToModels(this List<BusinessIntelligenceTileDto> dtos)
         {
-            return new TileModel()
+            List<TileModel> tileModels = new List<TileModel>();
+
+            if (dtos?.Any() == true)
             {
-                Id = dto.Id,
-                Name = dto.Name,
-                Description = dto.Description,
-                Status = dto.Status.GetDescription(),
-                TileTitle = dto.Status == ObjectStatusEnum.Active ? "Click here to go to the Dataset Detail Page" : "Dataset is marked for deletion",
-                FavoriteTitle = dto.Status == ObjectStatusEnum.Active ? "Click to toggle favorite" : "Dataset is marked for deletion, favorite functionality disabled",
-                IsFavorite = dto.IsFavorite,
-                Category = dto.Category,
-                Color = dto.Color,
-                IsSecured = dto.IsSecured,
-                LastActivityDateTime = dto.LastActivityDateTime.ToShortDateString(),
-                CreatedDateTime = dto.CreatedDateTime.ToShortDateString(),
-                IsReport = false,
-                ReportTypes = new List<string>()
-            };
+                foreach (BusinessIntelligenceTileDto dto in dtos)
+                {
+                    TileModel model = new TileModel()
+                    {
+                        AbbreviatedCategories = dto.AbbreviatedCategories, 
+                        IsReport = true,
+                        ReportType = dto.ReportType,
+                        UpdateFrequency = dto.UpdateFrequency,
+                        ContactNames = dto.ContactNames,
+                        BusinessUnits = dto.BusinessUnits,
+                        Tags = dto.Tags
+                    };
+
+                    MapToParentModel(dto, model);
+                    tileModels.Add(model);
+                }
+            }
+
+            return tileModels;
+        }
+
+        private static void MapToParentModel(DatasetTileDto dto, TileModel model)
+        {
+            model.Id = dto.Id;
+            model.Name = dto.Name;
+            model.Description = dto.Description;
+            model.Status = dto.Status.GetDescription();
+            model.TileTitle = dto.Status == ObjectStatusEnum.Active ? "Click here to go to the Dataset Detail Page" : "Dataset is marked for deletion";
+            model.FavoriteTitle = dto.Status == ObjectStatusEnum.Active ? "Click to toggle favorite" : "Dataset is marked for deletion; favorite functionality disabled";
+            model.IsFavorite = dto.IsFavorite;
+            model.Categories = dto.Categories;
+            model.Color = dto.Color;
+            model.IsSecured = dto.IsSecured;
+            model.LastActivityDateTime = dto.LastActivityDateTime.ToShortDateString();
+            model.CreatedDateTime = dto.CreatedDateTime.ToShortDateString();
+            model.IsReport = false;
         }
     }
 }

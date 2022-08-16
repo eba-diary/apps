@@ -12,15 +12,18 @@ namespace Sentry.data.Web
         public string TileTitle { get; set; }
         public string FavoriteTitle { get; set; }
         public bool IsFavorite { get; set; }
-        public string Category { get; set; }
+        public List<string> Categories { get; set; }
         public string Color { get; set; }
         public bool IsSecured { get; set; }
         public string LastActivityDateTime { get; set; }
         public string CreatedDateTime { get; set; }
         public bool IsReport { get; set; }
-        public List<string> ReportTypes { get; set; } = new List<string>();
+        public string AbbreviatedCategories { get; set; }
+        public string ReportType { get; set; }
         public string UpdateFrequency { get; set; }
         public string ContactNames { get; set; }
-        public string AdditionalContactNames { get; set; }
+        public List<string> BusinessUnits { get; set; }
+        public List<string> Functions { get; set; }
+        public List<string> Tags { get; set; }
     }
 }

@@ -146,6 +146,7 @@
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
+    <Compile Include="DomainServices\BusinessIntelligenceTileSearchService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DataInventoryService.cs" />
     <Compile Include="DomainServices\DataApplicationService.cs" />
