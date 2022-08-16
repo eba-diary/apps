@@ -109,7 +109,7 @@ namespace Sentry.data.Web.Controllers
             {
                 _supportLinkService.AddSupportLink(supportLinkDto);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Adding Support Link failed");
             }
@@ -124,7 +124,7 @@ namespace Sentry.data.Web.Controllers
             {
                 _supportLinkService.RemoveSupportLink(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Removing Support Link failed");
             }

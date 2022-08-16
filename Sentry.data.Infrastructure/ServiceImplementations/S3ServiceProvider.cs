@@ -293,13 +293,13 @@ namespace Sentry.data.Infrastructure
             return UploadDataFile(inputStream, targetBucket, targetKey, null);
         }
 
-        public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> tagContent)
+        public string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs)
         {
-            string fileVersionId = PutObject(inputStream, targetBucket, targetKey, tagContent);
+            string fileVersionId = PutObject(inputStream, targetBucket, targetKey, UploadTagKeyValuePairs);
             return fileVersionId;
         }
 
-        public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
+        public void TransferUtlityUploadStream(string keyPrefix, string fileName, Stream stream)
         {
             Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
             try
@@ -308,7 +308,7 @@ namespace Sentry.data.Infrastructure
                 Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
                 s3tuReq.BucketName = RootBucket;
                 s3tuReq.InputStream = stream;
-                s3tuReq.Key = folder + fileName;
+                s3tuReq.Key = keyPrefix + fileName;
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
                 s3tuReq.CannedACL = GetCannedAcl();
@@ -470,14 +470,7 @@ namespace Sentry.data.Infrastructure
             if(keyValuePairs != null)
             {
                 // using private helper method
-                ConvertToTags(keyValuePairs).ForEach(x => mReq.TagSet.Add(x));
-                /*
-                List<Tag> tags = ConvertToTags(keyValuePairs);
-                foreach (Tag tag in tags)
-                {
-                    mReq.TagSet.Add(tag);
-                }
-                */
+                ConvertToTags(keyValuePairs).ForEach(x => mReq.TagSet.Add(x));                
             }
 
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
@@ -970,7 +963,7 @@ namespace Sentry.data.Infrastructure
         {
 
             GetObjectRequest req = new GetObjectRequest();
-            GetObjectResponse response = new GetObjectResponse();
+            GetObjectResponse response;
 
             req.BucketName = RootBucket;
             req.Key = key;

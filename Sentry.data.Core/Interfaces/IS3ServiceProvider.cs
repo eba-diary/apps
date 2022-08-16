@@ -46,11 +46,11 @@ namespace Sentry.data.Core
         /// <summary>
         /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
         /// </summary>
-        /// <param name="inputstream"></param>
+        /// <param name="inputStream"></param>
         /// <param name="targetBucket"></param>
         /// <param name="targetKey"></param>
         /// <returns></returns>
-        string UploadDataFile(Stream inputstream, string targetBucket, string targetKey);
+        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey);
 
         /// <summary>
         /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
@@ -58,11 +58,11 @@ namespace Sentry.data.Core
         /// <param name="inputstream"></param>
         /// <param name="targetBucket"></param>
         /// <param name="targetKey"></param>
-        /// <param name="keyValuePairs"></param>
+        /// <param name="UploadTagKeyValuePairs"></param>
         /// <returns></returns>
-        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
+        string UploadDataFile(Stream inputStream, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs);
 
-        void TransferUtlityUploadStream(string category, string filename, Stream stream);
+        void TransferUtlityUploadStream(string keyPrefix, string fileName, Stream stream);
 
         void TransferUtlityUploadStream(string key, Stream stream);
 
@@ -85,7 +85,7 @@ namespace Sentry.data.Core
         #endregion
         void DeleteMulitpleS3Keys(List<string> keys);
 
-        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> keyValuePairs);
+        string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs);
 
         string GetDatasetDownloadUrl(string key, string bucket = null, string versionId = null, string fileName = null);
 

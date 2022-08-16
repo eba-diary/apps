@@ -143,9 +143,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Sentry.data.Web\Models\ApiModels\DatasetFile\DatasetFileModel.cs">
-      <Link>DatasetFileModel.cs</Link>
-    </Compile>
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />

@@ -1,9 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Tests
@@ -28,14 +25,6 @@ namespace Sentry.data.Core.Tests
 
             //Assert
             Assert.AreEqual(false, configJObj.ContainsKey("s3.proxy.password"));
-        }
-
-        protected JObject GetData(string fileName)
-        {
-            using (StreamReader rdr = new StreamReader($@"ExpectedJSON\{fileName}"))
-            {
-                return JObject.Parse(rdr.ReadToEnd().Replace("\r\n", string.Empty));
-            }
         }
     }
 }
