@@ -800,7 +800,20 @@ namespace Sentry.data.Core.Tests
 
             datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
-            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null); // creating the dataflowservice object
+            // Mock user service and setup return values
+            Mock<IUserService> userService = new Mock<IUserService>();
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+            userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            // Mock security service and setup return values
+            Mock<ISecurityService> securityService = new Mock<ISecurityService>();
+            UserSecurity security = new UserSecurity();
+            securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
+
+
+            var dataflowservice = new DataFlowService(context.Object, userService.Object, null, null, securityService.Object, null, datafeature.Object, null); // creating the dataflowservice object
 
             // Act
             var result = dataflowservice.GetDataFlowDtoByStepId(stepId).Id;// this creates a nullReferenceException  -> gets the step Id from the currrent dataflowservice object
@@ -921,7 +934,19 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
             datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
-            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null);
+            // Mock user service and setup return values
+            Mock<IUserService> userService = new Mock<IUserService>();
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+            userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            // Mock security service and setup return values
+            Mock<ISecurityService> securityService = new Mock<ISecurityService>();
+            UserSecurity security = new UserSecurity();
+            securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
+
+            var dataflowservice = new DataFlowService(context.Object, userService.Object, null, null, securityService.Object, null, datafeature.Object, null);
 
             // Act
             bool indicator = dataflowservice.ValidateStepIdAndDatasetFileIds(stepId, datasetFileIds);
@@ -1595,9 +1620,6 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             MockRepository mr = new MockRepository(MockBehavior.Loose);
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
-            user.Setup(s => s.DisplayName).Returns("displayName");
-            user.Setup(s => s.AssociateId).Returns("123456");
 
             // Setup Dataflow steps for DataFlow objects
             DataFlowStep step = new DataFlowStep()
@@ -1659,8 +1681,20 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> _datafeatures = new Mock<IDataFeatures>();
             _datafeatures.Setup(_ => _.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
+            // Mock user service and setup return values
+            Mock<IUserService> userService = new Mock<IUserService>();
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+            userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            // Mock security service and setup return values
+            Mock<ISecurityService> securityService = new Mock<ISecurityService>();
+            UserSecurity security = new UserSecurity();
+            securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
+
             // Setup DataFlowService
-            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, _datafeatures.Object, null);
+            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, null, securityService.Object, null, _datafeatures.Object, null);
 
             // Act
             List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(2);
