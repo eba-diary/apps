@@ -1,4 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -6,7 +6,7 @@ namespace Sentry.data.Web.Controllers
 {
     public class DatasetSearchController : TileSearchController<DatasetTileDto>
     {
-        public DatasetSearchController(ITileSearchService<DatasetTileDto> tileSearchService, IFilterSearchService filterSearchService) : base(tileSearchService, filterSearchService) { }
+        public DatasetSearchController(ITileSearchService<DatasetTileDto> tileSearchService, IEventService eventService, IFilterSearchService filterSearchService) : base(tileSearchService, eventService, filterSearchService) { }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {

@@ -2,12 +2,8 @@
 
 namespace Sentry.data.Web
 {
-    public class TileSearchModel : FilterSearchModel
+    public class TileSearchModel : TileSearchEventModel
     {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int SortBy { get; set; }
-        public int Layout { get; set; }
         public List<TileModel> SearchableTiles { get; set; }
     }
 }

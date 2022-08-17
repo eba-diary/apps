@@ -471,6 +471,7 @@
     <Compile Include="Models\Search\SaveSearchModel.cs" />
     <Compile Include="Models\Search\TileModel.cs" />
     <Compile Include="Models\Search\TileResultsModel.cs" />
+    <Compile Include="Models\Search\TileSearchEventModel.cs" />
     <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />

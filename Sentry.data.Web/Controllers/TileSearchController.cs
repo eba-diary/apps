@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Text.Json;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
@@ -13,10 +14,12 @@ namespace Sentry.data.Web.Controllers
     public abstract class TileSearchController<T> : BaseSearchableController where T : DatasetTileDto
     {
         private readonly ITileSearchService<T> _tileSearchService;
+        private readonly IEventService _eventService;
 
-        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService)
+        protected TileSearchController(ITileSearchService<T> tileSearchService, IEventService eventService, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
             _tileSearchService = tileSearchService;
+            _eventService = eventService;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
@@ -97,11 +100,15 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult TileResultsModel(TileSearchModel searchModel)
         {
-            //UpdateWithSavedSearch(searchModel);
             TileSearchDto<T> searchDto = MapToTileSearchDto(searchModel);
             TileSearchResultDto<T> resultDto = _tileSearchService.SearchTiles(searchDto);
             TileResultsModel tileResultsModel = resultDto.ToModel(searchModel.SortBy, searchModel.PageNumber, searchModel.Layout);
             tileResultsModel.Tiles = MapToTileModels(resultDto.Tiles);
+
+            //async publish event            
+            string serializedSearch = JsonSerializer.Serialize<TileSearchEventModel>(searchModel);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.SEARCH, "Searched Datasets", serializedSearch);
+
             return Json(tileResultsModel);
         }
 
@@ -170,28 +177,6 @@ namespace Sentry.data.Web.Controllers
             TileSearchDto<T> searchDto = searchModel.ToDto<T>();
             searchDto.SearchableTiles = MapToTileDtos(searchModel.SearchableTiles);
             return searchDto;
-        }
-
-        private void UpdateWithSavedSearch(TileSearchModel searchModel)
-        {
-            if (!string.IsNullOrEmpty(searchModel.SearchName))
-            {
-                try
-                {
-                    SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(GetSearchType(), searchModel.SearchName, SharedContext.CurrentUser.AssociateId);
-                    if (savedSearchDto.ResultConfiguration != null)
-                    {
-                        Dictionary<string, string> resultParameters = savedSearchDto.ResultConfiguration["ResultParameters"].ToObject<Dictionary<string, string>>();
-                        searchModel.PageSize = int.Parse(resultParameters[TileResultParameters.PAGESIZE]);
-                        searchModel.SortBy = int.Parse(resultParameters[TileResultParameters.SORTBY]);
-                        searchModel.Layout = int.Parse(resultParameters[TileResultParameters.LAYOUT]);
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Logger.Error("Error getting result parameters for saved search", ex);
-                }
-            }
         }
         #endregion
     }

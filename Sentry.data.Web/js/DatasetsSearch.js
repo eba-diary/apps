@@ -53,6 +53,8 @@ data.DatasetsSearch = {
                 $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
                     data.DatasetsSearch.initUI();
                     data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
+                    //write search event
+                    data.DatasetsSearch.publishSearchEvent();
                 });
             });
         }
@@ -187,5 +189,21 @@ data.DatasetsSearch = {
             filters.push(this.id);
         });
         localStorage.setItem("filters", JSON.stringify(filters));
+    },
+
+    publishSearchEvent: function () {
+        $.ajax({
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            type: 'POST',
+            url: '/Search/SearchEvent/' + self.SearchType() +
+                '?categoryFilters=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.CategoryFilters, self.SelectedFilters())) +
+                '&extensions=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.ExtensionFilters, self.SelectedFilters())) +
+                '&businessUnits=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.BusinessUnitFilters, self.SelectedFilters())) +
+                '&datasetFunctions=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.DatasetFunctionFilters, self.SelectedFilters())) +
+                '&tags=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.TagFilters, self.SelectedFilters())) +
+                '&searchTerm=' + window.vm.Query() +
+                '&resultsReturned=' + queryResults.length
+        });
     }
 }
