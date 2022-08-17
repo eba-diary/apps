@@ -101,6 +101,7 @@ namespace Sentry.data.Infrastructure.Tests
             SavedSearchOptionDto result = results.First();
             Assert.AreEqual("SearchName", result.SavedSearchName);
             Assert.AreEqual(1, result.SavedSearchId);
+            Assert.AreEqual("DataInventory/Search?savedSearch=SearchName", result.SavedSearchUrl);
             Assert.IsTrue(result.IsFavorite);
         }
 

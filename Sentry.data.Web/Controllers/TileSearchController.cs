@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
 using System.Collections.Generic;
@@ -22,11 +23,25 @@ namespace Sentry.data.Web.Controllers
         {
             if (HasPermission())
             {
-                if (TryGetSavedSearch(GetSearchType(), savedSearch, out ActionResult view))
+                if (TryGetSavedSearch(GetSearchType(), savedSearch, out SavedSearchDto savedSearchDto))
                 {
-                    return view;
-                }
+                    try
+                    {
+                        Dictionary<string, string> savedParameters = null;
+                        if (savedSearchDto.ResultConfiguration != null)
+                        {
+                            savedParameters = savedSearchDto.ResultConfiguration["ResultParameters"].ToObject<Dictionary<string, string>>();
+                            savedParameters.Add(TileResultParameters.PAGENUMBER, "1");
+                        }
 
+                        return GetFilterSearchView(savedSearchDto.ToModel(), savedParameters);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Logger.Error("Error getting result parameters for saved search", ex);
+                    }
+                }
+                
                 FilterSearchModel model = new FilterSearchModel()
                 {
                     SearchName = savedSearch,
@@ -67,8 +82,6 @@ namespace Sentry.data.Web.Controllers
                 LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(int.Parse(parameters[TileResultParameters.LAYOUT]))
             };
 
-
-
             return PartialView("~/Views/Search/TileResults.cshtml", tileResultsModel);
         }
 
@@ -84,6 +97,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult TileResultsModel(TileSearchModel searchModel)
         {
+            //UpdateWithSavedSearch(searchModel);
             TileSearchDto<T> searchDto = MapToTileSearchDto(searchModel);
             TileSearchResultDto<T> resultDto = _tileSearchService.SearchTiles(searchDto);
             TileResultsModel tileResultsModel = resultDto.ToModel(searchModel.SortBy, searchModel.PageNumber, searchModel.Layout);
@@ -156,6 +170,28 @@ namespace Sentry.data.Web.Controllers
             TileSearchDto<T> searchDto = searchModel.ToDto<T>();
             searchDto.SearchableTiles = MapToTileDtos(searchModel.SearchableTiles);
             return searchDto;
+        }
+
+        private void UpdateWithSavedSearch(TileSearchModel searchModel)
+        {
+            if (!string.IsNullOrEmpty(searchModel.SearchName))
+            {
+                try
+                {
+                    SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(GetSearchType(), searchModel.SearchName, SharedContext.CurrentUser.AssociateId);
+                    if (savedSearchDto.ResultConfiguration != null)
+                    {
+                        Dictionary<string, string> resultParameters = savedSearchDto.ResultConfiguration["ResultParameters"].ToObject<Dictionary<string, string>>();
+                        searchModel.PageSize = int.Parse(resultParameters[TileResultParameters.PAGESIZE]);
+                        searchModel.SortBy = int.Parse(resultParameters[TileResultParameters.SORTBY]);
+                        searchModel.Layout = int.Parse(resultParameters[TileResultParameters.LAYOUT]);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.Error("Error getting result parameters for saved search", ex);
+                }
+            }
         }
         #endregion
     }

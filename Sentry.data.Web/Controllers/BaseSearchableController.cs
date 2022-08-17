@@ -17,19 +17,15 @@ namespace Sentry.data.Web.Controllers
         public abstract ActionResult Results(Dictionary<string, string> parameters);
         protected abstract FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel);
 
-        protected bool TryGetSavedSearch(string searchType, string savedSearchName, out ActionResult actionResult)
+        protected bool TryGetSavedSearch(string searchType, string savedSearchName, out SavedSearchDto savedSearchDto)
 {
             if (!string.IsNullOrEmpty(savedSearchName))
 {
-                SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(searchType, savedSearchName, SharedContext.CurrentUser.AssociateId);
-                if (savedSearchDto != null)
-                {
-                    actionResult = GetFilterSearchView(savedSearchDto.ToModel(), null);
-                    return true;
-                }
+                savedSearchDto = _filterSearchService.GetSavedSearch(searchType, savedSearchName, SharedContext.CurrentUser.AssociateId);
+                return savedSearchDto != null;
             }
 
-            actionResult = null;
+            savedSearchDto = null;
             return false;
         }
 

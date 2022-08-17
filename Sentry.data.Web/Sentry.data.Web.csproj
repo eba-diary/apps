@@ -875,6 +875,7 @@
     <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="Images\DataInventory\DataInventoryIcon.svg" />
     <Content Include="Images\excel_active.png" />
+    <Content Include="Images\Icons\search_icon.svg" />
     <Content Include="Images\logo.png" />
     <Content Include="Images\logo2x.png" />
     <Content Include="Images\logo_blue.svg" />

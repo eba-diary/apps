@@ -95,6 +95,7 @@ namespace Sentry.data.Web
             {
                 SavedSearchId = dto.SavedSearchId,
                 SavedSearchName = dto.SavedSearchName,
+                SavedSearchUrl = dto.SavedSearchUrl,
                 IsFavorite = dto.IsFavorite
             };
         }

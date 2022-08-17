@@ -528,6 +528,7 @@ namespace Sentry.data.Web.Tests
             {
                 SavedSearchId = 1,
                 SavedSearchName = "SearchName",
+                SavedSearchUrl = "Url",
                 IsFavorite = true
             };
 
@@ -535,6 +536,7 @@ namespace Sentry.data.Web.Tests
 
             Assert.AreEqual(1, model.SavedSearchId);
             Assert.AreEqual("SearchName", model.SavedSearchName);
+            Assert.AreEqual("Url", model.SavedSearchUrl);
             Assert.IsTrue(model.IsFavorite);
         }
 

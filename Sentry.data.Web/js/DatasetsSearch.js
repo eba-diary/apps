@@ -14,8 +14,14 @@ data.DatasetsSearch = {
     },
 
     retrieveResultConfig: function () {
-        //required for FilterSearch.js
-        //no result config yet, might use for saving the sort by and page size
+        //get sort, page size, layout
+        var resultParameters = {
+            PageSize: $("#tile-result-page-size").val(),
+            SortBy: $("#tile-result-sort").val(),
+            Layout: $("#tile-result-layout").val()
+        }
+
+        return JSON.stringify({ ResultParameters: resultParameters });
     },
 
     executeSearch: function () {
