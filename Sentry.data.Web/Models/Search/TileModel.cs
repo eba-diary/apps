@@ -12,7 +12,7 @@ namespace Sentry.data.Web
         public string TileTitle { get; set; }
         public string FavoriteTitle { get; set; }
         public bool IsFavorite { get; set; }
-        public List<string> Categories { get; set; }
+        public string Category { get; set; }
         public string Color { get; set; }
         public bool IsSecured { get; set; }
         public string LastActivityDateTime { get; set; }

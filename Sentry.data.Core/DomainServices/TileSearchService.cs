@@ -42,7 +42,7 @@ namespace Sentry.data.Core
 
         public IEnumerable<T> SearchTileDtos(TileSearchDto<T> searchDto)
         {
-            IEnumerable<T> dtos = searchDto.SearchableTiles ?? GetTileDtos();
+            IEnumerable<T> dtos = searchDto.SearchableTiles?.Any() == true ? searchDto.SearchableTiles : GetTileDtos();
 
             if (!string.IsNullOrWhiteSpace(searchDto.SearchText))
             {

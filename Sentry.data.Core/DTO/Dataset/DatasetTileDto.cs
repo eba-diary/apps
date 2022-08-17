@@ -1,6 +1,5 @@
 ﻿using Sentry.data.Core.GlobalEnums;
 using System;
-using System.Collections.Generic;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
@@ -14,7 +13,7 @@ namespace Sentry.data.Core
         [FilterSearchField(FilterCategoryNames.Dataset.FAVORITE, hideResultCounts:true)]
         public bool IsFavorite { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, defaultOpen: true)]
-        public List<string> Categories { get; set; }
+        public string Category { get; set; }
         public string Color { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.SECURED, hideResultCounts: true)]
         public bool IsSecured { get; set; }

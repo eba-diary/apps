@@ -184,7 +184,7 @@ namespace Sentry.data.Web
             dto.Description = model.Description;
             dto.Status = EnumHelper.GetByDescription<ObjectStatusEnum>(model.Status);
             dto.IsFavorite = model.IsFavorite;
-            dto.Categories = model.Categories;
+            dto.Category = model.Category;
             dto.Color = model.Color;
             dto.IsSecured = model.IsSecured;
             dto.LastActivityDateTime = DateTime.Parse(model.LastActivityDateTime);

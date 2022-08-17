@@ -75,7 +75,7 @@ namespace Sentry.data.Web
             model.TileTitle = dto.Status == ObjectStatusEnum.Active ? "Click here to go to the Dataset Detail Page" : "Dataset is marked for deletion";
             model.FavoriteTitle = dto.Status == ObjectStatusEnum.Active ? "Click to toggle favorite" : "Dataset is marked for deletion; favorite functionality disabled";
             model.IsFavorite = dto.IsFavorite;
-            model.Categories = dto.Categories;
+            model.Category = dto.Category;
             model.Color = dto.Color;
             model.IsSecured = dto.IsSecured;
             model.LastActivityDateTime = dto.LastActivityDateTime.ToShortDateString();

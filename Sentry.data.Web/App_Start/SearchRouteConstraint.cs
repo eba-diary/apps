@@ -15,13 +15,13 @@ namespace Sentry.data.Web
                 if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.DATASET_SEARCH, StringComparison.OrdinalIgnoreCase))
                 {
                     values["controller"] = "DatasetSearch";
+                    values["action"] = "Search";
                 }
-                else if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH, StringComparison.OrdinalIgnoreCase))
-                {
-                    values["controller"] = "BusinessIntelligenceSearch";
-                }
-
-                values["action"] = "Search";
+                //else if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH, StringComparison.OrdinalIgnoreCase))
+                //{
+                //    values["controller"] = "BusinessIntelligenceSearch";
+                //    values["action"] = "Search";
+                //}
             }
 
             return true;

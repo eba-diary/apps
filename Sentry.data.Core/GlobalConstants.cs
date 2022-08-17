@@ -445,6 +445,14 @@ namespace Sentry.data.Core
                 public const string CATEGORY = "Category";
                 public const string SECURED = "Secured";
             }
+
+            public static class BusinessIntelligence
+            {
+                public const string REPORTTYPE = "Report Type";
+                public const string BUSINESSUNIT = "Business Unit";
+                public const string FUNCTION = "Function";
+                public const string TAG = "Tag";
+            }
         }
 
         public static class FilterCategoryOptions

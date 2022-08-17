@@ -34,14 +34,14 @@
                 <li class="tile-result tile-mr borderSide_@tile.Color boxShadowSm @(tile.Status == "Active" ? "tile-active" : "")" data-id="@tile.Id" title="@tile.TileTitle">
                     <div class="category-type-wrap">
                         <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
-                        <div class="category-type categoryBanner-@tile.Color" title="@string.Join(", ", tile.Categories)">
+                        <div class="category-type categoryBanner-@tile.Color" title="@tile.Category">
                             @if (tile.IsReport)
                             {
                                 <span>@tile.AbbreviatedCategories</span>
                             }
                             else
                             {
-                                <span>@tile.Categories.First()</span>
+                                <span>@tile.Category</span>
                             }
                         </div>
                     </div>

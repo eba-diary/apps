@@ -52,7 +52,7 @@ namespace Sentry.data.Core
 
             if (dataset.DatasetCategories?.Any() == true)
             {
-                dto.Categories = dataset.DatasetCategories.Select(x => x.Name).ToList();
+                dto.Category = dataset.DatasetCategories.Select(x => x.Name).FirstOrDefault();
 
                 if (dataset.DatasetCategories.Count == 1)
                 {

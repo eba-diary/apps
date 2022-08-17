@@ -146,6 +146,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
 
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
+            registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
