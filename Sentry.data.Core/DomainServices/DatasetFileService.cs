@@ -6,9 +6,15 @@ using Sentry.data.Core.Helpers.Paginate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
+using Sentry.data.Core.Interfaces;
+using Hangfire;
+using System.IO;
+using System.Text;
 
 namespace Sentry.data.Core
 {
+
     public class DatasetFileService : IDatasetFileService
     {
         private readonly IDatasetContext _datasetContext;
@@ -17,8 +23,9 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IEventService _eventService;
+        private readonly IJobScheduler _jobScheduler;
 
-        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IEventService eventService)
+        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IEventService eventService, IJobScheduler jobScheduler)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -26,27 +33,28 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _eventService = eventService;
+            _jobScheduler = jobScheduler;
         }
 
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
-            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+            DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId); // gets the specific schema
 
-            if (config == null)
+            if (config == null) // the case where the schema was not found
             {
                 throw new SchemaNotFoundException();
             }
 
+            // security measures taken to make sure that the user has the permission to see the schema/dataset data
             UserSecurity us = _securityService.GetUserSecurity(config.ParentDataset, _userService.GetCurrentUser());
             if (!us.CanViewFullDataset)
             {
-                throw new DatasetUnauthorizedAccessException();
+                throw new DatasetUnauthorizedAccessException(); // if the user does not have permission then this exception is thrown
             }
 
-            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(_datasetContext.DatasetFileStatusActive
-                                                .Where(x => x.Schema == config.Schema)
-                                                .OrderBy(o => o.DatasetFileId),
-                                                pageParameters.PageNumber, pageParameters.PageSize);
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive.Where(x => x.Schema == config.Schema);
+            datasetFileQueryable = pageParameters.SortDesc ? datasetFileQueryable.OrderByDescending(o => o.DatasetFileId) : datasetFileQueryable.OrderBy(o => o.DatasetFileId); // ordering datasetfiles by ascending or descending
+            PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(datasetFileQueryable, pageParameters.PageNumber, pageParameters.PageSize); // passing pageNumber and pageSize to the ToPagedList method
 
             return new PagedList<DatasetFileDto>(files.ToDto().ToList(), files.TotalCount, files.CurrentPage, files.PageSize);
         }
@@ -130,6 +138,92 @@ namespace Sentry.data.Core
             {
                 Logger.Info($"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3");
             }
+        }
+
+        /*
+         *  Schedules the hangfire delayed job for reprocessing
+         *  Logic for the time delay will be placed in this method eventually
+         */
+        public bool ScheduleReprocessing(int stepId, List<int> datasetFileIds)
+        {
+            bool submittedSuccessful = true;
+            int batchSize = 100;
+            int counter = 1;
+            List<int> batch = datasetFileIds.Take(batchSize).ToList();
+            int tempDatasetFileId = -1;
+            while (batch.Any())
+            {
+                try
+                {
+                    var timeDelay = 30 * counter; 
+                    foreach (int id in batch)
+                    {
+                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(timeDelay));
+                    }
+                } catch (Exception ex)
+                {
+                    submittedSuccessful = false;
+                    Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
+                }
+                counter++;    
+                batch = datasetFileIds.Skip(batchSize * (counter - 1)).ToList();
+            }
+
+            return submittedSuccessful;
+        }
+
+        /* 
+         * Implementation of reprocessing
+         * @param int stepid
+         * @param int[] datasetFileIds
+        */
+        [AutomaticRetry(Attempts = 0)]
+        public void ReprocessDatasetFile(int stepId, int datasetFileId)
+        {
+            try
+            {
+                DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+                DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+                KeyValuePair<string, string> triggerFileLocationAndContent = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
+                if (triggerFileLocationAndContent.Key == null || triggerFileLocationAndContent.Value == null)
+                {
+                    string errorMessage = "";
+                    if (triggerFileLocationAndContent.Key == null)
+                    {
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file location could not be found";
+                    }
+                    else if (triggerFileLocationAndContent.Value == null)
+                    {
+                        errorMessage = "Reprocessing with dataFlowStepId: " + stepId + " and datasetFileId: " + datasetFileId + " Failed because trigger file content could not be found";
+                    }
+                    throw new ArgumentNullException(errorMessage);
+                }
+                else
+                {
+
+                    List<KeyValuePair<string, string>> tagContent = new List<KeyValuePair<string, string>>()
+                    {
+                        new KeyValuePair<string, string>("Content", "Trigger"),
+                    };
+                    string targetBucket = dataFlowStep.TargetBucket;
+
+                    using (MemoryStream stream = new MemoryStream(Encoding.Default.GetBytes(triggerFileLocationAndContent.Value)))
+                    {
+                        _s3ServiceProvider.UploadDataFile(stream, targetBucket, triggerFileLocationAndContent.Key, tagContent);
+                    }
+
+                }
+
+
+            
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Reprocessig failed ", ex);
+                throw; // this will be caught in hangfire indicating failed job
+            }
+
         }
 
         #region PrivateMethods
@@ -305,6 +399,52 @@ namespace Sentry.data.Core
 
             return model;
         }
+
+        
+
+        /*
+         * Creating a wrapper method to incorporate both the helper methods GetTriggerFileLocation and GetSourceBucketAndSourceKey
+         */
+        private KeyValuePair<string, string> GetTriggerFileLocationAndSourceBucketKey(DataFlowStep dataFlowStep, DatasetFile datasetFile)
+        {
+            string triggerFileLocation = GetTriggerFileLocation(dataFlowStep, datasetFile);
+            string sourceBucketKey = GetSourceBucketAndSourceKey(datasetFile);
+            KeyValuePair<string, string> result = new KeyValuePair<string, string>(triggerFileLocation, sourceBucketKey);
+            return result;
+        }
+
+        /*
+         * Helper function for ReprocessingDatasetFile which gets the trigger file location
+         */
+        private string GetTriggerFileLocation(DataFlowStep dataFlowStep, DatasetFile datasetFile)
+        {
+            // trigger file location
+            return dataFlowStep.TriggerKey + datasetFile.FlowExecutionGuid + "/" + datasetFile.OriginalFileName + ".trg";
+        }
+
+        /*
+         * Helper function for ReprocessingDatasetFile wich gets the content of the trigger file
+         */
+        private string GetSourceBucketAndSourceKey(DatasetFile datasetFile)
+        {
+
+            List<string> splitString = datasetFile.FileKey.Split('/').ToList();
+            splitString.RemoveAt(splitString.Count - 1);
+            string newStr = String.Join("/", splitString) + "/";
+
+            newStr = newStr.Replace("rawquery", "raw");
+
+            string result = newStr + datasetFile.FlowExecutionGuid + "/" + datasetFile.OriginalFileName;            
+
+            // creating the ndjson object for the trigger file content
+            JObject jobject = new JObject();
+            jobject.Add("SourceBucket", datasetFile.FileBucket);
+            jobject.Add("SourceKey", result);
+            return jobject.ToString(Formatting.None);
+        }
         #endregion
+
     }
+
+    
 }

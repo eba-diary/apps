@@ -170,6 +170,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_06" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_15" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_16" />
+    <Folder Include="Stored Procedure" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -320,6 +321,8 @@
     <Build Include="Tables\ApplicationConfigurationProperties.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_15\CLA3991_InitializeDataflowSecurity.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_16\CLA-4317-HistoryFixControlMTriggerName.sql" />
+    <Build Include="Stored Procedure\usp_GetDeadJobs.sql" />
+    <Build Include="Tables\SupportLink.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
@@ -394,6 +397,7 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_02\CLA4099-Remove_New_Permissions_Accidentally_Available.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_04\CLA4126_Add_Short_Names_to_Datasets.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_06\CLA-4017-MoveSnowflakeColumnsToNewTable.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_15\CLA4101_Initialize_IsSystemGenerated.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />

@@ -1,17 +1,144 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json.Linq;
+using Rhino.Mocks;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Web.Tests
 {
     [TestClass]
     public class MappingTests
     {
+        [TestMethod]
+        public void ToModel_ConnectorInfoDto_ReturnConnectorModel() 
+        {
+            //Arrange
+            List<ConnectorDto> cdList = new List<ConnectorDto>();
+
+            //Act
+            cdList.Add(new ConnectorDto()
+            {
+                ConnectorName = "test_connector1",
+                ConnectorState = ConnectorState.RUNNING
+            });
+
+            cdList.Add(new ConnectorDto()
+            {
+                ConnectorName = "test_connector2",
+                ConnectorState = ConnectorState.FAILED
+            });
+
+            List<ConnectorModel> cmList = cdList.MapToModelList();
+            
+            //Assert
+            for(int i=0; i< cmList.Count;i++)
+            {
+                Assert.AreEqual(cmList[i].ConnectorName, cdList[i].ConnectorName);
+                Assert.AreEqual(cmList[i].ConnectorState, cdList[i].ConnectorState);
+            }
+        }
+
+    [TestMethod]
+        public void MapToModelList_DeadSparkJobDtoList_ReturnDeadSparkJobModelList()
+        {
+            //Arramge
+            List<DeadSparkJobDto> dpjDtoList = new List<DeadSparkJobDto>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                dpjDtoList.Add(new DeadSparkJobDto()
+                {
+                    SubmissionTime = DateTime.Now,
+                    DatasetName = "Dataset Name",
+                    SchemaName = "Schema Name",
+                    SourceKey = "Source Key",
+                    FlowExecutionGuid = "FlowExecutionGuid",
+                    ReprocessingRequired = "ReprocessingRequired",
+                    SubmissionID = i,
+                    SourceBucketName = "SourceBucketName",
+                    BatchID = i,
+                    LivyAppID = "LivyAppID",
+                    LivyDriverlogUrl = "LivyDriverlogUrl",
+                    LivySparkUiUrl = "LivySparkUiUrl",
+                    DatasetFileID = i,
+                    DataFlowStepID = i
+                });
+            }
+
+            //Act
+            List<DeadSparkJobModel> dpjModelList = dpjDtoList.MapToModelList();
+
+            //Assert
+            for(int i=0; i <dpjModelList.Count; i++)
+            {
+                Assert.AreEqual(dpjModelList[i].SubmissionTime, dpjDtoList[i].SubmissionTime);
+                Assert.AreEqual(dpjModelList[i].DatasetName, dpjDtoList[i].DatasetName);
+                Assert.AreEqual(dpjModelList[i].SchemaName, dpjDtoList[i].SchemaName);
+                Assert.AreEqual(dpjModelList[i].SourceKey, dpjDtoList[i].SourceKey);
+                Assert.AreEqual(dpjModelList[i].FlowExecutionGuid, dpjDtoList[i].FlowExecutionGuid);
+                Assert.AreEqual(dpjModelList[i].ReprocessingRequired, dpjDtoList[i].ReprocessingRequired);
+                Assert.AreEqual(dpjModelList[i].SubmissionID, dpjDtoList[i].SubmissionID);
+                Assert.AreEqual(dpjModelList[i].SourceBucketName, dpjDtoList[i].SourceBucketName);
+                Assert.AreEqual(dpjModelList[i].BatchID, dpjDtoList[i].BatchID);
+                Assert.AreEqual(dpjModelList[i].LivyAppID, dpjDtoList[i].LivyAppID);
+                Assert.AreEqual(dpjModelList[i].LivyDriverlogUrl, dpjDtoList[i].LivyDriverlogUrl);
+                Assert.AreEqual(dpjModelList[i].LivySparkUiUrl, dpjDtoList[i].LivySparkUiUrl);
+                Assert.AreEqual(dpjModelList[i].DatasetFileID, dpjDtoList[i].DatasetFileID);
+                Assert.AreEqual(dpjModelList[i].DataFlowStepID, dpjDtoList[i].DataFlowStepID);
+            }
+
+        }
+
+        [TestMethod]
+        public void MapToModel_DeadSparkJobDto_ReturnDeadSparkJobModel()
+        {
+            //Arramge
+            DeadSparkJobDto dsjDto = new DeadSparkJobDto()
+            {
+                SubmissionTime = DateTime.Now,
+                DatasetName = "Dataset Name",
+                SchemaName = "Schema Name",
+                SourceKey = "Source Key",
+                FlowExecutionGuid = "FlowExecutionGuid",
+                ReprocessingRequired = "ReprocessingRequired",
+                SubmissionID = 1,
+                SourceBucketName = "SourceBucketName",
+                BatchID = 1,
+                LivyAppID = "LivyAppID",
+                LivyDriverlogUrl = "LivyDriverlogUrl",
+                LivySparkUiUrl = "LivySparkUiUrl",
+                DatasetFileID = 1,
+                DataFlowStepID = 1
+            };
+
+            //Act
+            DeadSparkJobModel dpjModel = dsjDto.MapToModel();
+
+            //Assert
+            Assert.AreEqual(dpjModel.SubmissionTime, dsjDto.SubmissionTime);
+            Assert.AreEqual(dpjModel.DatasetName, dsjDto.DatasetName);
+            Assert.AreEqual(dpjModel.SchemaName, dsjDto.SchemaName);
+            Assert.AreEqual(dpjModel.SourceKey, dsjDto.SourceKey);
+            Assert.AreEqual(dpjModel.FlowExecutionGuid, dsjDto.FlowExecutionGuid);
+            Assert.AreEqual(dpjModel.ReprocessingRequired, dsjDto.ReprocessingRequired);
+            Assert.AreEqual(dpjModel.SubmissionID, dsjDto.SubmissionID);
+            Assert.AreEqual(dpjModel.SourceBucketName, dsjDto.SourceBucketName);
+            Assert.AreEqual(dpjModel.BatchID, dsjDto.BatchID);
+            Assert.AreEqual(dpjModel.LivyAppID, dsjDto.LivyAppID);
+            Assert.AreEqual(dpjModel.LivyDriverlogUrl, dsjDto.LivyDriverlogUrl);
+            Assert.AreEqual(dpjModel.LivySparkUiUrl, dsjDto.LivySparkUiUrl);
+            Assert.AreEqual(dpjModel.DatasetFileID, dsjDto.DatasetFileID);
+            Assert.AreEqual(dpjModel.DataFlowStepID, dsjDto.DataFlowStepID);
+
+        }
+
         [TestMethod]
         public void ToDto_SchemaInfoModel_ReturnFileSchemaDto()
         {
@@ -297,7 +424,7 @@ namespace Sentry.data.Web.Tests
                     }
                 }
             };
-            
+
             FilterSearchDto dto = model.ToDto();
 
             Assert.AreEqual("SearchName", dto.SearchName);
@@ -536,6 +663,55 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, model.SavedSearchId);
             Assert.AreEqual("SearchName", model.SavedSearchName);
             Assert.IsTrue(model.IsFavorite);
+        }
+
+        [TestMethod]
+        public void MapToModel_DataFlowDetailDto_DatFlowDetailModel()
+        {
+            // Arrange
+            DataFlowDetailDto dto = MockClasses.MockDataFlowDetailDto();
+
+            dto.steps = new Mock<List<DataFlowStepDto>>().Object;
+
+            // Act
+            Models.ApiModels.Dataflow.DataFlowDetailModel model = dto.MapToModel();
+
+            // Assert
+            Assert.AreEqual(dto.Id, model.Id);
+            Assert.AreEqual(dto.FlowGuid, model.FlowGuid);
+            Assert.AreEqual(dto.SaidKeyCode, model.SaidKeyCode);
+            Assert.AreEqual(dto.SchemaId, model.SchemaId);
+            Assert.AreEqual(dto.Name, model.Name);
+            Assert.AreEqual(dto.CreateDTM, model.CreateDTM);
+            Assert.AreEqual(dto.CreatedBy, model.CreatedBy);
+            Assert.AreEqual(dto.DFQuestionnaire, model.DFQuestionnaire);
+            Assert.AreEqual(dto.IngestionType, model.IngestionType);
+            Assert.AreEqual(dto.IsCompressed, model.IsCompressed);
+            Assert.AreEqual(dto.IsPreProcessingRequired, model.IsPreProcessingRequired);
+            Assert.AreEqual(dto.FlowStorageCode, model.FlowStorageCode);
+            Assert.AreEqual(dto.AssociatedJobs, model.AssociatedJobs);
+            Assert.AreEqual(dto.ObjectStatus, model.ObjectStatus);
+            Assert.AreEqual(dto.DeleteIssuer, model.DeleteIssuer);
+            Assert.AreEqual(dto.DeleteIssueDTM, model.DeleteIssueDTM);
+            Assert.AreEqual(dto.NamedEnvironment, model.NamedEnvironment);
+            Assert.AreEqual(dto.NamedEnvironmentType, model.NamedEnvironmentType);
+        }
+
+        [TestMethod]
+        public void MapToDetailModelList_DataFlowDetailDto_DataFlowDetailModel()
+        {
+            // Arrange
+            List<DataFlowDetailDto> detailDtos = MockClasses.MockDataFlowDetailDtos(2);
+
+            detailDtos.ForEach(x => x.steps = new Mock<List<DataFlowStepDto>>().Object);
+
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
+
+            // Act
+            modelList = detailDtos.MapToDetailModelList();
+
+            // Assert
+            Assert.AreEqual(detailDtos.Count, modelList.Count);
         }
 
         /// <summary>

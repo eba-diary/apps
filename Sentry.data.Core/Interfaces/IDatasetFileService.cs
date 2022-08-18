@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core.Helpers.Paginate;
 using System.Collections.Generic;
 
+
 namespace Sentry.data.Core
 {
     public interface IDatasetFileService
@@ -24,5 +25,6 @@ namespace Sentry.data.Core
 
         void UpdateObjectStatus(List<DatasetFile> dbList, GlobalEnums.ObjectStatusEnum status);
         void UpdateObjectStatus(int[] idList, GlobalEnums.ObjectStatusEnum status);
+        bool ScheduleReprocessing(int stepId, List<int> datasetFileIds);
     }
 }
