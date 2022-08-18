@@ -59,8 +59,6 @@ data.DatasetsSearch = {
                     data.DatasetsSearch.initUI();
                     data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
 
-                    $("#filter-search-text").focus();
-
                     if (updateFilters) {
                         data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
                     }
