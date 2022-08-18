@@ -22,5 +22,6 @@ namespace Sentry.data.Core
         public int FileExtensionId { get; set; }
         public int DataElementID { get; set; }
         public string SasLibrary { get; set; }
+        public string ControlMTriggerName { get; set; }
     }
 }
