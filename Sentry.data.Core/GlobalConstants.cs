@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System;
+
+namespace Sentry.data.Core
 {
     public static class GlobalConstants
     {        
@@ -186,6 +188,7 @@
             public const string DATASOURCE = "DataSource";
             public const string BUSINESSAREA = "BusinessArea"; 
             public const string ASSET = "Asset";
+            public const string DATAFLOW = "Dataflow";
         }
 
         public static class PermissionCodes
@@ -198,6 +201,7 @@
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
             public const string CAN_MANAGE_SCHEMA = "CanManageSchema";
+            public const string CAN_MANAGE_DATAFLOW = "CanManageDataflow";
             public const string S3_ACCESS = "S3Access";
             public const string SNOWFLAKE_ACCESS = "SnowflakeAccess";
             public const string INHERIT_PARENT_PERMISSIONS = "InheritParentPermissions";
@@ -398,6 +402,8 @@
         {
             public const string DATASET_STAGE = "SENTRY_DATASET";       //OLD STAGE NAME
             public const string PARQUET_STAGE = "DLST_PARQUET";         //NEW STAGE NAME
+            public const string RAWQUERY_STAGE = "DLST_RAWQUERY";
+            public const string RAW_STAGE = "DLST_RAW";
         }
 
         public static class SnowflakeWarehouse
@@ -461,9 +467,12 @@
             public const string XML = "XML";
             public const string JSON = "JSON";
             public const string DELIMITED = "DELIMITED";
-            public const string ANY = "ANY";
+            [Obsolete]
+            public const string ANY = "ANY"; //deprecated
             public const string CSV = "CSV";
             public const string TXT = "TXT";
+            [Obsolete]
+            public const string XLSX = "XLSX"; //deprecated
         }
 
         public static class DeleteFileResponseStatus

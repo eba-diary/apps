@@ -7,6 +7,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema20220609
 {
     public enum SchemaConsumptionTypeEnum
     {
-        Snowflake
+        SchemaConsumptionSnowflakeModel,
     }  
 }

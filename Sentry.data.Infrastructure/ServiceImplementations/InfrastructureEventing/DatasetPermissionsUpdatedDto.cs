@@ -79,6 +79,7 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
         {
             public const string STATUS_ACTIVE = "active";
             public const string STATUS_REQUESTED = "requested";
+            public const string STATUS_DISABLED = "disabled";
 
             public string Identity { get; set; }
             public string IdentityType { get; set; }
@@ -93,7 +94,7 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
 
             public string Action { get; set; }
             public string RequestedBy { get; set; }
-            public IList<PermissionDto> Permissions { get; set; }
+            public List<PermissionDto> Permissions { get; set; }
         }
 
         public Dictionary<string, string> ToDictionary()

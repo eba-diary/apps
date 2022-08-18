@@ -109,6 +109,13 @@ namespace Sentry.data.Core
 
         public virtual string AlternateContactEmail { get; set; }
 
+        public virtual bool IsHumanResources { 
+            get
+            {
+                return DatasetCategories.Any(w => w.AbbreviatedName == "HR");
+            }
+        }
+
         public virtual ValidationResults ValidateForDelete()
         {
             ValidationResults results = new ValidationResults();
