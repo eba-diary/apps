@@ -2063,6 +2063,88 @@ namespace Sentry.data.Core.Tests
 
 
         [TestMethod]
+        public void UpdateAndSaveSchema_ControlMTriggerName_CleansedCorrectly()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //mock context
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetFileConfigs = new List<DatasetFileConfig>(),
+                NamedEnvironment = "NamedEnvironment%$$#_",
+                ShortName = "short9839)(!@"
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig()
+            {
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1,
+                    CreateCurrentView = false,
+                    Extension = new FileExtension() { Id = 4 },
+                    Name = "schema&^Name"
+                },
+                ParentDataset = ds
+            };
+
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { fileConfig };
+            List<Dataset> datasets = new List<Dataset>() { ds };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
+            datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
+
+            datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
+
+            SchemaRevision revision = new SchemaRevision()
+            {
+                ParentSchema = fileConfig.Schema,
+                SchemaRevision_Id = 3
+            };
+            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
+            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
+
+            //mock user service
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
+            appUser.SetupGet(x => x.AssociateId).Returns("000000");
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
+
+            //mock security service
+            UserSecurity security = new UserSecurity() { CanManageSchema = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null, null);
+
+            FileSchemaDto dto = new FileSchemaDto()
+            {
+                SchemaId = 1,
+                ParentDatasetId = 2,
+                CreateCurrentView = true,
+                FileExtensionId = 4,
+                Name = "schema&^Name"
+            };
+
+            Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
+
+            //verify ControlMTriggerName was created correctly
+            Assert.AreEqual("DATA_NAMEDENVIRONMENT_SHORT9839_SCHEMANAME_COMPLETED", fileConfig.Schema.ControlMTriggerName);
+
+            mr.VerifyAll();
+        }
+
+
+        [TestMethod]
         public void UpdateAndSaveSchema_ParquetStorage_TrueAndCreateEvent()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);

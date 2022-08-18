@@ -435,14 +435,20 @@ namespace Sentry.data.Core
 
         private string GetControlMTrigger(FileSchemaDto dto)
         {
-            string name = string.Empty;
+            string controlMTriggerName = string.Empty;
             Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
             if(ds != null)
             {
-                name = $"DATA_{ds.NamedEnvironment}_{ds.ShortName}_{dto.Name}_COMPLETED";
+                Regex reg = new Regex("[^a-zA-Z0-9]");
+                string namedEnvironmentCleaned = reg.Replace((ds.NamedEnvironment != null)? ds.NamedEnvironment.ToUpper() : String.Empty,String.Empty);
+                string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
+                string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
+
+                //TODO: finish testing this to ensure upper case and no weird chars
+                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
             }
             
-            return name;
+            return controlMTriggerName;
         }
 
         private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
