@@ -444,8 +444,7 @@ namespace Sentry.data.Core
                 string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
                 string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
 
-                //TODO: finish testing this to ensure upper case and no weird chars
-                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
+                                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
             }
             
             return controlMTriggerName;
