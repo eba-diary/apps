@@ -77,17 +77,17 @@
     <Reference Include="LaunchDarkly.Cache, Version=1.0.2.0, Culture=neutral, PublicKeyToken=caeed01e3c7cd028, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Cache.1.0.2\lib\net45\LaunchDarkly.Cache.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.CommonSdk, Version=5.4.1.0, Culture=neutral, PublicKeyToken=45ef1738a929a7df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.CommonSdk.5.4.1\lib\net452\LaunchDarkly.CommonSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.CommonSdk, Version=5.5.0.0, Culture=neutral, PublicKeyToken=45ef1738a929a7df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.CommonSdk.5.5.0\lib\net452\LaunchDarkly.CommonSdk.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.EventSource, Version=4.1.3.0, Culture=neutral, PublicKeyToken=18e8c36453e3060f, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.EventSource.4.1.3\lib\net452\LaunchDarkly.EventSource.dll</HintPath>
+    <Reference Include="LaunchDarkly.EventSource, Version=4.2.0.0, Culture=neutral, PublicKeyToken=18e8c36453e3060f, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.EventSource.4.2.0\lib\net452\LaunchDarkly.EventSource.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.InternalSdk, Version=2.3.0.0, Culture=neutral, PublicKeyToken=ff53908ab73043b6, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.InternalSdk.2.3.0\lib\net452\LaunchDarkly.InternalSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.InternalSdk, Version=2.3.2.0, Culture=neutral, PublicKeyToken=ff53908ab73043b6, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.InternalSdk.2.3.2\lib\net452\LaunchDarkly.InternalSdk.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.JsonStream, Version=1.0.3.0, Culture=neutral, PublicKeyToken=baa039a572ce18d0, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.JsonStream.1.0.3\lib\net461\LaunchDarkly.JsonStream.dll</HintPath>
+    <Reference Include="LaunchDarkly.JsonStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=baa039a572ce18d0, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.JsonStream.1.1.0\lib\net461\LaunchDarkly.JsonStream.dll</HintPath>
     </Reference>
     <Reference Include="LaunchDarkly.Logging, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Logging.1.0.1\lib\net452\LaunchDarkly.Logging.dll</HintPath>
@@ -95,8 +95,8 @@
     <Reference Include="LaunchDarkly.Logging.Log4net, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Logging.Log4net.1.0.1\lib\net452\LaunchDarkly.Logging.Log4net.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.ServerSdk, Version=6.3.1.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.ServerSdk.6.3.1\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.ServerSdk, Version=6.3.2.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.ServerSdk.6.3.2\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
