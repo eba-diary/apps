@@ -79,8 +79,8 @@ namespace Sentry.data.Web
             model.Category = dto.Category;
             model.Color = dto.Color;
             model.IsSecured = dto.IsSecured;
-            model.LastActivityDateTime = dto.LastActivityDateTime.ToShortDateString();
-            model.CreatedDateTime = dto.CreatedDateTime.ToShortDateString();
+            model.LastActivityShortDate = dto.LastActivityDateTime.ToShortDateString();
+            model.CreatedShortDate = dto.CreatedDateTime.ToShortDateString();
             model.IsReport = false;
         }
     }

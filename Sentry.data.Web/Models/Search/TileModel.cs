@@ -15,8 +15,8 @@ namespace Sentry.data.Web
         public string Category { get; set; }
         public string Color { get; set; }
         public bool IsSecured { get; set; }
-        public string LastActivityDateTime { get; set; }
-        public string CreatedDateTime { get; set; }
+        public string LastActivityShortDate { get; set; }
+        public string CreatedShortDate { get; set; }
         public bool IsReport { get; set; }
         public string AbbreviatedCategories { get; set; }
         public string ReportType { get; set; }

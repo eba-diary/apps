@@ -204,8 +204,8 @@ namespace Sentry.data.Web
             dto.Category = model.Category;
             dto.Color = model.Color;
             dto.IsSecured = model.IsSecured;
-            dto.LastActivityDateTime = DateTime.Parse(model.LastActivityDateTime);
-            dto.CreatedDateTime = DateTime.Parse(model.CreatedDateTime);
+            dto.LastActivityDateTime = DateTime.Parse(model.LastActivityShortDate);
+            dto.CreatedDateTime = DateTime.Parse(model.CreatedShortDate);
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)
