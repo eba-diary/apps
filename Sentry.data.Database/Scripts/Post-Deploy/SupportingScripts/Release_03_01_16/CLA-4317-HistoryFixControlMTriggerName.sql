@@ -8,15 +8,49 @@ BEGIN TRY
     -- BEGIN POST-DEPLOY SCRIPT --
 
     
+	--Schema_NME CLEANSE
+	;WITH RECUR_Schema_NME
+	as 
+	(
+ 		SELECT DISTINCT 
+				S.Schema_Id
+				,S.Schema_NME AS Schema_NME_ORIG 
+				,CAST(S.Schema_NME AS VARCHAR(100)) AS Schema_NME, PATINDEX('%[^A-Z0-9]%', S.Schema_NME) AS BadCharIndex_Schema_NME
+		FROM dataset D
+		JOIN DatasetFileConfigs DFG
+			ON DFG.Dataset_ID = D.Dataset_ID
+		JOIN [Schema] S on DFG.Schema_Id = S.Schema_Id
+    
+		UNION ALL
+    
+		SELECT	
+				Schema_Id
+				,Schema_NME_ORIG
+				,CAST(Schema_NME AS VARCHAR(100)) AS Schema_NME, PATINDEX('%[^A-Z0-9]%', Schema_NME) AS BadCharIndex
+		FROM 
+		(
+			SELECT 
+				Schema_Id
+				,Schema_NME_ORIG
+				,CASE WHEN BadCharIndex_Schema_NME > 0 
+					THEN REPLACE(Schema_NME, SUBSTRING(Schema_NME, BadCharIndex_Schema_NME, 1), '')
+					ELSE Schema_NME 
+				END AS Schema_NME
+			FROM RECUR_Schema_NME
+			WHERE BadCharIndex_Schema_NME > 0
+
+		) badCharFinder
+	)
 
 	UPDATE S
-	SET S.ControlMTriggerName = 'DATA_' + D.NamedEnvironment + '_' + D.Short_NME + '_' + S.Schema_NME + '_COMPLETED'
-	--SELECT D.Dataset_ID,D.Dataset_NME,D.NamedEnvironment,D.Short_NME,S.Schema_NME ,'DATA_' + D.NamedEnvironment + '_' + D.Short_NME + '_' + S.Schema_NME + '_COMPLETED'
+		SET S.ControlMTriggerName = 'DATA_' + D.NamedEnvironment + '_' + D.Short_NME + '_' + R.Schema_NME + '_COMPLETED'
+	--SELECT S.Schema_Id, 'DATA_' + D.NamedEnvironment + '_' + D.Short_NME + '_' + R.Schema_NME + '_COMPLETED'
 	FROM dataset D
-	JOIN DatasetFileConfigs DFG
-		ON DFG.Dataset_ID = D.Dataset_ID
-	JOIN [Schema] S on DFG.Schema_Id = S.Schema_Id
-	WHERE	S.ControlMTriggerName IS NULL
+		JOIN DatasetFileConfigs DFG
+			ON DFG.Dataset_ID = D.Dataset_ID
+		JOIN [Schema] S on DFG.Schema_Id = S.Schema_Id
+		JOIN RECUR_Schema_NME R ON S.Schema_Id = R.Schema_Id
+	WHERE BadCharIndex_Schema_NME = 0
 
 
 
