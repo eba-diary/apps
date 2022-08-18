@@ -1,5 +1,4 @@
 ﻿using Sentry.data.Core;
-using System;
 using System.Collections.Generic;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -7,7 +6,7 @@ namespace Sentry.data.Web.Controllers
 {
     public class BusinessIntelligenceSearchController : TileSearchController<BusinessIntelligenceTileDto>
     {
-        public BusinessIntelligenceSearchController(ITileSearchService<BusinessIntelligenceTileDto> tileSearchService, IEventService eventService, IFilterSearchService filterSearchService) : base(tileSearchService, eventService, filterSearchService) { }
+        public BusinessIntelligenceSearchController(ITileSearchService<BusinessIntelligenceTileDto> tileSearchService, IFilterSearchService filterSearchService) : base(tileSearchService, filterSearchService) { }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {

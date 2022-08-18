@@ -3,6 +3,7 @@ using Sentry.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -10,11 +11,13 @@ namespace Sentry.data.Core
     {
         protected readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
+        private readonly IEventService _eventService;
 
-        protected TileSearchService(IDatasetContext datasetContext, IUserService userService)
+        protected TileSearchService(IDatasetContext datasetContext, IUserService userService, IEventService eventService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
+            _eventService = eventService;
         }
 
         public TileSearchResultDto<T> SearchTiles(TileSearchDto<T> searchDto)
@@ -51,6 +54,12 @@ namespace Sentry.data.Core
             }
 
             return dtos;
+        }
+
+        public async Task PublishSearchEventAsync(TileSearchEventDto eventDto)
+        {
+            string serializedSearch = JsonConvert.SerializeObject(eventDto);
+            await _eventService.PublishSuccessEvent(GlobalConstants.EventType.SEARCH, "Searched Datasets", serializedSearch);
         }
 
         #region Abstract

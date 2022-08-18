@@ -457,7 +457,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
-    <Compile Include="Models\Dataset\DatasetSearchModel.cs" />
+    <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RemovePermissionModel.cs" />
@@ -471,7 +471,6 @@
     <Compile Include="Models\Search\SaveSearchModel.cs" />
     <Compile Include="Models\Search\TileModel.cs" />
     <Compile Include="Models\Search\TileResultsModel.cs" />
-    <Compile Include="Models\Search\TileSearchEventModel.cs" />
     <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />

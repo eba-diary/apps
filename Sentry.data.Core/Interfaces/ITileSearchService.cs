@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -6,5 +7,6 @@ namespace Sentry.data.Core
     {
         TileSearchResultDto<T> SearchTiles(TileSearchDto<T> searchDto);
         IEnumerable<T> SearchTileDtos(TileSearchDto<T> searchDto);
+        Task PublishSearchEventAsync(TileSearchEventDto eventDto);
     }
 }

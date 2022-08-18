@@ -5,7 +5,7 @@ namespace Sentry.data.Core
 {
     public class DatasetTileSearchService : TileSearchService<DatasetTileDto>
     {
-        public DatasetTileSearchService(IDatasetContext datasetContext, IUserService userService) : base(datasetContext, userService) { }
+        public DatasetTileSearchService(IDatasetContext datasetContext, IUserService userService, IEventService eventService) : base(datasetContext, userService, eventService) { }
 
         protected override IQueryable<Dataset> GetDatasets()
         {

@@ -14,12 +14,10 @@ namespace Sentry.data.Web.Controllers
     public abstract class TileSearchController<T> : BaseSearchableController where T : DatasetTileDto
     {
         private readonly ITileSearchService<T> _tileSearchService;
-        private readonly IEventService _eventService;
 
-        protected TileSearchController(ITileSearchService<T> tileSearchService, IEventService eventService, IFilterSearchService filterSearchService) : base(filterSearchService)
+        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
             _tileSearchService = tileSearchService;
-            _eventService = eventService;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
@@ -105,9 +103,7 @@ namespace Sentry.data.Web.Controllers
             TileResultsModel tileResultsModel = resultDto.ToModel(searchModel.SortBy, searchModel.PageNumber, searchModel.Layout);
             tileResultsModel.Tiles = MapToTileModels(resultDto.Tiles);
 
-            //async publish event            
-            string serializedSearch = JsonSerializer.Serialize<TileSearchEventModel>(searchModel);
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.SEARCH, "Searched Datasets", serializedSearch);
+            _tileSearchService.PublishSearchEventAsync(searchModel.ToEventDto(tileResultsModel.TotalResults));
 
             return Json(tileResultsModel);
         }

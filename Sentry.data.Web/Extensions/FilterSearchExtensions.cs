@@ -134,6 +134,21 @@ namespace Sentry.data.Web
             return dto;
         }
 
+        public static TileSearchEventDto ToEventDto(this TileSearchModel model, int totalResults)
+        {
+            TileSearchEventDto dto = new TileSearchEventDto()
+            {
+                PageNumber = model.PageNumber,
+                PageSize = model.PageSize,
+                SortBy = model.SortBy,
+                Layout = model.Layout,
+                TotalResults = totalResults
+            };
+
+            MapToParentDto(model, dto);
+            return dto;
+        }
+
         public static List<DatasetTileDto> ToDatasetTileDtos(this List<TileModel> models)
         {
             List<DatasetTileDto> tileDtos = new List<DatasetTileDto>();

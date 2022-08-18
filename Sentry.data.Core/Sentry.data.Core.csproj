@@ -211,6 +211,7 @@
     <Compile Include="DTO\Search\FilterSearchDto.cs" />
     <Compile Include="DTO\Search\SavedSearchDto.cs" />
     <Compile Include="DTO\Search\SavedSearchOptionDto.cs" />
+    <Compile Include="DTO\Search\TileSearchEventDto.cs" />
     <Compile Include="DTO\Search\TileSearchResultDto.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupDto.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />

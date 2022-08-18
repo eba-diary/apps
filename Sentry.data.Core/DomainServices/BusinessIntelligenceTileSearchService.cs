@@ -1,9 +1,6 @@
 ﻿using Sentry.Associates;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -11,7 +8,10 @@ namespace Sentry.data.Core
     {
         private readonly IAssociateInfoProvider _associateInfoProvider;
 
-        public BusinessIntelligenceTileSearchService(IAssociateInfoProvider associateInfoProvider, IDatasetContext datasetContext, IUserService userService) : base(datasetContext, userService)
+        public BusinessIntelligenceTileSearchService(IAssociateInfoProvider associateInfoProvider, 
+                                                     IDatasetContext datasetContext, 
+                                                     IUserService userService, 
+                                                     IEventService eventService) : base(datasetContext, userService, eventService)
         {
             _associateInfoProvider = associateInfoProvider;
         }
