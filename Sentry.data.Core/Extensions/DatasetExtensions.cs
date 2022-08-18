@@ -1,7 +1,4 @@
-﻿using Nest;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
 using System.Linq;
 
 namespace Sentry.data.Core

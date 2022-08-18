@@ -505,12 +505,6 @@ namespace Sentry.data.Core
             public const string ASSET_LEVEL_GROUP_NAME = "Default";
         }
 
-        public static class CacheKeys
-        {
-            public const string SEARCHDATASETS = "SearchDatasets";
-            public const string DATASETSUMMARY = "DatasetSummaryMetadata";
-        }
-
         public static class Pagination
         {
             public const string ELLIPSIS = "...";

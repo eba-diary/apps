@@ -1,23 +1,15 @@
-﻿using Nest;
-using Newtonsoft.Json;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
-using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.Caching;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace Sentry.data.Core
 {
@@ -29,7 +21,7 @@ namespace Sentry.data.Core
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IQuartermasterService _quartermasterService;
-        private readonly ObjectCache _cache = MemoryCache.Default;
+        private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
         private readonly IDatasetFileService _datasetFileService;
@@ -80,7 +72,7 @@ namespace Sentry.data.Core
 
         public List<DatasetSummaryMetadataDTO> GetDatasetSummaryMetadataDTO()
         {
-            List<DatasetSummaryMetadataDTO> summaryResults = _cache[CacheKeys.DATASETSUMMARY] as List<DatasetSummaryMetadataDTO>;
+            List<DatasetSummaryMetadataDTO> summaryResults = cache["DatasetSummaryMetadata"] as List<DatasetSummaryMetadataDTO>;
 
             if (summaryResults == null)
             {
@@ -92,12 +84,12 @@ namespace Sentry.data.Core
 
                 //Pull summarized metadata from datasetfile table
                 summaryResults = _datasetContext.DatasetFileStatusActive.GroupBy(g => new { g.Dataset })
-                    .Select(s => new DatasetSummaryMetadataDTO
-                    {
-                        DatasetId = s.Key.Dataset.DatasetId,
-                        FileCount = s.Count(),
-                        Max_Created_DTM = s.Max(m => m.CreatedDTM)
-                    }).ToList();
+                .Select(s => new DatasetSummaryMetadataDTO
+                {
+                    DatasetId = s.Key.Dataset.DatasetId,
+                    FileCount = s.Count(),
+                    Max_Created_DTM = s.Max(m => m.CreatedDTM)
+                }).ToList();
 
                 //pull summarized metadata from events table
                 var eventlist = _datasetContext.Events
@@ -113,7 +105,7 @@ namespace Sentry.data.Core
                 }
 
                 //Assign result list to cache object
-                _cache.Set(CacheKeys.DATASETSUMMARY, summaryResults, policy);
+                cache.Set("DatasetSummaryMetadata", summaryResults, policy);
             }
 
             return summaryResults;
