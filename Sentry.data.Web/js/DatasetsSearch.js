@@ -2,9 +2,10 @@
 data.DatasetsSearch = {
 
     searchableDatasets: null,
+    keyupTimeout: null,
 
     init: function () {
-        data.DatasetsSearch.executeFullSearch(data.DatasetsSearch.getActivePage());
+        data.DatasetsSearch.initSearch(data.DatasetsSearch.getActivePage());
         data.DatasetsSearch.initEvents();
     },
 
@@ -25,18 +26,22 @@ data.DatasetsSearch = {
     },
 
     executeSearch: function () {
-        data.DatasetsSearch.executeFullSearch(1);
+        data.DatasetsSearch.executeDatasetSearch(1, true);
     },
 
-    executeFullSearch: function (pageNumber) {
-        $.post("/DatasetSearch/SearchableDatasets/", data.FilterSearch.buildSearchRequest(), function (response) {
-            data.DatasetsSearch.searchableDatasets = response
-            data.DatasetsSearch.executeDatasetSearch(pageNumber);
-            data.DatasetsSearch.getTileFilters();
+    initSearch: function (pageNumber) {
+        $.get("/DatasetSearch/SearchableTiles/", function (tileModels) {
+            data.DatasetsSearch.searchableDatasets = tileModels
+            data.DatasetsSearch.executeDatasetSearch(pageNumber, true);
         });
     },
 
-    executeDatasetSearch: function (pageNumber) {
+    executeSearchWithoutLoader: function (pageNumber, updateFilters) {
+        data.FilterSearch.clearActiveSavedSearch();
+        data.DatasetsSearch.executeDatasetSearch(pageNumber, updateFilters);
+    },
+
+    executeDatasetSearch: function (pageNumber, updateFilters) {
         var lastPageNumber = 1;
 
         if ($("#tile-page-next").length) {
@@ -44,7 +49,7 @@ data.DatasetsSearch = {
         }
 
         if (pageNumber > 0 && pageNumber <= lastPageNumber) {
-            var request = data.DatasetsSearch.buildDatasetSearchRequest(pageNumber);
+            var request = data.DatasetsSearch.buildDatasetSearchRequest(pageNumber, updateFilters);
 
             //get tiles
             $.post("/DatasetSearch/TileResultsModel/", request, function (tileResultsModel) {
@@ -53,22 +58,25 @@ data.DatasetsSearch = {
                 $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
                     data.DatasetsSearch.initUI();
                     data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
+
+                    $("#filter-search-text").focus();
+
+                    if (updateFilters) {
+                        data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
+                    }
                 });
             });
         }
     },
 
-    getTileFilters: function () {
-        $.post("/DatasetSearch/TileFilters/", data.DatasetsSearch.buildDatasetSearchRequest(1), (filters) => data.FilterSearch.completeFilterRetrieval(filters));
-    },
-
-    buildDatasetSearchRequest: function (pageNumber) {
+    buildDatasetSearchRequest: function (pageNumber, updateFilters) {
         var request = data.FilterSearch.buildSearchRequest();
         request.SearchableTiles = data.DatasetsSearch.searchableDatasets;
         request.PageNumber = pageNumber;
         request.PageSize = $("#tile-result-page-size").val();
         request.SortBy = $("#tile-result-sort").val();
         request.Layout = $("#tile-result-layout").val();
+        request.UpdateFilters = updateFilters;
 
         return request;
     },
@@ -120,45 +128,56 @@ data.DatasetsSearch = {
         $(document).on("click", "#tile-page-previous", function () {
             var previousPage = data.DatasetsSearch.getActivePage();
             previousPage--;
-            data.DatasetsSearch.executeDatasetSearch(previousPage);
+            data.DatasetsSearch.executeSearchWithoutLoader(previousPage);
         });
 
         $(document).on("click", "#tile-page-next", function () {
             var nextPage = data.DatasetsSearch.getActivePage();
             nextPage++;
-            data.DatasetsSearch.executeDatasetSearch(nextPage);
+            data.DatasetsSearch.executeSearchWithoutLoader(nextPage);
         });
 
         $(document).on("click", ".tile-page-number", function () {
             if (!$(this).hasClass("active")) {
-                data.DatasetsSearch.executeDatasetSearch(parseInt($(this).data("page")))
+                data.DatasetsSearch.executeSearchWithoutLoader(parseInt($(this).data("page")))
             }
         });
 
         //page size change event
-        $(document).on("change", "#tile-result-page-size", () => data.DatasetsSearch.executeDatasetSearch(1));
+        $(document).on("change", "#tile-result-page-size", () => data.DatasetsSearch.executeSearchWithoutLoader(1));
 
         //sort by change event
-        $(document).on("change", "#tile-result-sort", () => data.DatasetsSearch.executeDatasetSearch(1));
+        $(document).on("change", "#tile-result-sort", () => data.DatasetsSearch.executeSearchWithoutLoader(1));
 
         //select category option
         $(document).off("change", ".filter-search-category-option-checkbox");
         $(document).on("change", ".filter-search-category-option-checkbox", function () {
             data.FilterSearch.handleCheckboxChange(this);
-            data.DatasetsSearch.executeDatasetSearch(1);
+            data.DatasetsSearch.executeSearchWithoutLoader(1);
         });
 
         //filters cleared
         $(document).off("click", "#filter-search-clear");
         $(document).on("click", "#filter-search-clear", function () {
             data.FilterSearch.handleClearAll();
-            data.DatasetsSearch.executeDatasetSearch(1);
+            data.DatasetsSearch.executeSearchWithoutLoader(1);
         });
 
         $(document).off("click", "[id^='clearOption_']");
         $(document).on("click", "[id^='clearOption_']", function () {
             data.FilterSearch.handleBadgeClear(this);
-            data.DatasetsSearch.executeDatasetSearch(1);
+            data.DatasetsSearch.executeSearchWithoutLoader(1);
+        });
+
+        //text box type delay
+        $(document).on("keyup", "#filter-search-text", function (e) {
+            if (data.DatasetsSearch.keyupTimeout) {
+                clearTimeout(data.DatasetsSearch.keyupTimeout);
+            }
+
+            data.DatasetsSearch.keyupTimeout = setTimeout(function () {
+                data.DatasetsSearch.executeSearchWithoutLoader(1, true);
+            }, 500);
         });
     },
 

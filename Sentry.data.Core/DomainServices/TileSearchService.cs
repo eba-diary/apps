@@ -30,8 +30,19 @@ namespace Sentry.data.Core
 
             try
             {
-                IEnumerable<T> dtos = SearchTileDtos(searchDto);
-                List<T> allResults = dtos.FilterBy(searchDto.FilterCategories).ToList();
+                List<T> dtos = searchDto.SearchableTiles?.Any() == true ? searchDto.SearchableTiles : GetSearchableTiles();
+
+                if (!string.IsNullOrWhiteSpace(searchDto.SearchText))
+                {
+                    dtos = dtos.Where(x => x.Name.ToLower().Contains(searchDto.SearchText.ToLower())).ToList();
+                }
+
+                List<T> allResults = dtos.FilterBy(searchDto.FilterCategories);
+
+                if (searchDto.UpdateFilters)
+                {
+                    resultDto.FilterCategories = dtos.CreateFilters(searchDto.FilterCategories);
+                }
 
                 resultDto.TotalResults = allResults.Count;
                 resultDto.Tiles = ApplyPaging(allResults, searchDto);
@@ -44,31 +55,7 @@ namespace Sentry.data.Core
             return resultDto;
         }
 
-        public IEnumerable<T> SearchTileDtos(TileSearchDto<T> searchDto)
-        {
-            IEnumerable<T> dtos = searchDto.SearchableTiles?.Any() == true ? searchDto.SearchableTiles : GetTileDtos();
-
-            if (!string.IsNullOrWhiteSpace(searchDto.SearchText))
-            {
-                dtos = dtos.Where(x => x.Name.ToLower().Contains(searchDto.SearchText.ToLower()));
-            }
-
-            return dtos;
-        }
-
-        public async Task PublishSearchEventAsync(TileSearchEventDto eventDto)
-        {
-            string serializedSearch = JsonConvert.SerializeObject(eventDto);
-            await _eventService.PublishSuccessEvent(GlobalConstants.EventType.SEARCH, "Searched Datasets", serializedSearch);
-        }
-
-        #region Abstract
-        protected abstract IQueryable<Dataset> GetDatasets();
-        protected abstract T MapToTileDto(Dataset dataset);
-        #endregion
-
-        #region Private
-        private IEnumerable<T> GetTileDtos()
+        public List<T> GetSearchableTiles()
         {
             List<Dataset> datasets = GetDatasets().FetchAllChildren(_datasetContext);
 
@@ -97,6 +84,18 @@ namespace Sentry.data.Core
             return tileDtos;
         }
 
+        public async Task PublishSearchEventAsync(TileSearchEventDto eventDto)
+        {
+            string serializedSearch = JsonConvert.SerializeObject(eventDto);
+            await _eventService.PublishSuccessEvent(GlobalConstants.EventType.SEARCH, "Searched Datasets", serializedSearch);
+        }
+
+        #region Abstract
+        protected abstract IQueryable<Dataset> GetDatasets();
+        protected abstract T MapToTileDto(Dataset dataset);
+        #endregion
+
+        #region Private
         private List<T> ApplyPaging(IEnumerable<T> dtos, TileSearchDto<T> searchDto)
         {
             if (searchDto.OrderByDescending)

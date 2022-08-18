@@ -8,6 +8,7 @@ namespace Sentry.data.Web
         public int PageSize { get; set; }
         public int SortBy { get; set; }
         public int Layout { get; set; }
+        public bool UpdateFilters { get; set; }
         public List<TileModel> SearchableTiles { get; set; }
     }
 }

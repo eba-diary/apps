@@ -41,7 +41,7 @@ namespace Sentry.data.Core
             };
         }
 
-        public static IEnumerable<T> FilterBy<T>(this IEnumerable<T> enumerable, List<FilterCategoryDto> filterCategoryDtos) where T : IFilterSearchable
+        public static List<T> FilterBy<T>(this IEnumerable<T> enumerable, List<FilterCategoryDto> filterCategoryDtos) where T : IFilterSearchable
         {
             foreach (FilterCategoryDto categoryDto in filterCategoryDtos)
             {
@@ -58,7 +58,7 @@ namespace Sentry.data.Core
                 }
             }
 
-            return enumerable;
+            return enumerable.ToList();
         }
 
         public static List<FilterCategoryDto> CreateFilters<T>(this List<T> results, List<FilterCategoryDto> previousFilters) where T : IFilterSearchable

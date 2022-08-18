@@ -105,7 +105,8 @@ namespace Sentry.data.Web
             TileSearchDto<T> dto = new TileSearchDto<T>()
             {
                 PageSize = model.PageSize,
-                PageNumber = model.PageNumber
+                PageNumber = model.PageNumber,
+                UpdateFilters = model.UpdateFilters
             };
 
             switch ((TileSearchSortByOption)model.SortBy)

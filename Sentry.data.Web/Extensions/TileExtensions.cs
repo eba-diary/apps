@@ -8,15 +8,16 @@ namespace Sentry.data.Web
 {
     public static class TileExtensions
     {
-        public static TileResultsModel ToModel<T>(this TileSearchResultDto<T> dto, int selectedSortByValue, int selectedPageNumber, int selectedLayout)
+        public static TileResultsModel ToModel<T>(this TileSearchResultDto<T> dto, int selectedSortByValue, int  selectedLayout)
         {
             TileResultsModel model = new TileResultsModel()
             {
                 TotalResults = dto.TotalResults,
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(dto.PageSize.ToString()),
                 SortByOptions = Utility.BuildSelectListFromEnum<TileSearchSortByOption>(selectedSortByValue),
-                PageItems = Utility.BuildPageItemList(dto.TotalResults, dto.PageSize, selectedPageNumber),
-                LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(selectedLayout)
+                PageItems = Utility.BuildPageItemList(dto.TotalResults, dto.PageSize, dto.PageNumber),
+                LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(selectedLayout),
+                FilterCategories = dto.FilterCategories.ToModels()
             };
 
             return model;
