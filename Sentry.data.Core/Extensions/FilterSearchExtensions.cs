@@ -79,7 +79,7 @@ namespace Sentry.data.Core
             return options?.Any(o => o.OptionValue == value && o.Selected) == true;
         }
 
-        public static bool TryGetSelectedOptionsWithNoResultsIn(this List<FilterCategoryOptionDto> options, List<FilterCategoryOptionDto> newOptions, out List<FilterCategoryOptionDto> result)
+        public static bool TryGetSelectedOptionsWithNoResults(this List<FilterCategoryOptionDto> options, List<FilterCategoryOptionDto> newOptions, out List<FilterCategoryOptionDto> result)
         {
             result = options?.Where(x => x.Selected && !newOptions.Any(o => o.OptionValue == x.OptionValue)).ToList();
             return result?.Any() == true;
@@ -118,7 +118,7 @@ namespace Sentry.data.Core
                     categoryDto.CategoryOptions.Add(categoryOptionDto);
                 }
 
-                if (previousCategoryOptions.TryGetSelectedOptionsWithNoResultsIn(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
+                if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
                 {
                     categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
                 }

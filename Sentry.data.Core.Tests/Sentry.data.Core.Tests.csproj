@@ -164,6 +164,7 @@
     <Compile Include="FieldDtoTests.cs" />
     <Compile Include="SecurityTicketTests.cs" />
     <Compile Include="DatasetFileConfigExtensionsTests.cs" />
+    <Compile Include="DatasetExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

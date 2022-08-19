@@ -398,39 +398,46 @@ namespace Sentry.data.Web.Helpers
         {
             List<PageItemModel> pageItems = new List<PageItemModel>();
 
+            //calculate number of pages for result set
             int numberOfPages = pageSize == -1 ? 1 : (totalResults + pageSize - 1) / pageSize;
 
-            int frontPageNumbers = numberOfPages - 1;
-            bool useEllipsis = false;
-
-            if (numberOfPages > Pagination.MAX_PAGE_OPTIONS)
+            if (numberOfPages < 10)
             {
-                frontPageNumbers = Pagination.MAX_PAGE_OPTIONS - 2;
-                useEllipsis = true;
+                //display each page number because we are under 10 pages
+                pageItems.AddPages(1, numberOfPages, selectedPage);
             }
-
-            for (int i = 1; i <= frontPageNumbers; i++)
+            else
             {
-                pageItems.Add(new PageItemModel()
+                //special logic for when there are 10 or more pages of results
+                if (selectedPage <= 5)
                 {
-                    IsActive = i == selectedPage,
-                    PageNumber = i.ToString()
-                });
-            }
-
-            if (useEllipsis)
-            {
-                pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
-            }
-
-            if (numberOfPages > 0)
-            {
-                pageItems.Add(new PageItemModel()
+                    //add first 5 pages because the selected page is in the first 5 pages
+                    pageItems.AddPages(1, 5, selectedPage);
+                }
+                else
                 {
-                    IsActive = numberOfPages == selectedPage,
-                    PageNumber = numberOfPages.ToString()
-                });
-            }
+                    //selected page is not in the first 5 pages, add ellipsis and 2 previous pages
+                    pageItems.AddPage(1, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPage(selectedPage - 2, selectedPage);
+                    pageItems.AddPage(selectedPage - 1, selectedPage);
+                    pageItems.AddPage(selectedPage, selectedPage);
+                }
+
+                if (selectedPage > numberOfPages - 5)
+                {
+                    //add the last 5 pages because the selected page is in the last 5
+                    pageItems.AddPages(numberOfPages - 5, numberOfPages, selectedPage);
+                }
+                else
+                {
+                    //selected page is not in the last 5 pages, add ellipsis and 2 following pages
+                    pageItems.AddPage(selectedPage + 1, selectedPage);
+                    pageItems.AddPage(selectedPage + 2, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPage(numberOfPages, selectedPage);
+                }
+            }            
 
             return pageItems;
         }
@@ -676,5 +683,29 @@ namespace Sentry.data.Web.Helpers
 
             return ScheduleOptions;
         }
+
+        #region Private
+        private static void AddPages(this List<PageItemModel> pageItems, int start, int end, int selectedPage)
+        {
+            for (int i = start; i <= end; i++)
+            {
+                pageItems.AddPage(i, selectedPage);
+            }
+        }
+
+        private static void AddPage(this List<PageItemModel> pageItems, int pageNumber, int selectedPage)
+        {
+            pageItems.Add(new PageItemModel()
+            {
+                PageNumber = pageNumber.ToString(),
+                IsActive = pageNumber == selectedPage
+            });
+        }
+
+        private static void AddPageEllipsis(this List<PageItemModel> pageItems)
+        {
+            pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
+        }
+        #endregion
     }
 }

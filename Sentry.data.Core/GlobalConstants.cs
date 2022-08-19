@@ -508,7 +508,7 @@ namespace Sentry.data.Core
         public static class Pagination
         {
             public const string ELLIPSIS = "...";
-            public const int MAX_PAGE_OPTIONS = 6;
+            public const int MAX_PAGE_OPTIONS = 9;
         }
 
         public static class TileResultParameters

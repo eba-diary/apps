@@ -339,7 +339,7 @@ namespace Sentry.data.Infrastructure
                 });
             }
 
-            if (previousCategoryOptions.TryGetSelectedOptionsWithNoResultsIn(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
+            if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
             {
                 categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
             }
