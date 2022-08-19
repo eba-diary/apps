@@ -1,16 +1,16 @@
 ﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
+using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using Hangfire;
-using Sentry.data.Core.GlobalEnums;
-using System.Linq.Expressions;
 
 namespace Sentry.data.Core
 {
@@ -19,21 +19,19 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly IJobService _jobService;
-        private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
         private readonly IQuartermasterService _quartermasterService;
         private readonly IDataFeatures _dataFeatures;
         private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
 
         public DataFlowService(IDatasetContext datasetContext, 
-            IUserService userService, IJobService jobService, IS3ServiceProvider s3ServiceProvider,
+            IUserService userService, IJobService jobService,
             ISecurityService securityService, IQuartermasterService quartermasterService, 
             IDataFeatures dataFeatures, IBackgroundJobClient backgroundJobClient)
         {
             _datasetContext = datasetContext;
             _userService = userService;
             _jobService = jobService;
-            _s3ServiceProvider = s3ServiceProvider;
             _securityService = securityService;
             _quartermasterService = quartermasterService;
             _dataFeatures = dataFeatures;
@@ -687,7 +685,7 @@ namespace Sentry.data.Core
             try
             {
                 currentDataFlowDto = GetDataFlowDtoByStepId(stepId);
-            } catch (DataFlowStepNotFound ex)
+            } catch (DataFlowStepNotFound)
             {
                  return false;
             }
@@ -698,7 +696,7 @@ namespace Sentry.data.Core
                 foreach (int datasetFileId in datasetFileIds)
                 {
                     // compares the schemaIds from the DataFlowDto and the datasetFileId seeing if they are not equal
-                    if (!(currentDataFlowDto.SchemaId == GetSchemaIdFromDatasetFileId(datasetFileId)))
+                    if (currentDataFlowDto.SchemaId != GetSchemaIdFromDatasetFileId(datasetFileId))
                     {
                         // in the case that the schemaId are not equal to one another --> return false
                         indicator = false;
@@ -707,7 +705,7 @@ namespace Sentry.data.Core
 
 
                 }
-            } catch (DataFileNotFoundException ex)
+            } catch (DataFileNotFoundException)
             {
                 indicator = false;
             }
@@ -897,6 +895,24 @@ namespace Sentry.data.Core
             return df;
         }
 
+        public string GetSecurityGroup(int dataflowId)
+        {
+            var datasetId = _datasetContext.GetById<DataFlow>(dataflowId).DatasetId;
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+            if (ds == null)
+            {
+                return null;
+            }
+
+            var securityGroups = _securityService.GetDefaultSecurityGroupDtos(ds);
+
+            var group = securityGroups.FirstOrDefault(w => !w.IsAssetLevelGroup() && w.GroupType == AdSecurityGroupType.Prdcr).GetGroupName();
+
+            return group;
+        }
+
+
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPush).ToLower()}";
@@ -923,7 +939,7 @@ namespace Sentry.data.Core
                         string itemName = $"{item.SourceType}:::";
                         sourceTypeList.Append(itemName);
                     }
-                    Logger.Debug($"{methodName} source type list {sourceTypeList.ToString()}");
+                    Logger.Debug($"{methodName} source type list {sourceTypeList}");
                 }
 
                 RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
@@ -1081,67 +1097,7 @@ namespace Sentry.data.Core
             return map;
         }
 
-        private void MapToDtoList(List<DataFlow> dfList, List<DataFlowDto> dtoList)
-        {
-            foreach (DataFlow df in dfList)
-            {
-                DataFlowDto dfDto = new DataFlowDto();
-                MapToDto(df, dfDto);
-                dtoList.Add(dfDto);
-            }
-        }
-
-        private void MapToDto(DataFlow df, DataFlowDto dto)
-        {
-            dto.Id = df.Id;
-            dto.FlowGuid = df.FlowGuid;
-            dto.SaidKeyCode = df.SaidKeyCode;
-            dto.Name = df.Name;
-            dto.CreateDTM = df.CreatedDTM;
-            dto.CreatedBy = df.CreatedBy;
-            dto.FlowStorageCode = df.FlowStorageCode;
-            dto.MappedSchema = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? new List<int>() { df.SchemaId } : GetMappedFileSchema(df.Id);
-            dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
-            dto.ObjectStatus = df.ObjectStatus;
-            dto.DeleteIssuer = df.DeleteIssuer;
-            dto.DeleteIssueDTM = df.DeleteIssueDTM;
-            dto.IngestionType = df.IngestionType;
-            dto.IsCompressed = df.IsDecompressionRequired;
-            dto.CompressionType = df.CompressionType;
-            dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
-            dto.PreProcessingOption = df.PreProcessingOption;
-            dto.SaidKeyCode = df.SaidKeyCode;
-            dto.NamedEnvironment = df.NamedEnvironment;
-            dto.NamedEnvironmentType = df.NamedEnvironmentType;
-            dto.PrimaryContactId = df.PrimaryContactId;
-            dto.IsSecured = df.IsSecured;
-            dto.Security = _securityService.GetUserSecurity(df, _userService.GetCurrentUser());
-
-            if (dto.IsCompressed)
-            {
-                CompressionJobDto jobDto = new CompressionJobDto();
-                jobDto.CompressionType = (df.CompressionType.HasValue) ? (CompressionTypes)df.CompressionType : 0;
-                dto.CompressionJob = jobDto;
-            }
-
-            List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
-            foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
-            {
-                foreach (SchemaMap map in step.SchemaMappings)
-                {
-                    scmMapDtoList.Add(map.ToDto());
-                }
-            }
-            dto.SchemaMap = scmMapDtoList;
-
-            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
-            {
-                dto.RetrieverJob = GetAssociatedRetrieverJobDto(dto.Id);
-            }
-
-            dto.DatasetId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.DatasetId != 0) ? df.DatasetId : dto.SchemaMap.FirstOrDefault().DatasetId;
-            dto.SchemaId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? df.SchemaId : dto.SchemaMap.FirstOrDefault().SchemaId;
-        }
+        
 
         private List<int> GetMappedFileSchema(int dataflowId)
         {
@@ -1173,14 +1129,58 @@ namespace Sentry.data.Core
             dto.DatasetName = map.Dataset.DatasetName;
         }
 
-        private void MapToDetailDtoList(List<DataFlow> flows, List<DataFlowDetailDto> dtoList)
+        private void MapToDto(DataFlow df, DataFlowDto dto)
         {
-            foreach (DataFlow flow in flows)
+            dto.Id = df.Id;
+            dto.FlowGuid = df.FlowGuid;
+            dto.SaidKeyCode = df.SaidKeyCode;
+            dto.Name = df.Name;
+            dto.CreateDTM = df.CreatedDTM;
+            dto.CreatedBy = df.CreatedBy;
+            dto.FlowStorageCode = df.FlowStorageCode;
+            dto.MappedSchema = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? new List<int>() { df.SchemaId } : GetMappedFileSchema(df.Id);
+            dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
+            dto.ObjectStatus = df.ObjectStatus;
+            dto.DeleteIssuer = df.DeleteIssuer;
+            dto.DeleteIssueDTM = df.DeleteIssueDTM;
+            dto.IngestionType = df.IngestionType;
+            dto.IsCompressed = df.IsDecompressionRequired;
+            dto.CompressionType = df.CompressionType;
+            dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
+            dto.PreProcessingOption = df.PreProcessingOption;
+            dto.SaidKeyCode = df.SaidKeyCode;
+            dto.NamedEnvironment = df.NamedEnvironment;
+            dto.NamedEnvironmentType = df.NamedEnvironmentType;
+            dto.PrimaryContactId = df.PrimaryContactId;
+            dto.IsSecured = df.IsSecured;
+            dto.Security = _securityService.GetUserSecurity(df, _userService.GetCurrentUser());
+
+            if (dto.IsCompressed)
             {
-                DataFlowDetailDto detailDto = new DataFlowDetailDto();
-                MapToDetailDto(flow, detailDto);
-                dtoList.Add(detailDto);
+                CompressionJobDto jobDto = new CompressionJobDto
+                {
+                    CompressionType = (df.CompressionType.HasValue) ? (CompressionTypes)df.CompressionType : 0
+                };
+                dto.CompressionJob = jobDto;
             }
+
+            List<SchemaMapDto> scmMapDtoList = new List<SchemaMapDto>();
+            foreach (DataFlowStep step in df.Steps.Where(w => w.SchemaMappings != null && w.SchemaMappings.Any()))
+            {
+                foreach (SchemaMap map in step.SchemaMappings)
+                {
+                    scmMapDtoList.Add(map.ToDto());
+                }
+            }
+            dto.SchemaMap = scmMapDtoList;
+
+            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
+            {
+                dto.RetrieverJob = GetAssociatedRetrieverJobDto(dto.Id);
+            }
+
+            dto.DatasetId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.DatasetId != 0) ? df.DatasetId : dto.SchemaMap.FirstOrDefault().DatasetId;
+            dto.SchemaId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? df.SchemaId : dto.SchemaMap.FirstOrDefault().SchemaId;
         }
 
         private void MapToDto(DataFlowStep step, DataFlowStepDto dto)
@@ -1197,7 +1197,6 @@ namespace Sentry.data.Core
             dto.DataFlowId = step.DataFlow.Id;
         }
 
-
         private void MapToDto(SchemaMap map, SchemaMapDto dto)
         {
             dto.Id = map.Id;
@@ -1207,6 +1206,20 @@ namespace Sentry.data.Core
             dto.SearchCriteria = map.SearchCriteria;
             dto.StepId = map.DataFlowStepId.Id;
         }
+        private DataFlowDto MapToDto(FileSchema scm)
+        {
+            return new DataFlowDto()
+            {
+                SchemaMap = new List<SchemaMapDto>()
+                {
+                    new SchemaMapDto()
+                    {
+                        SchemaId = scm.SchemaId,
+                        SearchCriteria = "\\."
+                    }
+                }
+            };
+        }
 
         private void MapToDtoList(List<DataFlowStep> steps, List<DataFlowStepDto> dtoList)
         {
@@ -1215,6 +1228,26 @@ namespace Sentry.data.Core
                 DataFlowStepDto stepDto = new DataFlowStepDto();
                 MapToDto(step, stepDto);
                 dtoList.Add(stepDto);
+            }
+        }
+
+        private void MapToDtoList(List<DataFlow> dfList, List<DataFlowDto> dtoList)
+        {
+            foreach (DataFlow df in dfList)
+            {
+                DataFlowDto dfDto = new DataFlowDto();
+                MapToDto(df, dfDto);
+                dtoList.Add(dfDto);
+            }
+        }
+
+        private void MapToDetailDtoList(List<DataFlow> flows, List<DataFlowDetailDto> dtoList)
+        {
+            foreach (DataFlow flow in flows)
+            {
+                DataFlowDetailDto detailDto = new DataFlowDetailDto();
+                MapToDetailDto(flow, detailDto);
+                dtoList.Add(detailDto);
             }
         }
 
@@ -1533,20 +1566,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private DataFlowDto MapToDto(FileSchema scm)
-        {
-            return new DataFlowDto()
-            {
-                SchemaMap = new List<SchemaMapDto>()
-                {
-                    new SchemaMapDto()
-                    {
-                        SchemaId = scm.SchemaId,
-                        SearchCriteria = "\\."
-                    }
-                }
-            };
-        }
+        
         #endregion
 
         #endregion

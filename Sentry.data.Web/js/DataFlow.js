@@ -73,7 +73,6 @@
             $("#IsCompressed").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
-            //$("#schemaMapPanel select").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
@@ -85,6 +84,8 @@
     },
 
     DataFlowDetailInit: function (dataflowId) {
+        let producerAssetGroupName = $("#producerAssetGroupName").text();
+
         $('body').on('click', '.jobHeader', function () {
             if ($(this).children('.tracker-menu-icon').hasClass('fa-chevron-down')) {
                 $(this).children('.tracker-menu-icon').switchClass('fa-chevron-down', 'fa-chevron-up');
@@ -106,6 +107,12 @@
         var schemaMapUrl = "/DataFlow/_SchemaMapDetail/?dataflowId=" + encodeURI(dataflowId);
         $.get(schemaMapUrl, function (e) {
             $('#targetSchema').html(e);
+        });
+
+        $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
+
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
         });
 
     },
@@ -346,8 +353,6 @@
                     $(targetElement).val(curVal);
                 }
 
-                //$("#schemaMapPanel select").materialSelect();
-
             });
             createSchemaLink.show();
         }
@@ -413,11 +418,12 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
+                var curVal;
                 if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
-                    var curVal = datasetId;
+                    curVal = datasetId;
                 }
                 else {
-                    var curVal = parseInt(cur.val());
+                    curVal = parseInt(cur.val());
                 }
 
                 cur.html(newSubItems);
