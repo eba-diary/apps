@@ -35,5 +35,13 @@ namespace Sentry.data.Core
         void EnqueueCreateDefaultSecurityForDataset(int datasetId);
         void EnqueueCreateDefaultSecurityForDatasetList(int[] datasetIdList);
 
+        /// <summary>
+        /// Enqueues a Hangfire job that will create the default Security
+        /// Tickets in the database for them
+        /// </summary>
+        /// <param name="dataflowId">The Dataflow that was just created</param>
+        void EnqueueCreateDefaultSecurityForDataFlow(int dataflowId);
+        void EnqueueCreateDefaultSecurityForDataFlowList(int[] dataflowIdList);
+
     }
 }

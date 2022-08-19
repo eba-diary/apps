@@ -435,6 +435,12 @@ namespace Sentry.data.Core
 
                 _datasetContext.SaveChanges();
 
+                if (_dataFeatures.CLA3718_Authorization.GetValue())
+                {
+                    // Create a Hangfire job that will setup the default security groups for this new dataset
+                    _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
+                }
+
                 return df.Id;
             }
             catch (ValidationException)
