@@ -14,7 +14,7 @@ using Sentry.data.Web.Models;
 
 namespace Sentry.data.Web.Controllers
 {
-    /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class AdminController : BaseController
     {
         private readonly IKafkaConnectorService _connectorService;
