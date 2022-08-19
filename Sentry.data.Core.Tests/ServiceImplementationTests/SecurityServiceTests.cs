@@ -2002,6 +2002,26 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS));
         }
 
+        [TestMethod]
+        public void GetDataFlowPermission_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.CAN_MANAGE_DATAFLOW, SecurableObject = SecurableEntityName.DATAFLOW }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetDataflowPermissions();
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_MANAGE_DATAFLOW));
+        }
+
         #endregion
 
         #region "Private helpers"
