@@ -121,6 +121,8 @@ namespace Sentry.data.Core
 
         int GetSchemaIdFromDatasetFileId(int datasetFileId);
 
+        string GetSecurityGroup(int dataflowId);
+
 
     }
 }
