@@ -43,7 +43,7 @@ BEGIN TRY
 	)
 
 	UPDATE S
-		SET S.ControlMTriggerName = 'DATA_' + D.NamedEnvironment + '_' + D.Short_NME + '_' + R.Schema_NME + '_COMPLETED'
+		SET S.ControlMTriggerName = 'DATA_' + UPPER(D.NamedEnvironment) + '_' + UPPER(D.Short_NME) + '_' + UPPER(R.Schema_NME) + '_COMPLETED'
 	--SELECT S.Schema_Id, 'DATA_' + D.NamedEnvironment + '_' + D.Short_NME + '_' + R.Schema_NME + '_COMPLETED'
 	FROM dataset D
 		JOIN DatasetFileConfigs DFG
