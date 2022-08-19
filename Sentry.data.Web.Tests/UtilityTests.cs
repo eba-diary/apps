@@ -153,7 +153,7 @@ namespace Sentry.data.Web.Tests
         [TestMethod]
         public void BuildPageItemList_MultiplePages_SuffixEllipsis_PageItemModels()
         {
-            List<PageItemModel> items = Utility.BuildPageItemList(150, 15, 5);
+            List<PageItemModel> items = Utility.BuildPageItemList(300, 15, 5);
 
             Assert.AreEqual(9, items.Count);
 
@@ -198,7 +198,7 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(item.IsDisabled);
 
             item = items.Last();
-            Assert.AreEqual("10", item.PageNumber);
+            Assert.AreEqual("20", item.PageNumber);
             Assert.IsFalse(item.IsActive);
             Assert.IsFalse(item.IsDisabled);
         }
@@ -206,13 +206,107 @@ namespace Sentry.data.Web.Tests
         [TestMethod]
         public void BuildPageItemList_MultiplePagesAboveMax_PrefixEllipsis_PageItemModels()
         {
+            List<PageItemModel> items = Utility.BuildPageItemList(300, 15, 20);
 
+            Assert.AreEqual(9, items.Count);
+
+            PageItemModel item = items.First();
+            Assert.AreEqual("1", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[1];
+            Assert.AreEqual(Pagination.ELLIPSIS, item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsTrue(item.IsDisabled);
+
+            item = items[2];
+            Assert.AreEqual("14", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[3];
+            Assert.AreEqual("15", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[4];
+            Assert.AreEqual("16", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[5];
+            Assert.AreEqual("17", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[6];
+            Assert.AreEqual("18", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[7];
+            Assert.AreEqual("19", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items.Last();
+            Assert.AreEqual("20", item.PageNumber);
+            Assert.IsTrue(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
         }
 
         [TestMethod]
         public void BuildPageItemList_MultiplePagesAboveMax_PrefixAndSuffixEllipsis_PageItemModels()
         {
+            List<PageItemModel> items = Utility.BuildPageItemList(300, 15, 12);
 
+            Assert.AreEqual(9, items.Count);
+
+            PageItemModel item = items.First();
+            Assert.AreEqual("1", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[1];
+            Assert.AreEqual(Pagination.ELLIPSIS, item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsTrue(item.IsDisabled);
+
+            item = items[2];
+            Assert.AreEqual("10", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[3];
+            Assert.AreEqual("11", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[4];
+            Assert.AreEqual("12", item.PageNumber);
+            Assert.IsTrue(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[5];
+            Assert.AreEqual("13", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[6];
+            Assert.AreEqual("14", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
+
+            item = items[7];
+            Assert.AreEqual(Pagination.ELLIPSIS, item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsTrue(item.IsDisabled);
+
+            item = items.Last();
+            Assert.AreEqual("20", item.PageNumber);
+            Assert.IsFalse(item.IsActive);
+            Assert.IsFalse(item.IsDisabled);
         }
     }
 }

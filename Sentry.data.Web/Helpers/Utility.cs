@@ -412,28 +412,24 @@ namespace Sentry.data.Web.Helpers
                 if (selectedPage <= 5)
                 {
                     //add first 5 pages because the selected page is in the first 5 pages
-                    pageItems.AddPages(1, 5, selectedPage);
-                }
-                else
-                {
-                    //selected page is not in the first 5 pages, add ellipsis and 2 previous pages
-                    pageItems.AddPage(1, selectedPage);
+                    pageItems.AddPages(1, 7, selectedPage);
                     pageItems.AddPageEllipsis();
-                    pageItems.AddPage(selectedPage - 2, selectedPage);
-                    pageItems.AddPage(selectedPage - 1, selectedPage);
-                    pageItems.AddPage(selectedPage, selectedPage);
-                }
+                    pageItems.AddPage(numberOfPages, selectedPage);
 
-                if (selectedPage > numberOfPages - 5)
+                }
+                else if (selectedPage > numberOfPages - 5)
                 {
                     //add the last 5 pages because the selected page is in the last 5
-                    pageItems.AddPages(numberOfPages - 5, numberOfPages, selectedPage);
+                    pageItems.AddPage(1, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPages(numberOfPages - 6, numberOfPages, selectedPage);
                 }
                 else
                 {
-                    //selected page is not in the last 5 pages, add ellipsis and 2 following pages
-                    pageItems.AddPage(selectedPage + 1, selectedPage);
-                    pageItems.AddPage(selectedPage + 2, selectedPage);
+                    //selected page is somewhere in the middle, add 2 pages before and after
+                    pageItems.AddPage(1, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPages(selectedPage - 2, selectedPage + 2, selectedPage);
                     pageItems.AddPageEllipsis();
                     pageItems.AddPage(numberOfPages, selectedPage);
                 }
