@@ -99,7 +99,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.ProducerS3DropAction).Returns(MockClasses.MockProducerS3DropActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3240_UseDropLocationV2).MockValue = true;
 
             // Act
             var result = context.Object.ProducerS3DropAction.GetAction(dataFeatures, false);
@@ -108,22 +107,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(15, result.Id);
         }
 
-        [TestMethod]
-        public void DataActionQueryExtensions_GetProducerS3DropAction_DATADropLocation()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.ProducerS3DropAction).Returns(MockClasses.MockProducerS3DropActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3240_UseDropLocationV2).MockValue = false;
-
-            // Act
-            var result = context.Object.ProducerS3DropAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(12, result.Id);
-        }
         #endregion
 
         #region RawStorage Tests
@@ -143,23 +126,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetRawStorageAction_DataRawStorage()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.RawStorageAction).Returns(MockClasses.MockRawStorageActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.RawStorageAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(2, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetRawStorageAction_DlstRawStorage()
         {
             // Arrange
@@ -167,7 +133,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.RawStorageAction).Returns(MockClasses.MockRawStorageActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.RawStorageAction.GetAction(dataFeatures, false);
@@ -193,23 +158,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetQueryStorageAction_DataQueryStorage()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.QueryStorageAction).Returns(MockClasses.MockQueryStorageActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.QueryStorageAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(3, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetQueryStorageAction_DlstQueryStorage()
         {
             // Arrange
@@ -217,7 +165,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.QueryStorageAction).Returns(MockClasses.MockQueryStorageActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.QueryStorageAction.GetAction(dataFeatures, false);
@@ -243,23 +190,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetConvertToParquetAction_DataConvertToParquet()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.ConvertToParquetAction).Returns(MockClasses.MockConvertToParquetActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.ConvertToParquetAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(6, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetConvertToParquetAction_DlstConvertToParquet()
         {
             // Arrange
@@ -267,7 +197,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.ConvertToParquetAction).Returns(MockClasses.MockConvertToParquetActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.ConvertToParquetAction.GetAction(dataFeatures, false);
@@ -293,23 +222,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetUncompressZipAction_DataUncompressZip()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.UncompressZipAction).Returns(MockClasses.MockUncompressZipActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.UncompressZipAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(5, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetUncompressZipAction_DlstUncompressZip()
         {
             // Arrange
@@ -317,7 +229,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.UncompressZipAction).Returns(MockClasses.MockUncompressZipActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.UncompressZipAction.GetAction(dataFeatures, false);
@@ -340,23 +251,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetGoogleApiAction_DataUncompressZip()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.GoogleApiAction).Returns(MockClasses.MockGoogleApiActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.GoogleApiAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(8, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetGoogleApiAction_DlstUncompressZip()
         {
             // Arrange
@@ -364,7 +258,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.GoogleApiAction).Returns(MockClasses.MockGoogleApiActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.GoogleApiAction.GetAction(dataFeatures, false);
@@ -387,23 +280,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetClaimIQAction_DataClaimIQ()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.ClaimIQAction).Returns(MockClasses.MockClaimIQActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.ClaimIQAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(9, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetClaimIQAction_DlstClaimIQ()
         {
             // Arrange
@@ -411,7 +287,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.ClaimIQAction).Returns(MockClasses.MockClaimIQActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.ClaimIQAction.GetAction(dataFeatures, false);
@@ -434,23 +309,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetUncompressGzipAction_DataUncompressGzip()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.UncompressGzipAction).Returns(MockClasses.MockUncompressGzipActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.UncompressGzipAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(10, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetUncompressGzipAction_DlstUncompressGzip()
         {
             // Arrange
@@ -458,7 +316,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.UncompressGzipAction).Returns(MockClasses.MockUncompressGzipActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.UncompressGzipAction.GetAction(dataFeatures, false);
@@ -481,23 +338,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetFixedWidthAction_DataFixedWidth()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.FixedWidthAction).Returns(MockClasses.MockFixedWidthActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.FixedWidthAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(11, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetFixedWidthAction_DlstFixedWidth()
         {
             // Arrange
@@ -505,7 +345,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.FixedWidthAction).Returns(MockClasses.MockFixedWidthActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.FixedWidthAction.GetAction(dataFeatures, false);
@@ -531,23 +370,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetXmlAction_DataXml()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.XMLAction).Returns(MockClasses.MockXmlActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.XMLAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(13, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetXmlAction_DlstXml()
         {
             // Arrange
@@ -555,7 +377,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.XMLAction).Returns(MockClasses.MockXmlActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.XMLAction.GetAction(dataFeatures, false);
@@ -579,23 +400,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetJsonFlatteningAction_DataJsonFlattening()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.JsonFlatteningAction).Returns(MockClasses.MockJsonFlatteningActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.JsonFlatteningAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(14, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetJsonFlatteningAction_DlstJsonFlattening()
         {
             // Arrange
@@ -603,7 +407,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.JsonFlatteningAction).Returns(MockClasses.MockJsonFlatteningActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.JsonFlatteningAction.GetAction(dataFeatures, false);
@@ -624,23 +427,6 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(new MockDataFeatures(), true));
-        }
-
-        [TestMethod]
-        public void DataActionQueryExtensions_GetSchemaMapAction_DataSchemaMap()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.SchemaMapAction).Returns(MockClasses.MockSchemaMapActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.SchemaMapAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(7, result.Id);
         }
 
         [TestMethod]
@@ -666,23 +452,6 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(new MockDataFeatures(), true));
-        }
-
-        [TestMethod]
-        public void DataActionQueryExtensions_GetS3DropAction_DataS3Drop()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.S3DropAction).Returns(MockClasses.MockS3DropActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.S3DropAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(1, result.Id);
         }
 
         [TestMethod]
@@ -714,23 +483,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetSchemaLoadAction_DataSchemaLoading()
-        {
-            // Arrange
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.SchemaLoadAction).Returns(MockClasses.MockSchemaLoadActions().AsQueryable());
-
-            var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = false;
-
-            // Act
-            var result = context.Object.SchemaLoadAction.GetAction(dataFeatures, false);
-
-            // Assert
-            Assert.AreEqual(4, result.Id);
-        }
-
-        [TestMethod]
         public void DataActionQueryExtensions_GetSchemaLoadAction_DlstSchemaLoading()
         {
             // Arrange
@@ -738,7 +490,6 @@ namespace Sentry.data.Core.Tests
             context.Setup(f => f.SchemaLoadAction).Returns(MockClasses.MockSchemaLoadActions().AsQueryable());
 
             var dataFeatures = new MockDataFeatures();
-            ((MockBooleanFeatureFlag)dataFeatures.CLA3332_ConsolidatedDataFlows).MockValue = true;
 
             // Act
             var result = context.Object.SchemaLoadAction.GetAction(dataFeatures, false);
@@ -797,8 +548,6 @@ namespace Sentry.data.Core.Tests
 
             context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
-
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             // Mock user service and setup return values
             Mock<IUserService> userService = new Mock<IUserService>();
@@ -932,7 +681,6 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             // Mock user service and setup return values
             Mock<IUserService> userService = new Mock<IUserService>();
@@ -1020,7 +768,6 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             var dataflowservice = new DataFlowService(context.Object, null, null, null, null, datafeature.Object, null);
 
@@ -1031,255 +778,6 @@ namespace Sentry.data.Core.Tests
         /*
          * Unit test to see if exception is thrown when stepId cannot be found
          */
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void DatasetFileIdsNotFound_ExceptionThrown_DataFileNotFoundException()
-        {
-            // Arrange
-            List<int> datasetFileIds = new List<int> { 3, 3, 3 };
-
-            // creating 3 datasetfiles with the same associated schema/schemaid
-            FileSchema schema = new FileSchema()
-            {
-                SchemaId = 3,
-            };
-
-            DatasetFile dsf1 = new DatasetFile()
-            {
-                Schema = schema,
-                DatasetFileId = 1
-            };
-            DatasetFile dsf2 = new DatasetFile()
-            {
-                Schema = schema,
-                DatasetFileId = 2
-            };
-            DatasetFile dsf3 = new DatasetFile()
-            {
-                Schema = schema,
-                DatasetFileId = 3
-            };
-
-            var datasetfiles = new[] { dsf1, dsf2, dsf3 };
-
-            var context = new Mock<IDatasetContext>();
-            var datafeature = new Mock<IDataFeatures>();
-
-            DataFlow df = MockClasses.MockDataFlow();
-            df.ObjectStatus = ObjectStatusEnum.Active;
-            df.Id = 1;
-            df.DatasetId = 1;
-            df.SchemaId = 1;
-
-
-
-            DataFlowStep step1 = new DataFlowStep()
-            {
-                Id = 1,
-                Action = new ProducerS3DropAction(),
-                DataFlow = df
-            };
-
-
-
-            df.Steps = new[] { step1 };
-
-            // created two dataflow mock classes and two associated dataflowsteps
-
-            var dataflows = new[] { df };
-            var dataflowsteps = new[] { step1 };
-
-            context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
-            context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
-            context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
-
-            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, datafeature.Object, null);
-
-            int testDatasetFileId = 12;
-
-            // Act
-            Assert.ThrowsException<DataFileNotFoundException>(() => dataflowservice.GetSchemaIdFromDatasetFileId(testDatasetFileId));
-        }
-
-
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void DataFlowService_UpgradeDataFlow_Invalid_DataFlow_Id()
-        {
-            //Arrange
-            var context = new Mock<IDatasetContext>();
-            var dataflow = new DataFlow()
-            {
-                Id = 1
-            };
-            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
-
-
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
-
-            //Act
-            Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.UpgradeDataFlow(2));
-        }
-
-
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void DataFlowService_UpgradeDataFlow_Multiple_SchemaMappings()
-        {
-            //Arrange
-            var context = new Mock<IDatasetContext>();
-            var dataflow = new DataFlow()
-            {
-                Id = 1,
-                Name = "TestFlow"
-            };
-
-            var dataflowStep = new DataFlowStep()
-            {
-                Id = 1,
-                DataAction_Type_Id = DataActionType.SchemaMap
-            };
-
-            List<SchemaMap> schemaMappings = new List<SchemaMap>()
-            {
-                new SchemaMap()
-                {
-                    Id = 1,
-                    DataFlowStepId = dataflowStep
-                },
-                new SchemaMap()
-                {
-                    Id = 2,
-                    DataFlowStepId = dataflowStep
-                }
-            };
-
-            dataflowStep.SchemaMappings = schemaMappings;
-            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
-
-            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
-
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
-
-            //Act
-            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
-        }
-
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void DataFlowService_UpgradeDataFlow_FileSchemaFlow_Not_Upgraded()
-        {
-            //Arrange
-            var context = new Mock<IDatasetContext>();
-            var dataflow = new DataFlow()
-            {
-                Id = 1,
-                Name = "FileSchemaFlow_TestFlow"
-            };
-
-            var dataflowStep = new DataFlowStep()
-            {
-                Id = 1,
-                DataAction_Type_Id = DataActionType.SchemaMap
-            };
-
-            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
-
-            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
-
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
-
-            //Act
-            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
-        }
-
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void DataFlowService_UpgradeDataFlow_No_SchemaMap_Step_Not_Upgraded()
-        {
-            //Arrange
-            var context = new Mock<IDatasetContext>();
-            var dataflow = new DataFlow()
-            {
-                Id = 1,
-                Name = "FileSchemaFlow_TestFlow"
-            };
-
-            var dataflowStep = new DataFlowStep()
-            {
-                Id = 1,
-                DataAction_Type_Id = DataActionType.SchemaLoad
-            };
-
-            dataflow.Steps = new List<DataFlowStep>() { dataflowStep };
-
-            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
-
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
-
-            //Act
-            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
-        }
-
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void DataFlowService_UpgradeDataFlow_Only_Active_DataFlows_Upgraded()
-        {
-            //Arrange
-            var context = new Mock<IDatasetContext>();
-            var dataflow_Deleted = new DataFlow()
-            {
-                Id = 1,
-                Name = "FileSchemaFlow_TestFlow",
-                ObjectStatus = ObjectStatusEnum.Deleted
-            };
-
-            var dataflow_PendingDelete = new DataFlow()
-            {
-                Id = 2,
-                Name = "FileSchemaFlow_PendingDelete",
-                ObjectStatus = ObjectStatusEnum.Pending_Delete
-            };
-
-            var dataflow_Disabled = new DataFlow()
-            {
-                Id = 3,
-                Name = "FileSchemaFlow_Diabled",
-                ObjectStatus = ObjectStatusEnum.Disabled
-            };
-
-            context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow_Deleted);
-            context.Setup(f => f.GetById<DataFlow>(2)).Returns(dataflow_PendingDelete);
-            context.Setup(f => f.GetById<DataFlow>(3)).Returns(dataflow_Disabled);
-
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null);
-
-            //Act
-            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(1));
-            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(2));
-            Assert.ThrowsException<ArgumentException>(() => dataflowService.UpgradeDataFlow(3));
-        }
-
-        [TestCategory("Core DataFlowService")]
-        [TestMethod]
-        public void CheckForUpgradeDataFlow_ShouldBeEnqueued_OnlyOnce()
-        {
-            // Arrange
-            var client = new Mock<IBackgroundJobClient>();
-            var dataflowService = new DataFlowService(null, null, null, null, null, null, client.Object);
-
-            // Act
-            dataflowService.UpgradeDataFlows(new int[] { 1, 2 });
-
-            // Assert
-            client.Verify(x => x.Create(
-                It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 1),
-                It.IsAny<EnqueuedState>()), Times.Once);
-            client.Verify(x => x.Create(
-                It.Is<Job>(job => job.Method.Name == "UpgradeDataFlow" && (int)job.Args[0] == 2),
-                It.IsAny<EnqueuedState>()), Times.Once);
-        }
         [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void CheckForDeleteDataFlow_ShouldBeEnqueued_OnlyOnce()
@@ -1495,7 +993,6 @@ namespace Sentry.data.Core.Tests
             mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
 
             var mockDataFeatures = new Mock<IDataFeatures>();
-            mockDataFeatures.Setup(s => s.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null);
 
@@ -1547,7 +1044,6 @@ namespace Sentry.data.Core.Tests
             mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
 
             var mockDataFeatures = new Mock<IDataFeatures>();
-            mockDataFeatures.Setup(s => s.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null);
 
@@ -1679,7 +1175,6 @@ namespace Sentry.data.Core.Tests
 
             // Mock data features and setup return values
             Mock<IDataFeatures> _datafeatures = new Mock<IDataFeatures>();
-            _datafeatures.Setup(_ => _.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             // Mock user service and setup return values
             Mock<IUserService> userService = new Mock<IUserService>();
