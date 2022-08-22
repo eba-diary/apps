@@ -112,6 +112,11 @@ namespace Sentry.data.Core
 
         int GetSchemaIdFromDatasetFileId(int datasetFileId);
 
+        /// <summary>
+        /// Return AD group which grants CanManageDataflow permissions to dataflow.
+        /// </summary>
+        /// <param name="dataflowId"></param>
+        /// <returns></returns>
         string GetSecurityGroup(int dataflowId);
 
 

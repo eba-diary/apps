@@ -754,7 +754,7 @@ namespace Sentry.data.Core
             var ds = _datasetContext.GetById<Dataset>(df.DatasetId);
             if (ds == null)
             {
-                throw new ArgumentOutOfRangeException("DatasetId", $"Dataset with ID \"{df.DatasetId}\" could not be found.");
+                throw new ArgumentOutOfRangeException(nameof(dataflowId), $"Dataset with ID \"{df.DatasetId}\" could not be found.");
             }
 
             return CreateDefaultSecurityForDataflowAsync();
@@ -863,7 +863,7 @@ namespace Sentry.data.Core
                         IsSystemGenerated = true
                     };
                     var securityTicket = BuildAndAddPermissionTicket(accessRequest, df.Security, "DEFAULT_SECURITY");
-                    await ApproveTicket(securityTicket, Environment.UserName); //approving the ticket will also publish the Infrastructure Event
+                    await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }
             }
