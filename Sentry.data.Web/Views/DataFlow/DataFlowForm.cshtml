@@ -8,13 +8,13 @@
     @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
-
-        @Html.HiddenFor(x => x.DataFlowId);
-        @Html.HiddenFor(x => x.StorageCode);
-        @Html.HiddenFor(x => x.CreatedBy);
-        @Html.HiddenFor(x => x.PrimaryContactId);
-        @Html.HiddenFor(x => x.IsSecured);
-
+        <span id="DataFlowFormContainer_HiddenFor">
+            @Html.HiddenFor(x => x.DataFlowId);
+            @Html.HiddenFor(x => x.StorageCode);
+            @Html.HiddenFor(x => x.CreatedBy);
+            @Html.HiddenFor(x => x.PrimaryContactId);
+            @Html.HiddenFor(x => x.IsSecured);
+        </span>
         <div id="dataflow-home-wrapper" class="col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
                 <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>

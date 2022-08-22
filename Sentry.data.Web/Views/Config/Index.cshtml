@@ -151,6 +151,32 @@
                                 </div>
                             </div>
                             <div class="col-md-12 configDetailRow">
+                                int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                                <p>
+                                    <span>@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                    <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                </p>
+                            }
+                            else
+                            {
+                                <p>@item.ConfigFileDesc</p>
+                            }
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-12">
+                        <div class="col-md-3">Control-M Trigger Name:</div>
+                        <div class="col-md-11">
+                                <p>@item.ControlMTriggerName</p>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-12 configDetailRow">
 
                                 @if (Model.Security.ShowAdminControls)
                                 {
@@ -247,6 +273,37 @@
                                 <hr />
                                 <h4 class="@color pt-1">Producer DataFlow</h4>
 
+                        @* Loop through each external dataflow *@
+                        if (!item.ExternalDataFlowJobs.Any())
+                        {
+                            <p>This schema does not have any associated dataflows yet.</p>
+                        }
+                        foreach (var ext in item.ExternalDataFlowJobs)
+                        {
+                            <div class="retJob">
+                                <div class="jobHeader categoryBanner-@color">
+                                    <h6 class="pt-2">@ext.Name<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
+
+                                    @if (Model.DisplayDataflowEdit)
+                                    {
+                                        <div id="edit-dataflow-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@ext.Id)"><span class="far fa-edit"></span></div>
+                                    }
+                                </div>
+                                <div class="jobContainer" style="display:none;">
+                                    @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
+                                    {
+                                        <p>This dataflow contains the following steps:</p>
+                                        <ol>
+                                            @foreach (DataFlowStepModel step in ext.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").OrderBy(o => o.ExecutionOrder))
+                                            {
+                                                <li>@step.ActionName</li>
+                                            }
+                                        </ol>
+                                    }
+                                    else
+                                    {
+                                        <p>This dataflow does not contain any special processing.</p>
+                                    }
                                 @* Loop through each external dataflow *@
                                 if (!item.ExternalDataFlowJobs.Any())
                                 {
@@ -279,6 +336,95 @@
                                                 <p>This dataflow does not contain any special processing.</p>
                                             }
 
+                                    @* DataflowStep metadata *@
+                                    @foreach (DataFlowStepModel stepModel in ext.Step.Where(w => w.ActionName == "S3 Drop" || w.ActionName == "Producer S3 Drop"))
+                                    {
+                                        <div class="retJob @stepModel.ActionName">
+                                            <div class="jobHeader categoryBanner-@color">
+                                                <h6 class="pt-1">@stepModel.ActionName<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
+
+                                            </div>
+                                            <div class="jobContainer" style="display:none;">
+                                                <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
+                                                <div class="filePath"><span>@stepModel.RootAwsUrl@stepModel.TriggetKey</span></div>
+                                            </div>
+                                        </div>
+                                    }
+                                    @* Loop through associated retriever job metadata *@
+                                    @foreach (Sentry.data.Core.RetrieverJob extJob in ext.RetrieverJobs)
+                                    {
+                                        Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", extJob, new ViewDataDictionary { { "Color", color } });
+                                    }
+                                </div>
+                            </div>
+
+                        }
+                    }
+
+                    @if (Model.DisplayDataflowMetadata && Model.Security.ShowAdminControls)
+                    {
+                        <hr />
+                        <div class="adminContainer">
+                            <strong><p style="color:red">This section is visible to Admins only</p></strong>
+                            @if (item.DataFlowJobs == null)
+                            {
+                                <h4 class="gray pt-1">Schema DataFlow</h4>
+                                <p>This schema does not have any associated dataflows yet.</p>
+                            }
+                            else
+                            {
+                                <div class="retJob">
+                                    <div class="jobHeader categoryBanner-gray">
+                                        <h6 class="pt-1">Schema DataFlow (@item.DataFlowJobs.Name)<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+                                        @if (item.DataFlowJobs.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map" || w.ActionName != "Producer S3 Drop"))
+                                        {
+                                            <p>This dataflow contains the following steps:</p>
+                                            <ol>
+                                                @foreach (DataFlowStepModel step in item.DataFlowJobs.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").OrderBy(o => o.ExecutionOrder))
+                                                {
+                                                    <li>@step.ActionName</li>
+                                                }
+                                            </ol>
+                                        }
+                                        else
+                                        {
+                                            <p>This dataflow does not contain any special processing.</p>
+                                        }
+
+                                        @* DataflowStep metadata *@
+                                        @foreach (DataFlowStepModel stepModel in item.DataFlowJobs.Step.Where(w => w.ActionName == "S3 Drop" || w.ActionName == "Producer S3 Drop"))
+                                        {
+                                            <div class="retJob @stepModel.ActionName">
+                                                <div class="jobHeader categoryBanner-@color">
+                                                    <h6 class="pt-1">@stepModel.ActionName</h6>
+                                                    <em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em>
+                                                </div>
+                                                <div class="jobContainer" style="display:none;">
+                                                    <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
+                                                    <div class="filePath"><span>@stepModel.RootAwsUrl@stepModel.TriggetKey</span></div>
+                                                </div>
+                                            </div>
+                                        }
+                                        @* Loop through associated retriever job metadata *@
+                                        @foreach (Sentry.data.Core.RetrieverJob extJob in item.DataFlowJobs.RetrieverJobs)
+                                        {
+                                            Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", extJob, new ViewDataDictionary { { "Color", color } });
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @* // TODO - CLA-2372 - REMOVE COMMENTED CODE - Removing DFSBasic, DfsCustom, S3Basic references *@
+                            @* Legacy Data Processing Platform Metadata *@
+                            @*<div class="retJob">
+                    <div class="jobHeader categoryBanner-gray">
+                        <h6>Legacy Processing Platform Jobs</h6>
+                        <em class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></em>
+                    </div>
+                    <div class="jobContainer" style="display:none;">
+                        <h4 class="@color">Dataset Retrieval Jobs</h4>
+                        <hr />
                                             @* DataflowStep metadata *@
                                             @foreach (DataFlowStepModel stepModel in ext.Step.Where(w => w.ActionName == "S3 Drop" || w.ActionName == "Producer S3 Drop"))
                                             {

@@ -4,6 +4,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -18,9 +19,12 @@ namespace Sentry.data.Core
         /// <returns></returns>
         /// <exception cref="Sentry.data.Core.Exceptions.DataFlowNotFound"></exception>
         DataFlowDetailDto GetDataFlowDetailDto(int id);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoByDatasetId(int datasetId);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoBySchemaId(int schemaId);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoByStorageCode(string storageCode);
+
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);
-
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);
@@ -101,6 +105,14 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
+
+        bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds);
+
+        DataFlowDto GetDataFlowDtoByStepId(int stepId);
+
+        int GetSchemaIdFromDatasetFileId(int datasetFileId);
+
+
         int UpdateandSaveDataFlow(DataFlowDto dfDto);
     }
 }

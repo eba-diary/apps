@@ -380,6 +380,10 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
+            //schema=EXISTING; dto=NEW; SETTER
+            changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
+
+
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
                 changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
@@ -422,6 +426,23 @@ namespace Sentry.data.Core
             }
 
             return whatPropertiesChanged;
+        }
+
+        private string GetControlMTrigger(FileSchemaDto dto)
+        {
+            string controlMTriggerName = string.Empty;
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+            if(ds != null)
+            {
+                Regex reg = new Regex("[^a-zA-Z0-9]");
+                string namedEnvironmentCleaned = reg.Replace((ds.NamedEnvironment != null)? ds.NamedEnvironment.ToUpper() : String.Empty,String.Empty);
+                string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
+                string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
+
+                                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
+            }
+            
+            return controlMTriggerName;
         }
 
         private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
@@ -898,7 +919,8 @@ namespace Sentry.data.Core
                 ObjectStatus = dto.ObjectStatus,
                 SchemaRootPath = dto.SchemaRootPath,
                 ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
-                ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
+                ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
+                ControlMTriggerName = GetControlMTrigger(dto)
             };
             if (_dataFeatures.CLA3718_Authorization.GetValue())
             {
@@ -959,7 +981,8 @@ namespace Sentry.data.Core
                 SchemaRootPath = scm.SchemaRootPath,
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
-                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList()
+                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
+                ControlMTriggerName = scm.ControlMTriggerName
             };
 
         }
