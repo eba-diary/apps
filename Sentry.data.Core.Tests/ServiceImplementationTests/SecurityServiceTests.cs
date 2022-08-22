@@ -2,6 +2,7 @@
 using Moq;
 using Rhino.Mocks;
 using Sentry.data.Core.DTO.Security;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
@@ -1844,7 +1845,7 @@ namespace Sentry.data.Core.Tests
             var security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
             var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
-            var defaultPermissions = new SecurityService.DefaultPermissions(null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } }, null );
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_VIEW_FULL_DATASET, SecurableObject = SecurableEntityName.DATASET } }, null, null);
             var datasetTickets = new List<SecurityTicket>().AsEnumerable();
             var assetTickets = new List<SecurityTicket>().AsEnumerable();
 
@@ -1878,7 +1879,7 @@ namespace Sentry.data.Core.Tests
             var security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = security, Asset = new Asset() { SaidKeyCode = "ABCD" }, DataClassification = DataClassificationType.HighlySensitive };
             var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.NP) };
-            var defaultPermissions = new SecurityService.DefaultPermissions(null, null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.SNOWFLAKE_ACCESS, SecurableObject = SecurableEntityName.DATASET } });
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.SNOWFLAKE_ACCESS, SecurableObject = SecurableEntityName.DATASET } }, null);
             var datasetTickets = new List<SecurityTicket>().AsEnumerable();
             var assetTickets = new List<SecurityTicket>().AsEnumerable();
 
@@ -1900,6 +1901,35 @@ namespace Sentry.data.Core.Tests
             adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(1)); //verify the AD group attempted to be created
             securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(1)); //verify a ticket was built
             securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.Never); //verify the ticket was NOT approved
+            context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        public async Task CreateDefaultSecurityForDataflow_Internal_Dataflow_test()
+        {
+            //Arrange
+            var df_security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATAFLOW };
+            var df = new DataFlow() { NamedEnvironmentType = NamedEnvironmentType.Prod, Security = df_security};
+
+
+            var ds_security = new Security() { SecurityId = Guid.NewGuid(), Tickets = new List<SecurityTicket>(), SecurableEntityName = SecurableEntityName.DATASET };
+            var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Security = ds_security, Asset = new Asset() { SaidKeyCode = "ABCD" } };
+            var groups = new List<AdSecurityGroupDto>() { AdSecurityGroupDto.NewDatasetGroup(ds.Asset.SaidKeyCode, ds.ShortName, AdSecurityGroupType.Prdcr, AdSecurityGroupEnvironmentType.NP) };
+            var defaultPermissions = new SecurityService.DefaultPermissions(null, null, null, new List<Permission>() { new Permission() { PermissionCode = PermissionCodes.CAN_MANAGE_DATAFLOW, SecurableObject = SecurableEntityName.DATAFLOW } });
+            var datasetTickets = new List<SecurityTicket>().AsEnumerable();
+            var obsidianService = new Mock<IObsidianService>();
+            obsidianService.Setup(o => o.DoesGroupExist(It.IsAny<string>())).Returns(true);
+            var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Security).Returns(new List<Security>() { df_security, ds_security }.AsQueryable());
+            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object)
+            { CallBase = true }; //call the real method for anything not explicitely .Setup()
+            securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+
+            await securityService.Object.CreateDefaultSecurityForDataflow_Internal(df, groups, defaultPermissions, datasetTickets);
+
+            securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), df_security), Times.AtMost(1)); //verify a ticket was built
+            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.AtMost(1)); //verify the ticket was approved
             context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(2));
         }
 
@@ -1970,6 +2000,26 @@ namespace Sentry.data.Core.Tests
             //Assert
             Assert.AreEqual(1, actual.Count);
             Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS));
+        }
+
+        [TestMethod]
+        public void GetDataFlowPermission_Test()
+        {
+            //Arrange
+            var permissions = new List<Permission>()
+            {
+                new Permission() { PermissionCode = PermissionCodes.CAN_MANAGE_DATAFLOW, SecurableObject = SecurableEntityName.DATAFLOW }
+            };
+            var context = new Mock<IDatasetContext>();
+            context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
+
+            //Act
+            var actual = securityService.GetDataflowPermissions();
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
+            Assert.IsTrue(actual.Any(a => a.PermissionCode == PermissionCodes.CAN_MANAGE_DATAFLOW));
         }
 
         #endregion

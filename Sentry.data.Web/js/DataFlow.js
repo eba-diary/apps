@@ -72,7 +72,6 @@
             $("#IsCompressed").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
-            //$("#schemaMapPanel select").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
@@ -84,6 +83,8 @@
     },
 
     DataFlowDetailInit: function (dataflowId) {
+        let producerAssetGroupName = $("#producerAssetGroupName").text();
+
         $('body').on('click', '.jobHeader', function () {
             if ($(this).children('.tracker-menu-icon').hasClass('fa-chevron-down')) {
                 $(this).children('.tracker-menu-icon').switchClass('fa-chevron-down', 'fa-chevron-up');
@@ -105,6 +106,12 @@
         var schemaMapUrl = "/DataFlow/_SchemaMapDetail/?dataflowId=" + encodeURI(dataflowId);
         $.get(schemaMapUrl, function (e) {
             $('#targetSchema').html(e);
+        });
+
+        $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
+
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
         });
 
     },
@@ -340,8 +347,6 @@
                 else {
                     $(targetElement).val(curVal);
                 }
-
-                //$("#schemaMapPanel select").materialSelect();
 
             });
             createSchemaLink.show();
