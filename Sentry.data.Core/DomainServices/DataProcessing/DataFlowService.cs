@@ -117,103 +117,6 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
-        /// Will enqueue a hangfire job, for each id in producerDataFlowIds,
-        ///   that will run on hangfire background server and peform
-        ///   the dataflow upgrade.
-        /// </summary>
-        /// <param name="producerDataFlowIds"></param>
-        /// <remarks> This will serves an Admin only funtionlaity within DataFlow API </remarks>
-        public void UpgradeDataFlows(int[] producerDataFlowIds)
-        {
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(UpgradeDataFlows).ToLower()} Method Start");
-            foreach (int producerDataFlowId in producerDataFlowIds)
-            {
-                _hangfireBackgroundJobClient.Enqueue<DataFlowService>(x => x.UpgradeDataFlow(producerDataFlowId));
-            }
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(UpgradeDataFlows).ToLower()} Method End");
-        }
-
-        /// <summary>
-        /// Upgrades a producer dataflow to a single dataflow configuration (CLA-3332)
-        /// </summary>
-        /// <param name="producerDataFlowId"></param>
-        /// <remarks>
-        /// This method will be triggered by Hangfire.  
-        /// Added the AutomaticRetry attribute to ensure retries do not occur for this method.
-        /// https://docs.hangfire.io/en/latest/background-processing/dealing-with-exceptions.html
-        /// </remarks>
-        /// 
-        [AutomaticRetry(Attempts = 0)]
-        public void UpgradeDataFlow(int producerDataFlowId)
-        {
-            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(UpgradeDataFlow).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
-
-            DataFlow producerDataFlow = _datasetContext.GetById<DataFlow>(producerDataFlowId);
-
-            if (producerDataFlow == null)
-            {
-                throw new DataFlowNotFound("Invalid dataflow id");
-            }
-
-            if (producerDataFlow.ObjectStatus != GlobalEnums.ObjectStatusEnum.Active)
-            {
-                throw new ArgumentException("Only active producer dataflows can be upgraded");
-            }
-
-            /************************************************************************************************  
-             *  Do not upgrade Producer Dataflows if the following are true:
-             *      1.) Dataflow name starts with "FileSchemaFlow"
-             *      2.) Dataflow does not contain a dataflowstep of type SchemaMap
-             *************************************************************************************************/
-            DataFlowStep schemaMapStep = producerDataFlow.Steps.FirstOrDefault(w => w.DataAction_Type_Id == DataActionType.SchemaMap);
-            if (schemaMapStep == null || producerDataFlow.Name.StartsWith("FileSchemaFlow"))
-            {
-                throw new ArgumentException("Only producer dataflows can be upgraded");
-            }
-
-            /************************************************************************************************  
-             *  Only convert dataflows which map to single schema.  Dataflows that "Fan out" to multiple schema
-             *      will need to be handled on a case by case basis
-             *************************************************************************************************/
-            if (schemaMapStep.SchemaMappings.Count > 1)
-            {
-                throw new ArgumentException("Only producer dataflows with single schema map can be upgraded");
-            }
-
-            DataFlowDto dto = GetDataFlowDto(producerDataFlowId);
-
-            /************************************************************************************************
-             *  With CLA3332_ConsolidateDataflows = True, the UpdateandSaveDataflow()
-             *    Assumes the DataFlowDto has DatasetId set.  Since this method is converting from old
-             *    to new world, we need to set DataFlowDto.DatasetId to appropriate value
-             ************************************************************************************************/
-            dto.DatasetId = schemaMapStep.SchemaMappings.First().Dataset.DatasetId;
-
-            Logger.Info($"{methodName} Starting dataflow upgrade");
-
-            /**********************************************************************************
-             *  During conversion, we will create new dataflow and not delete existing dataflow.
-             *  This allows data producers not be tightly coupled with the conversion effort.
-             **********************************************************************************/
-            int newId = UpdateandSaveDataFlow(dto, false);
-
-            // Disable retriever job if exist
-            if (dto.IngestionType == (int)IngestionType.DSC_Pull)
-            {
-                _jobService.DisableJob(dto.RetrieverJob.JobId);
-            }
-
-            Logger.Info($"{methodName} Completed dataflow upgrade (original:{producerDataFlowId}:::new:{newId}");
-
-
-
-
-
-            Logger.Info($"{methodName} Method End");
-        }
-
-        /// <summary>
         /// Will enqueue a hangfire job, for each id in idList,
         ///   that will run on hangfire background server and peform
         ///   the dataflow delete.
@@ -421,8 +324,7 @@ namespace Sentry.data.Core
             }
 
             //Verify that the schema selected is not already connected with a different dataflow
-            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() &&
-                _datasetContext.DataFlow.Any(df => df.DatasetId == dto.SchemaMap.First().DatasetId &&
+            if (_datasetContext.DataFlow.Any(df => df.DatasetId == dto.SchemaMap.First().DatasetId &&
                                                    df.SchemaId == dto.SchemaMap.First().SchemaId &&
                                                    df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
             {
@@ -457,12 +359,7 @@ namespace Sentry.data.Core
         /// <param name="dfDto"></param>
         /// <param name="deleteOriginal"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// After CLA3332_ConsolidatedDataflows feature is rolled out and conversion
-        /// work is completed to single dataflow structure, the deleteOriginal option
-        /// should be removed.
-        /// </remarks>
-        public int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true)
+        public int UpdateandSaveDataFlow(DataFlowDto dfDto)
         {
             string methodName = $"<{nameof(DataFlowService).ToLower()}_{nameof(UpdateandSaveDataFlow).ToLower()} Method Start";
             Logger.Info($"{methodName} Method Start");
@@ -481,11 +378,8 @@ namespace Sentry.data.Core
              *  WallEService will eventually set the objects
              *    to a deleted status after a set period of time    
              */
-            if (deleteOriginal)
-            {
-                //Delete existing dataflow
-                Delete(dfDto.Id, _userService.GetCurrentUser(), false);
-            }
+
+            Delete(dfDto.Id, _userService.GetCurrentUser(), false);
 
             _datasetContext.SaveChanges();
 
@@ -852,9 +746,7 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 CreatedBy = dto.CreatedBy,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                                    ? _datasetContext.GetNextDataFlowStorageCDE()
-                                    : _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
+                FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
@@ -874,17 +766,11 @@ namespace Sentry.data.Core
                 //  (i.e. CanManageDataflow)
                 Security = (dto.Id == 0)
                                 ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
-                                : _datasetContext.GetById<DataFlow>(dto.Id).Security
+                                : _datasetContext.GetById<DataFlow>(dto.Id).Security,
+                DatasetId = dto.SchemaMap.First().DatasetId,
+                SchemaId = dto.SchemaMap.First().SchemaId
             };
 
-            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-            {
-                df.DatasetId = dto.SchemaMap.First().DatasetId;
-                df.SchemaId = dto.SchemaMap.First().SchemaId;
-            }
-
-            
-             
             _datasetContext.Add(df);
 
             Logger.Info($"{methodName} Method End");
@@ -964,28 +850,17 @@ namespace Sentry.data.Core
                 }
             }
 
-            //Feature flag = false, add schema map step
-            //Feature flag = true, do no add schema map step
-            if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-            {
-                //Generate Schema Map step to send files to schema specific data flow
-                AddDataFlowStep(dto, df, DataActionType.SchemaMap);
-            }
-            else
-            {
+            FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
 
-                FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
+            //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+            MapPreProcessingSteps(scm, dto, df);
 
-                //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
-                MapPreProcessingSteps(scm, dto, df);
+            //Generate DSC registering step
+            AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
+            AddDataFlowStep(dto, df, DataActionType.QueryStorage);
 
-                //Generate DSC registering step
-                AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
-                AddDataFlowStep(dto, df, DataActionType.QueryStorage);
-
-                ////Generate consumption layer steps
-                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
-            }
+            ////Generate consumption layer steps
+            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
 
             Logger.Info($"{methodName} Method End");
         }
@@ -1032,29 +907,17 @@ namespace Sentry.data.Core
                 }
             }
 
+            FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
 
-            //Feature flag = false, add schema map step
-            //Feature flag = true, do no add schema map step
-            if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-            {
-                //Generate Schema Map step to send files to schema specific data flow
-                AddDataFlowStep(dto, df, DataActionType.SchemaMap);
-            }
-            else
-            {
+            //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
+            MapPreProcessingSteps(scm, dto, df);
 
-                FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
+            //Generate DSC registering step
+            AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
+            AddDataFlowStep(dto, df, DataActionType.QueryStorage);
 
-                //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
-                MapPreProcessingSteps(scm, dto, df);
-
-                //Generate DSC registering step
-                AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
-                AddDataFlowStep(dto, df, DataActionType.QueryStorage);
-
-                ////Generate consumption layer steps
-                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
-            }
+            ////Generate consumption layer steps
+            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
 
             Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPull).ToLower()} Method End");
 
@@ -1094,7 +957,7 @@ namespace Sentry.data.Core
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
             dto.FlowStorageCode = df.FlowStorageCode;
-            dto.MappedSchema = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? new List<int>() { df.SchemaId } : GetMappedFileSchema(df.Id);
+            dto.MappedSchema = (df.SchemaId != 0) ? new List<int>() { df.SchemaId } : GetMappedFileSchema(df.Id);
             dto.AssociatedJobs = GetExternalRetrieverJobs(df.Id);
             dto.ObjectStatus = df.ObjectStatus;
             dto.DeleteIssuer = df.DeleteIssuer;
@@ -1133,8 +996,8 @@ namespace Sentry.data.Core
                 dto.RetrieverJob = GetAssociatedRetrieverJobDto(dto.Id);
             }
 
-            dto.DatasetId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.DatasetId != 0) ? df.DatasetId : dto.SchemaMap.FirstOrDefault().DatasetId;
-            dto.SchemaId = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue() && df.SchemaId != 0) ? df.SchemaId : dto.SchemaMap.FirstOrDefault().SchemaId;
+            dto.DatasetId = (df.DatasetId != 0) ? df.DatasetId : dto.SchemaMap.FirstOrDefault().DatasetId;
+            dto.SchemaId = (df.SchemaId != 0) ? df.SchemaId : dto.SchemaMap.FirstOrDefault().SchemaId;
         }
 
         private List<int> GetMappedFileSchema(int dataflowId)
@@ -1236,16 +1099,11 @@ namespace Sentry.data.Core
         {
             bool isHumanResources = false;
 
-            // If WORKDAY (HR category) work needs to go before CLA3332_ConsolidatedDataFlows,
-            //   then we need to determine datasetid associated with dto.SchemaMap.First().SchemaId
-            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            //Take DatasetId and figure out if Category = HR
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
+            if (ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
             {
-                //Take DatasetId and figure out if Category = HR
-                Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
-                if (ds.DatasetCategories.Any(w => w.AbbreviatedName == "HR"))
-                {
-                    isHumanResources = true;
-                }
+                isHumanResources = true;
             }
 
             //Look at ActionType and return correct BaseAction
@@ -1357,16 +1215,12 @@ namespace Sentry.data.Core
             }
             else if (step.DataAction_Type_Id == DataActionType.ProducerS3Drop)
             {
-                step.TriggerKey = _dataFeatures.CLA3240_UseDropLocationV2.GetValue()
-                    ? $"drop/{step.DataFlow.SaidKeyCode.ToUpper()}/{step.DataFlow.NamedEnvironment.ToUpper()}/{step.DataFlow.FlowStorageCode}/"
-                    : $"droplocation/data/{step.DataFlow.SaidKeyCode}/{step.DataFlow.FlowStorageCode}/";
+                step.TriggerKey = $"drop/{step.DataFlow.SaidKeyCode.ToUpper()}/{step.DataFlow.NamedEnvironment.ToUpper()}/{step.DataFlow.FlowStorageCode}/";
                 SetTriggerBucketForS3DropLocation(step);
             }
             else
             {
-                string triggerPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
-                    ? $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.DataFlow.FlowStorageCode}/"
-                    : $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.DataFlow.FlowStorageCode}/";
                 step.TriggerKey = triggerPrefix;
                 step.TriggerBucket = step.Action.TargetStorageBucket;
             }
@@ -1389,16 +1243,12 @@ namespace Sentry.data.Core
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
-                    step.TargetPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
-                        ? $"{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{schemaStorageCode}/"
-                        : step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    step.TargetPrefix = $"{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{schemaStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These sent output a step specific location along with down stream dependent steps
                 case DataActionType.RawStorage:
-                    step.TargetPrefix = _dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
-                        ? $"{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.DataFlow.FlowStorageCode}/"
-                        : step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
+                    step.TargetPrefix = $"{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.DataFlow.FlowStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
                     break;
                 //These only send output to down stream dependent steps
