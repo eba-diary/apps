@@ -549,8 +549,6 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
 
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
-
             // Mock user service and setup return values
             Mock<IUserService> userService = new Mock<IUserService>();
             Mock<IApplicationUser> user = new Mock<IApplicationUser>();
@@ -683,7 +681,6 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             // Mock user service and setup return values
             Mock<IUserService> userService = new Mock<IUserService>();
@@ -771,7 +768,6 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DataFlow).Returns(dataflows.AsQueryable);
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
-            datafeature.Setup(f => f.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, datafeature.Object, null);
 
@@ -1179,7 +1175,6 @@ namespace Sentry.data.Core.Tests
 
             // Mock data features and setup return values
             Mock<IDataFeatures> _datafeatures = new Mock<IDataFeatures>();
-            _datafeatures.Setup(_ => _.CLA3332_ConsolidatedDataFlows.GetValue()).Returns(true);
 
             // Mock user service and setup return values
             Mock<IUserService> userService = new Mock<IUserService>();
