@@ -151,7 +151,10 @@
       <HintPath>..\packages\Sentry.Core.2.1.1\lib\netstandard2.0\Sentry.Core.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.FeatureFlags, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.FeatureFlags.1.0.3\lib\net461\Sentry.FeatureFlags.dll</HintPath>
+      <HintPath>..\packages\Sentry.FeatureFlags.1.0.4\lib\net452\Sentry.FeatureFlags.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.FeatureFlags.LaunchDarkly, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.FeatureFlags.LaunchDarkly.2.0.1\lib\net452\Sentry.FeatureFlags.LaunchDarkly.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.NHibernate, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.NHibernate.2.0.0\lib\netstandard2.0\Sentry.NHibernate.dll</HintPath>
