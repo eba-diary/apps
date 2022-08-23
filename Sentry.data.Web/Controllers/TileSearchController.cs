@@ -87,7 +87,6 @@ namespace Sentry.data.Web.Controllers
 
         public JsonResult SearchableTiles()
         {
-            //TileSearchDto<T> searchDto = MapToTileSearchDto(searchModel);
             List<T> tileDtos = _tileSearchService.GetSearchableTiles();
             List<TileModel> tileModels = MapToTileModels(tileDtos);
             return Json(tileModels, JsonRequestBehavior.AllowGet);
