@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;

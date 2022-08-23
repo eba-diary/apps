@@ -100,11 +100,11 @@ namespace Sentry.data.Core
         {
             if (searchDto.OrderByDescending)
             {
-                dtos = dtos.OrderByDescending(searchDto.OrderByField);
+                dtos = dtos.OrderByDescending(searchDto.OrderByField).ThenBy(x => x.Name);
             }
             else
             {
-                dtos = dtos.OrderBy(searchDto.OrderByField);
+                dtos = dtos.OrderBy(searchDto.OrderByField).ThenBy(x => x.Name);
             }
 
             if (searchDto.PageSize > 0)
