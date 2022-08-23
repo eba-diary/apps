@@ -1,0 +1,34 @@
+﻿
+@{
+    ViewBag.Title = "Admin";
+    ViewBag.Fluid = true;
+}
+<!--Styles to make it look decent-->
+@Styles.Render("~/bundles/css/main")
+@RenderSection("styles", false)
+@Styles.Render("~/bundles/css/site")
+<!--Render DSC common header from layout controller-->
+@Html.Action("GetHeader", "Layout")
+<!--div containing side nav and current page-->
+<div class="row">
+    @RenderPage("~/Views/Shared/_AdminSideNav.cshtml")
+   
+    <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
+    <!--Render bundles necessary for admin pages before layout is applied to page-->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/js")
+    @Scripts.Render("~/bundles/dataTables")
+    @Styles.Render("~/bundles/css/dataTables")
+
+    @RenderSection("Scripts", false)
+    <!--div containing in-line styling and current page-->
+    <div class="col-lg-10">
+        <div id="body">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+<!--Render DSC common footer from layout controller-->
+@Html.Action("GetFooter", "Layout")
+

@@ -24,13 +24,12 @@ namespace Sentry.data.Web.Controllers
         private readonly IConfigService _configService;
         private readonly ISecurityService _securityService;
         private readonly ISAIDService _saidService;
-        private readonly ISchemaService _schemaService;
         private readonly IUserService _userService;
         private readonly Lazy<IDataFeatures> _dataFeatures;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
 
         public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService,
-            ISecurityService securityService, ISAIDService saidService, ISchemaService schemaService, Lazy<IDataFeatures> dataFeatures,
+            ISecurityService securityService, ISAIDService saidService, Lazy<IDataFeatures> dataFeatures,
             NamedEnvironmentBuilder namedEnvironmentBuilder, IUserService userService)
         {
             _dataFlowService = dataFlowService;
@@ -38,7 +37,6 @@ namespace Sentry.data.Web.Controllers
             _configService = configService;
             _securityService = securityService;
             _saidService = saidService;
-            _schemaService = schemaService;
             _dataFeatures = dataFeatures;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
             _userService = userService;
@@ -70,6 +68,11 @@ namespace Sentry.data.Web.Controllers
 
             model.DisplayDataflowEdit = _dataFeatures.Value.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
             model.UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
+
+            if (DataFeatures.CLA3718_Authorization.GetValue())
+            {
+                model.ProducerAssetGroupName = _dataFlowService.GetSecurityGroup(id);
+            }
 
             return View(model);
         }
@@ -105,12 +108,10 @@ namespace Sentry.data.Web.Controllers
             SchemaMapModel schemaModel = new SchemaMapModel
             {
                 SelectedDataset = 0,
-                CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()
             };
             model.SchemaMaps.Add(schemaModel);
             
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
@@ -156,14 +157,7 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
-            foreach (SchemaMapModel smm in model.SchemaMaps)
-            {
-                smm.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
-            }
-
             return View("DataFlowForm", model);
-
         }
 
         [HttpPost]
@@ -188,11 +182,8 @@ namespace Sentry.data.Web.Controllers
                      *   a single schema.  Therefore, refactor dataset\schema selection to be directly on DataFlowModel
                      *   (https://jira.sentry.com/browse/CLA-3507).
                     */
-                    if (DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                    {
-                        dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
-                        dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
-                    }
+                    dfDto.DatasetId = model.SchemaMaps.FirstOrDefault().SelectedDataset;
+                    dfDto.SchemaId = model.SchemaMaps.FirstOrDefault().SelectedSchema;
 
                     int newFlowId = 0;
 
@@ -273,11 +264,9 @@ namespace Sentry.data.Web.Controllers
                 foreach (SchemaMapModel mapModel in model.SchemaMaps)
                 {
                     SetSchemaModelLists(mapModel);
-                    mapModel.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
                 }
             }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            model.CLA3332_ConsolidatedDataFlows = DataFeatures.CLA3332_ConsolidatedDataFlows.GetValue();
 
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
             model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
@@ -627,41 +616,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             return datasetList;
-        }
-
-        private List<SelectListItem> BuildSchemaDropDown(int schemaSelection)
-        {
-            List<SelectListItem> schemaList = new List<SelectListItem>
-            {
-                new SelectListItem
-                {
-                    Value = "-1",
-                    Text = "Create Dataset",
-                    Selected = false,
-                    Disabled = false
-                },
-
-                new SelectListItem
-                {
-                    Value = "0",
-                    Text = "Select Schema",
-                    Selected = (schemaSelection == 0),
-                    Disabled = true
-                }
-            };
-
-            foreach (KeyValuePair<int, string> item in _schemaService.GetSchemaList())
-            {
-                schemaList.Add(new SelectListItem
-                {
-                    Value = item.Key.ToString(),
-                    Text = item.Value,
-                    Selected = (schemaSelection == item.Key),
-                    Disabled = false
-                });
-            }
-
-            return schemaList;
         }
 
 

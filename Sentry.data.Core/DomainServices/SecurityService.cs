@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core.Exceptions;
+﻿using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.FeatureFlags;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
@@ -686,6 +687,24 @@ namespace Sentry.data.Core
         }
 
         /// <summary>
+        /// Enqueues a Hangfire job that will create the default Security
+        /// Tickets in the database for them
+        /// </summary>
+        /// <param name="dataflowId">The Dataflow that was just created</param>
+        public void EnqueueCreateDefaultSecurityForDataFlow(int dataflowId)
+        {
+            _backgroundJobClient.Enqueue<SecurityService>(s => s.CreateDefaultSecuityForDataflow(dataflowId));
+        }
+
+        public void EnqueueCreateDefaultSecurityForDataFlowList(int[] dataflowIdList)
+        {
+            foreach(int dataflowId in dataflowIdList)
+            {
+                EnqueueCreateDefaultSecurityForDataFlow(dataflowId);
+            }
+        }
+
+        /// <summary>
         /// This method orchestrates creating new AD security groups,
         /// and creating the default SecurityTickets in the database for them.
         /// It is only run from the Goldeneye Service as a Hangfire job, 
@@ -722,6 +741,35 @@ namespace Sentry.data.Core
                 await CreateDefaultSecurityForDataset_Internal(ds, groups, permissions, datasetTickets, assetTickets);
             }
 
+        }
+
+        public Task CreateDefaultSecuityForDataflow(int dataflowId)
+        {
+            var df = _datasetContext.GetById<DataFlow>(dataflowId);
+            if (df == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(dataflowId), $"Dataflow with ID \"{dataflowId}\" could not be found.");
+            }
+
+            var ds = _datasetContext.GetById<Dataset>(df.DatasetId);
+            if (ds == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(dataflowId), $"Dataset with ID \"{df.DatasetId}\" could not be found.");
+            }
+
+            return CreateDefaultSecurityForDataflowAsync();
+            async Task CreateDefaultSecurityForDataflowAsync()
+            {
+                //enumerate the dataset producer AD group, excluding asset level
+                var groups = GetDefaultSecurityGroupDtos(ds).Where(w => !w.IsAssetLevelGroup() && w.GroupType == AdSecurityGroupType.Prdcr).ToList();
+
+                //get the list of permissions consumers and producers will be granted
+                var permissions = GetDefaultPermissions();
+
+                //get the list of existing security tickets for this dataset
+                var datasetTickets = GetSecurityTicketsForSecurable(ds, true);
+                await CreateDefaultSecurityForDataflow_Internal(df, groups, permissions, datasetTickets);
+            }
         }
 
         internal async Task CreateDefaultSecurityForDataset_Internal(Dataset ds, List<AdSecurityGroupDto> groups, DefaultPermissions permissions, IEnumerable<SecurityTicket> datasetTickets, IEnumerable<SecurityTicket> assetTickets)
@@ -796,6 +844,31 @@ namespace Sentry.data.Core
             }
         }
 
+        internal async Task CreateDefaultSecurityForDataflow_Internal(DataFlow df, List<AdSecurityGroupDto> groups, DefaultPermissions permissions, IEnumerable<SecurityTicket> datasetTickets)
+        {
+            foreach(var group in groups)
+            {
+                //create the security ticket that grants this group producer permissions (if it doesn't already exist)
+                if ((group.GroupType == AdSecurityGroupType.Prdcr && permissions.DataflowPermissions != null)
+                    && !datasetTickets.Any(t => t.AdGroupName == group.GetGroupName() && t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.CAN_MANAGE_DATAFLOW)))
+                {
+                    var accessRequest = new AccessRequest()
+                    {
+                        AdGroupName = group.GetGroupName(),
+                        SecurityId = df.Security.SecurityId,
+                        RequestorsId = Environment.UserName,
+                        RequestedDate = DateTime.Now,
+                        IsAddingPermission = true,
+                        Permissions = permissions.DataflowPermissions,
+                        IsSystemGenerated = true
+                    };
+                    var securityTicket = BuildAndAddPermissionTicket(accessRequest, df.Security, "DEFAULT_SECURITY");
+                    await ApproveTicket(securityTicket, Environment.UserName);
+                    _datasetContext.SaveChanges();
+                }
+            }
+        }
+
         private SecurityTicket BuildAndAddPermissionTicket(AccessRequest accessRequest, Security security, string ticketId)
         {
             var securityTicket = BuildAddingPermissionTicket(ticketId, accessRequest, security);
@@ -820,20 +893,23 @@ namespace Sentry.data.Core
 
         internal class DefaultPermissions
         {
-            public DefaultPermissions(List<Permission> producerPermissions, List<Permission> consumerPermissions, List<Permission> snowflakePermissions)
+            public DefaultPermissions(List<Permission> producerPermissions, List<Permission> consumerPermissions, List<Permission> snowflakePermissions, List<Permission> dataflowPermissions)
             {
                 ProducerPermissions = producerPermissions;
                 ConsumerPermissions = consumerPermissions;
                 SnowflakePermissions = snowflakePermissions;
+                DataflowPermissions = dataflowPermissions;
+
             }
             public List<Permission> ProducerPermissions { get; }
             public List<Permission> ConsumerPermissions { get; }
             public List<Permission> SnowflakePermissions { get; }
+            public List<Permission> DataflowPermissions { get; }
         }
 
         internal DefaultPermissions GetDefaultPermissions()
         {
-            return new DefaultPermissions(GetProducerPermissions(), GetConsumerPermissions(), GetSnowflakePermissions());
+            return new DefaultPermissions(GetProducerPermissions(), GetConsumerPermissions(), GetSnowflakePermissions(), GetDataflowPermissions());
         }
 
         internal List<Permission> GetProducerPermissions()
@@ -866,6 +942,16 @@ namespace Sentry.data.Core
             };
             return _datasetContext.Permission.Where(x => consumerPermissionCodes.Contains(x.PermissionCode) &&
                                                          x.SecurableObject == SecurableEntityName.DATASET).ToList();
+        }
+
+        internal List<Permission> GetDataflowPermissions()
+        {
+            var dataflowPermissionCodes = new List<string>()
+            {
+                PermissionCodes.CAN_MANAGE_DATAFLOW
+            };
+            return _datasetContext.Permission.Where(x => dataflowPermissionCodes.Contains(x.PermissionCode) &&
+                                                        x.SecurableObject == SecurableEntityName.DATAFLOW).ToList();
         }
     }
 }

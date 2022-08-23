@@ -50,7 +50,7 @@ namespace Sentry.data.Core
         public virtual bool CLA2429_SnowflakeCreateTable { get; set; }
         public virtual bool CLA1286_KafkaFlag { get; set; }
         public virtual bool CLA3014_LoadDataToSnowflake { get; set; }
-
+        public virtual string ControlMTriggerName { get; set; }
 
         #endregion
 

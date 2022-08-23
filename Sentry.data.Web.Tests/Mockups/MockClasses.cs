@@ -9,6 +9,7 @@ namespace Sentry.data.Web.Tests
 {
     public static class MockClasses
     {
+
         public static Dataset MockDataset(IApplicationUser user = null, Boolean addConfig = false)
         {
             Dataset ds = new Dataset()
@@ -132,6 +133,94 @@ namespace Sentry.data.Web.Tests
             feList.Add(fe);
 
             return feList;
+        }
+
+        public static List<DataFlowStepDto> MockDataFlowSteoDtos(int listSize)
+        {
+            List<DataFlowStepDto> steps = new List<DataFlowStepDto>();
+            for (int i = 1; i <= listSize; i++)
+            {
+                steps.Add(new DataFlowStepDto()
+                {
+                    Id = i,
+                    DataFlowId = i,
+                    DataFlowName = "DataFlowName" + i,
+                    DataActionType = DataActionType.None,
+                    DataActionTypeId = i,
+                    DataActionName = "DataActionName" + i,
+                    ActionId = i,
+                    ActionName = "ActionName" + i,
+                    ActionDescription = "ActionDescription",
+                    ExeuctionOrder = i,
+                    TriggerKey = "TriggerKey" + i,
+                    TriggerBucket = "TriggerBucket",
+                    TargetPrefix = "TargetPrefix"
+                });
+            }
+
+            return steps;
+        }
+
+        public static List<DataFlowDetailDto> MockDataFlowDetailDtos(int listSize)
+        {
+            List<DataFlowDetailDto> dtos = new List<DataFlowDetailDto>();
+            for (int i = 1; i<=listSize; i++)
+            {
+                dtos.Add(new DataFlowDetailDto()
+                {
+                    Id = i,
+                    FlowGuid = Guid.NewGuid(),
+                    SaidKeyCode = "SaidKeyCode",
+                    DatasetId = 1,
+                    SchemaId = 1,
+                    Name = "Name",
+                    CreateDTM = DateTime.Now,
+                    CreatedBy = "CreatedBy",
+                    DFQuestionnaire = "DFQuestionnaire",
+                    IngestionType = 1,
+                    IsCompressed = true,
+                    IsPreProcessingRequired = true,
+                    FlowStorageCode = "FlowStorageCode",
+                    MappedSchema = new List<int> { 1, 2 },
+                    AssociatedJobs = new List<int> { 1, 2 },
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DeleteIssuer = "DeleteIssuer",
+                    DeleteIssueDTM = DateTime.Now,
+                    NamedEnvironment = "NamedEnvironment",
+                    NamedEnvironmentType = NamedEnvironmentType.Prod
+                });
+            }
+
+            return dtos;
+        }
+
+        public static DataFlowDetailDto MockDataFlowDetailDto()
+        {
+            DataFlowDetailDto dto = new DataFlowDetailDto()
+            {
+                Id = 1,
+                FlowGuid = Guid.NewGuid(),
+                SaidKeyCode = "SaidKeyCode",
+                DatasetId = 1,
+                SchemaId = 1,
+                Name = "Name",
+                CreateDTM = DateTime.Now,
+                CreatedBy = "CreatedBy",
+                DFQuestionnaire = "DFQuestionnaire",
+                IngestionType = 1,
+                IsCompressed = true,
+                IsPreProcessingRequired = true,
+                FlowStorageCode = "FlowStorageCode",
+                MappedSchema = new List<int> { 1, 2 },
+                AssociatedJobs = new List<int> { 1, 2 },
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = "DeleteIssuer",
+                DeleteIssueDTM = DateTime.Now,
+                NamedEnvironment = "NamedEnvironment",
+                NamedEnvironmentType = NamedEnvironmentType.Prod
+            };
+
+            return dto;
         }
 
         public static List<DataSource> MockDataSources()
@@ -390,6 +479,7 @@ namespace Sentry.data.Web.Tests
             return datasetSubscriptions;
         }
 
+
         public static Event MockEvent()
         {
             return new Event
@@ -441,24 +531,5 @@ namespace Sentry.data.Web.Tests
 
             return dataFlowModel;
         }
-
-        //public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
-        //{
-        //    Schema schema = new Schema()
-        //    {
-        //        Schema_NME = "Mock Schema",
-        //        Schema_ID = 11000,
-        //        Schema_DSC = "Mock Schema",
-        //        Created_DTM = DateTime.Now,
-        //        DatasetFileConfig = dfc
-        //    };
-
-        //    var schemas = new List<Schema>();
-
-        //    schemas.Add(schema);
-
-        //    return schemas;
-
-        //}
     }
 }

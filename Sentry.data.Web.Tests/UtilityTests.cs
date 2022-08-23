@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;

@@ -145,7 +145,9 @@
   <ItemGroup>
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
+    <Compile Include="DomainServices\DeadSparkJobService.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
+    <Compile Include="DomainServices\ConnectorService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceTileSearchService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DataInventoryService.cs" />
@@ -160,9 +162,13 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DTO\Admin\SupportLinkDto.cs" />
     <Compile Include="DomainServices\TileSearchService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceTileDto.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFlowMetricDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryAssetCategoriesDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryCategoryDto.cs" />
@@ -173,9 +179,11 @@
     <Compile Include="DTO\DataInventory\DataInventoryUpdateDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
+    <Compile Include="DTO\DataProcessing\DeadSparkJobDto.cs" />
     <Compile Include="DTO\DataProcessing\NamedEnvironmentDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
@@ -217,6 +225,8 @@
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="Entities\DataFlowMetrics\DataFlowMetric.cs" />
+    <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
@@ -227,6 +237,9 @@
     <Compile Include="Entities\DataProcessing\Actions\UncompressGzipAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnectorTask.cs" />
+    <Compile Include="Entities\DataProcessing\ConfluentConnector.cs" />
+    <Compile Include="Entities\DataProcessing\DeadSparkJob.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
@@ -275,6 +288,7 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
@@ -282,8 +296,10 @@
     <Compile Include="GlobalEnums\LayoutOption.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
+    <Compile Include="GlobalEnums\ConnectorState.cs" />
     <Compile Include="GlobalEnums\TileSearchSortByOption.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
+    <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />
@@ -387,14 +403,19 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\Entities\IFilterSearchable.cs" />
     <Compile Include="Interfaces\IAdSecurityAdminProvider.cs" />
     <Compile Include="Interfaces\IApacheLivyProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IXMLAction.cs" />
     <Compile Include="Interfaces\IDataApplicationService.cs" />
+    <Compile Include="Interfaces\IDeadJobProvider.cs" />
+    <Compile Include="Interfaces\IDataFlowMetricProvider.cs" />
+    <Compile Include="Interfaces\IDataFlowMetricService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
     <Compile Include="Interfaces\IElasticContext.cs" />
+    <Compile Include="Interfaces\IDeadSparkJobService.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\IDataInventorySearchProvider.cs" />
@@ -404,6 +425,8 @@
     <Compile Include="Interfaces\InfrastructureEventing\IInevRestClient.cs" />
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
+    <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
     <Compile Include="Interfaces\IQuartermasterService.cs" />
@@ -414,6 +437,7 @@
     <Compile Include="Interfaces\IFilterSearchService.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
+    <Compile Include="Interfaces\IKafkaConnectorService.cs" />
     <Compile Include="Interfaces\ISnowProvider.cs" />
     <Compile Include="Interfaces\IDbExecuter.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />

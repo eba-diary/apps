@@ -54,6 +54,7 @@ namespace Sentry.data.Web
             this.SchemaRootPath = dto.SchemaRootPath;
             this.ParquetStorageBucket = dto.ParquetStorageBucket;
             this.ParquetStoragePrefix = dto.ParquetStoragePrefix;
+            this.ControlMTriggerName = dto.ControlMTriggerName;
             //this.CLA24 = (dto.Schema != null) ? dto.Schema.CLA1580_StructureHive : false;
         }
 
@@ -156,5 +157,7 @@ namespace Sentry.data.Web
         public string ParquetStoragePrefix { get; set; }
         public string DatasetScopeReadonly { get; set; }
         public string FileExtensionReadonly { get; set; }
+
+        public string ControlMTriggerName { get; set; }
     }
 }

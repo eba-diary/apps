@@ -103,6 +103,7 @@
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
@@ -136,10 +137,12 @@
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="ConfigServiceTests.cs" />
+    <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="HelperTests\CustomAttributeHelperTests.cs" />
     <Compile Include="JobServiceTests.cs" />
+    <Compile Include="ConnectorServiceTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
     <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />
@@ -200,6 +203,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ExpectedJSON\Schema_Complex.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnector_Config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ExpectedJSON\DatasetTileSearchService_TileSearchEventDto.json">

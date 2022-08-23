@@ -76,11 +76,7 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
 
-            public IFeatureFlag<bool> CLA3240_UseDropLocationV2 { get; } = new MockBooleanFeatureFlag(false);
-
             public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new NotImplementedException();
-
-            public IFeatureFlag<bool> CLA3332_ConsolidatedDataFlows { get; } = new MockBooleanFeatureFlag(false);
 
             public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new NotImplementedException();
 

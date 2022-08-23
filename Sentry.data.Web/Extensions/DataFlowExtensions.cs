@@ -56,7 +56,6 @@ namespace Sentry.data.Web
             }
         }
 
-
         public static List<DFModel> ToModelList(this List<Core.DataFlowDto> dtoList)
         {
             List<DFModel> modelList = new List<DFModel>();
@@ -66,9 +65,108 @@ namespace Sentry.data.Web
             }
             return modelList;
         }
+
+        public static List<Models.ApiModels.Dataflow.DataFlowStepModel> ToModelList(this List<Core.DataFlowStepDto> dtoList)
+        {
+            List<Models.ApiModels.Dataflow.DataFlowStepModel> modelList = new List<Models.ApiModels.Dataflow.DataFlowStepModel>();
+            foreach (Core.DataFlowStepDto dto in dtoList)
+            {
+                modelList.Add(dto.ToAPIModel());
+            }
+            return modelList;
+        }
+
         public static DFModel ToDFModel(this Core.DataFlowDto dto)
         {
             return new DFModel(dto) { };
+        }
+
+        public static Models.ApiModels.Dataflow.DataFlowDetailModel MapToModel(this DataFlowDetailDto dto)
+        {
+            Models.ApiModels.Dataflow.DataFlowDetailModel model = new Models.ApiModels.Dataflow.DataFlowDetailModel();
+
+            model.steps = dto.steps.ToModelList();
+
+            model.Id = dto.Id;
+            model.FlowGuid = dto.FlowGuid;
+            model.SaidKeyCode = dto.SaidKeyCode;
+            model.DatasetId = dto.DatasetId;
+            model.SchemaId = dto.SchemaId;
+            model.Name = dto.Name;
+            model.CreateDTM = dto.CreateDTM;
+            model.CreatedBy = dto.CreatedBy;
+            model.DFQuestionnaire = dto.DFQuestionnaire;
+            model.IngestionType = dto.IngestionType;
+            model.IsCompressed = dto.IsCompressed;
+            model.IsPreProcessingRequired = dto.IsPreProcessingRequired;
+            model.PreProcessingOption = dto.PreProcessingOption;
+            model.FlowStorageCode = dto.FlowStorageCode;
+            model.AssociatedJobs = dto.AssociatedJobs;
+            model.ObjectStatus = dto.ObjectStatus;
+            model.DeleteIssuer = dto.DeleteIssuer;
+            model.DeleteIssueDTM = dto.DeleteIssueDTM;
+            model.NamedEnvironment = dto.NamedEnvironment;
+            model.NamedEnvironmentType = dto.NamedEnvironmentType;
+
+            return model;
+        }
+
+        public static List<Models.ApiModels.Dataflow.DataFlowDetailModel> MapToDetailModelList(this List<DataFlowDetailDto> detailDto)
+        {
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> detailModelList = new List<Models.ApiModels.Dataflow.DataFlowDetailModel>();
+
+            foreach (DataFlowDetailDto dto in detailDto)
+            {
+                Models.ApiModels.Dataflow.DataFlowDetailModel detail = dto.MapToModel();
+                detailModelList.Add(detail);
+            }
+
+            return detailModelList;
+        }
+
+        public static Core.DataFlowDto ToDto(this DataFlowModel model)
+        {
+            Core.DataFlowDto dto = new Core.DataFlowDto
+            {
+                Id = model.DataFlowId,
+                Name = model.Name,
+                SaidKeyCode = model.SAIDAssetKeyCode,
+                CreatedBy = model.CreatedBy,
+                CreateDTM = model.CreatedDTM,
+                IngestionType = model.IngestionTypeSelection,
+                IsCompressed = model.IsCompressed,
+                IsPreProcessingRequired = model.IsPreProcessingRequired,
+                PreProcessingOption = model.PreProcessingSelection,
+                ObjectStatus = model.ObjectStatus,
+                FlowStorageCode = model.StorageCode,
+                NamedEnvironment = model.NamedEnvironment,
+                NamedEnvironmentType = model.NamedEnvironmentType
+            };
+
+            if (model.SchemaMaps != null)
+            {
+                dto.SchemaMap = model.SchemaMaps.ToDto();
+            }
+
+            if (model.RetrieverJob != null)
+            {
+                dto.RetrieverJob = model.RetrieverJob.ToDto();
+            }
+
+            if (model.IsCompressed)
+            {
+                CompressionJobDto cDto = model.CompressionJob.First().ToDto();
+                dto.CompressionJob = cDto;
+                dto.CompressionType = (int)cDto.CompressionType;
+            }
+            else
+            {
+                dto.CompressionType = null;
+            }
+
+            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
+
+            return dto;
         }
 
         public static Core.CompressionJobDto ToDto(this CompressionModel model)
@@ -146,7 +244,7 @@ namespace Sentry.data.Web
                 JobModel jobModel = new JobModel()
                 {
                     CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile,
-                    FtpPattern = dto.RetrieverJob.FtpPattern?? FtpPattern.NoPattern,
+                    FtpPattern = dto.RetrieverJob.FtpPattern ?? FtpPattern.NoPattern,
                     HttpRequestBody = dto.RetrieverJob.HttpRequestBody,
                     IsRegexSearch = true,
                     OverwriteDataFile = false,
@@ -160,6 +258,22 @@ namespace Sentry.data.Web
         public static DataFlowStepModel ToModel(this Core.DataFlowStepDto dto)
         {
             DataFlowStepModel model = new DataFlowStepModel()
+            {
+                Id = dto.Id,
+                ActionId = dto.ActionId,
+                ActionName = dto.ActionName,
+                ActionDescription = dto.ActionDescription,
+                ExecutionOrder = dto.ExeuctionOrder,
+                TriggetKey = dto.TriggerKey,
+                TargetPrefix = dto.TargetPrefix,
+                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{dto.TriggerBucket}/"
+            };
+            return model;
+        }
+
+        public static Models.ApiModels.Dataflow.DataFlowStepModel ToAPIModel(this Core.DataFlowStepDto dto)
+        {
+            Models.ApiModels.Dataflow.DataFlowStepModel model = new Models.ApiModels.Dataflow.DataFlowStepModel()
             {
                 Id = dto.Id,
                 ActionId = dto.ActionId,

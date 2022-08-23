@@ -1,8 +1,12 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Web.Http;
 
@@ -61,22 +65,76 @@ namespace Sentry.data.Web.WebApi.Controllers
         ////}
 
         /// <summary>
-        /// Create new dataflow (v3) for each dataflow provided
+        /// Retrieve dataflow detail metadata with the id(s) provided
         /// </summary>
-        /// <param name="idList"></param>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <param name="storagecode"></param>
         /// <returns></returns>
         [ApiVersionBegin(WebAPI.Version.v2)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK)]
-        [Route("updatedataflows")]
-        [HttpPost]
-        public IHttpActionResult UpdateDataFlows(int[] idList)
+        [Route("")]
+        [HttpGet]
+        public IHttpActionResult GetDataFlowMetadata([FromUri] int? datasetId = null, [FromUri] int? schemaId = null, [FromUri] string storagecode = null)
         {
-            DataFlowService.UpgradeDataFlows(idList);
+            // Dictionary to manage and check method params
+            IDictionary<string, object> parameters = new Dictionary<string, object>();
 
-            return Ok();
+            parameters.Add(new KeyValuePair<string, object>(nameof(datasetId), datasetId));
+            parameters.Add(new KeyValuePair<string, object>(nameof(schemaId), schemaId));
+            parameters.Add(new KeyValuePair<string, object>(nameof(storagecode), storagecode));
+
+            int counter = 0; // counter to check for excess amount of passed in params
+
+            foreach (var item in parameters)
+            {
+                if (item.Value != null) counter++;
+            }
+
+            KeyValuePair<string, object> itemCheck = new KeyValuePair<string, object>();
+
+            if (counter == 0)
+            {
+                return BadRequest("Ensure that one parameter is passed in"); // returns BadRequest result in the case of excessive or invalid params
+            } else if(counter > 1)
+            {
+                return BadRequest("Only one parameter may be passed in"); // returns BadRequest result in the case of excessive or invalid params
+            } 
+            else
+            {
+                foreach (var item in parameters)
+                {
+                    if (item.Value != null)
+                    {
+                        itemCheck = new KeyValuePair<string, object>(item.Key, item.Value);
+                    }
+                }
+            }
+
+            List<DataFlowDetailDto> dtoList = new List<DataFlowDetailDto>();
+
+            switch (itemCheck.Key) // Switch based on the param that was sent through
+            {
+                case "datasetId":
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoByDatasetId((int)itemCheck.Value);
+                    break;
+                case "schemaId":
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoBySchemaId((int)itemCheck.Value);
+                    break;
+                case "storagecode":
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoByStorageCode((string)itemCheck.Value);
+                    break;
+            }
+
+            // Map the DataFlowDetailDto to the DataFlowDetailModel via the MapToDetailModelList extension method.
+            List<Models.ApiModels.Dataflow.DataFlowDetailModel> modelList = dtoList.MapToDetailModelList(); 
+
+            return Ok(modelList);
         }
+
+        
 
         /// <summary>
         /// Delete each dataflow associated with id(s) provided

@@ -186,6 +186,7 @@
     <Compile Include="DatasetContextTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="DomainModelUnitTests.cs" />
+    <Compile Include="Extensions\DataFlowMetricExtensionsTests.cs" />
     <Compile Include="Extensions\ExtensionUnitTests.cs" />
     <Compile Include="Extensions\DatasetFileExtensionsTests.cs" />
     <Compile Include="Extensions\TileExtensionsTests.cs" />
@@ -217,7 +218,7 @@
       <Name>Sentry.data.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
-      <Project>{EA9EE762-CE32-4410-B2B6-367A0985645B}</Project>
+      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Infrastructure\Sentry.data.Infrastructure.csproj">
@@ -225,7 +226,7 @@
       <Name>Sentry.data.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Web\Sentry.data.Web.csproj">
-      <Project>{42C330E1-E605-487F-979D-635597D1C88D}</Project>
+      <Project>{42c330e1-e605-487f-979d-635597d1c88d}</Project>
       <Name>Sentry.data.Web</Name>
     </ProjectReference>
   </ItemGroup>

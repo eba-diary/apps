@@ -134,16 +134,22 @@ namespace Sentry.data.Infrastructure
             registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
+            registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
+            registry.For<ISupportLinkService>().Singleton().Use<SupportLinkService>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
+            settings.DefaultMappingFor<DataFlowMetric>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexFlowMetricSearch")).IdProperty(p=>p.EventMetricId));
             settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
             settings.ThrowExceptions();
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
             registry.For<IDataInventorySearchProvider>().Add<ElasticDataInventorySearchProvider>().Ctor<IDbExecuter>().Is(new DataInventorySqlExecuter());
+            registry.For<IDeadJobProvider>().Add<DeadJobProvider>().Ctor<IDbExecuter>().Is(new DeadSparkJobSqlExecuter());
             registry.For<IDataInventoryService>().Use<DataInventoryService>();
+            registry.For<IDeadSparkJobService>().Use<DeadSparkJobService>();
+            registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
@@ -195,6 +201,7 @@ namespace Sentry.data.Infrastructure
 
             //register polly policies
             registry.For<IPollyPolicy>().Singleton().Add<ApacheLivyProviderPolicy>();
+            registry.For<IPollyPolicy>().Singleton().Add<ConfluentConnectorProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
@@ -208,6 +215,18 @@ namespace Sentry.data.Infrastructure
             registry.For<IApacheLivyProvider>().Singleton().Use<ApacheLivyProvider>().
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider)
                 .SetProperty((c) => c.BaseUrl = Configuration.Config.GetHostSetting("ApacheLivy"));
+
+
+            //establish httpclient specific to ConfluentConnectorProvider
+            var confluentConnectorClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
+            confluentConnectorClient.DefaultRequestHeaders.Accept.Clear();
+            confluentConnectorClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            confluentConnectorClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+            var confluentConnectorHttpClientProvider = new HttpClientProvider(confluentConnectorClient);
+
+            registry.For<IKafkaConnectorProvider>().Singleton().Use<ConfluentConnectorProvider>().
+                Ctor<IHttpClientProvider>().Is(confluentConnectorHttpClientProvider).Ctor<string>("baseUrl").Is(Configuration.Config.GetHostSetting("ConfluentConnectorApi"));
+
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
