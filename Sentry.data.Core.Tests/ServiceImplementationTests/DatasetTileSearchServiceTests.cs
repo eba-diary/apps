@@ -298,9 +298,6 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
-            datasetContext.SetupGet(x => x.Security).Returns(new List<Security>().AsQueryable());
-            datasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>().AsQueryable());
 
             Mock<IApplicationUser> appUser = repository.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
