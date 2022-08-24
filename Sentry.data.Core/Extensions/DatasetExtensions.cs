@@ -28,11 +28,6 @@ namespace Sentry.data.Core
                 Tags = dataset.Tags.Select(x => x.Name).ToList(),
             };
 
-            if (dataset.DatasetCategories?.Any() == true)
-            {
-                biTileDto.AbbreviatedCategories = string.Join(", ", dataset.DatasetCategories.Select(x => !string.IsNullOrWhiteSpace(x.AbbreviatedName) ? x.AbbreviatedName : x.Name));
-            }
-
             MapToDatasetTileDto(dataset, biTileDto);
             return biTileDto;
         }
@@ -50,6 +45,7 @@ namespace Sentry.data.Core
             if (dataset.DatasetCategories?.Any() == true)
             {
                 dto.Category = dataset.DatasetCategories.Select(x => x.Name).FirstOrDefault();
+                dto.AbbreviatedCategory = string.Join(",", dataset.DatasetCategories.Select(x => x.AbbreviatedName ?? x.Name));
 
                 if (dataset.DatasetCategories.Count == 1)
                 {

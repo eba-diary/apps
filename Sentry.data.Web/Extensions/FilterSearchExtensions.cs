@@ -177,7 +177,6 @@ namespace Sentry.data.Web
                 {
                     BusinessIntelligenceTileDto dto = new BusinessIntelligenceTileDto()
                     {
-                        AbbreviatedCategories = model.AbbreviatedCategories,
                         ReportType = model.ReportType,
                         UpdateFrequency = model.UpdateFrequency,
                         ContactNames = model.ContactNames,
@@ -202,6 +201,7 @@ namespace Sentry.data.Web
             dto.Status = EnumHelper.GetByDescription<ObjectStatusEnum>(model.Status);
             dto.IsFavorite = model.IsFavorite;
             dto.Category = model.Category;
+            dto.AbbreviatedCategory = model.AbbreviatedCategory;
             dto.Color = model.Color;
             dto.IsSecured = model.IsSecured;
             dto.LastActivityDateTime = DateTime.Parse(model.LastActivityShortDate);

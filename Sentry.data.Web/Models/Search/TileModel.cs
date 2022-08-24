@@ -13,6 +13,7 @@ namespace Sentry.data.Web
         public string FavoriteTitle { get; set; }
         public bool IsFavorite { get; set; }
         public string Category { get; set; }
+        public string AbbreviatedCategory { get; set; }
         public string Color { get; set; }
         public bool IsSecured { get; set; }
         public string LastActivityShortDate { get; set; }

@@ -5,7 +5,6 @@ namespace Sentry.data.Core
 {
     public class BusinessIntelligenceTileDto : DatasetTileDto
     {
-        public string AbbreviatedCategories { get; set; }
         [FilterSearchField(FilterCategoryNames.BusinessIntelligence.REPORTTYPE, hideResultCounts: true)]
         public string ReportType { get; set; }
         public string UpdateFrequency { get; set; }

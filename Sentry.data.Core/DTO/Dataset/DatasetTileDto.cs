@@ -14,6 +14,7 @@ namespace Sentry.data.Core
         public bool IsFavorite { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, defaultOpen: true)]
         public string Category { get; set; }
+        public string AbbreviatedCategory { get; set; }
         public string Color { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.SECURED, hideResultCounts: true)]
         public bool IsSecured { get; set; }

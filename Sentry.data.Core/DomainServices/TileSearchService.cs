@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Associates;
 using Sentry.Common.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -57,29 +59,23 @@ namespace Sentry.data.Core
 
         public List<T> GetSearchableTiles()
         {
+            Stopwatch sw = new Stopwatch();
+
+            sw.Start();
             List<Dataset> datasets = GetDatasets().FetchAllChildren(_datasetContext);
+            sw.Stop();
+            Logger.Info($"GetSearchableTiles - GetDatasets {sw.ElapsedMilliseconds}ms");
 
+            sw.Restart();
             string associateId = _userService.GetCurrentUser().AssociateId;
-            List<T> tileDtos = new List<T>();
+            sw.Stop();
+            Logger.Info($"GetSearchableTiles - GetCurrentUser {sw.ElapsedMilliseconds}ms");
 
-            //map to DatasetTileDto
-            foreach (Dataset dataset in datasets)
-            {
-                T tileDto = MapToTileDto(dataset);
-                tileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-
-                tileDto.LastActivityDateTime = dataset.ChangedDtm;
-                if (dataset.DatasetFiles?.Any() == true)
-                {
-                    DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
-                    if (lastFileDate > tileDto.LastActivityDateTime)
-                    {
-                        tileDto.LastActivityDateTime = lastFileDate;
-                    }
-                }
-
-                tileDtos.Add(tileDto);
-            }
+            sw.Restart();
+            List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId)).ToList();
+            List<T> tileDtos = tasks.Select(x => x.Result).ToList();
+            sw.Stop();
+            Logger.Info($"GetSearchableTiles - Map {sw.ElapsedMilliseconds}ms");
 
             return tileDtos;
         }
@@ -96,6 +92,27 @@ namespace Sentry.data.Core
         #endregion
 
         #region Private
+        private async Task<T> MapAsync(Dataset dataset, string associateId)
+        {
+            return await Task.Run(() =>
+            {
+                T tileDto = MapToTileDto(dataset);
+                tileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+
+                tileDto.LastActivityDateTime = dataset.ChangedDtm;
+                if (dataset.DatasetFiles?.Any() == true)
+                {
+                    DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
+                    if (lastFileDate > tileDto.LastActivityDateTime)
+                    {
+                        tileDto.LastActivityDateTime = lastFileDate;
+                    }
+                }
+
+                return tileDto;
+            }).ConfigureAwait(false);
+        }
+
         private List<T> ApplyPaging(IEnumerable<T> dtos, TileSearchDto<T> searchDto)
         {
             if (searchDto.OrderByDescending)

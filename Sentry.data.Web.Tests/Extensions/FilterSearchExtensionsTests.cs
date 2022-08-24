@@ -330,6 +330,7 @@ namespace Sentry.data.Web.Tests.Extensions
                     Status = "Active",
                     IsFavorite = true,
                     Category = "Category",
+                    AbbreviatedCategory = "Cat",
                     Color = "Blue",
                     IsSecured = false,
                     LastActivityShortDate = "8/18/2022",
@@ -343,6 +344,7 @@ namespace Sentry.data.Web.Tests.Extensions
                     Status = "Deleted",
                     IsFavorite = false,
                     Category = "Category2",
+                    AbbreviatedCategory = "Cat2",
                     Color = "Green",
                     IsSecured = true,
                     LastActivityShortDate = "8/18/2021",
@@ -361,6 +363,7 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual(ObjectStatusEnum.Active, dto.Status);
             Assert.IsTrue(dto.IsFavorite);
             Assert.AreEqual("Category", dto.Category);
+            Assert.AreEqual("Cat", dto.AbbreviatedCategory);
             Assert.AreEqual("Blue", dto.Color);
             Assert.IsFalse(dto.IsSecured);
             Assert.AreEqual(DateTime.Parse("8/18/2022"), dto.LastActivityDateTime);
@@ -373,6 +376,7 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual(ObjectStatusEnum.Deleted, dto.Status);
             Assert.IsFalse(dto.IsFavorite);
             Assert.AreEqual("Category2", dto.Category);
+            Assert.AreEqual("Cat2", dto.AbbreviatedCategory);
             Assert.AreEqual("Green", dto.Color);
             Assert.IsTrue(dto.IsSecured);
             Assert.AreEqual(DateTime.Parse("8/18/2021"), dto.LastActivityDateTime);

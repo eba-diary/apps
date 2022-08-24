@@ -50,7 +50,6 @@ namespace Sentry.data.Web
                 {
                     TileModel model = new TileModel()
                     {
-                        AbbreviatedCategories = dto.AbbreviatedCategories, 
                         IsReport = true,
                         ReportType = dto.ReportType,
                         UpdateFrequency = dto.UpdateFrequency,
@@ -77,6 +76,7 @@ namespace Sentry.data.Web
             model.FavoriteTitle = dto.Status == ObjectStatusEnum.Active ? "Click to toggle favorite" : "Dataset is marked for deletion; favorite functionality disabled";
             model.IsFavorite = dto.IsFavorite;
             model.Category = dto.Category;
+            model.AbbreviatedCategory = dto.AbbreviatedCategory;
             model.Color = dto.Color;
             model.IsSecured = dto.IsSecured;
             model.LastActivityShortDate = dto.LastActivityDateTime.ToShortDateString();

@@ -56,6 +56,7 @@ namespace Sentry.data.Web.Tests
                     Status = ObjectStatusEnum.Active,
                     IsFavorite = true,
                     Category = "Category",
+                    AbbreviatedCategory = "Cat",
                     Color = "Blue",
                     IsSecured = false,
                     LastActivityDateTime = new DateTime(2022, 8, 18, 8, 0, 0),
@@ -69,6 +70,7 @@ namespace Sentry.data.Web.Tests
                     Status = ObjectStatusEnum.Deleted,
                     IsFavorite = false,
                     Category = "Category2",
+                    AbbreviatedCategory = "Cat2",
                     Color = "Green",
                     IsSecured = true,
                     LastActivityDateTime = new DateTime(2021, 8, 18, 8, 0, 0),
@@ -89,6 +91,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Click to toggle favorite", model.FavoriteTitle);
             Assert.IsTrue(model.IsFavorite);
             Assert.AreEqual("Category", model.Category);
+            Assert.AreEqual("Cat", model.AbbreviatedCategory);
             Assert.AreEqual("Blue", model.Color);
             Assert.IsFalse(model.IsSecured);
             Assert.AreEqual("8/18/2022", model.LastActivityShortDate);
@@ -111,6 +114,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Dataset is marked for deletion; favorite functionality disabled", model.FavoriteTitle);
             Assert.IsFalse(model.IsFavorite);
             Assert.AreEqual("Category2", model.Category);
+            Assert.AreEqual("Cat2", model.AbbreviatedCategory);
             Assert.AreEqual("Green", model.Color);
             Assert.IsTrue(model.IsSecured);
             Assert.AreEqual("8/18/2021", model.LastActivityShortDate);
