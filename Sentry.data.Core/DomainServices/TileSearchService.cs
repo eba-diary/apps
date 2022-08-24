@@ -72,8 +72,9 @@ namespace Sentry.data.Core
             Logger.Info($"GetSearchableTiles - GetCurrentUser {sw.ElapsedMilliseconds}ms");
 
             sw.Restart();
-            List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId)).ToList();
-            List<T> tileDtos = tasks.Select(x => x.Result).ToList();
+            List<T> tileDtos = datasets.Select(x => Map(x, associateId)).ToList();
+            //List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId)).ToList();
+            //List<T> tileDtos = tasks.Select(x => x.Result).ToList();
             sw.Stop();
             Logger.Info($"GetSearchableTiles - Map {sw.ElapsedMilliseconds}ms");
 
@@ -96,21 +97,26 @@ namespace Sentry.data.Core
         {
             return await Task.Run(() =>
             {
-                T tileDto = MapToTileDto(dataset);
-                tileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
-
-                tileDto.LastActivityDateTime = dataset.ChangedDtm;
-                if (dataset.DatasetFiles?.Any() == true)
-                {
-                    DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
-                    if (lastFileDate > tileDto.LastActivityDateTime)
-                    {
-                        tileDto.LastActivityDateTime = lastFileDate;
-                    }
-                }
-
-                return tileDto;
+                return Map(dataset, associateId);
             }).ConfigureAwait(false);
+        }
+
+        private T Map(Dataset dataset, string associateId)
+        {
+            T tileDto = MapToTileDto(dataset);
+            tileDto.IsFavorite = dataset.Favorities.Any(w => w.UserId == associateId);
+
+            tileDto.LastActivityDateTime = dataset.ChangedDtm;
+            if (dataset.DatasetFiles?.Any() == true)
+            {
+                DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
+                if (lastFileDate > tileDto.LastActivityDateTime)
+                {
+                    tileDto.LastActivityDateTime = lastFileDate;
+                }
+            }
+
+            return tileDto;
         }
 
         private List<T> ApplyPaging(IEnumerable<T> dtos, TileSearchDto<T> searchDto)
