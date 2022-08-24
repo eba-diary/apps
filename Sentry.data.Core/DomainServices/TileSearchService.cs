@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Sentry.Associates;
 using Sentry.Common.Logging;
+using Sentry.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,7 +62,11 @@ namespace Sentry.data.Core
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            List<Dataset> datasets = GetDatasets().FetchAllChildren(_datasetContext);
+            IQueryable<Dataset> datasetQueryable = GetDatasets();
+            datasetQueryable.FetchMany(x => x.DatasetCategories).ToFuture();
+            datasetQueryable.FetchMany(x => x.Favorities).ToFuture();
+            IEnumerable<Dataset> datasetEnumerable = datasetQueryable.FetchMany(x => x.DatasetFiles).ToFuture();
+            List<Dataset> datasets = datasetEnumerable.ToList();
             sw.Stop();
             Logger.Info($"GetSearchableTiles - GetDatasets {sw.ElapsedMilliseconds}ms");
 
@@ -72,9 +76,9 @@ namespace Sentry.data.Core
             Logger.Info($"GetSearchableTiles - GetCurrentUser {sw.ElapsedMilliseconds}ms");
 
             sw.Restart();
-            List<T> tileDtos = datasets.Select(x => Map(x, associateId)).ToList();
-            //List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId)).ToList();
-            //List<T> tileDtos = tasks.Select(x => x.Result).ToList();
+            //List<T> tileDtos = datasets.Select(x => Map(x, associateId)).ToList();
+            List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId)).ToList();
+            List<T> tileDtos = tasks.Select(x => x.Result).ToList();
             sw.Stop();
             Logger.Info($"GetSearchableTiles - Map {sw.ElapsedMilliseconds}ms");
 
@@ -95,10 +99,7 @@ namespace Sentry.data.Core
         #region Private
         private async Task<T> MapAsync(Dataset dataset, string associateId)
         {
-            return await Task.Run(() =>
-            {
-                return Map(dataset, associateId);
-            }).ConfigureAwait(false);
+            return await Task.Run(() => Map(dataset, associateId)).ConfigureAwait(false);
         }
 
         private T Map(Dataset dataset, string associateId)
