@@ -38,3 +38,5 @@ using System.Runtime.InteropServices;
 
 //Exposing internal methods to testing class
 [assembly: InternalsVisibleTo("Sentry.data.Infrastructure.Tests")]
+//Required for Moq to generate proxy classes for mocking
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
