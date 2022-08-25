@@ -74,6 +74,8 @@ namespace Sentry.data.Web.Controllers
                 model.ProducerAssetGroupName = _dataFlowService.GetSecurityGroup(id);
             }
 
+            model.CLA3718_Authorization = DataFeatures.CLA3718_Authorization.GetValue();
+
             return View(model);
         }
 
