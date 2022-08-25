@@ -181,6 +181,7 @@ namespace Sentry.data.Web.Helpers
             return items.OrderBy(o => o.Text);
         }
 
+        //TODO: PUT FEATURE FLAG TO ONLY LOAD new types if applicable
         public static IEnumerable<SelectListItem> BuildIngestionTypeDropdown(int ingestionTypeSelection)
         {
             List<SelectListItem> items = Enum.GetValues(typeof(IngestionType)).Cast<IngestionType>().Select(v =>

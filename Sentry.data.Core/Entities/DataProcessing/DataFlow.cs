@@ -43,6 +43,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string NamedEnvironment { get; set; }
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
 
+        public virtual string TopicName { get; set; }
+
         #region ISecurableImplementation
         public virtual bool IsSecured { get; set; } = true;
         public virtual Core.Security Security { get; set; }
@@ -74,6 +76,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string nameContainsReservedWords = "nameContainsReservedWords";
             public const string nameMustBeUnique = "nameMustBeUnique";
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
+
+            public const string topicNameIsBlank = "topicNameIsBlank";
         }
     }
 }

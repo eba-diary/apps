@@ -107,6 +107,7 @@ namespace Sentry.data.Web
             model.DeleteIssueDTM = dto.DeleteIssueDTM;
             model.NamedEnvironment = dto.NamedEnvironment;
             model.NamedEnvironmentType = dto.NamedEnvironmentType;
+            model.TopicName = dto.TopicName;
 
             return model;
         }
@@ -140,7 +141,8 @@ namespace Sentry.data.Web
                 ObjectStatus = model.ObjectStatus,
                 FlowStorageCode = model.StorageCode,
                 NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType
+                NamedEnvironmentType = model.NamedEnvironmentType,
+                TopicName = model.TopicName
             };
 
             if (model.SchemaMaps != null)

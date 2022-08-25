@@ -355,7 +355,8 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType,
                 PrimaryContactId = dto.PrimaryContactId,
-                IsSecured = dto.IsSecured
+                IsSecured = dto.IsSecured,
+                TopicName = dto.TopicName
             };
 
             if (dto.SchemaMap.Any())
@@ -730,6 +731,9 @@ namespace Sentry.data.Web.Controllers
                     case RetrieverJob.ValidationErrors.scheduleIsNull:
                         ModelState.AddModelError("RetrieverJob.SchedulePicker", vr.Description);
                         break;
+                    case DataFlow.ValidationErrors.topicNameIsBlank:
+                        ModelState.AddModelError("TopicName", vr.Description);
+                        break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
                         ModelState.AddModelError(string.Empty, vr.Description);
@@ -757,7 +761,8 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironmentType = model.NamedEnvironmentType,
                 // Propagate primary contact otherwise specify current user
                 PrimaryContactId = (model.PrimaryContactId) ?? _userService.GetCurrentUser().AssociateId,
-                IsSecured = true
+                IsSecured = true,
+                TopicName = model.TopicName
             };
 
             if (model.SchemaMaps != null)

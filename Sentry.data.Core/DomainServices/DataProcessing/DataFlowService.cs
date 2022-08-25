@@ -725,7 +725,13 @@ namespace Sentry.data.Core
 
             switch (dto.IngestionType)
             {
-                case (int)GlobalEnums.IngestionType.User_Push:
+                case (int)GlobalEnums.IngestionType.DFS_Drop:
+                    MapDataFlowStepsForPush(dto, df);
+                    break;
+                case (int)GlobalEnums.IngestionType.S3_Drop:
+                    MapDataFlowStepsForPush(dto, df);
+                    break;
+                case (int)GlobalEnums.IngestionType.Topic:
                     MapDataFlowStepsForPush(dto, df);
                     break;
                 case (int)GlobalEnums.IngestionType.DSC_Pull:
@@ -772,7 +778,8 @@ namespace Sentry.data.Core
                                 ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
                                 : _datasetContext.GetById<DataFlow>(dto.Id).Security,
                 DatasetId = dto.SchemaMap.First().DatasetId,
-                SchemaId = dto.SchemaMap.First().SchemaId
+                SchemaId = dto.SchemaMap.First().SchemaId,
+                TopicName = dto.TopicName
             };
 
             _datasetContext.Add(df);
@@ -803,7 +810,7 @@ namespace Sentry.data.Core
             return group;
         }
 
-
+        //GORDON: TODO: figure out how this changes with new DSC PUSH TYPES
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPush).ToLower()}";
@@ -1022,6 +1029,7 @@ namespace Sentry.data.Core
             dto.PrimaryContactId = df.PrimaryContactId;
             dto.IsSecured = df.IsSecured;
             dto.Security = _securityService.GetUserSecurity(df, _userService.GetCurrentUser());
+            dto.TopicName = df.TopicName;
 
             if (dto.IsCompressed)
             {
@@ -1204,6 +1212,7 @@ namespace Sentry.data.Core
                     
                     return schemaLoadStep;
 
+                //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources);
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
@@ -1351,6 +1360,7 @@ namespace Sentry.data.Core
 
         #region SchemaFlowMappings
 
+        //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED
         private DataFlow MapToDataFlow(FileSchema scm)
         {
             // This method maps Schema flow for given dataset schema
@@ -1364,7 +1374,7 @@ namespace Sentry.data.Core
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
                 DeleteIssueDTM = DateTime.MaxValue,
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
-                IngestionType = (int)GlobalEnums.IngestionType.User_Push
+                IngestionType = (int)GlobalEnums.IngestionType.DFS_Drop
             };
 
             _datasetContext.Add(df);

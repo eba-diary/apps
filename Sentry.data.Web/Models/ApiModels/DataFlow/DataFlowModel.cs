@@ -29,5 +29,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
         public DateTime DeleteIssueDTM { get; set; }
         public string NamedEnvironment { get; set; }
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public string TopicName { get; set; }
     }
 }

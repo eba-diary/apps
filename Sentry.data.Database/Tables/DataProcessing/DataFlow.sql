@@ -25,6 +25,7 @@
     [PrimaryContact_ID] VARCHAR(8) NULL,
     [IsSecured_IND] BIT NULL, 
     [Security_ID] UNIQUEIDENTIFIER NULL, 
+    [TopicName] VARCHAR(100) NULL,
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC

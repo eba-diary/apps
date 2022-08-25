@@ -3,12 +3,15 @@
     Orig_Dataset_Selection: 0,
     Orig_Schema_Selection: 0,
 
+    IngestionType_TOPIC: "5",              //IngestionType_TOPIC matches public enum IngestionType
+
     DataFlowFormInit: function (datasetId, schemaId) {
 
         data.DataFlow.Orig_Dataset_Selection = datasetId;
         data.DataFlow.Orig_Schema_Selection = schemaId;
 
         data.DataFlow.InitIngestionType();
+        data.DataFlow.InitIngestionListener();
 
         $("#PreprocessingOptions").materialSelect();
 
@@ -75,11 +78,38 @@
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
+            $("#ingestionType").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
 
         data.Job.FormInit();
+    },
+
+    //SETUP LISTENER for ingestionType Drop down and init beginning state
+    InitIngestionListener: function () {
+
+        //initially hide or show message
+        data.DataFlow.HideOrShowTopic();
+
+        //setup onChange event to fire when ingestionType drop down is changed
+        $('#ingestionType').change(function () {
+            data.DataFlow.HideOrShowTopic();
+        });
+    },
+
+    //function to HIDE OR SHOW TOPIC NAME for DSC PUSH DIGESTION types
+    HideOrShowTopic: function () {
+
+        var val = $("#ingestionType").val();
+        
+
+        if (val == data.DataFlow.IngestionType_TOPIC) {
+            $('#topicNameContainer').show();
+        }
+        else {
+            $('#topicNameContainer').hide();
+        }
     },
 
     DataFlowDetailInit: function (dataflowId) {
