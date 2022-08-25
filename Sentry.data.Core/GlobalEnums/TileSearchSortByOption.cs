@@ -8,9 +8,7 @@ namespace Sentry.data.Core.GlobalEnums
         Alphabetical,
         [Description("Favorites")]
         Favorites,
-        [Description("Recently Added")]
-        RecentlyAdded,
-        [Description("Recently Updated")]
-        RecentlyUpdated
+        [Description("Recent Activity")]
+        RecentActivity
     }
 }

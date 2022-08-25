@@ -285,7 +285,7 @@ namespace Sentry.data.Web.Tests.Extensions
             DateTime now = DateTime.Now;
             DatasetTileDto datasetTileDto = new DatasetTileDto()
             {
-                CreatedDateTime = now
+                LastActivityDateTime = now
             };
 
             TileSearchDto<DatasetTileDto> dto = model.ToDto<DatasetTileDto>();
@@ -333,8 +333,7 @@ namespace Sentry.data.Web.Tests.Extensions
                     AbbreviatedCategory = "Cat",
                     Color = "Blue",
                     IsSecured = false,
-                    LastActivityShortDate = "8/18/2022",
-                    CreatedShortDate = "8/17/2022"
+                    LastActivityShortDate = "8/18/2022"
                 },
                 new TileModel()
                 {
@@ -347,8 +346,7 @@ namespace Sentry.data.Web.Tests.Extensions
                     AbbreviatedCategory = "Cat2",
                     Color = "Green",
                     IsSecured = true,
-                    LastActivityShortDate = "8/18/2021",
-                    CreatedShortDate = "8/17/2021"
+                    LastActivityShortDate = "8/18/2021"
                 }
             };
 
@@ -367,7 +365,6 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual("Blue", dto.Color);
             Assert.IsFalse(dto.IsSecured);
             Assert.AreEqual(DateTime.Parse("8/18/2022"), dto.LastActivityDateTime);
-            Assert.AreEqual(DateTime.Parse("8/17/2022"), dto.CreatedDateTime);
 
             dto = dtos.Last();
             Assert.AreEqual("2", dto.Id);
@@ -380,7 +377,6 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual("Green", dto.Color);
             Assert.IsTrue(dto.IsSecured);
             Assert.AreEqual(DateTime.Parse("8/18/2021"), dto.LastActivityDateTime);
-            Assert.AreEqual(DateTime.Parse("8/17/2021"), dto.CreatedDateTime);
         }
 
         private TileSearchModel GetTileSearchModel()

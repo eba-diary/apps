@@ -196,3 +196,7 @@
 .tile-result-options {
     display: flex;
 }
+
+.search-blur {
+    opacity: 0.5;
+}

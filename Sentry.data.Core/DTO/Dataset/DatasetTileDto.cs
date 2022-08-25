@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         public string Name { get; set; }
         public string Description { get; set; }
         public ObjectStatusEnum Status { get; set; }
-        [FilterSearchField(FilterCategoryNames.Dataset.FAVORITE, hideResultCounts:true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.FAVORITE, hideResultCounts: true)]
         public bool IsFavorite { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, defaultOpen: true)]
         public string Category { get; set; }
@@ -19,6 +19,5 @@ namespace Sentry.data.Core
         [FilterSearchField(FilterCategoryNames.Dataset.SECURED, hideResultCounts: true)]
         public bool IsSecured { get; set; }
         public DateTime LastActivityDateTime { get; set; }
-        public DateTime CreatedDateTime { get; set; }
     }
 }

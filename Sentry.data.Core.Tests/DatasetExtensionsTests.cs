@@ -36,7 +36,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Description", dto.Description);
             Assert.AreEqual(ObjectStatusEnum.Active, dto.Status);
             Assert.IsTrue(dto.IsSecured);
-            Assert.AreEqual(new DateTime(2022, 8, 19, 8, 0, 0), dto.CreatedDateTime);
             Assert.AreEqual("Blue", dto.Color);
             Assert.AreEqual("Category", dto.Category);
         }

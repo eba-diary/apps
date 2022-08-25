@@ -38,6 +38,7 @@ data.DatasetsSearch = {
 
     executeSearchWithoutLoader: function (pageNumber, updateFilters) {
         data.FilterSearch.clearActiveSavedSearch();
+        $("#tile-results").addClass("search-blur");
         data.DatasetsSearch.executeDatasetSearch(pageNumber, updateFilters);
     },
 
@@ -83,6 +84,7 @@ data.DatasetsSearch = {
         $('#tile-result-page-size').materialSelect();
         $('#tile-result-sort').materialSelect();
         $('#tile-result-layout').materialSelect();
+        $("#tile-results").removeClass("search-blur");
 
         data.DatasetsSearch.setLayout();
     },

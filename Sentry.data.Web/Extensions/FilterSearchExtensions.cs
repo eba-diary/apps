@@ -118,11 +118,7 @@ namespace Sentry.data.Web
                     dto.OrderByField = x => x.IsFavorite;
                     dto.OrderByDescending = true;
                     break;
-                case TileSearchSortByOption.RecentlyAdded:
-                    dto.OrderByField = x => x.CreatedDateTime;
-                    dto.OrderByDescending = true;
-                    break;
-                case TileSearchSortByOption.RecentlyUpdated:
+                case TileSearchSortByOption.RecentActivity:
                     dto.OrderByField = x => x.LastActivityDateTime;
                     dto.OrderByDescending = true;
                     break;
@@ -205,7 +201,6 @@ namespace Sentry.data.Web
             dto.Color = model.Color;
             dto.IsSecured = model.IsSecured;
             dto.LastActivityDateTime = DateTime.Parse(model.LastActivityShortDate);
-            dto.CreatedDateTime = DateTime.Parse(model.CreatedShortDate);
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)

@@ -76,7 +76,7 @@ namespace Sentry.data.Web.Tests
         {
             List<SelectListItem> items = Utility.BuildSelectListFromEnum<TileSearchSortByOption>(2);
 
-            Assert.AreEqual(4, items.Count);
+            Assert.AreEqual(3, items.Count);
 
             SelectListItem item = items.First();
             Assert.AreEqual("Alphabetical", item.Text);
@@ -88,15 +88,10 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("1", item.Value);
             Assert.IsFalse(item.Selected);
 
-            item = items[2];
-            Assert.AreEqual("Recently Added", item.Text);
+            item = items.Last();
+            Assert.AreEqual("Recent Activity", item.Text);
             Assert.AreEqual("2", item.Value);
             Assert.IsTrue(item.Selected);
-
-            item = items.Last();
-            Assert.AreEqual("Recently Updated", item.Text);
-            Assert.AreEqual("3", item.Value);
-            Assert.IsFalse(item.Selected);
         }
 
         [TestMethod]

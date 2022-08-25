@@ -77,21 +77,21 @@ namespace Sentry.data.Core.Tests
 
             tile = tileDtos.First(x => x.Name == "Dataset2");
             Assert.IsFalse(tile.IsFavorite);
-            Assert.AreEqual(new DateTime(2022, 8, 11), tile.LastActivityDateTime);
+            Assert.AreEqual(new DateTime(2022, 8, 8), tile.LastActivityDateTime);
 
             tile = tileDtos.First(x => x.Name == "Dataset3");
             Assert.IsTrue(tile.IsFavorite);
-            Assert.AreEqual(new DateTime(2022, 8, 15), tile.LastActivityDateTime);
+            Assert.AreEqual(new DateTime(2022, 8, 12), tile.LastActivityDateTime);
 
             tile = tileDtos.First(x => x.Name == "Foo Bar");
             Assert.IsTrue(tile.IsFavorite);
-            Assert.AreEqual(new DateTime(2022, 8, 23), tile.LastActivityDateTime);
+            Assert.AreEqual(new DateTime(2022, 8, 20), tile.LastActivityDateTime);
 
             repository.VerifyAll();
         }
 
         [TestMethod]
-        public void SearchTiles_TileSearchDto_DatasetTileDto_EmptySearchableTiles_SortByCreateDateTime_TileSearchResultDto()
+        public void SearchTiles_TileSearchDto_DatasetTileDto_EmptySearchableTiles_SortByRecentActivity_TileSearchResultDto()
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
             DatasetTileSearchService searchService = GetSearchService(repository);
@@ -118,7 +118,7 @@ namespace Sentry.data.Core.Tests
                 },
                 UpdateFilters = true,
                 OrderByDescending = true,
-                OrderByField = x => x.CreatedDateTime
+                OrderByField = x => x.LastActivityDateTime
             };
 
             TileSearchResultDto<DatasetTileDto> result = searchService.SearchTiles(tileSearchDto);
@@ -135,7 +135,7 @@ namespace Sentry.data.Core.Tests
             DatasetTileDto tileDto = result.Tiles.First();
             Assert.AreEqual("Dataset3", tileDto.Name);
             Assert.IsTrue(tileDto.IsFavorite);
-            Assert.AreEqual(new DateTime(2022, 8, 15), tileDto.LastActivityDateTime);
+            Assert.AreEqual(new DateTime(2022, 8, 12), tileDto.LastActivityDateTime);
 
             tileDto = result.Tiles.Last();
             Assert.AreEqual("Dataset1", tileDto.Name);
@@ -295,9 +295,27 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
+            List<DatasetFile> files = new List<DatasetFile>()
+            {
+                new DatasetFile()
+                {
+                    Dataset = datasets.First(),
+                    CreatedDTM = new DateTime(2022, 8, 8)
+                },
+                new DatasetFile()
+                {
+                    Dataset = datasets[2],
+                    CreatedDTM = new DateTime(2022, 8, 10)
+                }
+            };
 
+            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
+            datasetContext.SetupGet(x => x.Security).Returns(new List<Security>().AsQueryable());
+            datasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>().AsQueryable());
+            datasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>().AsQueryable());
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
+            datasetContext.SetupGet(x => x.DatasetFileStatusActive).Returns(files.AsQueryable());
 
             Mock<IApplicationUser> appUser = repository.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -308,7 +326,7 @@ namespace Sentry.data.Core.Tests
             return new DatasetTileSearchService(datasetContext.Object, userService.Object, null);
         }
 
-        private Dataset GetDataset(int id, string name, string category, string favoriteId, bool isSecured, int createDay)
+        private Dataset GetDataset(int id, string name, string category, string favoriteId, bool isSecured, int changeDay)
         {
             return new Dataset()
             {
@@ -318,33 +336,21 @@ namespace Sentry.data.Core.Tests
                 DatasetName = name,
                 ObjectStatus = ObjectStatusEnum.Active,
                 IsSecured = isSecured,
-                DatasetDtm = new DateTime(2022, 8, createDay),
-                ChangedDtm = new DateTime(2022, 8, createDay + 2),
+                ChangedDtm = new DateTime(2022, 8, changeDay),
                 DatasetCategories = new List<Category>()
+                {
+                    new Category()
                     {
-                        new Category()
-                        {
-                            Name = category
-                        }
-                    },
-                Favorities = new List<Favorite>()
-                    {
-                        new Favorite()
-                        {
-                            UserId = favoriteId
-                        }
-                    },
-                DatasetFiles = new List<DatasetFile>()
-                    {
-                        new DatasetFile()
-                        {
-                            CreatedDTM = new DateTime(2022, 8, createDay + 3)
-                        },
-                        new DatasetFile()
-                        {
-                            CreatedDTM = new DateTime(2022, 8, createDay + 1)
-                        }
+                        Name = category
                     }
+                },
+                Favorities = new List<Favorite>()
+                {
+                    new Favorite()
+                    {
+                        UserId = favoriteId
+                    }
+                }
             };
         }
 
@@ -368,8 +374,7 @@ namespace Sentry.data.Core.Tests
                 IsFavorite = isFavorite,
                 Category = category,
                 IsSecured = isSecured,
-                LastActivityDateTime = new DateTime(2022, 8, createDay + 3),
-                CreatedDateTime = new DateTime(2022, 8, createDay)
+                LastActivityDateTime = new DateTime(2022, 8, createDay + 3)
             };
         }
         #endregion

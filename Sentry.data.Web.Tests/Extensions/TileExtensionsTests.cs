@@ -59,8 +59,7 @@ namespace Sentry.data.Web.Tests
                     AbbreviatedCategory = "Cat",
                     Color = "Blue",
                     IsSecured = false,
-                    LastActivityDateTime = new DateTime(2022, 8, 18, 8, 0, 0),
-                    CreatedDateTime = new DateTime(2022, 8, 17, 8, 0, 0)
+                    LastActivityDateTime = new DateTime(2022, 8, 18, 8, 0, 0)
                 },
                 new DatasetTileDto()
                 {
@@ -73,8 +72,7 @@ namespace Sentry.data.Web.Tests
                     AbbreviatedCategory = "Cat2",
                     Color = "Green",
                     IsSecured = true,
-                    LastActivityDateTime = new DateTime(2021, 8, 18, 8, 0, 0),
-                    CreatedDateTime = new DateTime(2021, 8, 17, 8, 0, 0)
+                    LastActivityDateTime = new DateTime(2021, 8, 18, 8, 0, 0)
                 }
             };
 
@@ -95,7 +93,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Blue", model.Color);
             Assert.IsFalse(model.IsSecured);
             Assert.AreEqual("8/18/2022", model.LastActivityShortDate);
-            Assert.AreEqual("8/17/2022", model.CreatedShortDate);
             Assert.IsFalse(model.IsReport);
             Assert.IsNull(model.AbbreviatedCategories);
             Assert.IsNull(model.ReportType);
@@ -118,7 +115,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Green", model.Color);
             Assert.IsTrue(model.IsSecured);
             Assert.AreEqual("8/18/2021", model.LastActivityShortDate);
-            Assert.AreEqual("8/17/2021", model.CreatedShortDate);
             Assert.IsFalse(model.IsReport);
             Assert.IsNull(model.AbbreviatedCategories);
             Assert.IsNull(model.ReportType);
