@@ -713,6 +713,8 @@ namespace Sentry.data.Core
         /// _adSecurityAdminProvider.CreateAdSecurityGroupAsync())
         /// </summary>
         /// <param name="ds">The dataset to create the groups for</param>
+
+        [AutomaticRetry(Attempts = 5, DelaysInSeconds = new int[5] { 60, 60, 60, 60, 240 })]
         public Task CreateDefaultSecurityForDataset(int datasetId)
         {
             //lookup the dataset
