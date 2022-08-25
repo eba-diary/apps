@@ -17,6 +17,9 @@ namespace Sentry.data.Core.Tests
                 DatasetName = "DatasetName",
                 DatasetDesc = "Description",
                 ObjectStatus = ObjectStatusEnum.Active,
+                OriginationCode = "Origin",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
                 IsSecured = true,
                 DatasetDtm = new DateTime(2022, 8, 19, 8, 0, 0),
                 DatasetCategories = new List<Category>()
@@ -38,6 +41,9 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(dto.IsSecured);
             Assert.AreEqual("Blue", dto.Color);
             Assert.AreEqual("Category", dto.Category);
+            Assert.AreEqual("Origin", dto.OriginationCode);
+            Assert.AreEqual("DEV", dto.Environment);
+            Assert.AreEqual("NonProd", dto.EnvironmentType);
         }
     }
 }

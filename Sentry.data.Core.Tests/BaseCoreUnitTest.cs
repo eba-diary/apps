@@ -102,6 +102,7 @@ namespace Sentry.data.Core.Tests
 
             public IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter => new MockStringFeatureFlag("");
             public IFeatureFlag<bool> CLA3756_UpdateSearchPages => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4258_DefaultProdSearchFilter => new MockBooleanFeatureFlag(true);
         }
     }
 }

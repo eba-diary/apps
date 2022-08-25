@@ -6,7 +6,9 @@ namespace Sentry.data.Web.Controllers
 {
     public class BusinessIntelligenceSearchController : TileSearchController<BusinessIntelligenceTileDto>
     {
-        public BusinessIntelligenceSearchController(ITileSearchService<BusinessIntelligenceTileDto> tileSearchService, IFilterSearchService filterSearchService) : base(tileSearchService, filterSearchService) { }
+        public BusinessIntelligenceSearchController(ITileSearchService<BusinessIntelligenceTileDto> tileSearchService,
+                                                    IFilterSearchService filterSearchService,
+                                                    IDataFeatures dataFeatures) : base(tileSearchService, filterSearchService, dataFeatures) { }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {

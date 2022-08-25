@@ -19,5 +19,11 @@ namespace Sentry.data.Core
         [FilterSearchField(FilterCategoryNames.Dataset.SECURED, hideResultCounts: true)]
         public bool IsSecured { get; set; }
         public DateTime LastActivityDateTime { get; set; }
+        [FilterSearchField(FilterCategoryNames.Dataset.ORIGIN, hideResultCounts: true)]
+        public string OriginationCode { get; set; }
+        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENT, hideResultCounts: true)]
+        public string Environment { get; set; }
+        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, defaultOpen:true, hideResultCounts: true)]
+        public string EnvironmentType { get; set; }
     }
 }

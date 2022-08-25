@@ -39,6 +39,9 @@ namespace Sentry.data.Core
             dto.Description = dataset.DatasetDesc;
             dto.Status = dataset.ObjectStatus;
             dto.IsSecured = dataset.IsSecured;
+            dto.OriginationCode = dataset.OriginationCode;
+            dto.Environment = dataset.NamedEnvironment;
+            dto.EnvironmentType = dataset.NamedEnvironmentType.GetDescription();
             dto.Color = "darkgray";
 
             if (dataset.DatasetCategories?.Any() == true)

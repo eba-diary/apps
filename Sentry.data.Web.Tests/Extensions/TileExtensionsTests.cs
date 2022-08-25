@@ -59,7 +59,10 @@ namespace Sentry.data.Web.Tests
                     AbbreviatedCategory = "Cat",
                     Color = "Blue",
                     IsSecured = false,
-                    LastActivityDateTime = new DateTime(2022, 8, 18, 8, 0, 0)
+                    LastActivityDateTime = new DateTime(2022, 8, 18, 8, 0, 0),
+                    OriginationCode = "Origin",
+                    Environment = "DEV",
+                    EnvironmentType = "NonProd"
                 },
                 new DatasetTileDto()
                 {
@@ -72,7 +75,10 @@ namespace Sentry.data.Web.Tests
                     AbbreviatedCategory = "Cat2",
                     Color = "Green",
                     IsSecured = true,
-                    LastActivityDateTime = new DateTime(2021, 8, 18, 8, 0, 0)
+                    LastActivityDateTime = new DateTime(2021, 8, 18, 8, 0, 0),
+                    OriginationCode = "Origin2",
+                    Environment = "PROD",
+                    EnvironmentType = "Prod"
                 }
             };
 
@@ -92,7 +98,10 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Cat", model.AbbreviatedCategory);
             Assert.AreEqual("Blue", model.Color);
             Assert.IsFalse(model.IsSecured);
-            Assert.AreEqual("8/18/2022", model.LastActivityShortDate);
+            Assert.AreEqual("Origin", model.OriginationCode);
+            Assert.AreEqual("Blue", model.Color);
+            Assert.AreEqual("DEV", model.Environment);
+            Assert.AreEqual("NonProd", model.EnvironmentType);
             Assert.IsFalse(model.IsReport);
             Assert.IsNull(model.AbbreviatedCategories);
             Assert.IsNull(model.ReportType);
@@ -115,6 +124,9 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Green", model.Color);
             Assert.IsTrue(model.IsSecured);
             Assert.AreEqual("8/18/2021", model.LastActivityShortDate);
+            Assert.AreEqual("Origin2", model.OriginationCode);
+            Assert.AreEqual("PROD", model.Environment);
+            Assert.AreEqual("Prod", model.EnvironmentType);
             Assert.IsFalse(model.IsReport);
             Assert.IsNull(model.AbbreviatedCategories);
             Assert.IsNull(model.ReportType);

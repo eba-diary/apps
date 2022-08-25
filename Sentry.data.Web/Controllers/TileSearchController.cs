@@ -13,10 +13,12 @@ namespace Sentry.data.Web.Controllers
     public abstract class TileSearchController<T> : BaseSearchableController where T : DatasetTileDto
     {
         private readonly ITileSearchService<T> _tileSearchService;
+        private readonly IDataFeatures _dataFeatures;
 
-        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService)
+        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService, IDataFeatures dataFeatures) : base(filterSearchService)
         {
             _tileSearchService = tileSearchService;
+            _dataFeatures = dataFeatures;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
@@ -141,7 +143,10 @@ namespace Sentry.data.Web.Controllers
 
                     if (existingCategory != null)
                     {
-                        existingCategory.CategoryOptions.Add(optionModel);
+                        if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
+                        {
+                            existingCategory.CategoryOptions.Add(optionModel);
+                        }
                     }
                     else
                     {
@@ -150,6 +155,17 @@ namespace Sentry.data.Web.Controllers
                         categories.Add(newCategory);
                     }
                 }
+            }
+            else if (_dataFeatures.CLA4258_DefaultProdSearchFilter.GetValue())
+            {
+                FilterCategoryModel defaultProd = new FilterCategoryModel() { CategoryName = FilterCategoryNames.Dataset.ENVIRONMENTTYPE };
+                defaultProd.CategoryOptions.Add(new FilterCategoryOptionModel()
+                {
+                    OptionValue = NamedEnvironmentType.Prod.GetDescription(),
+                    ParentCategoryName = defaultProd.CategoryName,
+                    Selected = true
+                });
+                categories.Add(defaultProd);
             }
 
             return categories;
