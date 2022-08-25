@@ -54,7 +54,7 @@ namespace Sentry.data.Core.Tests
          * Test method 1 seeing if files are in descending order 
          */
         [TestMethod]
-        public void DatasetFileService_GetAllDatasetFileBySchema_PageParameters_Ordering_Is_Descending()
+        public void DatasetFileService_GetAllNonDeletedDatasetFileBySchema_PageParameters_Ordering_Is_Descending()
         {
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
@@ -94,7 +94,7 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, null, null, null, null);
 
             // Act
-            PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
+            PagedList<DatasetFileDto> dtoList = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
             List<int> excludedIdList = Enumerable.Range(1, 5).ToList();
@@ -108,7 +108,7 @@ namespace Sentry.data.Core.Tests
          * Test method 1 to see if files are in ascending order
          */
         [TestMethod]
-        public void DatasetFileService_GetAllDaatsetFileBySchema_PageParameters_Ordering_Is_Ascending()
+        public void DatasetFileService_GetAllNonDeletedDatasetFileBySchema_PageParameters_Ordering_Is_Ascending()
         {
             Dataset ds = MockClasses.MockDataset();
             DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
@@ -151,7 +151,7 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
 
             // Act
-            PagedList<DatasetFileDto> dtoList = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
+            PagedList<DatasetFileDto> dtoList = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
             List<int> excludedIdList = Enumerable.Range(5, 9).ToList();
@@ -165,7 +165,7 @@ namespace Sentry.data.Core.Tests
 
 
         [TestMethod]
-        public void DatasetFileService_GetAllDatsetFileBySchema_DatasetUnauthorisedAccessException()
+        public void DatasetFileService_GetAllNonDeletedDatsetFileBySchema_DatasetUnauthorisedAccessException()
         {
             // Arrange
             //setup user
@@ -208,13 +208,13 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
 
             // Assert
-            Assert.ThrowsException<DatasetUnauthorizedAccessException>(() => datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams));
+            Assert.ThrowsException<DatasetUnauthorizedAccessException>(() => datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams));
         }
 
 
 
         [TestMethod]
-        public void DatasetFileService_GetAllDatasetFilesBySchema_Schema_Without_DataFlies()
+        public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_Without_DataFiles()
         {
             // Arrange
             //setup user
@@ -252,7 +252,7 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
 
             // Act
-            var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
+            var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
             Assert.AreEqual(false, result.Any());
@@ -260,7 +260,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DatasetFileService_GetAllDatasetFilesBySchema_Schema_With_DataFlies()
+        public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_With_DataFiles()
         {
             // Arrange
             //setup user
@@ -302,6 +302,256 @@ namespace Sentry.data.Core.Tests
             var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object,messagePublisher.Object, null, null, null);
 
             // Act
+            var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            Assert.AreEqual(true, result.Any());
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(23, result.First().Schema);
+        }
+
+        [TestMethod]
+        public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_With_Pending_DataFiles()
+        {
+            // Arrange
+            //setup user
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object, GlobalEnums.ObjectStatusEnum.Pending_Delete);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFileStatusActive).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
+
+            // Act
+            var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            Assert.AreEqual(true, result.Any());
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(23, result.First().Schema);
+        }
+
+        [TestMethod]
+        public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_With_Deleted_DataFiles()
+        {
+            // Arrange
+            //setup user
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object, GlobalEnums.ObjectStatusEnum.Deleted);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFileStatusActive).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            var messagePublisher = new Mock<IMessagePublisher>(); 
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
+
+            // Act
+            var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            Assert.AreEqual(false, result.Any());
+        }
+
+        [TestMethod]
+        public void DatasetFileService_GetAllActiveDatasetFilesBySchema_Schema_With_Active_DataFiles()
+        {
+            // Arrange
+            //setup user
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFileStatusAll).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
+
+            // Act
+            var result = datasetFileService.GetActiveDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            Assert.AreEqual(true, result.Any());
+            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(23, result.First().Schema);
+        }
+
+        [TestMethod]
+        public void DatasetFileService_GetAllActiveDatasetFilesBySchema_Schema_With_Deleted_DataFiles()
+        {
+            // Arrange
+            //setup user
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object, GlobalEnums.ObjectStatusEnum.Deleted);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFileStatusAll).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
+
+            // Act
+            var result = datasetFileService.GetActiveDatasetFileDtoBySchema(23, pageParams);
+
+            // Assert
+            Assert.AreEqual(false, result.Any());
+        }
+
+        [TestMethod]
+        public void DatasetFileService_GetAllDatasetFilesBySchema_Schema_With_DataFiles()
+        {
+            // Arrange
+            //setup user
+            var user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            //setup userService
+            var userService = new Mock<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
+
+            //setup securityService
+            var userSecurity = new UserSecurity
+            {
+                CanViewFullDataset = true
+            };
+            var securityService = new Mock<ISecurityService>();
+            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
+
+            //setup Entity objects
+            Dataset ds = MockClasses.MockDataset();
+            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            FileSchema schema = MockClasses.MockFileSchema();
+            dfc.Schema = schema;
+
+            //setup db context with DatasetFileConfig
+            var context = new Mock<IDatasetContext>();
+            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
+
+            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object, GlobalEnums.ObjectStatusEnum.Deleted);
+            datasetFile.Schema = schema;
+            context.Setup(f => f.DatasetFileStatusAll).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
+
+            PageParameters pageParams = new PageParameters(1, 5);
+
+            var messagePublisher = new Mock<IMessagePublisher>();
+
+
+            //Initialize Service
+            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
+
+            // Act
             var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
@@ -309,6 +559,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(23, result.First().Schema);
         }
+
 
         [TestMethod]
         public void DatasetFileService_UpdateAndSave_UnauthorizedException()

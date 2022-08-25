@@ -39,7 +39,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(PagedResponse<DatasetFileModel>))]
-        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000, [FromUri] bool sortDesc = false)
+        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000, [FromUri] bool sortDesc = false, bool activeOnly = true)
         {
             IHttpActionResult GetSchemaDatasetFilesFunction()
             {
@@ -51,7 +51,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                  ******************************************************/
                 PageParameters pagingParams = new PageParameters(pageNumber, pageSize, sortDesc);  // creating the PageParameters object  --> adding the sortDesc parameter to the object declaration
 
-                PagedList<DatasetFileDto> dtoList = _datafileService.GetAllDatasetFileDtoBySchema(schemaId, pagingParams);
+                PagedList<DatasetFileDto> dtoList = null;
+
+                // detemine whether the paged dataset list should only contain files with an object status of active or anything other than delted
+                if (activeOnly)
+                    dtoList = _datafileService.GetActiveDatasetFileDtoBySchema(schemaId, pagingParams);
+                else
+                    dtoList = _datafileService.GetNonDeletedDatasetFileDtoBySchema(schemaId, pagingParams);
+
 
                 PagedList<DatasetFileModel> modelList = new PagedList<DatasetFileModel>(dtoList.ToModel(), dtoList.TotalCount, dtoList.CurrentPage, dtoList.PageSize);
                 PagedResponse<DatasetFileModel> response = new PagedResponse<DatasetFileModel>(modelList);

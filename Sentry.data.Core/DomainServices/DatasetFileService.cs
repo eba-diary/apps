@@ -36,7 +36,49 @@ namespace Sentry.data.Core
             _jobScheduler = jobScheduler;
         }
 
+        /// <summary>
+        /// Get all active data files associated with schema.  PageParameters included to 
+        /// limit number of records returned.
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <param name="pageParameters"></param>
+        /// <returns></returns>
+        public PagedList<DatasetFileDto> GetActiveDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
+        {
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusAll.Where(x => x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+
+            return GetDatasetFileDtoBySchema(schemaId, pageParameters, datasetFileQueryable);
+        }
+
+        /// <summary>
+        /// Get all non deleted data files associated with schema.  PageParameters included to 
+        /// limit number of records returned.
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <param name="pageParameters"></param>
+        /// <returns></returns>
+        public PagedList<DatasetFileDto> GetNonDeletedDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
+        {
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive.Where(w => w.ObjectStatus != Core.GlobalEnums.ObjectStatusEnum.Deleted);
+
+            return GetDatasetFileDtoBySchema(schemaId, pageParameters, datasetFileQueryable);
+        }
+
+        /// <summary>
+        /// Get all data files associated with schema.  PageParameters included to 
+        /// limit number of records returned.
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <param name="pageParameters"></param>
+        /// <returns></returns>
         public PagedList<DatasetFileDto> GetAllDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
+        {
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusAll;
+
+            return GetDatasetFileDtoBySchema(schemaId, pageParameters, datasetFileQueryable);
+        }
+
+        private PagedList<DatasetFileDto> GetDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters, IQueryable<DatasetFile> queryable)
         {
             DatasetFileConfig config = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId); // gets the specific schema
 
@@ -52,7 +94,7 @@ namespace Sentry.data.Core
                 throw new DatasetUnauthorizedAccessException(); // if the user does not have permission then this exception is thrown
             }
 
-            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive.Where(x => x.Schema == config.Schema);
+            IQueryable<DatasetFile> datasetFileQueryable = queryable.Where(x => x.Schema == config.Schema);
             datasetFileQueryable = pageParameters.SortDesc ? datasetFileQueryable.OrderByDescending(o => o.DatasetFileId) : datasetFileQueryable.OrderBy(o => o.DatasetFileId); // ordering datasetfiles by ascending or descending
             PagedList<DatasetFile> files = PagedList<DatasetFile>.ToPagedList(datasetFileQueryable, pageParameters.PageNumber, pageParameters.PageSize); // passing pageNumber and pageSize to the ToPagedList method
 
