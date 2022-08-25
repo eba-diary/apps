@@ -59,25 +59,34 @@ namespace Sentry.data.Core
 
         public List<T> GetSearchableTiles()
         {
-            Stopwatch sw = new Stopwatch();
+            List<T> tileDtos = null;
 
-            sw.Start();
-            IQueryable<Dataset> datasetQueryable = GetDatasets();
-            List<Dataset> datasets = datasetQueryable.FetchAllChildren(_datasetContext);
-            sw.Stop();
-            Logger.Info($"GetSearchableTiles - GetDatasets {sw.ElapsedMilliseconds}ms");
+            try
+            {
+                Stopwatch sw = new Stopwatch();
 
-            sw.Restart();
-            var datasetFileDates = _datasetContext.DatasetFileStatusActive.GroupBy(x => x.Dataset).
-                Select(x => new KeyValuePair<int, DateTime>(x.Key.DatasetId, x.Max(m => m.CreatedDTM))).
-                ToDictionary(x => x.Key, x => x.Value);
-            sw.Stop();
-            Logger.Info($"GetSearchableTiles - MaxDatasetFileDate {sw.ElapsedMilliseconds}ms");
+                sw.Start();
+                IQueryable<Dataset> datasetQueryable = GetDatasets();
+                List<Dataset> datasets = datasetQueryable.FetchAllChildren(_datasetContext);
+                sw.Stop();
+                Logger.Info($"GetSearchableTiles - GetDatasets {sw.ElapsedMilliseconds}ms");
 
-            string associateId = _userService.GetCurrentUser().AssociateId;
+                sw.Restart();
+                var datasetFileDates = _datasetContext.DatasetFileStatusActive.GroupBy(x => x.Dataset).
+                    Select(x => new KeyValuePair<int, DateTime>(x.Key.DatasetId, x.Max(m => m.CreatedDTM))).
+                    ToDictionary(x => x.Key, x => x.Value);
+                sw.Stop();
+                Logger.Info($"GetSearchableTiles - MaxDatasetFileDate {sw.ElapsedMilliseconds}ms");
 
-            List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId, datasetFileDates)).ToList();
-            List<T> tileDtos = tasks.Select(x => x.Result).ToList();
+                string associateId = _userService.GetCurrentUser().AssociateId;
+
+                List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId, datasetFileDates)).ToList();
+                tileDtos = tasks.Select(x => x.Result).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error getting searchable tiles", ex);
+            }
 
             return tileDtos;
         }
