@@ -63,33 +63,21 @@ namespace Sentry.data.Core
 
             sw.Start();
             IQueryable<Dataset> datasetQueryable = GetDatasets();
-            List<Dataset> datasets = datasetQueryable.FetchAllChildren(_datasetContext);           
-            //IQueryable<Dataset> datasetQueryable = GetDatasets();
-            //datasetQueryable.FetchMany(x => x.DatasetCategories).ToFuture();
-            //datasetQueryable.FetchMany(x => x.Favorities).ToFuture();
-            //IEnumerable<Dataset> datasetEnumerable = datasetQueryable.FetchMany(x => x.DatasetFiles).ToFuture();
-            //List<Dataset> datasets = datasetEnumerable.ToList();
+            List<Dataset> datasets = datasetQueryable.FetchAllChildren(_datasetContext);
             sw.Stop();
             Logger.Info($"GetSearchableTiles - GetDatasets {sw.ElapsedMilliseconds}ms");
 
             sw.Restart();
-            //get datasetfile max created date
             var datasetFileDates = _datasetContext.DatasetFileStatusActive.GroupBy(x => x.Dataset).
                 Select(x => new KeyValuePair<int, DateTime>(x.Key.DatasetId, x.Max(m => m.CreatedDTM))).
                 ToDictionary(x => x.Key, x => x.Value);
             sw.Stop();
             Logger.Info($"GetSearchableTiles - MaxDatasetFileDate {sw.ElapsedMilliseconds}ms");
 
-            sw.Restart();
             string associateId = _userService.GetCurrentUser().AssociateId;
-            sw.Stop();
-            Logger.Info($"GetSearchableTiles - GetCurrentUser {sw.ElapsedMilliseconds}ms");
 
-            sw.Restart();
             List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId, datasetFileDates)).ToList();
             List<T> tileDtos = tasks.Select(x => x.Result).ToList();
-            sw.Stop();
-            Logger.Info($"GetSearchableTiles - Map {sw.ElapsedMilliseconds}ms");
 
             return tileDtos;
         }
@@ -117,15 +105,6 @@ namespace Sentry.data.Core
                 {
                     tileDto.LastActivityDateTime = maxDate;
                 }
-
-                //if (dataset.DatasetFiles?.Any() == true)
-                //{
-                //    DateTime lastFileDate = dataset.DatasetFiles.Max(x => x.CreatedDTM);
-                //    if (lastFileDate > tileDto.LastActivityDateTime)
-                //    {
-                //        tileDto.LastActivityDateTime = lastFileDate;
-                //    }
-                //}
 
                 return tileDto;
             }).ConfigureAwait(false);

@@ -304,6 +304,11 @@ namespace Sentry.data.Core.Tests
                 },
                 new DatasetFile()
                 {
+                    Dataset = datasets.First(),
+                    CreatedDTM = new DateTime(2022, 7, 8)
+                },
+                new DatasetFile()
+                {
                     Dataset = datasets[2],
                     CreatedDTM = new DateTime(2022, 8, 10)
                 }

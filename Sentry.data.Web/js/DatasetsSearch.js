@@ -85,6 +85,7 @@ data.DatasetsSearch = {
         $('#tile-result-sort').materialSelect();
         $('#tile-result-layout').materialSelect();
         $("#tile-results").removeClass("search-blur");
+        $(".filter-search-categories-container").removeClass("search-blur");
 
         data.DatasetsSearch.setLayout();
     },
@@ -176,6 +177,7 @@ data.DatasetsSearch = {
             }
 
             data.DatasetsSearch.keyupTimeout = setTimeout(function () {
+                $(".filter-search-categories-container").addClass("search-blur");
                 data.DatasetsSearch.executeSearchWithoutLoader(1, true);
             }, 500);
         });
