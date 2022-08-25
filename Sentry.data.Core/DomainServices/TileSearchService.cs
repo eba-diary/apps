@@ -59,7 +59,7 @@ namespace Sentry.data.Core
 
         public List<T> GetSearchableTiles()
         {
-            List<T> tileDtos = null;
+            List<T> tileDtos = new List<T>();
 
             try
             {
