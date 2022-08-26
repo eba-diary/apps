@@ -41,9 +41,14 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             //configure LD to use the proxy if necessary
             if (Convert.ToBoolean(Configuration.Config.GetHostSetting("UseProxy")))
             {
+                string userName = Configuration.Config.GetHostSetting("ServiceAccountID");
+                string password = Configuration.Config.GetHostSetting("ServiceAccountPassword");
+                string proxyUrl = Configuration.Config.GetHostSetting("EdgeWebProxyUrl");
+                System.Net.NetworkCredential proxyCredentials = new System.Net.NetworkCredential(userName, password);
+
                 configBuilder = configBuilder.Http(
                         Components.HttpConfiguration().Proxy(
-                            new System.Net.WebProxy(new Uri(Configuration.Config.GetHostSetting("WebProxyUrl"))) { UseDefaultCredentials = true }));
+                            new System.Net.WebProxy(proxyUrl) { Credentials = proxyCredentials }));
             }
             return new LdClient(configBuilder.Build());
         }
