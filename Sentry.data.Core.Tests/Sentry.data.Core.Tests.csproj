@@ -167,6 +167,8 @@
     <Compile Include="FieldDtoTests.cs" />
     <Compile Include="SecurityTicketTests.cs" />
     <Compile Include="DatasetFileConfigExtensionsTests.cs" />
+    <Compile Include="DatasetExtensionsTests.cs" />
+    <Compile Include="ServiceImplementationTests\DatasetTileSearchServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -204,6 +206,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ExpectedJSON\ConfluentConnector_Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\DatasetTileSearchService_TileSearchEventDto.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

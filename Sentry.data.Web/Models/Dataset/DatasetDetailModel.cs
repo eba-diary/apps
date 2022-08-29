@@ -38,5 +38,6 @@ namespace Sentry.data.Web
         public bool DisplayDatasetFileUpload { get; set; }
         public bool HasDataAccess { get; set; }
         public bool ShowManagePermissionsLink { get; set; }
+        public bool UseUpdatedSearchPage { get; set; }
     }
 }

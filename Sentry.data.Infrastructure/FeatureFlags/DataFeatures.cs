@@ -36,6 +36,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
         public IFeatureFlag<bool> CLA4310_UseHttpClient { get; }
         public IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; }
+        public IFeatureFlag<bool> CLA3756_UpdateSearchPages { get; }
 
 
         public DataFeatures(UserService userService, ILdClient ldClient)
@@ -62,6 +63,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA1130_SHOW_ALTERNATE_EMAIL = new BooleanFeatureFlagAmbientContext("CLA1130_SHOW_ALTERNATE_EMAIL", false, _ldClient, () => LdUser);
             CLA4310_UseHttpClient = new BooleanFeatureFlagAmbientContext("CLA4310_UseHttpClient", false, _ldClient, () => LdUser);
             CLA4260_QuartermasterNamedEnvironmentTypeFilter = new StringFeatureFlagAmbientContext("CLA4260_QuartermasterNamedEnvironmentTypeFilter", "Prod", _ldClient, () => LdUser);
+            CLA3756_UpdateSearchPages = new BooleanFeatureFlagAmbientContext("CLA3756_UpdateSearchPages", false, _ldClient, () => LdUser);
         }
 
         /// <summary>

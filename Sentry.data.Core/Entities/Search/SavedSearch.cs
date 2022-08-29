@@ -16,22 +16,27 @@ namespace Sentry.data.Core
         public virtual void SetFavoriteItem(FavoriteItem favoriteItem)
         {
             favoriteItem.Title = SearchName;
-            favoriteItem.Url = $"{GetUrl()}?savedSearch={HttpUtility.UrlEncode(SearchName)}";
+            favoriteItem.Url = GetUrl();
             favoriteItem.Img = GetImgPath();
             favoriteItem.FeedUrlType = "WEB";
         }
         #endregion
 
         #region Methods
-        private string GetUrl()
+        public virtual string GetUrl()
         {
+            string url = "";
             switch (SearchType)
             {
                 case GlobalConstants.SearchType.DATA_INVENTORY:
-                    return "DataInventory/Search";
-                default:
-                    return "";
+                    url = "DataInventory/Search";
+                    break;
+                case GlobalConstants.SearchType.DATASET_SEARCH:
+                    url = "Search/Datasets";
+                    break;
             }
+
+            return $"{url}?savedSearch={HttpUtility.UrlEncode(SearchName)}";
         }
         
         private string GetImgPath()
@@ -40,6 +45,8 @@ namespace Sentry.data.Core
             {
                 case GlobalConstants.SearchType.DATA_INVENTORY:
                     return "/Images/DataInventory/DataInventoryIcon.svg";
+                case GlobalConstants.SearchType.DATASET_SEARCH:
+                    return "/Images/Icons/search_icon.svg";
                 default:
                     return "";
             }

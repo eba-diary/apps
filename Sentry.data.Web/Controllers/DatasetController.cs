@@ -96,7 +96,8 @@ namespace Sentry.data.Web.Controllers
                 DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).Count(),
                 Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue()
+                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
+                DirectToSearchPages = _featureFlags.CLA3756_UpdateSearchPages.GetValue()
             };
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Home Page", 0);
@@ -335,7 +336,8 @@ namespace Sentry.data.Web.Controllers
                     ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
                     DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile,
                     DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue(),
-                    CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue()         //REMOVE WHEN TURNED ON LATER
+                    CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue(),         //REMOVE WHEN TURNED ON LATER
+                    UseUpdatedSearchPage = _featureFlags.CLA3756_UpdateSearchPages.GetValue()
                 };
                 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Detail Page", dto.DatasetId);

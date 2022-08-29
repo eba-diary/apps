@@ -12,7 +12,7 @@ namespace Sentry.data.Core.Tests
         [DataRow("foo", "foo")]
         public void Normalize_ProdType_Environment(string input, string output)
         {
-            Assert.AreEqual(FilterCategoryOptionNormalizer.Normalize(FilterCategoryNames.ENVIRONMENT, input), output);
+            Assert.AreEqual(FilterCategoryOptionNormalizer.Normalize(FilterCategoryNames.DataInventory.ENVIRONMENT, input), output);
         }
 
         [DataTestMethod]
@@ -21,7 +21,7 @@ namespace Sentry.data.Core.Tests
         [DataRow("foo", "foo")]
         public void Deormalize_Environment_ProdType(string input, string output)
         {
-            Assert.AreEqual(FilterCategoryOptionNormalizer.Denormalize(FilterCategoryNames.ENVIRONMENT, output), input);
+            Assert.AreEqual(FilterCategoryOptionNormalizer.Denormalize(FilterCategoryNames.DataInventory.ENVIRONMENT, output), input);
         }
     }
 }

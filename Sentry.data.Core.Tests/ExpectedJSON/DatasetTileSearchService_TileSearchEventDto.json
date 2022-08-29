@@ -1,0 +1,24 @@
+{
+  "PageNumber": 2,
+  "PageSize": 15,
+  "SortBy": 3,
+  "Layout": 1,
+  "TotalResults": 50,
+  "SearchName": "SearchName",
+  "SearchText": "SearchText",
+  "FilterCategories": [
+    {
+      "CategoryName": "Category",
+      "CategoryOptions": [
+        {
+          "OptionValue": "Sentry",
+          "ResultCount": 0,
+          "ParentCategoryName": "Category",
+          "Selected": true
+        }
+      ],
+      "DefaultCategoryOpen": true,
+      "HideResultCounts": false
+    }
+  ]
+}

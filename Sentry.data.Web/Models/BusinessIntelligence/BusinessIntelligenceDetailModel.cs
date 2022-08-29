@@ -20,5 +20,6 @@ namespace Sentry.data.Web
         public List<string> FunctionNames { get; set; }
         public List<string> BusinessUnitNames { get; set; }
         public string LocationType { get; set; }
+        public bool UseUpdatedSearchPage { get; set; }
     }
 }

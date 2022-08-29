@@ -1,4 +1,5 @@
 ﻿using DoddleReport.Web;
+using Sentry.data.Core;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -15,6 +16,13 @@ namespace Sentry.data.Web
 
             //enable attribute-based routing - see http://blogs.msdn.com/b/webdev/archive/2013/10/17/attribute-routing-in-asp-net-mvc-5.aspx
             routes.MapMvcAttributeRoutes();
+
+            routes.MapRoute(
+                name: "DatasetSearchFeature",
+                url: "Search/{searchType}/{indexSuffix}",
+                defaults: new { controller = "Search", action = "Index", searchType = GlobalConstants.SearchType.DATASET_SEARCH, indexSuffix = UrlParameter.Optional },
+                constraints: new { feature = new SearchRouteConstraint() }
+            );
 
             routes.MapRoute(
                 name: "DataAssetIndex",

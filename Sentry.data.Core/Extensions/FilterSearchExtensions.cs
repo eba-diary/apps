@@ -1,6 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -35,5 +40,98 @@ namespace Sentry.data.Core
                 ResultConfigurationJson = dto.ResultConfiguration != null ? dto.ResultConfiguration.ToString(Formatting.None) : null
             };
         }
+
+        public static List<T> FilterBy<T>(this IEnumerable<T> enumerable, List<FilterCategoryDto> filterCategoryDtos) where T : IFilterSearchable
+        {
+            foreach (FilterCategoryDto categoryDto in filterCategoryDtos)
+            {
+                if (CustomAttributeHelper.TryGetFilterSearchFieldProperty<T>(categoryDto.CategoryName, out PropertyInfo propertyInfo))
+                {
+                    ParameterExpression parameter = Expression.Parameter(typeof(T));
+
+                    List<string> selectedValues = categoryDto.GetSelectedValues();
+                    MethodInfo contains = selectedValues.GetType().GetMethod(nameof(selectedValues.Contains));
+
+                    MethodCallExpression body = Expression.Call(Expression.Constant(selectedValues), contains, ToStringProperty(parameter, propertyInfo));
+                    Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(body, new[] { parameter });
+                    enumerable = enumerable.Where(lambda.Compile());
+                }
+            }
+
+            return enumerable.ToList();
+        }
+
+        public static List<FilterCategoryDto> CreateFilters<T>(this List<T> results, List<FilterCategoryDto> previousFilters) where T : IFilterSearchable
+        {
+            List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
+
+            List<PropertyInfo> filterableProperties = CustomAttributeHelper.GetPropertiesWithAttribute<T, FilterSearchField>().ToList();
+
+            List<Task<FilterCategoryDto>> tasks = filterableProperties.Select(x => CreateFilterCategoryAsync(results, previousFilters, x)).ToList();
+
+            filterCategories.AddRange(tasks.Where(x => x.Result.CategoryOptions.Any()).Select(x => x.Result).ToList());
+
+            return filterCategories;
+        }
+
+        public static bool HasSelectedValueOf(this List<FilterCategoryOptionDto> options, string value)
+        {
+            return options?.Any(o => o.OptionValue == value && o.Selected) == true;
+        }
+
+        public static bool TryGetSelectedOptionsWithNoResults(this List<FilterCategoryOptionDto> options, List<FilterCategoryOptionDto> newOptions, out List<FilterCategoryOptionDto> result)
+        {
+            result = options?.Where(x => x.Selected && !newOptions.Any(o => o.OptionValue == x.OptionValue)).ToList();
+            return result?.Any() == true;
+        }
+
+        #region Private Methods
+        private static async Task<FilterCategoryDto> CreateFilterCategoryAsync<T>(List<T> results, List<FilterCategoryDto> searchedFilters, PropertyInfo propertyInfo) where T : IFilterSearchable
+        {
+            return await Task.Run(() =>
+            {
+                FilterSearchField filterAttribute = propertyInfo.GetCustomAttribute<FilterSearchField>();
+                FilterCategoryDto categoryDto = new FilterCategoryDto() 
+                { 
+                    CategoryName = filterAttribute.FilterCategoryName,
+                    DefaultCategoryOpen = filterAttribute.DefaultOpen,
+                    HideResultCounts = filterAttribute.HideResultCounts
+                };
+
+                ParameterExpression parameter = Expression.Parameter(typeof(T));
+                Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);
+
+                List<IGrouping<string, T>> categoryOptions = results.GroupBy(groupByExpression.Compile()).ToList();
+
+                List<FilterCategoryOptionDto> previousCategoryOptions = searchedFilters?.FirstOrDefault(x => x.CategoryName == categoryDto.CategoryName)?.CategoryOptions;
+
+                foreach (IGrouping<string, T> optionValues in categoryOptions)
+                {
+                    FilterCategoryOptionDto categoryOptionDto = new FilterCategoryOptionDto()
+                    {
+                        OptionValue = optionValues.Key,
+                        ResultCount = optionValues.Count(),
+                        ParentCategoryName = categoryDto.CategoryName,
+                        Selected = previousCategoryOptions.HasSelectedValueOf(optionValues.Key)
+                    };
+
+                    categoryDto.CategoryOptions.Add(categoryOptionDto);
+                }
+
+                if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
+                {
+                    categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
+                }
+
+                return categoryDto;
+            }).ConfigureAwait(false);
+        }
+
+        private static MethodCallExpression ToStringProperty(ParameterExpression parameter, PropertyInfo propertyInfo)
+        {
+            MethodInfo toString = propertyInfo.PropertyType.GetMethod("ToString", Type.EmptyTypes);
+            return Expression.Call(Expression.Property(parameter, propertyInfo.Name), toString);
+        }
+        #endregion
     }
 }
