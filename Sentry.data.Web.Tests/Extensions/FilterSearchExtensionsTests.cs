@@ -301,6 +301,34 @@ namespace Sentry.data.Web.Tests.Extensions
         }
 
         [TestMethod]
+        public void ToDto_TileSearchModel_TileSearchDto_SortByAlphabetical_DatasetTileDto()
+        {
+            TileSearchModel model = GetTileSearchModel();
+            model.SortBy = 0;
+
+            DatasetTileDto datasetTileDto = new DatasetTileDto() { Name = "SearchName" };
+
+            TileSearchDto<DatasetTileDto> dto = model.ToDto<DatasetTileDto>();
+
+            Assert.IsFalse(dto.OrderByDescending);
+            Assert.AreEqual("SearchName", dto.OrderByField.Invoke(datasetTileDto));
+        }
+
+        [TestMethod]
+        public void ToDto_TileSearchModel_TileSearchDto_SortByFavorite_DatasetTileDto()
+        {
+            TileSearchModel model = GetTileSearchModel();
+            model.SortBy = 1;
+
+            DatasetTileDto datasetTileDto = new DatasetTileDto() { IsFavorite = true };
+
+            TileSearchDto<DatasetTileDto> dto = model.ToDto<DatasetTileDto>();
+
+            Assert.IsTrue(dto.OrderByDescending);
+            Assert.IsTrue((bool)dto.OrderByField.Invoke(datasetTileDto));
+        }
+
+        [TestMethod]
         public void ToEventDto_TileSearchModel_TileSearchEventDto()
         {
             TileSearchModel model = GetTileSearchModel();

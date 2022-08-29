@@ -91,6 +91,21 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void GetSearchableTiles_ThrowsException()
+        {
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Throws(new Exception("No bueno!"));
+
+            DatasetTileSearchService searchService = new DatasetTileSearchService(datasetContext.Object, null, null);
+
+            List<DatasetTileDto> dtos = searchService.GetSearchableTiles();
+
+            Assert.AreEqual(0, dtos.Count);
+        }
+
+        [TestMethod]
         public void SearchTiles_TileSearchDto_DatasetTileDto_EmptySearchableTiles_SortByRecentActivity_TileSearchResultDto()
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
@@ -270,6 +285,23 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Dataset3", tileDto.Name);
             Assert.IsTrue(tileDto.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 15), tileDto.LastActivityDateTime);
+        }
+
+        [TestMethod]
+        public void SearchTiles_ThrowsException()
+        {
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Throws(new Exception("No bueno!"));
+
+            DatasetTileSearchService searchService = new DatasetTileSearchService(datasetContext.Object, null, null);
+
+            TileSearchDto<DatasetTileDto> tileSearchDto = new TileSearchDto<DatasetTileDto>();
+
+            TileSearchResultDto<DatasetTileDto> result = searchService.SearchTiles(tileSearchDto);
+
+            Assert.AreEqual(0, result.Tiles.Count);
         }
 
         #region Private
