@@ -2317,6 +2317,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 return 'filters=' + el;
             }).join('&');
         }
+        else {
+            url = data.Dataset.AddParamDivider(url) + "filters=";
+        }
 
         return url;
     },

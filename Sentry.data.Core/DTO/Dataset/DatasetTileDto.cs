@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core.GlobalEnums;
 using System;
+using System.Collections.Generic;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
@@ -25,5 +26,9 @@ namespace Sentry.data.Core
         public string Environment { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, defaultOpen:true, hideResultCounts: true)]
         public string EnvironmentType { get; set; }
+        [FilterSearchField(FilterCategoryNames.Dataset.DATASETASSET, hideResultCounts: true)]
+        public string DatasetAsset { get; set; }
+        [FilterSearchField(FilterCategoryNames.Dataset.PRODUCERASSET, hideResultCounts: true)]
+        public List<string> ProducerAssets { get; set; }
     }
 }

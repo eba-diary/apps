@@ -84,6 +84,8 @@ namespace Sentry.data.Web
             model.IsReport = false;
             model.Environment = dto.Environment;
             model.EnvironmentType = dto.EnvironmentType;
+            model.DatasetAsset = dto.DatasetAsset;
+            model.ProducerAssets = dto.ProducerAssets;
         }
     }
 }

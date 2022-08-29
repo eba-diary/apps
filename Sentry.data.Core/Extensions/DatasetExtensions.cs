@@ -42,6 +42,7 @@ namespace Sentry.data.Core
             dto.OriginationCode = dataset.OriginationCode;
             dto.Environment = dataset.NamedEnvironment;
             dto.EnvironmentType = dataset.NamedEnvironmentType.GetDescription();
+            dto.DatasetAsset = dataset.Asset.SaidKeyCode;
             dto.Color = "darkgray";
 
             if (dataset.DatasetCategories?.Any() == true)

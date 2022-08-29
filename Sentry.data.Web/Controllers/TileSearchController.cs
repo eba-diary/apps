@@ -129,30 +129,33 @@ namespace Sentry.data.Web.Controllers
             {
                 foreach (string filter in filters)
                 {
-                    List<string> parts = filter.Split('_').ToList();
-                    string category = parts.First();
-
-                    FilterCategoryOptionModel optionModel = new FilterCategoryOptionModel()
+                    if (!string.IsNullOrWhiteSpace(filter))
                     {
-                        OptionValue = HttpUtility.UrlDecode(parts.Last()),
-                        ParentCategoryName = category,
-                        Selected = true
-                    };
+                        List<string> parts = filter.Split('_').ToList();
+                        string category = parts.First();
 
-                    FilterCategoryModel existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
-
-                    if (existingCategory != null)
-                    {
-                        if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
+                        FilterCategoryOptionModel optionModel = new FilterCategoryOptionModel()
                         {
-                            existingCategory.CategoryOptions.Add(optionModel);
+                            OptionValue = HttpUtility.UrlDecode(parts.Last()),
+                            ParentCategoryName = category,
+                            Selected = true
+                        };
+
+                        FilterCategoryModel existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
+
+                        if (existingCategory != null)
+                        {
+                            if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
+                            {
+                                existingCategory.CategoryOptions.Add(optionModel);
+                            }
                         }
-                    }
-                    else
-                    {
-                        FilterCategoryModel newCategory = new FilterCategoryModel() { CategoryName = category };
-                        newCategory.CategoryOptions.Add(optionModel);
-                        categories.Add(newCategory);
+                        else
+                        {
+                            FilterCategoryModel newCategory = new FilterCategoryModel() { CategoryName = category };
+                            newCategory.CategoryOptions.Add(optionModel);
+                            categories.Add(newCategory);
+                        }
                     }
                 }
             }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -48,11 +49,21 @@ namespace Sentry.data.Core
                 if (CustomAttributeHelper.TryGetFilterSearchFieldProperty<T>(categoryDto.CategoryName, out PropertyInfo propertyInfo))
                 {
                     ParameterExpression parameter = Expression.Parameter(typeof(T));
+                    MethodCallExpression body;
 
-                    List<string> selectedValues = categoryDto.GetSelectedValues();
-                    MethodInfo contains = selectedValues.GetType().GetMethod(nameof(selectedValues.Contains));
+                    if (propertyInfo.PropertyType == typeof(List<>))
+                    {
+                        MethodCallExpression toStringAnyParameter = ToStringParameter(propertyInfo.PropertyType);
+                        MethodCallExpression selectedValuesContains = GetSelectedContainsExpression(categoryDto, toStringAnyParameter);
 
-                    MethodCallExpression body = Expression.Call(Expression.Constant(selectedValues), contains, ToStringProperty(parameter, propertyInfo));
+                        MethodInfo any = propertyInfo.PropertyType.GetMethod("Any");
+                        body = Expression.Call(Expression.Property(parameter, propertyInfo.Name), any, selectedValuesContains);
+                    }
+                    else
+                    {
+                        body = GetSelectedContainsExpression(categoryDto, ToStringProperty(parameter, propertyInfo));
+                    }
+
                     Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(body, new[] { parameter });
                     enumerable = enumerable.Where(lambda.Compile());
                 }
@@ -99,18 +110,38 @@ namespace Sentry.data.Core
                 };
 
                 ParameterExpression parameter = Expression.Parameter(typeof(T));
-                Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);
+                Dictionary<string, int> categoryOptions;
 
-                List<IGrouping<string, T>> categoryOptions = results.GroupBy(groupByExpression.Compile()).ToList();
+                if (propertyInfo.PropertyType == typeof(List<>))
+                {
+                    //x => x.ListOfItems.Select(s => s.ToString())
+                    MethodCallExpression toStringSelectParameter = ToStringParameter(propertyInfo.PropertyType);
+                    MethodCallExpression select = Expression.Call(Expression.Property(parameter, propertyInfo.Name), propertyInfo.PropertyType.GetMethod("Select"), toStringSelectParameter);
+                    Expression<Func<T, IEnumerable<string>>> selectManyExpression = Expression.Lambda<Func<T, IEnumerable<string>>>(select, parameter);
+
+                    //v => results.Where(w => w.ListOfItems.Contains(v)).Count()
+                    ParameterExpression elementParameter = Expression.Parameter(typeof(string));
+                    MethodCallExpression contains = Expression.Call(Expression.Property(parameter, propertyInfo.Name), propertyInfo.PropertyType.GetMethod("Contains"), elementParameter);
+                    MethodCallExpression where = Expression.Call(Expression.Constant(results), results.GetType().GetMethod("Where"), contains);
+                    MethodCallExpression count = Expression.Call(where, propertyInfo.PropertyType.GetMethod("Count"));
+                    Expression<Func<string, int>> whereExpression = Expression.Lambda<Func<string, int>>(count, elementParameter);
+
+                    categoryOptions = results.SelectMany(selectManyExpression.Compile()).Distinct().ToDictionary(k => k, whereExpression.Compile());
+                }
+                else
+                {
+                    Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);
+                    categoryOptions = results.GroupBy(groupByExpression.Compile()).ToDictionary(x => x.Key, v => v.Count());
+                }
 
                 List<FilterCategoryOptionDto> previousCategoryOptions = searchedFilters?.FirstOrDefault(x => x.CategoryName == categoryDto.CategoryName)?.CategoryOptions;
 
-                foreach (IGrouping<string, T> optionValues in categoryOptions)
+                foreach (KeyValuePair<string, int> optionValues in categoryOptions)
                 {
                     FilterCategoryOptionDto categoryOptionDto = new FilterCategoryOptionDto()
                     {
                         OptionValue = optionValues.Key,
-                        ResultCount = optionValues.Count(),
+                        ResultCount = optionValues.Value,
                         ParentCategoryName = categoryDto.CategoryName,
                         Selected = previousCategoryOptions.HasSelectedValueOf(optionValues.Key)
                     };
@@ -131,6 +162,19 @@ namespace Sentry.data.Core
         {
             MethodInfo toString = propertyInfo.PropertyType.GetMethod("ToString", Type.EmptyTypes);
             return Expression.Call(Expression.Property(parameter, propertyInfo.Name), toString);
+        }
+
+        private static MethodCallExpression GetSelectedContainsExpression(FilterCategoryDto categoryDto, MethodCallExpression toString)
+        {
+            List<string> selectedValues = categoryDto.GetSelectedValues();
+            MethodInfo contains = selectedValues.GetType().GetMethod(nameof(selectedValues.Contains));
+            return Expression.Call(Expression.Constant(selectedValues), contains, toString);
+        }
+
+        private static MethodCallExpression ToStringParameter(Type propertyType)
+        {
+            ParameterExpression selectParameter = Expression.Parameter(propertyType);
+            return Expression.Call(selectParameter, selectParameter.GetType().GetMethod("ToString", Type.EmptyTypes));
         }
         #endregion
     }

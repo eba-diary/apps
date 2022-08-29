@@ -204,6 +204,8 @@ namespace Sentry.data.Web
             dto.OriginationCode = model.OriginationCode;
             dto.Environment = model.Environment;
             dto.EnvironmentType = model.EnvironmentType;
+            dto.DatasetAsset = model.DatasetAsset;
+            dto.ProducerAssets = model.ProducerAssets;
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)
