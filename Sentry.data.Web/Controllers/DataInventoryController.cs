@@ -19,7 +19,7 @@ namespace Sentry.data.Web.Controllers
         {
             if (TryGetSavedSearch(SearchType.DATA_INVENTORY, savedSearch, out SavedSearchDto savedSearchDto))
             {
-                return GetFilterSearchView(savedSearchDto.ToModel(), null); ;
+                return GetFilterSearchView(savedSearchDto.ToModel(), null);
             }
             
             FilterSearchModel model = BuildBaseSearchModel();
