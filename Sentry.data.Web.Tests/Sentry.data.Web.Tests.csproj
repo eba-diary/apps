@@ -209,6 +209,7 @@
     <Compile Include="MappingTests.cs" />
     <Compile Include="SchemaConsumptionModelTransformerTests.cs" />
     <Compile Include="Extensions\DatasetExtensionsTests.cs" />
+    <Compile Include="ModelTests.cs" />
     <Compile Include="UtilityTests.cs" />
     <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>

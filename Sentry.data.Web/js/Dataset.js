@@ -126,6 +126,7 @@ data.Dataset = {
 
     },
 
+    // #region DELROY FUNCTIONS
     //****************************************************************************************************
     //DELROY FUNCTIONS
     //****************************************************************************************************
@@ -510,6 +511,7 @@ data.Dataset = {
     //END DELROY FUNCTIONS
     //****************************************************************************************************
 
+    // #endregion
 
 
     UpdateMetadata: function () {
@@ -1760,8 +1762,8 @@ data.Dataset = {
             },
             iDisplayLength: 10,
             aLengthMenu: [
-                [10, 25, 50, 100, 200, -1],
-                [10, 25, 50, 100, 200, "All"]
+                [10, 25, 50, 100, 200, 1000],
+                [10, 25, 50, 100, 200, 1000]
             ],
             columns: [
                 { data: null, className: "details-control", orderable: false, defaultContent: "", searchable: false },
