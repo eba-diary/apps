@@ -779,13 +779,23 @@ namespace Sentry.data.Core
                                 : _datasetContext.GetById<DataFlow>(dto.Id).Security,
                 DatasetId = dto.SchemaMap.First().DatasetId,
                 SchemaId = dto.SchemaMap.First().SchemaId,
-                TopicName = dto.TopicName
+
+                //ONLY SET IF IngestionType.Topic
+                TopicName =         (dto.IngestionType == (int)IngestionType.Topic) ? dto.TopicName             : null,
+                S3ConnectorName =   (dto.IngestionType == (int)IngestionType.Topic) ? GetS3ConnectorName(dto)   : null
             };
 
             _datasetContext.Add(df);
 
             Logger.Info($"{methodName} Method End");
             return df;
+        }
+
+        //GENERATE S3ConnectorName
+        private string GetS3ConnectorName(DataFlowDto dto)
+        {
+            string cleansedTopicName = dto.TopicName.Replace("-", "_");
+            return $"S3_{cleansedTopicName}_001";
         }
 
         /// <summary>
@@ -1029,6 +1039,7 @@ namespace Sentry.data.Core
             dto.IsSecured = df.IsSecured;
             dto.Security = _securityService.GetUserSecurity(df, _userService.GetCurrentUser());
             dto.TopicName = df.TopicName;
+            dto.S3ConnectorName = df.S3ConnectorName;
 
             if (dto.IsCompressed)
             {

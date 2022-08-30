@@ -356,7 +356,8 @@ namespace Sentry.data.Web.Controllers
                 NamedEnvironmentType = dto.NamedEnvironmentType,
                 PrimaryContactId = dto.PrimaryContactId,
                 IsSecured = dto.IsSecured,
-                TopicName = dto.TopicName
+                TopicName = dto.TopicName,
+                S3ConnectorName = dto.S3ConnectorName
             };
 
             if (dto.SchemaMap.Any())
@@ -762,7 +763,8 @@ namespace Sentry.data.Web.Controllers
                 // Propagate primary contact otherwise specify current user
                 PrimaryContactId = (model.PrimaryContactId) ?? _userService.GetCurrentUser().AssociateId,
                 IsSecured = true,
-                TopicName = model.TopicName
+                TopicName = model.TopicName,
+                S3ConnectorName = model.S3ConnectorName
             };
 
             if (model.SchemaMaps != null)

@@ -761,9 +761,11 @@ data.Dataset = {
         self.Jobs = ko.observableArray();
 
         //INGESTION TYPE SETUP FOR _SchemaAbout.cshtml WHICH DETERMINES WHAT TO DISPLAY FOR DATAFLOW DETAILS AKA
+        //IMPORTANT!!  In order for Razor View that uses knockout to display anything from Model, need to setup self with everything needed
         self.IngestionType = ko.observable(dataInput.IngestionType);
         self.TopicName = ko.observable(dataInput.TopicName);
         self.IngestionType_TOPIC = ko.observable(data.Dataset.IngestionType_TOPIC);         //WAY OF CREATING A CONST INSTEAD OF HARDCODE FOR EVALUATION IN KNOCKOUT
+        self.S3ConnectorName = ko.observable(dataInput.S3ConnectorName);
 
        
         $.each(dataInput.RetrieverJobs, function (i, val) {

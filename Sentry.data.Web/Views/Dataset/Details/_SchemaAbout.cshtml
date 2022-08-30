@@ -79,15 +79,21 @@
                                         <table class="table table-striped table-hover detailTable" style="margin: -1px; margin-top: -1px; margin-bottom:0px; max-width: 100%">
                                             <tbody>
 
-                                                @*IF INGESTION TYPE == "TOPIC" TYPE THEN DISPLAY TOPIC NAME*@
+                                                @*IF INGESTION TYPE == "TOPIC" TYPE THEN DISPLAY TOPIC NAME AND S3CONNECTOR*@
                                                 <!-- ko if: IngestionType() == IngestionType_TOPIC()-->
                                                 <tr>
                                                     <td class="borderMeta_@color colOneMeta">Topic Name: </td>
                                                     <td class="borderMeta_@color " data-bind="text: TopicName()"></td>
                                                 </tr>
+
+                                                <tr>
+                                                    <td class="borderMeta_@color colOneMeta">S3 Connector Name: </td>
+                                                    <td class="borderMeta_@color " data-bind="text: S3ConnectorName()"></td>
+                                                </tr>
+
+
+
                                                 <!-- /ko -->
-                                                
-                                                
                                                 <!-- ko foreach: Jobs -->
                                                 <tr>
                                                     <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
@@ -99,7 +105,7 @@
                                                     <!-- /ko -->
                                                 </tr>
                                                 <!-- /ko -->
-                                                
+
 
                                             </tbody>
                                         </table>

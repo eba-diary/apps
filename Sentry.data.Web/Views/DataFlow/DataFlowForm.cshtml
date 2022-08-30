@@ -38,7 +38,7 @@
             </div>
 
             <div id="topicNameContainer" class="md-form">
-                <h4>Please enter Topic Name</h4>
+                <h4>What is Topic Name?</h4>
                 @Html.TextBoxFor((m) => m.TopicName, Model.TopicName, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => Model.TopicName, "", new { @class = "text-danger" })
             </div>

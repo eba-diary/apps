@@ -44,6 +44,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual NamedEnvironmentType NamedEnvironmentType { get; set; }
 
         public virtual string TopicName { get; set; }
+        public virtual string S3ConnectorName { get; set; }
 
         #region ISecurableImplementation
         public virtual bool IsSecured { get; set; } = true;

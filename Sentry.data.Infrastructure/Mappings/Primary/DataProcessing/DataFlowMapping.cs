@@ -43,6 +43,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
 
             this.Property(x => x.TopicName);
+            this.Property(x => x.S3ConnectorName);
 
             this.Bag(x => x.Steps, (m) =>
             {

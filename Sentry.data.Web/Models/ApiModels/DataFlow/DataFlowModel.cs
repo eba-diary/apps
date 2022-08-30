@@ -30,5 +30,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
         public string NamedEnvironment { get; set; }
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
         public string TopicName { get; set; }
+        public string S3ConnectorName { get; set; }
     }
 }

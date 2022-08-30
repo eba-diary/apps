@@ -66,6 +66,7 @@ namespace Sentry.data.Web
 
         [DisplayName("What is the Topic Name?")]
         public string TopicName { get; set; }
+        public string S3ConnectorName { get; set; }
 
         /// <summary>
         /// Named Environment naming conventions from https://confluence.sentry.com/x/eQNvAQ
@@ -148,7 +149,8 @@ namespace Sentry.data.Web
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "Must associate data flow with SAID asset");
             }
 
-            if (string.IsNullOrWhiteSpace(TopicName))
+            //IF IngestionType==TOPIC THEN ENSURE NOT EMPTY
+            if (IngestionTypeSelection == (int) IngestionType.Topic && string.IsNullOrWhiteSpace(TopicName))
             {
                 results.Add(DataFlow.ValidationErrors.topicNameIsBlank, "Must specify a topic name");
             }

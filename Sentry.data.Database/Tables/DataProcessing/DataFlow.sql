@@ -26,6 +26,7 @@
     [IsSecured_IND] BIT NULL, 
     [Security_ID] UNIQUEIDENTIFIER NULL, 
     [TopicName] VARCHAR(100) NULL,
+    [S3ConnectorName] VARCHAR(150) NULL,
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
