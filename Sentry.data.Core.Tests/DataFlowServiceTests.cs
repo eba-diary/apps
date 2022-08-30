@@ -1070,6 +1070,43 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(flowDto.PrimaryContactId,           flow.PrimaryContactId,                  $"{nameof(DataFlow.PrimaryContactId)} mappping failed");
             Assert.AreEqual(flowDto.IsSecured,                  flow.IsSecured,                         $"{nameof(DataFlow.IsSecured)} mappping failed");
             Assert.AreEqual(Guid.Empty,                         flow.Security.SecurityId,               $"{nameof(DataFlow.Security.SecurityId)} mappping failed");
+
+            //ENSURE S3ConnectorName is NULL for a IngestionType != Topic
+            Assert.IsNull(flow.S3ConnectorName, $"{nameof(DataFlow.S3ConnectorName)} mappping failed");
+        }
+
+
+
+
+
+        [TestMethod]
+        public void Verify_S3TopicName_For_New_TOPIC_Dataflow()
+        {
+            //Arrange
+            var context = new Mock<IDatasetContext>();
+
+            FileSchema schema = MockClasses.MockFileSchema();
+            List<FileSchema> schemaList = new List<FileSchema>() { schema };
+
+            var schemaMapDto = new SchemaMapDto() { DatasetId = 1, SchemaId = schema.SchemaId, Id = 99 };
+            var flowDto = MockClasses.MockDataFlowDtoTopic(null, schemaMapDto);
+
+            context.Setup(s => s.FileSchema).Returns(schemaList.AsQueryable());
+
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("123456");
+            var mockUserService = new Mock<IUserService>();
+            mockUserService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            var mockDataFeatures = new Mock<IDataFeatures>();
+
+            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null);
+
+            //Act
+            DataFlow flow = dataflowService.MapToDataFlow(flowDto);
+
+            //Assert
+            Assert.AreEqual("S3_Topic_Name_Test_001", flow.S3ConnectorName, $"{nameof(DataFlow.S3ConnectorName)} mappping failed");
         }
 
 

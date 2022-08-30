@@ -526,7 +526,9 @@ namespace Sentry.data.Web.Tests
                         SelectedDataset = 1,
                         SelectedSchema = 1
                     }
-                }
+                },
+                TopicName = "Sample-Topic-Name",
+                S3ConnectorName = "Sample_Topic_Name"
             };
 
             return dataFlowModel;
