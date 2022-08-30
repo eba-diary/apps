@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Helpers.Paginate;
 using Sentry.data.Web.Models.ApiModels;
 using Sentry.data.Web.Models.ApiModels.DatasetFile;
@@ -39,7 +40,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(PagedResponse<DatasetFileModel>))]
-        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000, [FromUri] bool sortDesc = false, bool activeOnly = true)
+        public async Task<IHttpActionResult> GetDataFiles([FromUri] int datasetId, [FromUri] int schemaId, [FromUri] int? pageNumber = 1, [FromUri] int? pageSize = 1000, [FromUri] bool sortDesc = false, [FromUri] DatasetFileStatusType fileStatusType = DatasetFileStatusType.ActiveFiles)
         {
             IHttpActionResult GetSchemaDatasetFilesFunction()
             {
@@ -54,11 +55,18 @@ namespace Sentry.data.Web.WebApi.Controllers
                 PagedList<DatasetFileDto> dtoList = null;
 
                 // detemine whether the paged dataset list should only contain files with an object status of active or anything other than delted
-                if (activeOnly)
-                    dtoList = _datafileService.GetActiveDatasetFileDtoBySchema(schemaId, pagingParams);
-                else
-                    dtoList = _datafileService.GetNonDeletedDatasetFileDtoBySchema(schemaId, pagingParams);
-
+                switch (fileStatusType)
+                {
+                    case DatasetFileStatusType.ActiveFiles:
+                        dtoList = _datafileService.GetActiveDatasetFileDtoBySchema(schemaId, pagingParams);
+                        break;
+                    case DatasetFileStatusType.NonDeletedFiles:
+                        dtoList = _datafileService.GetNonDeletedDatasetFileDtoBySchema(schemaId, pagingParams);
+                        break;
+                    case DatasetFileStatusType.AllFiles:
+                        dtoList = _datafileService.GetAllDatasetFileDtoBySchema(schemaId, pagingParams);
+                        break;
+                }
 
                 PagedList<DatasetFileModel> modelList = new PagedList<DatasetFileModel>(dtoList.ToModel(), dtoList.TotalCount, dtoList.CurrentPage, dtoList.PageSize);
                 PagedResponse<DatasetFileModel> response = new PagedResponse<DatasetFileModel>(modelList);

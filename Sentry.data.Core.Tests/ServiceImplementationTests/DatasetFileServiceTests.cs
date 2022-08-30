@@ -362,54 +362,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_With_Deleted_DataFiles()
-        {
-            // Arrange
-            //setup user
-            var user1 = new Mock<IApplicationUser>();
-            user1.Setup(f => f.AssociateId).Returns("123456");
-
-            //setup userService
-            var userService = new Mock<IUserService>();
-            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
-
-            //setup securityService
-            var userSecurity = new UserSecurity
-            {
-                CanViewFullDataset = true
-            };
-            var securityService = new Mock<ISecurityService>();
-            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
-
-            //setup Entity objects
-            Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
-            FileSchema schema = MockClasses.MockFileSchema();
-            dfc.Schema = schema;
-
-            //setup db context with DatasetFileConfig
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
-
-            var datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object, GlobalEnums.ObjectStatusEnum.Deleted);
-            datasetFile.Schema = schema;
-            context.Setup(f => f.DatasetFileStatusActive).Returns(new List<DatasetFile>() { datasetFile }.AsQueryable());
-
-            PageParameters pageParams = new PageParameters(1, 5);
-
-            var messagePublisher = new Mock<IMessagePublisher>(); 
-
-            //Initialize Service
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
-
-            // Act
-            var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
-
-            // Assert
-            Assert.AreEqual(false, result.Any());
-        }
-
-        [TestMethod]
         public void DatasetFileService_GetAllActiveDatasetFilesBySchema_Schema_With_Active_DataFiles()
         {
             // Arrange
