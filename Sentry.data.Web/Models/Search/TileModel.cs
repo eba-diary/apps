@@ -21,7 +21,7 @@ namespace Sentry.data.Web
         public string Environment { get; set; }
         public string EnvironmentType { get; set; }
         public string DatasetAsset { get; set; }
-        public List<string> ProducerAssets { get; set; }
+        public List<string> ProducerAssets { get; set; } = new List<string>();
         public bool IsReport { get; set; }
         public string AbbreviatedCategories { get; set; }
         public string ReportType { get; set; }

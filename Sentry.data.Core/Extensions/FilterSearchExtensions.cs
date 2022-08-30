@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -51,16 +50,18 @@ namespace Sentry.data.Core
                     ParameterExpression parameter = Expression.Parameter(typeof(T));
                     MethodCallExpression body;
 
-                    if (propertyInfo.PropertyType == typeof(List<>))
+                    if (IsList(propertyInfo))
                     {
-                        MethodCallExpression toStringAnyParameter = ToStringParameter(propertyInfo.PropertyType);
-                        MethodCallExpression selectedValuesContains = GetSelectedContainsExpression(categoryDto, toStringAnyParameter);
+                        LambdaExpression containsExpression = GetToStringParameterExpression(propertyInfo, categoryDto);
+                        MethodInfo anyMethod = GetAnyMethodForType(propertyInfo);
+                        MemberExpression property = Expression.Property(parameter, propertyInfo.Name);
 
-                        MethodInfo any = propertyInfo.PropertyType.GetMethod("Any");
-                        body = Expression.Call(Expression.Property(parameter, propertyInfo.Name), any, selectedValuesContains);
+                        //x => x.ListProperty.Any(a => selectedValues.Contains(a.ToString()))
+                        body = Expression.Call(null, anyMethod, new Expression[] { Expression.Property(parameter, propertyInfo.Name), containsExpression });
                     }
                     else
                     {
+                        //x => selectedValues.Contains(x.PropertyName.ToString())
                         body = GetSelectedContainsExpression(categoryDto, ToStringProperty(parameter, propertyInfo));
                     }
 
@@ -109,44 +110,15 @@ namespace Sentry.data.Core
                     HideResultCounts = filterAttribute.HideResultCounts
                 };
 
-                ParameterExpression parameter = Expression.Parameter(typeof(T));
-                Dictionary<string, int> categoryOptions;
+                List<FilterCategoryOptionDto> previousCategoryOptions = searchedFilters?.FirstOrDefault(x => x.CategoryName == categoryDto.CategoryName)?.CategoryOptions;
 
-                if (propertyInfo.PropertyType == typeof(List<>))
+                if (IsList(propertyInfo))
                 {
-                    //x => x.ListOfItems.Select(s => s.ToString())
-                    MethodCallExpression toStringSelectParameter = ToStringParameter(propertyInfo.PropertyType);
-                    MethodCallExpression select = Expression.Call(Expression.Property(parameter, propertyInfo.Name), propertyInfo.PropertyType.GetMethod("Select"), toStringSelectParameter);
-                    Expression<Func<T, IEnumerable<string>>> selectManyExpression = Expression.Lambda<Func<T, IEnumerable<string>>>(select, parameter);
-
-                    //v => results.Where(w => w.ListOfItems.Contains(v)).Count()
-                    ParameterExpression elementParameter = Expression.Parameter(typeof(string));
-                    MethodCallExpression contains = Expression.Call(Expression.Property(parameter, propertyInfo.Name), propertyInfo.PropertyType.GetMethod("Contains"), elementParameter);
-                    MethodCallExpression where = Expression.Call(Expression.Constant(results), results.GetType().GetMethod("Where"), contains);
-                    MethodCallExpression count = Expression.Call(where, propertyInfo.PropertyType.GetMethod("Count"));
-                    Expression<Func<string, int>> whereExpression = Expression.Lambda<Func<string, int>>(count, elementParameter);
-
-                    categoryOptions = results.SelectMany(selectManyExpression.Compile()).Distinct().ToDictionary(k => k, whereExpression.Compile());
+                    categoryDto.CategoryOptions = CreateCategoryOptionsFromList(results, propertyInfo, previousCategoryOptions, categoryDto);
                 }
                 else
                 {
-                    Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);
-                    categoryOptions = results.GroupBy(groupByExpression.Compile()).ToDictionary(x => x.Key, v => v.Count());
-                }
-
-                List<FilterCategoryOptionDto> previousCategoryOptions = searchedFilters?.FirstOrDefault(x => x.CategoryName == categoryDto.CategoryName)?.CategoryOptions;
-
-                foreach (KeyValuePair<string, int> optionValues in categoryOptions)
-                {
-                    FilterCategoryOptionDto categoryOptionDto = new FilterCategoryOptionDto()
-                    {
-                        OptionValue = optionValues.Key,
-                        ResultCount = optionValues.Value,
-                        ParentCategoryName = categoryDto.CategoryName,
-                        Selected = previousCategoryOptions.HasSelectedValueOf(optionValues.Key)
-                    };
-
-                    categoryDto.CategoryOptions.Add(categoryOptionDto);
+                    categoryDto.CategoryOptions = CreateCategoryOptions(results, propertyInfo, previousCategoryOptions, categoryDto);
                 }
 
                 if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
@@ -158,23 +130,135 @@ namespace Sentry.data.Core
             }).ConfigureAwait(false);
         }
 
+        private static List<FilterCategoryOptionDto> CreateCategoryOptions<T>(List<T> results, PropertyInfo propertyInfo, List<FilterCategoryOptionDto> previousCategoryOptions, FilterCategoryDto categoryDto) where T : IFilterSearchable
+        {
+            List<FilterCategoryOptionDto> categoryOptionDtos = new List<FilterCategoryOptionDto>();
+
+            //results.GroupBy(x => x.PropertyName.ToString())
+            ParameterExpression parameter = Expression.Parameter(typeof(T));
+            Expression<Func<T, string>> groupByExpression = Expression.Lambda<Func<T, string>>(ToStringProperty(parameter, propertyInfo), parameter);
+            List<IGrouping<string, T>> categoryOptions = results.GroupBy(groupByExpression.Compile()).ToList();
+
+            foreach (IGrouping<string, T> optionValues in categoryOptions)
+            {
+                FilterCategoryOptionDto categoryOptionDto = new FilterCategoryOptionDto()
+                {
+                    OptionValue = optionValues.Key,
+                    ResultCount = categoryDto.HideResultCounts ? 0 : optionValues.Count(),
+                    ParentCategoryName = categoryDto.CategoryName,
+                    Selected = previousCategoryOptions.HasSelectedValueOf(optionValues.Key)
+                };
+
+                categoryOptionDtos.Add(categoryOptionDto);
+            }
+
+            return categoryOptionDtos;
+        }
+
+        private static List<FilterCategoryOptionDto> CreateCategoryOptionsFromList<T>(List<T> results, PropertyInfo propertyInfo, List<FilterCategoryOptionDto> previousCategoryOptions, FilterCategoryDto categoryDto) where T : IFilterSearchable
+        {
+            List<FilterCategoryOptionDto> categoryOptionDtos = new List<FilterCategoryOptionDto>();
+
+            ParameterExpression parameter = Expression.Parameter(typeof(T));
+            MemberExpression property = Expression.Property(parameter, propertyInfo.Name);
+            LambdaExpression toStringExpression = GetToStringParameterExpression(propertyInfo, null);
+            MethodInfo selectMethod = GetSelectMethodForType(propertyInfo);
+            MethodCallExpression select = Expression.Call(null, selectMethod, new Expression[] { property, toStringExpression });
+
+            //x => x.ListProperty.Select(s => s.ToString())
+            Expression<Func<T, IEnumerable<string>>> selectExpression = Expression.Lambda<Func<T, IEnumerable<string>>>(select, parameter);
+
+            List<string> distinctOptions = results.SelectMany(selectExpression.Compile()).Distinct().ToList();
+
+            foreach (string option in distinctOptions)
+            {
+                //x => x.ListProperty.Contains(option)
+                MethodCallExpression contains = Expression.Call(Expression.Property(parameter, propertyInfo.Name), propertyInfo.PropertyType.GetMethod("Contains"), Expression.Constant(option));
+                Expression<Func<T, bool>> countExpression = Expression.Lambda<Func<T, bool>>(contains, parameter);
+
+                FilterCategoryOptionDto categoryOptionDto = new FilterCategoryOptionDto()
+                {
+                    OptionValue = option,
+                    ResultCount = categoryDto.HideResultCounts ? 0 : results.Count(countExpression.Compile()),
+                    ParentCategoryName = categoryDto.CategoryName,
+                    Selected = previousCategoryOptions.HasSelectedValueOf(option)
+                };
+
+                categoryOptionDtos.Add(categoryOptionDto);
+            }
+
+            return categoryOptionDtos;
+        }
+
+        private static LambdaExpression GetToStringParameterExpression(PropertyInfo propertyInfo, FilterCategoryDto categoryDto)
+        {
+            //a => a.ToString()
+            Type elementType = GetGenericArgumentType(propertyInfo);
+            ParameterExpression toStringParameter = Expression.Parameter(elementType);
+            MethodCallExpression toString = Expression.Call(toStringParameter, elementType.GetMethod("ToString", Type.EmptyTypes));
+
+            if (categoryDto != null)
+            {
+                //a => selectedValues.Contains(a.ToString())
+                toString = GetSelectedContainsExpression(categoryDto, toString);
+            }
+
+            return Expression.Lambda(toString, toStringParameter);
+        }
+
+        private static Type GetGenericArgumentType(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.PropertyType.GetGenericArguments()[0];
+        }
+
+        private static MethodInfo GetSelectMethodForType(PropertyInfo propertyInfo)
+        {
+            //used to create a direct reference to the generic GetSelectMethod in case of name change
+            Type type = GetGenericArgumentType(propertyInfo);
+            Func<MethodInfo> getSelectMethod = GetSelectMethod<string>;
+            MethodInfo selectMethodInfo = typeof(FilterSearchExtensions).GetMethod(getSelectMethod.Method.Name, BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(type);
+            return (MethodInfo)selectMethodInfo.Invoke(null, null);
+        }
+
+        private static MethodInfo GetSelectMethod<T>()
+        {
+            Expression<Func<IEnumerable<T>, IEnumerable<string>>> lambda = list => list.Select(e => default(string));
+            return (lambda.Body as MethodCallExpression).Method;
+        }
+
+        private static MethodInfo GetAnyMethodForType(PropertyInfo propertyInfo)
+        {
+            //used to create a direct reference to the generic GetSelectMethod in case of name change
+            Type type = GetGenericArgumentType(propertyInfo);
+            Func<MethodInfo> getMethod = GetAnyMethod<string>;
+            MethodInfo methodInfo = typeof(FilterSearchExtensions).GetMethod(getMethod.Method.Name, BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(type);
+            return (MethodInfo)methodInfo.Invoke(null, null);
+        }
+
+        private static MethodInfo GetAnyMethod<T>()
+        {
+            Expression<Func<IEnumerable<T>, bool>> lambda = list => list.Any(e => default(bool));
+            return (lambda.Body as MethodCallExpression).Method;
+        }
+
+        private static bool IsList(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(List<>);
+        }
+
         private static MethodCallExpression ToStringProperty(ParameterExpression parameter, PropertyInfo propertyInfo)
         {
+            //x.PropertyName.ToString()
             MethodInfo toString = propertyInfo.PropertyType.GetMethod("ToString", Type.EmptyTypes);
             return Expression.Call(Expression.Property(parameter, propertyInfo.Name), toString);
         }
 
         private static MethodCallExpression GetSelectedContainsExpression(FilterCategoryDto categoryDto, MethodCallExpression toString)
         {
+            //selectedValues.Contains(x{.PropertyName}.ToString())
             List<string> selectedValues = categoryDto.GetSelectedValues();
             MethodInfo contains = selectedValues.GetType().GetMethod(nameof(selectedValues.Contains));
             return Expression.Call(Expression.Constant(selectedValues), contains, toString);
-        }
-
-        private static MethodCallExpression ToStringParameter(Type propertyType)
-        {
-            ParameterExpression selectParameter = Expression.Parameter(propertyType);
-            return Expression.Call(selectParameter, selectParameter.GetType().GetMethod("ToString", Type.EmptyTypes));
         }
         #endregion
     }

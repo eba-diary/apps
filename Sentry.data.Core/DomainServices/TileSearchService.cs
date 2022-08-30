@@ -73,8 +73,8 @@ namespace Sentry.data.Core
 
                 sw.Restart();
                 Dictionary<int, DateTime> datasetFileDates = _datasetContext.DatasetFileStatusActive.GroupBy(x => x.Dataset).
-                    Select(x => new KeyValuePair<int, DateTime>(x.Key.DatasetId, x.Max(m => m.CreatedDTM))).
-                    ToDictionary(x => x.Key, x => x.Value);
+                    Select(x => new { DatasetId = x.Key.DatasetId, MaxDate = x.Max(m => m.CreatedDTM) }).
+                    ToDictionary(x => x.DatasetId, x => x.MaxDate);
                 sw.Stop();
                 Logger.Info($"GetSearchableTiles - MaxDatasetFileDate {sw.ElapsedMilliseconds}ms");
 
@@ -127,7 +127,6 @@ namespace Sentry.data.Core
                     tileDto.LastActivityDateTime = maxDate;
                 }
 
-                tileDto.ProducerAssets = new List<string>();
                 if (producerAssets.TryGetValue(dataset.DatasetId, out List<string> assets))
                 {
                     tileDto.ProducerAssets = assets;

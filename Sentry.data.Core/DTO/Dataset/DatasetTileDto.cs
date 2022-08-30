@@ -29,6 +29,6 @@ namespace Sentry.data.Core
         [FilterSearchField(FilterCategoryNames.Dataset.DATASETASSET, hideResultCounts: true)]
         public string DatasetAsset { get; set; }
         [FilterSearchField(FilterCategoryNames.Dataset.PRODUCERASSET, hideResultCounts: true)]
-        public List<string> ProducerAssets { get; set; }
+        public List<string> ProducerAssets { get; set; } = new List<string>();
     }
 }
