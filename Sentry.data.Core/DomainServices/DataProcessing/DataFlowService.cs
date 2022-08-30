@@ -810,7 +810,6 @@ namespace Sentry.data.Core
             return group;
         }
 
-        //GORDON: TODO: figure out how this changes with new DSC PUSH TYPES
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPush).ToLower()}";
@@ -841,7 +840,7 @@ namespace Sentry.data.Core
                 }
 
                 RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-                
+
                 _datasetContext.Add(dfsDataFlowBasic);
 
                 _jobService.CreateDropLocation(dfsDataFlowBasic);
@@ -1212,7 +1211,7 @@ namespace Sentry.data.Core
                     
                     return schemaLoadStep;
 
-                //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED
+                //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED, BONUS AFTER TOPIC NAME IS WORKING
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources);
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
@@ -1229,6 +1228,7 @@ namespace Sentry.data.Core
                         }
                     }
                     return schemaMapStep;
+
                 case DataActionType.None:
                 default:
                     return null;
