@@ -296,6 +296,38 @@ namespace Sentry.data.Core.Tests
             return df;
         }
 
+        public static DatasetFile MockDatasetFile(Dataset ds, DatasetFileConfig dfc, IApplicationUser user, ObjectStatusEnum objectStatus)
+        {
+            DatasetFile df = new DatasetFile()
+            {
+                DatasetFileId = 3000,
+                FileName = "2014.annual.singlefile.csv",
+                Dataset = ds,
+                UploadUserName = user.AssociateId,
+                CreatedDTM = System.DateTime.Now.AddYears(-12),
+                ModifiedDTM = System.DateTime.Now.AddYears(-12),
+                FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
+                DatasetFileConfig = dfc,
+                IsBundled = false,
+                ParentDatasetFileId = 23,
+                VersionId = "QWENUD-asdf9320123n90afs",
+                Information = "Information Text",
+                Size = 1234567890,
+                FlowExecutionGuid = "20211209133645",
+                RunInstanceGuid = "20211210143750",
+                FileExtension = "csv",
+                Schema = MockFileSchema(),
+                SchemaRevision = MockSchemaRevision(),
+                FileKey = "test/key/file.txt",
+                FileBucket = "test-bucket-name",
+                ETag = "etag-string-value",
+                OriginalFileName = "zzztest0614.csv",
+                ObjectStatus = objectStatus
+            };
+
+            return df;
+        }
+
 
         public static DatasetFile MockDatasetFileB(Dataset ds, DatasetFileConfig dfc, IApplicationUser user)
         {
