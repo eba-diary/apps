@@ -2,6 +2,7 @@
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -74,18 +75,26 @@ namespace Sentry.data.Core.Tests
             DatasetTileDto tile = tileDtos.First(x => x.Name == "Dataset1");
             Assert.IsTrue(tile.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 8), tile.LastActivityDateTime);
+            Assert.AreEqual(1, tile.ProducerAssets.Count);
+            Assert.AreEqual("SAID", tile.ProducerAssets.First());
 
             tile = tileDtos.First(x => x.Name == "Dataset2");
             Assert.IsFalse(tile.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 8), tile.LastActivityDateTime);
+            Assert.AreEqual(2, tile.ProducerAssets.Count);
+            Assert.AreEqual("SAID", tile.ProducerAssets.First());
+            Assert.AreEqual("SAID3", tile.ProducerAssets.Last());
 
             tile = tileDtos.First(x => x.Name == "Dataset3");
             Assert.IsTrue(tile.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 12), tile.LastActivityDateTime);
+            Assert.AreEqual(1, tile.ProducerAssets.Count);
+            Assert.AreEqual("SAID3", tile.ProducerAssets.First());
 
             tile = tileDtos.First(x => x.Name == "Foo Bar");
             Assert.IsTrue(tile.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 20), tile.LastActivityDateTime);
+            Assert.AreEqual(0, tile.ProducerAssets.Count);
 
             repository.VerifyAll();
         }
@@ -142,20 +151,26 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(10, result.PageSize);
             Assert.AreEqual(1, result.PageNumber);
             Assert.AreEqual(2, result.Tiles.Count);
-            Assert.AreEqual(3, result.FilterCategories.Count);
+            Assert.AreEqual(5, result.FilterCategories.Count);
             Assert.AreEqual(2, result.FilterCategories.First(x => x.CategoryName == FilterCategoryNames.Dataset.CATEGORY).CategoryOptions.Count);
             Assert.AreEqual(2, result.FilterCategories.First(x => x.CategoryName == FilterCategoryNames.Dataset.SECURED).CategoryOptions.Count);
             Assert.AreEqual(2, result.FilterCategories.First(x => x.CategoryName == FilterCategoryNames.Dataset.FAVORITE).CategoryOptions.Count);
+            Assert.AreEqual(1, result.FilterCategories.First(x => x.CategoryName == FilterCategoryNames.Dataset.ENVIRONMENTTYPE).CategoryOptions.Count);
+            Assert.AreEqual(2, result.FilterCategories.First(x => x.CategoryName == FilterCategoryNames.Dataset.PRODUCERASSET).CategoryOptions.Count);
 
             DatasetTileDto tileDto = result.Tiles.First();
             Assert.AreEqual("Dataset3", tileDto.Name);
             Assert.IsTrue(tileDto.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 12), tileDto.LastActivityDateTime);
+            Assert.AreEqual(1, tileDto.ProducerAssets.Count);
+            Assert.AreEqual("SAID3", tileDto.ProducerAssets.First());
 
             tileDto = result.Tiles.Last();
             Assert.AreEqual("Dataset1", tileDto.Name);
             Assert.IsTrue(tileDto.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 8), tileDto.LastActivityDateTime);
+            Assert.AreEqual(1, tileDto.ProducerAssets.Count);
+            Assert.AreEqual("SAID", tileDto.ProducerAssets.First());
 
             repository.VerifyAll();
         }
@@ -240,7 +255,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, result.PageSize);
             Assert.AreEqual(1, result.PageNumber);
             Assert.AreEqual(1, result.Tiles.Count);
-            Assert.AreEqual(3, result.FilterCategories.Count);
+            Assert.AreEqual(8, result.FilterCategories.Count);
 
             FilterCategoryDto filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.CATEGORY);
             Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
@@ -261,12 +276,12 @@ namespace Sentry.data.Core.Tests
             option = filterCategory.CategoryOptions.First();
             Assert.AreEqual("True", option.OptionValue);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(1, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
 
             option = filterCategory.CategoryOptions.Last();
             Assert.AreEqual("False", option.OptionValue);
             Assert.IsTrue(option.Selected);
-            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
 
             filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.FAVORITE);
             Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
@@ -274,12 +289,82 @@ namespace Sentry.data.Core.Tests
             option = filterCategory.CategoryOptions.First();
             Assert.AreEqual("True", option.OptionValue);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
 
             option = filterCategory.CategoryOptions.Last();
             Assert.AreEqual("False", option.OptionValue);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(1, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.ORIGIN);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("Internal", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("External", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.ENVIRONMENT);
+            Assert.AreEqual(3, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("PROD", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions[1];
+            Assert.AreEqual("TEST", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("DEV", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.ENVIRONMENTTYPE);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("Prod", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("NonProd", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.DATASETASSET);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("SAID2", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.PRODUCERASSET);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("SAID2", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
 
             DatasetTileDto tileDto = result.Tiles.First();
             Assert.AreEqual("Dataset3", tileDto.Name);
@@ -346,6 +431,40 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
+            List<DataFlow> dataFlows = new List<DataFlow>()
+            {
+                new DataFlow()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DatasetId = 1,
+                    SaidKeyCode = "SAID"
+                },
+                new DataFlow()
+                {
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DatasetId = 1,
+                    SaidKeyCode = "SAID2"
+                },
+                new DataFlow()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DatasetId = 2,
+                    SaidKeyCode = "SAID"
+                },
+                new DataFlow()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DatasetId = 2,
+                    SaidKeyCode = "SAID3"
+                },
+                new DataFlow()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DatasetId = 3,
+                    SaidKeyCode = "SAID3"
+                }
+            };
+
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
             datasetContext.SetupGet(x => x.Security).Returns(new List<Security>().AsQueryable());
@@ -353,6 +472,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>().AsQueryable());
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
             datasetContext.SetupGet(x => x.DatasetFileStatusActive).Returns(files.AsQueryable());
+            datasetContext.SetupGet(x => x.DataFlow).Returns(dataFlows.AsQueryable());
 
             Mock<IApplicationUser> appUser = repository.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -395,14 +515,14 @@ namespace Sentry.data.Core.Tests
         {
             return new List<DatasetTileDto>()
             {
-                GetDatasetTileDto(1, "Dataset1", "Category1", true, true, 5),
-                GetDatasetTileDto(2, "Dataset2", "Category2", false, false, 8),
-                GetDatasetTileDto(3, "Dataset3", "Category1", true, false, 12),
-                GetDatasetTileDto(4, "Foo Bar", "Category1", true, false, 20)
+                GetDatasetTileDto(1, "Dataset1", "Category1", true, true, 5, "SAID", "Internal", "PROD"),
+                GetDatasetTileDto(2, "Dataset2", "Category2", false, false, 8, "SAID2", "External", "TEST"),
+                GetDatasetTileDto(3, "Dataset3", "Category1", true, false, 12, "SAID", "External", "DEV"),
+                GetDatasetTileDto(4, "Foo Bar", "Category1", true, false, 20, "SAID3", "Internal", "TEST")
             };
         }
 
-        private DatasetTileDto GetDatasetTileDto(int id, string name, string category, bool isFavorite, bool isSecured, int createDay)
+        private DatasetTileDto GetDatasetTileDto(int id, string name, string category, bool isFavorite, bool isSecured, int createDay, string asset, string origin, string env)
         {
             return new DatasetTileDto()
             {
@@ -411,7 +531,12 @@ namespace Sentry.data.Core.Tests
                 IsFavorite = isFavorite,
                 Category = category,
                 IsSecured = isSecured,
-                LastActivityDateTime = new DateTime(2022, 8, createDay + 3)
+                LastActivityDateTime = new DateTime(2022, 8, createDay + 3),
+                DatasetAsset = asset,
+                ProducerAssets = new List<string>() { asset },
+                OriginationCode = origin,
+                Environment = env,
+                EnvironmentType = env.Contains("PROD") ? NamedEnvironmentType.Prod.GetDescription() : NamedEnvironmentType.NonProd.GetDescription()
             };
         }
         #endregion

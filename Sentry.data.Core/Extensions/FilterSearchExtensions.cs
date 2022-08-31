@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,27 +104,34 @@ namespace Sentry.data.Core
             return await Task.Run(() =>
             {
                 FilterSearchField filterAttribute = propertyInfo.GetCustomAttribute<FilterSearchField>();
-                FilterCategoryDto categoryDto = new FilterCategoryDto() 
-                { 
+                FilterCategoryDto categoryDto = new FilterCategoryDto()
+                {
                     CategoryName = filterAttribute.FilterCategoryName,
                     DefaultCategoryOpen = filterAttribute.DefaultOpen,
                     HideResultCounts = filterAttribute.HideResultCounts
                 };
 
-                List<FilterCategoryOptionDto> previousCategoryOptions = searchedFilters?.FirstOrDefault(x => x.CategoryName == categoryDto.CategoryName)?.CategoryOptions;
+                try
+                {
+                    List<FilterCategoryOptionDto> previousCategoryOptions = searchedFilters?.FirstOrDefault(x => x.CategoryName == categoryDto.CategoryName)?.CategoryOptions;
 
-                if (IsList(propertyInfo))
-                {
-                    categoryDto.CategoryOptions = CreateCategoryOptionsFromList(results, propertyInfo, previousCategoryOptions, categoryDto);
-                }
-                else
-                {
-                    categoryDto.CategoryOptions = CreateCategoryOptions(results, propertyInfo, previousCategoryOptions, categoryDto);
-                }
+                    if (IsList(propertyInfo))
+                    {
+                        categoryDto.CategoryOptions = CreateCategoryOptionsFromList(results, propertyInfo, previousCategoryOptions, categoryDto);
+                    }
+                    else
+                    {
+                        categoryDto.CategoryOptions = CreateCategoryOptions(results, propertyInfo, previousCategoryOptions, categoryDto);
+                    }
 
-                if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
+                    if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
+                    {
+                        categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
+                    Logger.Error($"Error creating filter for {propertyInfo.Name}", ex);
                 }
 
                 return categoryDto;

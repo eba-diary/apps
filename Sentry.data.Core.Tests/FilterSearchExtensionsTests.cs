@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nest;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,7 +113,7 @@ namespace Sentry.data.Core.Tests
 
             List<FilterCategoryDto> filters = dtos.CreateFilters(searchedFilters);
 
-            Assert.AreEqual(3, filters.Count);
+            Assert.AreEqual(8, filters.Count);
 
             FilterCategoryDto filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.CATEGORY);
             Assert.AreEqual(3, filterCategory.CategoryOptions.Count);
@@ -138,7 +139,7 @@ namespace Sentry.data.Core.Tests
             option = filterCategory.CategoryOptions.First();
             Assert.AreEqual("True", option.OptionValue);
             Assert.IsTrue(option.Selected);
-            Assert.AreEqual(3, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
 
             filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.SECURED);
             Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
@@ -146,12 +147,87 @@ namespace Sentry.data.Core.Tests
             option = filterCategory.CategoryOptions.First();
             Assert.AreEqual("True", option.OptionValue);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(1, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
 
             option = filterCategory.CategoryOptions.Last();
             Assert.AreEqual("False", option.OptionValue);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.ORIGIN);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("Internal", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("External", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.ENVIRONMENT);
+            Assert.AreEqual(3, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("DEV", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions[1];
+            Assert.AreEqual("PROD", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("TEST", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.ENVIRONMENTTYPE);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("NonProd", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("Prod", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.DATASETASSET);
+            Assert.AreEqual(2, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("SAID2", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            filterCategory = filters.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.Dataset.PRODUCERASSET);
+            Assert.AreEqual(3, filterCategory.CategoryOptions.Count);
+
+            option = filterCategory.CategoryOptions.First();
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions[1];
+            Assert.AreEqual("SAID2", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
+
+            option = filterCategory.CategoryOptions.Last();
+            Assert.AreEqual("SAID3", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(0, option.ResultCount);
         }
 
         [TestMethod]
@@ -302,6 +378,11 @@ namespace Sentry.data.Core.Tests
                     Category = "Category",
                     IsFavorite = true,
                     IsSecured = true,
+                    Environment = "DEV",
+                    EnvironmentType = "NonProd",
+                    DatasetAsset = "SAID2",
+                    ProducerAssets = new List<string>() { "SAID", "SAID2", "SAID3" },
+                    OriginationCode = "Internal"
                 },
                 new DatasetTileDto()
                 {
@@ -309,6 +390,11 @@ namespace Sentry.data.Core.Tests
                     Category = "Category",
                     IsFavorite = true,
                     IsSecured = false,
+                    Environment = "PROD",
+                    EnvironmentType = "Prod",
+                    DatasetAsset = "SAID",
+                    ProducerAssets = new List<string>() { "SAID", "SAID2" },
+                    OriginationCode = "Internal"
                 },
                 new DatasetTileDto()
                 {
@@ -316,6 +402,11 @@ namespace Sentry.data.Core.Tests
                     Category = "Category3",
                     IsFavorite = true,
                     IsSecured = false,
+                    Environment = "TEST",
+                    EnvironmentType = "NonProd",
+                    DatasetAsset = "SAID",
+                    ProducerAssets = new List<string>() { "SAID2" },
+                    OriginationCode = "External"
                 }
             };
         }

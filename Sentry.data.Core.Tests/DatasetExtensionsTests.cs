@@ -29,7 +29,8 @@ namespace Sentry.data.Core.Tests
                         Name = "Category",
                         Color = "Blue"
                     }
-                }
+                },
+                Asset = new Asset() { SaidKeyCode = "SAID" }
             };
 
             DatasetTileDto dto = dataset.ToDatasetTileDto();
@@ -44,6 +45,8 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Origin", dto.OriginationCode);
             Assert.AreEqual("DEV", dto.Environment);
             Assert.AreEqual("NonProd", dto.EnvironmentType);
+            Assert.AreEqual("SAID", dto.DatasetAsset);
+            Assert.AreEqual(0, dto.ProducerAssets.Count);
         }
     }
 }

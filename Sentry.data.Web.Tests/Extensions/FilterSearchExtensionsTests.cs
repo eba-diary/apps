@@ -364,7 +364,9 @@ namespace Sentry.data.Web.Tests.Extensions
                     LastActivityShortDate = "8/18/2022",
                     OriginationCode = "Origin",
                     Environment = "DEV",
-                    EnvironmentType = "NonProd"
+                    EnvironmentType = "NonProd",
+                    DatasetAsset = "SAID",
+                    ProducerAssets = new List<string>() { "SAID1", "SAID2" }
                 },
                 new TileModel()
                 {
@@ -380,7 +382,9 @@ namespace Sentry.data.Web.Tests.Extensions
                     LastActivityShortDate = "8/18/2021",
                     OriginationCode = "Origin2",
                     Environment = "PROD",
-                    EnvironmentType = "Prod"
+                    EnvironmentType = "Prod",
+                    DatasetAsset = "SAID2",
+                    ProducerAssets = new List<string>() { "SAID" }
                 }
             };
 
@@ -402,6 +406,9 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual("Origin", dto.OriginationCode);
             Assert.AreEqual("DEV", dto.Environment);
             Assert.AreEqual("NonProd", dto.EnvironmentType);
+            Assert.AreEqual("SAID", dto.DatasetAsset);
+            Assert.AreEqual("SAID1", dto.ProducerAssets.First());
+            Assert.AreEqual("SAID2", dto.ProducerAssets.Last());
 
             dto = dtos.Last();
             Assert.AreEqual("2", dto.Id);
@@ -417,6 +424,8 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual("Origin2", dto.OriginationCode);
             Assert.AreEqual("PROD", dto.Environment);
             Assert.AreEqual("Prod", dto.EnvironmentType);
+            Assert.AreEqual("SAID2", dto.DatasetAsset);
+            Assert.AreEqual("SAID", dto.ProducerAssets.First());
         }
 
         private TileSearchModel GetTileSearchModel()
