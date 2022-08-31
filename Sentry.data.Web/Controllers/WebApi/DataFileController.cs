@@ -34,7 +34,8 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="schemaId"></param>
         /// <param name="pageNumber">Default is 1</param>
         /// <param name="pageSize">Default is 1000, Max is 10000</param>
-        /// <param name="sortDesc">Default is false</param> this parameter is also necessary for the object
+        /// <param name="sortDesc">Default is false</param>
+        /// <param name="fileStatusType"></param> this parameter is also necessary for the object
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
@@ -54,7 +55,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 PagedList<DatasetFileDto> dtoList = null;
 
-                // detemine whether the paged dataset list should only contain files with an object status of active or anything other than delted
+                // detemine whether the paged dataset list should only contain files with an object status of active, all non deleted files, or reutrn 
                 switch (fileStatusType)
                 {
                     case DatasetFileStatusType.ActiveFiles:
