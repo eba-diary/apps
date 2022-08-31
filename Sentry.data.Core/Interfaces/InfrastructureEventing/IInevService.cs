@@ -17,7 +17,7 @@ namespace Sentry.data.Core.Interfaces.InfrastructureEventing
         /// <param name="dataset">The dataset whose permissions were updated</param>
         /// <param name="ticket">The ticket that was just approved</param>
         /// <param name="securablePermissions">The full list of securable permissions on this dataset</param>
-        Task PublishDatasetPermissionsUpdated(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> securablePermissions);
+        Task PublishDatasetPermissionsUpdated(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> datasetPermissions, IList<SecurablePermission> parentPermissions);
         Task CheckDbaPortalEvents();
 
     }

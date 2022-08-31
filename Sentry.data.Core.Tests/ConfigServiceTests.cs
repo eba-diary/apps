@@ -31,7 +31,7 @@ namespace Sentry.data.Core.Tests
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
             securityService.Setup(s => s.GetUserSecurity(dfc.ParentDataset, user.Object));
 
-            var configService = new ConfigService(context.Object,null,null,null,null,null,null,null,null,null,null,null);
+            var configService = new ConfigService(context.Object,null,null,null,null,null,null,null,null,null,null,null,null);
 
             //Act
             configService.Delete(dfc.ConfigId, user.Object, true);
@@ -57,7 +57,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, true);
@@ -85,7 +85,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             configService.Delete(dfc.ConfigId, user.Object, true);
@@ -111,7 +111,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, false);
@@ -138,7 +138,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, false);
@@ -185,7 +185,7 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
             dataFlowService.Setup(s => s.GetDataFlowNameForFileSchema(It.IsAny<FileSchema>())).Returns("DataflowName");
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, dataFlowService.Object, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null);
 
             // Act
             configService.Delete(dfc.ConfigId, user.Object, false);
@@ -230,7 +230,7 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
             dataFlowService.Setup(s => s.GetDataFlowNameForFileSchema(It.IsAny<FileSchema>())).Returns("DataflowName");
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, dataFlowService.Object, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null);
 
             // Act
             configService.Delete(dfc.ConfigId, null, false);

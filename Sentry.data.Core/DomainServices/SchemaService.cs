@@ -68,11 +68,6 @@ namespace Sentry.data.Core
             {
                 newSchema = CreateSchema(schemaDto);
 
-                if (!_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                {
-                    _dataFlowService.CreateDataFlowForSchema(newSchema);
-                }
-
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -193,7 +188,6 @@ namespace Sentry.data.Core
             /* Any exceptions saving schema changes, do not execute remaining line of code */
             try
             {
-                //Update/save schema within DSC metadata
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
                 Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
@@ -386,6 +380,10 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
+            //schema=EXISTING; dto=NEW; SETTER
+            changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
+
+
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
                 changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
@@ -428,6 +426,23 @@ namespace Sentry.data.Core
             }
 
             return whatPropertiesChanged;
+        }
+
+        private string GetControlMTrigger(FileSchemaDto dto)
+        {
+            string controlMTriggerName = string.Empty;
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+            if(ds != null)
+            {
+                Regex reg = new Regex("[^a-zA-Z0-9]");
+                string namedEnvironmentCleaned = reg.Replace((ds.NamedEnvironment != null)? ds.NamedEnvironment.ToUpper() : String.Empty,String.Empty);
+                string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
+                string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
+
+                                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
+            }
+            
+            return controlMTriggerName;
         }
 
         private bool TryUpdate<T>(Func<T> existingValue, Func<T> updateValue, Action<T> setter)
@@ -875,7 +890,7 @@ namespace Sentry.data.Core
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString().PadLeft(7, '0');
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-            bool isHumanResources = (parentDataset.DatasetCategories.Any(w => w.AbbreviatedName == "HR")) ? true : false;           //Figure out if Category == HR
+            bool isHumanResources = parentDataset.IsHumanResources;           //Figure out if Category == HR
 
             FileSchema schema = new FileSchema()
             {
@@ -903,27 +918,31 @@ namespace Sentry.data.Core
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus,
                 SchemaRootPath = dto.SchemaRootPath,
-                ParquetStorageBucket = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                                        ? GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName())
-                                        : GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DSC, Config.GetDefaultEnvironmentName()),
-                ParquetStoragePrefix = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
-                                        ? GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode)
-                                        : GenerateParquetStoragePrefix(Configuration.Config.GetHostSetting("S3DataPrefix"), null, storageCode)
-
+                ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
+                ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
+                ControlMTriggerName = GetControlMTrigger(dto)
             };
-            schema.ConsumptionDetails = new List<SchemaConsumption>()
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
             {
-                new SchemaConsumptionSnowflake()
+                schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset, isHumanResources);
+            }
+            else
+            {
+                schema.ConsumptionDetails = new List<SchemaConsumption>()
                 {
-                    Schema = schema,
-                    SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                    SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                    SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                    SnowflakeStage = (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue()) ? GlobalConstants.SnowflakeStageNames.PARQUET_STAGE : GlobalConstants.SnowflakeStageNames.DATASET_STAGE,
-                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
-                }
-            };
+                    new SchemaConsumptionSnowflake()
+                    {
+                        Schema = schema,
+                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
+                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                    }
+                };
+            }
+
             _datasetContext.Add(schema);
 
             return schema;
@@ -962,7 +981,8 @@ namespace Sentry.data.Core
                 SchemaRootPath = scm.SchemaRootPath,
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
-                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList()
+                ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
+                ControlMTriggerName = scm.ControlMTriggerName
             };
 
         }
@@ -983,6 +1003,22 @@ namespace Sentry.data.Core
         private string GenerateSnowflakeDatabaseName(bool isHumanResources)
         {
             string dbName = (isHumanResources)? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
+            dbName += Config.GetDefaultEnvironmentName().ToUpper();
+            return dbName;
+        }
+
+        private string GenerateRawQuerySnowflakeDatabaseName(bool isHumanResources)
+        {
+            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
+            dbName += "RAWQUERY_";
+            dbName += Config.GetDefaultEnvironmentName().ToUpper();
+            return dbName;
+        }
+
+        private string GenerateRawSnowflakeDatabaseName(bool isHumanResources)
+        {
+            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
+            dbName += "RAW_";
             dbName += Config.GetDefaultEnvironmentName().ToUpper();
             return dbName;
         }
@@ -1026,20 +1062,12 @@ namespace Sentry.data.Core
 
             string prefix;
 
-            if (_dataFeatures.CLA3332_ConsolidatedDataFlows.GetValue())
+            if (string.IsNullOrEmpty(namedEnvironment))
             {
-                if (string.IsNullOrEmpty(namedEnvironment))
-                {
-                    throw new ArgumentNullException("namedEnvironment", "Named environment is required to generate parquet storage prefix");
-                }
-
-                prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{namedEnvironment.ToUpper()}/{storageCode}";
-            }
-            else
-            {
-                prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{storageCode}";
+                throw new ArgumentNullException("namedEnvironment", "Named environment is required to generate parquet storage prefix");
             }
 
+            prefix = $"{GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX}/{saidKeyCode.ToUpper()}/{namedEnvironment.ToUpper()}/{storageCode}";
 
             return prefix;
         }
@@ -1164,6 +1192,46 @@ namespace Sentry.data.Core
             }
 
             return results;
+        }
+
+        private IList<SchemaConsumption> GenerateConsumptionLayers(FileSchemaDto dto, FileSchema schema, Dataset parentDataset, bool isHumanResources)
+        {
+            return new List<SchemaConsumption>()
+                {
+                    new SchemaConsumptionSnowflake()
+                    {
+                        Schema = schema,
+                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
+                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                        SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+                    },
+                    new SchemaConsumptionSnowflake()
+                    {
+                        Schema = schema,
+                        SnowflakeDatabase = GenerateRawQuerySnowflakeDatabaseName(isHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
+                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                        SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery
+                    },
+                    new SchemaConsumptionSnowflake()
+                    {
+                        Schema = schema,
+                        SnowflakeDatabase = GenerateRawSnowflakeDatabaseName(isHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
+                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                        SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
+                    }
+                };
         }
     }
 }

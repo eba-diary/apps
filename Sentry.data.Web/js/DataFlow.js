@@ -1,6 +1,5 @@
 ﻿data.DataFlow = {
 
-    CLA3332_ConsolidatedDataFlows: false,
     Orig_Dataset_Selection: 0,
     Orig_Schema_Selection: 0,
 
@@ -73,7 +72,6 @@
             $("#IsCompressed").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
-            //$("#schemaMapPanel select").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
@@ -85,6 +83,8 @@
     },
 
     DataFlowDetailInit: function (dataflowId) {
+        let producerAssetGroupName = $("#producerAssetGroupName").text();
+
         $('body').on('click', '.jobHeader', function () {
             if ($(this).children('.tracker-menu-icon').hasClass('fa-chevron-down')) {
                 $(this).children('.tracker-menu-icon').switchClass('fa-chevron-down', 'fa-chevron-up');
@@ -106,6 +106,12 @@
         var schemaMapUrl = "/DataFlow/_SchemaMapDetail/?dataflowId=" + encodeURI(dataflowId);
         $.get(schemaMapUrl, function (e) {
             $('#targetSchema').html(e);
+        });
+
+        $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
+
+        $("#RequestAccessManageCopyBtn").click(function () {
+            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
         });
 
     },
@@ -315,13 +321,9 @@
                     return item.ObjectStatus === "ACTIVE";
                 });
 
-                //If feature flag is enabled, only show schemas that don't have a DataFlow
-                // or SchemaId matches the original schema selection
-                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
-                    filter = filter.filter(function (item) {
-                        return item.SchemaId === data.DataFlow.Orig_Schema_Selection || item.HasDataFlow === false;
-                    });
-                }
+                filter = filter.filter(function (item) {
+                    return item.SchemaId === data.DataFlow.Orig_Schema_Selection || item.HasDataFlow === false;
+                });
 
                 //Make list sorted by schema name
                 var sortedResults = filter.sort(
@@ -345,8 +347,6 @@
                 else {
                     $(targetElement).val(curVal);
                 }
-
-                //$("#schemaMapPanel select").materialSelect();
 
             });
             createSchemaLink.show();
@@ -413,12 +413,8 @@
 
             $('[id$=__SelectedDataset]').each(function (index) {
                 var cur = $(this);
-                if (data.DataFlow.CLA3332_ConsolidatedDataFlows) {
-                    var curVal = datasetId;
-                }
-                else {
-                    var curVal = parseInt(cur.val());
-                }
+
+                var curVal = datasetId;
 
                 cur.html(newSubItems);
 

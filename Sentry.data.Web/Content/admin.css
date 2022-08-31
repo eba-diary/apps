@@ -40,3 +40,7 @@ table#metricGroupsTable td.dt-control {
     display: inline-block !important;
 }
 
+.metricsButton{
+    margin-top:20px;
+    margin-bottom:20px;
+}

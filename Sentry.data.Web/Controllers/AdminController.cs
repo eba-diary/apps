@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using Sentry.data.Core.DTO.Admin;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
@@ -9,25 +12,29 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Sentry.data.Web.Models;
 
 namespace Sentry.data.Web.Controllers
 {
-    /*[AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]*/
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class AdminController : BaseController
     {
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
         private readonly IAuditService _auditSerivce;
         private readonly IDeadSparkJobService _deadSparkJobService;
+        private readonly ISupportLinkService _supportLinkService;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, IAuditService auditSerivce)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService connectorService, IAuditService auditSerivce)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
             _auditSerivce = auditSerivce;
             _deadSparkJobService = deadSparkJobService;
+            _supportLinkService = supportLinkService;
         }
 
+      
         [HttpPost]
         public async Task<JObject> GetConnectorConfig(string ConnectorId)
         {
@@ -131,15 +138,70 @@ namespace Sentry.data.Web.Controllers
             List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
             dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
             model.AllDatasets = new List<SelectListItem>();
-            foreach(DatasetDto dto in dtoList)
+            foreach (DatasetDto dto in dtoList)
             {
                 SelectListItem item = new SelectListItem();
                 item.Text = dto.DatasetName;
                 item.Value = dto.DatasetId.ToString();
                 model.AllDatasets.Add(item);
             }
+
+
             return model;
         }
+
+        [HttpGet]
+        public ActionResult CreateSupportLink()
+        {
+            SupportLinkModel supportLinkModel = new SupportLinkModel();
+            return PartialView("_SupportLinkForm", supportLinkModel);
+        }
+
+
+        // adds a support link to the link farm
+        public ActionResult AddSupportLink(SupportLinkModel supportLinkModel)
+        {
+            if (supportLinkModel.Name == null || supportLinkModel.Url == null)
+            {
+                if (supportLinkModel.Name == null)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Name was not submitted");
+                }
+                if (supportLinkModel.Url == null)
+                {
+                    return Content(System.Net.HttpStatusCode.BadRequest.ToString(), "Url was not submitted");
+                }
+            }
+
+            SupportLinkDto supportLinkDto = supportLinkModel.ToDto();
+
+            try
+            {
+                _supportLinkService.AddSupportLink(supportLinkDto);
+            }
+            catch (Exception)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Adding Support Link failed");
+            }
+
+            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was successfully added to database");
+        }
+
+        // removes a support link from the link farm
+        public ActionResult RemoveSupportLink(int id)
+        {
+            try
+            {
+                _supportLinkService.RemoveSupportLink(id);
+            }
+            catch (Exception)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Removing Support Link failed");
+            }
+
+            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was successfully removed from database");
+        }
+
         //below methods all return admin page views
         public ActionResult Index()
         {
@@ -164,6 +226,21 @@ namespace Sentry.data.Web.Controllers
         {
             ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
             return View(reprocessDeadSparkJobModel);
+        }
+
+        public ActionResult SupportLinks()
+        {
+            List<SupportLinkDto> supportLinkDtos = _supportLinkService.GetSupportLinks();
+            List<SupportLinkModel> supportLinks = new List<SupportLinkModel>();
+            foreach(SupportLinkDto link in supportLinkDtos)
+            {
+                supportLinks.Add(link.ToModel());
+            }
+            SupportLinkWrapper supportLinkWrapper = new SupportLinkWrapper()
+            {
+                AllSupportLinks = supportLinks,
+            };
+            return View(supportLinkWrapper);
         }
        
         public ActionResult RawqueryParquetAudit()

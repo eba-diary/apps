@@ -14,18 +14,22 @@
     [UserDropLocationBucket] VARCHAR(1000) NULL, 
     [UserDropLocationPrefix] VARCHAR(1000) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
-    [NamedEnvironmentType] VARCHAR(25) NULL, 
+    [NamedEnvironmentType] VARCHAR(25) NOT NULL, 
     [IngestionType] INT NULL, 
     [IsDecompressionRequired] BIT NULL, 
     [CompressionType] INT NULL, 
     [IsPreProcessingRequired] BIT NULL, 
     [PreProcessingOption] INT NULL, 
     [DatasetId] INT NULL, 
-    [SchemaId] INT NULL, 
+    [SchemaId] INT NULL,
+    [PrimaryContact_ID] VARCHAR(8) NULL,
+    [IsSecured_IND] BIT NULL, 
+    [Security_ID] UNIQUEIDENTIFIER NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY], 
+    CONSTRAINT [FK_DataFlow_ToSecurity] FOREIGN KEY ([Security_Id]) REFERENCES [Security]([Security_Id])
 ) ON [PRIMARY]
 
 GO

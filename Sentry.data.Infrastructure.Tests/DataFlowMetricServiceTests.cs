@@ -1,17 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Helpers.Paginate;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Sentry.data.Core.Interfaces;
-using Sentry.data.Core;
-using Nest;
-using System.Threading;
-using Sentry.data.Web;
 
 namespace Sentry.data.Infrastructure.Tests
 {

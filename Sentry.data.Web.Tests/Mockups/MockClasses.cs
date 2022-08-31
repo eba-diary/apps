@@ -3,9 +3,6 @@ using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Tests
@@ -491,6 +488,48 @@ namespace Sentry.data.Web.Tests
                 Status = MockEventStatuses()[0],
                 UserWhoStartedEvent = "012345"
             };
+        }
+        public static DataFlow MockDataFlow()
+        {
+            DataFlow df = new DataFlow()
+            {
+                Id = 90,
+                Name = "MockDataFlow",
+                SaidKeyCode = "DATA",
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue,
+                CreatedBy = "444555",
+                CreatedDTM = DateTime.Now,
+                IngestionType = (int)IngestionType.User_Push,
+
+            };
+            return df;
+        }
+
+        public static DataFlowModel MockDataFlowModel()
+        {
+            DataFlowModel dataFlowModel = new DataFlowModel()
+            {
+                Name = "my_flow",
+                PreProcessingSelection = 0,
+                SchemaId = 1,
+                SAIDAssetKeyCode = "DATA",
+                DataFlowId = 0,
+                PrimaryContactId = "123456",
+                SchemaMaps = new List<SchemaMapModel>()
+                {
+                    new SchemaMapModel()
+                    {
+                        SelectedDataset = 1,
+                        SelectedSchema = 1
+                    }
+                }
+            };
+
+            return dataFlowModel;
         }
     }
 }

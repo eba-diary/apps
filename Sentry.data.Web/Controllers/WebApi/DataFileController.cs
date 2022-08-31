@@ -18,13 +18,12 @@ namespace Sentry.data.Web.WebApi.Controllers
     {
         private readonly IDatasetFileService _datafileService;
         private readonly IDataFlowService _flowService;
-        private readonly IDataFeatures _dataFeatures;
+
 
         public DataFileController(IDatasetFileService dataFileService, IDataFeatures dataFeatures, IDataFlowService dataFlowService)
         {
             _datafileService = dataFileService;
             _flowService = dataFlowService;
-            _dataFeatures = dataFeatures;
         }
 
         /// <summary>
@@ -142,12 +141,14 @@ namespace Sentry.data.Web.WebApi.Controllers
 
 
         /// <summary>
-        /// Validates Reprocessing
+        /// Triggers reprocessing for each datasetfile Id with a Hangfire job.  
+        /// Files will be batched with a delay to minimize impact to processing platform.
         /// </summary>
         /// <param name="datasetFileReprocessModel"></param>
         /// <returns></returns>
         ///
         [HttpPost]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("DataFile/Reprocess")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]

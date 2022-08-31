@@ -50,11 +50,12 @@ namespace Sentry.data.Web
         public JobModel RetrieverJob { get; set; }
         public List<CompressionModel> CompressionJob { get; set; }
         public string CreatedBy { get; set; }
+        public string PrimaryContactId { get; set; }
+        public bool IsSecured { get; set; }
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string StorageCode { get; set; }
-        public bool CLA3332_ConsolidatedDataFlows { get; set; }
 
         /// <summary>
         /// How is data getting into DSC (Push or Pull)

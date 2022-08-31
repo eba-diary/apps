@@ -31,6 +31,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public bool HasDataFlow { get; set; }
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
+        public string ControlMTriggerName { get; set; }
 
         public List<string> Validate()
         {
