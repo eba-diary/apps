@@ -2,7 +2,7 @@
 data.DatasetsSearch = {
 
     searchableDatasets: null,
-    keyupTimeout: null,
+    inputTimeout: null,
 
     init: function () {
         data.DatasetsSearch.initSearch(data.DatasetsSearch.getActivePage());
@@ -171,12 +171,12 @@ data.DatasetsSearch = {
         });
 
         //text box type delay
-        $(document).on("keyup", "#filter-search-text", function (e) {
-            if (data.DatasetsSearch.keyupTimeout) {
-                clearTimeout(data.DatasetsSearch.keyupTimeout);
+        $(document).on("input", "#filter-search-text", function (e) {
+            if (data.DatasetsSearch.inputTimeout) {
+                clearTimeout(data.DatasetsSearch.inputTimeout);
             }
 
-            data.DatasetsSearch.keyupTimeout = setTimeout(function () {
+            data.DatasetsSearch.inputTimeout = setTimeout(function () {
                 $(".filter-search-categories-container").addClass("search-blur");
                 data.DatasetsSearch.executeSearchWithoutLoader(1, true);
             }, 500);
