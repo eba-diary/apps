@@ -211,54 +211,6 @@ namespace Sentry.data.Core.Tests
             Assert.ThrowsException<DatasetUnauthorizedAccessException>(() => datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams));
         }
 
-
-
-        [TestMethod]
-        public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_Without_DataFiles()
-        {
-            // Arrange
-            //setup user
-            var user1 = new Mock<IApplicationUser>();
-            user1.Setup(f => f.AssociateId).Returns("123456");
-
-            //setup userService
-            var userService = new Mock<IUserService>();
-            userService.Setup(s => s.GetCurrentUser()).Returns(user1.Object);
-
-            //setup securityService
-            var userSecurity = new UserSecurity
-            {
-                CanViewFullDataset = true
-            };
-            var securityService = new Mock<ISecurityService>();
-            securityService.Setup(r => r.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(userSecurity);
-
-            //setup Entity objects
-            Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
-            FileSchema schema = MockClasses.MockFileSchema();
-            dfc.Schema = schema;
-
-            //setup db context with DatasetFileConfig
-            var context = new Mock<IDatasetContext>();
-            context.Setup(f => f.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { dfc }.AsQueryable());
-
-            PageParameters pageParams = new PageParameters(1, 5);
-
-            var messagePublisher = new Mock<IMessagePublisher>();
-
-
-            //Initialize Service
-            var datasetFileService = new DatasetFileService(context.Object, securityService.Object, userService.Object, messagePublisher.Object, null, null, null);
-
-            // Act
-            var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
-
-            // Assert
-            Assert.AreEqual(false, result.Any());
-            Assert.AreEqual(0, result.Count());
-        }
-
         [TestMethod]
         public void DatasetFileService_GetAllNonDeletedDatasetFilesBySchema_Schema_With_DataFiles()
         {
@@ -305,6 +257,10 @@ namespace Sentry.data.Core.Tests
             var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
+            userService.VerifyAll();
+            securityService.VerifyAll();
+            context.VerifyAll();
+
             Assert.AreEqual(true, result.Any());
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(23, result.First().Schema);
@@ -356,6 +312,10 @@ namespace Sentry.data.Core.Tests
             var result = datasetFileService.GetNonDeletedDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
+            userService.VerifyAll();
+            securityService.VerifyAll();
+            context.VerifyAll();
+
             Assert.AreEqual(true, result.Any());
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(23, result.First().Schema);
@@ -407,6 +367,10 @@ namespace Sentry.data.Core.Tests
             var result = datasetFileService.GetActiveDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
+            userService.VerifyAll();
+            securityService.VerifyAll();
+            context.VerifyAll();
+
             Assert.AreEqual(true, result.Any());
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(23, result.First().Schema);
@@ -458,6 +422,10 @@ namespace Sentry.data.Core.Tests
             var result = datasetFileService.GetActiveDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
+            userService.VerifyAll();
+            securityService.VerifyAll();
+            context.VerifyAll();
+
             Assert.AreEqual(false, result.Any());
         }
 
@@ -507,6 +475,10 @@ namespace Sentry.data.Core.Tests
             var result = datasetFileService.GetAllDatasetFileDtoBySchema(23, pageParams);
 
             // Assert
+            userService.VerifyAll();
+            securityService.VerifyAll();
+            context.VerifyAll();
+
             Assert.AreEqual(true, result.Any());
             Assert.AreEqual(1, result.Count());
             Assert.AreEqual(23, result.First().Schema);

@@ -59,9 +59,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public PagedList<DatasetFileDto> GetNonDeletedDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
-            var query = _datasetContext.DatasetFileStatusActive;
-
-            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive.Where(w => w.ObjectStatus != Core.GlobalEnums.ObjectStatusEnum.Deleted);;
+            IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusActive;
 
             return GetDatasetFileDtoBySchema(schemaId, pageParameters, datasetFileQueryable);
         }
