@@ -72,15 +72,27 @@ namespace Sentry.data.Core
                 Logger.Info($"GetSearchableTiles - GetDatasets {sw.ElapsedMilliseconds}ms");
 
                 sw.Restart();
-                var datasetFileDates = _datasetContext.DatasetFileStatusActive.GroupBy(x => x.Dataset).
-                    Select(x => new KeyValuePair<int, DateTime>(x.Key.DatasetId, x.Max(m => m.CreatedDTM))).
-                    ToDictionary(x => x.Key, x => x.Value);
+                Dictionary<int, DateTime> datasetFileDates = _datasetContext.DatasetFileStatusActive.GroupBy(x => x.Dataset).
+                    Select(x => new { DatasetId = x.Key.DatasetId, MaxDate = x.Max(m => m.CreatedDTM) }).
+                    ToDictionary(x => x.DatasetId, x => x.MaxDate);
                 sw.Stop();
                 Logger.Info($"GetSearchableTiles - MaxDatasetFileDate {sw.ElapsedMilliseconds}ms");
 
+                sw.Restart();
+                var datasetIdSaidCodes = _datasetContext.DataFlow.Where(x => x.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted).
+                    GroupBy(x => new { x.DatasetId, x.SaidKeyCode }).
+                    Select(x => x.Key).
+                    ToList();
+
+                Dictionary<int, List<string>> producerAssets = datasetIdSaidCodes.GroupBy(x => x.DatasetId).
+                    ToDictionary(x => x.Key, 
+                                 v => v.Select(d => d.SaidKeyCode).ToList());
+                sw.Stop();
+                Logger.Info($"GetSearchableTiles - ProducerAssets {sw.ElapsedMilliseconds}ms");
+
                 string associateId = _userService.GetCurrentUser().AssociateId;
 
-                List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId, datasetFileDates)).ToList();
+                List<Task<T>> tasks = datasets.Select(x => MapAsync(x, associateId, datasetFileDates, producerAssets)).ToList();
                 tileDtos = tasks.Select(x => x.Result).ToList();
             }
             catch (Exception ex)
@@ -103,7 +115,7 @@ namespace Sentry.data.Core
         #endregion
 
         #region Private
-        private async Task<T> MapAsync(Dataset dataset, string associateId, Dictionary<int, DateTime> datasetFileDates)
+        private async Task<T> MapAsync(Dataset dataset, string associateId, Dictionary<int, DateTime> datasetFileDates, Dictionary<int, List<string>> producerAssets)
         {
             return await Task.Run(() => {
                 T tileDto = MapToTileDto(dataset);
@@ -113,6 +125,11 @@ namespace Sentry.data.Core
                 if (datasetFileDates.TryGetValue(dataset.DatasetId, out DateTime maxDate) && maxDate > tileDto.LastActivityDateTime)
                 {
                     tileDto.LastActivityDateTime = maxDate;
+                }
+
+                if (producerAssets.TryGetValue(dataset.DatasetId, out List<string> assets))
+                {
+                    tileDto.ProducerAssets = assets;
                 }
 
                 return tileDto;

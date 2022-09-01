@@ -445,6 +445,11 @@ namespace Sentry.data.Core
                 public const string FAVORITE = "Favorite";
                 public const string CATEGORY = "Category";
                 public const string SECURED = "Secured";
+                public const string ORIGIN = "Origin";
+                public const string ENVIRONMENT = "Environment";
+                public const string ENVIRONMENTTYPE = "Environment Type";
+                public const string DATASETASSET = "Dataset Asset";
+                public const string PRODUCERASSET = "Producer Asset";
             }
 
             public static class BusinessIntelligence

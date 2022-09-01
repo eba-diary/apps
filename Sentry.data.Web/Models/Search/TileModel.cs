@@ -17,6 +17,11 @@ namespace Sentry.data.Web
         public string Color { get; set; }
         public bool IsSecured { get; set; }
         public string LastActivityShortDate { get; set; }
+        public string OriginationCode { get; set; }
+        public string Environment { get; set; }
+        public string EnvironmentType { get; set; }
+        public string DatasetAsset { get; set; }
+        public List<string> ProducerAssets { get; set; } = new List<string>();
         public bool IsReport { get; set; }
         public string AbbreviatedCategories { get; set; }
         public string ReportType { get; set; }

@@ -80,7 +80,12 @@ namespace Sentry.data.Web
             model.Color = dto.Color;
             model.IsSecured = dto.IsSecured;
             model.LastActivityShortDate = dto.LastActivityDateTime.ToShortDateString();
+            model.OriginationCode = dto.OriginationCode;
             model.IsReport = false;
+            model.Environment = dto.Environment;
+            model.EnvironmentType = dto.EnvironmentType;
+            model.DatasetAsset = dto.DatasetAsset;
+            model.ProducerAssets = dto.ProducerAssets;
         }
     }
 }

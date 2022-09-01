@@ -13,10 +13,12 @@ namespace Sentry.data.Web.Controllers
     public abstract class TileSearchController<T> : BaseSearchableController where T : DatasetTileDto
     {
         private readonly ITileSearchService<T> _tileSearchService;
+        private readonly IDataFeatures _dataFeatures;
 
-        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService) : base(filterSearchService)
+        protected TileSearchController(ITileSearchService<T> tileSearchService, IFilterSearchService filterSearchService, IDataFeatures dataFeatures) : base(filterSearchService)
         {
             _tileSearchService = tileSearchService;
+            _dataFeatures = dataFeatures;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
@@ -127,29 +129,46 @@ namespace Sentry.data.Web.Controllers
             {
                 foreach (string filter in filters)
                 {
-                    List<string> parts = filter.Split('_').ToList();
-                    string category = parts.First();
-
-                    FilterCategoryOptionModel optionModel = new FilterCategoryOptionModel()
+                    if (!string.IsNullOrWhiteSpace(filter))
                     {
-                        OptionValue = HttpUtility.UrlDecode(parts.Last()),
-                        ParentCategoryName = category,
-                        Selected = true
-                    };
+                        List<string> parts = filter.Split('_').ToList();
+                        string category = parts.First();
 
-                    FilterCategoryModel existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
+                        FilterCategoryOptionModel optionModel = new FilterCategoryOptionModel()
+                        {
+                            OptionValue = HttpUtility.UrlDecode(parts.Last()),
+                            ParentCategoryName = category,
+                            Selected = true
+                        };
 
-                    if (existingCategory != null)
-                    {
-                        existingCategory.CategoryOptions.Add(optionModel);
-                    }
-                    else
-                    {
-                        FilterCategoryModel newCategory = new FilterCategoryModel() { CategoryName = category };
-                        newCategory.CategoryOptions.Add(optionModel);
-                        categories.Add(newCategory);
+                        FilterCategoryModel existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
+
+                        if (existingCategory != null)
+                        {
+                            if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
+                            {
+                                existingCategory.CategoryOptions.Add(optionModel);
+                            }
+                        }
+                        else
+                        {
+                            FilterCategoryModel newCategory = new FilterCategoryModel() { CategoryName = category };
+                            newCategory.CategoryOptions.Add(optionModel);
+                            categories.Add(newCategory);
+                        }
                     }
                 }
+            }
+            else if (_dataFeatures.CLA4258_DefaultProdSearchFilter.GetValue())
+            {
+                FilterCategoryModel defaultProd = new FilterCategoryModel() { CategoryName = FilterCategoryNames.Dataset.ENVIRONMENTTYPE };
+                defaultProd.CategoryOptions.Add(new FilterCategoryOptionModel()
+                {
+                    OptionValue = NamedEnvironmentType.Prod.GetDescription(),
+                    ParentCategoryName = defaultProd.CategoryName,
+                    Selected = true
+                });
+                categories.Add(defaultProd);
             }
 
             return categories;
