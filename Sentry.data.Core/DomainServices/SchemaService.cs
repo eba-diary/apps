@@ -74,7 +74,6 @@ namespace Sentry.data.Core
             {
                 Logger.Error("schemaservice-createandsaveschema", ex);
                 throw;
-                //return 0;
             }
 
             return newSchema.SchemaId;
@@ -258,7 +257,6 @@ namespace Sentry.data.Core
         /// <exception cref="AggregateException">Thows exception when event could not be published</exception>
         private void GenerateConsumptionLayerCreateEvent(FileSchema schema, JObject propertyDeltaList)
         {
-            //SchemaRevision latestRevision = null;
             var latestRevision = _datasetContext.SchemaRevision
                 .Where(w => w.ParentSchema.SchemaId == schema.SchemaId)
                 .Select(s => new {s.ParentSchema.SchemaId, s.SchemaRevision_Id, s.Revision_NBR })
@@ -897,7 +895,7 @@ namespace Sentry.data.Core
                 Name = dto.Name,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 SchemaEntity_NME = dto.SchemaEntity_NME,
-                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtensionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault() : null,
+                Extension = GetSchemaFileExtension(dto),
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
@@ -946,6 +944,22 @@ namespace Sentry.data.Core
             _datasetContext.Add(schema);
 
             return schema;
+        }
+
+        private FileExtension GetSchemaFileExtension(FileSchemaDto dto)
+        {
+            if (dto.FileExtensionId != 0)
+            {
+                return _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+            }
+            else if (dto.FileExtensionName != null)
+            {
+                return _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private FileSchemaDto MapToDto(FileSchema scm)

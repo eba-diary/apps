@@ -1,19 +1,17 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NJsonSchema;
+using Sentry.Core;
 using Sentry.data.Core.DTO.Schema.Fields;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Factories.Fields;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moq;
-using Sentry.FeatureFlags;
-using Sentry.FeatureFlags.Mock;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Core.Helpers;
-using Sentry.data.Core.Exceptions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Sentry.Core;
 
 namespace Sentry.data.Core.Tests
 {
@@ -532,7 +530,7 @@ namespace Sentry.data.Core.Tests
         {
             //setup
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
-            DecimalField field = (DecimalField)schema.Revisions[0].Fields.Where(w => w.FieldType == SchemaDatatypes.DECIMAL).First();
+            DecimalField field = (DecimalField)schema.Revisions[0].Fields.First(w => w.FieldType == SchemaDatatypes.DECIMAL);
 
             DecimalFieldDto dto = new DecimalFieldDto(field);
 
@@ -546,7 +544,7 @@ namespace Sentry.data.Core.Tests
         {
             //setup
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
-            DecimalField field = (DecimalField)schema.Revisions[0].Fields.Where(w => w.FieldType == SchemaDatatypes.DECIMAL).First();
+            DecimalField field = (DecimalField)schema.Revisions[0].Fields.First(w => w.FieldType == SchemaDatatypes.DECIMAL);
 
             DecimalFieldDto dto = new DecimalFieldDto(field);
 
@@ -560,7 +558,7 @@ namespace Sentry.data.Core.Tests
         {
             //setup
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
-            DecimalField field = (DecimalField)schema.Revisions[0].Fields.Where(w => w.FieldType == SchemaDatatypes.DECIMAL).First();
+            DecimalField field = (DecimalField)schema.Revisions[0].Fields.First(w => w.FieldType == SchemaDatatypes.DECIMAL);
 
             DecimalFieldDto dto = new DecimalFieldDto(field);
 
@@ -574,7 +572,7 @@ namespace Sentry.data.Core.Tests
         {
             //setup
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
-            DecimalField field = (DecimalField)schema.Revisions[0].Fields.Where(w => w.FieldType == SchemaDatatypes.DECIMAL).First();
+            DecimalField field = (DecimalField)schema.Revisions[0].Fields.First(w => w.FieldType == SchemaDatatypes.DECIMAL);
 
             DecimalFieldDto dto = new DecimalFieldDto(field);
 
@@ -588,7 +586,7 @@ namespace Sentry.data.Core.Tests
         {
             //setup
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
-            DecimalField field = (DecimalField)schema.Revisions[0].Fields.Where(w => w.FieldType == SchemaDatatypes.DECIMAL).First();
+            DecimalField field = (DecimalField)schema.Revisions[0].Fields.First(w => w.FieldType == SchemaDatatypes.DECIMAL);
 
             //Action
             DecimalFieldDto dto = new DecimalFieldDto(field);
@@ -603,7 +601,7 @@ namespace Sentry.data.Core.Tests
         {
             //Setup
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
-            DecimalField field = (DecimalField)schema.Revisions[0].Fields.Where(w => w.FieldType == SchemaDatatypes.DECIMAL).First();
+            DecimalField field = (DecimalField)schema.Revisions[0].Fields.First(w => w.FieldType == SchemaDatatypes.DECIMAL);
 
             //Action
             DecimalFieldDto dto = new DecimalFieldDto(field);
@@ -3125,28 +3123,7 @@ namespace Sentry.data.Core.Tests
 
             return revision;
         }
-        private DecimalField BuildMockDecimalField(SchemaRevision parentRevision, string fieldType)
-        {
-            DecimalField field = new DecimalField()
-            {
-                Name = "decimalField",
-                CreateDTM = DateTime.Parse("2020-06-17 13:08:00"),
-                Description = "Decimal Field",
-                EndPosition = 0,
-                FieldType = SchemaDatatypes.DECIMAL,
-                IsArray = false,
-                LastUpdateDTM = DateTime.Parse("2020-06-17 13:08:00"),
-                NullableIndicator = false,
-                OrdinalPosition = parentRevision.Fields.Count + 1,
-                ParentField = null,
-                Precision = 6,
-                Scale = 2,
-                StartPosition = 0,
-                FieldId = 99,
-                ParentSchemaRevision = parentRevision
-            };
-            return field;
-        }
+       
         private DecimalField BuildMockDecimalField(SchemaRevision parentRevision)
         {
             DecimalField field = new DecimalField()

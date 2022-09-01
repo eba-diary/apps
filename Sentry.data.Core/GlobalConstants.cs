@@ -294,7 +294,7 @@ namespace Sentry.data.Core
             public const string DELETE_ISSUER = "DeleteIssuer";
             public const string DELETE_ISSUE_DTM = "DeleteIssueDTM";
             public const string INCLUDE_IN_SAS = "SAS_IND";
-            public static string SAS_LIBRARY = "SASLibrary";
+            public const string SAS_LIBRARY = "SASLibrary";
         }
 
         public static class Datatypes
@@ -473,11 +473,11 @@ namespace Sentry.data.Core
             public const string XML = "XML";
             public const string JSON = "JSON";
             public const string DELIMITED = "DELIMITED";
-            [Obsolete]
+            [Obsolete("Not supported for new Schema")]
             public const string ANY = "ANY"; //deprecated
             public const string CSV = "CSV";
             public const string TXT = "TXT";
-            [Obsolete]
+            [Obsolete("Format not supported")]
             public const string XLSX = "XLSX"; //deprecated
         }
 
