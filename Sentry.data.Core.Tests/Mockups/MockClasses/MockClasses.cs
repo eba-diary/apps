@@ -919,7 +919,7 @@ namespace Sentry.data.Core.Tests
                 CreateDTM = DateTime.Now,
                 CreatedBy = "072984",
                 DFQuestionnaire = null,
-                IngestionType = 1,
+                IngestionType = (int) IngestionType.DFS_Drop,
                 RetrieverJob = null,
                 IsCompressed = false,
                 CompressionType = 0,
@@ -956,7 +956,7 @@ namespace Sentry.data.Core.Tests
                 CreateDTM = DateTime.Now,
                 CreatedBy = "072984",
                 DFQuestionnaire = null,
-                IngestionType = 5,      //IngestionType=Topic
+                IngestionType = (int) IngestionType.Topic,
                 RetrieverJob = null,
                 IsCompressed = false,
                 CompressionType = 0,
