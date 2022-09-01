@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using Hangfire;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
@@ -28,13 +29,14 @@ namespace Sentry.data.Core
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -47,6 +49,7 @@ namespace Sentry.data.Core
             _snowProvider = snowProvider;
             _eventService = eventService;
             _elasticContext = elasticContext;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         private string RootBucket
@@ -237,6 +240,43 @@ namespace Sentry.data.Core
             }
 
             return 0;
+        }
+
+        public void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIds)
+        {
+            foreach(int schemaId in schemaIds)
+            {
+                _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schemaId));
+            }
+        }
+
+        public void CreateConsumptionLayersForSchema(int schemaId)
+        {
+            FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
+            FileSchemaDto dto = MapToDto(schema);
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
+
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            {
+                foreach(SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+                {
+                    if(!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
+                    {
+                        schema.ConsumptionDetails.Add(snowflakeConsumption);
+                    }
+                }
+            }
+            else
+            {
+                SchemaConsumptionSnowflake categoryLayer = (SchemaConsumptionSnowflake)GenerateCategoryConsumptionLayer(dto, schema, ds);
+                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == categoryLayer.SnowflakeType))
+                {
+                    schema.ConsumptionDetails.Add(categoryLayer);
+                }
+            }
+            _datasetContext.SaveChanges();
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -924,22 +964,13 @@ namespace Sentry.data.Core
             };
             if (_dataFeatures.CLA3718_Authorization.GetValue())
             {
-                schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset, isHumanResources);
+                schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);
             }
             else
             {
                 schema.ConsumptionDetails = new List<SchemaConsumption>()
                 {
-                    new SchemaConsumptionSnowflake()
-                    {
-                        Schema = schema,
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
-                    }
+                    GenerateCategoryConsumptionLayer(dto, schema, parentDataset)
                 };
             }
 
@@ -1194,15 +1225,15 @@ namespace Sentry.data.Core
             return results;
         }
 
-        private IList<SchemaConsumption> GenerateConsumptionLayers(FileSchemaDto dto, FileSchema schema, Dataset parentDataset, bool isHumanResources)
+        private IList<SchemaConsumption> GenerateConsumptionLayers(FileSchemaDto dto, FileSchema schema, Dataset parentDataset)
         {
             return new List<SchemaConsumption>()
                 {
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(parentDataset.IsHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), parentDataset.IsHumanResources, parentDataset.ShortName),
                         SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
@@ -1212,8 +1243,8 @@ namespace Sentry.data.Core
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateRawQuerySnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeDatabase = GenerateRawQuerySnowflakeDatabaseName(parentDataset.IsHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), parentDataset.IsHumanResources, parentDataset.ShortName),
                         SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
@@ -1223,8 +1254,8 @@ namespace Sentry.data.Core
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateRawSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeDatabase = GenerateRawSnowflakeDatabaseName(parentDataset.IsHumanResources),
+                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), parentDataset.IsHumanResources, parentDataset.ShortName),
                         SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
@@ -1232,6 +1263,20 @@ namespace Sentry.data.Core
                         SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
                     }
                 };
+        }
+
+        private SchemaConsumption GenerateCategoryConsumptionLayer(FileSchemaDto dto, FileSchema schema, Dataset parentDataset)
+        {
+            return new SchemaConsumptionSnowflake()
+            {
+                Schema = schema,
+                SnowflakeDatabase = GenerateSnowflakeDatabaseName(parentDataset.IsHumanResources),
+                SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), parentDataset.IsHumanResources, parentDataset.ShortName),
+                SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
+                SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+            };
         }
     }
 }

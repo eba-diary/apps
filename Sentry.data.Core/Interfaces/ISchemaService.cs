@@ -110,5 +110,15 @@ namespace Sentry.data.Core
         /// <exception cref="ValidationException">Thrown when metadata does not adhere to validations</exception>
         void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList);
         IDictionary<int, string> GetSchemaList();
+        /// <summary>
+        /// Creates jobs to create new consumption layer(s) for a schema.
+        /// </summary>
+        /// <param name="schemaIdList">List of schemas to create a job for.</param>
+        void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIdList);
+        /// <summary>
+        /// Creates new consumption layer(s) for a schema.
+        /// </summary>
+        /// <param name="schemaId">Schema ID</param>
+        void CreateConsumptionLayersForSchema(int schemaId);
     }
 }
