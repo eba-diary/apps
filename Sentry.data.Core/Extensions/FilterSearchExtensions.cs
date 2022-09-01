@@ -55,7 +55,6 @@ namespace Sentry.data.Core
                     {
                         LambdaExpression containsExpression = GetToStringParameterExpression(propertyInfo, categoryDto);
                         MethodInfo anyMethod = GetAnyMethodForType(propertyInfo);
-                        MemberExpression property = Expression.Property(parameter, propertyInfo.Name);
 
                         //x => x.ListProperty.Any(a => selectedValues.Contains(a.ToString()))
                         body = Expression.Call(null, anyMethod, new Expression[] { Expression.Property(parameter, propertyInfo.Name), containsExpression });
