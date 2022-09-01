@@ -30,5 +30,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
         IFeatureFlag<bool> CLA4310_UseHttpClient { get; }
         IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; }
+        IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation { get; }
+        IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand { get; }
     }
 }

@@ -490,6 +490,6 @@ namespace Sentry.data.Core
         public static class SecurityConstants
         {
             public const string ASSET_LEVEL_GROUP_NAME = "Default";
-        }
+        }        
     }
 }
