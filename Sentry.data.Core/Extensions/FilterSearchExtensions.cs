@@ -78,9 +78,7 @@ namespace Sentry.data.Core
             List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
 
             List<PropertyInfo> filterableProperties = CustomAttributeHelper.GetPropertiesWithAttribute<T, FilterSearchField>().ToList();
-
             List<Task<FilterCategoryDto>> tasks = filterableProperties.Select(x => CreateFilterCategoryAsync(results, previousFilters, x)).ToList();
-
             filterCategories.AddRange(tasks.Where(x => x.Result.CategoryOptions.Any()).Select(x => x.Result).ToList());
 
             return filterCategories;
