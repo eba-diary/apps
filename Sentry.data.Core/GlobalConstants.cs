@@ -417,6 +417,12 @@ namespace Sentry.data.Core
             public const string DATA = "DATA_";
         }
 
+        public static class SnowflakeConsumptionLayerPrefixes
+        {
+            public const string RAW_PREFIX = "RAW_";
+            public const string RAWQUERY_PREFIX = "RAWQUERY_";
+        }
+
         public static class ElasticAliases
         {
             public const string DATA_INVENTORY = "data-inventory";

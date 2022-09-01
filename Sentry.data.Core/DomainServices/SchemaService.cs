@@ -933,8 +933,8 @@ namespace Sentry.data.Core
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
+                        SnowflakeDatabase = GetSnowflakeDatabaseName(isHumanResources),
+                        SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.CategorySchemaParquet),
                         SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
@@ -1000,38 +1000,140 @@ namespace Sentry.data.Core
             return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
         }
 
-        private string GenerateSnowflakeDatabaseName(bool isHumanResources)
+        /// <summary>
+        /// Returns snowflake database name.  Only returns value for <see cref="SnowflakeConsumptionType.CategorySchemaParquet"/> type.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <returns></returns>
+        private string GetSnowflakeDatabaseName(bool isHumanResources)
         {
-            string dbName = (isHumanResources)? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
-            dbName += Config.GetDefaultEnvironmentName().ToUpper();
-            return dbName;
+            return GetSnowflakeDatabaseName(isHumanResources, null, SnowflakeConsumptionType.CategorySchemaParquet);
         }
 
-        private string GenerateRawQuerySnowflakeDatabaseName(bool isHumanResources)
+        /// <summary>
+        /// Returns snowflake database name.  Will generate value for all <see cref="SnowflakeConsumptionType"/> types.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <param name="datasetNamedEnvironmentType"></param>
+        /// <param name="consumptionLayerType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        internal string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
         {
-            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
-            dbName += "RAWQUERY_";
-            dbName += Config.GetDefaultEnvironmentName().ToUpper();
-            return dbName;
-        }
-
-        private string GenerateRawSnowflakeDatabaseName(bool isHumanResources)
-        {
-            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
-            dbName += "RAW_";
-            dbName += Config.GetDefaultEnvironmentName().ToUpper();
-            return dbName;
-        }
-
-        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources, string datasetShortName)
-        {
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            switch (consumptionLayerType)
             {
-                return datasetShortName;
+                case SnowflakeConsumptionType.CategorySchemaParquet:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), null, null);
+                case SnowflakeConsumptionType.DatasetSchemaParquet:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), datasetNamedEnvironmentType, null);
+                case SnowflakeConsumptionType.DatasetSchemaRaw:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), datasetNamedEnvironmentType, GlobalConstants.SnowflakeConsumptionLayerPrefixes.RAW_PREFIX);
+                case SnowflakeConsumptionType.DatasetSchemaRawQuery:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), datasetNamedEnvironmentType, GlobalConstants.SnowflakeConsumptionLayerPrefixes.RAWQUERY_PREFIX);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(consumptionLayerType),"Unhandled SnowflakeConsumptionType generating snowflake database name");
             }
-            return (isHumanResources)? "HR" : cat.Name.ToUpper();
         }
-        
+
+        /// <summary>
+        /// This method is used by <see cref="GetSnowflakeDatabaseName(bool)"/> or <see cref="GetSnowflakeDatabaseName(bool, string, SnowflakeConsumptionType)"/>.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <param name="dscNamedEnvironment"></param>
+        /// <param name="datasetNamedEnvironmentType"></param>
+        /// <param name="consumptionLayerPrefix"></param>
+        /// <returns></returns>
+        internal string GenerateSnowflakeDatabaseName(bool isHumanResources, string dscNamedEnvironment, string datasetNamedEnvironmentType, string consumptionLayerPrefix)
+        {
+            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
+
+            if (!string.IsNullOrWhiteSpace(consumptionLayerPrefix))
+            {
+                dbName += consumptionLayerPrefix;
+            }
+
+            if (string.IsNullOrWhiteSpace(datasetNamedEnvironmentType))
+            {
+                dbName += dscNamedEnvironment;
+                return dbName;
+            }
+
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
+                && dscNamedEnvironment == "QUAL")
+            {
+                dbName += dscNamedEnvironment;
+                dbName += "NP";
+            }
+            else if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
+                && dscNamedEnvironment == "PROD")
+            {
+                dbName += "NONPROD";
+            }
+            else
+            {
+                dbName += dscNamedEnvironment;
+            }
+
+            return dbName;
+        }
+
+        /// <summary>
+        /// Generates Snowflake schema name for all <see cref="SnowflakeConsumptionType"/> types.
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <param name="consumptionType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        internal string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
+        {
+            switch (consumptionType)
+            {
+                case SnowflakeConsumptionType.CategorySchemaParquet:
+                    return GenerateCategoryBasedSnowflakeSchemaName(dataset);
+                case SnowflakeConsumptionType.DatasetSchemaParquet:
+                case SnowflakeConsumptionType.DatasetSchemaRaw:
+                case SnowflakeConsumptionType.DatasetSchemaRawQuery:
+                    return GenerateDatasetBasedSnowflakeSchemaName(dataset, bool.Parse(Configuration.Config.GetHostSetting("AlwaysSuffixSchemaNames")));
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(consumptionType),$"Not configured for snowflakeconsumptionlayertype of {consumptionType}");
+            }
+        }
+
+
+        /// <summary>
+        /// Use this method by calling <see cref="GetSnowflakeSchemaName(Dataset, SnowflakeConsumptionType)"/>
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <param name="alwaysSuffixSchemaNames"></param>
+        /// <returns></returns>
+        internal string GenerateDatasetBasedSnowflakeSchemaName(Dataset dataset, bool alwaysSuffixSchemaNames)
+        {
+            
+            string cleansedDatasetName = dataset.DatasetName.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
+            string schemaName = cleansedDatasetName;
+
+#pragma warning disable S2589 // Boolean expressions should not be gratuitous
+            if (alwaysSuffixSchemaNames || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL"))
+#pragma warning restore S2589 // Boolean expressions should not be gratuitous
+            {
+                schemaName += "_" + dataset.NamedEnvironment;
+            }
+
+            return schemaName;
+        }
+
+        /// <summary>
+        /// Use this method by calling <see cref="GetSnowflakeSchemaName(Dataset, SnowflakeConsumptionType)"/>
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <returns></returns>
+        internal string GenerateCategoryBasedSnowflakeSchemaName(Dataset dataset)
+        {
+            return (dataset.IsHumanResources) ? "HR" : dataset.DatasetCategories.First().Name.ToUpper();
+        }
+
 
         /// <summary>
         /// Generates appropriate bucket after evaluating various variables
@@ -1201,9 +1303,9 @@ namespace Sentry.data.Core
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeDatabase = GetSnowflakeDatabaseName(isHumanResources, parentDataset.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaParquet),
+                        SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.DatasetSchemaParquet),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
                         SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
@@ -1212,9 +1314,9 @@ namespace Sentry.data.Core
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateRawQuerySnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeDatabase = GetSnowflakeDatabaseName(isHumanResources, parentDataset.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaRawQuery),
+                        SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.DatasetSchemaRawQuery),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
                         SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
@@ -1223,9 +1325,9 @@ namespace Sentry.data.Core
                     new SchemaConsumptionSnowflake()
                     {
                         Schema = schema,
-                        SnowflakeDatabase = GenerateRawSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                        SnowflakeDatabase = GetSnowflakeDatabaseName(isHumanResources, parentDataset.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaRaw),
+                        SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.DatasetSchemaRaw),
+                        SnowflakeTable = FormatSnowflakeTableNamePart(dto.Name),
                         SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                         SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
                         SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,

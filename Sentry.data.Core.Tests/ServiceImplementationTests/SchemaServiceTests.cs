@@ -1679,14 +1679,15 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        #region GenerateParquetStorageBucket Tests
         [TestMethod]
         public void SchemaService_GenerateParquetStorageBucket_HRBucket()
         {
             // Arrange
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null,null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
-            var result = schemaService.GenerateParquetStorageBucket(true,"DATA","DEV");
+            var result = schemaService.GenerateParquetStorageBucket(true, "DATA", "DEV");
 
             // Assert
             Assert.AreEqual("sentry-data-dev-hrdataset-ae2", result, false);
@@ -1705,6 +1706,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("sentry-data-dev-dataset-ae2", result, false);
         }
 
+        #endregion
+
+        #region GenerateParquetStoragePrefix Tests
         [TestMethod]
         public void SchemaService_GenerateParquetStoragePrefix_ConsolidatedDataFlow_True()
         {
@@ -1754,6 +1758,195 @@ namespace Sentry.data.Core.Tests
             // Assert
             Assert.ThrowsException<ArgumentNullException>(() => schemaService.GenerateParquetStoragePrefix("DATA", null, "123456"));
         }
+
+        #endregion
+
+        #region Generate Snowflake Metadata Tests
+        [TestMethod]
+        public void SchemaService_GenerateSnowflakeDatabaseName_Include_Prefix()
+        {
+            //Arrange
+            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("All");
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null);
+
+            //Act
+            string dbName_TESTNP = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+
+            //Assert
+            Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+        }
+
+        [TestMethod]
+        [DataRow(" ")]
+        [DataRow("ABC")]
+        public void SchemaService_GenerateSnowflakeDatabaseName(string allowableEnvironments)
+        {
+            // Arrange
+            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(allowableEnvironments);
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null);
+
+            // Act
+            string dbName_TESTNP = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.NonProd.ToString(), null);
+            string dbName_TESTPROD = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.Prod.ToString(), null);
+            string dbName_QUALNP = schemaService.GenerateSnowflakeDatabaseName(false, "QUAL", NamedEnvironmentType.NonProd.ToString(), null);
+            string dbName_QUALPROD = schemaService.GenerateSnowflakeDatabaseName(false, "QUAL", NamedEnvironmentType.Prod.ToString(), null);
+            string dbName_PRODNP = schemaService.GenerateSnowflakeDatabaseName(false, "PROD", NamedEnvironmentType.NonProd.ToString(), null);
+            string dbName_PRODPROD = schemaService.GenerateSnowflakeDatabaseName(false, "PROD", NamedEnvironmentType.Prod.ToString(), null);
+
+            string dbName_TESTNP_HR = schemaService.GenerateSnowflakeDatabaseName(true, "TEST", NamedEnvironmentType.NonProd.ToString(), null);
+            string dbName_TESTPROD_HR = schemaService.GenerateSnowflakeDatabaseName(true, "TEST", NamedEnvironmentType.Prod.ToString(), null);
+            string dbName_QUALNP_HR = schemaService.GenerateSnowflakeDatabaseName(true, "QUAL", NamedEnvironmentType.NonProd.ToString(), null);
+            string dbName_QUALPROD_HR = schemaService.GenerateSnowflakeDatabaseName(true, "QUAL", NamedEnvironmentType.Prod.ToString(), null);
+            string dbName_PRODNP_HR = schemaService.GenerateSnowflakeDatabaseName(true, "PROD", NamedEnvironmentType.NonProd.ToString(), null);
+            string dbName_PRODPROD_HR = schemaService.GenerateSnowflakeDatabaseName(true, "PROD", NamedEnvironmentType.Prod.ToString(), null);
+
+            // Assert
+            if (allowableEnvironments == " ")
+            {
+                Assert.AreEqual("DATA_TEST", dbName_TESTNP);
+                Assert.AreEqual("DATA_TEST", dbName_TESTPROD);
+                Assert.AreEqual("WDAY_TEST", dbName_TESTNP_HR);
+                Assert.AreEqual("WDAY_TEST", dbName_TESTPROD_HR);
+
+                Assert.AreEqual("DATA_QUALNP", dbName_QUALNP);
+                Assert.AreEqual("DATA_QUAL", dbName_QUALPROD);
+                Assert.AreEqual("DATA_NONPROD", dbName_PRODNP);
+                Assert.AreEqual("DATA_PROD", dbName_PRODPROD);
+
+                Assert.AreEqual("WDAY_QUALNP", dbName_QUALNP_HR);
+                Assert.AreEqual("WDAY_QUAL", dbName_QUALPROD_HR);
+                Assert.AreEqual("WDAY_NONPROD", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_PROD", dbName_PRODPROD_HR);
+            }
+            else
+            {
+
+                Assert.AreEqual("DATA_TEST", dbName_TESTNP);
+                Assert.AreEqual("DATA_TEST", dbName_TESTPROD);
+                Assert.AreEqual("WDAY_TEST", dbName_TESTNP_HR);
+                Assert.AreEqual("WDAY_TEST", dbName_TESTPROD_HR);
+
+                Assert.AreEqual("DATA_QUAL", dbName_QUALNP);
+                Assert.AreEqual("DATA_QUAL", dbName_QUALPROD);
+                Assert.AreEqual("DATA_PROD", dbName_PRODNP);
+                Assert.AreEqual("DATA_PROD", dbName_PRODPROD);
+
+                Assert.AreEqual("WDAY_QUAL", dbName_QUALNP_HR);
+                Assert.AreEqual("WDAY_QUAL", dbName_QUALPROD_HR);
+                Assert.AreEqual("WDAY_PROD", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_PROD", dbName_PRODPROD_HR);
+            }
+
+        }
+
+        [TestMethod]
+        public void SchemaService_GenerateSnowflakeSchemaName()
+        {
+            //Arrange
+            Dataset dataset = MockClasses.MockDataset();
+            dataset.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset.NamedEnvironment = "QUAL";
+            dataset.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            Dataset datasetHR = MockClasses.MockDataset();
+            datasetHR.DatasetCategories = new List<Category>() { new Category() { Name = "Human Resources", AbbreviatedName = "HR" } };
+            datasetHR.NamedEnvironment = "QUAL";
+            datasetHR.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            var schemaName = schemaService.GenerateCategoryBasedSnowflakeSchemaName(dataset);
+            var schemaName_HR = schemaService.GenerateCategoryBasedSnowflakeSchemaName(datasetHR);
+
+            //Assert
+            Assert.AreEqual("CLAIM", schemaName);
+            Assert.AreEqual("HR", schemaName_HR);
+        }
+
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void SchemaService_GenerateDatasetBasedSnowflakeSchemaName(bool alwaysSuffixSchemaNames)
+        {
+            //Arrange
+            Dataset dataset_Prod = MockClasses.MockDataset();
+            dataset_Prod.DatasetName = "DS With Long Name";
+            dataset_Prod.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset_Prod.NamedEnvironment = "PROD";
+            dataset_Prod.NamedEnvironmentType = NamedEnvironmentType.Prod;
+
+            Dataset dataset_Prod2 = MockClasses.MockDataset();
+            dataset_Prod2.DatasetName = "DS With Long Name";
+            dataset_Prod2.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset_Prod2.NamedEnvironment = "PROD2";
+            dataset_Prod2.NamedEnvironmentType = NamedEnvironmentType.Prod;
+
+            Dataset dataset_Qual = MockClasses.MockDataset();
+            dataset_Qual.DatasetName = "DS With Long Name";
+            dataset_Qual.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset_Qual.NamedEnvironment = "QUAL";
+            dataset_Qual.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            Dataset dataset_Qual2 = MockClasses.MockDataset();
+            dataset_Qual2.DatasetName = "DS With Long Name";
+            dataset_Qual2.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset_Qual2.NamedEnvironment = "QUAL2";
+            dataset_Qual2.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            Dataset dataset_Test = MockClasses.MockDataset();
+            dataset_Test.DatasetName = "DS With Long Name";
+            dataset_Test.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset_Test.NamedEnvironment = "TEST";
+            dataset_Test.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            string schemaName_Prod = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Prod, alwaysSuffixSchemaNames);
+            string schemaName_Prod2 = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Prod2, alwaysSuffixSchemaNames);
+            string schemaName_Qual = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Qual, alwaysSuffixSchemaNames);
+            string schemaName_Qual2 = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Qual2, alwaysSuffixSchemaNames);
+            string schemaName_Test = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Test, alwaysSuffixSchemaNames);
+
+            //Assert
+            string expected_DS_Name = "DSWITHLONGNAME";
+            string expected_Prod_SchemaName;
+            string expected_Prod2_SchemaName;
+            string expected_Qual_SchemaName;
+            string expected_Qual2_SchemaName;
+            string expected_Test_SchemaName;
+
+            if (alwaysSuffixSchemaNames)
+            {
+                expected_Prod_SchemaName = expected_DS_Name + "_PROD";
+                expected_Prod2_SchemaName = expected_DS_Name + "_PROD2";
+                expected_Qual_SchemaName = expected_DS_Name + "_QUAL";
+                expected_Qual2_SchemaName = expected_DS_Name + "_QUAL2";
+                expected_Test_SchemaName = expected_DS_Name + "_TEST";
+            }
+            else
+            {
+                expected_Prod_SchemaName = expected_DS_Name;
+                expected_Prod2_SchemaName = expected_DS_Name;
+                expected_Qual_SchemaName = expected_DS_Name;
+                expected_Qual2_SchemaName = expected_DS_Name + "_QUAL2";
+                expected_Test_SchemaName = expected_DS_Name + "_TEST";
+            }
+
+            Assert.AreEqual(expected_Prod_SchemaName, schemaName_Prod);
+            Assert.AreEqual(expected_Prod2_SchemaName, schemaName_Prod2);
+            Assert.AreEqual(expected_Qual_SchemaName, schemaName_Qual);
+            Assert.AreEqual(expected_Qual2_SchemaName, schemaName_Qual2);
+            Assert.AreEqual(expected_Test_SchemaName, schemaName_Test);
+
+        }
+
+        #endregion
 
         [TestMethod]
         public void UpdateAndSaveSchema_UnknownSchemaId_ThrowDatasetNotFound()
