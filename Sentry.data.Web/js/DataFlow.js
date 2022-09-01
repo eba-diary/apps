@@ -3,7 +3,7 @@
     Orig_Dataset_Selection: 0,
     Orig_Schema_Selection: 0,
 
-    IngestionType_TOPIC: "5",              //IngestionType_TOPIC matches public enum IngestionType
+    IngestionType_TOPIC: "4",              //IngestionType_TOPIC matches public enum IngestionType
 
     DataFlowFormInit: function (datasetId, schemaId) {
 
@@ -78,7 +78,6 @@
             $("#NamedEnvironmentPartial select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
-            $("#ingestionType").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
@@ -93,7 +92,7 @@
         data.DataFlow.HideOrShowTopic();
 
         //setup onChange event to fire when ingestionType drop down is changed
-        $('#ingestionType').change(function () {
+        $('#IngestionTypeSelection').change(function () {
             data.DataFlow.HideOrShowTopic();
         });
     },
@@ -101,7 +100,7 @@
     //function to HIDE OR SHOW TOPIC NAME for DSC PUSH DIGESTION types
     HideOrShowTopic: function () {
 
-        var val = $("#ingestionType").val();
+        var val = $("#IngestionTypeSelection").val();
         
 
         if (val == data.DataFlow.IngestionType_TOPIC) {

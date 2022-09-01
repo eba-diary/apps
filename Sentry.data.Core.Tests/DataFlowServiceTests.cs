@@ -1107,6 +1107,9 @@ namespace Sentry.data.Core.Tests
 
             //Assert
             Assert.AreEqual("S3_Topic_Name_Test_001", flow.S3ConnectorName, $"{nameof(DataFlow.S3ConnectorName)} mappping failed");
+
+            context.VerifyAll();
+            mockUserService.VerifyAll();
         }
 
 

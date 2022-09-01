@@ -10,7 +10,7 @@ BEGIN TRY
     
 	--HISTORY FIX
 	UPDATE DF
-	SET DF.IngestionType = 5  --(IngestionType=Topic=5)
+	SET DF.IngestionType = 4  --(IngestionType=Topic=4)
 	--select * 
 	FROM [schema] S
 	JOIN DataFlow DF  ON S.[Schema_Id] = DF.SchemaId

@@ -5,7 +5,7 @@
 data.Dataset = {
 
     DatasetFilesTable: {},
-    IngestionType_TOPIC: "5",              //IngestionType_TOPIC matches public enum IngestionType, MY WAY OF CREATING A CONST INSTEAD OF HARDCODE
+    IngestionType_TOPIC: "4",              //IngestionType_TOPIC matches public enum IngestionType, MY WAY OF CREATING A CONST INSTEAD OF HARDCODE
 
     ViewModel: function () {
         var self = this;

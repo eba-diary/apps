@@ -34,7 +34,7 @@
                 @Html.DropDownListFor(
                     x => x.IngestionTypeSelection,
                     Model.IngestionTypeDropDown,
-                    new { @class = "mdb-select", @id="ingestionType" })  
+                    new { @class = "mdb-select" })  
             </div>
 
             <div id="topicNameContainer" class="md-form">
@@ -67,6 +67,7 @@
                     @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "mdb-select" })
                 </a>
             </div>
+
             <div class="md-form compressionJobPanel" style="display:none">
                 <div id="compressionJobPanel">
                     @if (Model.CompressionJob != null)
@@ -79,12 +80,17 @@
                     }
                 </div>
             </div>
+
+
+        @*DSC PULL*@
         </div>
         <div class="retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
                 @Html.EditorFor(model => Model.RetrieverJob)
             </div>
         </div>
+
+
         <div class="preProcessingPanel" style="display:none;">
             <div class="md-form">
                 <h4>Does your data require Preprocessing?</h4>

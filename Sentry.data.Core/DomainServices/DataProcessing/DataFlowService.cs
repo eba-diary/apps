@@ -726,11 +726,7 @@ namespace Sentry.data.Core
             switch (dto.IngestionType)
             {
                 case (int)GlobalEnums.IngestionType.DFS_Drop:
-                    MapDataFlowStepsForPush(dto, df);
-                    break;
                 case (int)GlobalEnums.IngestionType.S3_Drop:
-                    MapDataFlowStepsForPush(dto, df);
-                    break;
                 case (int)GlobalEnums.IngestionType.Topic:
                     MapDataFlowStepsForPush(dto, df);
                     break;
