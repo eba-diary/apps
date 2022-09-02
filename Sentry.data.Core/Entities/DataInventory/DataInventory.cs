@@ -12,7 +12,7 @@ namespace Sentry.data.Core
 
         [PropertyName("asset_cde")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.ASSET, true)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.ASSET, true)]
         public string AssetCode { get; set; }
 
         [PropertyName("basedatabase_id")]
@@ -20,7 +20,7 @@ namespace Sentry.data.Core
 
         [PropertyName("base_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.COLLECTIONNAME)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.COLLECTIONNAME)]
         public string BaseName { get; set; }
 
         [PropertyName("change_cnt")]
@@ -31,11 +31,11 @@ namespace Sentry.data.Core
 
         [PropertyName("column_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.COLUMN)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.COLUMN)]
         public string ColumnName { get; set; }
 
         [PropertyName("column_typ")]
-        [FilterSearchField(FilterCategoryNames.DATATYPE)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.DATATYPE)]
         public string ColumnType { get; set; }
 
         [PropertyName("content_id")]
@@ -46,7 +46,7 @@ namespace Sentry.data.Core
 
         [PropertyName("database_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.DATABASE, true)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.DATABASE, true)]
         public string DatabaseName { get; set; }
 
         [PropertyName("effectivechange_cnt")]
@@ -68,14 +68,14 @@ namespace Sentry.data.Core
         public DateTime? ExpirationDateTime { get; set; }
 
         [PropertyName("isnullable_flg")]
-        [FilterSearchField(FilterCategoryNames.NULLABLE)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.NULLABLE)]
         public bool? IsNullable { get; set; }
 
         [PropertyName("isownerverified_flg")]
         public bool IsOwnerVerified { get; set; }
 
         [PropertyName("issensitive_flg")]
-        [FilterSearchField(FilterCategoryNames.SENSITIVE)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.SENSITIVE)]
         public bool IsSensitive { get; set; }
 
         [PropertyName("maxlength_len")]
@@ -85,7 +85,7 @@ namespace Sentry.data.Core
         public int? Precision { get; set; }
 
         [PropertyName("prod_typ")]
-        [FilterSearchField(FilterCategoryNames.ENVIRONMENT)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.ENVIRONMENT)]
         public string ProdType { get; set; }
 
         [PropertyName("saidlist_nme")]
@@ -108,12 +108,12 @@ namespace Sentry.data.Core
 
         [PropertyName("server_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.SERVER)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.SERVER)]
         public string ServerName { get; set; }
 
         [PropertyName("source_nme")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.SOURCETYPE)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.SOURCETYPE)]
         public string SourceName { get; set; }
 
         [PropertyName("@timestamp")]
@@ -124,7 +124,7 @@ namespace Sentry.data.Core
 
         [PropertyName("type_dsc")]
         [GlobalSearchField]
-        [FilterSearchField(FilterCategoryNames.COLLECTIONTYPE)]
+        [FilterSearchField(FilterCategoryNames.DataInventory.COLLECTIONTYPE)]
         public string TypeDescription { get; set; }
 
         [PropertyName("@version")]
@@ -143,7 +143,7 @@ namespace Sentry.data.Core
                 ObjectType = TypeDescription,
                 Column = ColumnName,
                 IsSensitive = IsSensitive,
-                ProdType = FilterCategoryOptionNormalizer.Normalize(FilterCategoryNames.ENVIRONMENT, ProdType),
+                ProdType = FilterCategoryOptionNormalizer.Normalize(FilterCategoryNames.DataInventory.ENVIRONMENT, ProdType),
                 ColumnType = ColumnType,
                 MaxLength = MaxLength ?? 0,
                 Precision = Precision ?? 0,

@@ -26,21 +26,23 @@ namespace Sentry.data.Web.Controllers
         [ChildActionOnly()]
         public ActionResult GetHeader(/*bool hasMenu*/)
         {
-            HeaderModel headerModel = new HeaderModel();
-            headerModel.ShowAdminControls = SharedContext.CurrentUser.CanUserSwitch;
-            headerModel.CanUserSwitch = (SharedContext.CurrentUser.CanUserSwitch && Configuration.Config.GetHostSetting("ShowUserChoice").ToLower() == "true");
-            headerModel.CurrentUserName = SharedContext.CurrentUser.DisplayName;
-            headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
-            headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
-            headerModel.CanManageAssetAlerts = SharedContext.CurrentUser.CanManageAssetAlerts;
-            headerModel.CanViewDataset = SharedContext.CurrentUser.CanViewDataset;
-            headerModel.CanViewDataAsset = SharedContext.CurrentUser.CanViewDataAsset;
-            headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
-            headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
-            headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
-            headerModel.CanViewBusinessArea = true;
-            headerModel.CanViewDataInventory = true;
-            headerModel.DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue();
+            HeaderModel headerModel = new HeaderModel
+            {
+                ShowAdminControls = SharedContext.CurrentUser.CanUserSwitch,
+                CanUserSwitch = (SharedContext.CurrentUser.CanUserSwitch && Configuration.Config.GetHostSetting("ShowUserChoice").ToLower() == "true"),
+                CurrentUserName = SharedContext.CurrentUser.DisplayName,
+                CanUseApp = SharedContext.CurrentUser.CanUseApp,
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
+                CanManageAssetAlerts = SharedContext.CurrentUser.CanManageAssetAlerts,
+                CanViewDataset = SharedContext.CurrentUser.CanViewDataset,
+                CanViewDataAsset = SharedContext.CurrentUser.CanViewDataAsset,
+                CanViewReports = SharedContext.CurrentUser.CanViewReports,
+                CanManageReports = SharedContext.CurrentUser.CanManageReports,
+                CanViewBusinessArea = true,
+                CanViewDataInventory = true,
+                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
+                DirectToSearchPages = _featureFlags.CLA3756_UpdateSearchPages.GetValue()
+            };
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {

@@ -1,5 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Helpers;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Web
@@ -54,16 +58,23 @@ namespace Sentry.data.Web
             {
                 SearchName = dto.SearchName,
                 SearchText = dto.SearchText,
-                FilterCategories = dto.FilterCategories?.Select(x => x.ToModel()).ToList()
+                FilterCategories = dto.FilterCategories.ToModels()
             };
         }
 
-        public static FilterCategoryModel ToModel(this FilterCategoryDto dto)
+        public static List<FilterCategoryModel> ToModels(this List<FilterCategoryDto> dtos)
+        {
+            return dtos?.Select(x => x.ToModel()).ToList();
+        }
+
+        private static FilterCategoryModel ToModel(this FilterCategoryDto dto)
         {
             return new FilterCategoryModel()
             {
                 CategoryName = dto.CategoryName,
-                CategoryOptions = dto.CategoryOptions?.Select(x => x.ToModel()).ToList()
+                CategoryOptions = dto.CategoryOptions?.Select(x => x.ToModel()).ToList(),
+                DefaultCategoryOpen = dto.DefaultCategoryOpen,
+                HideResultCounts = dto.HideResultCounts
             };
         }
 
@@ -84,8 +95,117 @@ namespace Sentry.data.Web
             {
                 SavedSearchId = dto.SavedSearchId,
                 SavedSearchName = dto.SavedSearchName,
+                SavedSearchUrl = dto.SavedSearchUrl,
                 IsFavorite = dto.IsFavorite
             };
+        }
+
+        public static TileSearchDto<T> ToDto<T>(this TileSearchModel model) where T : DatasetTileDto
+        {
+            TileSearchDto<T> dto = new TileSearchDto<T>()
+            {
+                PageSize = model.PageSize,
+                PageNumber = model.PageNumber,
+                UpdateFilters = model.UpdateFilters
+            };
+
+            switch ((TileSearchSortByOption)model.SortBy)
+            {
+                case TileSearchSortByOption.Alphabetical:
+                    dto.OrderByField = x => x.Name;
+                    break;
+                case TileSearchSortByOption.Favorites:
+                    dto.OrderByField = x => x.IsFavorite;
+                    dto.OrderByDescending = true;
+                    break;
+                case TileSearchSortByOption.RecentActivity:
+                    dto.OrderByField = x => x.LastActivityDateTime;
+                    dto.OrderByDescending = true;
+                    break;
+                default:
+                    break;
+            }
+
+            MapToParentDto(model, dto);
+
+            return dto;
+        }
+
+        public static TileSearchEventDto ToEventDto(this TileSearchModel model, int totalResults)
+        {
+            TileSearchEventDto dto = new TileSearchEventDto()
+            {
+                PageNumber = model.PageNumber,
+                PageSize = model.PageSize,
+                SortBy = model.SortBy,
+                Layout = model.Layout,
+                TotalResults = totalResults
+            };
+
+            MapToParentDto(model, dto);
+            return dto;
+        }
+
+        public static List<DatasetTileDto> ToDatasetTileDtos(this List<TileModel> models)
+        {
+            List<DatasetTileDto> tileDtos = new List<DatasetTileDto>();
+
+            if (models?.Any() == true)
+            {
+                foreach (TileModel model in models)
+                {
+                    DatasetTileDto dto = new DatasetTileDto();
+                    MapToParentDto(model, dto);
+                    tileDtos.Add(dto);
+                }
+            }
+
+            return tileDtos;
+        }
+
+        public static List<BusinessIntelligenceTileDto> ToBusinessIntelligenceTileDtos(this List<TileModel> models)
+        {
+            List<BusinessIntelligenceTileDto> tileDtos = new List<BusinessIntelligenceTileDto>();
+
+            if (models?.Any() == true)
+            {
+                foreach (TileModel model in models)
+                {
+                    BusinessIntelligenceTileDto dto = new BusinessIntelligenceTileDto()
+                    {
+                        ReportType = model.ReportType,
+                        UpdateFrequency = model.UpdateFrequency,
+                        ContactNames = model.ContactNames,
+                        BusinessUnits = model.BusinessUnits,
+                        Functions = model.Functions,
+                        Tags = model.Tags
+                    };
+
+                    MapToParentDto(model, dto);
+                    tileDtos.Add(dto);
+                }
+            }
+
+            return tileDtos;
+        }
+
+        private static void MapToParentDto(TileModel model, DatasetTileDto dto)
+        {
+            dto.Id = model.Id;
+            dto.Name = model.Name;
+            dto.Description = model.Description;
+            dto.Status = EnumHelper.GetByDescription<ObjectStatusEnum>(model.Status);
+            dto.IsFavorite = model.IsFavorite;
+            dto.Category = model.Category;
+            dto.AbbreviatedCategory = model.AbbreviatedCategory;
+            dto.Color = model.Color;
+            dto.IsSecured = model.IsSecured;
+            dto.LastActivityDateTime = DateTime.Parse(model.LastActivityShortDate);
+            dto.OriginationCode = model.OriginationCode;
+            dto.Environment = model.Environment;
+            dto.EnvironmentType = model.EnvironmentType;
+            dto.DatasetAsset = model.DatasetAsset;
+            dto.ProducerAssets = model.ProducerAssets;
         }
 
         private static void MapToParentDto(FilterSearchModel model, FilterSearchDto dto)

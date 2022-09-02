@@ -25,5 +25,6 @@ namespace Sentry.data.Web
         public Boolean CanViewBusinessArea { get; set; }
         public Boolean CanViewDataInventory { get; set; }
         public Boolean DisplayDataflowMetadata { get; set; }
+        public bool DirectToSearchPages { get; set; }
     }
 }

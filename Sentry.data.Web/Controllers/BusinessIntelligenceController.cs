@@ -168,6 +168,7 @@ namespace Sentry.data.Web.Controllers
             BusinessIntelligenceDetailDto dto = _businessIntelligenceService.GetBusinessIntelligenceDetailDto(id);
             BusinessIntelligenceDetailModel model = new BusinessIntelligenceDetailModel(dto);
             model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();
+            model.UseUpdatedSearchPage = _featureFlags.CLA3756_UpdateSearchPages.GetValue();
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Business Intelligence Detail Page", dto.DatasetId);
             return View(model);

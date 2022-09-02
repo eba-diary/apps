@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 
 

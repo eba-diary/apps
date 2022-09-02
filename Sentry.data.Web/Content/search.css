@@ -64,22 +64,21 @@
     background-color: #fff !important;
 }
 
-#listOfDatasets .disregardParentClick {
+.disregardParentClick {
     float: right;
     margin-top: -3px;
     margin-right: 1px;
-}
-
-#listOfDatasets .ul-dataset-link-item:hover {
-    opacity: 0.95;
-    box-shadow: 2px 6px 10px #888888;
-    cursor: pointer;
 }
 
 #listOfDatasets .ul-dataset-list-item {
     background-color: #fff;
     cursor: pointer;
 }
+
+    #listOfDatasets .ul-dataset-list-item:hover {
+        box-shadow: 2px 6px 10px #888888;
+        cursor: pointer;
+    }
 
 .dataset-list-filter-category label {
     display: block;
@@ -138,9 +137,66 @@
     vertical-align: middle;
 }
 
-.btnFavoriteSearch {
+.btnFavoriteSearch, .tile-favorite {
     font-size: 125%;
-    color: blue;
+    color: #003DA5;
     cursor: pointer;
     margin-top: 0.1rem !important;
+}
+
+#tile-results {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.tile-result {
+    position: relative;
+    margin-bottom: 0.75%;
+    padding: 0.5em;
+    background-color: #FFFFFF;
+}
+
+.tile-result-layout-0 {
+    width: calc((100% / 3) - 0.75%);
+}
+
+.tile-result-layout-1 {
+    width: 100%;
+}
+
+.tile-active:hover {
+    cursor: pointer;
+    box-shadow: 2px 6px 10px #888888;
+}
+
+.tile-description {
+    height: 2.5rem;
+    line-height: 1.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tile-mr {
+    margin-right: 0.75%;
+}
+
+.tile-result-content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.tile-result-options {
+    display: flex;
+}
+
+.search-blur {
+    opacity: 0.5;
 }

@@ -112,7 +112,7 @@ data.Favorites = {
         $("#spinner-wrapper").removeClass("hidden");
     },
 
-    toggleFavorite: function (element, type, successFunction, toastFunction) {
+    toggleFavorite: function (element, type, successFunction) {
 
         var path;
         
@@ -132,7 +132,7 @@ data.Favorites = {
             $(element).toggleClass("fas far");
             successFunction();
         }).fail(function () {
-            toastFunction("error", "There was an issue setting favorite for the saved search. Please try again or reach out to DSCSupport@sentry.com.")
+            data.Dataset.makeToast("error", "There was an issue setting favorite. Please try again or reach out to DSCSupport@sentry.com.")
         });
     }
 };
