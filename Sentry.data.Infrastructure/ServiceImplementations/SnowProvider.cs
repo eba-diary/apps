@@ -32,14 +32,15 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public System.Data.DataTable GetExceptRows(string db, string schema, string table, string queryParameter, AuditSearchType auditSearchType)
+        //File name compare
+        public System.Data.DataTable GetExceptRows(string sourceDb, string targetDb, string schema, string table, string queryParameter, AuditSearchType auditSearchType)
         {  
             string queryClause = "";
 
             switch (auditSearchType)
             {
                 case AuditSearchType.fileName:
-                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}'";
+                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}' AND DATE_PARTITION > '{DateTime.Now.AddDays(-30):yyyy-MM-dd}'";
                     break;
                 case AuditSearchType.dateSelect:
                     queryClause = $"WHERE DATE_PARTITION > '{queryParameter}'";
@@ -48,22 +49,28 @@ namespace Sentry.data.Infrastructure
 
             string q = "";
 
-            q += $"SELECT COALESCE(R.\"ETL_FILE_NAME_ONLY\",P.\"ETL_FILE_NAME_ONLY\") AS \"ETL_FILE_NAME\" FROM "; 
-            q += $"(SELECT \"ETL_FILE_NAME_ONLY\" FROM \"{db}\".\"{schema}\".\"{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS R ";
-            q += $"FULL OUTER JOIN (SELECT \"ETL_FILE_NAME_ONLY\" FROM \"DATA_QUAL\".\"{schema}\".\"VW_{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS P ";
-            q += $"ON P.\"ETL_FILE_NAME_ONLY\" = R.\"ETL_FILE_NAME_ONLY\"";
+            q += $"drop table if exists {targetDb}.{schema}.SrcCompare; ";
+            q += $"create temporary table {targetDb}.{schema}.SrcCompare as SELECT ETL_FILE_NAME_ONLY FROM {sourceDb}.{schema}.{table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
+            q += $"drop table if exists {targetDb}.{schema}.TgtCompare; ";
+            q += $"create temporary table {targetDb}.{schema}.TgtCompare as SELECT ETL_FILE_NAME_ONLY FROM {targetDb}.{schema}.VW_{table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
+
+            q += $"SELECT";
+            q += $"COALESCE(tgt.ETL_FILE_NAME_ONLY,src.ETL_FILE_NAME_ONLY) AS ETL_FILE_NAME ";
+            q += $"FROM {targetDb}.{schema}.TgtCompare AS tgt ";
+            q += $"FULL OUTER JOIN {targetDb}.{schema}.SrcCompare AS src ON tgt.ETL_FILE_NAME_ONLY = src.ETL_FILE_NAME_ONLY;";
 
             return ExecuteQuery(q);
         }
 
-        public System.Data.DataTable GetCompareRows(string db, string schema, string table, string queryParameter, AuditSearchType auditSearchType)
+        //File row count compare
+        public System.Data.DataTable GetCompareRows(string sourceDb, string targetDb, string schema, string table, string queryParameter, AuditSearchType auditSearchType)
         {
             string queryClause = "";
 
             switch (auditSearchType)
             {
                 case AuditSearchType.fileName:
-                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}'";
+                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}' AND DATE_PARTITION > '{DateTime.Now.AddDays(-30):yyyy-MM-dd}'";
                     break;
                 case AuditSearchType.dateSelect:
                     queryClause = $"WHERE DATE_PARTITION > '{queryParameter}'";
@@ -72,13 +79,22 @@ namespace Sentry.data.Infrastructure
 
             string q = "";
 
-            q += $"SELECT COALESCE(R.\"ETL_FILE_NAME_ONLY\",P.\"ETL_FILE_NAME_ONLY\") AS \"ETL_FILE_NAME\", R.\"RAW_COUNT\", P.\"PAR_COUNT\" FROM ";
-            q += $"(SELECT \"ETL_FILE_NAME_ONLY\", COUNT(1) AS \"RAW_COUNT\" FROM \"{db}\".\"{schema}\".\"{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS R ";
-            q += $"FULL OUTER JOIN (SELECT \"ETL_FILE_NAME_ONLY\", COUNT(1) AS \"PAR_COUNT\" FROM \"DATA_QUAL\".\"{schema}\".\"VW_{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS P ";
-            q += $"ON P.\"ETL_FILE_NAME_ONLY\" = R.\"ETL_FILE_NAME_ONLY\"";
+            q += $"drop table if exists {targetDb}.{schema}.SrcCompare; ";
+            q += $"create temporary table {targetDb}.{schema}.SrcCompare as SELECT ETL_FILE_NAME_ONLY, COUNT(1) AS RAW_COUNT FROM {sourceDb}.{schema}.{table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
+            q += $"drop table if exists {targetDb}.{schema}.TgtCompare; ";
+            q += $"create temporary table {targetDb}.{schema}.TgtCompare as SELECT ETL_FILE_NAME_ONLY, COUNT(1) AS PAR_COUNT FROM {targetDb}.{schema}.VW_{table} data {queryClause} group by ETL_FILE_NAME_ONLY; ";
+
+            q += $"SELECT ";
+            q += $"COALESCE(tgt.ETL_FILE_NAME_ONLY,src.ETL_FILE_NAME_ONLY) AS ETL_FILE_NAME, ";
+            q += $"ifnull(src.RAW_COUNT, 0) AS RAW_COUNT, ";
+            q += $"ifnull(tgt.PAR_COUNT, 0) AS PAR_COUNT ";
+            q += $"FROM {targetDb}.{schema}.TgtCompare AS tgt ";
+            q += $"FULL OUTER JOIN {targetDb}.{schema}.SrcCompare AS src ON tgt.ETL_FILE_NAME_ONLY = src.ETL_FILE_NAME_ONLY;";
 
             return ExecuteQuery(q);
         }
+
+
 
         private string BuildSelectQuery(string db, string schema, string table, int rows)
         {

@@ -49,7 +49,7 @@ namespace Sentry.data.Core
                 stopWatch.Start();
 
                 // Calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetCompareRows(schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
+                DataTable dataTable = _snowProvider.GetCompareRows(findRawqueryDBName(schemaObject.SnowflakeDatabase), schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
 
                 stopWatch.Stop();
 
@@ -111,7 +111,7 @@ namespace Sentry.data.Core
                 stopWatch.Start();
 
                 // Calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetExceptRows(schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
+                DataTable dataTable = _snowProvider.GetExceptRows(findRawqueryDBName(schemaObject.SnowflakeDatabase), schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
 
                 stopWatch.Stop();
 
@@ -145,6 +145,13 @@ namespace Sentry.data.Core
             }
 
             return baseAuditDto;
+        }
+
+        private string findRawqueryDBName(string db)
+        {
+            string rawqueryDB = db.Replace("_", "_RAWQUERY_");
+
+            return rawqueryDB;
         }
     }
 }
