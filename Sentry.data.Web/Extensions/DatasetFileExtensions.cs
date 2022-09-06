@@ -41,7 +41,8 @@ namespace Sentry.data.Web
                 FileExtension = dto.FileExtension,
                 FileKey = dto.FileKey,
                 FileBucket = dto.FileBucket,
-                ETag = dto.ETag
+                ETag = dto.ETag,
+                ObjectStatus = dto.ObjectStatus
             };
 
             return model;
@@ -70,7 +71,8 @@ namespace Sentry.data.Web
                 FileExtension = model.FileExtension,
                 FileKey= model.FileKey,
                 FileBucket= model.FileBucket,
-                ETag= model.ETag
+                ETag= model.ETag,
+                ObjectStatus = model.ObjectStatus
             };
 
             return dto;
