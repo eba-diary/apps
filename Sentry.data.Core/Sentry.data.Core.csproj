@@ -270,6 +270,7 @@
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
+    <Compile Include="Entities\MessageFormats\DeleteFilesResponseDeletedFileModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseSingleStatusModel.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />

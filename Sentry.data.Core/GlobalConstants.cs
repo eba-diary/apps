@@ -503,6 +503,13 @@ namespace Sentry.data.Core
         {
             public const string SUCCESS = "SUCCESS";
             public const string FAILURE = "FAILURE";
+            public const string NOTFOUND = "NOTFOUND";
+        }
+
+        public static class DeleteFileResponseFileType
+        {
+            public const string PARQUET = "PARQUET";
+          
         }
 
         public static class SecurityConstants
