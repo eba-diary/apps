@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -1240,7 +1240,6 @@
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
-    <Content Include="Views\Shared\_DataFileReprocessing.cshtml" />
     <Content Include="Views\Shared\_NonParquetFilesTable.cshtml" />
     <Content Include="Views\Shared\_RowCountCompareTable.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
