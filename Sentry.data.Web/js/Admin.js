@@ -366,12 +366,12 @@ data.Admin = {
             switch (searchTypeId) {
                 case "0":
                     searchParameter = $("#datetime-picker").val();
-
-                    postCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+                    postCheck = data.Admin.ReprocessJobDateRangeCheck(searchParameter, 720);
                     break;
                 case "1":
-                    searchParameter = $("#datasetFileDropdown").find(":selected").val();
+                    searchParameter = $("#datasetFileDropdown").find(":selected").text();
                     postCheck = true;
+                    break;
             }
 
             if (postCheck) {
@@ -463,7 +463,7 @@ data.Admin = {
         var dateRangeToHours = Math.floor(Math.abs((new Date() - new Date(selectedDate)) / 36e5)) + 1;
 
         if (dateRangeToHours > rangeMax || dateRangeToHours < 0) {
-            data.Dataset.makeToast("error", `Date selected must be within ${dateRangeToHours/24} day(s) before current date`);
+            data.Dataset.makeToast("error", `Date selected must be within ${rangeMax/24} day(s) before current date`);
             return false;
         } 
 

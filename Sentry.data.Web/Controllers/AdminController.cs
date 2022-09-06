@@ -25,7 +25,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IDeadSparkJobService _deadSparkJobService;
         private readonly ISupportLinkService _supportLinkService;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService connectorService, IAuditService auditSerivce)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService, IAuditService auditSerivce)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
@@ -52,7 +52,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetAuditTableResults(int datasetId, int schemaId, int auditId, int searchTypeId, string selectedDate, string datasetFileId)
+        public ActionResult GetAuditTableResults(int datasetId, int schemaId, int auditId, int searchTypeId, string searchParameter)
         {
             // find audit and search enum types 
             AuditType auditType = Utility.FindEnumFromId<AuditType>(auditId);
@@ -60,32 +60,17 @@ namespace Sentry.data.Web.Controllers
             AuditSearchType auditSearchType = Utility.FindEnumFromId<AuditSearchType>(searchTypeId);
 
             BaseAuditModel tableModel = new BaseAuditModel();
-
-            tableModel.DataFlowStepId = 1;
-
-
-            string queryParameter = "";
-
-            switch (auditSearchType)
-            {
-                case AuditSearchType.dateSelect: 
-                    queryParameter = selectedDate; 
-                    break;
-                case AuditSearchType.fileName: 
-                    queryParameter = datasetFileId; 
-                    break;
-            }
             
             string viewPath = "";
 
             switch (auditType)
             {
                 case AuditType.NonParquetFiles:
-                    tableModel =_auditSerivce.GetExceptRows(datasetId, schemaId, queryParameter, auditSearchType).MapToModel();
+                    tableModel =_auditSerivce.GetExceptRows(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
                     viewPath = "_NonParquetFilesTable";
                     break;
                 case AuditType.RowCountCompare:
-                    tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, queryParameter, auditSearchType).MapToCompareModel();
+                    tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
                     viewPath = "_RowCountCompareTable";
                     break;
             }

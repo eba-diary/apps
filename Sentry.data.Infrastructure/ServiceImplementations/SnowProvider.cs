@@ -32,12 +32,52 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public System.Data.DataTable GetExceptRows(string db, string schema, string table)
-        {
-            string q1 = $"SELECT \"ETL_FILE_NAME_ONLY\" FROM(SELECT \"ETL_FILE_NAME_ONLY\" FROM \"{db}\".\"{schema}\".\"{table}\" EXCEPT ";
-            string q2 = $"SELECT \"ETL_FILE_NAME_ONLY\" FROM \"DATA_QUAL\".\"{schema}\".\"VW_{table}\")";
+        public System.Data.DataTable GetExceptRows(string db, string schema, string table, string queryParameter, AuditSearchType auditSearchType)
+        {  
+            string queryClause = "";
 
-            return ExecuteQuery(q1+q2);
+            switch (auditSearchType)
+            {
+                case AuditSearchType.fileName:
+                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}'";
+                    break;
+                case AuditSearchType.dateSelect:
+                    queryClause = $"WHERE DATE_PARTITION > '{queryParameter}'";
+                    break;
+            }
+
+            string q = "";
+
+            q += $"SELECT COALESCE(R.\"ETL_FILE_NAME_ONLY\",P.\"ETL_FILE_NAME_ONLY\") AS \"ETL_FILE_NAME\" FROM "; 
+            q += $"(SELECT \"ETL_FILE_NAME_ONLY\" FROM \"{db}\".\"{schema}\".\"{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS R ";
+            q += $"FULL OUTER JOIN (SELECT \"ETL_FILE_NAME_ONLY\" FROM \"DATA_QUAL\".\"{schema}\".\"VW_{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS P ";
+            q += $"ON P.\"ETL_FILE_NAME_ONLY\" = R.\"ETL_FILE_NAME_ONLY\"";
+
+            return ExecuteQuery(q);
+        }
+
+        public System.Data.DataTable GetCompareRows(string db, string schema, string table, string queryParameter, AuditSearchType auditSearchType)
+        {
+            string queryClause = "";
+
+            switch (auditSearchType)
+            {
+                case AuditSearchType.fileName:
+                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}'";
+                    break;
+                case AuditSearchType.dateSelect:
+                    queryClause = $"WHERE DATE_PARTITION > '{queryParameter}'";
+                    break;
+            }
+
+            string q = "";
+
+            q += $"SELECT COALESCE(R.\"ETL_FILE_NAME_ONLY\",P.\"ETL_FILE_NAME_ONLY\") AS \"ETL_FILE_NAME\", R.\"RAW_COUNT\", P.\"PAR_COUNT\" FROM ";
+            q += $"(SELECT \"ETL_FILE_NAME_ONLY\", COUNT(1) AS \"RAW_COUNT\" FROM \"{db}\".\"{schema}\".\"{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS R ";
+            q += $"FULL OUTER JOIN (SELECT \"ETL_FILE_NAME_ONLY\", COUNT(1) AS \"PAR_COUNT\" FROM \"DATA_QUAL\".\"{schema}\".\"VW_{table}\" {queryClause} GROUP BY \"ETL_FILE_NAME_ONLY\") AS P ";
+            q += $"ON P.\"ETL_FILE_NAME_ONLY\" = R.\"ETL_FILE_NAME_ONLY\"";
+
+            return ExecuteQuery(q);
         }
 
         private string BuildSelectQuery(string db, string schema, string table, int rows)
@@ -52,6 +92,8 @@ namespace Sentry.data.Infrastructure
 
         private System.Data.DataTable ExecuteQuery(string query)
         {
+            Logger.Info(query);
+
             DataTable dt = new DataTable();
             string connectionString = Config.GetHostSetting("SnowConnectionString");
             Logger.Info("START STEP 1:  SnowProvider.ExecuteQuery() ConnectionString:" + connectionString + " Query:" + query);

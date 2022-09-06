@@ -1,7 +1,9 @@
-﻿using Sentry.data.Core.Helpers;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +14,11 @@ namespace Sentry.data.Core
     {
         private readonly IConfigService _configService;
         private readonly ISnowProvider _snowProvider;
-        private readonly IDataFlowService _dataFlowService;
 
-        public AuditService(IConfigService configService, ISnowProvider snowProvider, IDataFlowService dataFlowService)
+        public AuditService(IConfigService configService, ISnowProvider snowProvider)
         {
             _configService = configService;
             _snowProvider = snowProvider;
-            _dataFlowService = dataFlowService;
         }
 
         public BaseAuditDto GetExceptRows(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
@@ -40,35 +40,44 @@ namespace Sentry.data.Core
                 }
             }
 
-            /*DataTable dataTable = _snowProvider.GetExceptRows(schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable);*/
+            BaseAuditDto baseAuditDto = new BaseAuditDto();
 
-            // Test 
-            DataTable dataTable = new DataTable();
+            if (schemaObject != null) {
 
-            dataTable.Columns.Add("ETL_FILE_NAME_ONLY");
-            dataTable.Rows.Add("INVOICE20210924010017_20211025015625530.xml.json");
-            dataTable.Rows.Add("INVOICE007_20210616193749403.xml.json");
-            dataTable.Rows.Add("INVOICE20210609082824_20220429174008000.xml.json");
-            dataTable.Rows.Add("INVOICE010_20210622135943928.xml.json");
-            dataTable.Rows.Add("INVOICE009_20210622123632273.xml.json");
-            dataTable.Rows.Add("INVOICE011_20210622142521337.xml.json");
+                Logger.Info("Audit Query Execution: Started");
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
 
-            BaseAuditDto baseAuditDto = new BaseAuditDto() { DataFlowStepId = 1 };
+                // Calls to the snow provider to create call snowflake and return DataTable with resulting data
+                DataTable dataTable = _snowProvider.GetCompareRows(schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
 
-            List<AuditDto> auditDtos = new List<AuditDto>();
+                stopWatch.Stop();
 
-            int resultId = 0;
+                TimeSpan ts = stopWatch.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
 
-            if (dataTable.Rows != null)
-            {
-                foreach (DataRow row in dataTable.Rows)
+                Logger.Info("Audit Query Execution: Complete");
+                Logger.Info($"Elapsed Time: {elapsedTime}");
+
+                List<AuditDto> auditDtos = new List<AuditDto>();
+
+                // Check if the data table is not null and then map it's values to the list of Audit Dto's
+                if (dataTable.Rows != null)
                 {
-                    auditDtos.Add(new AuditDto() { DatasetFileId = resultId, DatasetFileName = row["ETL_FILE_NAME_ONLY"].ToString() });
-                    resultId++;
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        auditDtos.Add(new AuditDto() {
+                            DatasetFileName = DatabaseHelper.SafeDatabaseString(row["ETL_FILE_NAME"]),
+                            ParquetRowCount = 0,
+                            RawqueryRowCount = 0
+                        });
+                    }
                 }
-            }
 
-            baseAuditDto.AuditDtos = auditDtos;
+                baseAuditDto.AuditDtos = auditDtos;
+            }
 
             return baseAuditDto;
         }
@@ -92,42 +101,48 @@ namespace Sentry.data.Core
                 }
             }
 
-            /*DataTable dataTable = _snowProvider.GetExceptRows(schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable);*/
+            BaseAuditDto baseAuditDto = new BaseAuditDto();
 
-            DataTable dataTable = new DataTable();
-
-            dataTable.Columns.Add("ETL_FILE_NAME_ONLY");
-            dataTable.Columns.Add("PAR_COUNT");
-            dataTable.Columns.Add("RAW_COUNT");
-            dataTable.Rows.Add("INVOICE20210924010017_20211025015625530.xml.json", 45, 63);
-            dataTable.Rows.Add("INVOICE007_20210616193749403.xml.json", 29,20);
-            dataTable.Rows.Add("INVOICE20210609082824_20220429174008000.xml.json", 34,23);
-            dataTable.Rows.Add("INVOICE010_20210622135943928.xml.json", 0,2);
-            dataTable.Rows.Add("INVOICE009_20210622123632273.xml.json", 8,3);
-            dataTable.Rows.Add("INVOICE011_20210622142521337.xml.json", 21,17);
-
-            BaseAuditDto baseAuditDto = new BaseAuditDto() { DataFlowStepId = 1 };
-
-            List<AuditDto> auditDtos = new List<AuditDto>();
-
-            int resultId = 0;
-
-            if (dataTable.Rows != null)
+            if (schemaObject != null)
             {
-                foreach (DataRow row in dataTable.Rows)
+                Logger.Info("Audit Query Execution: Started");
+                Stopwatch stopWatch = new Stopwatch();
+
+                stopWatch.Start();
+
+                // Calls to the snow provider to create call snowflake and return DataTable with resulting data
+                DataTable dataTable = _snowProvider.GetExceptRows(schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
+
+                stopWatch.Stop();
+
+                TimeSpan ts = stopWatch.Elapsed;
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+
+                Logger.Info("Audit Query Execution: Complete");
+                Logger.Info($"Elapsed Time: {elapsedTime}");
+
+
+                List<AuditDto> auditDtos = new List<AuditDto>();
+
+                // Check if the data table is not null and then map it's values to the list of Audit Dto's
+                if (dataTable.Rows != null)
                 {
-                    auditDtos.Add(new CompareAuditDto() { 
-                        DatasetFileId = resultId, 
-                        DatasetFileName = row["ETL_FILE_NAME_ONLY"].ToString(), 
-                        ParquetRowCount = DatabaseHelper.SafeDatabaseInt(row["PAR_COUNT"]), 
-                        RawqueryRowCount = DatabaseHelper.SafeDatabaseInt(row["RAW_COUNT"])
-                    });
+                    foreach (DataRow row in dataTable.Rows)
+                    {       
+                        auditDtos.Add(new AuditDto()
+                        {
+                            DatasetFileName = DatabaseHelper.SafeDatabaseString(row["ETL_FILE_NAME"]),
+                            RawqueryRowCount = DatabaseHelper.SafeDatabaseInt(row["RAW_COUNT"]),
+                            ParquetRowCount = DatabaseHelper.SafeDatabaseInt(row["PAR_COUNT"])
+                        });
 
-                    resultId++;
+                    }
                 }
-            }
 
-            baseAuditDto.AuditDtos = auditDtos;
+                baseAuditDto.AuditDtos = auditDtos;
+            }
 
             return baseAuditDto;
         }
