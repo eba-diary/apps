@@ -117,6 +117,11 @@ namespace Sentry.data.Web.WebApi.Controllers
             public string DeleteIssuer { get; set; }
             public DateTime DeleteIssueDTM { get; set; }
 
+            //USED BY KNOCKOUT TO DISPLAY TOPIC NAME ON _SchemaAbout.cshtml
+            public int IngestionType { get; set; }
+            public string TopicName { get; set; }
+            public string S3ConnectorName { get; set; }
+
         }
         #endregion
 
@@ -854,7 +859,10 @@ namespace Sentry.data.Web.WebApi.Controllers
                         PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1),
                         ObjectStatus = item.Item1.ObjectStatus,
                         DeleteIssuer = item.Item1.DeleteIssuer,
-                        DeleteIssueDTM = item.Item1.DeleteIssueDTM
+                        DeleteIssueDTM = item.Item1.DeleteIssueDTM,
+                        TopicName = item.Item1.TopicName,
+                        IngestionType = item.Item1.IngestionType,
+                        S3ConnectorName = item.Item1.S3ConnectorName
                     };
                     List<DropLocation> rjList = new List<DropLocation>();
                     foreach (var job in item.Item2)

@@ -462,16 +462,6 @@ div[id*="filterType_"]:hover {
     /*background-color: white;*/
 }
 
-.ul-dataset-list-item:nth-child(even) {
-    background-color: #FFFFFF;
-}
-
-.ul-dataset-list-item:nth-child(odd) {
-    background-color: #F7F8FF;
-}
-
-
-
 .ownerDate {
     padding: 4px 0;
 }

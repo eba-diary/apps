@@ -1,12 +1,9 @@
-﻿using Newtonsoft.Json;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
-using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Caching;
@@ -578,6 +575,55 @@ namespace Sentry.data.Core
             return new ValidationException(results);
         }
 
+        public List<Dataset> GetDatasetMarkedDeleted()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
+            return dsList;
+        }
+
+        public string SetDatasetFavorite(int datasetId, string associateId)
+        {
+            try
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == associateId))
+                {
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = associateId,
+                        Created = DateTime.Now
+                    };
+
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully added favorite.";
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+                    _datasetContext.SaveChanges();
+
+                    return "Successfully removed favorite.";
+                }
+            }
+            catch (Exception)
+            {
+                _datasetContext.Clear();
+                throw;
+            }
+        }
+
+        public IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId)
+        {
+            return _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileConfig.ConfigId == configId && 
+                                                                      x.ParentDatasetFileId == null &&
+                                                                      !x.IsBundled);
+        }
+
+        #region "private functions"
         private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
         {
             if (dto.DatasetCategoryIds == null)
@@ -636,56 +682,6 @@ namespace Sentry.data.Core
                 }
             }
         }
-
-        public List<Dataset> GetDatasetMarkedDeleted()
-        {
-            List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
-            return dsList;
-        }
-
-        public string SetDatasetFavorite(int datasetId, string associateId)
-        {
-            try
-            {
-                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
-                if (!ds.Favorities.Any(w => w.UserId == associateId))
-                {
-                    Favorite f = new Favorite()
-                    {
-                        DatasetId = ds.DatasetId,
-                        UserId = associateId,
-                        Created = DateTime.Now
-                    };
-
-                    _datasetContext.Merge(f);
-                    _datasetContext.SaveChanges();
-
-                    return "Successfully added favorite.";
-                }
-                else
-                {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
-                    _datasetContext.SaveChanges();
-
-                    return "Successfully removed favorite.";
-                }
-            }
-            catch (Exception)
-            {
-                _datasetContext.Clear();
-                throw;
-            }
-        }
-
-        public IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId)
-        {
-            return _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileConfig.ConfigId == configId && 
-                                                                      x.ParentDatasetFileId == null &&
-                                                                      !x.IsBundled);
-        }
-
-        #region "private functions"
 
         private void DeleteDatasetFiles(int datasetId, int schemaId)
         {

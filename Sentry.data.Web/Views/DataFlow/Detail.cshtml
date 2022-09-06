@@ -9,12 +9,12 @@
     <span class="hidden-item" id="producerAssetGroupName">@Model.ProducerAssetGroupName</span>
 
     <h2 class="pt-3 pl-0">
-        DataFlow Details (<span>@Model.Name</span>)@if (Model.DisplayDataflowEdit)
+        DataFlow Details (<span>@Model.Name</span>)@if (Model.DisplayDataflowEdit && Model.UserSecurity.CanModifyDataflow)
         {
             <span id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="far fa-edit"></span></span>
         }
     </h2>
-    @if (!Model.DisplayDataflowEdit)
+    @if (Model.DisplayDataflowEdit && Model.CLA3718_Authorization && !Model.UserSecurity.CanModifyDataflow)
     {
         <div id="RequestAccessManageTypeSection" class="requestAccessStage pb-4 pt-4">
             <h6 class="pt-1">To Request Manage Access:</h6>

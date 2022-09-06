@@ -29,6 +29,8 @@ namespace Sentry.data.Web
         public List<DatasetFileConfigSchemaModel> DatasetFileConfigSchemas { get; set; }
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public string DataClassificationDescription { get; set; }
+        
+        //NOTE: USED BY KNOCKOUT AS MODEL TO DISPLAY ELEMENTS
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
         public bool DisplayTabSections { get; set; }
@@ -38,5 +40,6 @@ namespace Sentry.data.Web
         public bool DisplayDatasetFileUpload { get; set; }
         public bool HasDataAccess { get; set; }
         public bool ShowManagePermissionsLink { get; set; }
+        public bool UseUpdatedSearchPage { get; set; }
     }
 }

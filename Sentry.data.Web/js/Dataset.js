@@ -5,6 +5,7 @@
 data.Dataset = {
 
     DatasetFilesTable: {},
+    IngestionType_TOPIC: "4",              //IngestionType_TOPIC matches public enum IngestionType, MY WAY OF CREATING A CONST INSTEAD OF HARDCODE
 
     ViewModel: function () {
         var self = this;
@@ -126,6 +127,7 @@ data.Dataset = {
 
     },
 
+    // #region DELROY FUNCTIONS
     //****************************************************************************************************
     //DELROY FUNCTIONS
     //****************************************************************************************************
@@ -510,6 +512,7 @@ data.Dataset = {
     //END DELROY FUNCTIONS
     //****************************************************************************************************
 
+    // #endregion
 
 
     UpdateMetadata: function () {
@@ -758,6 +761,15 @@ data.Dataset = {
         self.Id = ko.observable(dataInput.Id);
         self.DetailUrl = ko.observable(dataInput.DetailUrl);
         self.Jobs = ko.observableArray();
+
+        //INGESTION TYPE SETUP FOR _SchemaAbout.cshtml WHICH DETERMINES WHAT TO DISPLAY FOR DATAFLOW DETAILS AKA
+        //IMPORTANT!!  In order for Razor View that uses knockout to display anything from Model, need to setup self with everything needed
+        self.IngestionType = ko.observable(dataInput.IngestionType);
+        self.TopicName = ko.observable(dataInput.TopicName);
+        self.IngestionType_TOPIC = ko.observable(data.Dataset.IngestionType_TOPIC);         //WAY OF CREATING A CONST INSTEAD OF HARDCODE FOR EVALUATION IN KNOCKOUT
+        self.S3ConnectorName = ko.observable(dataInput.S3ConnectorName);
+
+       
         $.each(dataInput.RetrieverJobs, function (i, val) {
             var item = new data.Dataset.DropLocation(val);
 
@@ -1156,7 +1168,7 @@ data.Dataset = {
         });
 
 
-        data.Dataset.SetReturntoSearchUrl();
+        data.Dataset.SetReturntoSearchUrl(datasetDetailModel.UseUpdatedSearchPage);
 
         $('#datasetConfigList').select2({ width: '85%' });
 
@@ -1529,7 +1541,7 @@ data.Dataset = {
 
     CancelLink: function (id) {
         if (id === undefined || id === 0) {
-            return "/Dataset/Index";
+            return "/Search/Datasets";
         } else {
             return "/Dataset/Detail/" + encodeURIComponent(id);
         }
@@ -1760,8 +1772,8 @@ data.Dataset = {
             },
             iDisplayLength: 10,
             aLengthMenu: [
-                [10, 25, 50, 100, 200, -1],
-                [10, 25, 50, 100, 200, "All"]
+                [10, 25, 50, 100, 200, 1000],
+                [10, 25, 50, 100, 200, 1000]
             ],
             columns: [
                 { data: null, className: "details-control", orderable: false, defaultContent: "", searchable: false },
@@ -2278,51 +2290,100 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         return table;
     },
 
-    SetReturntoSearchUrl: function () {
+    AddParamDivider: function (url) {
+        if (url.includes('?')) {
+            url += "&";
+        }
+        else {
+            url += "?";
+        }
+
+        return url
+    },
+
+    AddParameterToUrl(url, key) {
+        var value = localStorage.getItem(key);
+
+        if (value && value !== "") {
+            url = data.Dataset.AddParamDivider(url);
+            url += `${key}=${encodeURIComponent(value)}`;
+        }
+
+        return url;
+    },
+
+    CreateReturnToSearchUrl: function (url) {
+        url = data.Dataset.AddParameterToUrl(url, "searchText");
+        url = data.Dataset.AddParameterToUrl(url, "sortBy");
+        url = data.Dataset.AddParameterToUrl(url, "pageNumber");
+        url = data.Dataset.AddParameterToUrl(url, "pageSize");
+        url = data.Dataset.AddParameterToUrl(url, "layout");
+
+        var filters = JSON.parse(localStorage.getItem("filters"));
+        if (filters.length) {
+            url = data.Dataset.AddParamDivider(url);
+
+            url += filters.map(function (el) {
+                return 'filters=' + el;
+            }).join('&');
+        }
+        else {
+            url = data.Dataset.AddParamDivider(url) + "filters=";
+        }
+
+        return url;
+    },
+
+    SetReturntoSearchUrl: function (useUpdatedSearchPage) {
         var returnUrl = "/Search/Datasets";
         var returnLink = $('#linkReturnToDatasetList');
         var firstParam = true;
 
-        //---is this neede?
-        if (localStorage.getItem("searchText") !== null) {
-            var text = { searchPhrase: localStorage.getItem("searchText") };
-
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
-
-            returnUrl += $.param(text);
-
+        //checking an item that only is populated from the new search page
+        if (useUpdatedSearchPage) {
+            returnUrl = data.Dataset.CreateReturnToSearchUrl(returnUrl);
         }
+        else {
+            //---is this neede?
+            if (localStorage.getItem("searchText") !== null) {
+                var text = { searchPhrase: localStorage.getItem("searchText") };
 
-        if (localStorage.getItem("filteredIds") !== null) {
-            storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
-
-            returnUrl += "ids=";
-
-            for (i = 0; i < storedNames.length; i++) {
-                returnUrl += storedNames[i] + ',';
+                returnUrl += $.param(text);
             }
-            returnUrl = returnUrl.replace(/,\s*$/, "");
-        }
 
-        if (localStorage.getItem("pageSelection") !== null) {
+            if (localStorage.getItem("filteredIds") !== null) {
+                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
 
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            returnUrl += "page=" + localStorage.getItem("pageSelection");
-        }
+                returnUrl += "ids=";
 
-        if (localStorage.getItem("sortByVal") !== null) {
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+                for (i = 0; i < storedNames.length; i++) {
+                    returnUrl += storedNames[i] + ',';
+                }
+                returnUrl = returnUrl.replace(/,\s*$/, "");
+            }
 
-            returnUrl += "sort=" + localStorage.getItem("sortByVal");
-        }
+            if (localStorage.getItem("pageSelection") !== null) {
 
-        if (localStorage.getItem("itemsToShow") !== null) {
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+                returnUrl += "page=" + localStorage.getItem("pageSelection");
+            }
+
+            if (localStorage.getItem("sortByVal") !== null) {
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+                returnUrl += "sort=" + localStorage.getItem("sortByVal");
+            }
+
+            if (localStorage.getItem("itemsToShow") !== null) {
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+                returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+            }
         }
 
         returnLink.attr('href', returnUrl);

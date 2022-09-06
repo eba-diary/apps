@@ -131,7 +131,7 @@ data.Report = {
         data.Images.InitImages();
     },
 
-    DetailInit: function () {
+    DetailInit: function (useUpdatedSearchPage) {
 
         // Initialize the dataset detail page
 
@@ -202,12 +202,12 @@ data.Report = {
             
         });
 
-        data.Report.SetReturntoSearchUrl();
+        data.Report.SetReturntoSearchUrl(useUpdatedSearchPage);
     },
 
     DeleteDataset: function (id) {
 
-        var returnUrl = "/BusinessIntelligence/Index";
+        var returnUrl = "/Search/BusinessIntelligence";
         $.ajax({
             url: "/BusinessIntelligence/Delete/" + encodeURI(id),
             method: "POST",
@@ -236,7 +236,7 @@ data.Report = {
 
     CancelLink: function (id) {
         if (id === undefined || id === 0) {
-            return "/BusinessIntelligence/Index";
+            return "/Search/BusinessIntelligence";
         } else {
             return "/BusinessIntelligence/Detail/" + encodeURIComponent(id);
         }
@@ -287,52 +287,57 @@ data.Report = {
         }
     },
 
-    SetReturntoSearchUrl: function () {
+    SetReturntoSearchUrl: function (useUpdatedSearchPage) {
 
         var returnUrl = "/Search/BusinessIntelligence";
         var returnLink = $('#linkReturnToBusinessIntelligenceList');
         var firstParam = true;
 
-        //---is this neede?
-        if (localStorage.getItem("searchText") !== null) {
-            var text = { searchPhrase: localStorage.getItem("searchText") };
-
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
-
-            returnUrl += $.param(text);
-            
+        if (useUpdatedSearchPage) {
+            returnUrl = data.Dataset.CreateReturnToSearchUrl(returnUrl);
         }
+        else {
+            //---is this neede?
+            if (localStorage.getItem("searchText") !== null) {
+                var text = { searchPhrase: localStorage.getItem("searchText") };
 
-        if (localStorage.getItem("filteredIds") !== null) {
-            storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+                returnUrl += $.param(text);
 
-            returnUrl += "ids=";
-
-            for (i = 0; i < storedNames.length; i++) {
-                returnUrl += storedNames[i] + ',';
             }
-            returnUrl = returnUrl.replace(/,\s*$/, "");
-        }
 
-        if (localStorage.getItem("pageSelection") !== null) {
+            if (localStorage.getItem("filteredIds") !== null) {
+                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
 
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            returnUrl += "page=" + localStorage.getItem("pageSelection");
-        }
+                returnUrl += "ids=";
 
-        if (localStorage.getItem("sortByVal") !== null) {
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+                for (i = 0; i < storedNames.length; i++) {
+                    returnUrl += storedNames[i] + ',';
+                }
+                returnUrl = returnUrl.replace(/,\s*$/, "");
+            }
 
-            returnUrl += "sort=" + localStorage.getItem("sortByVal");
-        }
+            if (localStorage.getItem("pageSelection") !== null) {
 
-        if (localStorage.getItem("itemsToShow") !== null) {
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }            
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+                returnUrl += "page=" + localStorage.getItem("pageSelection");
+            }
+
+            if (localStorage.getItem("sortByVal") !== null) {
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+                returnUrl += "sort=" + localStorage.getItem("sortByVal");
+            }
+
+            if (localStorage.getItem("itemsToShow") !== null) {
+                if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+                returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+            }
         }
 
         returnLink.attr('href', returnUrl);

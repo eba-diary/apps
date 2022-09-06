@@ -32,44 +32,44 @@ namespace Sentry.data.Core.Tests
 
             Assert.AreEqual(11, fields.Count());
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.ASSET));
-            Assert.IsNotNull(fields[FilterCategoryNames.ASSET].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.ASSET));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.ASSET].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.ENVIRONMENT));
-            Assert.IsNotNull(fields[FilterCategoryNames.ENVIRONMENT].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.ENVIRONMENT));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.ENVIRONMENT].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DATABASE));
-            Assert.IsNotNull(fields[FilterCategoryNames.DATABASE].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.DATABASE));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.DATABASE].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DATATYPE));
-            Assert.IsNotNull(fields[FilterCategoryNames.DATATYPE].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.DATATYPE));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.DATATYPE].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.SOURCETYPE));
-            Assert.IsNotNull(fields[FilterCategoryNames.SOURCETYPE].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.SOURCETYPE));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.SOURCETYPE].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.SERVER));
-            Assert.IsNotNull(fields[FilterCategoryNames.SERVER].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.SERVER));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.SERVER].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.COLUMN));
-            Assert.IsNotNull(fields[FilterCategoryNames.COLUMN].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.COLUMN));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.COLUMN].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.COLLECTIONNAME));
-            Assert.IsNotNull(fields[FilterCategoryNames.COLLECTIONNAME].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.COLLECTIONNAME));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.COLLECTIONNAME].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.COLLECTIONTYPE));
-            Assert.IsNotNull(fields[FilterCategoryNames.COLLECTIONTYPE].Terms.Field.Expression);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.COLLECTIONTYPE));
+            Assert.IsNotNull(fields[FilterCategoryNames.DataInventory.COLLECTIONTYPE].Terms.Field.Expression);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.NULLABLE));
-            Assert.AreEqual("IsNullable", fields[FilterCategoryNames.NULLABLE].Terms.Field.Property.Name);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.NULLABLE));
+            Assert.AreEqual("IsNullable", fields[FilterCategoryNames.DataInventory.NULLABLE].Terms.Field.Property.Name);
 
-            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.SENSITIVE));
-            Assert.AreEqual("IsSensitive", fields[FilterCategoryNames.SENSITIVE].Terms.Field.Property.Name);
+            Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.DataInventory.SENSITIVE));
+            Assert.AreEqual("IsSensitive", fields[FilterCategoryNames.DataInventory.SENSITIVE].Terms.Field.Property.Name);
         }
 
         [TestMethod]
         public void FilterCategoryFields_DataInventory_AssetCode_FilterSearchField()
         {
-            Field field = NestHelper.GetFilterCategoryField<DataInventory>(FilterCategoryNames.ASSET);            
+            Field field = NestHelper.GetFilterCategoryField<DataInventory>(FilterCategoryNames.DataInventory.ASSET);            
             Assert.IsNotNull(field.Expression);
         }
 

@@ -42,12 +42,12 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(1, result.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = result.FilterCategories.First();
-            Assert.AreEqual(GlobalConstants.FilterCategoryNames.ENVIRONMENT, categoryDto.CategoryName);
+            Assert.AreEqual(GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT, categoryDto.CategoryName);
             Assert.AreEqual(1, categoryDto.CategoryOptions.Count);
 
             FilterCategoryOptionDto optionDto = categoryDto.CategoryOptions.First();
             Assert.AreEqual(GlobalConstants.FilterCategoryOptions.ENVIRONMENT_PROD, optionDto.OptionValue);
-            Assert.AreEqual(GlobalConstants.FilterCategoryNames.ENVIRONMENT, optionDto.ParentCategoryName);
+            Assert.AreEqual(GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT, optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
             Assert.AreEqual(0, optionDto.ResultCount);
 
@@ -101,6 +101,7 @@ namespace Sentry.data.Infrastructure.Tests
             SavedSearchOptionDto result = results.First();
             Assert.AreEqual("SearchName", result.SavedSearchName);
             Assert.AreEqual(1, result.SavedSearchId);
+            Assert.AreEqual("DataInventory/Search?savedSearch=SearchName", result.SavedSearchUrl);
             Assert.IsTrue(result.IsFavorite);
         }
 
@@ -132,7 +133,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("text search", x.SearchText);
                 Assert.AreEqual(GlobalConstants.SearchType.DATA_INVENTORY, x.SearchType);
                 Assert.AreEqual("000000", x.AssociateId);
-                Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", x.FilterCategoriesJson);
+                Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""P"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}],""DefaultCategoryOpen"":false,""HideResultCounts"":false}]", x.FilterCategoriesJson);
                 Assert.AreEqual(@"{""VisibleColumns"":[1,2,3]}", x.ResultConfigurationJson);
             });
             datasetContext.Setup(x => x.SaveChanges(true));
@@ -154,13 +155,13 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     new FilterCategoryDto()
                     {
-                        CategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = GlobalConstants.FilterCategoryOptions.ENVIRONMENT_PROD,
-                                ParentCategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true,
                                 ResultCount = 0
                             }
@@ -217,13 +218,13 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     new FilterCategoryDto()
                     {
-                        CategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = GlobalConstants.FilterCategoryOptions.ENVIRONMENT_NONPROD,
-                                ParentCategoryName = GlobalConstants.FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = GlobalConstants.FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true,
                                 ResultCount = 0
                             }
@@ -242,7 +243,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.AreEqual(GlobalConstants.SaveSearchResults.UPDATE, result);
             Assert.AreEqual("new search", savedSearch.SearchText);
-            Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}]}]", savedSearch.FilterCategoriesJson);
+            Assert.AreEqual(@"[{""CategoryName"":""Environment"",""CategoryOptions"":[{""OptionValue"":""D"",""ResultCount"":0,""ParentCategoryName"":""Environment"",""Selected"":true}],""DefaultCategoryOpen"":false,""HideResultCounts"":false}]", savedSearch.FilterCategoriesJson);
             Assert.AreEqual(@"{""VisibleColumns"":[2,3]}", savedSearch.ResultConfigurationJson);
         }
 

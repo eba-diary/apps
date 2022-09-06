@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Helpers
@@ -372,20 +373,102 @@ namespace Sentry.data.Web.Helpers
 
             return rj;
         }
+        public static List<SelectListItem> BuildTilePageSizeOptions(string selectedValue)
+        {
+            return new List<SelectListItem>()
+            {
+                new SelectListItem()
+                {
+                    Value = "15",
+                    Text = "15",
+                    Selected = selectedValue == "15"
+                },
+                new SelectListItem()
+                {
+                    Value = "30",
+                    Text = "30",
+                    Selected = selectedValue == "30"
+                },
+                new SelectListItem()
+                {
+                    Value = "90",
+                    Text = "90",
+                    Selected = selectedValue == "90"
+                },
+                new SelectListItem()
+                {
+                    Value = "-1",
+                    Text = "All",
+                    Selected = selectedValue == "-1"
+                },
+            };
+        }
+
         public static List<SelectListItem> BuildDatasetSortByOptions()
         {
-            List<SelectListItem> sortOptions = new List<SelectListItem>();
+            return BuildSelectListFromEnum<DatasetSortByOption>(0);
+        }
 
-            foreach(DatasetSortByOption item in Enum.GetValues(typeof(DatasetSortByOption)))
+        public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
+        {
+            List<SelectListItem> options = new List<SelectListItem>();
+
+            foreach (T item in Enum.GetValues(typeof(T)))
             {
-                sortOptions.Add(new SelectListItem
+                int value = (int)Convert.ChangeType(item, item.GetTypeCode());
+                options.Add(new SelectListItem
                 {
                     Text = item.GetDescription(),
-                    Value = ((int)item).ToString()
+                    Value = value.ToString(),
+                    Selected = value == selectedValue
                 });
             }
 
-            return sortOptions;
+            return options;
+        }
+
+        public static List<PageItemModel> BuildPageItemList(int totalResults, int pageSize, int selectedPage)
+        {
+            List<PageItemModel> pageItems = new List<PageItemModel>();
+
+            //calculate number of pages for result set
+            int numberOfPages = pageSize == -1 ? 1 : (totalResults + pageSize - 1) / pageSize;
+
+            if (numberOfPages < 10)
+            {
+                //display each page number because we are under 10 pages
+                pageItems.AddPages(1, numberOfPages, selectedPage);
+            }
+            else
+            {
+                //special logic for when there are 10 or more pages of results
+                if (selectedPage <= 5)
+                {
+                    //add first 5 pages because the selected page is in the first 5 pages
+                    pageItems.AddPages(1, 7, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPage(numberOfPages, selectedPage);
+
+                }
+                else if (selectedPage > numberOfPages - 5)
+                {
+                    //add the last 5 pages because the selected page is in the last 5
+                    pageItems.AddPage(1, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPages(numberOfPages - 6, numberOfPages, selectedPage);
+                }
+                else
+                {
+                    //selected page is somewhere in the middle, add 2 pages before and after
+                    pageItems.AddPage(1, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPages(selectedPage - 2, selectedPage + 2, selectedPage);
+                    pageItems.AddPageEllipsis();
+                    pageItems.AddPage(numberOfPages, selectedPage);
+                }
+            }            
+
+            return pageItems;
         }
 
         public static List<SelectListItem> BuildSelectListitem(List<KeyValuePair<string,string>> list, string defaultText)
@@ -629,5 +712,29 @@ namespace Sentry.data.Web.Helpers
 
             return ScheduleOptions;
         }
+
+        #region Private
+        private static void AddPages(this List<PageItemModel> pageItems, int start, int end, int selectedPage)
+        {
+            for (int i = start; i <= end; i++)
+            {
+                pageItems.AddPage(i, selectedPage);
+            }
+        }
+
+        private static void AddPage(this List<PageItemModel> pageItems, int pageNumber, int selectedPage)
+        {
+            pageItems.Add(new PageItemModel()
+            {
+                PageNumber = pageNumber.ToString(),
+                IsActive = pageNumber == selectedPage
+            });
+        }
+
+        private static void AddPageEllipsis(this List<PageItemModel> pageItems)
+        {
+            pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
+        }
+        #endregion
     }
 }
