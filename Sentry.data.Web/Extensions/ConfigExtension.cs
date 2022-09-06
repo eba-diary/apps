@@ -109,6 +109,7 @@ namespace Sentry.data.Web
                 SchemaRootPath = model.SchemaRootPath,
                 ParquetStorageBucket = model.ParquetStorageBucket,
                 ParquetStoragePrefix = model.ParquetStoragePrefix,
+                ControlMTriggerName = model.ControlMTriggerName
             };
         }
 
@@ -135,6 +136,7 @@ namespace Sentry.data.Web
                 SchemaRootPath = model.SchemaRootPath,
                 ParquetStorageBucket = model.ParquetStorageBucket,
                 ParquetStoragePrefix = model.ParquetStoragePrefix,
+                ControlMTriggerName = model.ControlMTriggerName
             };
         }
 
@@ -152,7 +154,8 @@ namespace Sentry.data.Web
                 FileFormatId = model.FileTypeId,
                 ParentDatasetId = model.DatasetId,
                 FileExtensionId = model.FileExtensionID,
-                SasLibrary = model.SasLibrary
+                SasLibrary = model.SasLibrary,
+                ControlMTriggerName = model.ControlMTriggerName
             };
         }
 
@@ -246,7 +249,8 @@ namespace Sentry.data.Web
             model.SchemaRootPath = schemaDto.SchemaRootPath?.Split(',');
             model.HasDataFlow = dto.HasDataFlow;
             model.ParquetStorageBucket = schemaDto.ParquetStorageBucket;
-            model.ParquetStoragePrefix = schemaDto.ParquetStoragePrefix;            
+            model.ParquetStoragePrefix = schemaDto.ParquetStoragePrefix;
+            model.ControlMTriggerName = schemaDto.ControlMTriggerName;
         }
 
         public static List<SchemaInfoModel> ToSchemaModel(this List<Core.DatasetFileConfigDto> dtoList)
@@ -315,6 +319,7 @@ namespace Sentry.data.Web
                 SchemaRootPath = mdl.SchemaRootPath != null ? string.Join(",", mdl.SchemaRootPath) : null,
                 ParquetStorageBucket = mdl.ParquetStorageBucket,
                 ParquetStoragePrefix = mdl.ParquetStoragePrefix,
+                ControlMTriggerName = mdl.ControlMTriggerName
             };
         }
 
@@ -346,6 +351,7 @@ namespace Sentry.data.Web
             model.ObjectStatus = config.ObjectStatus;
             model.ParquetStorageBucket = config.Schema?.ParquetStorageBucket;
             model.ParquetStoragePrefix = config.Schema?.ParquetStoragePrefix;
+            model.ControlMTriggerName = config.Schema?.ControlMTriggerName;
         }
     }
 }

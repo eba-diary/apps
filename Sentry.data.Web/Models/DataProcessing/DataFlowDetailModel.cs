@@ -18,5 +18,7 @@ namespace Sentry.data.Web
         public List<SchemaMapModel> MappedSchema { get; set; }
         public UserSecurity UserSecurity { get; set; }
         public bool DisplayDataflowEdit { get; set; }
+        public string ProducerAssetGroupName { get; set; }
+        public bool CLA3718_Authorization { get; set; }
     }
 }

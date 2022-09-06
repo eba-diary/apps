@@ -29,12 +29,13 @@ namespace Sentry.data.Core
         private Guid _guid;
         private string _bucket;
         private readonly ISAIDService _saidService;
+        private readonly IDatasetFileService _datasetFileService;
 
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService)
+            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService, IDatasetFileService datasetFileService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -48,6 +49,7 @@ namespace Sentry.data.Core
             _featureFlags = dataFeatures;
             _dataFlowService = dataFlowService;
             _saidService = saidService;
+            _datasetFileService = datasetFileService;
         }
 
         private IJobService JobService
@@ -615,6 +617,9 @@ namespace Sentry.data.Core
 
                     /* Mark schema object for delete */
                     MarkForDelete(scm);
+
+                    //DELETE ALL DATASETFILES UNDER SCHEMA BEING DELETED
+                    DeleteDatasetFiles(dfc.ParentDataset.DatasetId, scm.SchemaId);
                 }
                 catch (Exception ex)
                 {
@@ -988,6 +993,26 @@ namespace Sentry.data.Core
             scm.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
+        private void DeleteDatasetFiles(int datasetId, int schemaId)
+        {
+            //DO NOT DELETE IF FEATURE IS OFF
+            if (!_featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            {
+                return;
+            }
+
+            //GET ALL DATASETFILE IDS FOR SCHEMA
+            List<DatasetFile> dbList = _datasetContext.DatasetFileStatusActive.Where(w => w.Schema.SchemaId == schemaId).ToList();
+
+            //DELETE ALL FILES IN LIST
+            if (dbList != null && dbList.Count > 0)
+            {
+                int[] idList = dbList.Select(s => s.DatasetFileId).ToArray();
+                DeleteFilesParamDto dto = new DeleteFilesParamDto() { UserFileIdList = idList };
+                _datasetFileService.Delete(datasetId, schemaId, dto);
+            }
+        }
+
         private void MapToDto(DataSource dsrc, DataSourceDto dto)
         {
             IApplicationUser primaryContact = _userService.GetByAssociateId(dsrc.PrimaryContactId);
@@ -1286,6 +1311,7 @@ namespace Sentry.data.Core
             dto.ParquetStorageBucket = dfc.Schema?.ParquetStorageBucket;
             dto.ParquetStoragePrefix = dfc.Schema?.ParquetStoragePrefix;
             dto.ConsumptionDetails = dfc.Schema?.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList();
+            dto.ControlMTriggerName = dfc.Schema?.ControlMTriggerName;
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)
@@ -1356,20 +1382,17 @@ namespace Sentry.data.Core
                 externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList));
             }
 
-            if (_featureFlags.CLA3332_ConsolidatedDataFlows.GetValue())
+            //Get DataFlow id which populates data to schema
+            int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
+            if (schemaDataFlowId != 0)
             {
-                //Get DataFlow id which populates data to schema
-                int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
-                if (schemaDataFlowId != 0)
+                DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
+                List<RetrieverJob> schemaFlowRetrieverJobList = new List<RetrieverJob>();
+                if (schemaFlowDto != null)
                 {
-                    DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
-                    List<RetrieverJob> schemaFlowRetrieverJobList = new List<RetrieverJob>();
-                    if (schemaFlowDto != null)
-                    {
-                        schemaFlowRetrieverJobList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaDataFlowId).ToList());
-                    }
-                    externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(schemaFlowDto, schemaFlowRetrieverJobList));
+                    schemaFlowRetrieverJobList.AddRange(_datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == schemaDataFlowId).ToList());
                 }
+                externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(schemaFlowDto, schemaFlowRetrieverJobList));
             }
 
             return externalJobList;

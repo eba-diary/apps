@@ -1,0 +1,20 @@
+{
+  "name": "S3_ICCM_TESTV2_CCIS_CLAIMANT_02",
+  "connector": {
+    "state": "RUNNING",
+    "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+  },
+  "tasks": [
+    {
+      "id": 0,
+      "state": "RUNNING",
+      "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+    },
+    {
+      "id": 1,
+      "state": "RUNNING",
+      "worker_id": "fit-n-kafksv-10.sentry.com:8083"
+    }
+  ],
+  "type": "sink"
+}

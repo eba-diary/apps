@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44371</IISExpressSSLPort>
+    <IISExpressSSLPort>44321</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -122,17 +122,17 @@
     <Reference Include="LaunchDarkly.Cache, Version=1.0.2.0, Culture=neutral, PublicKeyToken=caeed01e3c7cd028, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Cache.1.0.2\lib\net45\LaunchDarkly.Cache.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.CommonSdk, Version=5.4.1.0, Culture=neutral, PublicKeyToken=45ef1738a929a7df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.CommonSdk.5.4.1\lib\net452\LaunchDarkly.CommonSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.CommonSdk, Version=5.5.0.0, Culture=neutral, PublicKeyToken=45ef1738a929a7df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.CommonSdk.5.5.0\lib\net452\LaunchDarkly.CommonSdk.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.EventSource, Version=4.1.3.0, Culture=neutral, PublicKeyToken=18e8c36453e3060f, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.EventSource.4.1.3\lib\net452\LaunchDarkly.EventSource.dll</HintPath>
+    <Reference Include="LaunchDarkly.EventSource, Version=4.2.0.0, Culture=neutral, PublicKeyToken=18e8c36453e3060f, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.EventSource.4.2.0\lib\net452\LaunchDarkly.EventSource.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.InternalSdk, Version=2.3.0.0, Culture=neutral, PublicKeyToken=ff53908ab73043b6, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.InternalSdk.2.3.0\lib\net452\LaunchDarkly.InternalSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.InternalSdk, Version=2.3.2.0, Culture=neutral, PublicKeyToken=ff53908ab73043b6, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.InternalSdk.2.3.2\lib\net452\LaunchDarkly.InternalSdk.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.JsonStream, Version=1.0.3.0, Culture=neutral, PublicKeyToken=baa039a572ce18d0, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.JsonStream.1.0.3\lib\net461\LaunchDarkly.JsonStream.dll</HintPath>
+    <Reference Include="LaunchDarkly.JsonStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=baa039a572ce18d0, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.JsonStream.1.1.0\lib\net461\LaunchDarkly.JsonStream.dll</HintPath>
     </Reference>
     <Reference Include="LaunchDarkly.Logging, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Logging.1.0.1\lib\net452\LaunchDarkly.Logging.dll</HintPath>
@@ -143,8 +143,8 @@
     <Reference Include="Hangfire.StructureMap, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.StructureMap.2.0.1\lib\net452\Hangfire.StructureMap.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.ServerSdk, Version=6.3.1.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.ServerSdk.6.3.1\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.ServerSdk, Version=6.3.2.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.ServerSdk.6.3.2\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
     </Reference>
     <Reference Include="LazyCache, Version=0.7.1.44, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LazyCache.0.7.1.44\lib\net45\LazyCache.dll</HintPath>
@@ -345,11 +345,11 @@
     <Reference Include="System.Text.Encoding.CodePages, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encoding.CodePages.5.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.5.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.5.0.0\lib\net461\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.5.0.2\lib\net461\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.RegularExpressions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.RegularExpressions.4.3.1\lib\net463\System.Text.RegularExpressions.dll</HintPath>
@@ -430,15 +430,32 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\DataFlowMetricController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
+    <Compile Include="Extensions\AdminExtensions.cs" />
+    <Compile Include="Extensions\ConnectorExtensions.cs" />
+    <Compile Include="Extensions\DataFlowMetricExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
+    <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
+    <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
+    <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
+    <Compile Include="Models\AdminPage\SupportLinkWrapper.cs" />
+    <Compile Include="Models\AdminPage\SupportLinkModel.cs" />
+    <Compile Include="Models\ApiModels\DataFlow\DataFlowModel.cs" />
+    <Compile Include="Models\ApiModels\DataFlow\DataFlowDetailModel.cs" />
+    <Compile Include="Models\ApiModels\DataFlow\DataFlowStepModel.cs" />
+    <Compile Include="Models\ApiModels\DatasetFile\DatasetFileReprocessModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
@@ -450,11 +467,14 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
+    <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RemovePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\RequestPermissionInheritanceModel.cs" />
+    <Compile Include="Models\Layout\SideBarModel.cs" />
     <Compile Include="Models\Search\FilterCategoryModel.cs" />
     <Compile Include="Models\Search\FilterCategoryOptionModel.cs" />
     <Compile Include="Models\Search\FilterSearchConfigModel.cs" />
@@ -466,6 +486,7 @@
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
+    <Content Include="Content\admin.css" />
     <Content Include="Content\all.css" />
     <Content Include="Content\all.min.css" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -1216,9 +1237,21 @@
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
+    <Content Include="Views\Shared\_AdminLayout.cshtml" />
+    <Content Include="Views\Admin\DataFileReprocessing.cshtml" />
+    <Content Include="Views\Shared\_AdminTest2.cshtml" />
+    <Content Include="Views\Shared\_AdminTest4.cshtml" />
+    <Content Include="Views\Shared\_AdminTest3.cshtml" />
+    <Content Include="Views\Admin\ConnectorStatus.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFile.cshtml" />
+    <Content Include="Views\Shared\_DeadJobTable.cshtml" />
+    <Content Include="Views\Admin\ReprocessDeadSparkJobs.cshtml" />
+    <Content Include="Views\Admin\DataFlowMetrics.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Shared\_AdminSideNav.cshtml" />
+    <Content Include="Views\Admin\SupportLinks.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1982,6 +2015,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Helpers\Validation\" />
     <Folder Include="Images\Home\" />
+    <Folder Include="Models\ApiModels\Admin\" />
     <Folder Include="Models\Dataset\ApiModels\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\AccessRequest\" />
@@ -2049,9 +2083,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost.sentry.com:44321</IISUrl>
+          <IISUrl>https://localhost.sentry.com:44321/</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost.sentry.com:44321</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44321/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

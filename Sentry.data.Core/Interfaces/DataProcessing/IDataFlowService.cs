@@ -4,6 +4,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -18,9 +19,12 @@ namespace Sentry.data.Core
         /// <returns></returns>
         /// <exception cref="Sentry.data.Core.Exceptions.DataFlowNotFound"></exception>
         DataFlowDetailDto GetDataFlowDetailDto(int id);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoByDatasetId(int datasetId);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoBySchemaId(int schemaId);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoByStorageCode(string storageCode);
+
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);
-
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);
@@ -46,13 +50,6 @@ namespace Sentry.data.Core
         /// <exception cref="Exceptions.DataFlowStepNotFound">Thrown if dataf flow step is not found</exception>
         /// <exception cref="ArgumentNullException">Thrown if parameter is not specified</exception>
         DataFlowStep GetDataFlowStepForDataFlowByActionType(int dataFlowId, DataActionType actionType);
-
-        /// <summary>
-        /// Will create an upgraded dataflow (single dataflow configuration) from existing
-        ///   producer dataflow metadata
-        /// </summary>
-        /// <param name="producerDataFlowIds"></param>
-        void UpgradeDataFlows(int[] producerDataFlowIds);
 
         /// <summary>
         /// For the list of dataflow ids provided, this will set ObjectStatus appropriately based on logicDelete flag.
@@ -108,6 +105,21 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
-        int UpdateandSaveDataFlow(DataFlowDto dfDto, bool deleteOriginal = true);
+
+        bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds);
+
+        DataFlowDto GetDataFlowDtoByStepId(int stepId);
+
+        int GetSchemaIdFromDatasetFileId(int datasetFileId);
+
+        /// <summary>
+        /// Return AD group which grants CanManageDataflow permissions to dataflow.
+        /// </summary>
+        /// <param name="dataflowId"></param>
+        /// <returns></returns>
+        string GetSecurityGroup(int dataflowId);
+
+
+        int UpdateandSaveDataFlow(DataFlowDto dfDto);
     }
 }

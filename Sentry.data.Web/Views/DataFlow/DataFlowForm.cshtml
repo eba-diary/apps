@@ -89,43 +89,19 @@
                 @* PreProcessing Options *@
                 <div class="md-form">
                     @Html.LabelFor((model) => model.PreProcessingSelection, new { @class = "mdb-main-label" })
-                        @Html.DropDownListFor(
-                            x => x.PreProcessingSelection,
-                            Model.PreProcessingOptionsDropdown,
-                            new { @class = "mdb-select", @placeholder = "Select option" })
+                    @Html.DropDownListFor(
+                        x => x.PreProcessingSelection,
+                        Model.PreProcessingOptionsDropdown,
+                        new { @class = "mdb-select", @placeholder = "Select option" })
                 </div>
             </div>
         </div>
-        if (Model.CLA3332_ConsolidatedDataFlows)
-        {
-            <div class="schemaMapPanel md-form" style="display:none;">
-                <h4>Where do you want the data to go?</h4>
-                <div id="schemaMapPanel">
-                    @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
-                </div>
+        <div class="schemaMapPanel md-form" style="display:none;">
+            <h4>Where do you want the data to go?</h4>
+            <div id="schemaMapPanel">
+                @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
             </div>
-        }
-        else
-        {
-            <div class="schemaMapPanel" style="display:none;">
-                <div class="md-form">
-                   <h4>Where do you want the data to go?</h4>
-                    @if (Model.CLA3332_ConsolidatedDataFlows)
-                    {
-                        <div id="schemaMapPanel">
-                            @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
-                        </div>
-                    }
-                    else
-                    {
-                        <div id="schemaMapPanel" class="md-form">
-                            @Html.EditorForMany(m => m.SchemaMaps, x => x.Index)
-                            <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
+        </div>
         <div class="form-group formSubmitButtons" style="display: none;">
             <div>
                 <input type="submit" value="Submit" class="btn btn-primary waves-effect waves-light" />
@@ -148,32 +124,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
     <script type="text/javascript">
         $(function () {
-            data.DataFlow.CLA3332_ConsolidatedDataFlows = @Model.CLA3332_ConsolidatedDataFlows.ToString().ToLower();
             data.DataFlow.DataFlowFormInit(@Model.SelectedDataset, @Model.SelectedSchema);
-
-            @if (!Model.CLA3332_ConsolidatedDataFlows) {
-                <text>
-                //Adding delete button logic here to ensure it is added to
-                // any additional schemaMapLineItems that are added
-                $(document).on("click", "#btnSchemaMapRemove", function () {
-                    if ($('.schemaMapLineItem.active').length === 1) {
-                        Sentry.ShowModalAlert("At least one schema mapping is required");
-                    }
-                    else {
-                        var self = $(this);
-                        var parentContainer = self.parent(".schemaMapLineItem");
-                        var isDeleteHidden = parentContainer.find("[id$=IsDeleted]");
-                        //Set hidden value for when object is model is passed back to controller
-                        $(isDeleteHidden).val("True");
-                        //remove active class from parentcontainer to ensure not counted
-                        // when ensuring there is at least one active mapping
-                        $(parentContainer).removeClass("active");
-                        //Hide parentcontainer to ensure not displayed to user after deletion
-                        $(parentContainer).hide();
-                    }
-                })
-                </text>
-            }
         });
     </script>
 }

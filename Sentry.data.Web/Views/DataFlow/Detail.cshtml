@@ -5,19 +5,30 @@
 }
 
 <div class="detailContainer ">
-    <h1 class="pt-3 pl-0">DataFlow Details </h1>
-    <div class="row pl-4">
-        <h2 class="pt-1"> @Model.Name</h2>
-        @if (Model.DisplayDataflowEdit)
+
+    <span class="hidden-item" id="producerAssetGroupName">@Model.ProducerAssetGroupName</span>
+
+    <h2 class="pt-3 pl-0">
+        DataFlow Details (<span>@Model.Name</span>)@if (Model.DisplayDataflowEdit && Model.UserSecurity.CanModifyDataflow)
         {
-            <div id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="far fa-edit"></span></div>
+            <span id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="far fa-edit"></span></span>
         }
-    </div>
+    </h2>
+    @if (Model.DisplayDataflowEdit && Model.CLA3718_Authorization && !Model.UserSecurity.CanModifyDataflow)
+    {
+        <div id="RequestAccessManageTypeSection" class="requestAccessStage pb-4 pt-4">
+            <h6 class="pt-1">To Request Manage Access:</h6>
+            <div class="btn-group" role="group">
+                <button id="RequestAccessManageMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/identityiq/accessRequest/accessRequest.jsf#/accessRequest/selectUser?quickLink=Request%20Access','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton">Use MyAccess to Request <em id="RequestAccessManageEntitlement" class="font-style-normal"></em></button>
+                <button id="RequestAccessManageCopyBtn" type="button" class="w-20 btn btn-default waves-effect waves-light requestAccessButton material-tooltip-main" data-toggle="tooltip" data-placement="right" title="Copy to clipboard" data-original-title="Copy to clipboard"><em class="far fa-copy fa-2x"></em></button>
+            </div>
+        </div>
+    }
     @if (Model.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete)
     {
         <h3 style="color:red"><strong>Pending Delete - Data will not be processed through this data flow</strong></h3>
     }
-    <div class="pl-4">
+    <div class="pl-0 pt-3">
         <h4 class="pt-1">Associated Retriever Jobs</h4>
         <div class="d-block">
             @if (Model.AssociatedJobs == null || Model.AssociatedJobs.Count > 0)
@@ -39,7 +50,6 @@
         </div>
     </div>
 
-    <hr />
     <h4 class="pt-3">DataFlow Steps </h4>
     <ul class="stepList">
         @foreach (DataFlowStepModel step in Model.Step)
@@ -64,7 +74,7 @@
             </li>
         }
     </ul>
-    <hr />
+
     <h4><span>Target Schema</span></h4>
     <div id="targetSchema">
         <div id="targetSchemaSpinner"></div>

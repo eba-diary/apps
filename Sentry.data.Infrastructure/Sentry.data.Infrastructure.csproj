@@ -77,17 +77,17 @@
     <Reference Include="LaunchDarkly.Cache, Version=1.0.2.0, Culture=neutral, PublicKeyToken=caeed01e3c7cd028, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Cache.1.0.2\lib\net45\LaunchDarkly.Cache.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.CommonSdk, Version=5.4.1.0, Culture=neutral, PublicKeyToken=45ef1738a929a7df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.CommonSdk.5.4.1\lib\net452\LaunchDarkly.CommonSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.CommonSdk, Version=5.5.0.0, Culture=neutral, PublicKeyToken=45ef1738a929a7df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.CommonSdk.5.5.0\lib\net452\LaunchDarkly.CommonSdk.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.EventSource, Version=4.1.3.0, Culture=neutral, PublicKeyToken=18e8c36453e3060f, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.EventSource.4.1.3\lib\net452\LaunchDarkly.EventSource.dll</HintPath>
+    <Reference Include="LaunchDarkly.EventSource, Version=4.2.0.0, Culture=neutral, PublicKeyToken=18e8c36453e3060f, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.EventSource.4.2.0\lib\net452\LaunchDarkly.EventSource.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.InternalSdk, Version=2.3.0.0, Culture=neutral, PublicKeyToken=ff53908ab73043b6, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.InternalSdk.2.3.0\lib\net452\LaunchDarkly.InternalSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.InternalSdk, Version=2.3.2.0, Culture=neutral, PublicKeyToken=ff53908ab73043b6, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.InternalSdk.2.3.2\lib\net452\LaunchDarkly.InternalSdk.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.JsonStream, Version=1.0.3.0, Culture=neutral, PublicKeyToken=baa039a572ce18d0, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.JsonStream.1.0.3\lib\net461\LaunchDarkly.JsonStream.dll</HintPath>
+    <Reference Include="LaunchDarkly.JsonStream, Version=1.1.0.0, Culture=neutral, PublicKeyToken=baa039a572ce18d0, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.JsonStream.1.1.0\lib\net461\LaunchDarkly.JsonStream.dll</HintPath>
     </Reference>
     <Reference Include="LaunchDarkly.Logging, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Logging.1.0.1\lib\net452\LaunchDarkly.Logging.dll</HintPath>
@@ -95,8 +95,8 @@
     <Reference Include="LaunchDarkly.Logging.Log4net, Version=1.0.1.0, Culture=neutral, PublicKeyToken=d9182e4b0afd33e7, processorArchitecture=MSIL">
       <HintPath>..\packages\LaunchDarkly.Logging.Log4net.1.0.1\lib\net452\LaunchDarkly.Logging.Log4net.dll</HintPath>
     </Reference>
-    <Reference Include="LaunchDarkly.ServerSdk, Version=6.3.1.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
-      <HintPath>..\packages\LaunchDarkly.ServerSdk.6.3.1\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
+    <Reference Include="LaunchDarkly.ServerSdk, Version=6.3.2.0, Culture=neutral, PublicKeyToken=f86add69004e6885, processorArchitecture=MSIL">
+      <HintPath>..\packages\LaunchDarkly.ServerSdk.6.3.2\lib\net471\LaunchDarkly.ServerSdk.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
@@ -140,7 +140,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Polly.7.2.2\lib\net472\Polly.dll</HintPath>
+      <HintPath>..\packages\Polly.7.2.3\lib\net472\Polly.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=2.2.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <HintPath>..\packages\Remotion.Linq.2.2.0\lib\net45\Remotion.Linq.dll</HintPath>
@@ -236,11 +236,11 @@
     <Reference Include="System.ServiceModel.Security, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ServiceModel.Security.4.8.1\lib\net461\System.ServiceModel.Security.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.5.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Json, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.5.0.0\lib\net461\System.Text.Json.dll</HintPath>
+    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.5.0.2\lib\net461\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -349,6 +349,7 @@
     <Compile Include="Mappings\Primary\Security\SecurityMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityPermissionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityTicketMapping.cs" />
+    <Compile Include="Mappings\Primary\SupportLinkMapping.cs" />
     <Compile Include="Mappings\Primary\UserFavoriteMapping.cs" />
     <Compile Include="Mappings\Subscriptions\BusinessAreaSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />
@@ -362,6 +363,7 @@
     <Compile Include="Mappings\Primary\RTSourceTypesMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIEndpointsMapping.cs" />
     <Compile Include="Mappings\Subscriptions\StatusTypeMapping.cs" />
+    <Compile Include="PollyPolicies\ConfluentConnectorProviderPolicy.cs" />
     <Compile Include="PollyPolicies\ApacheLivyProviderPolicy.cs" />
     <Compile Include="PollyPolicies\GenericHttpProviderPolicy.cs" />
     <Compile Include="PollyPolicies\FtpProviderPolicy.cs" />
@@ -371,9 +373,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\ConfluentConnectorProvider.cs" />
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataFlowMetricProvider.cs" />
+    <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
+    <Compile Include="ServiceImplementations\HangfireJobScheduler.cs" />
+    <Compile Include="ServiceImplementations\DeadSparkJobSqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataInventorySqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />
@@ -414,11 +421,13 @@
     <Compile Include="ServiceImplementations\Messaging\FileDeleteEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
+    <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\SecBotProvider.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
+    <Compile Include="ServiceImplementations\SupportLinkService.cs" />
     <Compile Include="ServiceImplementations\ThreadSafeInstanceGenerator.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />

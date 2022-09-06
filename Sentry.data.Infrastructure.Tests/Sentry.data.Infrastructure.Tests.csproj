@@ -87,7 +87,7 @@
       <HintPath>..\packages\NHibernate.5.3.12\lib\net461\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Polly.7.2.2\lib\net472\Polly.dll</HintPath>
+      <HintPath>..\packages\Polly.7.2.3\lib\net472\Polly.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=2.2.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <HintPath>..\packages\Remotion.Linq.2.2.0\lib\net45\Remotion.Linq.dll</HintPath>
@@ -125,6 +125,7 @@
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
@@ -159,7 +160,10 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ConfluentConnectorProviderTests.cs" />
+    <Compile Include="DeadJobProviderTests.cs" />
     <Compile Include="ApacheLivyProviderTests.cs" />
+    <Compile Include="DataFlowMetricServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="ElasticDataInventorySearchProviderTests.cs" />
@@ -168,6 +172,8 @@
     <Compile Include="FilterSearchServiceTests.cs" />
     <Compile Include="FileDeleteEventHandlerTests.cs" />
     <Compile Include="InevServiceTests.cs" />
+    <Compile Include="SupportLinkServiceTests.cs" />
+    <Compile Include="SecBotProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +185,18 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="ExpectedJSON\ConfluentConnectors.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnectors_Names.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnector_Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\ConfluentConnector_Status.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
