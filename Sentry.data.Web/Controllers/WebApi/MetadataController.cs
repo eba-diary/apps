@@ -102,6 +102,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         public class KafkaMessage
         {
+            public string Topic { get; set; }
             public string Key { get; set; }
             public string Message { get; set; }
         }
@@ -688,7 +689,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
                 }
 
-                _messagePublisher.PublishDSCEvent(message.Key, message.Message);
+                _messagePublisher.PublishDSCEvent(message.Key, message.Message, message.Topic);
                 return Ok();
             }
             catch (KafkaProducerException ex)
@@ -735,7 +736,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     kMsg = JsonConvert.DeserializeObject<KafkaMessage>(message);
                 }
 
-                _messagePublisher.PublishDSCEvent(kMsg.Key, kMsg.Message);
+                _messagePublisher.PublishDSCEvent(kMsg.Key, kMsg.Message, kMsg.Topic);
                 return Ok();
             }
             catch (KafkaProducerException ex)
