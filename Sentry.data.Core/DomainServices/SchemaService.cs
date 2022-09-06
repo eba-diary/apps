@@ -1001,7 +1001,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="isHumanResources"></param>
         /// <returns></returns>
-        private string GetSnowflakeDatabaseName(bool isHumanResources)
+        internal virtual string GetSnowflakeDatabaseName(bool isHumanResources)
         {
             return GetSnowflakeDatabaseName(isHumanResources, null, SnowflakeConsumptionType.CategorySchemaParquet);
         }
@@ -1014,7 +1014,7 @@ namespace Sentry.data.Core
         /// <param name="consumptionLayerType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
+        internal virtual string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
         {
             switch (consumptionLayerType)
             {
@@ -1082,7 +1082,7 @@ namespace Sentry.data.Core
         /// <param name="consumptionType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
+        internal virtual string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
         {
             switch (consumptionType)
             {
