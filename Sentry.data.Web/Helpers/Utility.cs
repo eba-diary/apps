@@ -409,24 +409,6 @@ namespace Sentry.data.Web.Helpers
             return BuildSelectListFromEnum<DatasetSortByOption>(0);
         }
 
-        public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
-        {
-            List<SelectListItem> options = new List<SelectListItem>();
-
-            foreach (T item in Enum.GetValues(typeof(T)))
-            {
-                int value = (int)Convert.ChangeType(item, item.GetTypeCode());
-                options.Add(new SelectListItem
-                {
-                    Text = item.GetDescription(),
-                    Value = value.ToString(),
-                    Selected = value == selectedValue
-                });
-            }
-
-            return options;
-        }
-
         public static List<PageItemModel> BuildPageItemList(int totalResults, int pageSize, int selectedPage)
         {
             List<PageItemModel> pageItems = new List<PageItemModel>();
