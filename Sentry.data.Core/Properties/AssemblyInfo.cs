@@ -38,3 +38,4 @@ using System.Runtime.InteropServices;
 
 //Exposing internal methods to testing class
 [assembly:InternalsVisibleTo("Sentry.data.Core.Tests")]
+[assembly:InternalsVisibleTo("DynamicProxyGenAssembly2")]
