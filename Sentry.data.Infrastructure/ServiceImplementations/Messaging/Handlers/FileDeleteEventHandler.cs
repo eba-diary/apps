@@ -108,28 +108,16 @@ namespace Sentry.data.Infrastructure
 
                 foreach ( DeleteFilesResponseSingleStatusModel single in responseModel.DeleteProcessStatusPerID)
                 {
-                    if(single.DatasetFileIdDeleteStatus == null)
+                    string status = GetStatus(single);
+
+                    if (status == GlobalConstants.DeleteFileResponseStatus.SUCCESS)
                     {
-                        continue;
+                        successList.Add(single.DatasetFileId);
                     }
-                    
-                    //SUCCESS = STATUS OF SUCCESS OR FAILURE and NOTFOUND
-                    if( single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS
-                        || 
-                        (   
-                            single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE 
-                             && single.DeletedFiles.Exists(w => (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET) 
-                        )
-                    )
-                    {
-                          successList.Add(single.DatasetFileId);
-                    }
-                    //FAILURE
-                    else if(single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE)     
+                    else if (status == GlobalConstants.DeleteFileResponseStatus.FAILURE)
                     {
                         failureList.Add(single.DatasetFileId);
                     }
-                    //ERROR
                     else
                     {
                         errorList.Add(single.DatasetFileId);
@@ -157,6 +145,37 @@ namespace Sentry.data.Infrastructure
             {
                 Logger.Info($"filedeleteeventhandler unable to locate {nameof(responseModel.DeleteProcessStatusPerID)} in message");
             }
+        }
+
+        private string GetStatus(DeleteFilesResponseSingleStatusModel single)
+        {
+            //DEFAULT TO ERROR
+            string status = GlobalConstants.DeleteFileResponseStatus.ERROR;
+
+            //IF THIS IS NULL, ERROR IMMEDIATEY
+            if (single.DatasetFileIdDeleteStatus == null)
+            {
+                return status;
+            }
+
+            //SUCCESS = SUCCESS OR (FAILURE and NOTFOUND)
+            if (   single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS
+                        ||
+                        (
+                            single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
+                             && single.DeletedFiles.Exists(w => (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET)
+                        )
+            )
+            {
+                status = GlobalConstants.DeleteFileResponseStatus.SUCCESS;
+            }
+            //FAILURE
+            else if (single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE)
+            {
+                status = GlobalConstants.DeleteFileResponseStatus.FAILURE;
+            }
+            
+            return status;
         }
 
         bool IMessageHandler<string>.HandleComplete()
