@@ -56,7 +56,8 @@ namespace Sentry.data.Core
                 FileExtension = file.FileExtension,
                 FileKey = file.FileKey,
                 FileBucket = file.FileBucket,
-                ETag = file.ETag
+                ETag = file.ETag,
+                ObjectStatus = file.ObjectStatus,
             };
 
             return dto;

@@ -1,4 +1,5 @@
 ﻿using System;
+using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
 
 namespace Sentry.data.Web.Models.ApiModels.DatasetFile
@@ -39,6 +40,7 @@ namespace Sentry.data.Web.Models.ApiModels.DatasetFile
         public string FileKey { get; set; }
         public string FileBucket { get; set; }
         public string ETag { get; set; }
+        public string ObjectStatus { get; set; }
 
         public List<string> Validate()
         {
