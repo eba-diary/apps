@@ -3,6 +3,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.Messaging.Common;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -101,25 +102,41 @@ namespace Sentry.data.Infrastructure
             //GROUP INTO MULTIPLE GROUPS
             if (responseModel != null && responseModel.DeleteProcessStatusPerID != null)
             {
-                int[] successList = responseModel.DeleteProcessStatusPerID.Where(w => (w.DatasetFileIdDeleteStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS).Select(s => s.DatasetFileId).ToArray();
-                int[] failureList = responseModel.DeleteProcessStatusPerID.Where(w => (w.DatasetFileIdDeleteStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE).Select(s => s.DatasetFileId).ToArray();
-                int[] errorList = responseModel.DeleteProcessStatusPerID.Where(w => (w.DatasetFileIdDeleteStatus)?.ToUpper()       != GlobalConstants.DeleteFileResponseStatus.SUCCESS
-                                                                                    && (w.DatasetFileIdDeleteStatus)?.ToUpper()    != GlobalConstants.DeleteFileResponseStatus.FAILURE)
-                                                                        .Select(s => s.DatasetFileId).ToArray();
+                List<int> successList  = new List<int>();
+                List<int> failureList  = new List<int>();
+                List<int> errorList = new List<int>();  
 
-                if(successList!= null && successList.Count() > 0)
+                foreach ( DeleteFilesResponseSingleStatusModel single in responseModel.DeleteProcessStatusPerID)
                 {
-                    _datafileService.UpdateObjectStatus(successList, Core.GlobalEnums.ObjectStatusEnum.Deleted);
+                    string status = GetStatus(single);
+
+                    if (status == GlobalConstants.DeleteFileResponseStatus.SUCCESS)
+                    {
+                        successList.Add(single.DatasetFileId);
+                    }
+                    else if (status == GlobalConstants.DeleteFileResponseStatus.FAILURE)
+                    {
+                        failureList.Add(single.DatasetFileId);
+                    }
+                    else
+                    {
+                        errorList.Add(single.DatasetFileId);
+                    }
+                }
+
+                if(successList.Count > 0)
+                {
+                    _datafileService.UpdateObjectStatus(successList.ToArray(), Core.GlobalEnums.ObjectStatusEnum.Deleted);
                     Logger.Info($"filedeleteeventhandler will attempt to mark {successList.ToString()} as {Core.GlobalEnums.ObjectStatusEnum.Deleted.GetDescription()}");
                 }
 
-                if (failureList != null && failureList.Count() > 0)
+                if (failureList.Count > 0)
                 {
-                    _datafileService.UpdateObjectStatus(failureList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure);
+                    _datafileService.UpdateObjectStatus(failureList.ToArray(), Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure);
                     Logger.Info($"filedeleteeventhandler will attempt to mark {failureList.ToString()} as {Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure.GetDescription()}");
                 }
 
-                if (errorList != null && errorList.Count() > 0)
+                if (errorList.Count > 0)
                 {
                     Logger.Info($"filedeleteeventhandler unable to process {errorList.ToString()} due to unknown status");
                 }
@@ -130,6 +147,36 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        private string GetStatus(DeleteFilesResponseSingleStatusModel single)
+        {
+            //DEFAULT TO ERROR
+            string status = GlobalConstants.DeleteFileResponseStatus.ERROR;
+
+            //IF THIS IS NULL, ERROR IMMEDIATEY
+            if (single.DatasetFileIdDeleteStatus == null)
+            {
+                return status;
+            }
+
+            //SUCCESS = SUCCESS OR (FAILURE and NOTFOUND)
+            if (   single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS
+                        ||
+                        (
+                            single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
+                             && single.DeletedFiles.Exists(w => (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET)
+                        )
+            )
+            {
+                status = GlobalConstants.DeleteFileResponseStatus.SUCCESS;
+            }
+            //FAILURE
+            else if (single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE)
+            {
+                status = GlobalConstants.DeleteFileResponseStatus.FAILURE;
+            }
+            
+            return status;
+        }
 
         bool IMessageHandler<string>.HandleComplete()
         {
