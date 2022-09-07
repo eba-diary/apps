@@ -2225,8 +2225,8 @@ namespace Sentry.data.Core.Tests
             };
 
             Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
-            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
-            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate), null)).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate), null)).Verifiable();
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null, null, null);
 
@@ -2497,8 +2497,8 @@ namespace Sentry.data.Core.Tests
             };
 
             Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
-            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
-            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(hiveCreate), null)).Verifiable();
+            publisher.Setup(x => x.PublishDSCEvent("1", JsonConvert.SerializeObject(snowCreate), null)).Verifiable();
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null, null, null);
 
