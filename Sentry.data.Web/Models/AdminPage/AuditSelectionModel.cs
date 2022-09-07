@@ -11,7 +11,7 @@ namespace Sentry.data.Web
         public List<SelectListItem> AllDatasets { get; set; }
         public List<SelectListItem> AllAuditTypes { get; set; }
         public List<SelectListItem> AllAuditSearchTypes { get; set; }
-        public DateTime currentDate = DateTime.Now.Date;
+        public DateTime CurrentDate { get { return DateTime.Now.Date; } }
         public int[] AuditAddedSearchKey { get; set; }
         public List<string> Schema { get; set; }
     }

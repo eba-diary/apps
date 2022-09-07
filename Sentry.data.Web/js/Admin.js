@@ -104,12 +104,14 @@ data.Admin = {
                         return 0;
                     }
                 });
-                var s = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
-                var s = '<option value="-1">Please Select a Schema</option>';
+                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
+                scheamDropdown += '<option value="-1">Please Select a Schema</option>';
+
                 for (var d of data) {
-                    s += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
+                    scheamDropdown += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
                 }
-                $("#schemaDropdown").html(s);
+
+                $("#schemaDropdown").html(scheamDropdown);
                 // proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
                 $("#defaultSchemaSelection").prop("disabled", true);
                 $("#schemaDropdown").materialSelect();
@@ -122,7 +124,7 @@ data.Admin = {
         // Check if the dataset file drop down is being reinitialized on a dataset select dropwdown change
         if (isBaseInit) {
             $("#datasetFileDropdown").materialSelect({ destroy: true });
-            var s = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
+            var datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
 
             $("#datasetFileDropdown").html(s);
             $("#defaultDatasetFileSelection").prop("disabled", true);
@@ -133,13 +135,13 @@ data.Admin = {
                 url: url,
                 success: function (data) {
                     $("#datasetFileDropdown").materialSelect({ destroy: true });
-                    var s = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
+                    var datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
 
                     for (var d of data.Records) {
-                        s += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>';
+                        datasetFileDropdown += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>';
                     }
 
-                    $("#datasetFileDropdown").html(s);
+                    $("#datasetFileDropdown").html(datasetFileDropdown);
                     $("#defaultDatasetFileSelection").prop("disabled", true);
                     $("#datasetFileDropdown").materialSelect();
                 }
@@ -239,8 +241,12 @@ data.Admin = {
 
         $("select.admin-audit-dropdown.active").each(function () {
             console.log($(this).find(":selected").val());
+
+            // Checks if any acive dropdown items are not selected
             if ($(this).find(":selected").val() == null || $(this).find(":selected").val() == "" || $(this).find(":selected").val() == "-1") {
                 searchStatus = true;
+
+                // Break from each loop
                 return false;
             } 
 
@@ -248,11 +254,7 @@ data.Admin = {
             console.log($(this).attr("id"));
         })
 
-        if (searchStatus) {
-            $("#auditSearchButton").prop("disabled", searchStatus);
-        } else {
-            $("#auditSearchButton").prop("disabled", searchStatus);
-        }
+        $("#auditSearchButton").prop("disabled", searchStatus);
     },
 
     /*// activate or deactivate reprocess button based on input list of checked boxes
@@ -334,7 +336,7 @@ data.Admin = {
             var currentAuditSelection = $(`#audit-selection-${searchId}`);
 
             var selection = $(".audit-search-selection");
-            var dropdown = $(".admin-audit-dropdown");
+            /*var dropdown = $(".admin-audit-dropdown");*/
 
             // Set's all search elements to hidden
             selection.removeClass("active");
@@ -361,6 +363,7 @@ data.Admin = {
 
             var searchParameter;
 
+            // Post check is defaulted to true
             var postCheck = true;
 
             switch (searchTypeId) {
@@ -370,7 +373,6 @@ data.Admin = {
                     break;
                 case "1":
                     searchParameter = $("#datasetFileDropdown").find(":selected").text();
-                    postCheck = true;
                     break;
             }
 
@@ -405,19 +407,7 @@ data.Admin = {
             }
         });
 
-        $("#data-file-select-all").click(function (event) {
-            var selectAllCheckbox = $(this);
-            if (selectAllCheckbox.is(":checked")) {
-                $(".select-all-target").each(function () {
-                    $(this).prop("checked", true);
-                });
-            }
-            else {
-                $(".select-all-target").each(function () {
-                    $(this).prop("checked", false);
-                });
-            }
-        });
+        admin.data.DataFileSelectAll();
     },
 
     RetrieveDeadSparkJobListButton: function () {
@@ -434,7 +424,7 @@ data.Admin = {
             // Retrieve seleced date
             var selectedDate = $('#datetime-picker').val();
 
-            timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            var timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {
@@ -470,9 +460,7 @@ data.Admin = {
         return true;
     },
 
-    // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
-    ReprocessDeadJobs: function () {
-
+    DataFileSelectAll: function () {
         // defines logic for select all checkbox 
         $("#data-file-select-all").click(function (event) {
             var selectAllCheckbox = $(this);
@@ -487,6 +475,12 @@ data.Admin = {
                 });
             }
         });
+    },
+
+    // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
+    ReprocessDeadJobs: function () {
+
+        admin.data.DataFileSelectAll();
 
         // submits selected jobs to be reprocessed
         $("#reprocessButton").click(function () {
