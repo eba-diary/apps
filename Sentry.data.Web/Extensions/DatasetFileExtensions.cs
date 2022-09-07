@@ -1,4 +1,6 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Helpers;
 using Sentry.data.Web.Models.ApiModels.DatasetFile;
 using System;
 using System.Collections.Generic;
@@ -42,7 +44,7 @@ namespace Sentry.data.Web
                 FileKey = dto.FileKey,
                 FileBucket = dto.FileBucket,
                 ETag = dto.ETag,
-                ObjectStatus = dto.ObjectStatus
+                ObjectStatus = dto.ObjectStatus.GetDescription()
             };
 
             return model;
@@ -69,10 +71,10 @@ namespace Sentry.data.Web
                 FlowExecutionGuid = model.FlowExecutionGuid,
                 RunInstanceGuid = model.RunInstanceGuid,
                 FileExtension = model.FileExtension,
-                FileKey= model.FileKey,
-                FileBucket= model.FileBucket,
-                ETag= model.ETag,
-                ObjectStatus = model.ObjectStatus
+                FileKey = model.FileKey,
+                FileBucket = model.FileBucket,
+                ETag = model.ETag,
+                ObjectStatus = EnumHelper.GetByDescription<ObjectStatusEnum>(model.ObjectStatus)
             };
 
             return dto;
