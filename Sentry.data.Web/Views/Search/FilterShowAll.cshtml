@@ -19,7 +19,10 @@
                                         <input type="checkbox" id="modal_@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
                                         <label for="modal_@option.OptionId" class="form-check-label filter-search-category-option-label">
                                             @(option.OptionValue.Length > 25 ? option.OptionValue.Substring(0, 22) + "..." : option.OptionValue)
-                                            <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
+                                            @if (!category.HideResultCounts)
+                                            {
+                                                <span class="filter-search-category-option-count">(@option.ResultCount.ToString("N0"))</span>
+                                            }
                                         </label>
                                     </div>
                                 </li>

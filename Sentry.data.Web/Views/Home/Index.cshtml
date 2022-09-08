@@ -37,7 +37,14 @@
                 <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
 
                 <div id="ds-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                    <a href="/Dataset"><h2 class="home-tile-link-bi sentry-dark-green-text">Datasets</h2></a>
+                    @if (Model.DirectToSearchPages)
+                    {
+                        <a href="/Search/Datasets"><h2 class="home-tile-link-ds">Datasets</h2></a>
+                    }
+                    else
+                    {
+                        <a href="/Dataset"><h2 class="home-tile-link-ds">Datasets</h2></a>
+                    }
                     <div class="home-photo bg-photo-ds border-btm-green"></div>
                     <div id="ds-content-wrapper" class="home-tile">
                         <p>
@@ -62,7 +69,7 @@
             <div class="row">
 
                 <div id="ds-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                    <a href="/DataInventory/Search"><h2 class="home-tile-link-di-large ">Data Inventory</h2></a>
+                    <a href="/DataInventory/Search"><h2 class="home-tile-link-di">Data Inventory</h2></a>
                     <div class="home-photo bg-photo-di border-btm-yellow"></div>
                     <div id="ds-content-wrapper" class="home-tile">
                         <p>
@@ -75,7 +82,7 @@
                 <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
 
                 <div id="da-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                    <a href="/DataAsset/Index"><h2 class="home-tile-link-bi sentry-dark-plum-text">Data Assets</h2></a>
+                    <a href="/DataAsset/Index"><h2 class="home-tile-link-da">Data Assets</h2></a>
                     <div class="home-photo bg-photo-da border-btm-plum"></div>
                     <div id="da-conent-wrapper" class="home-tile">
                         <p>
