@@ -13,7 +13,7 @@ namespace Sentry.data.Core.GlobalEnums
         [Description("S3 Drop")]
         S3_Drop = 3,
 
-        [Description("Topic")]
+        [Description("Kafka Topic")]
         Topic = 4
     }
 }
