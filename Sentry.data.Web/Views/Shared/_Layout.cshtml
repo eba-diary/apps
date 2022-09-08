@@ -4,7 +4,7 @@
 @{
     //bool isSubPage = (ViewData["menu"] == null || (bool)ViewData["menu"] == true) ? true : false;
     bool isFluid = (ViewData["fluid"] == null || (bool)ViewData["fluid"] == false) ? false : true;
-    string overflowScroll = ViewData["OverflowScroll"] == null || (bool)ViewData["OverflowScroll"] == false ? "" : "overflow-scroll";
+    string overflowScroll = ViewData["OverflowScroll"] != null && (bool)ViewData["OverflowScroll"] ? "overflow-scroll" : "";
 }
 
 <!DOCTYPE html>
