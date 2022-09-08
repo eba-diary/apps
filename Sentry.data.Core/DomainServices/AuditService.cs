@@ -48,8 +48,18 @@ namespace Sentry.data.Core
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
+                SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
+                {
+                    SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
+                    TargetDb = schemaObject.SnowflakeDatabase,
+                    Schema = schemaObject.SnowflakeSchema,
+                    Table = schemaObject.SnowflakeTable,
+                    QueryParameter = queryParameter,
+                    AuditSearchType = auditSearchType,
+                };
+
                 // Calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetCompareRows(findRawqueryDBName(schemaObject.SnowflakeDatabase), schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
+                DataTable dataTable = _snowProvider.GetCompareRows(snowCompareConfig);
 
                 stopWatch.Stop();
 
@@ -110,8 +120,18 @@ namespace Sentry.data.Core
 
                 stopWatch.Start();
 
+                SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
+                {
+                    SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
+                    TargetDb = schemaObject.SnowflakeDatabase,
+                    Schema = schemaObject.SnowflakeSchema,
+                    Table = schemaObject.SnowflakeTable,
+                    QueryParameter = queryParameter,
+                    AuditSearchType = auditSearchType,
+                };
+
                 // Calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetExceptRows(findRawqueryDBName(schemaObject.SnowflakeDatabase), schemaObject.SnowflakeDatabase, schemaObject.SnowflakeSchema, schemaObject.SnowflakeTable, queryParameter, auditSearchType);
+                DataTable dataTable = _snowProvider.GetExceptRows(snowCompareConfig);
 
                 stopWatch.Stop();
 
@@ -147,7 +167,7 @@ namespace Sentry.data.Core
             return baseAuditDto;
         }
 
-        private string findRawqueryDBName(string db)
+        private string findRawQueryDBName(string db)
         {
             string rawqueryDB = db.Replace("_", "_RAWQUERY_");
 

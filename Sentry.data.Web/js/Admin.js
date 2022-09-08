@@ -126,7 +126,7 @@ data.Admin = {
             $("#datasetFileDropdown").materialSelect({ destroy: true });
             var datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
 
-            $("#datasetFileDropdown").html(s);
+            $("#datasetFileDropdown").html(datasetFileDropdown);
             $("#defaultDatasetFileSelection").prop("disabled", true);
             $("#datasetFileDropdown").materialSelect();
         } else {
