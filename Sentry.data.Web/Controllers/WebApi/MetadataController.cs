@@ -829,7 +829,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-                //GORDON:  Add controlMtrigger name here
+                //SET Metadata to pass back to KO
                 Metadata m = new Metadata
                 {
                     //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
