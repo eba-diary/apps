@@ -157,7 +157,7 @@ a.create-link:focus {
 }
 
 
-    .configHeader h1 {
+    .configHeader h2 {
         color: white !important;
         padding-left: 15px;
         display: inline-block;
@@ -209,4 +209,9 @@ a.create-link:focus {
 
 .on-demand-run {
     margin-bottom: 3px;
+}
+
+.config-header {
+    height: 60px;
+    border-bottom: 1px #DDDDDD solid;
 }
