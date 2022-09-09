@@ -1,79 +1,201 @@
 ﻿@model Sentry.data.Web.ManageConfigsModel
 
+@using Sentry.data.Core
+
 @{
     ViewBag.Title = "View Dataset Configuration Details";
+    ViewBag.OverflowScroll = true;
     string color = "dsc-" + Model.CategoryColor + "-text";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @helper BackLink()
 {
-    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-2"></em>Back to Dataset Information</a>
+    <a class="backToList mt-2 mb-0" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-2"></em>Back to Dataset Information</a>
 }
 
 @BackLink()
 
-<div class="topBanner config-header">
-    <div class="relative hidden-sm hidden-xs">
-        <div class="no-overflow">
-            <h1 class="detailName leftFloat @color pt-0">
-                @Model.DatasetName
-            </h1>
-        </div>
-    </div>
+<div class="config-banner">
+    <h1 class="detailName leftFloat @color pt-0">@Model.DatasetName</h1>
+    <a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus mr-2"></em>Add Schema</a>
 </div>
 
 <!--Accordion wrapper-->
 <div class="accordion md-accordion" id="accordionSchemas" role="tablist" aria-multiselectable="true">
     @foreach (DatasetFileConfigsModel item in Model.DatasetFileConfigs.Where(x => (x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && x.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted)).ToList())
     {
-
+        string fileExtension = item.FileExtension.Name.Trim();
         <!-- Accordion card -->
         <div class="card">
             <!-- Card header -->
-            <div class="card-header" role="tab" id="heading_@item.ConfigId">
-                <a class="collapsed" data-toggle="collapse" data-parent="#accordionSchemas" href="#collapse_@item.ConfigId" aria-expanded="false" aria-controls="collapse_@item.ConfigId">
+            <div class="card-header" role="tab" id="heading-config-@item.ConfigId">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordionSchemas" href="#collapse-config-@item.ConfigId" aria-expanded="false" aria-controls="collapse-config-@item.ConfigId">
                     <h2 class="@color pt-3">
-                            @item.ConfigFileName
-                            @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
-                            {
-                                <em class="ml-2">(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em>
-                            }
-                            <em class="fas fa-angle-down rotate-icon"></em>
+                        @item.ConfigFileName
+                        @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
+                        {
+                            <em class="ml-2">(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em>
+                        }
+                        <em class="fas fa-angle-down rotate-icon"></em>
                     </h2>
                 </a>
             </div>
 
             <!-- Card body -->
-            <div id="collapse_@item.ConfigId" class="collapse" role="tabpanel" aria-labelledby="heading_@item.ConfigId" data-parent="#accordionSchemas">
-                <div class="card-body">
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
-                    wolf
-                    moon
-                    officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-                    Brunch
-                    3
-                    wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda
-                    shoreditch
-                    et.
-                    Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-                    Ad
-                    vegan
-                    excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth
-                    nesciunt
-                    you probably haven't heard of them accusamus labore sustainable VHS.
+            <div id="collapse-config-@item.ConfigId" class="collapse" role="tabpanel" aria-labelledby="heading-config-@item.ConfigId" data-parent="#accordionSchemas">
+                <div class="card-body ml-3">
+                    @*<div class="card-body-header">
+                        <h4 class="@color pt-0">Configuration Metadata</h4>
+
+                        <div>
+                            <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
+                            <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
+                        </div>
+                    </div>*@
+
+                    <div class="card-body-header">
+                        <h4 class="@color pt-0">Configuration Metadata</h4>
+
+                        <div class="schema-modify-icons">
+                            <a class="far fa-edit schema-edit-icon mr-3" href="/Config/Edit/@item.ConfigId" title="Edit"></a>
+                            <a class="icon-trash schema-delete-icon" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete"></a>
+                        </div>
+                    </div>
+
+                    <div class="ml-3">
+                        <div class="pb-3">
+                            <div class="font-weight-bold">Description:</div>
+                            @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
+                            {
+                                int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                                <div>
+                                    <span>@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                    <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div>@item.ConfigFileDesc</div>
+                            }
+                        </div>
+
+                        <div class="pb-3"><span class="font-weight-bold">Control-M Trigger Name:</span> @item.ControlMTriggerName</div>
+
+                        <div class="pb-3">
+                            @if (Model.Security.ShowAdminControls)
+                            {
+                                <div><span class="font-weight-bold">Storage id:</span> @item.RawStorageId</div>
+                                <div><span class="font-weight-bold">Schema id:</span> @item.SchemaId <em>(@item.OldSchemaId)</em></div>
+                            }
+                            else
+                            {
+                                <div><span class="font-weight-bold">Schema id:</span> @item.SchemaId</div>
+                            }
+                            <div><span class="font-weight-bold">Configuration classification:</span> @item.FileType</div>
+                            <div><span class="font-weight-bold">File type:</span> @item.FileExtension.Name</div>
+                        </div>
+
+                        @if (fileExtension == GlobalConstants.ExtensionNames.ANY || fileExtension == GlobalConstants.ExtensionNames.DELIMITED || fileExtension == GlobalConstants.ExtensionNames.CSV)
+                        {
+                            <div class="pb-3">
+                                <div>This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
+                                @if (Model.Security.ShowAdminControls)
+                                {
+                                    <div><span class="font-weight-bold">Files contain headers:</span> @item.HasHeader</div>
+                                    <div><span class="font-weight-bold">CLA1396_NewEtlColumns:</span> @item.CLA1396_NewEtlColumns</div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <span class="font-weight-bold">Files contain headers:</span> @item.HasHeader
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (fileExtension == GlobalConstants.ExtensionNames.XML || fileExtension == GlobalConstants.ExtensionNames.JSON)
+                        {
+                            <div class="pb-3">
+                                <div>
+                                    <span class="font-weight-bold">Schema Root Path:</span>
+                                    <span>@(string.IsNullOrWhiteSpace(item.SchemaRootPath) ? "(Not Specified)" : item.SchemaRootPath)</span>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="pb-3">
+                            @if (fileExtension == GlobalConstants.ExtensionNames.ANY || fileExtension == GlobalConstants.ExtensionNames.DELIMITED || fileExtension == GlobalConstants.ExtensionNames.FIXEDWIDTH)
+                            {
+                                <div>This configuration will allow <span class="font-weight-bold">all</span> file extensions.</div>
+                            }
+                            else
+                            {
+                                <div>This configuration will only allow files with <span class="font-weight-bold">.@fileExtension.ToLower()</span> extension</div>
+                            }
+                        </div>
+
+                        <div class="pb-3">
+                            <div>This configuration Data Scope is <span class="font-weight-bold">@item.ScopeType.Name</span> which means:</div>
+                            <div>@item.ScopeType.Description</div>
+                        </div>
+
+                        <div class="pb-3">
+                            @if (item.CreateCurrentView)
+                            {
+                                <div>A current view exists for this schema which filters to data from latest file processed.</div>
+                            }
+                            else
+                            {
+                                <div>This schema does not contain a current view</div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (item.Schema != null)
+                    {
+                        <h4 class="@color pt-3">Columns Metadata (name, datatype, is array, etc.)</h4>
+                        <div class="ml-3">
+                            @if (item.Schema.Revisions.Count() == 0)
+                            {
+                                <div>This schema does not have any columns associated to it.</div>
+                            }
+                            <div><span class="font-weight-bold">Created on:</span> @item.Schema.CreatedDTM</div>
+                            <div><span class="font-weight-bold">Last Modified on:</span> @item.Schema.LastUpdatedDTM</div>
+                        </div>
+
+                        bool hasRevisions = item.Schema.Revisions.Count() > 0;
+                        <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">@(hasRevisions ? "Edit" : "Add") Columns Metadata</a>
+                        if (hasRevisions)
+                        {
+                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
+                        }
+                    }
+
+                    @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
+                    {
+                        <h4 class="@color pt-3">Producer DataFlow</h4>
+
+                        @* Loop through each external dataflow *@
+                        if (!item.ExternalDataFlowJobs.Any())
+                        {
+                            <p>This schema does not have any associated dataflows yet.</p>
+                        }
+                        else
+                        {
+                            Html.RenderPartial("_DataFlowAccordion", item.ExternalDataFlowJobs, new ViewDataDictionary { { "DisplayDataflowEdit", Model.DisplayDataflowEdit }, { "Color", color } });
+                        }
+                    }
                 </div>
             </div>
-
         </div>
         <!-- Accordion card -->
     }
 </div>
 <!-- Accordion wrapper -->
-
-<a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus"></em>  Create new Data File Configuration</a>
-
-<hr />
 
 @BackLink()
 

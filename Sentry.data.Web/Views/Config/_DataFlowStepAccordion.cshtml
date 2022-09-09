@@ -1,0 +1,30 @@
+﻿@model List<DataFlowStepModel>
+
+<!--Accordion wrapper-->
+<div class="accordion md-accordion" id="accordionSteps" role="tablist" aria-multiselectable="true">
+    @* DataflowStep metadata *@
+    @foreach (DataFlowStepModel stepModel in Model)
+    {
+        <!-- Accordion card -->
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header" role="tab" id="heading-step-@stepModel.Id">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordionSteps" href="#collapse-step-@stepModel.Id" aria-expanded="false" aria-controls="collapse-step-@stepModel.Id">
+                    <h6 class="mb-0">
+                        @stepModel.ActionName <em class="fas fa-angle-down rotate-icon"></em>
+                    </h6>
+                </a>
+            </div>
+
+            <!-- Card body -->
+            <div id="collapse-step-@stepModel.Id" class="collapse" role="tabpanel" aria-labelledby="heading-step-@stepModel.Id" data-parent="#accordionSteps">
+                <div class="card-body">
+                    <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
+                    <div class="filePath"><span>@stepModel.RootAwsUrl@stepModel.TriggetKey</span></div>
+                </div>
+            </div>
+        </div>
+        <!-- Accordion card -->
+    }
+</div>
+<!-- Accordion wrapper -->

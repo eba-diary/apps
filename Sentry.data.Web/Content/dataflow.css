@@ -215,3 +215,29 @@ a.create-link:focus {
     height: 60px;
     border-bottom: 1px #DDDDDD solid;
 }
+
+.config-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px #DDDDDD solid;
+}
+
+.card-body-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.schema-modify-icons {
+    font-size: 1.75rem;
+    display: flex;
+    margin-right: 1.5rem;
+}
+
+.schema-delete-icon {
+    color: #B3140B !important;
+}
+
+    .schema-delete-icon:hover {
+        color: #f5190c !important;
+    }
