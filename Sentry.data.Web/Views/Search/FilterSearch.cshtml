@@ -3,6 +3,7 @@
 @{
     ViewBag.Fluid = true;
     ViewBag.Title = Model.PageTitle;
+    ViewBag.OverflowScroll = true;
     string jsControllerName = "data." + Model.SearchType + "Search";
 }
 
@@ -76,7 +77,6 @@
             Html.RenderAction("Results", new { parameters = Model.ResultParameters });
         }
     </div>
-
 </div>
 
 <div class="modal fade" id="filter-search-save-modal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="filter-search-save-modal-label" aria-hidden="true" style="display: none;">
