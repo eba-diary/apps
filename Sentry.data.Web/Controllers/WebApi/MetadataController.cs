@@ -88,6 +88,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             public int DatasetId { get; set; }
             public List<string> SnowflakeViews { get; set; }
 
+            public string ControlMTriggerName { get; set; }
+
             //   public int Views { get; set; }
             //   public int Downloads { get; set; }
         }
@@ -506,6 +508,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetBasicMetadataInformationFor(int DatasetConfigID)
         {
+            //GORDON: 
             IHttpActionResult GetBasicMetadataInformationForFunction()
             {
                 DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
@@ -826,12 +829,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                 };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
+                //GORDON:  Add controlMtrigger name here
                 Metadata m = new Metadata
                 {
                     //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
                     DatasetId = config.ParentDataset.DatasetId,
                     SchemaId = config.Schema.SchemaId,
-                    Description = config.Description
+                    Description = config.Description,
+                    ControlMTriggerName = config.Schema.ControlMTriggerName
                 };
 
                 //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
