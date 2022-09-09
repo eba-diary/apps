@@ -508,7 +508,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetBasicMetadataInformationFor(int DatasetConfigID)
         {
-            //GORDON: 
             IHttpActionResult GetBasicMetadataInformationForFunction()
             {
                 DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
