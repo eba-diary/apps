@@ -4,10 +4,11 @@
 @{
     //bool isSubPage = (ViewData["menu"] == null || (bool)ViewData["menu"] == true) ? true : false;
     bool isFluid = (ViewData["fluid"] == null || (bool)ViewData["fluid"] == false) ? false : true;
+    string overflowScroll = ViewBag.OverflowScroll != null && (bool)ViewBag.OverflowScroll ? "overflow-scroll" : "";
 }
 
 <!DOCTYPE html>
-<html>
+<html class="@overflowScroll">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
