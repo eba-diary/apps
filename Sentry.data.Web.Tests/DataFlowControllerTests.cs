@@ -49,6 +49,9 @@ namespace Sentry.data.Web.Tests
 
             Assert.AreEqual(1, dto.SchemaMap.Count, "Schema Maps Count");
             Assert.AreEqual(flowModel.SchemaMaps[0].SelectedSchema, dto.SchemaMap[0].SchemaId, "SchemaMap.SchemaId");
+
+            Assert.AreEqual(flowModel.TopicName, dto.TopicName, "Sample-Topic-Name");
+            Assert.AreEqual(flowModel.TopicName, dto.TopicName, "Sample_Topic_Name");
         }
     }
 }

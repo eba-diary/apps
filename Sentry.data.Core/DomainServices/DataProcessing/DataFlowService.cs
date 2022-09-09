@@ -725,7 +725,9 @@ namespace Sentry.data.Core
 
             switch (dto.IngestionType)
             {
-                case (int)GlobalEnums.IngestionType.User_Push:
+                case (int)GlobalEnums.IngestionType.DFS_Drop:
+                case (int)GlobalEnums.IngestionType.S3_Drop:
+                case (int)GlobalEnums.IngestionType.Topic:
                     MapDataFlowStepsForPush(dto, df);
                     break;
                 case (int)GlobalEnums.IngestionType.DSC_Pull:
@@ -772,13 +774,24 @@ namespace Sentry.data.Core
                                 ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
                                 : _datasetContext.GetById<DataFlow>(dto.Id).Security,
                 DatasetId = dto.SchemaMap.First().DatasetId,
-                SchemaId = dto.SchemaMap.First().SchemaId
+                SchemaId = dto.SchemaMap.First().SchemaId,
+
+                //ONLY SET IF IngestionType.Topic
+                TopicName =         (dto.IngestionType == (int)IngestionType.Topic) ? dto.TopicName             : null,
+                S3ConnectorName =   (dto.IngestionType == (int)IngestionType.Topic) ? GetS3ConnectorName(dto)   : null
             };
 
             _datasetContext.Add(df);
 
             Logger.Info($"{methodName} Method End");
             return df;
+        }
+
+        //GENERATE S3ConnectorName
+        private string GetS3ConnectorName(DataFlowDto dto)
+        {
+            string cleansedTopicName = dto.TopicName.Replace("-", "_");
+            return $"S3_{cleansedTopicName}_001";
         }
 
         /// <summary>
@@ -802,7 +815,6 @@ namespace Sentry.data.Core
 
             return group;
         }
-
 
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
@@ -834,7 +846,7 @@ namespace Sentry.data.Core
                 }
 
                 RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-                
+
                 _datasetContext.Add(dfsDataFlowBasic);
 
                 _jobService.CreateDropLocation(dfsDataFlowBasic);
@@ -1022,6 +1034,8 @@ namespace Sentry.data.Core
             dto.PrimaryContactId = df.PrimaryContactId;
             dto.IsSecured = df.IsSecured;
             dto.Security = _securityService.GetUserSecurity(df, _userService.GetCurrentUser());
+            dto.TopicName = df.TopicName;
+            dto.S3ConnectorName = df.S3ConnectorName;
 
             if (dto.IsCompressed)
             {
@@ -1204,6 +1218,7 @@ namespace Sentry.data.Core
                     
                     return schemaLoadStep;
 
+                //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED, BONUS AFTER TOPIC NAME IS WORKING
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources);
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
@@ -1220,6 +1235,7 @@ namespace Sentry.data.Core
                         }
                     }
                     return schemaMapStep;
+
                 case DataActionType.None:
                 default:
                     return null;
@@ -1351,6 +1367,7 @@ namespace Sentry.data.Core
 
         #region SchemaFlowMappings
 
+        //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED
         private DataFlow MapToDataFlow(FileSchema scm)
         {
             // This method maps Schema flow for given dataset schema
@@ -1364,7 +1381,7 @@ namespace Sentry.data.Core
                 FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE(),
                 DeleteIssueDTM = DateTime.MaxValue,
                 ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
-                IngestionType = (int)GlobalEnums.IngestionType.User_Push
+                IngestionType = (int)GlobalEnums.IngestionType.DFS_Drop
             };
 
             _datasetContext.Add(df);

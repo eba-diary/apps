@@ -13,7 +13,7 @@ namespace Sentry.data.Core.Tests
         public void TryGetFilterCategoryName_DataInventory_Asset_True()
         {
             Assert.IsTrue(CustomAttributeHelper.TryGetFilterCategoryName<DataInventory>("asset", out string result));
-            Assert.AreEqual(FilterCategoryNames.ASSET, result);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.ASSET, result);
         }
         
         [TestMethod]

@@ -137,13 +137,13 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     new FilterCategoryDto()
                     {
-                        CategoryName = FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
-                                ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true
                             }
                         }
@@ -161,7 +161,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(2, result.FilterCategories.Count);
 
             //assert dto mapping
-            FilterCategoryDto category = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.ENVIRONMENT);
+            FilterCategoryDto category = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.DataInventory.ENVIRONMENT);
             Assert.IsNotNull(category);
             Assert.AreEqual(2, category.CategoryOptions.Count);
 
@@ -169,15 +169,15 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(FilterCategoryOptions.ENVIRONMENT_PROD, option.OptionValue);
             Assert.AreEqual(5, option.ResultCount);
             Assert.IsTrue(option.Selected);
-            Assert.AreEqual(FilterCategoryNames.ENVIRONMENT, option.ParentCategoryName);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.ENVIRONMENT, option.ParentCategoryName);
 
             option = category.CategoryOptions.Last();
             Assert.AreEqual(FilterCategoryOptions.ENVIRONMENT_NONPROD, option.OptionValue);
             Assert.AreEqual(3, option.ResultCount);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(FilterCategoryNames.ENVIRONMENT, option.ParentCategoryName);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.ENVIRONMENT, option.ParentCategoryName);
 
-            category = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.SENSITIVE);
+            category = result.FilterCategories.FirstOrDefault(x => x.CategoryName == FilterCategoryNames.DataInventory.SENSITIVE);
             Assert.IsNotNull(category);
             Assert.AreEqual(2, category.CategoryOptions.Count);
 
@@ -185,13 +185,13 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("false", option.OptionValue);
             Assert.AreEqual(2, option.ResultCount);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(FilterCategoryNames.SENSITIVE, option.ParentCategoryName);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.SENSITIVE, option.ParentCategoryName);
 
             option = category.CategoryOptions.Last();
             Assert.AreEqual("true", option.OptionValue);
             Assert.AreEqual(6, option.ResultCount);
             Assert.IsFalse(option.Selected);
-            Assert.AreEqual(FilterCategoryNames.SENSITIVE, option.ParentCategoryName);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.SENSITIVE, option.ParentCategoryName);
         }
 
         [TestMethod]
@@ -209,32 +209,32 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     new FilterCategoryDto()
                     {
-                        CategoryName = FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
-                                ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true
                             },
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = FilterCategoryOptions.ENVIRONMENT_NONPROD,
-                                ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true
                             }
                         }
                     },
                     new FilterCategoryDto()
                     {
-                        CategoryName = FilterCategoryNames.SENSITIVE,
+                        CategoryName = FilterCategoryNames.DataInventory.SENSITIVE,
                         CategoryOptions = new List<FilterCategoryOptionDto>()
                         {
                             new FilterCategoryOptionDto()
                             {
                                 OptionValue = "true",
-                                ParentCategoryName = FilterCategoryNames.SENSITIVE,
+                                ParentCategoryName = FilterCategoryNames.DataInventory.SENSITIVE,
                                 Selected = true
                             }
                         }
@@ -556,7 +556,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 Aggregations = new AggregateDictionary(new Dictionary<string, IAggregate>
                 {
-                    [FilterCategoryNames.ENVIRONMENT] = new BucketAggregate()
+                    [FilterCategoryNames.DataInventory.ENVIRONMENT] = new BucketAggregate()
                     {
                         SumOtherDocCount = 0,
                         Items = new List<KeyedBucket<object>>
@@ -573,7 +573,7 @@ namespace Sentry.data.Infrastructure.Tests
                             }
                         }.AsReadOnly()
                     },
-                    [FilterCategoryNames.SENSITIVE] = new BucketAggregate()
+                    [FilterCategoryNames.DataInventory.SENSITIVE] = new BucketAggregate()
                     {
                         SumOtherDocCount = 0,
                         Items = new List<KeyedBucket<object>>
@@ -596,7 +596,7 @@ namespace Sentry.data.Infrastructure.Tests
                     {
                         Items = new List<KeyedBucket<string>>().AsReadOnly()
                     },
-                    [FilterCategoryNames.DATABASE] = new BucketAggregate()
+                    [FilterCategoryNames.DataInventory.DATABASE] = new BucketAggregate()
                     {
                         SumOtherDocCount = 10,
                         Items = new List<KeyedBucket<string>>().AsReadOnly()

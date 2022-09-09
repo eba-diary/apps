@@ -30,12 +30,19 @@
 
         <div class="md-form">
             <h4>How will the data be sent to us?</h4>
-            <div class="material-tooltip-main" data-toggle="tooltip" title="Will your process send a file to DSC (User_Push)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
+            <div class="material-tooltip-main" data-toggle="tooltip" title="Will your process send a file to DSC (Drop/Topic)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
                 @Html.DropDownListFor(
                     x => x.IngestionTypeSelection,
                     Model.IngestionTypeDropDown,
-                    new { @class = "mdb-select" })
+                    new { @class = "mdb-select" })  
             </div>
+
+            <div id="topicNameContainer" class="md-form">
+                <h4>What is Topic Name?</h4>
+                @Html.TextBoxFor((m) => m.TopicName, Model.TopicName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => Model.TopicName, "", new { @class = "text-danger" })
+            </div>
+
         </div>
 
         <div class="namePanel" style="display:none;">
@@ -60,6 +67,7 @@
                     @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "mdb-select" })
                 </a>
             </div>
+
             <div class="md-form compressionJobPanel" style="display:none">
                 <div id="compressionJobPanel">
                     @if (Model.CompressionJob != null)
@@ -72,12 +80,17 @@
                     }
                 </div>
             </div>
+
+
+        @*DSC PULL*@
         </div>
         <div class="retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
                 @Html.EditorFor(model => Model.RetrieverJob)
             </div>
         </div>
+
+
         <div class="preProcessingPanel" style="display:none;">
             <div class="md-form">
                 <h4>Does your data require Preprocessing?</h4>

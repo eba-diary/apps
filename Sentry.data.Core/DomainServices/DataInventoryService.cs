@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
@@ -86,7 +87,7 @@ namespace Sentry.data.Core
         {
             if (string.Equals(category, "said", StringComparison.OrdinalIgnoreCase))
             {
-                category = FilterCategoryNames.ASSET;
+                category = FilterCategoryNames.DataInventory.ASSET;
             }
             
             return CustomAttributeHelper.TryGetFilterCategoryName<DataInventory>(category, out categoryName);

@@ -37,5 +37,7 @@ namespace Sentry.data.Core
         public string PrimaryContactId { get; set; }
         public bool IsSecured { get; set; }
         public UserSecurity Security { get; set; }
+        public string TopicName { get; set; }
+        public string S3ConnectorName { get; set; }
     }
 }

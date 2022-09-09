@@ -1,4 +1,4 @@
-﻿data.DataInventory = {
+﻿data.DataInventorySearch = {
 
     updateHash: {},
 
@@ -9,7 +9,7 @@
     },
 
     executeSearch: function () {
-        $("#di-result-table").DataTable().ajax.reload(json => data.DataInventory.completeDataInventorySearch(json));
+        $("#di-result-table").DataTable().ajax.reload(json => data.DataInventorySearch.completeDataInventorySearch(json));
     },
 
     buildFilter: function () {
@@ -34,7 +34,7 @@
             method: "GET",
             dataType: 'json',
             success: function (obj) {
-                data.DataInventory.initDataTable(obj);
+                data.DataInventorySearch.initDataTable(obj);
 
                 if (!obj.canViewSensitive) {
                     data.FilterSearch.showToast("error", "All results may not be displayed. " +
@@ -85,9 +85,9 @@
                 //the key piece here is including a label with text to indicate whether IsSensitive column is true or false so the filtering works
                 //Since I did not want user to see label text and still have a filter.  My cheat to this was to style label with display:none while still keeping the filtering ability
                 //later on when they check/uncheck the box my editRow() function will refresh the data associated with the grid which changes the label hidden text to the opposite so filtering can refresh
-                { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canEditSensitive || (obj.canEditSensitive && !obj.canEditOwnerVerified && d.IsOwnerVerified), d.IsSensitive, "sensitive_" + d.BaseColumnId) },
+                { data: null, className: "IsSensitive", visible: false, render: (d) => data.DataInventorySearch.getTableElementCheckbox(!obj.canEditSensitive || (obj.canEditSensitive && !obj.canEditOwnerVerified && d.IsOwnerVerified), d.IsSensitive, "sensitive_" + d.BaseColumnId) },
                 //OWNER VERIFIED CHECKBOX
-                { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventory.getTableElementCheckbox(!obj.canEditOwnerVerified, d.IsOwnerVerified, "owner_" + d.BaseColumnId) },
+                { data: null, className: "IsOwnerVerified", visible: false, render: (d) => data.DataInventorySearch.getTableElementCheckbox(!obj.canEditOwnerVerified, d.IsOwnerVerified, "owner_" + d.BaseColumnId) },
                 { data: "ProdType", className: "ProdType", visible: false },
                 { data: "ColumnType", className: "ColumnType", visible: false },
                 { data: "MaxLength", className: "MaxLength", visible: false },
@@ -101,8 +101,8 @@
             ],
             aLengthMenu: [10, 20, 50, 100, 500],
             dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
-            buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventory.saveUpdates }],
-            initComplete: (settings, json) => data.DataInventory.completeDataInventorySearch(json),
+            buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventorySearch.saveUpdates }],
+            initComplete: (settings, json) => data.DataInventorySearch.completeDataInventorySearch(json),
             "autoWidth": false
         });
     },
@@ -110,10 +110,10 @@
     initEvents: function () {
 
         //datatable page change
-        $(document).on("page.dt", "#di-result-table", data.DataInventory.updatePageInfo);
+        $(document).on("page.dt", "#di-result-table", data.DataInventorySearch.updatePageInfo);
 
         //datatable page length change
-        $(document).on("length.dt", "#di-result-table", data.DataInventory.updatePageInfo);
+        $(document).on("length.dt", "#di-result-table", data.DataInventorySearch.updatePageInfo);
 
         //sensitive or owner verified change
         $(document).on("change", ".table-element-checkbox", function (e) {
@@ -124,18 +124,18 @@
                 IsOwnerVerified: $("#owner_" + baseColumnId).is(":checked")
             }
 
-            var exists = data.DataInventory.updateHash[baseColumnId];
+            var exists = data.DataInventorySearch.updateHash[baseColumnId];
 
             if (exists) {
                 if (exists.original.IsSensitive == change.IsSensitive && exists.original.IsOwnerVerified == change.IsOwnerVerified) {
-                    delete data.DataInventory.updateHash[baseColumnId];
+                    delete data.DataInventorySearch.updateHash[baseColumnId];
                 }
                 else {
                     exists.updated = change;
                 }
             }
             else {
-                data.DataInventory.updateHash[baseColumnId] = {
+                data.DataInventorySearch.updateHash[baseColumnId] = {
                     original: {
                         IsSensitive: this.id.includes("sensitive") ? !this.checked : $("#sensitive_" + baseColumnId).is(":checked"),
                         IsOwnerVerified: this.id.includes("owner") ? !this.checked : $("#owner_" + baseColumnId).is(":checked")
@@ -144,7 +144,7 @@
                 };
             }
 
-            if (Object.keys(data.DataInventory.updateHash).length > 0) {
+            if (Object.keys(data.DataInventorySearch.updateHash).length > 0) {
                 $(".di-save").show();
             }
             else {
@@ -171,7 +171,7 @@
 
         var request = { models: [] };
 
-        for (var [key, value] of Object.entries(data.DataInventory.updateHash)) {
+        for (var [key, value] of Object.entries(data.DataInventorySearch.updateHash)) {
             request.models.push({
                 BaseColumnId: key,
                 IsSensitive: value.updated.IsSensitive,
@@ -182,7 +182,7 @@
         $.post("/DataInventory/Update/", request, function (x) {
             if (x.success) {
                 $(".di-save").hide();
-                data.DataInventory.updateHash = {};
+                data.DataInventorySearch.updateHash = {};
             }
             else {
                 data.FilterSearch.showToast("error", "Something went wrong trying to save changes. Please try again or reach out to DSCSupport@sentry.com.");

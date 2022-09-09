@@ -87,25 +87,32 @@
 
                     <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Business Intelligence</a>
                     <ul class="dropdown-menu z-depth-1">
-                        <li class="dropdown-item"><a class="" href="~/BusinessIntelligence/Index">Home</a></li>
+                        @if (Model.DirectToSearchPages)
+                        {
+                            <li class="dropdown-item"><a class="" href="~/Search/BusinessIntelligence">Search</a></li>
+                        }
+                        else
+                        {
+                            <li class="dropdown-item"><a class="" href="~/BusinessIntelligence/Index">Home</a></li>
 
-                        <li class="dropdown-submenu">
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Search</a>
-                            <ul class="dropdown-menu z-depth-1">
-                                <li class="dropdown-item">
-                                    <a href="/Search/BusinessIntelligence/Index?searchPhrase=" class="waves-effect waves-light">All</a>
-                                </li>
-                                @foreach (Sentry.data.Web.Models.BusinessIntelligenceUIModel da in ViewBag.BusinessIntelligenceCategories)
-                                {
+                            <li class="dropdown-submenu">
+                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Search</a>
+                                <ul class="dropdown-menu z-depth-1">
                                     <li class="dropdown-item">
-                                        <a href="/Search/BusinessIntelligence/Index?category=@da.Name" class="waves-effect waves-light">@da.Name</a>
+                                        <a href="/Search/BusinessIntelligence/Index?searchPhrase=" class="waves-effect waves-light">All</a>
                                     </li>
-                                }
+                                    @foreach (Sentry.data.Web.Models.BusinessIntelligenceUIModel da in ViewBag.BusinessIntelligenceCategories)
+                                    {
+                                        <li class="dropdown-item">
+                                            <a href="/Search/BusinessIntelligence/Index?category=@da.Name" class="waves-effect waves-light">@da.Name</a>
+                                        </li>
+                                    }
 
-                            </ul>
-                        </li>
+                                </ul>
+                            </li>
+                            <li><div class="dropdown-header">Exhibit Actions</div></li>
+                        }
 
-                        <li><div class="dropdown-header">Exhibit Actions</div></li>
                         <li class="dropdown-item"><a class="" href="~/BusinessIntelligence/Create">Create Exhibit</a></li>
 
                     </ul>
@@ -116,10 +123,18 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle waves-effect waves-light" id="navbarDropdownDatasetLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Datasets</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownDatasetLink">
-                        <a class="dropdown-item" href="~/Dataset/Index">Home</a>
-                        <a class="dropdown-item" href="~/Search/Datasets">Search</a>
-                        <div class="dropdown-divider"></div>
-                        <div class="dropdown-header">Dataset Actions</div>
+                        @if (Model.DirectToSearchPages)
+                        {
+                            <a class="dropdown-item" href="~/Search/Datasets">Search</a>
+                        }
+                        else
+                        {
+                            <a class="dropdown-item" href="~/Dataset/Index">Home</a>
+                            <a class="dropdown-item" href="~/Search/Datasets">Search</a>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-header">Dataset Actions</div>
+                        }
+
                         @if (Model.DisplayDataflowMetadata)
                         {
                             <a class="dropdown-item waves-effect waves-light" href="/DataFlow/Create">Send Data to DSC</a>
@@ -128,8 +143,13 @@
                         {
                             <a class="dropdown-item waves-effect waves-light" href="/Dataset/Create">Create Dataset</a>
                         }
-                        <div class="dropdown-divider"></div>
-                        <div class="dropdown-header">Dataset Administration</div>
+
+                        @if (!Model.DirectToSearchPages)
+                        {
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-header">Dataset Administration</div>
+                        }
+
                         <a class="dropdown-item waves-effect waves-light" href="/Config/Source/Create">Create Retriever Source</a>
                     </div>
                 </li>

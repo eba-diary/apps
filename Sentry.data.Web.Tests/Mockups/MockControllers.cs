@@ -2,6 +2,7 @@
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Controllers;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,7 +69,7 @@ namespace Sentry.data.Web.Tests
             
             var mockEventService = MockRepository.GenerateStub<IEventService>();
 
-            var mockFeatureFlag = MockRepository.GenerateStub<IDataFeatures>();
+            var mockFeatureFlag = new Moq.Mock<IDataFeatures>();
 
             mockSharedContextModel.CurrentUser = user;
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
@@ -102,11 +103,17 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 
-            mockFeatureFlag.Stub(x => x.Expose_Dataflow_Metadata_CLA_2146.GetValue()).Return(false);
+            var updateSearchPagesFeature = new Moq.Mock<IFeatureFlag<bool>>();
+            updateSearchPagesFeature.Setup(x => x.GetValue()).Returns(false);
+            mockFeatureFlag.SetupGet(x => x.CLA3756_UpdateSearchPages).Returns(updateSearchPagesFeature.Object);
+
+            var exposeDataFlowFeature = new Moq.Mock<IFeatureFlag<bool>>();
+            exposeDataFlowFeature.Setup(x => x.GetValue()).Returns(false);
+            mockFeatureFlag.SetupGet(x => x.Expose_Dataflow_Metadata_CLA_2146).Returns(exposeDataFlowFeature.Object);
 
             var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, 
                 mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService,
-                mockFeatureFlag, null, null, null, null, null, null);
+                mockFeatureFlag.Object, null, null, null, null, null, null);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;
