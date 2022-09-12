@@ -161,6 +161,7 @@ namespace Sentry.data.Core
         
         public void UploadDatasetFileToS3(UploadDatasetFileDto uploadDatasetFileDto)
         {
+            string errorMessage = null;
             DatasetFileConfig datasetFileConfig = _datasetContext.GetById<DatasetFileConfig>(uploadDatasetFileDto.ConfigId);
 
             if (datasetFileConfig != null)
@@ -175,14 +176,18 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    string message = $"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3";
-                    Logger.Warn(message);
-                    throw new DataFlowNotFound(message);
+                    errorMessage = $"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3";
                 }
             }
             else
             {
-                Logger.Warn($"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3");
+                errorMessage = $"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3";
+            }
+
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                Logger.Warn(errorMessage);
+                throw new DataFlowNotFound(errorMessage);
             }
         }
 
