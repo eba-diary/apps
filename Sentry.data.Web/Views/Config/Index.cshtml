@@ -18,19 +18,27 @@
 
 <div class="config-banner">
     <h1 class="detailName leftFloat @color pt-0">@Model.DatasetName</h1>
-    <a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus mr-2"></em>Add Schema</a>
+
+    <div>
+        @if (HttpContext.Current.IsDebuggingEnabled)
+        {
+            <a class="btn btn-success btnCreateDirectory mt-3"><em class="fas fa-plus mr-2"></em>Create Directories</a>
+        }
+        <a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus mr-2"></em>Add Schema</a>
+    </div>
 </div>
 
 <!--Accordion wrapper-->
 <div class="accordion md-accordion" id="accordionSchemas" role="tablist" aria-multiselectable="true">
     @foreach (DatasetFileConfigsModel item in Model.DatasetFileConfigs.Where(x => (x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && x.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted)).ToList())
     {
+        bool isActive = item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active;
         string fileExtension = item.FileExtension.Name.Trim();
         <!-- Accordion card -->
         <div class="card">
             <!-- Card header -->
             <a class="collapsed" data-toggle="collapse" data-parent="#accordionSchemas" href="#collapse-config-@item.ConfigId" aria-expanded="false" aria-controls="collapse-config-@item.ConfigId">
-                <div class="card-header" role="tab" id="heading-config-@item.ConfigId">
+                <div class="card-header schema-card-header" role="tab" id="heading-config-@item.ConfigId">
                     <h2 class="@color mb-0 pt-0">
                         @item.ConfigFileName
                         @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
@@ -44,16 +52,16 @@
 
             <!-- Card body -->
             <div id="collapse-config-@item.ConfigId" class="collapse" role="tabpanel" aria-labelledby="heading-config-@item.ConfigId" data-parent="#accordionSchemas">
-                <div class="card-body ml-3 mr-3 pt-0">
+                <div class="card-body ml-3 mr-3">
                     <div class="card-body-header">
                         <h4 class="@color pt-0">Schema Information</h4>
 
                         <div class="schema-modify-icons">
-                            <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" title="Edit Schema"></a>
-                            @if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
+                            @if (isActive)
                             {
+                                <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" title="Edit Schema"></a>
                                 <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete Schema"></a>
-                            }                            
+                            }
                         </div>
                     </div>
 
@@ -150,21 +158,29 @@
                     </div>
 
                     @if (item.Schema != null)
-                    {
-                        <div class="card-body-header mt-3">
+                        {
+                            bool hasRevisions = item.Schema.Revisions.Count() > 0;
+                            <div class="card-body-header mt-3">
                             <h4 class="@color pt-0">Columns (name, datatype, is array, etc.)</h4>
 
                             <div class="schema-modify-icons">
-                                <a class="far fa-edit" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Edit Columns Metadata"></a>
-                                @if (item.Schema.Revisions.Count() > 0)
+                                @if (isActive)
                                 {
-                                    <a class="fas fa-sync schema-sync-icon ml-3" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId" title="Sync Consumption Layer"></a>
+                                    if (hasRevisions)
+                                    {
+                                        <a class="far fa-edit" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Edit Columns"></a>
+                                        <a class="fas fa-sync schema-sync-icon ml-3" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId" title="Sync Consumption Layer"></a>
+                                    }
+                                    else
+                                    {
+                                        <a class="fas fa-plus schema-add-icon" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Add Columns"></a>
+                                    }
                                 }
                             </div>
                         </div>
 
                         <div class="ml-3">
-                            @if (item.Schema.Revisions.Count() == 0)
+                            @if (!hasRevisions)
                             {
                                 <div>This schema does not have any columns associated to it.</div>
                             }
@@ -180,9 +196,16 @@
                             <h4 class="@color pt-0">Producer DataFlow</h4>
 
                             <div class="schema-modify-icons">
-                                @if (Model.DisplayDataflowEdit && ext != null)
+                                @if (isActive)
                                 {
+                                    if (ext == null)
+                                    {
+                                    <a class="fas fa-plus schema-add-icon" href="/DataFlow/Create" title="Add DataFlow"></a>
+                                    }
+                                    else if (Model.DisplayDataflowEdit)
+                                    {
                                     <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" title="Edit DataFlow"></a>
+                                    }
                                 }
                             </div>
                         </div>
