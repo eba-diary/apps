@@ -60,7 +60,11 @@
                             @if (isActive)
                             {
                                 <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" title="Edit Schema"></a>
-                                <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete Schema"></a>
+
+                                if (Model.DatasetFileConfigs.Where(x => x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active).Count() > 1)
+                                {
+                                    <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete Schema"></a>
+                                }
                             }
                         </div>
                     </div>
