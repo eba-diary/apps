@@ -231,7 +231,6 @@ a.create-link:focus {
 .schema-modify-icons {
     font-size: 1.75rem;
     display: flex;
-    margin-right: 1.5rem;
 }
 
 .schema-delete-icon {
@@ -240,4 +239,27 @@ a.create-link:focus {
 
     .schema-delete-icon:hover {
         color: #f5190c !important;
+    }
+
+.schema-sync-icon {
+    color: #005844 !important;
+}
+
+    .schema-sync-icon:hover {
+        color: #84BD00 !important;
+    }
+
+.data-flow-card-radius {
+    border-radius: 10px !important;
+}
+
+/*overriding mdb css so that full header bar is clickable and chevron rotates accordingly*/ 
+.md-accordion .card a {
+    -webkit-transition: ease-in-out 0.3s;
+    transition: ease-in-out 0.3s
+}
+
+    .md-accordion .card a:not(.collapsed) .rotate-icon {
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg)
     }

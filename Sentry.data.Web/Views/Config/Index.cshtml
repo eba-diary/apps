@@ -29,9 +29,9 @@
         <!-- Accordion card -->
         <div class="card">
             <!-- Card header -->
-            <div class="card-header" role="tab" id="heading-config-@item.ConfigId">
-                <a class="collapsed" data-toggle="collapse" data-parent="#accordionSchemas" href="#collapse-config-@item.ConfigId" aria-expanded="false" aria-controls="collapse-config-@item.ConfigId">
-                    <h2 class="@color pt-3">
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordionSchemas" href="#collapse-config-@item.ConfigId" aria-expanded="false" aria-controls="collapse-config-@item.ConfigId">
+                <div class="card-header" role="tab" id="heading-config-@item.ConfigId">
+                    <h2 class="@color mb-0 pt-0">
                         @item.ConfigFileName
                         @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                         {
@@ -39,48 +39,42 @@
                         }
                         <em class="fas fa-angle-down rotate-icon"></em>
                     </h2>
-                </a>
-            </div>
+                </div>
+            </a>
 
             <!-- Card body -->
             <div id="collapse-config-@item.ConfigId" class="collapse" role="tabpanel" aria-labelledby="heading-config-@item.ConfigId" data-parent="#accordionSchemas">
-                <div class="card-body ml-3">
-                    @*<div class="card-body-header">
-                        <h4 class="@color pt-0">Configuration Metadata</h4>
-
-                        <div>
-                            <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
-                            <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
-                        </div>
-                    </div>*@
-
+                <div class="card-body ml-3 mr-3 pt-0">
                     <div class="card-body-header">
-                        <h4 class="@color pt-0">Configuration Metadata</h4>
+                        <h4 class="@color pt-0">Schema Information</h4>
 
                         <div class="schema-modify-icons">
-                            <a class="far fa-edit schema-edit-icon mr-3" href="/Config/Edit/@item.ConfigId" title="Edit"></a>
-                            <a class="icon-trash schema-delete-icon" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete"></a>
+                            <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" title="Edit Schema"></a>
+                            @if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
+                            {
+                                <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete Schema"></a>
+                            }                            
                         </div>
                     </div>
 
                     <div class="ml-3">
                         <div class="pb-3">
                             <div class="font-weight-bold">Description:</div>
-                            @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
-                            {
-                                int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
-                                <div>
+                            <div class="ml-3">
+                                @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
+                                {
+                                    int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
                                     <span>@item.ConfigFileDesc.Substring(0, lastInfo)</span>
                                     <span id="usageSeeMoreEllipsis">...&nbsp;</span>
                                     <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
                                     <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
                                     <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                                </div>
-                            }
-                            else
-                            {
-                                <div>@item.ConfigFileDesc</div>
-                            }
+                                }
+                                else
+                                {
+                                    @item.ConfigFileDesc
+                                }
+                            </div>
                         </div>
 
                         <div class="pb-3"><span class="font-weight-bold">Control-M Trigger Name:</span> @item.ControlMTriggerName</div>
@@ -143,7 +137,7 @@
                             <div>@item.ScopeType.Description</div>
                         </div>
 
-                        <div class="pb-3">
+                        <div>
                             @if (item.CreateCurrentView)
                             {
                                 <div>A current view exists for this schema which filters to data from latest file processed.</div>
@@ -157,7 +151,18 @@
 
                     @if (item.Schema != null)
                     {
-                        <h4 class="@color pt-3">Columns Metadata (name, datatype, is array, etc.)</h4>
+                        <div class="card-body-header mt-3">
+                            <h4 class="@color pt-0">Columns (name, datatype, is array, etc.)</h4>
+
+                            <div class="schema-modify-icons">
+                                <a class="far fa-edit" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Edit Columns Metadata"></a>
+                                @if (item.Schema.Revisions.Count() > 0)
+                                {
+                                    <a class="fas fa-sync schema-sync-icon ml-3" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId" title="Sync Consumption Layer"></a>
+                                }
+                            </div>
+                        </div>
+
                         <div class="ml-3">
                             @if (item.Schema.Revisions.Count() == 0)
                             {
@@ -166,28 +171,50 @@
                             <div><span class="font-weight-bold">Created on:</span> @item.Schema.CreatedDTM</div>
                             <div><span class="font-weight-bold">Last Modified on:</span> @item.Schema.LastUpdatedDTM</div>
                         </div>
-
-                        bool hasRevisions = item.Schema.Revisions.Count() > 0;
-                        <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">@(hasRevisions ? "Edit" : "Add") Columns Metadata</a>
-                        if (hasRevisions)
-                        {
-                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
-                        }
                     }
 
                     @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
                     {
-                        <h4 class="@color pt-3">Producer DataFlow</h4>
+                        AssociatedDataFlowModel ext = item.ExternalDataFlowJobs.FirstOrDefault(x => x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active);
+                        <div class="card-body-header mt-3">
+                            <h4 class="@color pt-0">Producer DataFlow</h4>
 
-                        @* Loop through each external dataflow *@
-                        if (!item.ExternalDataFlowJobs.Any())
-                        {
-                            <p>This schema does not have any associated dataflows yet.</p>
-                        }
-                        else
-                        {
-                            Html.RenderPartial("_DataFlowAccordion", item.ExternalDataFlowJobs, new ViewDataDictionary { { "DisplayDataflowEdit", Model.DisplayDataflowEdit }, { "Color", color } });
-                        }
+                            <div class="schema-modify-icons">
+                                @if (Model.DisplayDataflowEdit && ext != null)
+                                {
+                                    <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" title="Edit DataFlow"></a>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="ml-3">
+                            @{
+                                if (ext == null)
+                                {
+                                    <p>This schema does not have any associated dataflows yet.</p>
+                                }
+                                else
+                                {
+                                    List<DataFlowStepModel> steps = ext.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").ToList();
+                                    if (steps.Any())
+                                    {
+                                        <div>This dataflow contains the following steps:</div>
+                                        <ol>
+                                            @foreach (DataFlowStepModel step in steps.OrderBy(o => o.ExecutionOrder))
+                                            {
+                                                <li>@step.ActionName</li>
+                                            }
+                                        </ol>
+                                    }
+                                    else
+                                    {
+                                        <div>This dataflow does not contain any special processing.</div>
+                                    }
+
+                                    Html.RenderPartial("_DataFlowStepAccordion", ext, new ViewDataDictionary { { "Color", Model.CategoryColor } });
+                                }
+                            }
+                        </div>
                     }
                 </div>
             </div>
