@@ -165,7 +165,9 @@ namespace Sentry.data.Core
 
             if (datasetFileConfig != null)
             {
-                DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.DatasetId == uploadDatasetFileDto.DatasetId && x.SchemaId == datasetFileConfig.Schema.SchemaId);
+                DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.DatasetId == uploadDatasetFileDto.DatasetId && 
+                                                                            x.SchemaId == datasetFileConfig.Schema.SchemaId && 
+                                                                            x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
                 DataFlowStep dropStep = dataFlow?.Steps.FirstOrDefault(x => x.DataAction_Type_Id == DataActionType.ProducerS3Drop);
                 if (dropStep != null)
                 {
@@ -173,12 +175,14 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    Logger.Info($"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3");
+                    string message = $"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3";
+                    Logger.Warn(message);
+                    throw new DataFlowNotFound(message);
                 }
             }
             else
             {
-                Logger.Info($"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3");
+                Logger.Warn($"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3");
             }
         }
 
