@@ -108,7 +108,7 @@
                         @if (fileExtension == GlobalConstants.ExtensionNames.ANY || fileExtension == GlobalConstants.ExtensionNames.DELIMITED || fileExtension == GlobalConstants.ExtensionNames.CSV)
                         {
                             <div class="pb-3">
-                                <div>This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
+                                <div>This schema's current Delimiter is ( <span class="font-weight-bold">@item.Delimiter</span> )</div>
                                 @if (Model.Security.ShowAdminControls)
                                 {
                                     <div><span class="font-weight-bold">Files contain headers:</span> @item.HasHeader</div>

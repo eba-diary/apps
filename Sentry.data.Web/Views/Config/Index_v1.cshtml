@@ -86,28 +86,28 @@
 
                             @if (Model.Security.ShowAdminControls)
                             {
-                                <div class="col-md-3">Storage id: <b>@item.RawStorageId</b></div>
-                                <div class="col-md-3">Schema id: <b>@item.SchemaId</b> <i>(@item.OldSchemaId)</i></div>
+                                <div class="col-md-3">Storage id: <strong>@item.RawStorageId</strong></div>
+                                <div class="col-md-3">Schema id: <strong>@item.SchemaId</strong> <i>(@item.OldSchemaId)</i></div>
                             }
                             else
                             {
-                                <div class="col-md-3">Schema id: <b>@item.SchemaId</b></div>
+                                <div class="col-md-3">Schema id: <strong>@item.SchemaId</strong></div>
                             }
-                            <div class="col-md-3">Configuration classification: <b>@item.FileType</b></div>
-                            <div class="col-md-3">File type: <b>@item.FileExtension.Name</b></div>
+                            <div class="col-md-3">Configuration classification: <strong>@item.FileType</strong></div>
+                            <div class="col-md-3">File type: <strong>@item.FileExtension.Name</strong></div>
                         </div>
                         @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.ANY || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.DELIMITED || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.CSV)
                         {
                             <div class="col-md-12 configDetailRow">
-                                <div class="col-md-3">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
+                                <div class="col-md-3">This schema's current Delimiter is ( <strong>@item.Delimiter</strong> )</div>
                                 @if (Model.Security.ShowAdminControls)
                                 {
-                                    <div class="col-md-3">Files contain headers: <b>@item.HasHeader</b></div>
-                                    <div class="col-md-6">CLA1396_NewEtlColumns: <b>@item.CLA1396_NewEtlColumns</b></div>
+                                    <div class="col-md-3">Files contain headers: <strong>@item.HasHeader</strong></div>
+                                    <div class="col-md-6">CLA1396_NewEtlColumns: <strong>@item.CLA1396_NewEtlColumns</strong></div>
                                 }
                                 else
                                 {
-                                    <div class="col-md-9">Files contain headers: <b>@item.HasHeader</b></div>
+                                    <div class="col-md-9">Files contain headers: <strong>@item.HasHeader</strong></div>
                                 }
                             </div>
                         }
@@ -128,12 +128,12 @@
 
                         <div class="col-md-12 configDetailRow">
                             @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.ANY || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.DELIMITED || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.FIXEDWIDTH)
-                            {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
+                            {<div class="col-md-12">This configuration will allow <strong>all</strong> file extensions.</div>}
                             else
-                            {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}
+                            {<div class="col-md-12">This configuration will only allow files with <strong>.@item.FileExtension.Name.ToLower()</strong> extension</div>}
                         </div>
                         <div class="col-md-12 configDetailRow">
-                            <div class="col-md-12">This configuration Data Scope is <b>@item.ScopeType.Name</b> which means :</div>
+                            <div class="col-md-12">This configuration Data Scope is <strong>@item.ScopeType.Name</strong> which means :</div>
                             <div class="col-md-11 col-md-offset-1">@item.ScopeType.Description</div>
                         </div>
                         <div class="col-md-12 configDetailRow">
