@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Bson;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace Sentry.data.Core
         public virtual SchemaRevision ParentSchemaRevision { get; set; }
         public virtual int FieldLength { get; set; }
         public virtual string DotNamePath { get; set; }
-
+        public virtual string StructurePosition { get; set; }
 
         //abstract properties
         public abstract SchemaDatatypes FieldType { get; set; }
@@ -79,6 +80,11 @@ namespace Sentry.data.Core
             }
 
             return definition;
+        }
+
+        public virtual void SetStructurePosition(int index)
+        {
+            //by default do nothing, method overriden by StructField
         }
 
         protected abstract JObject GetJsonTypeDefinition();

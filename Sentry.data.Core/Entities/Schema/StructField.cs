@@ -14,6 +14,18 @@ namespace Sentry.data.Core
             set => FieldType = SchemaDatatypes.STRUCT;
         }
 
+        public override void SetStructurePosition(int index)
+        {
+            if (ParentField == null)
+            {
+                StructurePosition = index.ToString();
+            }
+            else
+            {
+                StructurePosition = $"{ParentField.StructurePosition}.{index}";
+            }
+        }
+
         protected override JObject GetJsonTypeDefinition()
         {
             JObject definition = new JObject() { { "type", "object" } };

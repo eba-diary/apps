@@ -2728,7 +2728,7 @@ namespace Sentry.data.Core.Tests
         {
             List<BaseField> fields = BuildMockNestedSchema();
             SchemaService schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
-            schemaService.SchemaFieldsBuildDotNamePath(fields);
+            schemaService.SetHierarchyProperties(fields);
             Assert.AreEqual("Root", fields[0].DotNamePath);
             Assert.AreEqual("Root.Middle", fields[1].DotNamePath);
             Assert.AreEqual("Root.Middle.Child", fields[2].DotNamePath);
