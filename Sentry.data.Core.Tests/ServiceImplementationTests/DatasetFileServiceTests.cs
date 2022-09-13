@@ -857,6 +857,7 @@ namespace Sentry.data.Core.Tests
             {
                 DatasetId = 3,
                 SchemaId = 2,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
                 Steps = new List<DataFlowStep>()
                 {
                     new DataFlowStep()
@@ -888,6 +889,64 @@ namespace Sentry.data.Core.Tests
             };
 
             datasetFileService.UploadDatasetFileToS3(dto);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UploadDatasetFileToS3_UploadDatasetFileDto_DatasetFileConfigNotFound()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DatasetFileConfig>(1)).Returns<DatasetFileConfig>(null);
+
+            DatasetFileService datasetFileService = new DatasetFileService(datasetContext.Object, null, null, null, null, null, null);
+
+            UploadDatasetFileDto dto = new UploadDatasetFileDto()
+            {
+                ConfigId = 1
+            };
+
+            Assert.ThrowsException<DataFlowNotFound>(() => datasetFileService.UploadDatasetFileToS3(dto), "Dataset File Config with Id: 1 not found while attempting to upload file to S3");
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UploadDatasetFileToS3_UploadDatasetFileDto_DataFlowNotFound()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            DatasetFileConfig datasetFileConfig = new DatasetFileConfig()
+            {
+                ConfigId = 1,
+                Schema = new FileSchema()
+                {
+                    SchemaId = 2
+                }
+            };
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                DatasetId = 3,
+                SchemaId = 2,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted
+            };
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DatasetFileConfig>(1)).Returns(datasetFileConfig);
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>() { dataFlow }.AsQueryable());
+
+            DatasetFileService datasetFileService = new DatasetFileService(datasetContext.Object, null, null, null, null, null, null);
+
+            UploadDatasetFileDto dto = new UploadDatasetFileDto()
+            {
+                DatasetId = 3,
+                ConfigId = 1
+            };
+
+            Assert.ThrowsException<DataFlowNotFound>(() => datasetFileService.UploadDatasetFileToS3(dto), "Data Flow for dataset: 3 and schema: 2 not found while attempting to upload file to S3");
 
             mockRepository.VerifyAll();
         }
