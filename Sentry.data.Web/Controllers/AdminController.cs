@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
-using Sentry.data.Core.DTO.Admin;
+using Sentry.data.Core.DTO;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Web.Extensions;
 using System;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Sentry.data.Web.Models;
+using Sentry.data.Core.DTO.Admin;
 
 namespace Sentry.data.Web.Controllers
 {

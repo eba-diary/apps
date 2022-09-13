@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             Id(x => x.SupportLinkId, x =>
             {
-                x.Column("SupportLinkId");
+                x.Column("SupportLink_Id");
                 x.Generator(Generators.Identity);
             });
             Property(x => x.Name, x =>
