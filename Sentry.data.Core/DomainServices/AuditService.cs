@@ -23,43 +23,22 @@ namespace Sentry.data.Core
 
         public BaseAuditDto GetExceptRows(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
-            DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-
-            SchemaConsumptionSnowflakeDto schemaObject = null;
-
-            foreach (var consumptionDetailDto in datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
-            {
-                if (consumptionDetailDto.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet)
-                {
-                    schemaObject = consumptionDetailDto;
-                    break;
-                }
-                else
-                {
-                    schemaObject = consumptionDetailDto;
-                }
-            }
+            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
             if (schemaObject != null) {
 
+                // Query execution logger
                 Logger.Info("Audit Query Execution: Started");
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
-                {
-                    SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
-                    TargetDb = schemaObject.SnowflakeDatabase,
-                    Schema = schemaObject.SnowflakeSchema,
-                    Table = schemaObject.SnowflakeTable,
-                    QueryParameter = queryParameter,
-                    AuditSearchType = auditSearchType,
-                };
+                // Create config object
+                SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
 
                 // Calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetCompareRows(snowCompareConfig);
+                DataTable dataTable = _snowProvider.GetExceptRows(snowCompareConfig);
 
                 stopWatch.Stop();
 
@@ -94,22 +73,7 @@ namespace Sentry.data.Core
 
         public BaseAuditDto GetRowCountCompare(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
-            DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-
-            SchemaConsumptionSnowflakeDto schemaObject = null;
-
-            foreach (var consumptionDetailDto in datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
-            {
-                if (consumptionDetailDto.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet)
-                {
-                    schemaObject = consumptionDetailDto;
-                    break;
-                }
-                else
-                {
-                    schemaObject = consumptionDetailDto;
-                }
-            }
+            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
@@ -120,18 +84,10 @@ namespace Sentry.data.Core
 
                 stopWatch.Start();
 
-                SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
-                {
-                    SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
-                    TargetDb = schemaObject.SnowflakeDatabase,
-                    Schema = schemaObject.SnowflakeSchema,
-                    Table = schemaObject.SnowflakeTable,
-                    QueryParameter = queryParameter,
-                    AuditSearchType = auditSearchType,
-                };
+                SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
 
                 // Calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetExceptRows(snowCompareConfig);
+                DataTable dataTable = _snowProvider.GetCompareRows(snowCompareConfig);
 
                 stopWatch.Stop();
 
@@ -165,6 +121,35 @@ namespace Sentry.data.Core
             }
 
             return baseAuditDto;
+        }
+
+        private SnowCompareConfig createConfigObject(SchemaConsumptionSnowflakeDto schemaObject, string queryParameter, AuditSearchType auditSearchType)
+        {
+            SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
+            {
+                SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
+                TargetDb = schemaObject.SnowflakeDatabase,
+                Schema = schemaObject.SnowflakeSchema,
+                Table = schemaObject.SnowflakeTable,
+                QueryParameter = queryParameter,
+                AuditSearchType = auditSearchType,
+            };
+
+            return snowCompareConfig;
+        }
+
+        private SchemaConsumptionSnowflakeDto GetSchemaObjectBySchemaId(int datasetId, int schemaId)
+        {
+            DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+
+            SchemaConsumptionSnowflakeDto schemaObject = null;
+
+            schemaObject = datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>()
+                            .Where(x => x.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet)
+                            .DefaultIfEmpty(datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault())
+                            .First();
+
+            return schemaObject;
         }
 
         private string findRawQueryDBName(string db)
