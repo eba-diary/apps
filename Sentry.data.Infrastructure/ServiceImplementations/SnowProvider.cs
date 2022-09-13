@@ -37,29 +37,21 @@ namespace Sentry.data.Infrastructure
         {  
             string queryClause = "";
 
-            switch (snowCompareConfig.AuditSearchType)
-            {
-                case AuditSearchType.fileName:
-                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{snowCompareConfig.QueryParameter}' AND DATE_PARTITION > '{DateTime.Now.AddDays(-30):yyyy-MM-dd}'";
-                    break;
-                case AuditSearchType.dateSelect:
-                    queryClause = $"WHERE DATE_PARTITION > '{snowCompareConfig.QueryParameter}'";
-                    break;
-            }
+            queryClause = CreateAuditWhereClause(snowCompareConfig.AuditSearchType, snowCompareConfig.QueryParameter);
 
-            string q = "";
+            string exceptQuery = "";
 
-            q += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare; ";
-            q += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare as SELECT ETL_FILE_NAME_ONLY FROM {snowCompareConfig.SourceDb}.{snowCompareConfig.Schema}.{snowCompareConfig.Table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
-            q += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare; ";
-            q += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare as SELECT ETL_FILE_NAME_ONLY FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.VW_{snowCompareConfig.Table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
+            exceptQuery += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare; ";
+            exceptQuery += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare as SELECT ETL_FILE_NAME_ONLY FROM {snowCompareConfig.SourceDb}.{snowCompareConfig.Schema}.{snowCompareConfig.Table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
+            exceptQuery += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare; ";
+            exceptQuery += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare as SELECT ETL_FILE_NAME_ONLY FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.VW_{snowCompareConfig.Table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
 
-            q += $"SELECT";
-            q += $"COALESCE(tgt.ETL_FILE_NAME_ONLY,src.ETL_FILE_NAME_ONLY) AS ETL_FILE_NAME ";
-            q += $"FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare AS tgt ";
-            q += $"FULL OUTER JOIN {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare AS src ON tgt.ETL_FILE_NAME_ONLY = src.ETL_FILE_NAME_ONLY;";
+            exceptQuery += $"SELECT";
+            exceptQuery += $"COALESCE(tgt.ETL_FILE_NAME_ONLY,src.ETL_FILE_NAME_ONLY) AS ETL_FILE_NAME ";
+            exceptQuery += $"FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare AS tgt ";
+            exceptQuery += $"FULL OUTER JOIN {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare AS src ON tgt.ETL_FILE_NAME_ONLY = src.ETL_FILE_NAME_ONLY;";
 
-            return ExecuteQuery(q);
+            return ExecuteQuery(exceptQuery);
         }
 
         //File row count compare
@@ -67,34 +59,41 @@ namespace Sentry.data.Infrastructure
         {
             string queryClause = "";
 
-            switch (snowCompareConfig.AuditSearchType)
+            queryClause = CreateAuditWhereClause(snowCompareConfig.AuditSearchType, snowCompareConfig.QueryParameter);
+
+            string compareQuery = "";
+
+            compareQuery += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare; ";
+            compareQuery += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare as SELECT ETL_FILE_NAME_ONLY, COUNT(1) AS RAW_COUNT FROM {snowCompareConfig.SourceDb}.{snowCompareConfig.Schema}.{snowCompareConfig.Table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
+            compareQuery += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare; ";
+            compareQuery += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare as SELECT ETL_FILE_NAME_ONLY, COUNT(1) AS PAR_COUNT FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.VW_{snowCompareConfig.Table} data {queryClause} group by ETL_FILE_NAME_ONLY; ";
+
+            compareQuery += $"SELECT ";
+            compareQuery += $"COALESCE(tgt.ETL_FILE_NAME_ONLY,src.ETL_FILE_NAME_ONLY) AS ETL_FILE_NAME, ";
+            compareQuery += $"ifnull(src.RAW_COUNT, 0) AS RAW_COUNT, ";
+            compareQuery += $"ifnull(tgt.PAR_COUNT, 0) AS PAR_COUNT ";
+            compareQuery += $"FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare AS tgt ";
+            compareQuery += $"FULL OUTER JOIN {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare AS src ON tgt.ETL_FILE_NAME_ONLY = src.ETL_FILE_NAME_ONLY;";
+
+            return ExecuteQuery(compareQuery);
+        }
+
+        private string CreateAuditWhereClause(AuditSearchType auditSearchType, string queryParameter)
+        {
+            string queryClause = "";
+
+            switch (auditSearchType)
             {
                 case AuditSearchType.fileName:
-                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{snowCompareConfig.QueryParameter}' AND DATE_PARTITION > '{DateTime.Now.AddDays(-30):yyyy-MM-dd}'";
+                    queryClause = $"WHERE \"ETL_FILE_NAME_ONLY\" = '{queryParameter}' AND DATE_PARTITION > '{DateTime.Now.AddDays(-30):yyyy-MM-dd}'";
                     break;
                 case AuditSearchType.dateSelect:
-                    queryClause = $"WHERE DATE_PARTITION > '{snowCompareConfig.QueryParameter}'";
+                    queryClause = $"WHERE DATE_PARTITION > '{queryParameter}'";
                     break;
             }
 
-            string q = "";
-
-            q += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare; ";
-            q += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare as SELECT ETL_FILE_NAME_ONLY, COUNT(1) AS RAW_COUNT FROM {snowCompareConfig.SourceDb}.{snowCompareConfig.Schema}.{snowCompareConfig.Table} data {queryClause} GROUP BY ETL_FILE_NAME_ONLY; ";
-            q += $"drop table if exists {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare; ";
-            q += $"create temporary table {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare as SELECT ETL_FILE_NAME_ONLY, COUNT(1) AS PAR_COUNT FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.VW_{snowCompareConfig.Table} data {queryClause} group by ETL_FILE_NAME_ONLY; ";
-
-            q += $"SELECT ";
-            q += $"COALESCE(tgt.ETL_FILE_NAME_ONLY,src.ETL_FILE_NAME_ONLY) AS ETL_FILE_NAME, ";
-            q += $"ifnull(src.RAW_COUNT, 0) AS RAW_COUNT, ";
-            q += $"ifnull(tgt.PAR_COUNT, 0) AS PAR_COUNT ";
-            q += $"FROM {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.TgtCompare AS tgt ";
-            q += $"FULL OUTER JOIN {snowCompareConfig.TargetDb}.{snowCompareConfig.Schema}.SrcCompare AS src ON tgt.ETL_FILE_NAME_ONLY = src.ETL_FILE_NAME_ONLY;";
-
-            return ExecuteQuery(q);
+            return queryClause;
         }
-
-
 
         private string BuildSelectQuery(string db, string schema, string table, int rows)
         {
