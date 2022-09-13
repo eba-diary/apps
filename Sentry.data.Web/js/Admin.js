@@ -122,9 +122,11 @@ data.Admin = {
     // creates dataset file dropdown for selected dataset
     GetDatasetFileDropdown: function (url, isBaseInit) {
         // Check if the dataset file drop down is being reinitialized on a dataset select dropwdown change
+        var datasetFileDropdown = "";
+
         if (isBaseInit) {
             $("#datasetFileDropdown").materialSelect({ destroy: true });
-            var datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
+            datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
 
             $("#datasetFileDropdown").html(datasetFileDropdown);
             $("#defaultDatasetFileSelection").prop("disabled", true);
@@ -135,7 +137,7 @@ data.Admin = {
                 url: url,
                 success: function (data) {
                     $("#datasetFileDropdown").materialSelect({ destroy: true });
-                    var datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
+                    datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
 
                     for (var d of data.Records) {
                         datasetFileDropdown += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>';
@@ -336,7 +338,6 @@ data.Admin = {
             var currentAuditSelection = $(`#audit-selection-${searchId}`);
 
             var selection = $(".audit-search-selection");
-            /*var dropdown = $(".admin-audit-dropdown");*/
 
             // Set's all search elements to hidden
             selection.removeClass("active");

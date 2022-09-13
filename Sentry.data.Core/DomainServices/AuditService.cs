@@ -27,11 +27,6 @@ namespace Sentry.data.Core
 
             SchemaConsumptionSnowflakeDto schemaObject = null;
 
-/*            schemaObject = datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>()
-                                                                .Where(x => x.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet)
-                                                                .DefaultIfEmpty(datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault())
-                                                                .First();*/
-
             foreach (var consumptionDetailDto in datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
             {
                 if (consumptionDetailDto.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet)
