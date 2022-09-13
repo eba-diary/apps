@@ -776,11 +776,24 @@ namespace Sentry.data.Core
             foreach (BaseField field in fields)
             {
                 field.DotNamePath = BuildDotNamePath(field);
-                field.SetStructurePosition(index);
+                field.StructurePosition = BuildStructurePosition(field, index);
                 if (field.ChildFields.Count > 0)
                 {
                     SetHierarchyProperties(field.ChildFields);
                 }
+                index++;
+            }
+        }
+
+        private string BuildStructurePosition(BaseField field, int index)
+        {
+            if (field.ParentField == null)
+            {
+                return index.ToString();
+            }
+            else
+            {
+                return $"{field.ParentField.StructurePosition}.{index}";
             }
         }
 
@@ -1204,7 +1217,8 @@ namespace Sentry.data.Core
             {
                 foreach (BaseFieldDto cRow in row.ChildFields)
                 {
-                    newField.ChildFields.Add(AddRevisionField(cRow, CurrentRevision, newField, previousRevision));
+                    //When ParentField is set in ToEntity, field is automatically add as child field, the returned field therefore does not need to be added to the ChildField list
+                    AddRevisionField(cRow, CurrentRevision, newField, previousRevision);
                 }
             }
 

@@ -82,11 +82,6 @@ namespace Sentry.data.Core
             return definition;
         }
 
-        public virtual void SetStructurePosition(int index)
-        {
-            //by default do nothing, method overriden by StructField
-        }
-
         protected abstract JObject GetJsonTypeDefinition();
     }
 }
