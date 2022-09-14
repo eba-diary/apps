@@ -236,6 +236,8 @@ namespace Sentry.data.Core
                 DataFlowStep dataFlowStep = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
                 DatasetFile datasetFile = _datasetContext.DatasetFileStatusActive.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
 
+                DeleteParquetFileByDatsetId(datasetFile.FileKey, datasetFile.FileBucket);
+
                 KeyValuePair<string, string> triggerFileLocationAndContent = GetTriggerFileLocationAndSourceBucketKey(dataFlowStep, datasetFile);
                 if (triggerFileLocationAndContent.Key == null || triggerFileLocationAndContent.Value == null)
                 {
@@ -265,9 +267,6 @@ namespace Sentry.data.Core
                     }
 
                 }
-
-
-            
             }
             catch (Exception ex)
             {
@@ -278,6 +277,13 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+        private void DeleteParquetFileByDatsetId(string fileKey, string fileBucket)
+        {
+            fileKey = fileKey.Replace("rawquery", "parquet");
+
+            _s3ServiceProvider.DeleteS3Prefix(fileKey, fileBucket);
+        }
+
         internal void UpdateDataFile(DatasetFileDto dto, DatasetFile dataFile)
         {
             dataFile.FileLocation = dto.FileLocation;
