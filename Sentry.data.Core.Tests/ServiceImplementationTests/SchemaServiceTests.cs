@@ -2728,10 +2728,79 @@ namespace Sentry.data.Core.Tests
         {
             List<BaseField> fields = BuildMockNestedSchema();
             SchemaService schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
-            schemaService.SchemaFieldsBuildDotNamePath(fields);
+            schemaService.SetHierarchyProperties(fields);
             Assert.AreEqual("Root", fields[0].DotNamePath);
             Assert.AreEqual("Root.Middle", fields[1].DotNamePath);
             Assert.AreEqual("Root.Middle.Child", fields[2].DotNamePath);
+        }
+
+        [TestMethod]
+        public void SetHierarchyProperties_Fields_StructurePositions()
+        {
+            List<BaseField> fields = new List<BaseField>()
+            {
+                new VarcharField() { Name = "Varchar" },
+                new StructField() { Name = "RootStruct" },
+                new IntegerField() { Name = "Integer" },
+                new StructField() { Name = "RootStruct2"}
+            };
+
+            VarcharField midVarchar = new VarcharField()
+            {
+                Name = "MidVarchar",
+                ParentField = fields[1]
+            };
+
+            StructField midStruct = new StructField()
+            {
+                Name = "MidStruct",
+                ParentField = fields[1]
+            };
+
+            DateField lowDate = new DateField()
+            {
+                Name = "LowDate",
+                ParentField = midStruct
+            };
+
+            BigIntField lowBigInt = new BigIntField()
+            {
+                Name = "LowBigInt",
+                ParentField = midStruct
+            };
+
+            DecimalField midDecimal = new DecimalField()
+            {
+                Name = "MidDecimal",
+                ParentField = fields[3]
+            };
+
+            VarcharField midVarchar2 = new VarcharField()
+            {
+                Name = "MidVarchar2",
+                ParentField = fields[3]
+            };
+
+            SchemaService service = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
+            service.SetHierarchyProperties(fields);
+
+            Assert.AreEqual("1", fields.First().StructurePosition);
+            Assert.AreEqual("2", fields[1].StructurePosition);
+
+            IList<BaseField> childFields = fields[1].ChildFields;
+            Assert.AreEqual("2.1", childFields.First().StructurePosition);
+            Assert.AreEqual("2.2", childFields.Last().StructurePosition);
+
+            childFields = childFields.Last().ChildFields;
+            Assert.AreEqual("2.2.1", childFields.First().StructurePosition);
+            Assert.AreEqual("2.2.2", childFields.Last().StructurePosition);
+
+            Assert.AreEqual("3", fields[2].StructurePosition);
+            Assert.AreEqual("4", fields.Last().StructurePosition);
+
+            childFields = fields.Last().ChildFields;
+            Assert.AreEqual("4.1", childFields.First().StructurePosition);
+            Assert.AreEqual("4.2", childFields.Last().StructurePosition);
         }
 
         [TestMethod]

@@ -22,6 +22,7 @@ namespace Sentry.data.Core
             Length = field.FieldLength;
             OrdinalPosition = field.OrdinalPosition;
             DotNamePath = field.DotNamePath;
+            StructurePosition = field.StructurePosition;
         }
 
         protected BaseFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array)
@@ -67,6 +68,7 @@ namespace Sentry.data.Core
         public bool HasChildren { get; set; }
         public string DotNamePath { get; set; }
         public int Length { get; set; }
+        public string StructurePosition { get; set; }
         #endregion
 
         #region Abstract

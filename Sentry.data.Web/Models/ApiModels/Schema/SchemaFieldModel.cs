@@ -22,5 +22,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string Description { get; set; }
         public int Length { get; set; }
         public string DotNamePath { get; set; }
+        public string StructurePosition { get; set; }
     }
 }

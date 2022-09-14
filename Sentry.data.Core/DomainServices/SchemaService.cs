@@ -117,8 +117,6 @@ namespace Sentry.data.Core
                 throw new SchemaUnauthorizedAccessException();
             }
 
-
-
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
             SchemaRevision revision;
             SchemaRevision latestRevision = null;
@@ -140,7 +138,6 @@ namespace Sentry.data.Core
 
                     _datasetContext.Add(revision);
 
-
                     //filter out fields marked for deletion
                     foreach (var row in schemaRows.Where(w => !w.DeleteInd))
                     {
@@ -149,7 +146,7 @@ namespace Sentry.data.Core
 
                     //Add posible checksum validation here
 
-                    SchemaFieldsBuildDotNamePath(revision.Fields);
+                    SetHierarchyProperties(revision.Fields);
 
                     _datasetContext.SaveChanges();
 
@@ -773,15 +770,30 @@ namespace Sentry.data.Core
         /// Recursive function to traverse a layer of schema to call BuildParentChildHierarchy on. 
         /// </summary>
         /// <param name="fields">List of fields to iterate over</param>
-        public void SchemaFieldsBuildDotNamePath(IList<BaseField> fields)
+        public void SetHierarchyProperties(IList<BaseField> fields)
         {
+            int index = 1;
             foreach (BaseField field in fields)
             {
                 field.DotNamePath = BuildDotNamePath(field);
+                field.StructurePosition = BuildStructurePosition(field, index);
                 if (field.ChildFields.Count > 0)
                 {
-                    SchemaFieldsBuildDotNamePath(field.ChildFields);
+                    SetHierarchyProperties(field.ChildFields);
                 }
+                index++;
+            }
+        }
+
+        private string BuildStructurePosition(BaseField field, int index)
+        {
+            if (field.ParentField == null)
+            {
+                return index.ToString();
+            }
+            else
+            {
+                return $"{field.ParentField.StructurePosition}.{index}";
             }
         }
 
@@ -1201,11 +1213,12 @@ namespace Sentry.data.Core
             _datasetContext.Add(newField);
 
             //if there are child rows, perform a recursive call to this function
-            if (newField != null && row.ChildFields != null)
+            if (row.ChildFields != null)
             {
                 foreach (BaseFieldDto cRow in row.ChildFields)
                 {
-                    newField.ChildFields.Add(AddRevisionField(cRow, CurrentRevision, newField, previousRevision));
+                    //When ParentField is set in ToEntity, field is automatically added as child field, the returned field therefore does not need to be added to the ChildField list
+                    AddRevisionField(cRow, CurrentRevision, newField, previousRevision);
                 }
             }
 
