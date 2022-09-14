@@ -544,7 +544,16 @@ data.Admin = {
             });
         });
     },
-
+    //support link init function
+    SupportLinkInit: function () {
+        $("#LinkSubmitButton").click(function () {
+            var model = new Object();
+            model.Name = $("#name").val();
+            model.Description = $("#description").val();
+            model.Url = $("#url").val();
+            console.log(model);
+        })
+    },
     // makeToast config
     makeToast: function (severity, message) {
 

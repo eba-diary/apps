@@ -158,7 +158,6 @@ namespace Sentry.data.Web.Controllers
             ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
             return View(reprocessDeadSparkJobModel);
         }
-
         public ActionResult SupportLinks()
         {
             List<SupportLinkDto> supportLinkDtos = _supportLinkService.GetSupportLinks();
