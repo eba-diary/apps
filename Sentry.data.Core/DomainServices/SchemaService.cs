@@ -1213,11 +1213,11 @@ namespace Sentry.data.Core
             _datasetContext.Add(newField);
 
             //if there are child rows, perform a recursive call to this function
-            if (newField != null && row.ChildFields != null)
+            if (row.ChildFields != null)
             {
                 foreach (BaseFieldDto cRow in row.ChildFields)
                 {
-                    //When ParentField is set in ToEntity, field is automatically add as child field, the returned field therefore does not need to be added to the ChildField list
+                    //When ParentField is set in ToEntity, field is automatically added as child field, the returned field therefore does not need to be added to the ChildField list
                     AddRevisionField(cRow, CurrentRevision, newField, previousRevision);
                 }
             }
