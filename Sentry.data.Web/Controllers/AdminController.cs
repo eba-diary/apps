@@ -90,6 +90,7 @@ namespace Sentry.data.Web.Controllers
 
 
         // adds a support link to the link farm
+        [HttpPost]
         public ActionResult AddSupportLink(SupportLinkModel supportLinkModel)
         {
             if (supportLinkModel.Name == null || supportLinkModel.Url == null)

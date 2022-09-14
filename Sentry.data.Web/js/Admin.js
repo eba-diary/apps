@@ -551,7 +551,25 @@ data.Admin = {
             model.Name = $("#name").val();
             model.Description = $("#description").val();
             model.Url = $("#url").val();
-            console.log(model);
+            $.ajax({
+                type: "POST",
+                url: "/Admin/AddSupportLink",
+                datatype: "json",
+                data: model,
+                success: function (data) {
+                    console.log(data);
+                }
+            })
+            $("#name").val("");
+            $("#description").val("");
+            $("#url").val("");
+            $("#AddLinkModal").modal("hide");
+        })
+        $("#ModalCloseButton").click(function () {
+            $("#name").val("");
+            $("#description").val("");
+            $("#url").val("");
+            $("#AddLinkModal").modal("hide");
         })
     },
     // makeToast config
