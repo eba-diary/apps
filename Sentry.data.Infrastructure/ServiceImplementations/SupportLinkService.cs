@@ -72,6 +72,7 @@ namespace Sentry.data.Infrastructure
             {
                 SupportLinkDto supportLinkDto = new SupportLinkDto()
                 {
+                    SupportLinkId = supportLink.SupportLinkId,
                     Name = supportLink.Name,
                     Description = supportLink.Description,
                     Url = supportLink.Url,

@@ -571,6 +571,20 @@ data.Admin = {
             $("#url").val("");
             $("#AddLinkModal").modal("hide");
         })
+        $("#supportLinkList").on("click", "#delete-icon", function () {
+            var icon = $(this);
+            var model = new Object();
+            model.SupportLinkId = icon.data("supportlinkid");
+            $.ajax({
+                type: "POST",
+                url: "/Admin/RemoveSupportLink",
+                data: model,
+                success: function (data) {
+                    console.log(data);
+                    console.log("link with id " + model.SupportLinkId + " has been deleted")
+                }
+            })
+        })
     },
     // makeToast config
     makeToast: function (severity, message) {

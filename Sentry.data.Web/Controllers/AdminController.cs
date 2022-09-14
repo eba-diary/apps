@@ -120,10 +120,12 @@ namespace Sentry.data.Web.Controllers
         }
 
         // removes a support link from the link farm
-        public ActionResult RemoveSupportLink(int id)
+        [HttpPost]
+        public ActionResult RemoveSupportLink(SupportLinkModel supportLinkModel)
         {
             try
             {
+                int id = supportLinkModel.SupportLinkId;
                 _supportLinkService.RemoveSupportLink(id);
             }
             catch (Exception)
