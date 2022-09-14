@@ -105,6 +105,7 @@ namespace Sentry.data.Infrastructure
                 x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
                 x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                 x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                x.Type<GoogleBigQueryJobProvider>().Named(DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
             });
 
 

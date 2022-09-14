@@ -290,4 +290,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
         }
     }
+
+    public class GoogleBigQueryApiMapping : SubclassMapping<GoogleBigQueryApiSource>
+    {
+        public GoogleBigQueryApiMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+        }
+    }
 }

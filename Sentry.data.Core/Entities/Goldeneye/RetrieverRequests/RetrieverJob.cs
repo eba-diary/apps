@@ -12,6 +12,7 @@ namespace Sentry.data.Core
     public class RetrieverJob : IRetrieverJob, IValidatable
     {
         private string _jobOptions;
+        private string _executionParameters;
 
         public RetrieverJob()
         {
@@ -112,6 +113,17 @@ namespace Sentry.data.Core
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
+        public virtual Dictionary<string, string> ExecutionParameters
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_executionParameters) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(_executionParameters);
+            }
+            set
+            {
+                _executionParameters = JsonConvert.SerializeObject(value);
+            }
+        }
 
 
         public virtual Uri GetUri()

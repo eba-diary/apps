@@ -89,6 +89,9 @@ namespace Sentry.data.Infrastructure
                             case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
                                 break;
+                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+                                break;
                             case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
                                 includeFilename = true;
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
