@@ -138,6 +138,7 @@ data.Admin = {
             }
         })
     },
+
     //generates table with datafiles from selected dataset and schema
     PopulateTable: function (url) {
         $("#results").DataTable({
@@ -299,7 +300,10 @@ data.Admin = {
             };
         });
     },
-
+    // sets the dataset dropdown to scroll to top on click
+    DatasetDropdownScrollToTop: function () {
+        $("input.select-dropdown.form-control").click(function () { $(this).next("ul.dropdown-content.select-dropdown").scrollTop(0) });
+    },
     GetFlowEvents: function (data) {
         var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partition</th><th>Run Instance Guid</th><th>Event Contents</th></tr>';
         for (var flowEvent of data.FlowEvents) {
@@ -321,11 +325,15 @@ data.Admin = {
         $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect()
         $("#flowStepsDropdown").materialSelect();
+
+        data.Admin.DatasetDropdownScrollToTop();
+
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
+                data.Admin.DatasetDropdownScrollToTop();
             }
 
         });
@@ -337,6 +345,7 @@ data.Admin = {
                 data.Admin.PopulateTable(url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
                 data.Admin.GetFlowStepDropdown(url);
+                data.Admin.DatasetDropdownScrollToTop();
             }
         });
         // activate or deactivate button
@@ -397,11 +406,15 @@ data.Admin = {
         $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect();
         $("#fileDropdown").materialSelect();
+
+        data.Admin.DatasetDropdownScrollToTop();
+
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
+                data.Admin.DatasetDropdownScrollToTop();
             }
             data.Admin.ActivateDeactivateSubmitButton();
 
@@ -412,6 +425,7 @@ data.Admin = {
             if (schemaId != -1 && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.GetFileDropdown(url);
+                data.Admin.DatasetDropdownScrollToTop();
             }
             data.Admin.ActivateDeactivateSubmitButton();
         });
@@ -505,6 +519,11 @@ data.Admin = {
                 icon.addClass('fa-minus')
                 icon.removeClass('fa-plus')
             }
+        });
+
+        //
+        $(".select-dropdown.form-control").click(function () {
+            $(this).next("ul.dropdown-content.select-dropdown").scrollTop(0);
         });
     },
 
