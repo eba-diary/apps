@@ -619,6 +619,28 @@ namespace Sentry.data.Web.Helpers
             return compressionList;
         }
 
+        public static IEnumerable<SelectListItem> BuildBackFillDropdown(bool isBackFilled)
+        {
+            List<SelectListItem> BackFillList = new List<SelectListItem>
+            {
+                new SelectListItem()
+                {
+                    Text = "Yes",
+                    Value = "true",
+                    Selected = isBackFilled == true
+                },
+
+                new SelectListItem()
+                {
+                    Text = "No",
+                    Value = "false",
+                    Selected = isBackFilled == false
+                }
+            };
+
+            return BackFillList;
+        }
+
         public static IEnumerable<SelectListItem> BuildCompressionTypesDropdown(string selectedType)
         {
             if (string.IsNullOrEmpty(selectedType))

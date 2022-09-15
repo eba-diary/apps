@@ -98,6 +98,7 @@ namespace Sentry.data.Web
             model.DFQuestionnaire = dto.DFQuestionnaire;
             model.IngestionType = dto.IngestionType;
             model.IsCompressed = dto.IsCompressed;
+            model.IsBackFilled = dto.IsBackFilled;
             model.IsPreProcessingRequired = dto.IsPreProcessingRequired;
             model.PreProcessingOption = dto.PreProcessingOption;
             model.FlowStorageCode = dto.FlowStorageCode;
@@ -137,6 +138,7 @@ namespace Sentry.data.Web
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionTypeSelection,
                 IsCompressed = model.IsCompressed,
+                IsBackFilled = model.IsBackFilled,      
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,
@@ -240,7 +242,8 @@ namespace Sentry.data.Web
                 CreatedBy = dto.CreatedBy,
                 DataFlowId = dto.Id,
                 CreatedDTM = dto.CreateDTM,
-                IsCompressed = dto.IsCompressed
+                IsCompressed = dto.IsCompressed,
+                IsBackFilled = dto.IsBackFilled
             };
 
             if (dto.RetrieverJob != null)

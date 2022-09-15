@@ -906,6 +906,44 @@ namespace Sentry.data.Core.Tests
             return df;
         }
 
+
+        public static DataFlow MockDataFlowIsBackFilledNo()
+        {
+            DataFlow df = new DataFlow()
+            {
+                Id = 77,
+                Name = "Leonardo",
+                SaidKeyCode = "DATA",
+                NamedEnvironment = "SUPERPROD",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int) GlobalEnums.IngestionType.Topic,
+                IsBackFilled = false,
+            };
+            return df;
+        }
+
+
+        public static DataFlow MockDataFlowIsBackFilledYes()
+        {
+            DataFlow df = new DataFlow()
+            {
+                Id = 77,
+                Name = "Leonardo",
+                SaidKeyCode = "DATA",
+                NamedEnvironment = "SUPERPROD",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)GlobalEnums.IngestionType.Topic,
+                IsBackFilled = true,
+            };
+            return df;
+        }
+
         public static Security MockSecurity(IList<string> permissions)
         {
             var security = new Security()
@@ -952,6 +990,7 @@ namespace Sentry.data.Core.Tests
                 IngestionType = (int) IngestionType.DFS_Drop,
                 RetrieverJob = null,
                 IsCompressed = false,
+                IsBackFilled = true,
                 CompressionType = 0,
                 CompressionJob = null,
                 IsPreProcessingRequired = false,
@@ -989,6 +1028,7 @@ namespace Sentry.data.Core.Tests
                 IngestionType = (int) IngestionType.Topic,
                 RetrieverJob = null,
                 IsCompressed = false,
+                IsBackFilled = true,
                 CompressionType = 0,
                 CompressionJob = null,
                 IsPreProcessingRequired = false,

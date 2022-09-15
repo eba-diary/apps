@@ -33,6 +33,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
         public virtual bool IsDecompressionRequired { get; set; }
+        public virtual bool IsBackFilled { get; set; }
         public virtual int? CompressionType { get; set; }
         public virtual bool IsPreProcessingRequired { get; set; }
         public virtual int? PreProcessingOption { get; set; }
