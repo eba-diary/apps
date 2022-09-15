@@ -110,6 +110,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 _supportLinkService.AddSupportLink(supportLinkDto);
+                return Json(new { redirectToUrl = Url.Action("SupportLinks", "Admin") });
             }
             catch (Exception)
             {
@@ -127,6 +128,7 @@ namespace Sentry.data.Web.Controllers
             {
                 int id = supportLinkModel.SupportLinkId;
                 _supportLinkService.RemoveSupportLink(id);
+                return Json(new { redirectToUrl = Url.Action("SupportLinks", "Admin") });
             }
             catch (Exception)
             {
@@ -161,6 +163,7 @@ namespace Sentry.data.Web.Controllers
             ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
             return View(reprocessDeadSparkJobModel);
         }
+        [HttpGet]
         public ActionResult SupportLinks()
         {
             List<SupportLinkDto> supportLinkDtos = _supportLinkService.GetSupportLinks();

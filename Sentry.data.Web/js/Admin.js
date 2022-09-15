@@ -557,7 +557,7 @@ data.Admin = {
                 datatype: "json",
                 data: model,
                 success: function (data) {
-                    console.log(data);
+                    window.location.href = data.redirectToUrl;
                 }
             })
             $("#name").val("");
@@ -580,8 +580,7 @@ data.Admin = {
                 url: "/Admin/RemoveSupportLink",
                 data: model,
                 success: function (data) {
-                    console.log(data);
-                    console.log("link with id " + model.SupportLinkId + " has been deleted")
+                    window.location.href = data.redirectToUrl;
                 }
             })
         })
