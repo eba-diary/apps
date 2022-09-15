@@ -13,23 +13,23 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IS3ServiceProvider _s3ServiceProvider;
-        private readonly IAuthorizationService _authorizationService;
+        private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IGoogleBigQueryService _googleBigQueryService;
         private readonly IHttpClientGenerator _httpClientGenerator;
 
-        public GoogleBigQueryJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationService authorizationService, IHttpClientGenerator httpClientGenerator, IGoogleBigQueryService googleBigQueryService)
+        public GoogleBigQueryJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IGoogleBigQueryService googleBigQueryService)
         {
             _datasetContext = datasetContext;
             _s3ServiceProvider = s3ServiceProvider;
             _httpClientGenerator = httpClientGenerator;
-            _authorizationService = authorizationService;
+            _authorizationProvider = authorizationProvider;
             _googleBigQueryService = googleBigQueryService;
         }
 
         public void Execute(RetrieverJob job)
         {
             //get Google token
-            string accessToken = _authorizationService.GetOAuthAccessToken((HTTPSSource)job.DataSource);
+            string accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
 
             //get Google schema
             HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
@@ -39,7 +39,7 @@ namespace Sentry.data.Infrastructure
             {
                 //update DSC schema
                 JArray bigQueryFields = GetBigQueryFields(httpClient, job);
-                _googleBigQueryService.UpdateSchemaFields(job.DataFlow.DatasetId, job.DataFlow.SchemaId, bigQueryFields);
+                _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
 
                 //build the request
                 //use execution parameters

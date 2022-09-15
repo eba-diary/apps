@@ -8,6 +8,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class DateFieldDto : BaseFieldDto
     {
+        public DateFieldDto() : base() { }
         public DateFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int rowPosition, bool array) : base(prop, rowPosition, array)
         {
             IDictionary<string, object> extData = null;

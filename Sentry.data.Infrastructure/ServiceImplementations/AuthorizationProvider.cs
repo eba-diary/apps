@@ -14,13 +14,13 @@ using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
-    public class AuthorizationService : IAuthorizationService
+    public class AuthorizationProvider : IAuthorizationProvider
     {
         private readonly IEncryptionService _encryptionService;
         private readonly IDatasetContext _datasetContext;
         private readonly IDataFeatures _dataFeatures;
 
-        public AuthorizationService(IEncryptionService encryptionService, IDatasetContext datasetContext, IDataFeatures dataFeatures)
+        public AuthorizationProvider(IEncryptionService encryptionService, IDatasetContext datasetContext, IDataFeatures dataFeatures)
         {
             _encryptionService = encryptionService;
             _datasetContext = datasetContext;

@@ -9,6 +9,13 @@ namespace Sentry.data.Core
     public abstract class BaseFieldDto
     {
         #region Constructors
+        protected BaseFieldDto()
+        {
+            CreateDtm = DateTime.Now;
+            LastUpdatedDtm = DateTime.Now;
+            ChildFields = new List<BaseFieldDto>();
+        }
+
         protected BaseFieldDto(BaseField field)
         {
             FieldId = field.FieldId;

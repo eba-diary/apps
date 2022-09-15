@@ -792,7 +792,7 @@ namespace Sentry.data.Web.Controllers
                 List<BaseFieldDto> schemaRowsDto = schemaRows.ToDto();
 
                 _schemaService.ValidateCleanedFields(schemaId, schemaRowsDto);
-                _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "blah");
+                _schemaService.CreateAndSaveSchemaRevision(schemaId, schemaRowsDto, "UpdateFromUI");
 
             }
             catch (SchemaUnauthorizedAccessException)
