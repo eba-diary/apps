@@ -35,6 +35,19 @@ namespace Sentry.data.Core
             };
         }
 
+        public static SchemaMapDto ToDto(this SchemaMap scmMap)
+        {
+            return new SchemaMapDto()
+            {
+                Id = scmMap.Id,
+                DatasetId = (scmMap.Dataset != null) ? scmMap.Dataset.DatasetId : 0,
+                SchemaId = scmMap.MappedSchema.SchemaId,
+                SearchCriteria = scmMap.SearchCriteria,
+                StepId = scmMap.DataFlowStepId.Id
+            };
+        }
+
+
         //DETERMINE WHETHER TO CREATE DFSDROP LOCATIONS OR NOT DEPENDING ON DataFlow properties
         public static bool ShouldCreateDFSDropLocations(this DataFlow df, IDataFeatures dataFeatures)
         {
@@ -54,18 +67,6 @@ namespace Sentry.data.Core
             {
                 return false;
             }
-        }
-
-        public static SchemaMapDto ToDto(this SchemaMap scmMap)
-        {
-            return new SchemaMapDto()
-            {
-                Id = scmMap.Id,
-                DatasetId = (scmMap.Dataset != null) ? scmMap.Dataset.DatasetId : 0,
-                SchemaId = scmMap.MappedSchema.SchemaId,
-                SearchCriteria = scmMap.SearchCriteria,
-                StepId = scmMap.DataFlowStepId.Id
-            };
         }
 
         public static string GetDataFlowStepPrefix(string key)

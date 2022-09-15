@@ -627,14 +627,14 @@ namespace Sentry.data.Web.Helpers
                 {
                     Text = "Yes",
                     Value = "true",
-                    Selected = isBackFilled == true
+                    Selected = isBackFilled
                 },
 
                 new SelectListItem()
                 {
                     Text = "No",
                     Value = "false",
-                    Selected = isBackFilled == false
+                    Selected = isBackFilled
                 }
             };
 
