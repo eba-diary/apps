@@ -29,15 +29,15 @@ namespace Sentry.data.Core
 
             if (schemaObject != null) {
 
-                // Query execution logger
+                //query execution logger
                 Logger.Info("Audit Query Execution: Started");
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                // Create config object
+                //create config object
                 SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
 
-                // Calls to the snow provider to create call snowflake and return DataTable with resulting data
+                //calls to the snow provider to create call snowflake and return DataTable with resulting data
                 DataTable dataTable = _snowProvider.GetExceptRows(snowCompareConfig);
 
                 stopWatch.Stop();
@@ -52,7 +52,7 @@ namespace Sentry.data.Core
 
                 List<AuditDto> auditDtos = new List<AuditDto>();
 
-                // Check if the data table is not null and then map it's values to the list of Audit Dto's
+                //check if the data table is not null and then map it's values to the list of Audit Dto's
                 if (dataTable.Rows != null)
                 {
                     foreach (DataRow row in dataTable.Rows)
@@ -86,7 +86,7 @@ namespace Sentry.data.Core
 
                 SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
 
-                // Calls to the snow provider to create call snowflake and return DataTable with resulting data
+                //calls to the snow provider to create call snowflake and return DataTable with resulting data
                 DataTable dataTable = _snowProvider.GetCompareRows(snowCompareConfig);
 
                 stopWatch.Stop();
@@ -102,7 +102,7 @@ namespace Sentry.data.Core
 
                 List<AuditDto> auditDtos = new List<AuditDto>();
 
-                // Check if the data table is not null and then map it's values to the list of Audit Dto's
+                //check if the data table is not null and then map it's values to the list of Audit Dto's
                 if (dataTable.Rows != null)
                 {
                     foreach (DataRow row in dataTable.Rows)
@@ -140,20 +140,25 @@ namespace Sentry.data.Core
 
         private SchemaConsumptionSnowflakeDto GetSchemaObjectBySchemaId(int datasetId, int schemaId)
         {
+            //find DatasetFileConfigDto by parameter datasetId + schemaId 
             DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
-            SchemaConsumptionSnowflakeDto schemaObject = null;
+            //find SchemaConsumptionSnowflakeDto with snowflake consumption of dataset schema parquet
+            SchemaConsumptionSnowflakeDto schemaObject = datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>()
+                                                            .FirstOrDefault(x => x.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet);
 
-            schemaObject = datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>()
-                            .Where(x => x.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet)
-                            .DefaultIfEmpty(datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault())
-                            .First();
+            //if no object is found with a snowflake consumption of dataset schema parquet, set to first or default
+            if (schemaObject is null)
+            {
+                schemaObject = datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault();
+            }
 
             return schemaObject;
         }
 
         private string findRawQueryDBName(string db)
         {
+            //derive rawquery db name from passerd in snowflake database name.
             string rawqueryDB = db.Replace("_", "_RAWQUERY_");
 
             return rawqueryDB;
