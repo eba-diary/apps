@@ -4,7 +4,7 @@
     ViewBag.Title = "_AdminTest";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div id="linkList">
+
         <h1>My Links</h1>
         <br />
         <button type="button" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#AddLinkModal" id="addLinkButton">
@@ -57,22 +57,16 @@
         </div>
     </div>
             
-    <div id ="supportLinkList">
+    <div id ="supportLinkList" class="list-group">
         @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
         {
-                <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="fas fa-trash" style="cursor: pointer; color: red"></em>
-                <a href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px">@supportLinkModel.Name</a>
-                <br />
+            <div class="list-group-item">
+                <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
+                <a href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px; padding-right: 60px">@supportLinkModel.Name</a>
+                @supportLinkModel.Description
+            </div>
         }
     </div> <br />       
-</div>
-
-<style>
-    #linkList{
-        width: 80%;
-        margin: auto;
-    }
-</style>
 
 <script>
     $(function () {
