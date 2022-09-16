@@ -43,6 +43,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             Property(x => x.FlowExecutionGuid);
             Property(x => x.RunInstanceGuid);
+            Property(x => x.ClusterUrl);
 
             this.ManyToOne(x => x.JobId, m =>
             {

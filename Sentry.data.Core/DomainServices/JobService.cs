@@ -1,11 +1,16 @@
 ﻿using Hangfire;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core
@@ -15,13 +20,18 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IDataFeatures _dataFeatures;
+        private readonly IApacheLivyProvider _apacheLivyProvider;
 
         public JobService(IDatasetContext datasetContext, IUserService userService,
-            IRecurringJobManager recurringJobManager)
+            IRecurringJobManager recurringJobManager, IDataFeatures dataFeatures,
+            IApacheLivyProvider apacheLivyProvider)
         {
             _datasetContext = datasetContext;
             _userService = userService;
             _recurringJobManager = recurringJobManager;
+            _dataFeatures = dataFeatures;
+            _apacheLivyProvider = apacheLivyProvider;
         }
 
         public JobHistory GetLastExecution(RetrieverJob job)
@@ -393,8 +403,225 @@ namespace Sentry.data.Core
             }
         }
 
+        public async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, Guid JobGuid, JavaOptionsOverrideDto dto)
+        {
+            if (JobId == 0)
+            {
+                throw new ArgumentNullException(nameof(JobId), "JobId required");
+            }
+
+            if (JobGuid == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(JobGuid), "JobGuid required");
+            }
+
+            RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.Id == JobId && JobGuid == w.JobGuid);
+
+            if (job == null)
+            {
+                throw new JobNotFoundException($"JobId:{JobId} | JobGuid:{JobGuid}");
+            }
+
+            if (!job.DataSource.Is<JavaAppSource>())
+            {
+                throw new ArgumentOutOfRangeException(nameof(JobId), "This only submits job defined with a data source type of JavaApp");
+            }
+
+            return await SubmitApacheLivyJobInternalAsync(job, JobGuid, dto);
+
+        }
+
+        private async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobInternalAsync(RetrieverJob job, Guid JobGuid, JavaOptionsOverrideDto dto)
+        {
+            string postContent = BuildLivyPostContent(dto, job);
+
+            _apacheLivyProvider.SetBaseUrl(dto.ClusterUrl);
+
+            System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", postContent);
+
+            string result = response.Content.ReadAsStringAsync().Result;
+            string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+            Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode}:::result:{postResult}");
+
+            //Record submission regardless if target deems it a bad request.
+            Submission sub = MapToSubmission(job, dto);
+
+            _datasetContext.Add(sub);
+            _datasetContext.SaveChanges();
+
+            if (response.IsSuccessStatusCode)
+            {
+                LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);
+
+                JobHistory histRecord = new JobHistory()
+                {
+                    JobId = job,
+                    BatchId = batchResult.Id,
+                    JobGuid = JobGuid,
+                    State = batchResult.State,
+                    LivyAppId = batchResult.Appid,
+                    LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                    LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                    Active = true,
+                    Submission = sub,
+                    ClusterUrl = dto.ClusterUrl
+                };
+
+                _datasetContext.Add(histRecord);
+                _datasetContext.SaveChanges();
+            }
+
+            return response;
+        }
 
         #region Private Methods
+
+        internal Submission MapToSubmission(RetrieverJob job, JavaOptionsOverrideDto dto)
+        {
+            var submission = new Submission()
+            {
+                JobId = job,
+                JobGuid = job.JobGuid,
+                Created = DateTime.Now,
+                Serialized_Job_Options = JsonConvert.SerializeObject(dto),
+                FlowExecutionGuid = dto.FlowExecutionGuid,
+                RunInstanceGuid = dto.RunInstanceGuid,
+                ClusterUrl = dto.ClusterUrl
+            };
+            return submission;
+        }
+
+        internal string BuildLivyPostContent(JavaOptionsOverrideDto dto, RetrieverJob job)
+        {
+            JavaAppSource dsrc = _datasetContext.GetById<JavaAppSource>(job.DataSource.Id);
+
+            StringBuilder json = new StringBuilder();
+            json.Append($"{{\"file\": \"{dsrc.Options.JarFile}\"");
+
+            AddElement(json, "className", dsrc.Options.ClassName, null);
+
+            if (_dataFeatures.CLA3497_UniqueLivySessionName.GetValue())
+            {
+                string livySessionName = GenerateUnitLivySessionName(dsrc);
+                AddElement(json, "name", livySessionName, null);
+                Logger.AddContextVariable(new TextVariable("livysessionname", livySessionName));
+            }
+            else
+            {
+                json.Append($", \"name\": \"{dsrc.Name}\"");
+            }
+
+            if (dto != null)
+            {
+
+                AddElement(json, "driverMemory", dto.DriverMemory, job.JobOptions?.JavaAppOptions?.DriverMemory);
+
+                AddElement(json, "driverCores", dto.DriverCores, job.JobOptions?.JavaAppOptions?.DriverCores);
+
+                AddElement(json, "executorMemory", dto.ExecutorMemory, job.JobOptions?.JavaAppOptions?.ExecutorMemory);
+
+                AddElement(json, "executorCores", dto.ExecutorCores, job.JobOptions?.JavaAppOptions?.ExecutorCores);
+
+                AddElement(json, "numExecutors", dto.NumExecutors, job.JobOptions?.JavaAppOptions?.NumExecutors);
+
+                AddElement(json, "conf", dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
+
+                // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
+                AddArgumentsElement(json, dto.Arguments, job.JobOptions?.JavaAppOptions?.Arguments);
+            }            
+
+            string[] jars = dsrc.Options.JarDepenencies;
+
+            for (int i = 0; i < jars.Count(); i++)
+            {
+                if (i == 0)
+                {
+                    json.Append($", \"jars\": [");
+                }
+                json.Append($"\"{jars[i]}\"");
+                if (i != jars.Count() - 1)
+                {
+                    json.Append(",");
+                }
+                else
+                {
+                    json.Append("]");
+                }
+            }
+
+
+            //DO NOT KILL THIS
+            json.Append("}");
+
+            return json.ToString();
+        }
+
+        internal virtual string GenerateUnitLivySessionName(JavaAppSource dsrc)
+        {
+            Random random = new Random();
+            string randomString = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6).Select(s => s[random.Next(s.Length)]).ToArray());
+            string livySessionName = $"{dsrc.Name}_{randomString}";
+            return livySessionName;
+        }
+
+        internal void AddArgumentsElement(StringBuilder content, string[] newValue, string[] defaultValue)
+        {
+            if (newValue != null && newValue.Any())
+            {
+                GenerateArguments(newValue, content);
+            }
+            else if (defaultValue != null && defaultValue.Any())
+            {
+                GenerateArguments(defaultValue, content);
+            }
+        }
+        internal void AddElement(StringBuilder content, string elementName, string newValue, string defaultValue)
+        {
+            if (String.IsNullOrEmpty(elementName) || (String.IsNullOrEmpty(newValue) && String.IsNullOrEmpty(defaultValue)))
+            {
+                throw new ArgumentNullException(nameof(newValue));
+            }
+
+            if (!String.IsNullOrWhiteSpace(newValue))
+            {
+                content.Append($", \"{elementName}\": \"{newValue}\"");
+            }
+            else
+            {
+                content.Append($", \"{elementName}\": \"{defaultValue}\"");
+            }
+        }
+
+        internal void AddElement(StringBuilder content, string elementName, int? newValue, int? defaultValue)
+        {
+            if (elementName == null || (newValue == null && defaultValue == null))
+            {
+                throw new ArgumentNullException(nameof(newValue));
+            }
+
+            if (newValue != null)
+            {
+                content.Append($", \"{elementName}\": {newValue}");
+            }
+            else
+            {
+                content.Append($", \"{elementName}\": {defaultValue}");
+            }
+        }
+
+        private static void GenerateArguments(string[] arguments, StringBuilder json)
+        {
+            json.Append($", \"args\": [");
+            int iteration = 1;
+            int argcnt = arguments.Count();
+            foreach (string arg in arguments)
+            {
+                string argString = (iteration < argcnt) ? $"\"{arg}\"," : $"\"{arg}\"]";
+                json.Append(argString);
+                iteration++;
+            }
+        }
 
         private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
         {

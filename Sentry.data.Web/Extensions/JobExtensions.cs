@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Sentry.data.Core.DTO.Job;
 using Sentry.data.Web.Models.ApiModels.Job;
 
 namespace Sentry.data.Web.Extensions
@@ -58,6 +59,23 @@ namespace Sentry.data.Web.Extensions
             }
 
             return (modelList);
+        }
+
+        public static JavaOptionsOverrideDto ToDto(this JavaOptionsOverride options) 
+        {
+            return new JavaOptionsOverrideDto()
+            {
+                Arguments = options.Arguments,
+                ConfigurationParameters = options.ConfigurationParameters,
+                DriverMemory = options.DriverMemory,
+                DriverCores = options.DriverCores,
+                ExecutorMemory = options.ExecutorMemory,
+                ExecutorCores = options.ExecutorCores,
+                NumExecutors = options.NumExecutors,
+                FlowExecutionGuid = (options.FlowExecutionGuid) ?? "00000000000000000",
+                RunInstanceGuid = (options.RunInstanceGuid) ?? "00000000000000000",
+                ClusterUrl = options.ClusterUrl
+            };
         }
         
     }

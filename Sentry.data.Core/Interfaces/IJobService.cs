@@ -1,6 +1,8 @@
-﻿using Sentry.data.Core.Entities.DataProcessing;
+﻿using Sentry.data.Core.DTO.Job;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -40,5 +42,7 @@ namespace Sentry.data.Core
         bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
 
         List<RetrieverJob> GetDfsRetrieverJobs();
+
+        Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);
     }
 }

@@ -3,7 +3,9 @@ using Polly.Registry;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
@@ -11,6 +13,7 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IAsyncPolicy _asyncProviderPolicy;
         private readonly IHttpClientProvider _httpClient;
+        private string _baseUrl;
 
         public ApacheLivyProvider(IHttpClientProvider httpClientProvider, IPolicyRegistry<string> policyRegistry)
         {
@@ -18,13 +21,32 @@ namespace Sentry.data.Infrastructure
             _asyncProviderPolicy = policyRegistry.Get<IAsyncPolicy>(PollyPolicyKeys.ApacheLivyProviderAsyncPolicy);
         }
 
-        public string BaseUrl { get; set; } = "";
+        public void SetBaseUrl(string baseUrl)
+        {
+            this._baseUrl = baseUrl;
+        }
+
+        public string GetBaseUrl()
+        {
+            return _baseUrl;
+        }
+
+        public async Task<HttpResponseMessage> PostRequestAsync(string resource, string content)
+        {
+            HttpContent contentPost = new StringContent(content, Encoding.UTF8, "application/json");
+
+            return await PostRequestAsync(resource, contentPost).ConfigureAwait(false);
+        }
 
         public async Task<HttpResponseMessage> PostRequestAsync(string resource, HttpContent postContent)
         {
+            string stringContent = await postContent.ReadAsStringAsync().ConfigureAwait(false);
+            Logger.Debug($"{nameof(PostRequestAsync)} - baseurl:{_baseUrl}");
+            Logger.Debug($"{nameof(PostRequestAsync)} - resource:{resource}");
+            Logger.Debug($"{nameof(PostRequestAsync)} - postContent:{stringContent}");
             var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
-                var x =  await _httpClient.PostAsync(BaseUrl + $"/{resource}", postContent).ConfigureAwait(false);
+                var x =  await _httpClient.PostAsync(_baseUrl + $"/{resource}", postContent).ConfigureAwait(false);
 
                 return x;
 
@@ -39,7 +61,7 @@ namespace Sentry.data.Infrastructure
         {
             var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
-                var x = await _httpClient.GetAsync(BaseUrl + resource).ConfigureAwait(false);
+                var x = await _httpClient.GetAsync(_baseUrl + resource).ConfigureAwait(false);
 
                 return x;
 
@@ -54,7 +76,7 @@ namespace Sentry.data.Infrastructure
         {
             var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
-                var x = await _httpClient.DeleteAsync(BaseUrl + resource).ConfigureAwait(false);
+                var x = await _httpClient.DeleteAsync(_baseUrl + resource).ConfigureAwait(false);
 
                 return x;
 

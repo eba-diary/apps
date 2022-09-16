@@ -13,6 +13,7 @@
     [ActiveInd] BIT NOT NULL, 
     [Job_Guid] UNIQUEIDENTIFIER NULL, 
     [Submission] INT NULL, 
+    [ClusterUrl] VARCHAR(100) NULL, 
     CONSTRAINT [FK_JobHistory_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID])
 )
 GO
