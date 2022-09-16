@@ -5,6 +5,9 @@
 
 
 /*#region TemplateSettings*/
+.overflow-scroll {
+    overflow-y: scroll;
+}
 
 .item-list-image {
     max-height: 150px;

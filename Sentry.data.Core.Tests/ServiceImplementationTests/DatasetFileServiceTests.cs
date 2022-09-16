@@ -47,6 +47,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(DatasetFile.FlowExecutionGuid, dto.FlowExecutionGuid);
             Assert.AreEqual(DatasetFile.RunInstanceGuid, dto.RunInstanceGuid);
             Assert.AreEqual(DatasetFile.FileExtension, dto.FileExtension);
+            Assert.AreEqual(DatasetFile.ObjectStatus, dto.ObjectStatus);
 
         }
 

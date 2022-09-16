@@ -17,13 +17,13 @@ namespace Sentry.data.Core
         /// <param name="value"></param>
         void Publish(string topic, string key, string value);
 
-        Task PublishDSCEventAsync(string key, string value);
+        Task PublishDSCEventAsync(string key, string value, string topic = null);
 
         /// <summary>
         /// Publish message to data.sentry.com event topic
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        void PublishDSCEvent(string key, string value);
+        void PublishDSCEvent(string key, string value, string topic = null);
     }
 }

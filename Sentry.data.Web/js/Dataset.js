@@ -2320,7 +2320,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         url = data.Dataset.AddParameterToUrl(url, "layout");
 
         var filters = JSON.parse(localStorage.getItem("filters"));
-        if (filters.length) {
+        if (filters && filters.length) {
             url = data.Dataset.AddParamDivider(url);
 
             url += filters.map(function (el) {

@@ -124,7 +124,7 @@ namespace Sentry.data.Infrastructure
                     Producer p = Producer;
                 }
 
-                Logger.Info($"Publishing message - Topic:{KafkaHelper.Get_Producer_Topic_For_DSCEvents()} Key:{key} Message:{value}");
+                Logger.Info($"Publishing message - Topic:{topic} Key:{key} Message:{value}");
 
                 _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler());
 
@@ -145,7 +145,7 @@ namespace Sentry.data.Infrastructure
                     Producer p = Producer;
                 }
 
-                Logger.Info($"Publishing message - Topic:{KafkaHelper.Get_Producer_Topic_For_DSCEvents()} Key:{key} Message:{value}");
+                Logger.Info($"Publishing message - Topic:{topic} Key:{key} Message:{value}");
 
                 await Task.Factory.StartNew(() => _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler())).ConfigureAwait(false);
 
@@ -157,14 +157,16 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void PublishDSCEvent(string key, string value)
+        public void PublishDSCEvent(string key, string value, string topic = null)
         {
-            Publish(KafkaHelper.Get_Producer_Topic_For_DSCEvents(), key, value);
+            if (string.IsNullOrEmpty(topic)) { topic = KafkaHelper.Get_Producer_Topic_For_DSCEvents(); }
+            Publish(topic, key, value);
         }
 
-        public async Task PublishDSCEventAsync(string key, string value)
+        public async Task PublishDSCEventAsync(string key, string value, string topic = null)
         {
-             await PublishAsync(KafkaHelper.Get_Producer_Topic_For_DSCEvents(), key, value).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(topic)) { topic = KafkaHelper.Get_Producer_Topic_For_DSCEvents(); }
+            await PublishAsync(topic, key, value).ConfigureAwait(false);
         }
         #endregion
         
