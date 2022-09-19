@@ -169,6 +169,7 @@
     <Compile Include="DatasetFileConfigExtensionsTests.cs" />
     <Compile Include="DatasetExtensionsTests.cs" />
     <Compile Include="ServiceImplementationTests\DatasetTileSearchServiceTests.cs" />
+    <Compile Include="SchemaExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

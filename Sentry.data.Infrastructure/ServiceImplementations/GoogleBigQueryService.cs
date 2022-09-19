@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure
         public void UpdateSchemaFields(int schemaId, JArray bigQueryFields)
         {
             //convert to BaseFieldDtos
-            int index = 1;
+            int index = 0;
             List<BaseFieldDto> fieldDtos = ConvertToFieldDtos(bigQueryFields, ref index);
 
             SchemaRevisionDto revision = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
@@ -29,7 +29,7 @@ namespace Sentry.data.Infrastructure
                 List<BaseFieldDto> existingFields = _schemaService.GetBaseFieldDtoBySchemaRevision(revision.RevisionId);
 
                 //if same, do nothing
-                if (FieldsAreEqual(existingFields, fieldDtos))
+                if (existingFields.AreEqualTo(fieldDtos))
                 {
                     return;
                 }
@@ -45,8 +45,8 @@ namespace Sentry.data.Infrastructure
 
             foreach (JToken bigQueryField in bigQueryFields)
             {
-                fieldDtos.Add(ConvertToFieldDto(bigQueryField, ref index));
                 index++;
+                fieldDtos.Add(ConvertToFieldDto(bigQueryField, ref index));
             }
 
             return fieldDtos;
@@ -103,34 +103,6 @@ namespace Sentry.data.Infrastructure
             fieldDto.ChildFields = ConvertToFieldDtos((JArray)bigQueryField.SelectToken("fields"), ref index);
 
             return fieldDto;
-        }
-
-        private bool FieldsAreEqual(List<BaseFieldDto> existingFields, List<BaseFieldDto> newFields)
-        {
-            if (existingFields.Count == newFields.Count)
-            {
-                for (int i = 0; i < existingFields.Count; i++)
-                {
-                    if (!FieldsAreEqual(existingFields[i], newFields[i]))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool FieldsAreEqual(BaseFieldDto existingField, BaseFieldDto newField)
-        {
-            return existingField.FieldType == newField.FieldType &&
-                existingField.Name == newField.Name &&
-                existingField.IsArray == newField.IsArray &&
-                existingField.Scale == newField.Scale &&
-                existingField.Precision == newField.Precision &&
-                FieldsAreEqual(existingField.ChildFields, newField.ChildFields);
         }
         #endregion
     }

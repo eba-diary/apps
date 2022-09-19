@@ -160,6 +160,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BaseInfrastructureUnitTest.cs" />
     <Compile Include="ConfluentConnectorProviderTests.cs" />
     <Compile Include="DeadJobProviderTests.cs" />
     <Compile Include="ApacheLivyProviderTests.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="InevServiceTests.cs" />
     <Compile Include="SupportLinkServiceTests.cs" />
     <Compile Include="SecBotProviderTests.cs" />
+    <Compile Include="GoogleBigQueryServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +197,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ExpectedJSON\ConfluentConnector_Status.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_EventsSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_BasicSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

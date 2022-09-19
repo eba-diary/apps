@@ -1,0 +1,55 @@
+{
+  "fields": [
+    {
+      "name": "string_field",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "integer_field",
+      "type": "INTEGER",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "date_field",
+      "type": "DATE",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "decimal_field",
+      "type": "NUMERIC",
+      "mode": "NULLABLE",
+      "precision": 5,
+      "scale": 2
+    },
+    {
+      "name": "struct_field",
+      "type": "RECORD",
+      "mode": "REPEATED",
+      "fields": [
+        {
+          "name": "child_string_field",
+          "type": "STRING",
+          "mode": "NULLABLE"
+        },
+        {
+          "name": "child_struct_field",
+          "type": "RECORD",
+          "mode": "NULLABLE",
+          "fields": [
+            {
+              "name": "grandchild_timestamp_field",
+              "type": "TIMESTAMP",
+              "mode": "NULLABLE"
+            },
+            {
+              "name": "grandchild_float_field",
+              "type": "FLOAT",
+              "mode": "NULLABLE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
