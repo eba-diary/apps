@@ -37,12 +37,30 @@ namespace Sentry.data.Infrastructure
 
             using (httpClient)
             {
+                //need to calculate the tableId first
+                List<string> uriParts = job.RelativeUri.Split('/').ToList();
+                string projectId = uriParts[1];
+                string datasetId = uriParts[3];
+                string tableId = uriParts[5];
+
+                //handle everything with the parameters in code here first then determine if a shared or usable version is possible
+                //The first value desired will either get entered through UI or get put in the brackets with the variable name
+                //if parameters are null, use that value (will only need to check for null if don't add an "Add Parameter" to UI
+                if (job.ExecutionParameters == null)
+                {
+
+                }
+
+                //else increment the parameter value needed accordingly
+
                 //update DSC schema
                 JArray bigQueryFields = GetBigQueryFields(httpClient, job);
                 _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
 
                 //build the request
                 //use execution parameters
+                //parameters will have record count and last consumed date
+                //if parameters are null, get 
                 //loop over each day since last successful execution
 
                 //make request
