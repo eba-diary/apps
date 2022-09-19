@@ -367,13 +367,6 @@ namespace Sentry.data.Core
         {
             string methodName = $"<{nameof(DataFlowService).ToLower()}_{nameof(UpdateandSaveDataFlow).ToLower()} Method Start";
             Logger.Info($"{methodName} Method Start");
-            /*
-             *  Create new Dataflow
-             *  - The incoming dto will have flowstoragecode and will
-             *     be used by new dataflow as well  
-            */
-
-            DataFlow newDataFlow = CreateDataFlow(dfDto);
 
             /*
              *  Logically delete the existing dataflow
@@ -382,8 +375,14 @@ namespace Sentry.data.Core
              *  WallEService will eventually set the objects
              *    to a deleted status after a set period of time    
              */
-
             Delete(dfDto.Id, _userService.GetCurrentUser(), false);
+
+            /*
+             *  Create new Dataflow
+             *  - The incoming dto will have flowstoragecode and will
+             *     be used by new dataflow as well  
+            */
+            DataFlow newDataFlow = CreateDataFlow(dfDto);
 
             _datasetContext.SaveChanges();
 
