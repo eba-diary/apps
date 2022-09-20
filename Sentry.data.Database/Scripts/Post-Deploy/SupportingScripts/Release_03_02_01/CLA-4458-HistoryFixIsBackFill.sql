@@ -11,8 +11,8 @@ BEGIN TRY
     --select * from dataflow
 	--HISTORY FIX
 	UPDATE DF
-	SET DF.IsBackFilled = CASE WHEN DF.IngestionType = 4 AND S.CLA1286_KafkaFlag = 1 THEN 1 ELSE 0 END  
-	--select DF.Ingestiontype, S.CLA1286_KafkaFlag, DF.IsBackFilled,*
+	SET DF.IsBackFillRequired = CASE WHEN DF.IngestionType = 4 AND S.CLA1286_KafkaFlag = 1 THEN 1 ELSE 0 END  
+	--select DF.Ingestiontype, S.CLA1286_KafkaFlag, DF.IsBackFillRequired,*
 	FROM [schema] S
 	JOIN DataFlow DF  ON S.[Schema_Id] = DF.SchemaId
 	WHERE	DF.ObjectStatus = 1			--ACTIVE

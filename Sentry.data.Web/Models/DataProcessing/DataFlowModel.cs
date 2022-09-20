@@ -16,7 +16,7 @@ namespace Sentry.data.Web
         {
             SchemaMaps = new List<SchemaMapModel>();
             IsCompressed = false;
-            IsBackFilled = false;
+            IsBackFillRequired = false;
             IsPreProcessingRequired = false;
             RetrieverJob = new JobModel();
             ObjectStatus = ObjectStatusEnum.Active;
@@ -34,7 +34,7 @@ namespace Sentry.data.Web
         [DisplayName("Is incoming data compressed?")]
         public bool IsCompressed { get; set; }
         [DisplayName("Do you need to backfill data from DFS Drop Location?")]
-        public bool IsBackFilled { get; set; }                                    //IsCompressed
+        public bool IsBackFillRequired { get; set; }                                    //IsCompressed
         public bool IsPreProcessingRequired { get; set; }
         [DisplayName("Pre Processing Options")]
         public int PreProcessingSelection { get; set; }
@@ -88,7 +88,7 @@ namespace Sentry.data.Web
         public int SelectedSchema { get; set; }
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
-        public IEnumerable<SelectListItem> BackfillDropdown { get; set; }       //CompressionDropdown
+        public IEnumerable<SelectListItem> IsBackFillRequiredDropdown { get; set; }       
         public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }

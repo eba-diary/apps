@@ -920,7 +920,7 @@ namespace Sentry.data.Core.Tests
                 DeleteIssuer = null,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = (int) GlobalEnums.IngestionType.Topic,
-                IsBackFilled = false,
+                IsBackFillRequired = false,
             };
             return df;
         }
@@ -939,7 +939,7 @@ namespace Sentry.data.Core.Tests
                 DeleteIssuer = null,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = (int)GlobalEnums.IngestionType.Topic,
-                IsBackFilled = true,
+                IsBackFillRequired = true,
             };
             return df;
         }
@@ -990,7 +990,7 @@ namespace Sentry.data.Core.Tests
                 IngestionType = (int) IngestionType.DFS_Drop,
                 RetrieverJob = null,
                 IsCompressed = false,
-                IsBackFilled = true,
+                IsBackFillRequired = true,
                 CompressionType = 0,
                 CompressionJob = null,
                 IsPreProcessingRequired = false,
@@ -1028,7 +1028,7 @@ namespace Sentry.data.Core.Tests
                 IngestionType = (int) IngestionType.Topic,
                 RetrieverJob = null,
                 IsCompressed = false,
-                IsBackFilled = true,
+                IsBackFillRequired = true,
                 CompressionType = 0,
                 CompressionJob = null,
                 IsPreProcessingRequired = false,

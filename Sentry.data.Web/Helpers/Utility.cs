@@ -619,7 +619,7 @@ namespace Sentry.data.Web.Helpers
             return compressionList;
         }
 
-        public static IEnumerable<SelectListItem> BuildBackFillDropdown(bool isBackFilled)
+        public static IEnumerable<SelectListItem> BuildBackFillRequiredDropdown(bool isBackFilledRequired)
         {
             List<SelectListItem> BackFillList = new List<SelectListItem>
             {
@@ -627,14 +627,14 @@ namespace Sentry.data.Web.Helpers
                 {
                     Text = "Yes",
                     Value = "true",
-                    Selected = isBackFilled
+                    Selected = isBackFilledRequired
                 },
 
                 new SelectListItem()
                 {
                     Text = "No",
                     Value = "false",
-                    Selected = isBackFilled
+                    Selected = isBackFilledRequired
                 }
             };
 

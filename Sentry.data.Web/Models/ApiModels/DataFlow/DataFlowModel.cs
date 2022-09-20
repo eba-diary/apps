@@ -16,7 +16,7 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
         public string DFQuestionnaire { get; set; }
         public int IngestionType { get; set; }
         public bool IsCompressed { get; set; }
-        public bool IsBackFilled { get; set; }
+        public bool IsBackFillRequired { get; set; }
         public int? CompressionType { get; set; }
         public bool IsPreProcessingRequired { get; set; }
         public int? PreProcessingOption { get; set; }

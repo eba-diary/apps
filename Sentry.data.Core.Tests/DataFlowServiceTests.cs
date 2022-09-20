@@ -1010,7 +1010,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(flowDto.DeleteIssueDTM,             DateTime.MaxValue,                      $"{nameof(DataFlow.DeleteIssueDTM)} mappping failed");
             Assert.AreEqual(flowDto.IngestionType,              flow.IngestionType,                     $"{nameof(DataFlow.IngestionType)} mappping failed");
             Assert.AreEqual(flowDto.IsCompressed,               flow.IsDecompressionRequired,           $"{nameof(DataFlow.IsDecompressionRequired)} mapping failed");
-            Assert.AreEqual(flowDto.IsBackFilled,               flow.IsBackFilled,                      $"{nameof(DataFlow.IsBackFilled)} mapping failed");
+            Assert.AreEqual(flowDto.IsBackFillRequired,               flow.IsBackFillRequired,                      $"{nameof(DataFlow.IsBackFillRequired)} mapping failed");
             Assert.AreEqual(flowDto.CompressionType,            flow.CompressionType,                   $"{nameof(DataFlow.CompressionType)} mappping failed");
             Assert.AreEqual(flowDto.IsPreProcessingRequired,    flow.IsPreProcessingRequired,           $"{nameof(DataFlow.IsPreProcessingRequired)} mappping failed");
             Assert.AreEqual(flowDto.PreProcessingOption,        flow.PreProcessingOption,               $"{nameof(DataFlow.PreProcessingOption)} mappping failed");

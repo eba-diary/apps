@@ -55,7 +55,7 @@ namespace Sentry.data.Core
             if (!dataFeatures.CLA3241_DisableDfsDropLocation.GetValue()
                    &&
                    (
-                       (df.IngestionType == (int)GlobalEnums.IngestionType.Topic && df.IsBackFilled)
+                       (df.IngestionType == (int)GlobalEnums.IngestionType.Topic && df.IsBackFillRequired)
                        ||
                        (df.IngestionType == (int)GlobalEnums.IngestionType.DFS_Drop)
                    )

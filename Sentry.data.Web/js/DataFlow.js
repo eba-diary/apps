@@ -75,7 +75,7 @@
         $(document).ready(function () {
             $("#SAIDAssetKeyCode").materialSelect();
             $("#IsCompressed").materialSelect();
-            $("#IsBackFilled").materialSelect();
+            $("#IsBackFillRequired").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
@@ -213,11 +213,11 @@
 
         if (val == data.DataFlow.IngestionType_TOPIC) {
             $('#topicNameContainer').show();
-            $('#backFillContainer').show();
+            $('#isBackFillRequiredContainer').show();
         }
         else {
             $('#topicNameContainer').hide();
-            $('#backFillContainer').hide();
+            $('#isBackFillRequiredContainer').hide();
         }
     },
 

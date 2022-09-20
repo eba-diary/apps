@@ -43,11 +43,11 @@
                 @Html.ValidationMessageFor(model => Model.TopicName, "", new { @class = "text-danger" })
             </div>
 
-            <div id="backFillContainer" style="display:none;">
+            <div id="isBackFillRequiredContainer" style="display:none;">
                 <div class="md-form">
                     <h4>Do you need to backfill data from DFS Drop Location?</h4>
                     <a data-toggle="tooltip" class="material-tooltip-main" title="Yes, if you need to backfill from DFSDropLocation.">
-                        @Html.DropDownListFor((m) => m.IsBackFilled, Model.BackfillDropdown, new { @class = "mdb-select" })
+                        @Html.DropDownListFor((m) => m.IsBackFillRequired, Model.IsBackFillRequiredDropdown, new { @class = "mdb-select" })
                     </a>
                 </div>
 

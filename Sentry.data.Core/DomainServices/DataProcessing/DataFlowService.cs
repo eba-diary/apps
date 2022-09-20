@@ -759,7 +759,7 @@ namespace Sentry.data.Core
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,
                 IsDecompressionRequired = dto.IsCompressed,
-                IsBackFilled = dto.IsBackFilled,
+                IsBackFillRequired = dto.IsBackFillRequired,
                 CompressionType = dto.CompressionType,
                 IsPreProcessingRequired = dto.IsPreProcessingRequired,
                 PreProcessingOption = (int)dto.PreProcessingOption,
@@ -1026,7 +1026,7 @@ namespace Sentry.data.Core
             dto.DeleteIssueDTM = df.DeleteIssueDTM;
             dto.IngestionType = df.IngestionType;
             dto.IsCompressed = df.IsDecompressionRequired;
-            dto.IsBackFilled = df.IsBackFilled;
+            dto.IsBackFillRequired = df.IsBackFillRequired;
             dto.CompressionType = df.CompressionType;
             dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
             dto.PreProcessingOption = df.PreProcessingOption;
