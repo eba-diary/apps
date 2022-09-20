@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44321</IISExpressSSLPort>
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -425,6 +425,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\SearchRouteConstraint.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
@@ -432,8 +433,12 @@
     </AdditionalFiles>
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DataFlowMetricController.cs" />
+    <Compile Include="Controllers\BaseSearchableController.cs" />
+    <Compile Include="Controllers\BusinessIntelligenceSearchController.cs" />
     <Compile Include="Controllers\DataInventoryController.cs" />
+    <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
@@ -444,6 +449,7 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="Extensions\TileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
@@ -470,6 +476,7 @@
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
     <Compile Include="Models\Dataset\Permission\RemovePermissionModel.cs" />
@@ -482,6 +489,9 @@
     <Compile Include="Models\Search\SavedSearchOptionModel.cs" />
     <Compile Include="Models\Search\SavedSearchDropdownModel.cs" />
     <Compile Include="Models\Search\SaveSearchModel.cs" />
+    <Compile Include="Models\Search\TileModel.cs" />
+    <Compile Include="Models\Search\TileResultsModel.cs" />
+    <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
@@ -886,13 +896,15 @@
     <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="Images\DataInventory\DataInventoryIcon.svg" />
     <Content Include="Images\excel_active.png" />
+    <Content Include="Images\Icons\search_icon.svg" />
     <Content Include="Images\logo.png" />
     <Content Include="Images\logo2x.png" />
     <Content Include="Images\logo_blue.svg" />
     <Content Include="Images\presence.png" />
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\DataFlow.js" />
-    <Content Include="js\DataInventory.js" />
+    <Content Include="js\DataInventorySearch.js" />
+    <Content Include="js\DatasetsSearch.js" />
     <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
@@ -1252,6 +1264,9 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_AdminSideNav.cshtml" />
     <Content Include="Views\Admin\SupportLinks.cshtml" />
+    <Content Include="Views\Search\TileResults.cshtml" />
+    <Content Include="Views\Config\Index.cshtml" />
+    <Content Include="Views\Config\_DataFlowStepAccordion.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1922,7 +1937,7 @@
     <Content Include="Views\Home\ReleaseNotes.cshtml" />
     <Content Include="Views\Dataset\QueryTool.cshtml" />
     <Content Include="Views\DataAsset\Lineage.cshtml" />
-    <Content Include="Views\Config\Index.cshtml" />
+    <Content Include="Views\Config\Index_v1.cshtml" />
     <Content Include="Views\Config\CreateRetrievalJob.cshtml" />
     <Content Include="Views\Config\Edit.cshtml" />
     <Content Include="Views\Config\EditRetrievalJob.cshtml" />
@@ -2023,11 +2038,15 @@
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\Auth\" />
     <Folder Include="Views\BaseDataInventory\" />
+    <Folder Include="Views\BaseSearchable\" />
+    <Folder Include="Views\BusinessIntelligenceSearch\" />
+    <Folder Include="Views\DatasetSearch\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
     <Folder Include="Views\Tag\" />
+    <Folder Include="Views\TileSearch\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Project_Readme.html" />

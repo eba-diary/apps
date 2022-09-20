@@ -3,31 +3,35 @@
 @{
     ViewBag.Fluid = true;
     ViewBag.Title = Model.PageTitle;
-    string jsControllerName = "data." + Model.SearchType;
+    ViewBag.OverflowScroll = true;
+    string jsControllerName = "data." + Model.SearchType + "Search";
 }
 
-<div class="search-head-wrapper">
+<div class="pt-4">
     <div class="text-center">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
         <div class="search-head-item">
             <h1 class="filter-search-page-title">@Model.PageTitle</h1>
         </div>
 
-        <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
-            <em class="icon-info-solid dsc-blue-text"></em>
-        </a>
+        @if (!string.IsNullOrEmpty(Model.InfoLink))
+        {
+            <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
+                <em class="icon-info-solid dsc-blue-text"></em>
+            </a>
+        }
     </div>
 
     <div class="filter-search-box-and-save">
-        <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
-            <span class="input-group-prepend filter-search-start sentry-blue white-text icon-search clickable display-none"></span>
-            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
-        </div>
-
         <div class="filter-search-save-search-container display-none">
             @{
                 Html.RenderAction("SavedSearches", "FilterSearch", new { searchType = Model.SearchType, activeSearchName = Model.DefaultSearch.SearchName });
             }
+        </div>
+
+        <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
+            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+            <span class="input-group-append filter-search-start sentry-blue white-text icon-search clickable display-none"></span>
         </div>
     </div>
 </div>
@@ -36,7 +40,7 @@
     <div class="filter-search-container">
         <div class="filter-search-result-count-container display-none">
             <div class="filter-search-total-results"><span id="filter-search-total"></span> Total Results</div>
-            <div>Showing <span id="filter-search-page-size"></span> of <span id="filter-search-returned-total"></span></div>
+            <div class="filter-search-page-showing">Showing <span id="filter-search-page-size"></span> <span class="d-none" id="filter-search-returned-subset">of <span id="filter-search-returned-total"></span></span></div>
         </div>
 
         <div class="filter-search-title-container bottom-border">
@@ -69,9 +73,10 @@
     </div>
 
     <div class="filter-search-results-container display-none">
-        @Html.Partial(Model.ResultView)
+        @{
+            Html.RenderAction("Results", new { parameters = Model.ResultParameters });
+        }
     </div>
-
 </div>
 
 <div class="modal fade" id="filter-search-save-modal" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="filter-search-save-modal-label" aria-hidden="true" style="display: none;">

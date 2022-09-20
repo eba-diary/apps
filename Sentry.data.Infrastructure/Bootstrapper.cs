@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.Caching;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
@@ -150,6 +151,9 @@ namespace Sentry.data.Infrastructure
             registry.For<IDeadSparkJobService>().Use<DeadSparkJobService>();
             registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
+            registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
+            registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
+
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
             registry.For<IRecurringJobManager>().Singleton().Use<RecurringJobManager>().SelectConstructor(() => new RecurringJobManager());
@@ -201,7 +205,6 @@ namespace Sentry.data.Infrastructure
             registry.For<IPollyPolicy>().Singleton().Add<GoogleApiProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<GenericHttpProviderPolicy>();
             registry.For<IPollyPolicy>().Singleton().Add<FtpProviderPolicy>();
-
 
             //establish httpclient specific to ApacheLivyProvider
             var apacheLivyClient = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

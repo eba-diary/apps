@@ -503,7 +503,7 @@ namespace Sentry.data.Web.Tests
                 DeleteIssueDTM = DateTime.MaxValue,
                 CreatedBy = "444555",
                 CreatedDTM = DateTime.Now,
-                IngestionType = (int)IngestionType.User_Push,
+                IngestionType = (int)IngestionType.S3_Drop,
 
             };
             return df;
@@ -526,7 +526,9 @@ namespace Sentry.data.Web.Tests
                         SelectedDataset = 1,
                         SelectedSchema = 1
                     }
-                }
+                },
+                TopicName = "Sample-Topic-Name",
+                S3ConnectorName = "Sample_Topic_Name"
             };
 
             return dataFlowModel;

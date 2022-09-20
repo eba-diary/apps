@@ -6,28 +6,20 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class DataInventoryController : BaseController
+    public class DataInventoryController : BaseSearchableController
     {
         private readonly IDataInventoryService _dataInventoryService;
-        private readonly IFilterSearchService _filterSearchService;
-        private readonly IDataFeatures _featureFlags;
 
-        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService, IDataFeatures featureFlags)
+        public DataInventoryController(IDataInventoryService dataInventoryService, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
             _dataInventoryService = dataInventoryService;
-            _filterSearchService = filterSearchService;
-            _featureFlags = featureFlags;
         }
         
         public ActionResult Search(string target = null, string search = null, string savedSearch = null)
         {
-            if (!string.IsNullOrEmpty(savedSearch))
+            if (TryGetSavedSearch(SearchType.DATA_INVENTORY, savedSearch, out SavedSearchDto savedSearchDto))
             {
-                SavedSearchDto savedSearchDto = _filterSearchService.GetSavedSearch(SearchType.DATA_INVENTORY, savedSearch, SharedContext.CurrentUser.AssociateId);
-                if (savedSearchDto != null)
-                {
-                    return GetView(savedSearchDto.ToModel());
-                }
+                return GetFilterSearchView(savedSearchDto.ToModel(), null);
             }
             
             FilterSearchModel model = BuildBaseSearchModel();
@@ -50,7 +42,13 @@ namespace Sentry.data.Web.Controllers
                 });
             }
             
-            return GetView(model);
+            return GetFilterSearchView(model, null);
+        }
+
+        [ChildActionOnly]
+        public override ActionResult Results(Dictionary<string, string> parameters)
+        {
+            return PartialView("SearchResult");
         }
 
         [HttpPost]
@@ -118,19 +116,16 @@ namespace Sentry.data.Web.Controllers
         }
 
         #region Methods
-        private ActionResult GetView(FilterSearchModel searchModel)
+        protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
-            FilterSearchConfigModel model = new FilterSearchConfigModel()
+            return new FilterSearchConfigModel()
             {
                 PageTitle = "Data Inventory",
                 SearchType = SearchType.DATA_INVENTORY,
                 IconPath = "~/Images/DataInventory/DataInventoryIconBlue.svg",
-                ResultView = "SearchResult",
                 InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
                 DefaultSearch = searchModel
             };
-
-            return View("~/Views/Search/FilterSearch.cshtml", model);
         }
 
         private FilterSearchModel BuildBaseSearchModel()
@@ -141,13 +136,13 @@ namespace Sentry.data.Web.Controllers
                 {
                     new FilterCategoryModel()
                     {
-                        CategoryName = FilterCategoryNames.ENVIRONMENT,
+                        CategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                         CategoryOptions = new List<FilterCategoryOptionModel>()
                         {
                             new FilterCategoryOptionModel()
                             {
                                 OptionValue = FilterCategoryOptions.ENVIRONMENT_PROD,
-                                ParentCategoryName = FilterCategoryNames.ENVIRONMENT,
+                                ParentCategoryName = FilterCategoryNames.DataInventory.ENVIRONMENT,
                                 Selected = true
                             }
                         }
@@ -162,7 +157,7 @@ namespace Sentry.data.Web.Controllers
             {
                 RemoveSensitive(searchModel);
 
-                FilterCategoryModel category = new FilterCategoryModel() { CategoryName = FilterCategoryNames.SENSITIVE };
+                FilterCategoryModel category = new FilterCategoryModel() { CategoryName = FilterCategoryNames.DataInventory.SENSITIVE };
                 category.CategoryOptions.Add(new FilterCategoryOptionModel() { OptionValue = "false", Selected = true, ParentCategoryName = category.CategoryName });
 
                 searchModel.FilterCategories.Add(category);
@@ -171,7 +166,7 @@ namespace Sentry.data.Web.Controllers
 
         private void RemoveSensitive(FilterSearchModel searchModel)
         {
-            searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.SENSITIVE);
+            searchModel.FilterCategories.RemoveAll(x => x.CategoryName == FilterCategoryNames.DataInventory.SENSITIVE);
         }
 
         protected bool CanViewSensitive()

@@ -88,6 +88,8 @@ namespace Sentry.data.Web.WebApi.Controllers
             public int DatasetId { get; set; }
             public List<string> SnowflakeViews { get; set; }
 
+            public string ControlMTriggerName { get; set; }
+
             //   public int Views { get; set; }
             //   public int Downloads { get; set; }
         }
@@ -102,6 +104,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         public class KafkaMessage
         {
+            public string Topic { get; set; }
             public string Key { get; set; }
             public string Message { get; set; }
         }
@@ -116,6 +119,11 @@ namespace Sentry.data.Web.WebApi.Controllers
             public ObjectStatusEnum ObjectStatus { get; set; }
             public string DeleteIssuer { get; set; }
             public DateTime DeleteIssueDTM { get; set; }
+
+            //USED BY KNOCKOUT TO DISPLAY TOPIC NAME ON _SchemaAbout.cshtml
+            public int IngestionType { get; set; }
+            public string TopicName { get; set; }
+            public string S3ConnectorName { get; set; }
 
         }
         #endregion
@@ -711,7 +719,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
                 }
 
-                _messagePublisher.PublishDSCEvent(message.Key, message.Message);
+                _messagePublisher.PublishDSCEvent(message.Key, message.Message, message.Topic);
                 return Ok();
             }
             catch (KafkaProducerException ex)
@@ -758,7 +766,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     kMsg = JsonConvert.DeserializeObject<KafkaMessage>(message);
                 }
 
-                _messagePublisher.PublishDSCEvent(kMsg.Key, kMsg.Message);
+                _messagePublisher.PublishDSCEvent(kMsg.Key, kMsg.Message, kMsg.Topic);
                 return Ok();
             }
             catch (KafkaProducerException ex)
@@ -848,12 +856,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                 };
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
+                //SET Metadata to pass back to KO
                 Metadata m = new Metadata
                 {
                     //grab DatasetId and  SchemaId to be used to fill delroy Fields grid
                     DatasetId = config.ParentDataset.DatasetId,
                     SchemaId = config.Schema.SchemaId,
-                    Description = config.Description
+                    Description = config.Description,
+                    ControlMTriggerName = config.Schema.ControlMTriggerName
                 };
 
                 //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
@@ -882,7 +892,10 @@ namespace Sentry.data.Web.WebApi.Controllers
                         PopulatesMultipleSchema = (item.Item1.MappedSchema.Count > 1),
                         ObjectStatus = item.Item1.ObjectStatus,
                         DeleteIssuer = item.Item1.DeleteIssuer,
-                        DeleteIssueDTM = item.Item1.DeleteIssueDTM
+                        DeleteIssueDTM = item.Item1.DeleteIssueDTM,
+                        TopicName = item.Item1.TopicName,
+                        IngestionType = item.Item1.IngestionType,
+                        S3ConnectorName = item.Item1.S3ConnectorName
                     };
                     List<DropLocation> rjList = new List<DropLocation>();
                     foreach (var job in item.Item2)

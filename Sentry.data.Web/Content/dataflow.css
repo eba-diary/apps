@@ -157,7 +157,7 @@ a.create-link:focus {
 }
 
 
-    .configHeader h1 {
+    .configHeader h2 {
         color: white !important;
         padding-left: 15px;
         display: inline-block;
@@ -209,4 +209,69 @@ a.create-link:focus {
 
 .on-demand-run {
     margin-bottom: 3px;
+}
+
+.config-header {
+    height: 60px;
+    border-bottom: 1px #DDDDDD solid;
+}
+
+.config-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px #DDDDDD solid;
+}
+
+.card-body-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.schema-modify-icons {
+    font-size: 1.75rem;
+    display: flex;
+}
+
+.schema-delete-icon {
+    color: #B3140B !important;
+}
+
+    .schema-delete-icon:hover {
+        color: #f54940 !important;
+    }
+
+.schema-sync-icon {
+    color: #74531C !important;
+}
+
+    .schema-sync-icon:hover {
+        color: #EAAA00 !important;
+    }
+
+.schema-add-icon {
+    color: #005844 !important;
+}
+
+    .schema-add-icon:hover {
+        color: #84BD00 !important;
+    }
+
+.data-flow-card-radius {
+    border-radius: 10px !important;
+}
+
+/*overriding mdb css so that full header bar is clickable and chevron rotates accordingly*/ 
+.md-accordion .card a {
+    -webkit-transition: ease-in-out 0.3s;
+    transition: ease-in-out 0.3s
+}
+
+    .md-accordion .card a:not(.collapsed) .rotate-icon {
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg)
+    }
+
+.schema-card-header:hover {
+    background-color: #f7f5f5 !important;
 }

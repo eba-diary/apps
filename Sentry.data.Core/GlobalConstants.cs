@@ -36,6 +36,7 @@ namespace Sentry.data.Core
         {
             public const string CREATED_FILE = "Created File";
             public const string VIEWED = "Viewed";
+            public const string SEARCH = "Search";
             public const string DOWNLOAD = "Downloaded Data File";
             public const string EDITED_DATA_FILE = "Edited Data File";
 
@@ -294,7 +295,7 @@ namespace Sentry.data.Core
             public const string DELETE_ISSUER = "DeleteIssuer";
             public const string DELETE_ISSUE_DTM = "DeleteIssueDTM";
             public const string INCLUDE_IN_SAS = "SAS_IND";
-            public static string SAS_LIBRARY = "SASLibrary";
+            public const string SAS_LIBRARY = "SASLibrary";
         }
 
         public static class Datatypes
@@ -417,6 +418,12 @@ namespace Sentry.data.Core
             public const string DATA = "DATA_";
         }
 
+        public static class SnowflakeConsumptionLayerPrefixes
+        {
+            public const string RAW_PREFIX = "RAW_";
+            public const string RAWQUERY_PREFIX = "RAWQUERY_";
+        }
+
         public static class ElasticAliases
         {
             public const string DATA_INVENTORY = "data-inventory";
@@ -424,17 +431,40 @@ namespace Sentry.data.Core
 
         public static class FilterCategoryNames
         {
-            public const string ASSET = "Asset";
-            public const string COLLECTIONNAME = "Collection Name";
-            public const string COLUMN = "Column";
-            public const string DATATYPE = "Datatype";
-            public const string DATABASE = "Database";
-            public const string NULLABLE = "Nullable";
-            public const string SENSITIVE = "Sensitive";
-            public const string ENVIRONMENT = "Environment";
-            public const string SERVER = "Server";
-            public const string SOURCETYPE = "Source Type";
-            public const string COLLECTIONTYPE = "Collection Type";
+            public static class DataInventory
+            {
+                public const string ASSET = "Asset";
+                public const string COLLECTIONNAME = "Collection Name";
+                public const string COLUMN = "Column";
+                public const string DATATYPE = "Datatype";
+                public const string DATABASE = "Database";
+                public const string NULLABLE = "Nullable";
+                public const string SENSITIVE = "Sensitive";
+                public const string ENVIRONMENT = "Environment";
+                public const string SERVER = "Server";
+                public const string SOURCETYPE = "Source Type";
+                public const string COLLECTIONTYPE = "Collection Type";
+            }
+
+            public static class Dataset
+            {
+                public const string FAVORITE = "Favorite";
+                public const string CATEGORY = "Category";
+                public const string SECURED = "Secured";
+                public const string ORIGIN = "Origin";
+                public const string ENVIRONMENT = "Environment";
+                public const string ENVIRONMENTTYPE = "Environment Type";
+                public const string DATASETASSET = "Dataset Asset";
+                public const string PRODUCERASSET = "Producer Asset";
+            }
+
+            public static class BusinessIntelligence
+            {
+                public const string REPORTTYPE = "Report Type";
+                public const string BUSINESSUNIT = "Business Unit";
+                public const string FUNCTION = "Function";
+                public const string TAG = "Tag";
+            }
         }
 
         public static class FilterCategoryOptions
@@ -467,11 +497,11 @@ namespace Sentry.data.Core
             public const string XML = "XML";
             public const string JSON = "JSON";
             public const string DELIMITED = "DELIMITED";
-            [Obsolete]
+            [Obsolete("Not supported for new Schema")]
             public const string ANY = "ANY"; //deprecated
             public const string CSV = "CSV";
             public const string TXT = "TXT";
-            [Obsolete]
+            [Obsolete("Format not supported")]
             public const string XLSX = "XLSX"; //deprecated
         }
 
@@ -479,11 +509,32 @@ namespace Sentry.data.Core
         {
             public const string SUCCESS = "SUCCESS";
             public const string FAILURE = "FAILURE";
+            public const string NOTFOUND = "NOTFOUND";
+            public const string ERROR = "ERROR";
+        }
+
+        public static class DeleteFileResponseFileType
+        {
+            public const string PARQUET = "PARQUET";
+          
         }
 
         public static class SecurityConstants
         {
             public const string ASSET_LEVEL_GROUP_NAME = "Default";
+        }
+
+        public static class Pagination
+        {
+            public const string ELLIPSIS = "...";
+        }
+
+        public static class TileResultParameters
+        {
+            public const string SORTBY = "SortBy";
+            public const string PAGENUMBER = "PageNumber";
+            public const string PAGESIZE = "PageSize";
+            public const string LAYOUT = "Layout";
         }
     }
 }

@@ -64,6 +64,10 @@ namespace Sentry.data.Web
         [DisplayName("How will data be ingested into DSC?")]
         public int IngestionTypeSelection { get; set; }
 
+        [DisplayName("What is the Topic Name?")]
+        public string TopicName { get; set; }
+        public string S3ConnectorName { get; set; }
+
         /// <summary>
         /// Named Environment naming conventions from https://confluence.sentry.com/x/eQNvAQ
         /// </summary>
@@ -143,6 +147,12 @@ namespace Sentry.data.Web
             if (String.IsNullOrWhiteSpace(SAIDAssetKeyCode))
             {
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "Must associate data flow with SAID asset");
+            }
+
+            //IF IngestionType==TOPIC THEN ENSURE NOT EMPTY
+            if (IngestionTypeSelection == (int) IngestionType.Topic && string.IsNullOrWhiteSpace(TopicName))
+            {
+                results.Add(DataFlow.ValidationErrors.topicNameIsBlank, "Must specify a topic name");
             }
 
             ValidationException ex = new ValidationException(results);            

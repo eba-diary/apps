@@ -9,7 +9,7 @@
     <span class="hidden-item" id="producerAssetGroupName">@Model.ProducerAssetGroupName</span>
 
     <h2 class="pt-3 pl-0">
-        DataFlow Details (<span>@Model.Name</span>)@if (Model.DisplayDataflowEdit)
+        DataFlow Details (<span>@Model.Name</span>)@if (Model.DisplayDataflowEdit && Model.UserSecurity.CanModifyDataflow)
         {
             <span id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="far fa-edit"></span></span>
         }
