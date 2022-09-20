@@ -238,9 +238,9 @@ namespace Sentry.data.Core
             return 0;
         }
 
-        public void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIds)
+        public void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIdList)
         {
-            foreach(int schemaId in schemaIds)
+            foreach(int schemaId in schemaIdList)
             {
                 _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schemaId));
             }
@@ -254,24 +254,14 @@ namespace Sentry.data.Core
 
             List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
 
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
             {
-                foreach(SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
                 {
-                    if(!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
-                    {
-                        schema.ConsumptionDetails.Add(snowflakeConsumption);
-                    }
+                    schema.ConsumptionDetails.Add(snowflakeConsumption);
                 }
             }
-            else
-            {
-                SchemaConsumptionSnowflake categoryLayer = (SchemaConsumptionSnowflake)GenerateCategoryConsumptionLayer(dto, schema, ds);
-                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == categoryLayer.SnowflakeType))
-                {
-                    schema.ConsumptionDetails.Add(categoryLayer);
-                }
-            }
+
             _datasetContext.SaveChanges();
         }
 
@@ -1372,7 +1362,8 @@ namespace Sentry.data.Core
                     SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                    SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
                 });
             }
 
