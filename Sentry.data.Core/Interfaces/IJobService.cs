@@ -44,5 +44,7 @@ namespace Sentry.data.Core
         List<RetrieverJob> GetDfsRetrieverJobs();
 
         Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);
+        Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusAsync(int jobId, int batchId);
+        Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusAsync(JobHistory historyRecord);
     }
 }

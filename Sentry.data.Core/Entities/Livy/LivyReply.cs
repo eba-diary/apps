@@ -34,6 +34,17 @@ namespace Sentry.data.Core.Entities.Livy
         public string livyURL { get; set; }
         public Dictionary<string,string> appInfo { get; set; }
         public string[] log { get; set; }
+        public bool IsActive()
+        {
+            if (state == "dead" || state == "error" || state == "success")
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
 
     }
 

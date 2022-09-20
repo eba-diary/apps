@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
 using Sentry.data.Core.DTO.Job;
+using Sentry.data.Core.Entities.Livy;
 using System;
 using System.Text;
 
@@ -450,6 +451,60 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(JsonConvert.SerializeObject(javaOptionsOverrideDto), result.Serialized_Job_Options);
             Assert.AreEqual(retrieverJob, result.JobId);
             Assert.AreEqual(retrieverJob.JobGuid, result.JobGuid);
+        }
+
+        [TestCategory("Core JobService")]
+        [TestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void SubmitApacheLivyJobInternalAsync(bool isLivyCallSuccessful)
+        {
+            //Arrange
+            RetrieverJob job = new RetrieverJob()
+            {
+                JobGuid = Guid.NewGuid()
+            };
+            JavaOptionsOverrideDto dto = new JavaOptionsOverrideDto();
+
+            LivyBatch livyBatch = new LivyBatch()
+            {
+                Id = 11,
+                State = "Success",
+                Appid = "App Id",
+                AppInfo = new System.Collections.Generic.Dictionary<string, string>() { { "driverLogUrl", "driver value" }, { "sparkUiUrl", "spark UI Url value"} }
+            };
+
+            System.Net.Http.HttpResponseMessage response = new System.Net.Http.HttpResponseMessage()
+            {
+                Content = new System.Net.Http.StringContent(JsonConvert.SerializeObject(livyBatch)),
+                StatusCode = (isLivyCallSuccessful) ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.BadRequest
+            };
+
+            Mock<IApacheLivyProvider> apacheProvider = new Mock<IApacheLivyProvider>();
+            apacheProvider.Setup(s => s.PostRequestAsync(It.IsAny<String>(), It.IsAny<String>())).ReturnsAsync(response);
+
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<Submission>()));
+            context.Setup(s => s.Add(It.IsAny<JobHistory>()));
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object) { CallBase = true };
+            jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
+            jobService.Setup(s => s.MapToSubmission(It.IsAny<RetrieverJob>(), It.IsAny<JavaOptionsOverrideDto>())).Verifiable();
+
+            
+            Times jobHistoryAddCount = isLivyCallSuccessful ? Times.Once() : Times.Never();
+            Times saveChancesCount = isLivyCallSuccessful ? Times.Exactly(2) : Times.Once();
+
+            //Act
+            _ = jobService.Object.SubmitApacheLivyJobInternalAsync(job, job.JobGuid, dto);
+
+            //Assert
+            jobService.VerifyAll();            
+            context.Verify(v => v.Add(It.IsAny<Submission>()), Times.Once);
+            context.Verify(v => v.Add(It.IsAny<JobHistory>()), jobHistoryAddCount);
+            context.Verify(v => v.SaveChanges(It.IsAny<bool>()), saveChancesCount);
         }
 
     }

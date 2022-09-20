@@ -464,108 +464,13 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
-                JobHistory hr = _datasetContext.JobHistory.Where(w => w.JobId.Id == jobId && w.BatchId == batchId && w.Active).FirstOrDefault();
+                await _jobService.GetApacheLibyBatchStatusAsync(jobId, batchId);
 
-                if (hr == null)
-                {
-                    return BadRequest("No history of Job\\Batch ID combination");
-                }
-
-
-                /*
-                 * Add flowexecutionguid context variable
-                 */
-                string flowExecutionGuid = (hr.Submission != null && hr.Submission.FlowExecutionGuid != null) ? hr.Submission.FlowExecutionGuid : "00000000000000000";
-                Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-
-                /*
-                 * Add runinstanceguid context variable
-                 */
-                string runInstanceGuid = (hr.Submission != null && hr.Submission.RunInstanceGuid != null) ? hr.Submission.RunInstanceGuid : "00000000000000000";
-                Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
-
-                Logger.Info($"<jobcontroller-getbatchstate> start-method");
-
-
-                Logger.Info($"<jobcontroller-getbatchstate> pull batch metadata: batchId:{batchId} apacheLivyUrl:/batches/{batchId}");
-                //var client = _httpClient;
-                //HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}").ConfigureAwait(false);
-                HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{batchId}").ConfigureAwait(false);
-
-                string result = response.Content.ReadAsStringAsync().Result;
-                string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
-
-                Logger.Info($"<jobcontroller-getbatchstate> getbatchstate_livyresponse batchId:{batchId} statuscode:{response.StatusCode}:::result:{sendresult}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    if (result == $"Session '{batchId}' not found.")
-                    {
-                        return BadRequest("Session not found");
-                    }
-
-                    LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
-
-                    //create history record and set it active
-                    JobHistory histRecord = new JobHistory()
-                    {
-                        JobId = hr.JobId,
-                        BatchId = hr.BatchId,
-                        Created = hr.Created,
-                        Modified = DateTime.Now,
-                        State = lr.state,
-                        LivyAppId = lr.appId,
-                        LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                        LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
-                        JobGuid = hr.JobGuid,
-                        Submission = hr.Submission
-                    };
-
-                    if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
-                    {
-                        histRecord.Active = false;
-                    }
-                    else
-                    {
-                        histRecord.Active = true;
-                    }
-
-                    _datasetContext.Add(histRecord);
-
-                    //set previous active record to inactive
-                    hr.Modified = DateTime.Now;
-                    hr.Active = false;
-
-                    _datasetContext.SaveChanges();
-                }
-                else if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    //create new history record, however, set active to false as livy did not find any record of it
-                    JobHistory histRecord = new JobHistory()
-                    {
-                        JobId = hr.JobId,
-                        BatchId = hr.BatchId,
-                        Created = hr.Created,
-                        Modified = DateTime.Now,
-                        State = "Unknown",
-                        LivyAppId = hr.LivyAppId,
-                        LivyDriverLogUrl = hr.LivyDriverLogUrl,
-                        LivySparkUiUrl = hr.LivySparkUiUrl,
-                        LogInfo = "Livy did not return a status for this batch job.",
-                        Active = false,
-                        JobGuid = hr.JobGuid,
-                        Submission = hr.Submission
-                    };
-
-                    _datasetContext.Add(histRecord);
-
-                    //set previous active record to inactive
-                    hr.Modified = DateTime.Now;
-                    hr.Active = false;
-
-                    _datasetContext.SaveChanges();
-                }
                 return Ok();
+            }
+            catch (Exception ex) when (ex is ArgumentNullException || ex is LivyBatchNotFoundException)
+            {
+                return BadRequest(ex.Message);
             }
             catch (HttpResponseException responseEx)
             {
@@ -576,11 +481,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 Logger.Error("<jobcontroller-getbatchstate> livy connection timeout", timeoutEx);
                 return Content(HttpStatusCode.GatewayTimeout, "Livy connection timeout");
-            }
-            catch (ArgumentNullException argEx)
-            {
-                Logger.Error("<jobcontroller-getbatchstate> null arguement", argEx);
-                return Content(HttpStatusCode.BadRequest, "Bad livy request");
             }
             catch (Exception ex)
             {

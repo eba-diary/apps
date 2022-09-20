@@ -431,7 +431,126 @@ namespace Sentry.data.Core
 
         }
 
-        private async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobInternalAsync(RetrieverJob job, Guid JobGuid, JavaOptionsOverrideDto dto)
+        public Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusAsync(JobHistory historyRecord)
+        {
+            Logger.Debug($"{nameof(GetApacheLibyBatchStatusAsync)} - Method Start");
+            if (historyRecord == null)
+            {
+                throw new ArgumentNullException(nameof(historyRecord), "History Record Required");
+            }
+
+            Logger.Debug($"{nameof(GetApacheLibyBatchStatusAsync)} - Method End");
+            return GetApacheLibyBatchStatusInternalAsync(historyRecord);
+        }
+
+        public Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusAsync(int jobId, int batchId)
+        {
+            if (jobId == 0)
+            {
+                throw new ArgumentNullException(nameof(jobId), "Job Id Required");
+            }
+            if (batchId == 0)
+            {
+                throw new ArgumentNullException(nameof(batchId), "Batch Id Required");
+            }
+
+            JobHistory hr = _datasetContext.JobHistory.FirstOrDefault(w => w.JobId.Id == jobId && w.BatchId == batchId && w.Active);
+
+            if (hr == null)
+            {
+                throw new JobNotFoundException("No history of Job\\Batch ID combination");
+            }
+
+            return GetApacheLibyBatchStatusInternalAsync(hr);
+        }
+
+        private async Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusInternalAsync(JobHistory historyRecord)
+        {
+            Logger.Debug($"{nameof(GetApacheLibyBatchStatusInternalAsync)} - Method Start");
+            /*
+            * Add flowexecutionguid context variable
+            */
+            string flowExecutionGuid = (historyRecord.Submission != null && historyRecord.Submission.FlowExecutionGuid != null) ? historyRecord.Submission.FlowExecutionGuid : "00000000000000000";
+            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+
+            /*
+             * Add runinstanceguid context variable
+             */
+            string runInstanceGuid = (historyRecord.Submission != null && historyRecord.Submission.RunInstanceGuid != null) ? historyRecord.Submission.RunInstanceGuid : "00000000000000000";
+            Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+
+
+            Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:/batches/{historyRecord.BatchId}");
+            //var client = _httpClient;
+            //HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}").ConfigureAwait(false);
+
+            _apacheLivyProvider.SetBaseUrl(historyRecord.ClusterUrl);
+            System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
+
+            string result = response.Content.ReadAsStringAsync().Result;
+            string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+            Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                if (result == $"Session '{historyRecord.BatchId}' not found.")
+                {
+                    throw new LivyBatchNotFoundException("Session not found");
+                }
+
+                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
+
+                JobHistory newHistoryRecord = MapToJobHistory(historyRecord, lr);
+
+                _datasetContext.Add(newHistoryRecord);
+
+                //set previous active record to inactive
+                historyRecord.Modified = DateTime.Now;
+                historyRecord.Active = false;
+
+                _datasetContext.SaveChanges();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                JobHistory newHistoryRecord = MapToJobHistory(historyRecord, null);
+
+                _datasetContext.Add(newHistoryRecord);
+
+                //set previous active record to inactive
+                historyRecord.Modified = DateTime.Now;
+                historyRecord.Active = false;
+
+                _datasetContext.SaveChanges();
+            }
+
+            Logger.Debug($"{nameof(GetApacheLibyBatchStatusInternalAsync)} - Method End");
+            return response;
+        }
+
+        #region Private Methods
+
+        private JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
+        {
+            //create history record and set it active
+            return new JobHistory()
+            {
+                JobId = previousHistoryRec.JobId,
+                BatchId = previousHistoryRec.BatchId,
+                Created = previousHistoryRec.Created,
+                Modified = DateTime.Now,
+                State = (reply != null) ? reply.state : "Unknown",
+                LivyAppId = (reply != null) ? reply.appId : previousHistoryRec.LivyAppId,
+                LivyDriverLogUrl = (reply != null) ? reply.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault() : previousHistoryRec.LivyDriverLogUrl,
+                LivySparkUiUrl = (reply != null) ? reply.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault() : previousHistoryRec.LivySparkUiUrl,
+                LogInfo = (reply != null) ? null : "Livy did not return a status for this batch job.",
+                Active = (reply != null) ? reply.IsActive() : false,
+                JobGuid = previousHistoryRec.JobGuid,
+                Submission = previousHistoryRec.Submission
+            };
+        }
+
+        internal async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobInternalAsync(RetrieverJob job, Guid JobGuid, JavaOptionsOverrideDto dto)
         {
             string postContent = BuildLivyPostContent(dto, job);
 
@@ -475,9 +594,7 @@ namespace Sentry.data.Core
             return response;
         }
 
-        #region Private Methods
-
-        internal Submission MapToSubmission(RetrieverJob job, JavaOptionsOverrideDto dto)
+        internal virtual Submission MapToSubmission(RetrieverJob job, JavaOptionsOverrideDto dto)
         {
             var submission = new Submission()
             {
@@ -492,7 +609,7 @@ namespace Sentry.data.Core
             return submission;
         }
 
-        internal string BuildLivyPostContent(JavaOptionsOverrideDto dto, RetrieverJob job)
+        internal virtual string BuildLivyPostContent(JavaOptionsOverrideDto dto, RetrieverJob job)
         {
             JavaAppSource dsrc = _datasetContext.GetById<JavaAppSource>(job.DataSource.Id);
 

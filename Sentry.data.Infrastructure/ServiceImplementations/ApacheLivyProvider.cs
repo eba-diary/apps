@@ -59,6 +59,9 @@ namespace Sentry.data.Infrastructure
 
         public async Task<HttpResponseMessage> GetRequestAsync(string resource)
         {
+            Logger.Debug($"{nameof(GetRequestAsync)} - baseurl:{_baseUrl}");
+            Logger.Debug($"{nameof(GetRequestAsync)} - resource:{resource}");
+
             var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
                 var x = await _httpClient.GetAsync(_baseUrl + resource).ConfigureAwait(false);
