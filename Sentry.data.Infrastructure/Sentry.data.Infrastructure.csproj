@@ -267,6 +267,7 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\ElasticContext.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
+    <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
     <Compile Include="Exceptions\InfrastructureEventingException.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
     <Compile Include="Exceptions\SecBotProviderException.cs" />
@@ -381,6 +382,7 @@
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
+    <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />
     <Compile Include="ServiceImplementations\HangfireJobScheduler.cs" />

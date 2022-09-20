@@ -176,6 +176,7 @@
     <Compile Include="SupportLinkServiceTests.cs" />
     <Compile Include="SecBotProviderTests.cs" />
     <Compile Include="GoogleBigQueryServiceTests.cs" />
+    <Compile Include="GoogleBigQueryJobProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -108,7 +108,6 @@ namespace Sentry.data.Infrastructure
                 x.Type<GoogleBigQueryJobProvider>().Named(DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
             });
 
-
             //Register event handlers for MetadataProcessorService
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
             registry.For<IMessageHandler<string>>().Add<SnowflakeEventService>();

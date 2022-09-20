@@ -537,5 +537,14 @@ namespace Sentry.data.Core
             public const string PAGESIZE = "PageSize";
             public const string LAYOUT = "Layout";
         }
+
+        public static class ExecutionParameterKeys
+        {
+            public static class GoogleBigQueryApi
+            {
+                public const string LASTINDEX = "LastIndex";
+                public const string TOTALROWS = "TotalRows";
+            }
+        }
     }
 }

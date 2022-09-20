@@ -6,6 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Sentry.Common.Logging;
+using System.Globalization;
+using System.IO;
+using static Sentry.data.Core.GlobalConstants;
+using System.Text;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Infrastructure
 {
@@ -38,63 +43,175 @@ namespace Sentry.data.Infrastructure
             using (httpClient)
             {
                 //need to calculate the tableId first
-                List<string> uriParts = job.RelativeUri.Split('/').ToList();
-                string projectId = uriParts[1];
-                string datasetId = uriParts[3];
-                string tableId = uriParts[5];
+                GoogleBigQueryConfiguration config = GetConfig(job);
 
-                //handle everything with the parameters in code here first then determine if a shared or usable version is possible
-                //The first value desired will either get entered through UI or get put in the brackets with the variable name
-                //if parameters are null, use that value (will only need to check for null if don't add an "Add Parameter" to UI
-                if (job.ExecutionParameters == null)
+                try
                 {
+                    //update DSC schema
+                    JArray bigQueryFields = GetBigQueryFields(httpClient, config);
+                    _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
 
+                    //get data flow step for drop location info
+                    DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop).FirstOrDefault();
+
+                    do
+                    {
+                        string requestKey = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+
+                        //make request
+                        MemoryStream stream = GetBigQueryRowsStream(httpClient, config);
+
+                        //if rows to upload
+                        if (stream != null)
+                        {
+                            using (stream)
+                            {
+                                //manufacture target key
+                                string targetKey = $"{step.TriggerKey}{job.JobOptions.TargetFileName}_{config.TableId}_{requestKey}.json";
+
+                                //upload to S3
+                                _s3ServiceProvider.UploadDataFile(stream, step.TriggerBucket, targetKey);
+
+                                //update execution parameters
+                                SaveProgress(config, job);
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(config.PageToken))
+                        {
+                            IncrementTableId(config);
+                        }
+                    }
+                    while (true); //only break loop on exception
                 }
-
-                //else increment the parameter value needed accordingly
-
-                //update DSC schema
-                JArray bigQueryFields = GetBigQueryFields(httpClient, job);
-                _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
-
-                //build the request
-                //use execution parameters
-                //parameters will have record count and last consumed date
-                //if parameters are null, get 
-                //loop over each day since last successful execution
-
-                //make request
-
-                //track last record in response (in case of failure to start from where left off)
-
-                //upload to S3 (async? would need to handle if fails upload)
-
-                //loop until no more pages
-
-                //update execution parameters
+                catch (GoogleBigQueryNotFoundException)
+                {
+                    //no more tables to collect from
+                    DateTime expectedDate = DateTime.Today.AddDays(-1);
+                    DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
+                    if (stopDate < expectedDate)
+                    {
+                        //means there may be an unexpected gap
+                        Logger.Error($"Google Big Query Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                    }
+                }
             }
         }
 
         #region Private
-        private JArray GetBigQueryFields(HttpClient httpClient, RetrieverJob job)
+        private GoogleBigQueryConfiguration GetConfig(RetrieverJob job)
         {
             List<string> uriParts = job.RelativeUri.Split('/').ToList();
-            string projectId = uriParts[1];
-            string datasetId = uriParts[3];
-            string tableId = uriParts[5];
 
-            string tableMetadataUri = $"{job.DataSource.BaseUri}{projectId}/datasets/{datasetId}/tables/{tableId}";
-
-            HttpResponseMessage tableMetadataResponse = httpClient.GetAsync(tableMetadataUri).Result;
-            string tableMetadataResponseString = tableMetadataResponse.Content.ReadAsStringAsync().Result;
-            if (!tableMetadataResponse.IsSuccessStatusCode)
+            GoogleBigQueryConfiguration config = new GoogleBigQueryConfiguration()
             {
-                Logger.Error($"Google Big Query Api Provider failed to retrieve table metadata. {tableMetadataResponseString}");
-                throw new GoogleBigQueryJobProviderException(tableMetadataResponseString);
+                BaseUri = job.DataSource.BaseUri.ToString(),
+                ProjectId = uriParts[1],
+                DatasetId = uriParts[3],
+                TableId = uriParts[5],
+                RelativeUri = job.RelativeUri
+            };
+
+            if (job.ExecutionParameters != null && 
+                job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX) && 
+                job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS) &&
+                job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX] != job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS])
+            {
+                //if have not completed retrieving all records for current table, continue from last index
+                config.LastIndex = int.Parse(job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX]);
+            }
+            else
+            {
+                //else move to the next day for the table
+                IncrementTableId(config);
             }
 
-            JObject tableMetadata = JObject.Parse(tableMetadataResponseString);
-            return (JArray)tableMetadata.SelectToken("schema.fields");
+            return config;
+        }
+
+        private void IncrementTableId(GoogleBigQueryConfiguration config)
+        {
+            List<string> idParts = config.TableId.Split('_').ToList();
+            DateTime lastDate = DateTime.ParseExact(idParts.Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
+
+            //reset config for new table
+            config.TableId = idParts.First() + "_" + lastDate.AddDays(1).ToString("yyyyMMdd");
+            config.PageToken = "";
+            config.LastIndex = 0;
+            config.TotalRows = 0;
+
+            List<string> uriParts = config.RelativeUri.Split('/').ToList();
+            uriParts[5] = config.TableId;
+            config.RelativeUri = string.Join("/", uriParts);
+        }
+
+        private JArray GetBigQueryFields(HttpClient httpClient, GoogleBigQueryConfiguration config)
+        {
+            string tableMetadataUri = $"{config.BaseUri}{config.ProjectId}/datasets/{config.DatasetId}/tables/{config.TableId}";
+            JObject response = GetBigQueryResponse(httpClient, tableMetadataUri);
+            return (JArray)response.SelectToken("schema.fields");
+        }
+
+        private MemoryStream GetBigQueryRowsStream(HttpClient httpClient, GoogleBigQueryConfiguration config)
+        {
+            string uri = config.BaseUri + config.RelativeUri;
+
+            if (!string.IsNullOrEmpty(config.PageToken)) //if have a page token use it
+            {
+                AddUriParameter(ref uri, "pageToken", config.PageToken);
+            }
+            else if (config.LastIndex > 0) //only use start index if failed in the middle of collecting and no longer have page token
+            {
+                AddUriParameter(ref uri, "startIndex", config.LastIndex.ToString());
+            }
+
+            JObject response = GetBigQueryResponse(httpClient, uri);
+
+            //when at the end, there is no rows or pageToken field
+            config.TotalRows = response.Value<int>("totalRows");
+            config.PageToken = response.Value<string>("pageToken");
+
+            if (response.ContainsKey("rows"))
+            {
+                config.LastIndex += ((JArray)response.SelectToken("rows")).Count();
+                return new MemoryStream(Encoding.UTF8.GetBytes(response.ToString()));
+            }
+
+            return null;
+        }
+
+        private void AddUriParameter(ref string uri, string parameterKey, string parameterValue)
+        {
+            uri += uri.Contains("?") ? "&" : "?" + $"{parameterKey}={parameterValue}";
+        }
+
+        private JObject GetBigQueryResponse(HttpClient httpClient, string uri)
+        {
+            HttpResponseMessage response = httpClient.GetAsync(uri).Result;
+            string responseString = response.Content.ReadAsStringAsync().Result;
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    Logger.Info($"Google Big Query request to {uri} returned NotFound. {responseString}");
+                    throw new GoogleBigQueryNotFoundException();
+                }
+
+                Logger.Error($"Google Big Query request to {uri} failed. {responseString}");
+                throw new GoogleBigQueryJobProviderException(responseString);
+            }
+
+            return JObject.Parse(responseString);
+        }
+
+        private void SaveProgress(GoogleBigQueryConfiguration config, RetrieverJob job)
+        {
+            job.RelativeUri = config.RelativeUri;
+            job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX] = config.LastIndex.ToString();
+            job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS] = config.TotalRows.ToString();
+            
+            _datasetContext.SaveChanges();
         }
         #endregion
 
