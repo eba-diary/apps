@@ -1869,7 +1869,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
             dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("All");
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null);
 
             //Act
             string dbName_TESTNP = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
@@ -1887,7 +1887,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
             dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(allowableEnvironments);
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null);
 
             // Act
             string dbName_TESTNP = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.NonProd.ToString(), null);
@@ -1957,7 +1957,7 @@ namespace Sentry.data.Core.Tests
             datasetHR.NamedEnvironment = "QUAL";
             datasetHR.NamedEnvironmentType = NamedEnvironmentType.NonProd;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             var schemaName = schemaService.GenerateCategoryBasedSnowflakeSchemaName(dataset);
@@ -2004,7 +2004,7 @@ namespace Sentry.data.Core.Tests
             dataset_Test.NamedEnvironment = "TEST";
             dataset_Test.NamedEnvironmentType = NamedEnvironmentType.NonProd;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             string schemaName_Prod = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Prod, alwaysSuffixSchemaNames);
@@ -2781,7 +2781,7 @@ namespace Sentry.data.Core.Tests
                 ParentField = fields[3]
             };
 
-            SchemaService service = new SchemaService(null, null, null, null, null, null, null, null, null, null, null);
+            SchemaService service = new SchemaService(null, null, null, null, null, null, null, null, null, null, null, null);
             service.SetHierarchyProperties(fields);
 
             Assert.AreEqual("1", fields.First().StructurePosition);
