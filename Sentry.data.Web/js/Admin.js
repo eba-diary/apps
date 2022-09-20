@@ -118,7 +118,7 @@ data.Admin = {
     },
     // creates url for Ajax call to get data files
     GetFileUrl: function (datasetId, schemaId) {
-        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
+        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true&fileStatusType=ActiveFiles";
     },
 
     GetFileDropdown: function (url) {
