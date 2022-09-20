@@ -119,6 +119,6 @@ namespace Sentry.data.Core
         /// Creates new consumption layer(s) for a schema.
         /// </summary>
         /// <param name="schemaId">Schema ID</param>
-        void CreateConsumptionLayersForSchema(int schemaId);
+        void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
     }
 }

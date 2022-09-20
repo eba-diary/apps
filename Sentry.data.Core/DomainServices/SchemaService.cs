@@ -242,16 +242,14 @@ namespace Sentry.data.Core
         {
             foreach(int schemaId in schemaIdList)
             {
-                _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schemaId));
+                FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
+                Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+                _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schema, MapToDto(schema), ds));
             }
         }
 
-        public void CreateConsumptionLayersForSchema(int schemaId)
+        public void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
         {
-            FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
-            FileSchemaDto dto = MapToDto(schema);
-            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
-
             List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
 
             foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))

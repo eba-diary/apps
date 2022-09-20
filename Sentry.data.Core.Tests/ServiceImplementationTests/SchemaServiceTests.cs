@@ -1779,7 +1779,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = new FileSchema() { SchemaId = 1 };
 
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -1815,7 +1815,7 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
             FileSchema schema = new FileSchema() { SchemaId = 1 };
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -1848,7 +1848,7 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
             FileSchema schema = new FileSchema() { SchemaId = 1 };
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -2043,7 +2043,37 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(expected_Qual_SchemaName, schemaName_Qual);
             Assert.AreEqual(expected_Qual2_SchemaName, schemaName_Qual2);
             Assert.AreEqual(expected_Test_SchemaName, schemaName_Test);
+        }
 
+        [TestMethod]
+        public void SchemaService_CreateConsumptionLayersForSchema()
+        {
+            //Arrange
+            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(false);
+            dataFeatures.Setup(s => s.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue()).Returns("2022-08-15");
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            Dataset dataset = MockClasses.MockDataset();
+            dataset.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset.NamedEnvironment = "QUAL";
+
+            FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
+            FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
+
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(datasetContext.Object, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
+            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
+            schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
+            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
+
+            //Act
+            schemaService.Object.CreateConsumptionLayersForSchema(schema, fileSchemaDto, dataset);
+
+            //Assert
+            Assert.AreEqual(4, schema.ConsumptionDetails.Count());
         }
 
         #endregion
@@ -3206,7 +3236,8 @@ namespace Sentry.data.Core.Tests
                 UpdatedBy = "072984",
                 CLA1396_NewEtlColumns = false,
                 CLA1580_StructureHive = false,
-                Revisions = new List<SchemaRevision>()
+                Revisions = new List<SchemaRevision>(),
+                ConsumptionDetails = new List<SchemaConsumption>()
             };
 
             if (addRevision)
