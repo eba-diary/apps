@@ -98,7 +98,12 @@ namespace Sentry.data.Web.Controllers
 
                 CreateEvent("Viewed Dataset Configuration Page", ds.DatasetId);
 
-                return View("Index", mcm);
+                if (_featureFlags.CLA3878_ManageSchemasAccordion.GetValue())
+                {
+                    return View(mcm);
+                }
+
+                return View("Index_v1", mcm);
             }
             else
             {

@@ -47,6 +47,28 @@ namespace Sentry.data.Core
             };
         }
 
+
+        //DETERMINE WHETHER TO CREATE DFSDROP LOCATIONS OR NOT DEPENDING ON DataFlow properties
+        public static bool ShouldCreateDFSDropLocations(this DataFlow df, IDataFeatures dataFeatures)
+        {
+            //LOGIC: CREATE DFSDROPLOCATION IF FEATURE FLAG DISABLED AND EITHER TOPIC/BACKFILLED OR DFSDROP
+            if (!dataFeatures.CLA3241_DisableDfsDropLocation.GetValue()
+                   &&
+                   (
+                       (df.IngestionType == (int)GlobalEnums.IngestionType.Topic && df.IsBackFillRequired)
+                       ||
+                       (df.IngestionType == (int)GlobalEnums.IngestionType.DFS_Drop)
+                   )
+                )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static string GetDataFlowStepPrefix(string key)
         {
             string filePrefix = null;

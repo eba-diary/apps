@@ -200,6 +200,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Core.Tests\Sentry.data.Core.Tests.csproj">
+      <Project>{d871509a-ab3d-4b70-b1f1-23bf5f807d0d}</Project>
+      <Name>Sentry.data.Core.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>

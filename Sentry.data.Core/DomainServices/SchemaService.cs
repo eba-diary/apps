@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using Hangfire;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
@@ -28,13 +29,14 @@ namespace Sentry.data.Core
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -47,6 +49,7 @@ namespace Sentry.data.Core
             _snowProvider = snowProvider;
             _eventService = eventService;
             _elasticContext = elasticContext;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         private string RootBucket
@@ -117,8 +120,6 @@ namespace Sentry.data.Core
                 throw new SchemaUnauthorizedAccessException();
             }
 
-
-
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
             SchemaRevision revision;
             SchemaRevision latestRevision = null;
@@ -140,7 +141,6 @@ namespace Sentry.data.Core
 
                     _datasetContext.Add(revision);
 
-
                     //filter out fields marked for deletion
                     foreach (var row in schemaRows.Where(w => !w.DeleteInd))
                     {
@@ -149,7 +149,7 @@ namespace Sentry.data.Core
 
                     //Add posible checksum validation here
 
-                    SchemaFieldsBuildDotNamePath(revision.Fields);
+                    SetHierarchyProperties(revision.Fields);
 
                     _datasetContext.SaveChanges();
 
@@ -236,6 +236,31 @@ namespace Sentry.data.Core
             }
 
             return 0;
+        }
+
+        public void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIdList)
+        {
+            foreach(int schemaId in schemaIdList)
+            {
+                FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
+                Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+                _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schema, MapToDto(schema), ds));
+            }
+        }
+
+        public void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
+        {
+            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
+
+            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+            {
+                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
+                {
+                    schema.ConsumptionDetails.Add(snowflakeConsumption);
+                }
+            }
+
+            _datasetContext.SaveChanges();
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -773,15 +798,30 @@ namespace Sentry.data.Core
         /// Recursive function to traverse a layer of schema to call BuildParentChildHierarchy on. 
         /// </summary>
         /// <param name="fields">List of fields to iterate over</param>
-        public void SchemaFieldsBuildDotNamePath(IList<BaseField> fields)
+        public void SetHierarchyProperties(IList<BaseField> fields)
         {
+            int index = 1;
             foreach (BaseField field in fields)
             {
                 field.DotNamePath = BuildDotNamePath(field);
+                field.StructurePosition = BuildStructurePosition(field, index);
                 if (field.ChildFields.Count > 0)
                 {
-                    SchemaFieldsBuildDotNamePath(field.ChildFields);
+                    SetHierarchyProperties(field.ChildFields);
                 }
+                index++;
+            }
+        }
+
+        private string BuildStructurePosition(BaseField field, int index)
+        {
+            if (field.ParentField == null)
+            {
+                return index.ToString();
+            }
+            else
+            {
+                return $"{field.ParentField.StructurePosition}.{index}";
             }
         }
 
@@ -1201,11 +1241,12 @@ namespace Sentry.data.Core
             _datasetContext.Add(newField);
 
             //if there are child rows, perform a recursive call to this function
-            if (newField != null && row.ChildFields != null)
+            if (row.ChildFields != null)
             {
                 foreach (BaseFieldDto cRow in row.ChildFields)
                 {
-                    newField.ChildFields.Add(AddRevisionField(cRow, CurrentRevision, newField, previousRevision));
+                    //When ParentField is set in ToEntity, field is automatically added as child field, the returned field therefore does not need to be added to the ChildField list
+                    AddRevisionField(cRow, CurrentRevision, newField, previousRevision);
                 }
             }
 
@@ -1319,7 +1360,8 @@ namespace Sentry.data.Core
                     SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                    SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
                 });
             }
 

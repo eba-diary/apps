@@ -367,13 +367,6 @@ namespace Sentry.data.Core
         {
             string methodName = $"<{nameof(DataFlowService).ToLower()}_{nameof(UpdateandSaveDataFlow).ToLower()} Method Start";
             Logger.Info($"{methodName} Method Start");
-            /*
-             *  Create new Dataflow
-             *  - The incoming dto will have flowstoragecode and will
-             *     be used by new dataflow as well  
-            */
-
-            DataFlow newDataFlow = CreateDataFlow(dfDto);
 
             /*
              *  Logically delete the existing dataflow
@@ -382,8 +375,14 @@ namespace Sentry.data.Core
              *  WallEService will eventually set the objects
              *    to a deleted status after a set period of time    
              */
-
             Delete(dfDto.Id, _userService.GetCurrentUser(), false);
+
+            /*
+             *  Create new Dataflow
+             *  - The incoming dto will have flowstoragecode and will
+             *     be used by new dataflow as well  
+            */
+            DataFlow newDataFlow = CreateDataFlow(dfDto);
 
             _datasetContext.SaveChanges();
 
@@ -396,8 +395,8 @@ namespace Sentry.data.Core
             DataFlow df = MapToDataFlow(scm);
 
             MapDataFlowStepsForFileSchema(scm, df);
-
-            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            
+            if (df.ShouldCreateDFSDropLocations(_dataFeatures))
             {
                 _jobService.CreateDropLocation(_datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow == df));
             }
@@ -759,6 +758,7 @@ namespace Sentry.data.Core
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,
                 IsDecompressionRequired = dto.IsCompressed,
+                IsBackFillRequired = dto.IsBackFillRequired,
                 CompressionType = dto.CompressionType,
                 IsPreProcessingRequired = dto.IsPreProcessingRequired,
                 PreProcessingOption = (int)dto.PreProcessingOption,
@@ -828,7 +828,7 @@ namespace Sentry.data.Core
             Logger.Debug($"IsCompressed:::{dto.IsCompressed}");
             Logger.Debug($"IsPreProcessingRequired:::{dto.IsCompressed}");
 
-            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            if (df.ShouldCreateDFSDropLocations(_dataFeatures))
             {
                 //Add default DFS drop location for data flow
                 List<DataSource> srcList = _datasetContext.DataSources.ToList();
@@ -1025,6 +1025,7 @@ namespace Sentry.data.Core
             dto.DeleteIssueDTM = df.DeleteIssueDTM;
             dto.IngestionType = df.IngestionType;
             dto.IsCompressed = df.IsDecompressionRequired;
+            dto.IsBackFillRequired = df.IsBackFillRequired;
             dto.CompressionType = df.CompressionType;
             dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
             dto.PreProcessingOption = df.PreProcessingOption;
@@ -1398,7 +1399,7 @@ namespace Sentry.data.Core
         {
             DataFlowDto dto = MapToDto(scm);
 
-            if (!_dataFeatures.CLA3241_DisableDfsDropLocation.GetValue())
+            if (df.ShouldCreateDFSDropLocations(_dataFeatures))
             {
                 //Add default DFS drop location for data flow
                 List<DataSource> srcList = _datasetContext.DataSources.ToList();

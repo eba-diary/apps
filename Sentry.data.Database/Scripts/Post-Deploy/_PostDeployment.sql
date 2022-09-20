@@ -94,3 +94,4 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_15\CLA3991_InitializeDataflowSecurity.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_15\CLA4101_Initialize_IsSystemGenerated.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_01_18\CLA-4353-HistoryFixIngestionType.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_02_01\CLA-4458-HistoryFixIsBackFill.sql
