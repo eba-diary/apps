@@ -524,6 +524,9 @@ data.Dataset = {
 
         var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
         $.get(metadataURL, function (result) {
+
+            data.Dataset.updateUploadButtonOnSchemaChange();
+
             //Set schema metadata
             self.vm.Downloads(result.Downloads);
             self.vm.Views(result.Views);
@@ -1858,7 +1861,8 @@ data.Dataset = {
         parent.parent().css("align-items", "end");
 
         if (datasetDetailModel.DisplayDatasetFileUpload) {
-            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>');
+            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button d-none"><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>');
+            data.Dataset.updateUploadButtonOnSchemaChange();
         }
 
         //use the global search location to add delete button even though we are going to remove global search from the dom
@@ -2834,5 +2838,20 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     copyTextToClipboard: function (text) {
         navigator.clipboard.writeText(text);
         data.Dataset.makeToast("success","Copied " + text + " to clipboard")
+    },
+
+    updateUploadButtonOnSchemaChange: function () {
+        $.ajax({
+            type: "GET",
+            url: '/Config/Dataset/ShowFileUpload/' + $('#datasetConfigList').val(),
+            success: function (data) {
+                if (data === 'True') {
+                    $("#data-file-upload-open-modal").removeClass("d-none")
+                }
+                else {
+                    $("#data-file-upload-open-modal").addClass("d-none")
+                }
+            }
+        });
     }
 };
