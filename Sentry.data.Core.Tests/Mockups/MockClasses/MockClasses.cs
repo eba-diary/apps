@@ -289,8 +289,6 @@ namespace Sentry.data.Core.Tests
                 ETag = "etag-string-value",
                 OriginalFileName = "zzztest0614.csv",
                 ObjectStatus = ObjectStatusEnum.Active
-                
-                
             };
 
             return df;

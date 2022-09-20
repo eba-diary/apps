@@ -17,6 +17,10 @@ data.Dataset = {
         self.SchemaRows = ko.observableArray();
         self.DataLastUpdated = ko.observable();
         self.Description = ko.observable();
+
+        //DECLARE ControlMTriggerName for KO 
+        self.ControlMTriggerName = ko.observable();
+
         self.LessDescription = ko.computed(function () {
             if (self.Description() != null && self.Description().length > 300) {
 
@@ -524,6 +528,9 @@ data.Dataset = {
             self.vm.Downloads(result.Downloads);
             self.vm.Views(result.Views);
             self.vm.Description(result.Description);
+
+            //SET ControlMTriggerName for KO from AJAX call
+            self.vm.ControlMTriggerName(result.ControlMTriggerName);
 
             //Populate legacy retriever jobs
             self.vm.OtherJobs.removeAll();
@@ -2320,7 +2327,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         url = data.Dataset.AddParameterToUrl(url, "layout");
 
         var filters = JSON.parse(localStorage.getItem("filters"));
-        if (filters.length) {
+        if (filters && filters.length) {
             url = data.Dataset.AddParamDivider(url);
 
             url += filters.map(function (el) {

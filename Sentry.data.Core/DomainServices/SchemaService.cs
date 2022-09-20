@@ -74,7 +74,6 @@ namespace Sentry.data.Core
             {
                 Logger.Error("schemaservice-createandsaveschema", ex);
                 throw;
-                //return 0;
             }
 
             return newSchema.SchemaId;
@@ -118,8 +117,6 @@ namespace Sentry.data.Core
                 throw new SchemaUnauthorizedAccessException();
             }
 
-
-
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
             SchemaRevision revision;
             SchemaRevision latestRevision = null;
@@ -141,7 +138,6 @@ namespace Sentry.data.Core
 
                     _datasetContext.Add(revision);
 
-
                     //filter out fields marked for deletion
                     foreach (var row in schemaRows.Where(w => !w.DeleteInd))
                     {
@@ -150,7 +146,7 @@ namespace Sentry.data.Core
 
                     //Add posible checksum validation here
 
-                    SchemaFieldsBuildDotNamePath(revision.Fields);
+                    SetHierarchyProperties(revision.Fields);
 
                     _datasetContext.SaveChanges();
 
@@ -258,7 +254,6 @@ namespace Sentry.data.Core
         /// <exception cref="AggregateException">Thows exception when event could not be published</exception>
         private void GenerateConsumptionLayerCreateEvent(FileSchema schema, JObject propertyDeltaList)
         {
-            //SchemaRevision latestRevision = null;
             var latestRevision = _datasetContext.SchemaRevision
                 .Where(w => w.ParentSchema.SchemaId == schema.SchemaId)
                 .Select(s => new {s.ParentSchema.SchemaId, s.SchemaRevision_Id, s.Revision_NBR })
@@ -775,15 +770,30 @@ namespace Sentry.data.Core
         /// Recursive function to traverse a layer of schema to call BuildParentChildHierarchy on. 
         /// </summary>
         /// <param name="fields">List of fields to iterate over</param>
-        public void SchemaFieldsBuildDotNamePath(IList<BaseField> fields)
+        public void SetHierarchyProperties(IList<BaseField> fields)
         {
+            int index = 1;
             foreach (BaseField field in fields)
             {
                 field.DotNamePath = BuildDotNamePath(field);
+                field.StructurePosition = BuildStructurePosition(field, index);
                 if (field.ChildFields.Count > 0)
                 {
-                    SchemaFieldsBuildDotNamePath(field.ChildFields);
+                    SetHierarchyProperties(field.ChildFields);
                 }
+                index++;
+            }
+        }
+
+        private string BuildStructurePosition(BaseField field, int index)
+        {
+            if (field.ParentField == null)
+            {
+                return index.ToString();
+            }
+            else
+            {
+                return $"{field.ParentField.StructurePosition}.{index}";
             }
         }
 
@@ -897,7 +907,7 @@ namespace Sentry.data.Core
                 Name = dto.Name,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
                 SchemaEntity_NME = dto.SchemaEntity_NME,
-                Extension = (dto.FileExtensionId != 0) ? _datasetContext.GetById<FileExtension>(dto.FileExtensionId) : (dto.FileExtensionName != null) ? _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault() : null,
+                Extension = GetSchemaFileExtension(dto),
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
@@ -920,32 +930,30 @@ namespace Sentry.data.Core
                 SchemaRootPath = dto.SchemaRootPath,
                 ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
                 ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
-                ControlMTriggerName = GetControlMTrigger(dto)
+                ControlMTriggerName = GetControlMTrigger(dto),
             };
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
-            {
-                schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset, isHumanResources);
-            }
-            else
-            {
-                schema.ConsumptionDetails = new List<SchemaConsumption>()
-                {
-                    new SchemaConsumptionSnowflake()
-                    {
-                        Schema = schema,
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
-                    }
-                };
-            }
+            
+            schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);           
 
             _datasetContext.Add(schema);
 
             return schema;
+        }
+
+        private FileExtension GetSchemaFileExtension(FileSchemaDto dto)
+        {
+            if (dto.FileExtensionId != 0)
+            {
+                return _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+            }
+            else if (dto.FileExtensionName != null)
+            {
+                return _datasetContext.FileExtensions.Where(w => w.Name == dto.FileExtensionName).FirstOrDefault();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private FileSchemaDto MapToDto(FileSchema scm)
@@ -1000,38 +1008,140 @@ namespace Sentry.data.Core
             return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
         }
 
-        private string GenerateSnowflakeDatabaseName(bool isHumanResources)
+        /// <summary>
+        /// Returns snowflake database name.  Only returns value for <see cref="SnowflakeConsumptionType.CategorySchemaParquet"/> type.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <returns></returns>
+        internal virtual string GetSnowflakeDatabaseName(bool isHumanResources)
         {
-            string dbName = (isHumanResources)? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
-            dbName += Config.GetDefaultEnvironmentName().ToUpper();
-            return dbName;
+            return GetSnowflakeDatabaseName(isHumanResources, null, SnowflakeConsumptionType.CategorySchemaParquet);
         }
 
-        private string GenerateRawQuerySnowflakeDatabaseName(bool isHumanResources)
+        /// <summary>
+        /// Returns snowflake database name.  Will generate value for all <see cref="SnowflakeConsumptionType"/> types.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <param name="datasetNamedEnvironmentType"></param>
+        /// <param name="consumptionLayerType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        internal virtual string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
         {
-            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
-            dbName += "RAWQUERY_";
-            dbName += Config.GetDefaultEnvironmentName().ToUpper();
-            return dbName;
-        }
-
-        private string GenerateRawSnowflakeDatabaseName(bool isHumanResources)
-        {
-            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
-            dbName += "RAW_";
-            dbName += Config.GetDefaultEnvironmentName().ToUpper();
-            return dbName;
-        }
-
-        private string GenerateSnowflakeSchema(Category cat, bool isHumanResources, string datasetShortName)
-        {
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            switch (consumptionLayerType)
             {
-                return datasetShortName;
+                case SnowflakeConsumptionType.CategorySchemaParquet:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), null, null);
+                case SnowflakeConsumptionType.DatasetSchemaParquet:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), datasetNamedEnvironmentType, null);
+                case SnowflakeConsumptionType.DatasetSchemaRaw:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), datasetNamedEnvironmentType, GlobalConstants.SnowflakeConsumptionLayerPrefixes.RAW_PREFIX);
+                case SnowflakeConsumptionType.DatasetSchemaRawQuery:
+                    return GenerateSnowflakeDatabaseName(isHumanResources, Config.GetDefaultEnvironmentName().ToUpper(), datasetNamedEnvironmentType, GlobalConstants.SnowflakeConsumptionLayerPrefixes.RAWQUERY_PREFIX);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(consumptionLayerType),"Unhandled SnowflakeConsumptionType generating snowflake database name");
             }
-            return (isHumanResources)? "HR" : cat.Name.ToUpper();
         }
-        
+
+        /// <summary>
+        /// This method is used by <see cref="GetSnowflakeDatabaseName(bool)"/> or <see cref="GetSnowflakeDatabaseName(bool, string, SnowflakeConsumptionType)"/>.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <param name="dscNamedEnvironment"></param>
+        /// <param name="datasetNamedEnvironmentType"></param>
+        /// <param name="consumptionLayerPrefix"></param>
+        /// <returns></returns>
+        internal string GenerateSnowflakeDatabaseName(bool isHumanResources, string dscNamedEnvironment, string datasetNamedEnvironmentType, string consumptionLayerPrefix)
+        {
+            string dbName = (isHumanResources) ? GlobalConstants.SnowflakeDatabase.WDAY : GlobalConstants.SnowflakeDatabase.DATA;
+
+            if (!string.IsNullOrWhiteSpace(consumptionLayerPrefix))
+            {
+                dbName += consumptionLayerPrefix;
+            }
+
+            if (string.IsNullOrWhiteSpace(datasetNamedEnvironmentType))
+            {
+                dbName += dscNamedEnvironment;
+                return dbName;
+            }
+
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
+                && dscNamedEnvironment == "QUAL")
+            {
+                dbName += dscNamedEnvironment;
+                dbName += "NP";
+            }
+            else if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
+                && dscNamedEnvironment == "PROD")
+            {
+                dbName += "NONPROD";
+            }
+            else
+            {
+                dbName += dscNamedEnvironment;
+            }
+
+            return dbName;
+        }
+
+        /// <summary>
+        /// Generates Snowflake schema name for all <see cref="SnowflakeConsumptionType"/> types.
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <param name="consumptionType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        internal virtual string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
+        {
+            switch (consumptionType)
+            {
+                case SnowflakeConsumptionType.CategorySchemaParquet:
+                    return GenerateCategoryBasedSnowflakeSchemaName(dataset);
+                case SnowflakeConsumptionType.DatasetSchemaParquet:
+                case SnowflakeConsumptionType.DatasetSchemaRaw:
+                case SnowflakeConsumptionType.DatasetSchemaRawQuery:
+                    return GenerateDatasetBasedSnowflakeSchemaName(dataset, bool.Parse(Configuration.Config.GetHostSetting("AlwaysSuffixSchemaNames")));
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(consumptionType),$"Not configured for snowflakeconsumptionlayertype of {consumptionType}");
+            }
+        }
+
+
+        /// <summary>
+        /// Use this method by calling <see cref="GetSnowflakeSchemaName(Dataset, SnowflakeConsumptionType)"/>
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <param name="alwaysSuffixSchemaNames"></param>
+        /// <returns></returns>
+        internal string GenerateDatasetBasedSnowflakeSchemaName(Dataset dataset, bool alwaysSuffixSchemaNames)
+        {
+            
+            string cleansedDatasetName = dataset.DatasetName.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
+            string schemaName = cleansedDatasetName;
+
+#pragma warning disable S2589 // Boolean expressions should not be gratuitous
+            if (alwaysSuffixSchemaNames || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL"))
+#pragma warning restore S2589 // Boolean expressions should not be gratuitous
+            {
+                schemaName += "_" + dataset.NamedEnvironment;
+            }
+
+            return schemaName;
+        }
+
+        /// <summary>
+        /// Use this method by calling <see cref="GetSnowflakeSchemaName(Dataset, SnowflakeConsumptionType)"/>
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <returns></returns>
+        internal string GenerateCategoryBasedSnowflakeSchemaName(Dataset dataset)
+        {
+            return (dataset.IsHumanResources) ? "HR" : dataset.DatasetCategories.First().Name.ToUpper();
+        }
+
 
         /// <summary>
         /// Generates appropriate bucket after evaluating various variables
@@ -1103,11 +1213,12 @@ namespace Sentry.data.Core
             _datasetContext.Add(newField);
 
             //if there are child rows, perform a recursive call to this function
-            if (newField != null && row.ChildFields != null)
+            if (row.ChildFields != null)
             {
                 foreach (BaseFieldDto cRow in row.ChildFields)
                 {
-                    newField.ChildFields.Add(AddRevisionField(cRow, CurrentRevision, newField, previousRevision));
+                    //When ParentField is set in ToEntity, field is automatically added as child field, the returned field therefore does not need to be added to the ChildField list
+                    AddRevisionField(cRow, CurrentRevision, newField, previousRevision);
                 }
             }
 
@@ -1194,44 +1305,77 @@ namespace Sentry.data.Core
             return results;
         }
 
-        private IList<SchemaConsumption> GenerateConsumptionLayers(FileSchemaDto dto, FileSchema schema, Dataset parentDataset, bool isHumanResources)
+        internal IList<SchemaConsumption> GenerateConsumptionLayers(FileSchemaDto dto, FileSchema schema, Dataset parentDataset)
         {
-            return new List<SchemaConsumption>()
+            List<SchemaConsumption> layerList = new List<SchemaConsumption>();
+
+            /* 
+             * All created schema will have dataset based created
+             * 
+             * This is logic for Category based:
+             * IF CLA3718_Authorization is off (false), all created schema will have Category based created
+             * IF CLA3718_Authorization is On (true)
+             *     IF CLA4410_Stop flag is on (true), no newly created schema will have Category based
+             *     IF CLA4410_Stop flag is off (false),  Dataset created date check kicks in
+             *         IF Dataset created date is before constant datetime, Category based will be created
+             *         IF Dataset created date is after constant datetime, category based is not created
+            */
+            if (!_dataFeatures.CLA3718_Authorization.GetValue() ||  (!_dataFeatures.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()
+                                                                      && parentDataset.DatasetDtm < DateTime.Parse(_dataFeatures.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue())))
+            {
+                layerList.Add(
+                new SchemaConsumptionSnowflake()
                 {
-                    new SchemaConsumptionSnowflake()
-                    {
-                        Schema = schema,
-                        SnowflakeDatabase = GenerateSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                        SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
-                    },
-                    new SchemaConsumptionSnowflake()
-                    {
-                        Schema = schema,
-                        SnowflakeDatabase = GenerateRawQuerySnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
-                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                        SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery
-                    },
-                    new SchemaConsumptionSnowflake()
-                    {
-                        Schema = schema,
-                        SnowflakeDatabase = GenerateRawSnowflakeDatabaseName(isHumanResources),
-                        SnowflakeSchema = GenerateSnowflakeSchema(parentDataset.DatasetCategories.First(), isHumanResources, parentDataset.ShortName),
-                        SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                        SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                        SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
-                        SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                        SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
-                    }
-                };
+                    Schema = schema,
+                    SnowflakeDatabase = GetSnowflakeDatabaseName(parentDataset.IsHumanResources),
+                    SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.CategorySchemaParquet),
+                    SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
+                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                });
+            }
+
+            //All schemas, regardless of when dataset is created, will have dataset based consumption layers generated
+            layerList.AddRange(
+            new List<SchemaConsumption>()
+            {
+                new SchemaConsumptionSnowflake()
+                {
+                    Schema = schema,
+                    SnowflakeDatabase = GetSnowflakeDatabaseName(parentDataset.IsHumanResources, parentDataset.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaParquet),
+                    SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.DatasetSchemaParquet),
+                    SnowflakeTable = FormatSnowflakeTableNamePart(dto.Name),
+                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+                },
+                new SchemaConsumptionSnowflake()
+                {
+                    Schema = schema,
+                    SnowflakeDatabase = GetSnowflakeDatabaseName(parentDataset.IsHumanResources, parentDataset.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaRawQuery),
+                    SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.DatasetSchemaRawQuery),
+                    SnowflakeTable = FormatSnowflakeTableNamePart(dto.Name),
+                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery
+                },
+                new SchemaConsumptionSnowflake()
+                {
+                    Schema = schema,
+                    SnowflakeDatabase = GetSnowflakeDatabaseName(parentDataset.IsHumanResources, parentDataset.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaRaw),
+                    SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.DatasetSchemaRaw),
+                    SnowflakeTable = FormatSnowflakeTableNamePart(dto.Name),
+                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
+                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
+                }
+            });
+
+            return layerList;
         }
     }
 }

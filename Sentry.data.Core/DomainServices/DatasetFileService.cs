@@ -161,11 +161,14 @@ namespace Sentry.data.Core
         
         public void UploadDatasetFileToS3(UploadDatasetFileDto uploadDatasetFileDto)
         {
+            string errorMessage = null;
             DatasetFileConfig datasetFileConfig = _datasetContext.GetById<DatasetFileConfig>(uploadDatasetFileDto.ConfigId);
 
             if (datasetFileConfig != null)
             {
-                DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.DatasetId == uploadDatasetFileDto.DatasetId && x.SchemaId == datasetFileConfig.Schema.SchemaId);
+                DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.DatasetId == uploadDatasetFileDto.DatasetId && 
+                                                                            x.SchemaId == datasetFileConfig.Schema.SchemaId && 
+                                                                            x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
                 DataFlowStep dropStep = dataFlow?.Steps.FirstOrDefault(x => x.DataAction_Type_Id == DataActionType.ProducerS3Drop);
                 if (dropStep != null)
                 {
@@ -173,12 +176,18 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    Logger.Info($"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3");
+                    errorMessage = $"Data Flow for dataset: {uploadDatasetFileDto.DatasetId} and schema: {datasetFileConfig.Schema.SchemaId} not found while attempting to upload file to S3";
                 }
             }
             else
             {
-                Logger.Info($"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3");
+                errorMessage = $"Dataset File Config with Id: {uploadDatasetFileDto.ConfigId} not found while attempting to upload file to S3";
+            }
+
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                Logger.Warn(errorMessage);
+                throw new DataFlowNotFound(errorMessage);
             }
         }
 

@@ -32,5 +32,8 @@ namespace Sentry.data.Core
         IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; }
         IFeatureFlag<bool> CLA3756_UpdateSearchPages { get; }
         IFeatureFlag<bool> CLA4258_DefaultProdSearchFilter { get; }
+        IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation { get; }
+        IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand { get; }
+        IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
     }
 }

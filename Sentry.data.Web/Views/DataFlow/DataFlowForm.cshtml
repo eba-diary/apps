@@ -9,11 +9,11 @@
     {
         @Html.AntiForgeryToken()
         <span id="DataFlowFormContainer_HiddenFor">
-            @Html.HiddenFor(x => x.DataFlowId);
-            @Html.HiddenFor(x => x.StorageCode);
-            @Html.HiddenFor(x => x.CreatedBy);
-            @Html.HiddenFor(x => x.PrimaryContactId);
-            @Html.HiddenFor(x => x.IsSecured);
+            @Html.HiddenFor(x => x.DataFlowId)
+            @Html.HiddenFor(x => x.StorageCode)
+            @Html.HiddenFor(x => x.CreatedBy)
+            @Html.HiddenFor(x => x.PrimaryContactId)
+            @Html.HiddenFor(x => x.IsSecured)
         </span>
         <div id="dataflow-home-wrapper" class="col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
@@ -38,7 +38,7 @@
             </div>
 
             <div id="topicNameContainer" class="md-form">
-                <h4>What is Topic Name?</h4>
+                <h4>What is the Kafka Topic Name?</h4>
                 @Html.TextBoxFor((m) => m.TopicName, Model.TopicName, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => Model.TopicName, "", new { @class = "text-danger" })
             </div>
