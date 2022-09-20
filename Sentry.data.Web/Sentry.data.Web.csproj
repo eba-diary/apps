@@ -442,6 +442,7 @@
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
@@ -451,6 +452,8 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Extensions\TileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
+    <Compile Include="Models\AdminPage\BaseAuditModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
@@ -1249,11 +1252,10 @@
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
+    <Content Include="Views\Shared\_NonParquetFilesTable.cshtml" />
+    <Content Include="Views\Shared\_RowCountCompareTable.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\Admin\DataFileReprocessing.cshtml" />
-    <Content Include="Views\Shared\_AdminTest2.cshtml" />
-    <Content Include="Views\Shared\_AdminTest4.cshtml" />
-    <Content Include="Views\Shared\_AdminTest3.cshtml" />
     <Content Include="Views\Admin\ConnectorStatus.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
@@ -1263,6 +1265,7 @@
     <Content Include="Views\Admin\DataFlowMetrics.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_AdminSideNav.cshtml" />
+    <Content Include="Views\Admin\RawqueryParquetAudit.cshtml" />
     <Content Include="Views\Admin\SupportLinks.cshtml" />
     <Content Include="Views\Search\TileResults.cshtml" />
     <Content Include="Views\Config\Index.cshtml" />
