@@ -1240,7 +1240,12 @@ namespace Sentry.data.Infrastructure
 
         public void DeleteS3Prefix(string prefix)
         {
-            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(RootBucket, prefix).ToList());
+            DeleteS3Prefix(prefix, RootBucket);
+        }
+
+        public void DeleteS3Prefix(string prefix, string bucket)
+        {
+            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(bucket, prefix).ToList());
             if (s3Keys.Count == 0)
             {
                 Logger.Info($"deleteS3Prefix-nofilesdetected - prefix:{prefix}");
