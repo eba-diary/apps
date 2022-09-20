@@ -547,9 +547,9 @@ namespace Sentry.data.Core.Tests
             BaseAuditDto baseAuditDto = auditService.GetExceptRows(1,1,"query",AuditSearchType.dateSelect);
 
             // Assert
-            Assert.AreEqual(baseAuditDto.AuditDtos[0].DatasetFileName, "agentevents_20220827235951657_20220828045952000.json");
-            Assert.AreEqual(baseAuditDto.AuditDtos[1].DatasetFileName, "agentevents_20220911155957552_20220911205958000.json");
-            Assert.AreEqual(baseAuditDto.AuditDtos[2].DatasetFileName, "agentevents_20220818090453182_20220818140454000.json");
+            Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
+            Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
+            Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
         }
 
         [TestMethod]
@@ -603,17 +603,17 @@ namespace Sentry.data.Core.Tests
             BaseAuditDto baseAuditDto = auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
-            Assert.AreEqual(baseAuditDto.AuditDtos[0].DatasetFileName, "agentevents_20220827235951657_20220828045952000.json");
-            Assert.AreEqual(baseAuditDto.AuditDtos[1].DatasetFileName, "agentevents_20220911155957552_20220911205958000.json");
-            Assert.AreEqual(baseAuditDto.AuditDtos[2].DatasetFileName, "agentevents_20220818090453182_20220818140454000.json");
+            Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
+            Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
+            Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
 
-            Assert.AreEqual(baseAuditDto.AuditDtos[0].ParquetRowCount, 10);
-            Assert.AreEqual(baseAuditDto.AuditDtos[1].ParquetRowCount, 20);
-            Assert.AreEqual(baseAuditDto.AuditDtos[2].ParquetRowCount, 20);
+            Assert.AreEqual(10, baseAuditDto.AuditDtos[0].ParquetRowCount);
+            Assert.AreEqual(20, baseAuditDto.AuditDtos[1].ParquetRowCount);
+            Assert.AreEqual(20, baseAuditDto.AuditDtos[2].ParquetRowCount);
 
-            Assert.AreEqual(baseAuditDto.AuditDtos[0].RawqueryRowCount, 10);
-            Assert.AreEqual(baseAuditDto.AuditDtos[1].RawqueryRowCount, 20);
-            Assert.AreEqual(baseAuditDto.AuditDtos[2].RawqueryRowCount, 0);
+            Assert.AreEqual(10, baseAuditDto.AuditDtos[0].RawqueryRowCount);
+            Assert.AreEqual(20, baseAuditDto.AuditDtos[1].RawqueryRowCount);
+            Assert.AreEqual(0,  baseAuditDto.AuditDtos[2].RawqueryRowCount);
         }
 
         [TestCategory("Core DatasetService")]
