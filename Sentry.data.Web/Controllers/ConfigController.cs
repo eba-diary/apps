@@ -829,7 +829,7 @@ namespace Sentry.data.Web.Controllers
             {
                 return Json(new { Success = false, Message = "Failed schema validation", Errors = vEx.ValidationResults.GetAll() }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { Success = false, Message = "Failed to validate schema rows" }, JsonRequestBehavior.AllowGet);
             }
@@ -1612,7 +1612,7 @@ namespace Sentry.data.Web.Controllers
                     case Dataset.ValidationErrors.datasetDateRequired:
                         ModelState.AddModelError("DatasetDate", vr.Description);
                         break;
-                    case SFtpSource.ValidationErrors.portNumberValueNonZeroValue:
+                    case SFtpSource.SftpValidationErrors.portNumberValueNonZeroValue:
                         ModelState.AddModelError("PortNumber", vr.Description);
                         break;
                     default:

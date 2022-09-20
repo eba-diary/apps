@@ -1,11 +1,7 @@
-﻿using System;
+﻿using Sentry.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using StructureMap;
 
 namespace Sentry.data.Core
 {
@@ -75,6 +71,18 @@ namespace Sentry.data.Core
         public override string GetDropPrefix(RetrieverJob Job)
         {
             throw new NotImplementedException();
+        }
+
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
+        {
+            if (String.IsNullOrWhiteSpace(job.RelativeUri))
+            {
+                validationResults.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for FTP data sources");
+            }
+            if (job.JobOptions.FtpPattern == FtpPattern.None)
+            {
+                validationResults.Add(ValidationErrors.ftpPatternNotSelected, "The FTP Pattern field is required");
+            }
         }
     }
 }

@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Sentry.data.Web;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -710,25 +709,22 @@ namespace Sentry.data.Web.Controllers
                     case "SchedulePicker":
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.googleApiRelativeUriIsBlank:
-                        ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
-                        break;
-                    case RetrieverJob.ValidationErrors.httpsRequestBodyIsBlank:
+                    case DataSource.ValidationErrors.httpsRequestBodyIsBlank:
                         ModelState.AddModelError("RetrieverJob.HttpRequestBody", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.httpsRequestDataFormatNotSelected:
+                    case DataSource.ValidationErrors.httpsRequestDataFormatNotSelected:
                         ModelState.AddModelError("RetrieverJob.SelectedRequestDataFormat", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.httpsRequestMethodNotSelected:
+                    case DataSource.ValidationErrors.httpsRequestMethodNotSelected:
                         ModelState.AddModelError("RetrieverJob.SelectedRequestMethod", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.httpsTargetFileNameIsBlank:
+                    case DataSource.ValidationErrors.httpsTargetFileNameIsBlank:
                         ModelState.AddModelError("RetrieverJob.TargetFileName", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
+                    case DataSource.ValidationErrors.ftpPatternNotSelected:
                         ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.relativeUriNotSpecified:
+                    case DataSource.ValidationErrors.relativeUriNotSpecified:
                         ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
                         break;
                     case RetrieverJob.ValidationErrors.scheduleIsNull:
