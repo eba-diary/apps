@@ -551,14 +551,11 @@ data.Admin = {
         $("#schemaDropdown").materialSelect()
         $("#flowStepsDropdown").materialSelect();
 
-        data.Admin.DatasetDropdownScrollToTop();
-
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
-                data.Admin.DatasetDropdownScrollToTop();
             }
 
         });
@@ -570,7 +567,6 @@ data.Admin = {
                 data.Admin.PopulateTable(url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
                 data.Admin.GetFlowStepDropdown(url);
-                data.Admin.DatasetDropdownScrollToTop();
             }
         });
         // activate or deactivate button
