@@ -24,15 +24,7 @@ namespace TESTING_CONSOLE
             //Call your bootstrapper to initialize your application
             Bootstrapper.Init();
 
-            ExampleofThread obj = new ExampleofThread();
-
-            // Creating and initializing threads
-            Thread thr1 = new Thread(new ThreadStart(obj.Thread1));
-            Thread thr2 = new Thread(new ThreadStart(obj.Thread2));
-
-            thr1.Start();
-            thr2.Start();
-
+            
             Console.WriteLine("Press any key to stop");
             while (!Console.KeyAvailable)
             {
@@ -40,62 +32,5 @@ namespace TESTING_CONSOLE
             }
 
         }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public class ExampleofThread
-        {
-            // Non-Static method
-            public void Thread1()
-            {
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    IApacheLivyProvider apacheProvider = container.GetInstance<IApacheLivyProvider>();
-
-                    for (int x = 0; x < 2; x++)
-                    {
-
-                        Console.WriteLine("Thread1 is working");
-                        string before = apacheProvider.GetBaseUrl();
-                        apacheProvider.SetBaseUrl("abc.com");
-                        Console.WriteLine($"Thread1 - BaseUrl:before-{before}:::after-{apacheProvider.GetBaseUrl()}");
-
-                        // Sleep for 4 seconds
-                        // Using Sleep() method
-                        Thread.Sleep(4000);
-                    }
-                }
-            }
-
-
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public void Thread2()
-            {
-                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    IApacheLivyProvider apacheProvider = container.GetInstance<IApacheLivyProvider>();
-
-                    for (int x = 0; x < 6; x++)
-                    {
-
-                        Console.WriteLine("Thread2 is working");
-                        string before = apacheProvider.GetBaseUrl();
-                        apacheProvider.SetBaseUrl("sentry.com");
-                        Console.WriteLine($"Thread2 - BaseUrl:before-{before}:::after-{apacheProvider.GetBaseUrl()}");
-
-                        // Sleep for 4 seconds
-                        // Using Sleep() method
-                        Thread.Sleep(1000);
-                    }
-                }
-            }
-        }
-
-        
     }
 }
