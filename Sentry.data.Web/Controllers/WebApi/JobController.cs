@@ -27,9 +27,7 @@ namespace Sentry.data.Web.WebApi.Controllers
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IJobService _jobService;
-        private HttpClient _httpClient;
-        private IApacheLivyProvider _apacheLivyProvider;
-        private readonly IDataFeatures _dataFeatures;
+        private readonly IApacheLivyProvider _apacheLivyProvider;
 
         public JobController(IDatasetContext datasetContext, IJobService jobService, 
             IApacheLivyProvider apacheLivyProvider, IDataFeatures dataFeatures)
@@ -37,7 +35,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             _datasetContext = datasetContext;
             _jobService = jobService;
             _apacheLivyProvider = apacheLivyProvider;
-            _dataFeatures = dataFeatures;
         }
         /// <summary>
         /// Gets all Jobs

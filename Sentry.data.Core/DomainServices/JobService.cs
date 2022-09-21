@@ -482,8 +482,6 @@ namespace Sentry.data.Core
 
 
             Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:/batches/{historyRecord.BatchId}");
-            //var client = _httpClient;
-            //HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}").ConfigureAwait(false);
 
             _apacheLivyProvider.SetBaseUrl(historyRecord.ClusterUrl);
             System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
