@@ -2749,8 +2749,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.requestAccessShowSaveChanges();
     },
 
-
-
     requestAccessShowSaveChanges() {
         $("#RequestAccessSubmit").removeClass("d-none");
     },

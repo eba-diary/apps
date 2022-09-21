@@ -225,6 +225,10 @@
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sentry.data.Web\Sentry.data.Web.csproj">
+      <Project>{42c330e1-e605-487f-979d-635597d1c88d}</Project>
+      <Name>Sentry.data.Web</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
       <Project>{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}</Project>
       <Name>Sentry.Messaging.Common</Name>

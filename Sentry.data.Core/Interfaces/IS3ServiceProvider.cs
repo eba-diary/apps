@@ -123,6 +123,11 @@ namespace Sentry.data.Core
         /// <param name="prefix"></param>
         void DeleteS3Prefix(string prefix);
         /// <summary>
+        /// Will delete prefix and all child prefixes. 
+        /// </summary>
+        /// <param name="prefix"></param>
+        void DeleteS3Prefix(string prefix, string bucket);
+        /// <summary>
         /// Will delete prefix and all child prefixes.  For all prefixes in the list.
         /// </summary>
         /// <param name="prefixList"></param>
