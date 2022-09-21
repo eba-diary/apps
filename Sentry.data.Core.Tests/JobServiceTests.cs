@@ -351,7 +351,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<JavaAppSource>(It.IsAny<int>())).Returns(DataSource);
 
             Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null) { CallBase = true };
-            service.Setup(s => s.GenerateUnitLivySessionName(DataSource)).Returns("session_name");
+            service.Setup(s => s.GenerateUniqueLivySessionName(DataSource)).Returns("session_name");
 
             //Act
             var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
@@ -414,7 +414,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<JavaAppSource>(It.IsAny<int>())).Returns(DataSource);
 
             Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null) { CallBase = true };
-            service.Setup(s => s.GenerateUnitLivySessionName(DataSource)).Returns("session_name");
+            service.Setup(s => s.GenerateUniqueLivySessionName(DataSource)).Returns("session_name");
 
             //Act
             var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
@@ -505,6 +505,25 @@ namespace Sentry.data.Core.Tests
             context.Verify(v => v.Add(It.IsAny<Submission>()), Times.Once);
             context.Verify(v => v.Add(It.IsAny<JobHistory>()), jobHistoryAddCount);
             context.Verify(v => v.SaveChanges(It.IsAny<bool>()), saveChancesCount);
+        }
+
+        [TestMethod]
+        public void GenerateUniqueLivySessionName()
+        {
+            //Arrange
+            JavaAppSource javaAppSource = new JavaAppSource()
+            {
+                Name = "JavaSrc"
+            };
+
+            JobService jobService = new JobService(null, null, null, null, null);
+
+            //Act
+            string result = jobService.GenerateUniqueLivySessionName(javaAppSource);
+
+            //Assert
+            Assert.IsTrue(result.StartsWith($"{javaAppSource.Name}_"));
+            Assert.AreEqual(14, result.Length);
         }
 
     }

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static Sentry.data.Core.RetrieverJobOptions;
@@ -620,7 +621,7 @@ namespace Sentry.data.Core
 
             if (_dataFeatures.CLA3497_UniqueLivySessionName.GetValue())
             {
-                string livySessionName = GenerateUnitLivySessionName(dsrc);
+                string livySessionName = GenerateUniqueLivySessionName(dsrc);
                 AddElement(json, "name", livySessionName, null);
                 Logger.AddContextVariable(new TextVariable("livysessionname", livySessionName));
             }
@@ -674,12 +675,34 @@ namespace Sentry.data.Core
             return json.ToString();
         }
 
-        internal virtual string GenerateUnitLivySessionName(JavaAppSource dsrc)
+        internal virtual string GenerateUniqueLivySessionName(JavaAppSource dsrc)
         {
-            Random random = new Random();
-            string randomString = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6).Select(s => s[random.Next(s.Length)]).ToArray());
-            string livySessionName = $"{dsrc.Name}_{randomString}";
-            return livySessionName;
+            var RNGCrypto = new RNGCryptoServiceProvider();
+
+            string validCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            StringBuilder randomCharacterSting = new StringBuilder();
+
+            for (int i = 0; i < 6; i++)
+            {
+                byte[] randomNumber = new byte[1];
+                do
+                {
+                    RNGCrypto.GetBytes(randomNumber);
+                }
+                while (!IsWithinBounds(randomNumber[0], (byte)validCharacters.Length));
+                randomCharacterSting.Append(new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 1).Select(s => s[randomNumber[0]]).ToArray()));
+
+                Console.WriteLine($"{randomNumber[0]}:::{randomNumber[0] % 6}");
+            }
+
+            RNGCrypto.Dispose();
+
+            string livySessionName = $"{dsrc.Name}_{randomCharacterSting}";
+            return livySessionName;    
+        }
+        private static bool IsWithinBounds(byte value, byte maxValue)
+        {
+            return value < maxValue;
         }
 
         internal void AddArgumentsElement(StringBuilder content, string[] newValue, string[] defaultValue)
