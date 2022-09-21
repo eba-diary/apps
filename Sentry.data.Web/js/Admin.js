@@ -153,7 +153,7 @@ data.Admin = {
 
 
     GetFileUrl: function (datasetId, schemaId) {
-    // creates url for Ajax call to get data files
+        // creates url for Ajax call to get data files
         return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
     },
 
@@ -167,7 +167,7 @@ data.Admin = {
                 $("#fileDropdown").materialSelect({ destroy: true });
                 var s = '<option value="-1"id="defaultFileSelection">All Files</option>';
                 for (var d of data.Records) {
-                    s+= '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
+                    s += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
                 }
                 $("#fileDropdown").html(s);
                 $("#fileDropdown").materialSelect();
@@ -204,7 +204,7 @@ data.Admin = {
     GetFlowStepUrl: function (schemaId) {
         return "../../api/v2/dataflow?schemaId=" + schemaId;
     },
-     
+
     // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
     GetFlowStepDropdown: function (url) {
         $.ajax({
@@ -250,7 +250,7 @@ data.Admin = {
 
                 // Break from each loop
                 return false;
-            } 
+            }
 
             console.log(searchStatus);
             console.log($(this).attr("id"));
@@ -317,7 +317,7 @@ data.Admin = {
 
             // Init an empty Dataset File Dropwdown on dataset selection change
             data.Admin.GetDatasetFileDropdown("empty", true);
-            
+
         });
 
         $("#schemaDropdown").change(function (event) {
@@ -386,8 +386,8 @@ data.Admin = {
                     success: function (result) {
                         $("#AuditResultTable").html(result);
                     },
-                    error: function () {
-                        data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
+                    error: function (message) {
+                        data.Dataset.makeToast("error", message)
                     }
                 })
             }
@@ -456,7 +456,7 @@ data.Admin = {
         if (dateRangeToHours > rangeMax || dateRangeToHours < 0) {
             data.Dataset.makeToast("error", `Date selected must be within ${rangeMax/24} day(s) before current date`);
             return false;
-        } 
+        }
 
         return true;
     },
@@ -589,15 +589,15 @@ data.Admin = {
                 error: function () {
                     data.Dataset.makeToast("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
                 }
-                
+
             })
         });
         // activate or deactivate button
         $("#flowStepsDropdown").change(function (event) {
             data.Admin.ActivateDeactivateReprocessButton();
         });
-        
-         // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
+
+        // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
         /*
         $("#selectAll").click(function (event) {
             var selectAllCheckbox = $(this);
@@ -615,7 +615,7 @@ data.Admin = {
             console.log(filesToReprocess);
         });
         */
-        
+
     },
     //loads dataflow metric page events
     DataFlowMetricsInit: function () {
@@ -659,7 +659,7 @@ data.Admin = {
                     type: "POST",
                     url: "/DataFlowMetric/PopulateTable",
                     data: dto,
-                   // contentType: "application/json",
+                    // contentType: "application/json",
                     dataType: "json",
                     dataSrc: "",
                 },
@@ -816,4 +816,3 @@ data.Admin = {
         toastr[severity](message);
     }
 }
-
