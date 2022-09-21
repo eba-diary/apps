@@ -1152,7 +1152,7 @@ namespace Sentry.data.Infrastructure
                     taskList.Add(_jobService.GetApacheLibyBatchStatusAsync(job));
                 }                
 
-                var results = await Task.WhenAll(taskList);
+                await Task.WhenAll(taskList);
             }
             catch (Exception ex)
             {
