@@ -1,0 +1,14 @@
+{
+  "error": {
+    "code": 404,
+    "message": "Not found: Table ga4-data-lake:analytics_255461376.events_2022091",
+    "errors": [
+      {
+        "message": "Not found: Table ga4-data-lake:analytics_255461376.events_2022091",
+        "domain": "global",
+        "reason": "notFound"
+      }
+    ],
+    "status": "NOT_FOUND"
+  }
+}

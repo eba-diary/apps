@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure
                         string requestKey = DateTime.Now.ToString("yyyyMMddHHmmssfff");
 
                         //make request
-                        MemoryStream stream = GetBigQueryRowsStream(httpClient, config);
+                        MemoryStream stream = GetBigQueryDataStream(httpClient, config);
 
                         //if rows to upload
                         if (stream != null)
@@ -112,13 +112,14 @@ namespace Sentry.data.Infrastructure
                 RelativeUri = job.RelativeUri
             };
 
-            if (job.ExecutionParameters != null && 
-                job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX) && 
-                job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS) &&
-                job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX] != job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS])
+            Dictionary<string, string> parameters = job.ExecutionParameters;
+
+            if (parameters.ContainsKey(ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX) &&
+                parameters.ContainsKey(ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS) &&
+                parameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX] != parameters[ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS])
             {
                 //if have not completed retrieving all records for current table, continue from last index
-                config.LastIndex = int.Parse(job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX]);
+                config.LastIndex = int.Parse(parameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX]);
             }
             else
             {
@@ -147,12 +148,13 @@ namespace Sentry.data.Infrastructure
 
         private JArray GetBigQueryFields(HttpClient httpClient, GoogleBigQueryConfiguration config)
         {
-            string tableMetadataUri = $"{config.BaseUri}{config.ProjectId}/datasets/{config.DatasetId}/tables/{config.TableId}";
-            JObject response = GetBigQueryResponse(httpClient, tableMetadataUri);
+            string removeSuffix = "/data";
+            string uri = config.BaseUri + config.RelativeUri.Remove(config.RelativeUri.Length - removeSuffix.Length);
+            JObject response = GetBigQueryResponse(httpClient, uri);
             return (JArray)response.SelectToken("schema.fields");
         }
 
-        private MemoryStream GetBigQueryRowsStream(HttpClient httpClient, GoogleBigQueryConfiguration config)
+        private MemoryStream GetBigQueryDataStream(HttpClient httpClient, GoogleBigQueryConfiguration config)
         {
             string uri = config.BaseUri + config.RelativeUri;
 
@@ -182,7 +184,7 @@ namespace Sentry.data.Infrastructure
 
         private void AddUriParameter(ref string uri, string parameterKey, string parameterValue)
         {
-            uri += uri.Contains("?") ? "&" : "?" + $"{parameterKey}={parameterValue}";
+            uri += uri.Contains("?") ? "&" : "?" + $"{parameterKey}={Uri.EscapeDataString(parameterValue)}";
         }
 
         private JObject GetBigQueryResponse(HttpClient httpClient, string uri)
@@ -208,8 +210,8 @@ namespace Sentry.data.Infrastructure
         private void SaveProgress(GoogleBigQueryConfiguration config, RetrieverJob job)
         {
             job.RelativeUri = config.RelativeUri;
-            job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX] = config.LastIndex.ToString();
-            job.ExecutionParameters[ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS] = config.TotalRows.ToString();
+            job.AddOrUpdateExecutionParameter(ExecutionParameterKeys.GoogleBigQueryApi.LASTINDEX, config.LastIndex.ToString());
+            job.AddOrUpdateExecutionParameter(ExecutionParameterKeys.GoogleBigQueryApi.TOTALROWS, config.TotalRows.ToString());
             
             _datasetContext.SaveChanges();
         }

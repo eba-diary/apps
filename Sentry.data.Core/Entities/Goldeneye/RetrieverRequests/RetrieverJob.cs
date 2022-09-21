@@ -119,12 +119,18 @@ namespace Sentry.data.Core
             {
                 return string.IsNullOrEmpty(_executionParameters) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(_executionParameters);
             }
-            set
+            protected set
             {
                 _executionParameters = JsonConvert.SerializeObject(value);
             }
         }
 
+        public virtual void AddOrUpdateExecutionParameter(string key, string value)
+        {
+            Dictionary<string, string> parameters = ExecutionParameters;
+            parameters[key] = value;
+            ExecutionParameters = parameters;
+        }
 
         public virtual Uri GetUri()
         {
