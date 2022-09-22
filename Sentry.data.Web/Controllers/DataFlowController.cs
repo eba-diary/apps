@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Sentry.data.Web;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -634,40 +635,44 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case "FTP":
+                case DataSoureDiscriminator.FTP_SOURCE:
                     List<DataSource> fTpList = _dataFlowService.GetDataSources().Where(x => x is FtpSource).ToList();
                     output.AddRange(fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "SFTP":
+                case DataSoureDiscriminator.SFTP_SOURCE:
                     List<DataSource> sfTpList = _dataFlowService.GetDataSources().Where(x => x is SFtpSource).ToList();
                     output.AddRange(sfTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "DFSBasic":
+                case DataSoureDiscriminator.DEFAULT_DROP_LOCATION:
                     List<DataSource> dfsBasicList = _dataFlowService.GetDataSources().Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "DFSCustom":
+                case DataSoureDiscriminator.DFS_CUSTOM:
                     List<DataSource> dfsCustomList = _dataFlowService.GetDataSources().Where(x => x is DfsCustom).ToList();
                     output.AddRange(dfsCustomList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "S3Basic":
+                case DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION:
                     List<DataSource> s3BasicList = _dataFlowService.GetDataSources().Where(x => x is S3Basic).ToList();
                     output.AddRange(s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "HTTPS":
+                case DataSoureDiscriminator.HTTPS_SOURCE:
                     List<DataSource> HttpsList = _dataFlowService.GetDataSources().Where(x => x is HTTPSSource).ToList();
                     output.AddRange(HttpsList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "GOOGLEAPI":
+                case DataSoureDiscriminator.GOOGLE_API_SOURCE:
                     List<DataSource> GApiList = _dataFlowService.GetDataSources().Where(x => x is GoogleApiSource).ToList();
                     output.AddRange(GApiList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
+                    break;
+                case DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                    List<DataSource> bigQueryList = _dataFlowService.GetDataSources().Where(x => x is GoogleBigQueryApiSource).ToList();
+                    output.AddRange(bigQueryList.Select(v => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 default:
                     throw new NotImplementedException();

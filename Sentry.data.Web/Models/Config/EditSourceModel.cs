@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
 {
@@ -28,14 +29,14 @@ namespace Sentry.data.Web
             Headers = new List<RequestHeader>();
 
 
-            if (ds.Is<DfsBasic>()) { SourceType = "DFSBasic"; }
-            else if (ds.Is<S3Basic>()) { SourceType = "S3Basic"; }
-            else if (ds.Is<FtpSource>()) { SourceType = "FTP"; }
-            else if (ds.Is<SFtpSource>()) { SourceType = "SFTP"; }
-            else if (ds.Is<DfsCustom>()) { SourceType = "DFSCustom"; }
+            if (ds.Is<DfsBasic>()) { SourceType = DataSoureDiscriminator.DEFAULT_DROP_LOCATION; }
+            else if (ds.Is<S3Basic>()) { SourceType = DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION; }
+            else if (ds.Is<FtpSource>()) { SourceType = DataSoureDiscriminator.FTP_SOURCE; }
+            else if (ds.Is<SFtpSource>()) { SourceType = DataSoureDiscriminator.SFTP_SOURCE; }
+            else if (ds.Is<DfsCustom>()) { SourceType = DataSoureDiscriminator.DFS_CUSTOM; }
             else if (ds.Is<HTTPSSource>())
             {
-                SourceType = "HTTPS";
+                SourceType = DataSoureDiscriminator.HTTPS_SOURCE;
                 Headers = ((HTTPSSource)ds).RequestHeaders ?? new List<RequestHeader>();
                 if (ds.SourceAuthType.Is<TokenAuthentication>())
                 {

@@ -19,8 +19,8 @@ namespace Sentry.data.Infrastructure
         private readonly IDatasetContext _datasetContext;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IAuthorizationProvider _authorizationProvider;
-        private readonly IGoogleBigQueryService _googleBigQueryService;
         private readonly IHttpClientGenerator _httpClientGenerator;
+        private readonly IGoogleBigQueryService _googleBigQueryService;
 
         public GoogleBigQueryJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IGoogleBigQueryService googleBigQueryService)
         {
@@ -33,6 +33,9 @@ namespace Sentry.data.Infrastructure
 
         public void Execute(RetrieverJob job)
         {
+            //calculate the tableId first
+            GoogleBigQueryConfiguration config = GetConfig(job);
+
             //get Google token
             string accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
 
@@ -42,9 +45,6 @@ namespace Sentry.data.Infrastructure
 
             using (httpClient)
             {
-                //need to calculate the tableId first
-                GoogleBigQueryConfiguration config = GetConfig(job);
-
                 try
                 {
                     //update DSC schema

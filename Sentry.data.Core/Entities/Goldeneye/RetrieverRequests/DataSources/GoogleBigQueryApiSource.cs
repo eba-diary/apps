@@ -20,6 +20,9 @@ namespace Sentry.data.Core
             ValidHttpMethods = new List<HttpMethods>();
             ValidHttpMethods.Add(HttpMethods.get);
 
+            ValidHttpDataFormats = new List<HttpDataFormat>();
+            ValidHttpDataFormats.Add(HttpDataFormat.json);
+
             //Control compression types which can be chossen for this source type.  As new
             // types are integrated, add the type to the list.
             ValidCompressionTypes = new List<CompressionTypes>();

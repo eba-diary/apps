@@ -80,9 +80,10 @@ namespace Sentry.data.Infrastructure.Tests
             HttpResponseMessage httpResponseMessageNotFound = GetResponseMessage(HttpStatusCode.NotFound, "NotFound");
 
             string requestDatePartition = today.AddDays(-1).ToString("yyyyMMdd");
-            string fieldsUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{requestDatePartition}";
+            string baseUri = "https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_";
+            string fieldsUri = $"{baseUri}{requestDatePartition}";
             string dataUri = fieldsUri + "/data";
-            string dataLastUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{today:yyyyMMdd}/data";
+            string dataLastUri = $"{baseUri}{today:yyyyMMdd}/data";
 
             httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", 
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == fieldsUri), 
@@ -166,10 +167,11 @@ namespace Sentry.data.Infrastructure.Tests
             HttpResponseMessage httpResponseMessageNotFound = GetResponseMessage(HttpStatusCode.NotFound, "NotFound");
 
             string requestDatePartition = today.AddDays(-1).ToString("yyyyMMdd");
-            string fieldsUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{requestDatePartition}";
+            string baseUri = "https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_";
+            string fieldsUri = $"{baseUri}{requestDatePartition}";
             string dataUri = fieldsUri + "/data";
             string dataUri2 = dataUri + "?pageToken=BFDECMLBQMAQAAASAUIIBAEAAUNAICAFCACSB77777777777757SUAA%3D";
-            string dataLastUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{today:yyyyMMdd}/data";
+            string dataLastUri = $"{baseUri}{today:yyyyMMdd}/data";
 
             httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == fieldsUri),
@@ -410,10 +412,11 @@ namespace Sentry.data.Infrastructure.Tests
             HttpResponseMessage httpResponseMessageData = GetResponseMessage(HttpStatusCode.OK, "Data_PageToken");
 
             string requestDatePartition = today.AddDays(-1).ToString("yyyyMMdd");
-            string fieldsUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{requestDatePartition}";
+            string baseUri = "https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_";
+            string fieldsUri = $"{baseUri}{requestDatePartition}";
             string dataUri = fieldsUri + "/data";
             string dataUri2 = dataUri + "?pageToken=BFDECMLBQMAQAAASAUIIBAEAAUNAICAFCACSB77777777777757SUAA%3D";
-            string dataLastUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{today:yyyyMMdd}/data";
+            string dataLastUri = $"{baseUri}{today:yyyyMMdd}/data";
 
             httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == fieldsUri),
@@ -501,9 +504,10 @@ namespace Sentry.data.Infrastructure.Tests
             HttpResponseMessage httpResponseMessageNotFound = GetResponseMessage(HttpStatusCode.NotFound, "NotFound");
 
             string requestDatePartition = today.AddDays(-1).ToString("yyyyMMdd");
-            string fieldsUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{requestDatePartition}";
+            string baseUri = "https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_";
+            string fieldsUri = $"{baseUri}{requestDatePartition}";
             string dataUri = fieldsUri + "/data?startIndex=5";
-            string dataLastUri = $"https://bigquery.googleapis.com/bigquery/v2/projects/project1/datasets/dataset1/tables/events_{today:yyyyMMdd}/data";
+            string dataLastUri = $"{baseUri}{today:yyyyMMdd}/data";
 
             httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == fieldsUri),
