@@ -29,14 +29,14 @@ namespace Sentry.data.Web
             Headers = new List<RequestHeader>();
 
 
-            if (ds.Is<DfsBasic>()) { SourceType = DataSoureDiscriminator.DEFAULT_DROP_LOCATION; }
-            else if (ds.Is<S3Basic>()) { SourceType = DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION; }
-            else if (ds.Is<FtpSource>()) { SourceType = DataSoureDiscriminator.FTP_SOURCE; }
-            else if (ds.Is<SFtpSource>()) { SourceType = DataSoureDiscriminator.SFTP_SOURCE; }
-            else if (ds.Is<DfsCustom>()) { SourceType = DataSoureDiscriminator.DFS_CUSTOM; }
+            if (ds.Is<DfsBasic>()) { SourceType = DataSourceDiscriminator.DEFAULT_DROP_LOCATION; }
+            else if (ds.Is<S3Basic>()) { SourceType = DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION; }
+            else if (ds.Is<FtpSource>()) { SourceType = DataSourceDiscriminator.FTP_SOURCE; }
+            else if (ds.Is<SFtpSource>()) { SourceType = DataSourceDiscriminator.SFTP_SOURCE; }
+            else if (ds.Is<DfsCustom>()) { SourceType = DataSourceDiscriminator.DFS_CUSTOM; }
             else if (ds.Is<HTTPSSource>())
             {
-                SourceType = DataSoureDiscriminator.HTTPS_SOURCE;
+                SourceType = DataSourceDiscriminator.HTTPS_SOURCE;
                 Headers = ((HTTPSSource)ds).RequestHeaders ?? new List<RequestHeader>();
                 if (ds.SourceAuthType.Is<TokenAuthentication>())
                 {

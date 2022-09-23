@@ -1014,8 +1014,9 @@ namespace Sentry.data.Web.Controllers
             bool result;
             switch (dto.SourceType)
             {
-                case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
-                case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
+                case DataSourceDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                     result = true;
                     break;
                 default:
@@ -1178,11 +1179,11 @@ namespace Sentry.data.Web.Controllers
             });
 
             cjm.SourceTypesDropdown = temp.Where(x =>
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION).OrderBy(x => x.Value);
+                x.Value != GlobalConstants.DataSourceDiscriminator.DEFAULT_DROP_LOCATION &&
+                x.Value != GlobalConstants.DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION &&
+                x.Value != GlobalConstants.DataSourceDiscriminator.JAVA_APP_SOURCE &&
+                x.Value != GlobalConstants.DataSourceDiscriminator.DEFAULT_HSZ_DROP_LOCATION &&
+                x.Value != GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION).OrderBy(x => x.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
@@ -1232,26 +1233,26 @@ namespace Sentry.data.Web.Controllers
             List<SelectListItem> temp2;
 
 
-            if (retrieverJob.DataSource.SourceType == DataSoureDiscriminator.DEFAULT_DROP_LOCATION)
+            if (retrieverJob.DataSource.SourceType == DataSourceDiscriminator.DEFAULT_DROP_LOCATION)
             {
-                temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DataSoureDiscriminator.DEFAULT_DROP_LOCATION).Select(v
+                temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DataSourceDiscriminator.DEFAULT_DROP_LOCATION).Select(v
                    => new SelectListItem
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == DataSoureDiscriminator.DEFAULT_DROP_LOCATION
+                       Disabled = v.DiscrimatorValue == DataSourceDiscriminator.DEFAULT_DROP_LOCATION
                    }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
             }
-            else if (retrieverJob.DataSource.SourceType == DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION)
+            else if (retrieverJob.DataSource.SourceType == DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION)
             {
-                temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION).Select(v
+                temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION).Select(v
                    => new SelectListItem
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION
+                       Disabled = v.DiscrimatorValue == DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION
                    }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
@@ -1263,7 +1264,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == DataSoureDiscriminator.DEFAULT_DROP_LOCATION || v.DiscrimatorValue == DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION
+                       Disabled = v.DiscrimatorValue == DataSourceDiscriminator.DEFAULT_DROP_LOCATION || v.DiscrimatorValue == DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION
                    }).ToList();
 
                 temp.Add(new SelectListItem()
@@ -1330,7 +1331,7 @@ namespace Sentry.data.Web.Controllers
             //set selected for current value
             temp.ForEach(x => x.Selected = model.SourceType.Equals(x.Value));
 
-            model.SourceTypesDropdown = temp.Where(x => x.Value != DataSoureDiscriminator.DEFAULT_DROP_LOCATION && x.Value != DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && x.Value != DataSoureDiscriminator.JAVA_APP_SOURCE).OrderBy(x => x.Value);
+            model.SourceTypesDropdown = temp.Where(x => x.Value != DataSourceDiscriminator.DEFAULT_DROP_LOCATION && x.Value != DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION && x.Value != DataSourceDiscriminator.JAVA_APP_SOURCE).OrderBy(x => x.Value);
 
             var temp2 = AuthenticationTypesByType(model.SourceType, Int32.TryParse(model.AuthID, out int intvalue) ? (int?)intvalue : null);
 
@@ -1356,13 +1357,13 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case DataSoureDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     methodList = new HTTPSSource().ValidHttpDataFormats;
                     break;
-                case DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     methodList = new GoogleApiSource().ValidHttpDataFormats;
                     break;
-                case DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                     methodList = new GoogleBigQueryApiSource().ValidHttpDataFormats;
                     break;
                 default:
@@ -1396,22 +1397,22 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case DataSoureDiscriminator.FTP_SOURCE:
+                case DataSourceDiscriminator.FTP_SOURCE:
                     dataSource = new FtpSource();
                     break;
-                case DataSoureDiscriminator.SFTP_SOURCE:
+                case DataSourceDiscriminator.SFTP_SOURCE:
                     dataSource = new SFtpSource();
                     break;
-                case DataSoureDiscriminator.DFS_CUSTOM:
+                case DataSourceDiscriminator.DFS_CUSTOM:
                     dataSource = new DfsCustom();
                     break;
-                case DataSoureDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     dataSource = new HTTPSSource();
                     break;
-                case DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     dataSource = new GoogleApiSource();
                     break;
-                case DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                     dataSource = new GoogleBigQueryApiSource();
                     break;
                 default:
@@ -1465,42 +1466,42 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case DataSoureDiscriminator.FTP_SOURCE:
+                case DataSourceDiscriminator.FTP_SOURCE:
                     List<DataSource> fTpList = _datasetContext.DataSources.Where(x => x is FtpSource).ToList();
                     output.AddRange(fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.SFTP_SOURCE:
+                case DataSourceDiscriminator.SFTP_SOURCE:
                     List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
                     output.AddRange(sfTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.DEFAULT_DROP_LOCATION:
+                case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                     List<DataSource> dfsBasicList = _datasetContext.DataSources.Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.DFS_CUSTOM:
+                case DataSourceDiscriminator.DFS_CUSTOM:
                     List<DataSource> dfsCustomList = _datasetContext.DataSources.Where(x => x is DfsCustom).ToList();
                     output.AddRange(dfsCustomList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION:
+                case DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION:
                     List<DataSource> s3BasicList = _datasetContext.DataSources.Where(x => x is S3Basic).ToList();
                     output.AddRange(s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
                     output.AddRange(HttpsList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     List<DataSource> GApiList = _datasetContext.DataSources.Where(x => x is GoogleApiSource).ToList();
                     output.AddRange(GApiList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                     List<DataSource> bigQueryList = _datasetContext.DataSources.Where(x => x is GoogleBigQueryApiSource).ToList();
                     output.AddRange(bigQueryList.Select(v => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
@@ -1525,10 +1526,10 @@ namespace Sentry.data.Web.Controllers
             });
 
             csm.SourceTypesDropdown = temp.Where(x =>
-                    x.Value != DataSoureDiscriminator.DEFAULT_DROP_LOCATION &&
-                    x.Value != DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION &&
-                    x.Value != DataSoureDiscriminator.JAVA_APP_SOURCE &&
-                    x.Value != DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
+                    x.Value != DataSourceDiscriminator.DEFAULT_DROP_LOCATION &&
+                    x.Value != DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION &&
+                    x.Value != DataSourceDiscriminator.JAVA_APP_SOURCE &&
+                    x.Value != DataSourceDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
             if (csm.SourceType == null)
             {
@@ -1580,13 +1581,13 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case DataSoureDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     methodList = new HTTPSSource().ValidHttpMethods;
                     break;
-                case DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     methodList = new GoogleApiSource().ValidHttpMethods;
                     break;
-                case DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                     methodList = new GoogleBigQueryApiSource().ValidHttpMethods;
                     break;
                 default:

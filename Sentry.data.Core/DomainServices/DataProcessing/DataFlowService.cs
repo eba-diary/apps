@@ -845,61 +845,14 @@ namespace Sentry.data.Core
                     Logger.Debug($"{methodName} source type list {sourceTypeList}");
                 }
 
-                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
 
                 _datasetContext.Add(dfsDataFlowBasic);
 
                 _jobService.CreateDropLocation(dfsDataFlowBasic);
             }
 
-            //Generate ingestion steps (get file to raw location)
-            AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
-
-            AddDataFlowStep(dto, df, DataActionType.RawStorage);
-
-            if (dto.IsCompressed)
-            {
-                Logger.Debug($"Is CompressionJob Null:::{dto.CompressionJob == null}");
-                switch (dto.CompressionJob.CompressionType)
-                {
-                    case CompressionTypes.ZIP:
-                        AddDataFlowStep(dto, df, DataActionType.UncompressZip);
-                        break;
-                    case CompressionTypes.GZIP:
-                        AddDataFlowStep(dto, df, DataActionType.UncompressGzip);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (dto.IsPreProcessingRequired)
-            {
-                Logger.Debug($"Is PreProcessingOption Null:::{dto.PreProcessingOption == null}");
-                switch (dto.PreProcessingOption)
-                {
-                    case (int)DataFlowPreProcessingTypes.googleapi:
-                        AddDataFlowStep(dto, df, DataActionType.GoogleApi);
-                        break;
-                    case (int)DataFlowPreProcessingTypes.claimiq:
-                        AddDataFlowStep(dto, df, DataActionType.ClaimIq);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            FileSchema scm = _datasetContext.GetById<FileSchema>(dto.SchemaMap.First().SchemaId);
-
-            //Generate preprocessing for file types (i.e. fixedwidth, csv, json, etc...)
-            MapPreProcessingSteps(scm, dto, df);
-
-            //Generate DSC registering step
-            AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
-            AddDataFlowStep(dto, df, DataActionType.QueryStorage);
-
-            ////Generate consumption layer steps
-            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            MapDataFlowSteps(dto, df);
 
             Logger.Info($"{methodName} Method End");
         }
@@ -911,6 +864,13 @@ namespace Sentry.data.Core
             dto.RetrieverJob.DataFlow = df.Id;
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
+            MapDataFlowSteps(dto, df);
+
+            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPull).ToLower()} Method End");
+        }
+
+        private void MapDataFlowSteps(DataFlowDto dto, DataFlow df)
+        {
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.ProducerS3Drop);
 
@@ -932,7 +892,7 @@ namespace Sentry.data.Core
             }
 
             if (dto.IsPreProcessingRequired)
-            {                
+            {
                 switch (dto.PreProcessingOption)
                 {
                     case (int)DataFlowPreProcessingTypes.googleapi:
@@ -940,6 +900,9 @@ namespace Sentry.data.Core
                         break;
                     case (int)DataFlowPreProcessingTypes.claimiq:
                         AddDataFlowStep(dto, df, DataActionType.ClaimIq);
+                        break;
+                    case (int)DataFlowPreProcessingTypes.googlebigqueryapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleBigQueryApi);
                         break;
                     default:
                         break;
@@ -957,9 +920,6 @@ namespace Sentry.data.Core
 
             ////Generate consumption layer steps
             AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
-
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPull).ToLower()} Method End");
-
         }
 
         private SchemaMap MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
@@ -975,9 +935,7 @@ namespace Sentry.data.Core
             _datasetContext.Add(map);
 
             return map;
-        }
-
-        
+        }        
 
         private List<int> GetMappedFileSchema(int dataflowId)
         {
@@ -1189,6 +1147,9 @@ namespace Sentry.data.Core
                     break;
                 case DataActionType.GoogleApi:
                     action = _datasetContext.GoogleApiAction.GetAction(_dataFeatures, isHumanResources);
+                    break;
+                case DataActionType.GoogleBigQueryApi:
+                    action = _datasetContext.GoogleBigQueryApiAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ClaimIq:
                     action = _datasetContext.ClaimIQAction.GetAction(_dataFeatures, isHumanResources);
@@ -1403,7 +1364,7 @@ namespace Sentry.data.Core
             {
                 //Add default DFS drop location for data flow
                 List<DataSource> srcList = _datasetContext.DataSources.ToList();
-                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
                 _datasetContext.Add(dfsDataFlowBasic);
             }
 

@@ -123,7 +123,7 @@ namespace Sentry.data.Core
             public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "Default DataFlow DFS Drop Location";
         }
 
-        public static class DataSoureDiscriminator
+        public static class DataSourceDiscriminator
         {
             public const string DFS_SOURCE = "DFS";
             public const string DEFAULT_DROP_LOCATION = "DFSBasic";

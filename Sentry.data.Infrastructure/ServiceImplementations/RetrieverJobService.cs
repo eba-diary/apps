@@ -58,9 +58,9 @@ namespace Sentry.data.Infrastructure
                     {
                         switch (_job.DataSource.SourceType)
                         {
-                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
-                            case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
-                            case GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE:
+                            case GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE:
+                            case GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE:
+                            case GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE:
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
 
                                 // Execute job
@@ -80,19 +80,19 @@ namespace Sentry.data.Infrastructure
                         switch (_job.DataSource.SourceType)
                         {
                             //Map exising source type to new Dataflow Provider
-                            case GlobalConstants.DataSoureDiscriminator.FTP_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.FTP_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
+                            case GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
                                 includeFilename = true;
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
                                 break;

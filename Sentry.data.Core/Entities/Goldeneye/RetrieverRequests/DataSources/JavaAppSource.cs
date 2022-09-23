@@ -25,7 +25,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.JAVA_APP_SOURCE;
             }
         }
 

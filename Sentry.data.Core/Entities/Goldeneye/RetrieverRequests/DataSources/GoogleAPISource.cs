@@ -42,7 +42,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE;
             }
         }
     }

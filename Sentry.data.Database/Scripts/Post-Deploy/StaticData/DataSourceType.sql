@@ -13,7 +13,7 @@
 									('Spark Java Application', 'Java application to run on Spark Cluster', 'JavaApp'),
 									('GoogleApi', 'Google Api (v3)', 'GOOGLEAPI'),
 									('Basic DataFlow DFS', 'DFS drop location controlled by data.sentry.com', 'DFSDataFlowBasic'),
-									('Google Big Query API', 'Retrieves Google Big Query data', 'GoogleBigQueryApi')
+									('Google BigQuery API', 'Retrieves Google Big Query data', 'GoogleBigQueryApi')
 								)
 								AS Source ([Name], [Description], [DiscrimatorValue]) 
 

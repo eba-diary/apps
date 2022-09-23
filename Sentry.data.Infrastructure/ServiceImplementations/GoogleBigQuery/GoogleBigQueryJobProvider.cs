@@ -92,7 +92,7 @@ namespace Sentry.data.Infrastructure
                     if (stopDate < expectedDate)
                     {
                         //means there may be an unexpected gap
-                        Logger.Error($"Google Big Query Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                        Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
                     }
                 }
             }
@@ -196,11 +196,11 @@ namespace Sentry.data.Infrastructure
             {
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    Logger.Info($"Google Big Query request to {uri} returned NotFound. {responseString}");
+                    Logger.Info($"Google BigQuery request to {uri} returned NotFound. {responseString}");
                     throw new GoogleBigQueryNotFoundException();
                 }
 
-                Logger.Error($"Google Big Query request to {uri} failed. {responseString}");
+                Logger.Error($"Google BigQuery request to {uri} failed. {responseString}");
                 throw new GoogleBigQueryJobProviderException(responseString);
             }
 

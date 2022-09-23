@@ -40,7 +40,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE;
             }
         }
     }

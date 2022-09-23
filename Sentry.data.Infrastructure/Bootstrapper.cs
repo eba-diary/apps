@@ -99,13 +99,13 @@ namespace Sentry.data.Infrastructure
             //Register other services
             registry.For<IBaseJobProvider>().AddInstances(x =>
             {
-                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
-                x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
-                x.Type<DfsDataFlowBasicProvider>().Named(GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
-                x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
-                x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
-                x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
-                x.Type<GoogleBigQueryJobProvider>().Named(DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE);
+                x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE);
+                x.Type<DfsDataFlowBasicProvider>().Named(GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+                x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE);
+                x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
+                x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                x.Type<GoogleBigQueryJobProvider>().Named(DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
             });
 
             //Register event handlers for MetadataProcessorService

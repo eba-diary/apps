@@ -89,7 +89,7 @@ namespace Sentry.data.Web
             }
 
             //Validate GoogleApi Configuration
-            if (SelectedSourceType == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE)
+            if (SelectedSourceType == GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE)
             {
                 ValidateGoogleApiValues(results);
             }

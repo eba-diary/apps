@@ -51,7 +51,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE;
             }
         }
         public virtual List<HttpMethods> ValidHttpMethods { get; set; }

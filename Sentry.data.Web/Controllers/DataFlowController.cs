@@ -506,10 +506,16 @@ namespace Sentry.data.Web.Controllers
 
         private void CreateDropDownSetup(JobModel model)
         {
+            List<string> sources = new List<string>()
+            {
+                DataSourceDiscriminator.FTP_SOURCE,
+                DataSourceDiscriminator.GOOGLE_API_SOURCE,
+                DataSourceDiscriminator.HTTPS_SOURCE,
+                DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE
+            };
+
             var temp = _dataFlowService.GetDataSourceTypes()
-                .Where(w => w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE ||
-                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE ||
-                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE)
+                .Where(w => sources.Contains(w.DiscrimatorValue))
                 .Select(v => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue })
                 .ToList();
 
@@ -639,42 +645,42 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case DataSoureDiscriminator.FTP_SOURCE:
+                case DataSourceDiscriminator.FTP_SOURCE:
                     List<DataSource> fTpList = _dataFlowService.GetDataSources().Where(x => x is FtpSource).ToList();
                     output.AddRange(fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.SFTP_SOURCE:
+                case DataSourceDiscriminator.SFTP_SOURCE:
                     List<DataSource> sfTpList = _dataFlowService.GetDataSources().Where(x => x is SFtpSource).ToList();
                     output.AddRange(sfTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.DEFAULT_DROP_LOCATION:
+                case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                     List<DataSource> dfsBasicList = _dataFlowService.GetDataSources().Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.DFS_CUSTOM:
+                case DataSourceDiscriminator.DFS_CUSTOM:
                     List<DataSource> dfsCustomList = _dataFlowService.GetDataSources().Where(x => x is DfsCustom).ToList();
                     output.AddRange(dfsCustomList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION:
+                case DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION:
                     List<DataSource> s3BasicList = _dataFlowService.GetDataSources().Where(x => x is S3Basic).ToList();
                     output.AddRange(s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.HTTPS_SOURCE:
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     List<DataSource> HttpsList = _dataFlowService.GetDataSources().Where(x => x is HTTPSSource).ToList();
                     output.AddRange(HttpsList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     List<DataSource> GApiList = _dataFlowService.GetDataSources().Where(x => x is GoogleApiSource).ToList();
                     output.AddRange(GApiList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSoureDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                     List<DataSource> bigQueryList = _dataFlowService.GetDataSources().Where(x => x is GoogleBigQueryApiSource).ToList();
                     output.AddRange(bigQueryList.Select(v => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
