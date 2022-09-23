@@ -425,7 +425,7 @@ data.Admin = {
             // Retrieve seleced date
             var selectedDate = $('#datetime-picker').val();
 
-            var timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {
