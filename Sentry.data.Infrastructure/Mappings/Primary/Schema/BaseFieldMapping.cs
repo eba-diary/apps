@@ -28,6 +28,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property((x) => x.Description, (m) => m.Column("Description"));
             Property(x => x.FieldLength, m => m.Column("FieldLength"));
             Property((x) => x.DotNamePath, (m) => m.Column("DotNamePath"));
+            Property(x => x.StructurePosition, m => m.Column("StructurePosition"));
 
             Discriminator(x => x.Column("Type"));
 

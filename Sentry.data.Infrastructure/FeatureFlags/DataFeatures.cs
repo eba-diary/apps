@@ -40,7 +40,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4258_DefaultProdSearchFilter { get; }
         public IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation { get; }
         public IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand { get; }
-
+        public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
 
         public DataFeatures(UserService userService, ILdClient ldClient)
         {
@@ -70,6 +70,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4258_DefaultProdSearchFilter = new BooleanFeatureFlagAmbientContext("CLA4258_DefaultProdSearchFilter", false, _ldClient, () => LdUser);
             CLA4410_StopCategoryBasedConsumptionLayerCreation = new BooleanFeatureFlagAmbientContext("CLA4410_StopCategoryBasedConsumptionLayerCreation", false, _ldClient, () => LdUser);
             CLA440_CategoryConsumptionLayerCreateLineInSand = new StringFeatureFlagAmbientContext("CLA440_CategoryConsumptionLayerCreateLineInSand", "2022-08-15", _ldClient, () => LdUser);
+            CLA3878_ManageSchemasAccordion = new BooleanFeatureFlagAmbientContext("CLA3878_ManageSchemasAccordion", false, _ldClient, () => LdUser);
         }
 
         /// <summary>

@@ -4,432 +4,254 @@
 
 @{
     ViewBag.Title = "View Dataset Configuration Details";
+    ViewBag.OverflowScroll = true;
     string color = "dsc-" + Model.CategoryColor + "-text";
-
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>  Back to Dataset Information</a>
 
-<div class="topBanner" style="height: 60px;
-    border-bottom: 1px #DDDDDD solid;">
-    <div class="relative hidden-sm hidden-xs">
-        <div>
-            <div class="no-overflow">
-                <h1 class="detailName leftFloat @color pt-0">
-                    @Model.DatasetName
-                </h1>
-            </div>
-        </div>
+@helper BackLink()
+{
+    <a class="backToList mt-2 mb-0" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-2"></em>Back to Dataset Information</a>
+}
+
+@BackLink()
+
+<div class="config-banner">
+    <h1 class="detailName leftFloat @color pt-0">@Model.DatasetName</h1>
+
+    <div>
+        @if (HttpContext.Current.IsDebuggingEnabled)
+        {
+            <a class="btn btn-success btnCreateDirectory mt-3"><em class="fas fa-plus mr-2"></em>Create Directories</a>
+        }
+        <a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus mr-2"></em>Add Schema</a>
     </div>
-
-    @*<div class="hidden-md hidden-lg">
-            <h1 class="detailName leftFloat @color">
-                @Model.DatasetName
-
-                @if (Model.IsSecured)
-                {
-                    <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                }
-            </h1>
-
-            <div>
-                <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="margin-top: 5px;">
-                    <button type="button"
-                            class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                            data-toggle="dropdown">
-                        <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                    </button>
-
-                    <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                        <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                            <a>
-                                Subscribe
-                            </a>
-                        </li>
-
-                        @if (Model.CanQueryTool)
-                        {
-                            <li title="Query Dataset">
-                                <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                    Query this Dataset
-                                </a>
-                            </li>
-                        }
-                        @if (Model.CanEditDataset)
-                        {
-                            <li>
-                                <a href="/Config/Dataset/@Model.DatasetId">
-                                    Manage Schemas
-                                </a>
-                            </li>
-                        }
-
-                        @if (Model.CanUpload)
-                        {
-                            <li id="UploadModal" data-id="@Model.DatasetId">
-                                <a>Upload Files</a>
-                            </li>
-                        }
-
-                        @if (Model.CanEditDataset)
-                        {
-                            <li id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
-                                <a>Edit Dataset</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-
-        </div>*@
-
 </div>
 
-<p>Click any section header to begin:</p>
+<!--Accordion wrapper-->
+<div class="accordion md-accordion" id="accordionSchemas" role="tablist" aria-multiselectable="true">
+    @foreach (DatasetFileConfigsModel item in Model.DatasetFileConfigs.Where(x => (x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && x.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted)).ToList())
+    {
+        bool isActive = item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active;
+        string fileExtension = item.FileExtension.Name.Trim();
+        <!-- Accordion card -->
+        <div class="card">
+            <!-- Card header -->
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordionSchemas" href="#collapse-config-@item.ConfigId" aria-expanded="false" aria-controls="collapse-config-@item.ConfigId">
+                <div class="card-header schema-card-header" role="tab" id="heading-config-@item.ConfigId">
+                    <h2 class="@color mb-0 pt-0">
+                        @item.ConfigFileName
+                        @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
+                        {
+                            <em class="ml-2">(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em>
+                        }
+                        <em class="fas fa-angle-down rotate-icon"></em>
+                    </h2>
+                </div>
+            </a>
 
-@{
-    <div id="configs">
+            <!-- Card body -->
+            <div id="collapse-config-@item.ConfigId" class="collapse" role="tabpanel" aria-labelledby="heading-config-@item.ConfigId" data-parent="#accordionSchemas">
+                <div class="card-body ml-3 mr-3">
+                    <div class="card-body-header">
+                        <h4 class="@color pt-0">Schema Information</h4>
 
-
-        @foreach (var item in Model.DatasetFileConfigs)
-        {
-            @* Do not display any objects with DELETED status *@
-            if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted)
-            {
-                <div>
-                    @* Only show ACTIVE objects to users.  Administrators can see ACTIVE\PENDING DELETE objects *@
-                    @if ((item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted))
-                    {
-                        <div class="configHeader categoryBanner-@Model.CategoryColor">
-                            @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
+                        <div class="schema-modify-icons">
+                            @if (isActive)
                             {
-                                <h2 class="@color pt-3">@item.ConfigFileName<strong><em>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em></strong><em class="fas fa-chevron-up tracker-menu-icon fa-sm"></em></h2>
+                                <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" title="Edit Schema"></a>
+
+                                if (Model.DatasetFileConfigs.Where(x => x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active).Count() > 1)
+                                {
+                                    <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete Schema"></a>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="ml-3">
+                        <div class="pb-3">
+                            <div class="font-weight-bold">Description:</div>
+                            <div class="ml-3">
+                                @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
+                                {
+                                    int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                                    <span>@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                    <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                }
+                                else
+                                {
+                                    @item.ConfigFileDesc
+                                }
+                            </div>
+                        </div>
+
+                        <div class="pb-3"><span class="font-weight-bold">Control-M Trigger Name:</span> @item.ControlMTriggerName</div>
+
+                        <div class="pb-3">
+                            @if (Model.Security.ShowAdminControls)
+                            {
+                                <div><span class="font-weight-bold">Storage id:</span> @item.RawStorageId</div>
+                                <div><span class="font-weight-bold">Schema id:</span> @item.SchemaId <em>(@item.OldSchemaId)</em></div>
                             }
                             else
                             {
-                                <h2 class="@color pt-3">@item.ConfigFileName<em class="fas fa-chevron-up tracker-menu-icon fa-sm"></em></h2>
+                                <div><span class="font-weight-bold">Schema id:</span> @item.SchemaId</div>
                             }
-
+                            <div><span class="font-weight-bold">Configuration classification:</span> @item.FileType</div>
+                            <div><span class="font-weight-bold">File type:</span> @item.FileExtension.Name</div>
                         </div>
-                        @*if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
-                            {
-                                <div class="configHeader categoryBanner-@color">
-                                    <h1 class="@color">@item.ConfigFileName</h1>
-                                    <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
-                                </div>
-                            }
-                            else if (item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete)
-                            {
-                                <div class="configHeader categoryBanner-gray">
-                                    <h1 class="@color">@item.ConfigFileName <strong><i>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</i></strong></h1>
-                                </div>
-                            }*@
 
-                        <div class="configContainer" style="display: none;">
-
-                            <h4 class="@color pt-1">Configuration Metadata</h4>
-
-                            <div class="col-md-12">
-                                <div class="col-md-1">Description:</div>
-                                <div class="col-md-11">
-                                    @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
-                                    {
-
-                                        int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
-                                        <p>
-                                            <span>@item.ConfigFileDesc.Substring(0, lastInfo)</span>
-                                            <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                                            <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
-                                            <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                                            <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                                        </p>
-                                    }
-                                    else
-                                    {
-                                        <p>@item.ConfigFileDesc</p>
-                                    }
-                                </div>
-                            </div>
-
-
-                            <div class="col-md-12">
-                                <div class="col-md-3">Control-M Trigger Name:</div>
-                                <div class="col-md-11">
-                                    <p>@item.ControlMTriggerName</p>
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-12 configDetailRow">
-
+                        @if (fileExtension == GlobalConstants.ExtensionNames.ANY || fileExtension == GlobalConstants.ExtensionNames.DELIMITED || fileExtension == GlobalConstants.ExtensionNames.CSV)
+                        {
+                            <div class="pb-3">
+                                <div>This schema's current Delimiter is ( <span class="font-weight-bold">@item.Delimiter</span> )</div>
                                 @if (Model.Security.ShowAdminControls)
                                 {
-                                    <div class="col-md-3">Storage id: <b>@item.RawStorageId</b></div>
-                                    <div class="col-md-3">Schema id: <b>@item.SchemaId</b> <i>(@item.OldSchemaId)</i></div>
+                                    <div><span class="font-weight-bold">Files contain headers:</span> @item.HasHeader</div>
+                                    <div><span class="font-weight-bold">CLA1396_NewEtlColumns:</span> @item.CLA1396_NewEtlColumns</div>
                                 }
                                 else
                                 {
-                                    <div class="col-md-3">Schema id: <b>@item.SchemaId</b></div>
+                                    <div>
+                                        <span class="font-weight-bold">Files contain headers:</span> @item.HasHeader
+                                    </div>
                                 }
-                                <div class="col-md-3">Configuration classification: <b>@item.FileType</b></div>
-                                <div class="col-md-3">File type: <b>@item.FileExtension.Name</b></div>
                             </div>
-                            @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.ANY || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.DELIMITED || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.CSV)
+                        }
+
+                        @if (fileExtension == GlobalConstants.ExtensionNames.XML || fileExtension == GlobalConstants.ExtensionNames.JSON)
+                        {
+                            <div class="pb-3">
+                                <div>
+                                    <span class="font-weight-bold">Schema Root Path:</span>
+                                    <span>@(string.IsNullOrWhiteSpace(item.SchemaRootPath) ? "(Not Specified)" : item.SchemaRootPath)</span>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="pb-3">
+                            @if (fileExtension == GlobalConstants.ExtensionNames.ANY || fileExtension == GlobalConstants.ExtensionNames.DELIMITED || fileExtension == GlobalConstants.ExtensionNames.FIXEDWIDTH)
                             {
-                                <div class="col-md-12 configDetailRow">
-                                    <div class="col-md-3">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
-                                    @if (Model.Security.ShowAdminControls)
+                                <div>This configuration will allow <span class="font-weight-bold">all</span> file extensions.</div>
+                            }
+                            else
+                            {
+                                <div>This configuration will only allow files with <span class="font-weight-bold">.@fileExtension.ToLower()</span> extension</div>
+                            }
+                        </div>
+
+                        <div class="pb-3">
+                            <div>This configuration Data Scope is <span class="font-weight-bold">@item.ScopeType.Name</span> which means:</div>
+                            <div>@item.ScopeType.Description</div>
+                        </div>
+
+                        <div>
+                            @if (item.CreateCurrentView)
+                            {
+                                <div>A current view exists for this schema which filters to data from latest file processed.</div>
+                            }
+                            else
+                            {
+                                <div>This schema does not contain a current view</div>
+                            }
+                        </div>
+                    </div>
+
+                    @if (item.Schema != null)
+                        {
+                            bool hasRevisions = item.Schema.Revisions.Count() > 0;
+                            <div class="card-body-header mt-3">
+                            <h4 class="@color pt-0">Columns (name, datatype, is array, etc.)</h4>
+
+                            <div class="schema-modify-icons">
+                                @if (isActive)
+                                {
+                                    if (hasRevisions)
                                     {
-                                        <div class="col-md-3">Files contain headers: <b>@item.HasHeader</b></div>
-                                        <div class="col-md-6">CLA1396_NewEtlColumns: <b>@item.CLA1396_NewEtlColumns</b></div>
+                                        <a class="far fa-edit" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Edit Columns"></a>
+                                        <a class="fas fa-sync schema-sync-icon ml-3" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId" title="Sync Consumption Layer"></a>
                                     }
                                     else
                                     {
-                                        <div class="col-md-9">Files contain headers: <b>@item.HasHeader</b></div>
+                                        <a class="fas fa-plus schema-add-icon" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Add Columns"></a>
                                     }
-                                </div>
-                            }
-
-                            @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.XML || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.JSON)
-                            {
-                                <div class="col-md-12 configDetailRow">
-                                    @if (String.IsNullOrWhiteSpace(item.SchemaRootPath))
-                                    {
-                                        <div class="col-md-9">Schema Root Path: <em>(Not Specified)</em></div>
-                                    }
-                                    else
-                                    {
-                                        <div class="col-md-9">Schema Root Path: <strong>@item.SchemaRootPath</strong></div>
-                                    }
-                                </div>
-                            }
-
-                            <div class="col-md-12 configDetailRow">
-                                @if (item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.ANY || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.DELIMITED || item.FileExtension.Name.Trim() == GlobalConstants.ExtensionNames.FIXEDWIDTH)
-                                {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
-                                else
-                                {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}
-                            </div>
-                            <div class="col-md-12 configDetailRow">
-                                <div class="col-md-12">This configuration Data Scope is <b>@item.ScopeType.Name</b> which means :</div>
-                                <div class="col-md-11 col-md-offset-1">@item.ScopeType.Description</div>
-                            </div>
-                            <div class="col-md-12 configDetailRow">
-                                @if (item.CreateCurrentView)
-                                {
-                                    <div class="col-md-12">A current view exists for this schema which filters to data from latest file processed.</div>
-                                }
-                                else
-                                {
-                                    <div class="col-md-12">This schema does not contain a current view</div>
                                 }
                             </div>
+                        </div>
 
-
-                            <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
-                            <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
-                            @* Schema Metadata *@
-                            @if (item.Schema != null)
+                        <div class="ml-3">
+                            @if (!hasRevisions)
                             {
-                                <hr />
-                                <h4 class="@color pt-1">Columns Metadata (name, datatype, is array, etc.)</h4>
-                                <div class="columnsContainer col-md-12">
-                                    @if (item.Schema.Revisions.Count() == 0)
-                                    {
-                                        <p>This schema is not currently does not yet have any columns associated to it.</p>
-                                    }
-                                    <p>Created on: @item.Schema.CreatedDTM</p>
-                                    <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
-                                </div>
-                                if (item.Schema.Revisions.Count() > 0)
-                                {
-                                    <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns Metadata</a>
-                                    <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
-                                }
-                                if (item.Schema.Revisions.Count() == 0)
-                                {
-                                    <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Add Columns Metadata</a>
-                                }
+                                <div>This schema does not have any columns associated to it.</div>
                             }
+                            <div><span class="font-weight-bold">Created on:</span> @item.Schema.CreatedDTM</div>
+                            <div><span class="font-weight-bold">Last Modified on:</span> @item.Schema.LastUpdatedDTM</div>
+                        </div>
+                    }
 
-                            @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
-                            {
-                                <hr />
-                                <h4 class="@color pt-1">Producer DataFlow</h4>
+                    @if (Model.DisplayDataflowMetadata || Model.Security.ShowAdminControls)
+                    {
+                        AssociatedDataFlowModel ext = item.ExternalDataFlowJobs.FirstOrDefault(x => x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active);
+                        <div class="card-body-header mt-3">
+                            <h4 class="@color pt-0">Producer DataFlow</h4>
 
-                                @* Loop through each external dataflow *@
-                                if (!item.ExternalDataFlowJobs.Any())
+                            <div class="schema-modify-icons">
+                                @if (isActive)
+                                {
+                                    if (ext == null)
+                                    {
+                                    <a class="fas fa-plus schema-add-icon" href="/DataFlow/Create" title="Add DataFlow"></a>
+                                    }
+                                    else if (Model.DisplayDataflowEdit)
+                                    {
+                                    <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" title="Edit DataFlow"></a>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="ml-3">
+                            @{
+                                if (ext == null)
                                 {
                                     <p>This schema does not have any associated dataflows yet.</p>
                                 }
-                                foreach (var ext in item.ExternalDataFlowJobs)
+                                else
                                 {
-                                    <div class="retJob">
-                                        <div class="jobHeader categoryBanner-@color">
-                                            <h6 class="pt-2">@ext.Name<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
+                                    List<DataFlowStepModel> steps = ext.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").ToList();
+                                    if (steps.Any())
+                                    {
+                                        <div>This dataflow contains the following steps:</div>
+                                        <ol>
+                                            @foreach (DataFlowStepModel step in steps.OrderBy(o => o.ExecutionOrder))
+                                            {
+                                                <li>@step.ActionName</li>
+                                            }
+                                        </ol>
+                                    }
+                                    else
+                                    {
+                                        <div>This dataflow does not contain any special processing.</div>
+                                    }
 
-                                            @if (Model.DisplayDataflowEdit)
-                                            {
-                                                <div id="edit-dataflow-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@ext.Id)"><span class="far fa-edit"></span></div>
-                                            }
-                                        </div>
-                                        <div class="jobContainer" style="display:none;">
-                                            @if (ext.Step.Any(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map"))
-                                            {
-                                                <p>This dataflow contains the following steps:</p>
-                                                <ol>
-                                                    @foreach (DataFlowStepModel step in ext.Step.Where(w => w.ActionName != "S3 Drop" || w.ActionName != "Raw Storage" || w.ActionName != "Schema Map").OrderBy(o => o.ExecutionOrder))
-                                                    {
-                                                        <li>@step.ActionName</li>
-                                                    }
-                                                </ol>
-                                            }
-                                            else
-                                            {
-                                                <p>This dataflow does not contain any special processing.</p>
-                                            }
-
-                                            @* DataflowStep metadata *@
-                                            @foreach (DataFlowStepModel stepModel in ext.Step.Where(w => w.ActionName == "S3 Drop" || w.ActionName == "Producer S3 Drop"))
-                                            {
-                                                <div class="retJob @stepModel.ActionName">
-                                                    <div class="jobHeader categoryBanner-@color">
-                                                        <h6 class="pt-1">@stepModel.ActionName<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
-
-                                                    </div>
-                                                    <div class="jobContainer" style="display:none;">
-                                                        <div><span>We are watching for files dropped in this AWS S3 url:</span></div>
-                                                        <div class="filePath"><span>@stepModel.RootAwsUrl@stepModel.TriggetKey</span></div>
-                                                    </div>
-                                                </div>
-                                            }
-                                            @* Loop through associated retriever job metadata *@
-                                            @foreach (Sentry.data.Core.RetrieverJob extJob in ext.RetrieverJobs)
-                                            {
-                                                Html.RenderPartial("~/Views/RetrieverJob/_RetrieverJob.cshtml", extJob, new ViewDataDictionary { { "Color", color } });
-                                            }
-                                        </div>
-                                    </div>
-
+                                    Html.RenderPartial("_DataFlowStepAccordion", ext, new ViewDataDictionary { { "Color", Model.CategoryColor } });
                                 }
                             }
                         </div>
                     }
                 </div>
-                <hr />
-            }
-        }
-
-    </div>
-
-    <div>
-        @if (HttpContext.Current.IsDebuggingEnabled)
-        {
-            <a class="btn btn-success btnCreateDirectory"><em class="fas fa-plus"></em>  Create Directories</a>
-            <hr />
-        }
-        <a class="btn btn-success" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus"></em>  Create new Data File Configuration</a>
-    </div>
-    <hr />
-}
-
-<div>
-    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><em class="fas fa-chevron-left pr-3"></em>  Back to Dataset Information</a>
+            </div>
+        </div>
+        <!-- Accordion card -->
+    }
 </div>
+<!-- Accordion wrapper -->
 
-<style>
-    .filePath {
-        margin-left: 30px;
-    }
-
-    .configDetailRow {
-        padding-bottom: 15px;
-    }
-
-    .jobstatus {
-        cursor: pointer;
-        margin-right: 30px;
-    }
-
-    .configContainer {
-        border-radius: 5px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-        background: white;
-        border: 1px solid black;
-        padding: 15px;
-    }
-
-    .configHeader {
-        background-color: #555;
-        color: white;
-        display: inline-block;
-        width: 100%;
-        padding: 7px;
-        cursor: pointer;
-        border-radius: 5px 5px 5px 5px;
-        font-weight: 700;
-    }
-
-
-        .configHeader h2 {
-            color: white;
-            padding-left: 15px;
-            display: inline-block;
-        }
-
-        .configHeader .tracker-menu-icon {
-            margin: 2px 10px 0 10px;
-            color: white;
-            display: inline-block;
-        }
-
-    .retJob {
-        border-radius: 5px;
-        background: white;
-        padding-bottom: 5px;
-    }
-
-    .jobContainer {
-        border-radius: 5px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
-        background: white;
-        border: 1px solid black;
-        padding: 15px;
-    }
-
-    .jobHeader {
-        background-color: #555;
-        color: white;
-        display: inline-block;
-        width: 100%;
-        padding: 7px;
-        border-radius: 5px 5px 5px 5px;
-        font-weight: 700;
-    }
-
-    .retJobDetails {
-        cursor: pointer;
-    }
-
-    .jobHeader h6 {
-        color: white;
-        padding-left: 15px;
-        display: inline-block;
-    }
-
-    .jobHeader .tracker-menu-icon {
-        margin: 2px 10px 0 10px;
-        color: white;
-        display: inline-block;
-    }
-
-    .on-demand-run {
-        margin-bottom: 3px;
-    }
-</style>
-
+@BackLink()
 
 @section Scripts {
 
