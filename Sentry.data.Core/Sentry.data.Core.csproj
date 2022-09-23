@@ -147,6 +147,7 @@
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
+    <Compile Include="DomainServices\AuditService.cs" />
     <Compile Include="DomainServices\ConnectorService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceTileSearchService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
@@ -162,6 +163,8 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DTO\AuditDto.cs" />
+    <Compile Include="DTO\BaseAuditDto.cs" />
     <Compile Include="DTO\Admin\SupportLinkDto.cs" />
     <Compile Include="DomainServices\TileSearchService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceTileDto.cs" />
@@ -257,6 +260,7 @@
     <Compile Include="Entities\DataProcessing\Log_Level.cs" />
     <Compile Include="Entities\DataProcessing\RunInstance.cs" />
     <Compile Include="Entities\Datasets\Asset.cs" />
+    <Compile Include="Entities\Datasets\SnowCompareConfig.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Elastic\ElasticResult.cs" />
@@ -294,6 +298,8 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
+    <Compile Include="GlobalEnums\AuditSearchType.cs" />
+    <Compile Include="GlobalEnums\AuditType.cs" />
     <Compile Include="GlobalEnums\DatasetFileStatusType.cs" />
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\LayoutOption.cs" />
@@ -386,6 +392,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
+    <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />

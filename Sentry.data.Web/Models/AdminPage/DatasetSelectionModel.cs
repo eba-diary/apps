@@ -10,5 +10,9 @@ namespace Sentry.data.Web
     public class DatasetSelectionModel
     {
         public List<SelectListItem> AllDatasets { get; set; }
+        public List<string> Schema { get; set; }
+        public List<string> FlowSteps { get; set; }
+
+
     }
 }

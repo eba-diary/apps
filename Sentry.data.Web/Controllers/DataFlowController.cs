@@ -101,11 +101,12 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = new DataFlowModel();
             model.CreatedBy = SharedContext.CurrentUser.AssociateId;
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
 
-
+            
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
@@ -149,6 +150,7 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = ToDataFlowModel(dto);
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
@@ -255,6 +257,7 @@ namespace Sentry.data.Web.Controllers
              */
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
@@ -346,6 +349,7 @@ namespace Sentry.data.Web.Controllers
                 Name = dto.Name,
                 IngestionTypeSelection = dto.IngestionType,
                 IsCompressed = dto.IsCompressed,
+                IsBackFillRequired = dto.IsBackFillRequired,
                 IsPreProcessingRequired = dto.IsPreProcessingRequired,
                 PreProcessingSelection = (dto.PreProcessingOption.HasValue) ? (int)dto.PreProcessingOption : 0,
                 SAIDAssetKeyCode = dto.SaidKeyCode,
@@ -761,6 +765,7 @@ namespace Sentry.data.Web.Controllers
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionTypeSelection,
                 IsCompressed = model.IsCompressed,
+                IsBackFillRequired = model.IsBackFillRequired,
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,

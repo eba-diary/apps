@@ -19,6 +19,7 @@ namespace Sentry.data.Core
         public List<SchemaMapDto> SchemaMap { get; set; }
         public RetrieverJobDto RetrieverJob { get; set; }
         public bool IsCompressed { get; set; }
+        public bool IsBackFillRequired { get; set; }
         public int? CompressionType { get; set; }
         public CompressionJobDto CompressionJob { get; set; }
         public bool IsPreProcessingRequired { get; set; }

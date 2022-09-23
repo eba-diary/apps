@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using Hangfire;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
@@ -28,13 +29,14 @@ namespace Sentry.data.Core
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -47,6 +49,7 @@ namespace Sentry.data.Core
             _snowProvider = snowProvider;
             _eventService = eventService;
             _elasticContext = elasticContext;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         private string RootBucket
@@ -233,6 +236,31 @@ namespace Sentry.data.Core
             }
 
             return 0;
+        }
+
+        public void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIdList)
+        {
+            foreach(int schemaId in schemaIdList)
+            {
+                FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
+                Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+                _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schema, MapToDto(schema), ds));
+            }
+        }
+
+        public void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
+        {
+            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
+
+            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+            {
+                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
+                {
+                    schema.ConsumptionDetails.Add(snowflakeConsumption);
+                }
+            }
+
+            _datasetContext.SaveChanges();
         }
 
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -1332,7 +1360,8 @@ namespace Sentry.data.Core
                     SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME
+                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
+                    SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
                 });
             }
 
