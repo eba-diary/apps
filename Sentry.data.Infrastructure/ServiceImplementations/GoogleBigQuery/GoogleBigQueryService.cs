@@ -43,13 +43,29 @@ namespace Sentry.data.Infrastructure
         {
             List<BaseFieldDto> fieldDtos = new List<BaseFieldDto>();
 
-            foreach (JToken bigQueryField in bigQueryFields)
+            for (int i = 0; i < bigQueryFields.Count; i++)
             {
                 index++;
-                fieldDtos.Add(ConvertToFieldDto(bigQueryField, ref index));
+                JToken bigQueryField = bigQueryFields[i];
+                if (i + 1 < bigQueryFields.Count && FieldsAreKeyValuePair(bigQueryField, bigQueryFields[i + 1]))
+                {
+                    fieldDtos.Add(CreateField<VarcharFieldDto>(bigQueryField, index));
+                    fieldDtos.Add(CreateField<VarcharFieldDto>(bigQueryFields[i + 1], ++index));
+                    i++; //skip next field
+                }
+                else
+                {
+                    fieldDtos.Add(ConvertToFieldDto(bigQueryField, ref index));
+                }
             }
 
             return fieldDtos;
+        }
+
+        private bool FieldsAreKeyValuePair(JToken bigQueryField, JToken siblingField)
+        {
+            return string.Equals(bigQueryField.Value<string>("name"), "key", StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(siblingField.Value<string>("name"), "value", StringComparison.OrdinalIgnoreCase);
         }
 
         private BaseFieldDto ConvertToFieldDto(JToken bigQueryField, ref int index)
@@ -60,7 +76,7 @@ namespace Sentry.data.Infrastructure
             {
                 case "INTEGER":
                 case "INT64":
-                    return CreateField<IntegerFieldDto>(bigQueryField, index);
+                    return CreateField<BigIntFieldDto>(bigQueryField, index);
                 case "DATE":
                     return CreateField<DateFieldDto>(bigQueryField, index);
                 case "TIMESTAMP":

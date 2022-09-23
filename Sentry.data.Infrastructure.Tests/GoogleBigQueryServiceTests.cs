@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure.Tests
             schemaService.Setup(x => x.CreateAndSaveSchemaRevision(1, It.IsAny<List<BaseFieldDto>>(), $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}", null))
                 .Callback<int, List<BaseFieldDto>, string, string>((id, fields, name, json) =>
                 {
-                    Assert.AreEqual(5, fields.Count);
+                    Assert.AreEqual(7, fields.Count);
 
                     BaseFieldDto field = fields.First();
                     Assert.AreEqual("string_field", field.Name);
@@ -34,7 +34,7 @@ namespace Sentry.data.Infrastructure.Tests
                     field = fields[1];
                     Assert.AreEqual("integer_field", field.Name);
                     Assert.AreEqual(2, field.OrdinalPosition);
-                    Assert.AreEqual(GlobalConstants.Datatypes.INTEGER, field.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.BIGINT, field.FieldType);
                     Assert.IsFalse(field.IsArray);
 
                     field = fields[2];
@@ -84,6 +84,32 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual(9, grandChildField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, grandChildField.FieldType);
                     Assert.IsFalse(grandChildField.IsArray);
+
+                    field = fields[5];
+                    Assert.AreEqual("key_value_struct", field.Name);
+                    Assert.AreEqual(10, field.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.STRUCT, field.FieldType);
+                    Assert.IsTrue(field.IsArray);
+                    Assert.IsTrue(field.HasChildren);
+                    Assert.AreEqual(2, field.ChildFields.Count);
+
+                    childField = field.ChildFields.First();
+                    Assert.AreEqual("key", childField.Name);
+                    Assert.AreEqual(11, childField.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.IsFalse(childField.IsArray);
+
+                    childField = field.ChildFields.Last();
+                    Assert.AreEqual("value", childField.Name);
+                    Assert.AreEqual(12, childField.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.IsFalse(childField.IsArray);
+
+                    field = fields[6];
+                    Assert.AreEqual("string_field_2", field.Name);
+                    Assert.AreEqual(13, field.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, field.FieldType);
+                    Assert.IsFalse(field.IsArray);
                 }).Returns(1);
 
             GoogleBigQueryService service = new GoogleBigQueryService(schemaService.Object);
@@ -107,7 +133,7 @@ namespace Sentry.data.Infrastructure.Tests
             schemaService.Setup(x => x.CreateAndSaveSchemaRevision(1, It.IsAny<List<BaseFieldDto>>(), $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}", null))
                 .Callback<int, List<BaseFieldDto>, string, string>((id, fields, name, json) =>
                 {
-                    Assert.AreEqual(5, fields.Count);
+                    Assert.AreEqual(7, fields.Count);
 
                     BaseFieldDto field = fields.First();
                     Assert.AreEqual("string_field", field.Name);
@@ -118,7 +144,7 @@ namespace Sentry.data.Infrastructure.Tests
                     field = fields[1];
                     Assert.AreEqual("integer_field", field.Name);
                     Assert.AreEqual(2, field.OrdinalPosition);
-                    Assert.AreEqual(GlobalConstants.Datatypes.INTEGER, field.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.BIGINT, field.FieldType);
                     Assert.IsFalse(field.IsArray);
 
                     field = fields[2];
@@ -168,6 +194,32 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual(9, grandChildField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, grandChildField.FieldType);
                     Assert.IsFalse(grandChildField.IsArray);
+
+                    field = fields[5];
+                    Assert.AreEqual("key_value_struct", field.Name);
+                    Assert.AreEqual(10, field.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.STRUCT, field.FieldType);
+                    Assert.IsTrue(field.IsArray);
+                    Assert.IsTrue(field.HasChildren);
+                    Assert.AreEqual(2, field.ChildFields.Count);
+
+                    childField = field.ChildFields.First();
+                    Assert.AreEqual("key", childField.Name);
+                    Assert.AreEqual(11, childField.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.IsFalse(childField.IsArray);
+
+                    childField = field.ChildFields.Last();
+                    Assert.AreEqual("value", childField.Name);
+                    Assert.AreEqual(12, childField.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.IsFalse(childField.IsArray);
+
+                    field = fields[6];
+                    Assert.AreEqual("string_field_2", field.Name);
+                    Assert.AreEqual(13, field.OrdinalPosition);
+                    Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, field.FieldType);
+                    Assert.IsFalse(field.IsArray);
                 }).Returns(1);
 
             GoogleBigQueryService service = new GoogleBigQueryService(schemaService.Object);
@@ -205,13 +257,23 @@ namespace Sentry.data.Infrastructure.Tests
                 childStructField
             };
 
+            StructFieldDto keyValueField = GetField<StructFieldDto>("key_value_struct", true, 10);
+            keyValueField.HasChildren = true;
+            keyValueField.ChildFields = new List<BaseFieldDto>
+            {
+                GetField<VarcharFieldDto>("key", false, 11),
+                GetField<VarcharFieldDto>("value", false, 12)
+            };
+
             schemaService.Setup(x => x.GetBaseFieldDtoBySchemaRevision(2)).Returns(new List<BaseFieldDto>()
             {
                 GetField<VarcharFieldDto>("string_field", false, 1),
-                GetField<IntegerFieldDto>("integer_field", false, 2),
+                GetField<BigIntFieldDto>("integer_field", false, 2),
                 GetField<DateFieldDto>("date_field", false, 3),
                 decimalField,
-                structField
+                structField,
+                keyValueField,
+                GetField<VarcharFieldDto>("string_field_2", false, 13)
             });
 
             GoogleBigQueryService service = new GoogleBigQueryService(schemaService.Object);

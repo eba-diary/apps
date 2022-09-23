@@ -50,6 +50,40 @@
           ]
         }
       ]
+    },
+    {
+      "name": "key_value_struct",
+      "type": "RECORD",
+      "mode": "REPEATED",
+      "fields": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "mode": "NULLABLE"
+        },
+        {
+          "name": "value",
+          "type": "RECORD",
+          "mode": "NULLABLE",
+          "fields": [
+            {
+              "name": "value_field",
+              "type": "STRING",
+              "mode": "NULLABLE"
+            },
+            {
+              "name": "value_field_2",
+              "type": "INTEGER",
+              "mode": "NULLABLE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "string_field_2",
+      "type": "STRING",
+      "mode": "NULLABLE"
     }
   ]
 }
