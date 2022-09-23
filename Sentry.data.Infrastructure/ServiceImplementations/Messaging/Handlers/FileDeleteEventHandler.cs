@@ -160,16 +160,11 @@ namespace Sentry.data.Infrastructure
 
             //SUCCESS = SUCCESS OR (FAILURE and NOTFOUND)
             if (   single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS
-                        ||
-                        (
-                            single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
-                             && single.DeletedFiles.Exists(w => (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET)
-                        )
-                        ||
-                        (
-                            single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
-                             && single.DeletedFiles.Exists(w => (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET)
-                        )
+                    ||
+                    (
+                        single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
+                            && single.DeletedFiles.Exists(w => ( (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND || (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS ) && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET)
+                    )
             )
             {
                 status = GlobalConstants.DeleteFileResponseStatus.SUCCESS;
