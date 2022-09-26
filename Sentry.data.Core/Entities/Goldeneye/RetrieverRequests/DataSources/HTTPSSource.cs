@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -120,6 +121,18 @@ namespace Sentry.data.Core
         public override string GetDropPrefix(RetrieverJob Job)
         {
             throw new NotImplementedException();
+        }
+
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
+        {
+            if (String.IsNullOrWhiteSpace(job.JobOptions.TargetFileName))
+            {
+                validationResults.Add(ValidationErrors.httpsTargetFileNameIsBlank, "Target file name is required for HTTPS data sources");
+            }
+            if (String.IsNullOrWhiteSpace(job.RelativeUri))
+            {
+                validationResults.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for HTTPS data sources");
+            }
         }
     }
 }

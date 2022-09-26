@@ -1,7 +1,8 @@
-﻿using System;
-using System.IO;
-using Sentry.Configuration;
+﻿using Sentry.Configuration;
+using Sentry.Core;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Sentry.data.Core
 {
@@ -34,6 +35,11 @@ namespace Sentry.data.Core
         }
 
         public override string GetDropPrefix(RetrieverJob Job)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
         {
             throw new NotImplementedException();
         }
