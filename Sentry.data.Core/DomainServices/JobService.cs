@@ -144,7 +144,7 @@ namespace Sentry.data.Core
             }
 
             HttpsOptions ho = new HttpsOptions();
-            MaptToHttpsOptions(dto, ho);
+            MapToHttpsOptions(dto, ho);
 
             RetrieverJobOptions rjo = new RetrieverJobOptions();
             MapToRetrieverJobOptions(dto, rjo);
@@ -158,7 +158,7 @@ namespace Sentry.data.Core
             job.DeleteIssueDTM = DateTime.MaxValue;
 
             //if we have previous execution parameters from a data flow edit, only keep if RelativeUri did not change
-            if (dto.ExecutionParameters?.Any() == true)
+            if (dto.ExecutionParameters?.Any() == true && dto.FileSchema > 0)
             {
                 //check that all jobs are currently deleted and get the most recent deleted job
                 RetrieverJob previousRetrieverJob = _datasetContext.RetrieverJob.OrderByDescending(x => x.Id).FirstOrDefault(w => w.DataFlow.SchemaId == dto.FileSchema);
@@ -490,7 +490,7 @@ namespace Sentry.data.Core
             jobOptions.TargetFileName = dto.TargetFileName;
         }
 
-        private void MaptToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
+        private void MapToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
         {
             httpOptions.Body = dto.HttpRequestBody;
             httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
