@@ -9,13 +9,12 @@
     <!-- Data Set Dropdown Menu-->
     <h3>Datasets</h3>
     @Html.DropDownListFor(m => m.AllDatasets,
-                          new SelectList(Model.AllDatasets, "Value", "Text"),
-                          "Please select Dataset",
+                          Model.AllDatasets,
                           new
                           {
-                              @class = "admin-reprocess-dropdown",
-                              @style = "display: none",
-                              @searchable = "Search Available Datasets"
+                              searchable = "Search Available Datasets",
+                              @class = "mdb-select admin-reprocess-dropdown",
+                              @style = "display: none"
                           })
 </div>
 <!-- Schema Dropdown Menu-->
@@ -61,9 +60,6 @@
         $(function () {
             data.Admin.ReprocessInit();
         });
-
-
-
     </script>
 
 
