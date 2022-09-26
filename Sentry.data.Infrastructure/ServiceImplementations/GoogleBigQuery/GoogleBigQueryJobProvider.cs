@@ -83,7 +83,7 @@ namespace Sentry.data.Infrastructure
 
                                 //update execution parameters
                                 SaveProgress(config, job);
-                                Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {job.Id},, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                                Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
                             }
                         }
 
