@@ -212,8 +212,17 @@ namespace Sentry.data.Infrastructure
             apacheLivyClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
             apacheLivyClient.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
             var apacheHttpClientProvider = new HttpClientProvider(apacheLivyClient);
-            registry.For<IApacheLivyProvider>().Use<ApacheLivyProvider>().
+            if (Configuration.Config.GetDefaultEnvironmentName().ToLower() == "dev")
+            {
+                registry.For<IApacheLivyProvider>().Use<MockApacheLivyProvider>().
                 Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider);
+            }
+            else
+            {
+                registry.For<IApacheLivyProvider>().Use<ApacheLivyProvider>().
+                Ctor<IHttpClientProvider>().Is(apacheHttpClientProvider);
+            }
+            
 
 
             //establish httpclient specific to ConfluentConnectorProvider

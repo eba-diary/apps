@@ -290,8 +290,8 @@ namespace Sentry.data.Core.Tests
             JobService jobService = new JobService(null, null, null, null, null);
 
             //Act
-            jobService.AddArgumentsElement(builder_newValue, argsNewValue, argsDefaultValue);
-            jobService.AddArgumentsElement(builder_defaultValue, null, argsDefaultValue);
+            jobService.AddLivyArgumentsElement(builder_newValue, argsNewValue, argsDefaultValue);
+            jobService.AddLivyArgumentsElement(builder_defaultValue, null, argsDefaultValue);
 
             //Arrange
             Assert.AreEqual(", \"args\": [\"\"type\":\"alpha\"\",\"\"count\":5678\"]", builder_newValue.ToString(), "New value assignment failed");
@@ -357,7 +357,7 @@ namespace Sentry.data.Core.Tests
             var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
 
             //Assert
-            Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"22GB\", \"driverCores\": 22, \"executorMemory\": \"88GB\", \"executorCores\": 88, \"numExecutors\": 9999, \"conf\": \"Override parameters\", \"args\": [\"\"123\":7777\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
+            Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"22GB\", \"driverCores\": 22, \"executorMemory\": \"88GB\", \"executorCores\": 88, \"numExecutors\": 9999, \"conf\": {\"Override parameters\"}, \"args\": [\"\"123\":7777\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
         }
 
         [TestCategory("Core JobService")]

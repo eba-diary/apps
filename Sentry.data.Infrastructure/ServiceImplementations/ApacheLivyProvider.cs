@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
+using System;
 
 namespace Sentry.data.Infrastructure
 {
@@ -38,7 +39,7 @@ namespace Sentry.data.Infrastructure
             return await PostRequestAsync(resource, contentPost).ConfigureAwait(false);
         }
 
-        public async Task<HttpResponseMessage> PostRequestAsync(string resource, HttpContent postContent)
+        public virtual async Task<HttpResponseMessage> PostRequestAsync(string resource, HttpContent postContent)
         {
             string stringContent = await postContent.ReadAsStringAsync().ConfigureAwait(false);
             Logger.Debug($"{nameof(PostRequestAsync)} - baseurl:{_baseUrl}");
@@ -57,7 +58,7 @@ namespace Sentry.data.Infrastructure
             return response;
         }
 
-        public async Task<HttpResponseMessage> GetRequestAsync(string resource)
+        public virtual async Task<HttpResponseMessage> GetRequestAsync(string resource)
         {
             Logger.Debug($"{nameof(GetRequestAsync)} - baseurl:{_baseUrl}");
             Logger.Debug($"{nameof(GetRequestAsync)} - resource:{resource}");

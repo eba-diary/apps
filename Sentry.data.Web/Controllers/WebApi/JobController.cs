@@ -381,7 +381,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 {
                     HttpResponseMessage response  = await _jobService.SubmitApacheLivyJobAsync(JobId, JobGuid, dto);
 
-                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Ok(response);
+                    }
+                    else if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
                         Logger.Debug($"BadRequest from Spark (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(dto)}");
                         return BadRequest(response.Content.ReadAsStringAsync().Result);

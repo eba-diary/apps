@@ -422,6 +422,7 @@
     <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
+    <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />

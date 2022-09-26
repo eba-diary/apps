@@ -36,7 +36,7 @@ namespace Sentry.data.Core.Entities.Livy
         public string[] log { get; set; }
         public bool IsActive()
         {
-            if (state == "dead" || state == "error" || state == "success")
+            if (state.ToLower() == "dead" || state.ToLower() == "error" || state.ToLower() == "success")
             {
                 return false;
             }

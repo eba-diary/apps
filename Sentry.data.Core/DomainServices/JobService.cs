@@ -485,6 +485,7 @@ namespace Sentry.data.Core
             Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
 
             _apacheLivyProvider.SetBaseUrl(clusterUrl);
+
             System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
 
             string result = response.Content.ReadAsStringAsync().Result;
@@ -492,28 +493,22 @@ namespace Sentry.data.Core
 
             Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
 
+            LivyReply lr = null;
+
             if (response.IsSuccessStatusCode)
             {
                 if (result == $"Session '{historyRecord.BatchId}' not found.")
                 {
                     throw new LivyBatchNotFoundException("Session not found");
                 }
+                lr = JsonConvert.DeserializeObject<LivyReply>(result);
+            }
 
-                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
-
+            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
                 JobHistory newHistoryRecord = MapToJobHistory(historyRecord, lr);
 
-                _datasetContext.Add(newHistoryRecord);
-
-                //set previous active record to inactive
-                historyRecord.Modified = DateTime.Now;
-                historyRecord.Active = false;
-
-                _datasetContext.SaveChanges();
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                JobHistory newHistoryRecord = MapToJobHistory(historyRecord, null);
+                if (string.IsNullOrEmpty(newHistoryRecord.ClusterUrl)) { newHistoryRecord.ClusterUrl = clusterUrl; }
 
                 _datasetContext.Add(newHistoryRecord);
 
@@ -522,13 +517,13 @@ namespace Sentry.data.Core
                 historyRecord.Active = false;
 
                 _datasetContext.SaveChanges();
-            }
+            }            
 
             Logger.Debug($"{nameof(GetApacheLibyBatchStatusInternalAsync)} - Method End");
             return response;
         }
 
-        #region Private Methods
+#region Private Methods
 
         private JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
         {
@@ -546,7 +541,8 @@ namespace Sentry.data.Core
                 LogInfo = (reply != null) ? null : "Livy did not return a status for this batch job.",
                 Active = (reply != null) ? reply.IsActive() : false,
                 JobGuid = previousHistoryRec.JobGuid,
-                Submission = previousHistoryRec.Submission
+                Submission = previousHistoryRec.Submission,
+                ClusterUrl = previousHistoryRec.ClusterUrl
             };
         }
 
@@ -567,6 +563,8 @@ namespace Sentry.data.Core
 
             //Record submission regardless if target deems it a bad request.
             Submission sub = MapToSubmission(job, dto);
+            sub.Serialized_Job_Options = postContent;
+            sub.ClusterUrl = clusterUrl;
 
             _datasetContext.Add(sub);
             _datasetContext.SaveChanges();
@@ -586,7 +584,7 @@ namespace Sentry.data.Core
                     LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
                     Active = true,
                     Submission = sub,
-                    ClusterUrl = dto.ClusterUrl
+                    ClusterUrl = clusterUrl
                 };
 
                 _datasetContext.Add(histRecord);
@@ -612,7 +610,6 @@ namespace Sentry.data.Core
                 JobId = job,
                 JobGuid = job.JobGuid,
                 Created = DateTime.Now,
-                Serialized_Job_Options = JsonConvert.SerializeObject(dto),
                 FlowExecutionGuid = dto.FlowExecutionGuid,
                 RunInstanceGuid = dto.RunInstanceGuid,
                 ClusterUrl = dto.ClusterUrl
@@ -653,10 +650,11 @@ namespace Sentry.data.Core
 
                 AddElement(json, "numExecutors", dto.NumExecutors, job.JobOptions?.JavaAppOptions?.NumExecutors);
 
-                AddElement(json, "conf", dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
+                //AddElement(json, "conf", dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
+                AddLivyConfigElement(json, dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
 
                 // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
-                AddArgumentsElement(json, dto.Arguments, job.JobOptions?.JavaAppOptions?.Arguments);
+                AddLivyArgumentsElement(json, dto.Arguments, job.JobOptions?.JavaAppOptions?.Arguments);
             }            
 
             string[] jars = dsrc.Options.JarDepenencies;
@@ -715,15 +713,33 @@ namespace Sentry.data.Core
             return value < maxValue;
         }
 
-        internal void AddArgumentsElement(StringBuilder content, string[] newValue, string[] defaultValue)
+        internal void AddLivyConfigElement(StringBuilder content, string newValue, string defaultValue)
         {
+            string configValue = null;
+
             if (newValue != null && newValue.Any())
             {
-                GenerateArguments(newValue, content);
+                configValue = newValue;
             }
             else if (defaultValue != null && defaultValue.Any())
             {
-                GenerateArguments(defaultValue, content);
+                configValue = defaultValue;
+            }
+
+            if (configValue != null)
+            {
+                content.Append($", \"conf\":{configValue}");
+            }
+        }
+        internal void AddLivyArgumentsElement(StringBuilder content, string[] newValue, string[] defaultValue)
+        {
+            if (newValue != null && newValue.Any())
+            {
+                GenerateLivyArguments(newValue, content);
+            }
+            else if (defaultValue != null && defaultValue.Any())
+            {
+                GenerateLivyArguments(defaultValue, content);
             }
         }
         internal void AddElement(StringBuilder content, string elementName, string newValue, string defaultValue)
@@ -760,7 +776,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private static void GenerateArguments(string[] arguments, StringBuilder json)
+        private static void GenerateLivyArguments(string[] arguments, StringBuilder json)
         {
             json.Append($", \"args\": [");
             int iteration = 1;
@@ -920,6 +936,6 @@ namespace Sentry.data.Core
 
             Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method End");
         }
-        #endregion
+#endregion
     }
 }
