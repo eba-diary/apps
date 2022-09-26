@@ -365,9 +365,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public int UpdateandSaveDataFlow(DataFlowDto dfDto)
         {
-            string methodName = $"<{nameof(DataFlowService).ToLower()}_{nameof(UpdateandSaveDataFlow).ToLower()} Method Start";
-            Logger.Info($"{methodName} Method Start");
-
             /*
              *  Logically delete the existing dataflow
              *    This will take care of deleting any existing 
@@ -382,13 +379,18 @@ namespace Sentry.data.Core
              *  - The incoming dto will have flowstoragecode and will
              *     be used by new dataflow as well  
             */
-            DataFlow newDataFlow = CreateDataFlow(dfDto);
+            try
+            {
+                DataFlow newDataFlow = CreateDataFlow(dfDto);
+                _datasetContext.SaveChanges();
 
-            _datasetContext.SaveChanges();
-
-            Logger.Info($"{methodName} Method Start");
-
-            return newDataFlow.Id;
+                return newDataFlow.Id;
+            }
+            catch (ValidationException)
+            {
+                _datasetContext.Clear();
+                throw;
+            }
         }
         public void CreateDataFlowForSchema(FileSchema scm)
         {

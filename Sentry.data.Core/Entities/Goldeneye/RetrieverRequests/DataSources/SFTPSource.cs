@@ -1,12 +1,7 @@
-﻿using System;
+﻿using Sentry.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using StructureMap;
-using Sentry.Core;
 
 namespace Sentry.data.Core
 {
@@ -74,6 +69,14 @@ namespace Sentry.data.Core
             throw new NotImplementedException();
         }
 
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
+        {
+            if (String.IsNullOrWhiteSpace(job.RelativeUri))
+            {
+                validationResults.Add(DataSource.ValidationErrors.relativeUriNotSpecified);
+            }
+        }
+
         public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
@@ -85,13 +88,13 @@ namespace Sentry.data.Core
 
             if (PortNumber == 0)
             {
-                vr.Add(ValidationErrors.portNumberValueNonZeroValue, "FTP Data Sources requires Port Number greater than 0.");
+                vr.Add(SftpValidationErrors.portNumberValueNonZeroValue, "FTP Data Sources requires Port Number greater than 0.");
             }
 
             return vr;
         }
 
-        public class ValidationErrors
+        public static class SftpValidationErrors
         {
             public const string portNumberValueNonZeroValue = "portNumberValueNonZeroValue";
             public const string distinctSourceName = "distinctSourceName";

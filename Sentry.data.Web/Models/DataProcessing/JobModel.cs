@@ -1,9 +1,9 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Core;
+using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.Mvc;
-using Sentry.Core;
 
 namespace Sentry.data.Web
 {
@@ -87,41 +87,8 @@ namespace Sentry.data.Web
                 results.Add("SchedulePicker", "Schedule is required");
             }
 
-            //Validate GoogleApi Configuration
-            if (SelectedSourceType == GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE)
-            {
-                ValidateGoogleApiValues(results);
-            }
-
             return new ValidationException(results);
         }
-        
-        private void ValidateGoogleApiValues(ValidationResults results)
-        {
-            if (string.IsNullOrWhiteSpace(RelativeUri))
-            {
-                
-                results.Add(RetrieverJob.ValidationErrors.googleApiRelativeUriIsBlank, "Please provide a url");
-            }
-            if (SelectedRequestMethod == HttpMethods.none)
-            {
-                results.Add(RetrieverJob.ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
-            }
-
-            if (SelectedRequestMethod == HttpMethods.post && SelectedRequestDataFormat == HttpDataFormat.none)
-            {
-                results.Add(RetrieverJob.ValidationErrors.httpsRequestDataFormatNotSelected, "Request Body Format is required");
-            }
-
-            if (SelectedRequestMethod == HttpMethods.post && string.IsNullOrWhiteSpace(HttpRequestBody))
-            {
-                results.Add(RetrieverJob.ValidationErrors.httpsRequestBodyIsBlank, "Request body is required");
-            }
-
-            if (string.IsNullOrWhiteSpace(TargetFileName))
-            {
-                results.Add(RetrieverJob.ValidationErrors.httpsTargetFileNameIsBlank, "Target file name is required");
-            }
-        }
+       
     }
 }

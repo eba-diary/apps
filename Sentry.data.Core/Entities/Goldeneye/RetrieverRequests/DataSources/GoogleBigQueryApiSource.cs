@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.Core;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -41,6 +42,16 @@ namespace Sentry.data.Core
             get
             {
                 return GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE;
+            }
+        }
+
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
+        {
+            base.Validate(job, validationResults);
+
+            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
+            {
+                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
             }
         }
     }
