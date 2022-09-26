@@ -492,6 +492,7 @@ namespace Sentry.data.Core.Tests
             Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object) { CallBase = true };
             jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
             jobService.Setup(s => s.MapToSubmission(It.IsAny<RetrieverJob>(), It.IsAny<JavaOptionsOverrideDto>())).Verifiable();
+            jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
 
             
             Times jobHistoryAddCount = isLivyCallSuccessful ? Times.Once() : Times.Never();

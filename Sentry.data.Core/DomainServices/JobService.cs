@@ -480,7 +480,7 @@ namespace Sentry.data.Core
             string runInstanceGuid = (historyRecord.Submission != null && historyRecord.Submission.RunInstanceGuid != null) ? historyRecord.Submission.RunInstanceGuid : "00000000000000000";
             Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
 
-            string clusterUrl = (!string.IsNullOrEmpty(historyRecord.ClusterUrl)) ? historyRecord.ClusterUrl : Configuration.Config.GetHostSetting("ApacheLivy");
+            string clusterUrl = GetClusterUrl(historyRecord);
 
             Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
 
@@ -554,7 +554,9 @@ namespace Sentry.data.Core
         {
             string postContent = BuildLivyPostContent(dto, job);
 
-            _apacheLivyProvider.SetBaseUrl(dto.ClusterUrl);
+            string clusterUrl = GetClusterUrl(dto);
+
+            _apacheLivyProvider.SetBaseUrl(clusterUrl);
 
             System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", postContent);
 
@@ -592,6 +594,15 @@ namespace Sentry.data.Core
             }
 
             return response;
+        }
+
+        internal virtual string GetClusterUrl(JavaOptionsOverrideDto dto)
+        {
+            return (!string.IsNullOrWhiteSpace(dto.ClusterUrl)) ? dto.ClusterUrl : Configuration.Config.GetHostSetting("ApacheLivy");
+        }
+        internal virtual string GetClusterUrl(JobHistory historyRecord)
+        {
+            return (!string.IsNullOrWhiteSpace(historyRecord.ClusterUrl)) ? historyRecord.ClusterUrl : Configuration.Config.GetHostSetting("ApacheLivy");
         }
 
         internal virtual Submission MapToSubmission(RetrieverJob job, JavaOptionsOverrideDto dto)
