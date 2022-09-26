@@ -480,10 +480,11 @@ namespace Sentry.data.Core
             string runInstanceGuid = (historyRecord.Submission != null && historyRecord.Submission.RunInstanceGuid != null) ? historyRecord.Submission.RunInstanceGuid : "00000000000000000";
             Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
 
+            string clusterUrl = (!string.IsNullOrEmpty(historyRecord.ClusterUrl)) ? historyRecord.ClusterUrl : Configuration.Config.GetHostSetting("ApacheLivy");
 
-            Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:/batches/{historyRecord.BatchId}");
+            Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
 
-            _apacheLivyProvider.SetBaseUrl(historyRecord.ClusterUrl);
+            _apacheLivyProvider.SetBaseUrl(clusterUrl);
             System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
 
             string result = response.Content.ReadAsStringAsync().Result;
