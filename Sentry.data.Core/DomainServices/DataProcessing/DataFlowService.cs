@@ -714,8 +714,7 @@ namespace Sentry.data.Core
             return new ValidationException(results);
         }
 
-        #region Private Methods
-        
+        #region Private Methods        
         private DataFlow CreateDataFlow(DataFlowDto dto)
         {
             Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method Start");
@@ -862,6 +861,7 @@ namespace Sentry.data.Core
             Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPull).ToLower()} Method Start");
 
             dto.RetrieverJob.DataFlow = df.Id;
+            dto.RetrieverJob.FileSchema = df.SchemaId;
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
             MapDataFlowSteps(dto, df);

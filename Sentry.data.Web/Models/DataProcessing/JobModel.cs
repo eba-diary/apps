@@ -67,10 +67,9 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
         public IEnumerable<SelectListItem> FtpPatternDropDown { get; internal set; }
         public IEnumerable<SelectListItem> SchedulePickerDropdown { get; set; }
-
         public List<string> SourceIds { get; set; }
-
         public UserSecurity Security { get; set; }
+        public Dictionary<string, string> ExecutionParameters { get; set; }
 
         internal ValidationException Validate()
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Nest;
 using RestSharp;
 using Sentry.Core;
 
@@ -77,6 +78,7 @@ namespace Sentry.data.Core
             dto.RequestMethod = job.JobOptions?.HttpOptions?.RequestMethod ?? null;
             dto.RequestDataFormat = job.JobOptions?.HttpOptions?.RequestDataFormat ?? null;
             dto.FtpPattern = job.JobOptions?.FtpPattern ?? null;
+            dto.ExecutionParameters = job.ExecutionParameters;
 
             return dto;
         }

@@ -172,7 +172,6 @@ namespace Sentry.data.Web.Controllers
 
             AddCoreValidationExceptionsToModel(model.Validate());
 
-
             DataFlowDto dfDto = ModelToDto(model);
 
             AddCoreValidationExceptionsToModel(await _dataFlowService.ValidateAsync(dfDto));
@@ -397,7 +396,7 @@ namespace Sentry.data.Web.Controllers
 
         private JobModel ToJobModel(RetrieverJobDto dto)
         {
-            JobModel model = new JobModel()
+            JobModel model = new JobModel
             {
                 Schedule = dto.Schedule,
                 SchedulePicker = dto.SchedulePicker.ToString(),
@@ -410,10 +409,11 @@ namespace Sentry.data.Web.Controllers
                 SelectedSourceType = dto.DataSourceType,
                 SelectedRequestMethod = dto.RequestMethod ?? Core.HttpMethods.none,
                 SelectedRequestDataFormat = dto.RequestDataFormat ?? Core.HttpDataFormat.none,
-                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern
+                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern,
+                ExecutionParameters = dto.ExecutionParameters,
+                SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule)
             };
 
-            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule);
             model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault().ToString();
 
             return model;

@@ -119,7 +119,7 @@ namespace Sentry.data.Core
             {
                 return string.IsNullOrEmpty(_executionParameters) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(_executionParameters);
             }
-            protected set
+            set
             {
                 _executionParameters = JsonConvert.SerializeObject(value);
             }

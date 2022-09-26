@@ -36,8 +36,11 @@ namespace Sentry.data.Infrastructure
             //calculate the tableId first
             GoogleBigQueryConfiguration config = GetConfig(job);
 
+            Logger.Info($"Google BigQuery Retriever Job start - Job: {job.Id}");
+
             //get Google token
             string accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
+            Logger.Info($"Google BigQuery Retriever Job access token retrieved - Job: {job.Id}");
 
             //get Google schema
             HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
@@ -49,17 +52,21 @@ namespace Sentry.data.Infrastructure
                 {
                     //update DSC schema
                     JArray bigQueryFields = GetBigQueryFields(httpClient, config);
+                    Logger.Info($"Google BigQuery Retriever Job fields retrieved - Job: {job.Id}");
                     _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
+                    Logger.Info($"Google BigQuery Retriever Job fields saved - Job: {job.Id}");
 
                     //get data flow step for drop location info
                     DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop).FirstOrDefault();
 
                     do
                     {
+                        Logger.Info($"Google BigQuery Retriever Job start data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
                         string requestKey = DateTime.Now.ToString("yyyyMMddHHmmssfff");
 
                         //make request
                         MemoryStream stream = GetBigQueryDataStream(httpClient, config);
+                        Logger.Info($"Google BigQuery Retriever Job end data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
 
                         //if rows to upload
                         if (stream != null)
@@ -67,13 +74,16 @@ namespace Sentry.data.Infrastructure
                             using (stream)
                             {
                                 //manufacture target key
-                                string targetKey = $"{step.TriggerKey}{job.JobOptions.TargetFileName}_{config.TableId}_{requestKey}.json";
+                                string targetKey = $"{step.TriggerKey}{job.JobOptions.TargetFileName}_{config.TableId}_{config.LastIndex}_{requestKey}.json";
 
                                 //upload to S3
+                                Logger.Info($"Google BigQuery Retriever Job start S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
                                 _s3ServiceProvider.UploadDataFile(stream, step.TriggerBucket, targetKey);
+                                Logger.Info($"Google BigQuery Retriever Job end S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
 
                                 //update execution parameters
                                 SaveProgress(config, job);
+                                Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {job.Id},, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
                             }
                         }
 
@@ -96,6 +106,8 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
+
+            Logger.Info($"Google BigQuery Retriever Job end - Job: {job.Id}");
         }
 
         #region Private
