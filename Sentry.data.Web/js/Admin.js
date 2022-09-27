@@ -377,6 +377,10 @@ data.Admin = {
                     break;
             }
 
+            // Show spinner + Reprocess button
+            $("#tab-spinner").show();
+            $("#auditReprocessButton").show();
+
             if (postCheck) {
                 $.ajax({
                     type: "POST",
@@ -388,6 +392,10 @@ data.Admin = {
                     },
                     error: function () {
                         data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
+                    },
+                    complete: function (msg) {
+                        // Hide spinner
+                        $("#tab-spinner").hide();
                     }
                 })
             }
@@ -440,7 +448,7 @@ data.Admin = {
                     error: function (req, status, error) {
                         alert("Error try again");
                     },
-                    complete: function (msg) {
+                    complete: function (msg) { 
                         // Hide spinner
                         $("#tab-spinner").hide();
                     }
