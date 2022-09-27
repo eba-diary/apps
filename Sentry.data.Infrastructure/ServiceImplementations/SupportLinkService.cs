@@ -64,6 +64,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        
         public List<SupportLinkDto> GetSupportLinks()
         {
             List<SupportLink> supportLinks = _datasetContext.SupportLinks.ToList();
@@ -81,5 +82,6 @@ namespace Sentry.data.Infrastructure
             }
             return supportLinkDtos;
         }
+        
     }
 }
