@@ -227,6 +227,126 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
 
+        [TestMethod]
+        public void Process_OverallFailure_But_Parquet_Success()
+        {
+            //ARRANGE
+            MockRepository mockRepository = new MockRepository(MockBehavior.Loose);
+            Mock<IEventService> mockEventService = mockRepository.Create<IEventService>();
+            Mock<IDatasetFileService> mockDataFileService = mockRepository.Create<IDatasetFileService>();
+
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mockRepository.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> mockDataFeatureService = mockRepository.Create<IDataFeatures>();
+            mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
+            mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
+
+            string mockMessage = @"
+                                    {
+                                      'DeleteProcessStatus': 'Failure',
+                                      'EventType': 'FILE_DELETE_RESPONSE',
+                                      'RequestGUID': '20220606110640049',
+                                      'DeleteProcessStatusPerID': [
+                                        {
+                                          'DatasetFileId': 3000,
+                                          'DeletedFiles': [
+                                            {
+                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
+                                              'deleteProcessStatus': 'NotFound',
+                                              'fileType': 'RawQuery',
+                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
+                                            },
+                                            {
+                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
+                                              'deleteProcessStatus': 'NotFound',
+                                              'fileType': 'Raw',
+                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
+                                            },
+                                            {
+                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
+                                              'deleteProcessStatus': 'Success',
+                                              'fileType': 'Parquet',
+                                              'key': []
+                                            }
+                                          ],
+                                          'DatasetFileIdDeleteStatus': 'Failure'
+                                        }
+                                      ]
+                                    }
+                                    ";
+            FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
+            handle.HandleLogic(mockMessage);
+
+            //VERIFY
+            mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Deleted), Times.Once);
+            mockDataFileService.VerifyAll();
+        }
+
+
+
+        [TestMethod]
+        public void Process_OverallFailure_But_Parquet_Failure_Raw_Success_MakeSureStillDeleteFailure()
+        {
+            //ARRANGE
+            MockRepository mockRepository = new MockRepository(MockBehavior.Loose);
+            Mock<IEventService> mockEventService = mockRepository.Create<IEventService>();
+            Mock<IDatasetFileService> mockDataFileService = mockRepository.Create<IDatasetFileService>();
+
+
+            //mock features
+            Mock<IFeatureFlag<bool>> feature = mockRepository.Create<IFeatureFlag<bool>>();
+            feature.Setup(x => x.GetValue()).Returns(true);
+            Mock<IDataFeatures> mockDataFeatureService = mockRepository.Create<IDataFeatures>();
+            mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
+            mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
+
+            string mockMessage = @"
+                                    {
+                                      'DeleteProcessStatus': 'Failure',
+                                      'EventType': 'FILE_DELETE_RESPONSE',
+                                      'RequestGUID': '20220606110640049',
+                                      'DeleteProcessStatusPerID': [
+                                        {
+                                          'DatasetFileId': 3000,
+                                          'DeletedFiles': [
+                                            {
+                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
+                                              'deleteProcessStatus': 'Success',
+                                              'fileType': 'RawQuery',
+                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
+                                            },
+                                            {
+                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
+                                              'deleteProcessStatus': 'NotFound',
+                                              'fileType': 'Raw',
+                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
+                                            },
+                                            {
+                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
+                                              'deleteProcessStatus': 'Belgrade',
+                                              'fileType': 'Parquet',
+                                              'key': []
+                                            }
+                                          ],
+                                          'DatasetFileIdDeleteStatus': 'Failure'
+                                        }
+                                      ]
+                                    }
+                                    ";
+            FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
+            handle.HandleLogic(mockMessage);
+
+            //VERIFY
+            mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure), Times.Once);
+            mockDataFileService.VerifyAll();
+        }
+
+
+
+
+
 
         [TestMethod]
         public void Process_Parquet_Not_Found()
