@@ -315,7 +315,7 @@ namespace Sentry.data.Core.Tests
                 ExecutorMemory = "88GB",
                 ExecutorCores = 88,
                 NumExecutors = 9999,
-                ConfigurationParameters = "Override parameters",
+                ConfigurationParameters = "\"Override parameters\"",
                 Arguments = new string[] { "\"123\":7777" }
             };
 
@@ -357,7 +357,7 @@ namespace Sentry.data.Core.Tests
             var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
 
             //Assert
-            Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"22GB\", \"driverCores\": 22, \"executorMemory\": \"88GB\", \"executorCores\": 88, \"numExecutors\": 9999, \"conf\": {\"Override parameters\"}, \"args\": [\"\"123\":7777\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
+            Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"22GB\", \"driverCores\": 22, \"executorMemory\": \"88GB\", \"executorCores\": 88, \"numExecutors\": 9999, \"conf\":\"Override parameters\", \"args\": [\"\"123\":7777\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
         }
 
         [TestCategory("Core JobService")]
@@ -405,7 +405,7 @@ namespace Sentry.data.Core.Tests
                         ExecutorMemory = "99MB",
                         ExecutorCores = 99,
                         NumExecutors = 12345,
-                        ConfigurationParameters = "config parameters",
+                        ConfigurationParameters = "\"config parameters\"",
                         Arguments = new string[] { "\"abc\":\"zyz\"" }
                     }
                 }
@@ -420,7 +420,7 @@ namespace Sentry.data.Core.Tests
             var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
 
             //Assert
-            Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"1MB\", \"driverCores\": 1, \"executorMemory\": \"99MB\", \"executorCores\": 99, \"numExecutors\": 12345, \"conf\": \"config parameters\", \"args\": [\"\"abc\":\"zyz\"\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
+            Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"1MB\", \"driverCores\": 1, \"executorMemory\": \"99MB\", \"executorCores\": 99, \"numExecutors\": 12345, \"conf\":\"config parameters\", \"args\": [\"\"abc\":\"zyz\"\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
         }
 
         [TestCategory("Core JobService")]
@@ -445,10 +445,10 @@ namespace Sentry.data.Core.Tests
             //Act
             var result = service.MapToSubmission(retrieverJob, javaOptionsOverrideDto);
 
+            //Assert
             Assert.AreEqual(javaOptionsOverrideDto.ClusterUrl, result.ClusterUrl);
             Assert.AreEqual(javaOptionsOverrideDto.FlowExecutionGuid, result.FlowExecutionGuid);
             Assert.AreEqual(javaOptionsOverrideDto.RunInstanceGuid, result.RunInstanceGuid);
-            Assert.AreEqual(JsonConvert.SerializeObject(javaOptionsOverrideDto), result.Serialized_Job_Options);
             Assert.AreEqual(retrieverJob, result.JobId);
             Assert.AreEqual(retrieverJob.JobGuid, result.JobGuid);
         }

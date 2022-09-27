@@ -60,6 +60,10 @@ namespace Sentry.data.Infrastructure
 
         public virtual async Task<HttpResponseMessage> GetRequestAsync(string resource)
         {
+            if (string.IsNullOrEmpty(_baseUrl)) { throw new ArgumentNullException(nameof(resource),"Client url is required"); }
+            if (string.IsNullOrEmpty(resource)) { throw new ArgumentNullException(nameof(resource),"resource is required"); }
+
+
             Logger.Debug($"{nameof(GetRequestAsync)} - baseurl:{_baseUrl}");
             Logger.Debug($"{nameof(GetRequestAsync)} - resource:{resource}");
 
