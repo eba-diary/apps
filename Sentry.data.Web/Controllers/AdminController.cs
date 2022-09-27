@@ -126,11 +126,21 @@ namespace Sentry.data.Web.Controllers
             List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
             dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
             model.AllDatasets = new List<SelectListItem>();
+
+            model.AllDatasets.Add(new SelectListItem()
+            {
+                Value = "None",
+                Text = "Please select a dataset...",
+                Selected = true,
+                Disabled = true,
+            });
+
             foreach (DatasetDto dto in dtoList)
             {
                 SelectListItem item = new SelectListItem();
                 item.Text = dto.DatasetName;
                 item.Value = dto.DatasetId.ToString();
+                item.Selected = false;
                 model.AllDatasets.Add(item);
             }
 

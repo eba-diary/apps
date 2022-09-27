@@ -425,7 +425,7 @@ data.Admin = {
             // Retrieve seleced date
             var selectedDate = $('#datetime-picker').val();
 
-            var timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {
@@ -524,6 +524,12 @@ data.Admin = {
         });
     },
 
+    // sets the dataset dropdown to scroll to top on click
+    // this method should be considered to be refactored.
+    DatasetDropdownScrollToTop: function () {
+        $("input.select-dropdown.form-control").click(function () { $(this).next("ul.dropdown-content.select-dropdown").scrollTop(0) });
+    },
+
     GetFlowEvents: function (data) {
         var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partition</th><th>Run Instance Guid</th><th>Event Contents</th></tr>';
         for (var flowEvent of data.FlowEvents) {
@@ -547,11 +553,16 @@ data.Admin = {
         $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect()
         $("#flowStepsDropdown").materialSelect();
+
+        data.Admin.DatasetDropdownScrollToTop();
+
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
+
+                data.Admin.DatasetDropdownScrollToTop();
             }
 
         });
@@ -563,6 +574,8 @@ data.Admin = {
                 data.Admin.PopulateTable(url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
                 data.Admin.GetFlowStepDropdown(url);
+
+                data.Admin.DatasetDropdownScrollToTop();
             }
         });
         // activate or deactivate button
@@ -623,11 +636,16 @@ data.Admin = {
         $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect();
         $("#fileDropdown").materialSelect();
+
+        data.Admin.DatasetDropdownScrollToTop();
+
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
+
+                data.Admin.DatasetDropdownScrollToTop();
             }
             data.Admin.ActivateDeactivateSubmitButton();
 
@@ -638,6 +656,8 @@ data.Admin = {
             if (schemaId != -1 && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.GetFileDropdown(url);
+
+                data.Admin.DatasetDropdownScrollToTop();
             }
             data.Admin.ActivateDeactivateSubmitButton();
         });
