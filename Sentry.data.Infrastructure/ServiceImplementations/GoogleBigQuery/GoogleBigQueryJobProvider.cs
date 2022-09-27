@@ -45,6 +45,7 @@ namespace Sentry.data.Infrastructure
             //get Google schema
             HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+            httpClient.Timeout = new TimeSpan(0, 10, 0);
 
             using (httpClient)
             {
@@ -91,6 +92,11 @@ namespace Sentry.data.Infrastructure
                         {
                             IncrementTableId(config);
                         }
+
+                        //refresh token if expired
+                        accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
+                        httpClient.DefaultRequestHeaders.Clear();
+                        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
                     }
                     while (true); //only break loop on exception
                 }

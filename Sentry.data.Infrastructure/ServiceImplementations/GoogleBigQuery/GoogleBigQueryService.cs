@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Owin.Logging;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.DTO.Schema.Fields;
 using System;
@@ -36,6 +38,7 @@ namespace Sentry.data.Infrastructure
             }
 
             _schemaService.CreateAndSaveSchemaRevision(schemaId, fieldDtos, $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}");
+            Logger.Info($"Google Big Query schema has been updated - SchemaId: {schemaId}");
         }
 
         #region Private
