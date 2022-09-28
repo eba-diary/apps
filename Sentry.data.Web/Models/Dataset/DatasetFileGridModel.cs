@@ -51,14 +51,6 @@ namespace Sentry.data.Web
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><em class='fas fa-cloud-download-alt text-primary'></em></a>";
                 }
-
-                if (HasFullViewDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(FileName)))
-                {
-                    href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
-                        "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
-                        "</a>";
-
-                }
                 return href;
             }
         }
