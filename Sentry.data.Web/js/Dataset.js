@@ -1541,24 +1541,6 @@ data.Dataset = {
         }
     },
 
-    ProgressModalStatus: function () {
-        // Reference the auto-generated proxy for the hub.
-        var progress = $.connection.progressHub;
-        // Create a function that the hub can call back to display messages.
-        progress.client.AddProgress = function (message, percentage) {
-            ProgressBarModal("show", message, "Progress: " + percentage);
-            $('#ProgressMessage').width(percentage);
-            if (percentage === "100%") {
-                ProgressBarModal();
-            }
-        };
-
-        connectionId = $.connection.hub.start()
-            .done(function () {
-                var connectionId = $.connection.hub.id;
-            });
-    },
-
     DownloadLatestDatasetFile: function (id) {
         /// Send temp URL (containing the dataset, from S3) to a new window
         /// This will initiate the download process
