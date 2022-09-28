@@ -127,7 +127,6 @@ namespace Sentry.data.Infrastructure
             registry.For<ILdClient>().Singleton().Use(LdClientFactory.BuildLdClient());
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
-            registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();

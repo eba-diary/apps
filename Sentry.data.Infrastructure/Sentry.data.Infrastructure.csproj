@@ -472,8 +472,6 @@
     <Compile Include="ServiceImplementations\ExtendedUserInfo.cs" />
     <Compile Include="ServiceImplementations\ExtendedUserInfoProvider.cs" />
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
-    <Compile Include="ServiceImplementations\SASProvider.cs" />
-    <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
     <Compile Include="ServiceImplementations\UserFavoriteService.cs" />
     <Compile Include="ServiceImplementations\WallEService.cs" />

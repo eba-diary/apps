@@ -469,12 +469,7 @@ namespace Sentry.data.Infrastructure
         #region Extensions
         private void ToChangeTemplateResponse(AccessRequest model, TemplateResponse response)
         {
-
-
             SetFieldValue(response.Fields, "Title", BuildTitleByTemplate(model));
-
-
-
             SetFieldValue(response.Fields, "Description", BuildBodyByTemplate(model).ToString());
             SetFieldValue(response.Fields, "ProposedStartDate", DateTime.Now.ToString("MM/dd/yyyy hh:mm tt"));
             SetFieldValue(response.Fields, "ScheduledEndDate", DateTime.Now.Add(TimeSpan.FromDays(14)).ToString("MM/dd/yyyy hh:mm tt"));
@@ -482,7 +477,6 @@ namespace Sentry.data.Infrastructure
             var customerInfoResponse = GetCustomerInfo(model.RequestorsId);
 
             SetFieldValue(response.Fields, "RequestedBy", customerInfoResponse.Fields.FirstOrDefault(w => w.Name == "FullName").Value);
-
             SetFieldValue(response.Fields, "OwnedByTeam", "BI Portal Administration");
 
             var userInfoResponse = GetUserInfo("072984");
@@ -552,7 +546,8 @@ namespace Sentry.data.Infrastructure
                     break;
             }
             sb.Append($"Business Reason: {model.BusinessReason} <br>");
-            sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
+            sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName} <br>");
+            sb.Append($"DSC Environment: {Config.GetHostSetting("WebApiUrl").Replace("http://", "")}");
             return sb;
         }
 

@@ -134,13 +134,6 @@
             <param name="extension"></param>
             <returns></returns>
         </member>
-        <member name="M:Sentry.data.Common.Utilities.IsExtentionPushToSAScompatible(System.String)">
-            <summary>
-            
-            </summary>
-            <param name="extension"></param>
-            <returns></returns>
-        </member>
         <member name="M:Sentry.data.Common.Utilities.GenerateHash(System.String)">
             <summary>
             Generates hash based on input, returns GUID 

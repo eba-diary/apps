@@ -1918,9 +1918,7 @@
     <Content Include="Views\Dataset\_ListItem.cshtml" />
     <Content Include="Views\Dataset\Detail.cshtml" />
     <Content Include="_status\web.config" />
-    <Content Include="Views\Dataset\_PushToFilenameOverride.cshtml" />
     <Content Include="Views\Shared\_Success.cshtml" />
-    <Content Include="Views\Dataset\_PushToFilenameOverride_new.cshtml" />
     <Content Include="Views\DataAsset\Index.cshtml" />
     <Content Include="Views\DataAsset\_ConsumptionLayerComponent.cshtml" />
     <Content Include="Views\DataAsset\_ComponentTableRow.cshtml" />
@@ -1928,12 +1926,10 @@
     <Content Include="Views\Home\_GridTwo.cshtml" />
     <Content Include="Views\Home\_Feed.cshtml" />
     <Content Include="Views\Dataset\_HomeDataset.cshtml" />
-    <Content Include="Views\Dataset\_ListDatasetFile.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFileForm.cshtml" />
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />
-    <Content Include="Views\Dataset\_BundleFilename.cshtml" />
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Config\Create.cshtml" />
     <Content Include="Views\Dataset\_Subscribe.cshtml" />

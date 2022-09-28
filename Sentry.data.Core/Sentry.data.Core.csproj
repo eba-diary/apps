@@ -353,7 +353,6 @@
     <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\KafkaProducerException.cs" />
     <Compile Include="Exceptions\RetrieverJobProcessingException.cs" />
-    <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
@@ -499,7 +498,6 @@
     <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
-    <Compile Include="Extensions\DataElementExtensions.cs" />
     <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
@@ -626,7 +624,6 @@
     <Compile Include="Interfaces\IMessagePublisher.cs" />
     <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
-    <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IBaseJobProvider.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IGoogleApiProvider.cs" />

@@ -540,6 +540,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
             snowProvider.Setup(sp => sp.GetExceptRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
@@ -550,6 +551,50 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
+        }
+
+        [TestMethod]
+        public void GetExceptRows_Check_If_Table_Exists_ArgumentException_Thrown()
+        {
+            // Arrange 
+            MockRepository mr = new MockRepository(MockBehavior.Default);
+            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
+
+            SchemaConsumptionSnowflakeDto schemaConsumptionDto = new SchemaConsumptionSnowflakeDto()
+            {
+                SnowflakeDatabase = "db_test",
+                SnowflakeSchema = "schema",
+                SnowflakeTable = "table",
+                SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+            };
+
+            List<SchemaConsumptionDto> schemaConsumptionDtos = new List<SchemaConsumptionDto>() { schemaConsumptionDto };
+
+            FileSchemaDto fileSchemaDto = new FileSchemaDto()
+            {
+                SchemaId = 1,
+                ConsumptionDetails = schemaConsumptionDtos
+            };
+
+            List<FileSchemaDto> fileSchemaDtos = new List<FileSchemaDto>() { fileSchemaDto };
+
+            List<DatasetFileConfigDto> datasetFileConfigDtos = new List<DatasetFileConfigDto>();
+
+            DatasetFileConfigDto configDto = new DatasetFileConfigDto()
+            {
+                Schema = fileSchemaDto
+            };
+
+            datasetFileConfigDtos.Add(configDto);
+
+            configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+
+            AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
+
+            // Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => auditService.GetExceptRows(1, 1, "query", AuditSearchType.dateSelect));
         }
 
         [TestMethod]
@@ -596,6 +641,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
             snowProvider.Setup(sp => sp.GetCompareRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
@@ -614,6 +660,50 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(10, baseAuditDto.AuditDtos[0].RawqueryRowCount);
             Assert.AreEqual(20, baseAuditDto.AuditDtos[1].RawqueryRowCount);
             Assert.AreEqual(0,  baseAuditDto.AuditDtos[2].RawqueryRowCount);
+        }
+
+        [TestMethod]
+        public void GetCompareRows_Check_If_Table_Exists_ArgumentException_Thrown()
+        {
+            // Arrange 
+            MockRepository mr = new MockRepository(MockBehavior.Default);
+            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
+
+            SchemaConsumptionSnowflakeDto schemaConsumptionDto = new SchemaConsumptionSnowflakeDto()
+            {
+                SnowflakeDatabase = "db_test",
+                SnowflakeSchema = "schema",
+                SnowflakeTable = "table",
+                SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+            };
+
+            List<SchemaConsumptionDto> schemaConsumptionDtos = new List<SchemaConsumptionDto>() { schemaConsumptionDto };
+
+            FileSchemaDto fileSchemaDto = new FileSchemaDto()
+            {
+                SchemaId = 1,
+                ConsumptionDetails = schemaConsumptionDtos
+            };
+
+            List<FileSchemaDto> fileSchemaDtos = new List<FileSchemaDto>() { fileSchemaDto };
+
+            List<DatasetFileConfigDto> datasetFileConfigDtos = new List<DatasetFileConfigDto>();
+
+            DatasetFileConfigDto configDto = new DatasetFileConfigDto()
+            {
+                Schema = fileSchemaDto
+            };
+
+            datasetFileConfigDtos.Add(configDto);
+
+            configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+
+            AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
+
+            // Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect));
         }
 
         [TestCategory("Core DatasetService")]
