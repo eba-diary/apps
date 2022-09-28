@@ -465,7 +465,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
-                await _jobService.GetApacheLibyBatchStatusAsync(jobId, batchId);
+                await _jobService.GetApacheLivyBatchStatusAsync(jobId, batchId);
 
                 return Ok();
             }

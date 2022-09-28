@@ -432,19 +432,19 @@ namespace Sentry.data.Core
 
         }
 
-        public Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusAsync(JobHistory historyRecord)
+        public Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(JobHistory historyRecord)
         {
-            Logger.Debug($"{nameof(GetApacheLibyBatchStatusAsync)} - Method Start");
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method Start");
             if (historyRecord == null)
             {
                 throw new ArgumentNullException(nameof(historyRecord), "History Record Required");
             }
 
-            Logger.Debug($"{nameof(GetApacheLibyBatchStatusAsync)} - Method End");
-            return GetApacheLibyBatchStatusInternalAsync(historyRecord);
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method End");
+            return GetApacheLivyBatchStatusInternalAsync(historyRecord);
         }
 
-        public Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusAsync(int jobId, int batchId)
+        public Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(int jobId, int batchId)
         {
             if (jobId == 0)
             {
@@ -462,12 +462,12 @@ namespace Sentry.data.Core
                 throw new JobNotFoundException("No history of Job\\Batch ID combination");
             }
 
-            return GetApacheLibyBatchStatusInternalAsync(hr);
+            return GetApacheLivyBatchStatusInternalAsync(hr);
         }
 
-        private async Task<System.Net.Http.HttpResponseMessage> GetApacheLibyBatchStatusInternalAsync(JobHistory historyRecord)
+        private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
         {
-            Logger.Debug($"{nameof(GetApacheLibyBatchStatusInternalAsync)} - Method Start");
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
             /*
             * Add flowexecutionguid context variable
             */
@@ -482,7 +482,7 @@ namespace Sentry.data.Core
 
             string clusterUrl = GetClusterUrl(historyRecord);
 
-            Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
+            Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
 
             _apacheLivyProvider.SetBaseUrl(clusterUrl);
 
@@ -491,7 +491,7 @@ namespace Sentry.data.Core
             string result = response.Content.ReadAsStringAsync().Result;
             string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
 
-            Logger.Info($"{nameof(GetApacheLibyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
+            Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
 
             LivyReply lr = null;
 
@@ -519,7 +519,7 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
             }            
 
-            Logger.Debug($"{nameof(GetApacheLibyBatchStatusInternalAsync)} - Method End");
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
             return response;
         }
 
@@ -650,7 +650,7 @@ namespace Sentry.data.Core
 
                 AddElement(json, "numExecutors", dto.NumExecutors, job.JobOptions?.JavaAppOptions?.NumExecutors);
 
-                //AddElement(json, "conf", dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
+
                 AddLivyConfigElement(json, dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
 
                 // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]

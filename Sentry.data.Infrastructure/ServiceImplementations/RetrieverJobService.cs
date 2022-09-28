@@ -1149,7 +1149,7 @@ namespace Sentry.data.Infrastructure
 
                 foreach(var job in jobList)
                 {
-                    taskList.Add(_jobService.GetApacheLibyBatchStatusAsync(job));
+                    taskList.Add(_jobService.GetApacheLivyBatchStatusAsync(job));
                 }                
 
                 await Task.WhenAll(taskList);
