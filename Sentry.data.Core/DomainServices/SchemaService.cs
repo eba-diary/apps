@@ -238,13 +238,14 @@ namespace Sentry.data.Core
             return 0;
         }
 
-        public void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIdList)
+        public void CreateConsumptionLayersForSchemaList(int[] schemaIdList)
         {
             foreach(int schemaId in schemaIdList)
             {
                 FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
                 Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
-                _backgroundJobClient.Enqueue<SchemaService>(s => s.CreateConsumptionLayersForSchema(schema, MapToDto(schema), ds));
+                FileSchemaDto dto = MapToDto(schema);
+                CreateConsumptionLayersForSchema(schema, dto, ds);
             }
         }
 
