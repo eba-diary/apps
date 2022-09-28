@@ -404,7 +404,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, Guid JobGuid, JavaOptionsOverrideDto dto)
+        public Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, Guid JobGuid, JavaOptionsOverrideDto dto)
         {
             if (JobId == 0)
             {
@@ -428,7 +428,9 @@ namespace Sentry.data.Core
                 throw new ArgumentOutOfRangeException(nameof(JobId), "This only submits job defined with a data source type of JavaApp");
             }
 
-            return await SubmitApacheLivyJobInternalAsync(job, JobGuid, dto);
+
+
+            return SubmitApacheLivyJobInternalAsync(job, JobGuid, dto);
 
         }
 
