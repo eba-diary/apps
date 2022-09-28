@@ -24,7 +24,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION;
+                return GlobalConstants.DataSourceDiscriminator.DEFAULT_DROP_LOCATION;
             }
         }
         public override Uri CalcRelativeUri(RetrieverJob Job)

@@ -150,7 +150,7 @@
         <div class="md-form fieldDescription">
             <label class="control-label"></label>
             <div class="text-muted">
-                <em>Industry statandard default port values:</em>
+                <em>Industry standard default port values:</em>
                 <ul>
                     <li><em>FTP : 21</em></li>
                     <li><em>SSH\SFTP : 22</em></li>
@@ -211,7 +211,7 @@
             data.DataSource.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
 
             function setSourceTypeDefaults(sourceType) {
-                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
+                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS" || sourceType == "GOOGLEAPI" || sourceType == "GoogleBigQueryApi") {
 
                     $('#portNumberPanel').show();
                     $('#userPassPanel').hide();
@@ -235,6 +235,9 @@
                     else if (sourceType == "FTP") {
                         //Setting default values for port number
                         $('#PortNumber').val('21');
+                    }
+                    else if (sourceType == "GoogleBigQueryApi") {
+                        $('#PortNumber').val('443');
                     }
                     else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
                         //Setting default values for port number

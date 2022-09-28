@@ -137,6 +137,7 @@
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="ConfigServiceTests.cs" />
+    <Compile Include="DataSourceTests.cs" />
     <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="DatasetFileConfigExtensionsTests.cs" />
     <Compile Include="DatasetExtensionsTests.cs" />
     <Compile Include="ServiceImplementationTests\DatasetTileSearchServiceTests.cs" />
+    <Compile Include="SchemaExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

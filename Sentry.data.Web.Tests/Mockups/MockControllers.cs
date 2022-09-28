@@ -48,7 +48,6 @@ namespace Sentry.data.Web.Tests
 
         public static DatasetController MockDatasetController(Dataset ds, IApplicationUser user, List<DatasetSubscription> datasetSubscriptions = null)
         {
-
             Random r = new Random();
 
             var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
@@ -59,7 +58,6 @@ namespace Sentry.data.Web.Tests
 
             var mockObsidianService = MockRepository.GenerateStub<IObsidianService>();
             var mockS3Provider = MockRepository.GenerateStub<S3ServiceProvider>();
-            var mockSasProvider = MockRepository.GenerateStub<ISASService>();
 
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
@@ -111,7 +109,7 @@ namespace Sentry.data.Web.Tests
             exposeDataFlowFeature.Setup(x => x.GetValue()).Returns(false);
             mockFeatureFlag.SetupGet(x => x.Expose_Dataflow_Metadata_CLA_2146).Returns(exposeDataFlowFeature.Object);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, 
+            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, 
                 mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService,
                 mockFeatureFlag.Object, null, null, null, null, null, null);
             dsc.SharedContext = mockSharedContextModel;
@@ -128,7 +126,6 @@ namespace Sentry.data.Web.Tests
             var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
 
             var mockS3Provider = MockRepository.GenerateStub<S3ServiceProvider>();
-            var mockSasProvider = MockRepository.GenerateStub<ISASService>();
             var mockConfigService = MockRepository.GenerateStub<IConfigService>();
             var mockEvensService = MockRepository.GenerateStub<IEventService>();
             var mockDataFeatures = MockRepository.GenerateStub<IDataFeatures>();
@@ -158,7 +155,6 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
             mockDatasetContext.Stub(x => x.EventStatus).Return(MockClasses.MockEventStatuses().AsQueryable());
             mockDatasetContext.Stub(x => x.FileExtensions).Return(MockClasses.MockFileExtensions().AsQueryable());
-            //mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(dfc).AsQueryable());
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
@@ -168,29 +164,5 @@ namespace Sentry.data.Web.Tests
 
             return cc;
         }
-
-        //public static MetadataController MockMetadataController(Dataset ds, DatasetFileConfig dfc, Schema scm, IApplicationUser user)
-        //{
-        //    var mockConfigService = MockRepository.GenerateStub<IConfigService>();
-        //    var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
-        //    var mockSchemaService = MockRepository.GenerateStub<ISchemaService>();
-        //    var mockDataFlowService = MockRepository.GenerateStub<IDataFlowService>();
-        //    var mockHostSettings = MockRepository.GenerateStub<IHostSettings>();
-
-        //    var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
-        //    var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
-        //    var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
-        //    var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
-
-        //    mockHostSettings.Stub(x => x["S3DataPrefix"]).Return("data/");
-
-
-        //    mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());            
-
-
-        //    var mc = new MetadataController(, mockUserService, mockConfigService, mockDatasetService, mockSchemaService, mockSecurityService, mockDataFlowService);
-
-        //    return mc;
-        //}
     }
 }

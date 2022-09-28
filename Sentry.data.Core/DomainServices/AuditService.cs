@@ -37,6 +37,11 @@ namespace Sentry.data.Core
                 //create config object
                 SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
 
+                if (!_snowProvider.CheckIfExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table))
+                {
+                    throw new ArgumentException($"The table ({snowCompareConfig.Table}) trying to be compared does not exist in the current context.");
+                }
+
                 //calls to the snow provider to create call snowflake and return DataTable with resulting data
                 DataTable dataTable = _snowProvider.GetExceptRows(snowCompareConfig);
 
@@ -86,12 +91,18 @@ namespace Sentry.data.Core
 
                 SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
 
+                if(!_snowProvider.CheckIfExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table))
+                {
+                    throw new ArgumentException($"Table: {snowCompareConfig.Table} does not exist in the current context");
+                }
+                
                 //calls to the snow provider to create call snowflake and return DataTable with resulting data
                 DataTable dataTable = _snowProvider.GetCompareRows(snowCompareConfig);
 
                 stopWatch.Stop();
 
                 TimeSpan ts = stopWatch.Elapsed;
+
                 string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                     ts.Hours, ts.Minutes, ts.Seconds,
                     ts.Milliseconds / 10);

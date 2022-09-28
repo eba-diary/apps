@@ -34,5 +34,6 @@ namespace Sentry.data.Core
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string DeleteIssuer { get; set; }
         public DateTime DeleteIssueDTM { get; set; }
+        public Dictionary<string, string> ExecutionParameters { get; set; }
     }
 }

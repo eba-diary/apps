@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Nest;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
@@ -134,7 +135,6 @@ namespace Sentry.data.Core
             return newJob;
         }
 
-
         public RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto)
         {
             Compression compress = new Compression();
@@ -144,7 +144,7 @@ namespace Sentry.data.Core
             }
 
             HttpsOptions ho = new HttpsOptions();
-            MaptToHttpsOptions(dto, ho);
+            MapToHttpsOptions(dto, ho);
 
             RetrieverJobOptions rjo = new RetrieverJobOptions();
             MapToRetrieverJobOptions(dto, rjo);
@@ -157,6 +157,16 @@ namespace Sentry.data.Core
             job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Active;
             job.DeleteIssueDTM = DateTime.MaxValue;
 
+            //if we have previous execution parameters from a data flow edit, only keep if RelativeUri did not change
+            if (dto.ExecutionParameters?.Any() == true && dto.FileSchema > 0)
+            {
+                //check that all jobs are currently deleted and get the most recent deleted job
+                RetrieverJob previousRetrieverJob = _datasetContext.RetrieverJob.OrderByDescending(x => x.Id).FirstOrDefault(w => w.DataFlow.SchemaId == dto.FileSchema);
+                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted && previousRetrieverJob.RelativeUri == job.RelativeUri)
+                {
+                    job.ExecutionParameters = dto.ExecutionParameters;
+                }
+            }
             _datasetContext.Add(job);
 
             CreateDropLocation(job);
@@ -480,7 +490,7 @@ namespace Sentry.data.Core
             jobOptions.TargetFileName = dto.TargetFileName;
         }
 
-        private void MaptToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
+        private void MapToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
         {
             httpOptions.Body = dto.HttpRequestBody;
             httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;

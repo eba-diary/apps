@@ -264,7 +264,7 @@ data.Admin = {
 
                 // Break from each loop
                 return false;
-            } 
+            }
 
             console.log(searchStatus);
             console.log($(this).attr("id"));
@@ -417,6 +417,10 @@ data.Admin = {
                     break;
             }
 
+            // Show spinner + Reprocess button
+            $("#tab-spinner").show();
+            $("#auditReprocessButton").show();
+
             if (postCheck) {
                 $.ajax({
                     type: "POST",
@@ -428,6 +432,10 @@ data.Admin = {
                     },
                     error: function () {
                         data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
+                    },
+                    complete: function (msg) {
+                        // Hide spinner
+                        $("#tab-spinner").hide();
                     }
                 })
             }
@@ -459,7 +467,7 @@ data.Admin = {
         if (dateRangeToHours > rangeMax || dateRangeToHours < 0) {
             data.Dataset.makeToast("error", `Date selected must be within ${rangeMax/24} day(s) before current date`);
             return false;
-        } 
+        }
 
         return true;
     },
@@ -530,7 +538,6 @@ data.Admin = {
     // sets the dataset dropdown to scroll to top on click
     // this method should be considered to be refactored.
     DatasetDropdownScrollToTop: function () {
-        console.log("test");
         $("input.select-dropdown.form-control").click(function () { $(this).next("ul.dropdown-content.select-dropdown").scrollTop(0) });
     },
 
@@ -598,15 +605,15 @@ data.Admin = {
                 error: function () {
                     data.Dataset.makeToast("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
                 }
-                
+
             })
         });
         // activate or deactivate button
         $("#flowStepsDropdown").change(function (event) {
             data.Admin.ActivateDeactivateReprocessButton();
         });
-        
-         // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
+
+        // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
         /*
         $("#selectAll").click(function (event) {
             var selectAllCheckbox = $(this);
@@ -623,7 +630,8 @@ data.Admin = {
 
             console.log(filesToReprocess);
         });
-        */  
+        */
+
     },
     //loads dataflow metric page events
     DataFlowMetricsInit: function () {
@@ -837,4 +845,3 @@ data.Admin = {
         toastr[severity](message);
     }
 }
-

@@ -2,6 +2,14 @@
 @*@using (Html.BeginCollectionItem("RetrieverJob"))
     {*@
 
+@if (Model.ExecutionParameters?.Any() == true)
+{
+    foreach (string key in Model.ExecutionParameters.Keys)
+    {
+        @Html.HiddenFor(model => model.ExecutionParameters[key]);
+    }
+}
+
 <h4>Where Do You Want Us to Pull From?</h4>
 
 <div class="md-form">

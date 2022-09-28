@@ -91,88 +91,6 @@ namespace Sentry.data.Core
             return result;
         }
 
-        private static T GetDataAction<T>(this IQueryable<T> query) where T: BaseAction
-        {
-            Logger.Info("Method <GetDataAction> Started");
-
-            int actionId;
-
-            if (query is IQueryable<ProducerS3DropAction>)
-            {
-                actionId = 12;
-            }
-            else if (query is IQueryable<RawStorageAction>)
-            {
-                actionId = 2;
-            }
-            else if (query is IQueryable<QueryStorageAction>)
-            {
-                actionId = 3;
-            }
-            else if (query is IQueryable<ConvertToParquetAction>)
-            {
-                actionId = 6;
-            }
-            else if (query is IQueryable<UncompressZipAction>)
-            {
-                actionId = 5;
-            }
-            else if (query is IQueryable<GoogleApiAction>)
-            {
-                actionId = 8;
-            }
-            else if (query is IQueryable<ClaimIQAction>)
-            {
-                actionId = 9;
-            }
-            else if (query is IQueryable<UncompressGzipAction>)
-            {
-                actionId = 10;
-            }
-            else if (query is IQueryable<FixedWidthAction>)
-            {
-                actionId = 11;
-            }
-            else if (query is IQueryable<XMLAction>)
-            {
-                actionId = 13;
-            }
-            else if (query is IQueryable<JsonFlatteningAction>)
-            {
-                actionId = 14;
-            }
-            else if (query is IQueryable<SchemaLoadAction>)
-            {
-                actionId = 4;
-            }
-            else if (query is IQueryable<SchemaMapAction>)
-            {
-                actionId = 7;
-            }
-            else if (query is IQueryable<S3DropAction>)
-            {
-                actionId = 1;
-            }
-            else
-            {
-                actionId = 0;
-            }
-
-            T result = query.FirstOrDefault(a => a.Id == actionId);
-
-            if (result == null)
-            {
-                string actionType = query.First().GetType().Name;
-                DataFlowStepNotImplementedException ex = new DataFlowStepNotImplementedException($"Action (type:{actionType}) not found for use with DATA bucket");
-                Logger.Warn($"DataFlowStep (type:{actionType}) not implmented for use with DATA bucket", ex);
-                Logger.Info("Method <GetHrAction> Ended");
-                throw ex;
-            }
-
-            Logger.Info("Method <GetDataAction> Ended");
-            return result;
-        }
-
         private static T GetDlstAction<T>(this IQueryable<T> query) where T: BaseAction
         {
             Logger.Info("Method <GetDlstAction> Started");
@@ -226,6 +144,10 @@ namespace Sentry.data.Core
             else if (query is IQueryable<SchemaLoadAction>)
             {
                 actionId = 32;
+            }
+            else if (query is IQueryable<GoogleBigQueryApiAction>)
+            {
+                actionId = 33;
             }
             else
             {

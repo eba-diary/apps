@@ -521,6 +521,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<GoogleBigQueryApiAction> GoogleBigQueryApiAction
+        {
+            get
+            {
+                return Query<GoogleBigQueryApiAction>();
+            }
+        }
+
         public IQueryable<SchemaMap> SchemaMap
         {
             get

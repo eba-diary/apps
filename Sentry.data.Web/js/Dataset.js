@@ -524,6 +524,9 @@ data.Dataset = {
 
         var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
         $.get(metadataURL, function (result) {
+
+            data.Dataset.updateUploadButtonOnSchemaChange();
+
             //Set schema metadata
             self.vm.Downloads(result.Downloads);
             self.vm.Views(result.Views);
@@ -1037,11 +1040,6 @@ data.Dataset = {
             window.location = "/Dataset/Edit/" + encodeURI($(this).data("id"));
         });
 
-        $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.FileNameModal($(this).data("id"));
-        });
-
         $(document).on('click', '#data-file-upload-open-modal', function (e) {
             e.preventDefault();
             data.Dataset.LoadUploadFileModal(datasetDetailModel.DatasetId);
@@ -1057,21 +1055,10 @@ data.Dataset = {
             data.Dataset.DownloadLatestDatasetFile($(this).data("id"));
         });
 
-        $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.PushToSAS($(this).data("id"));
-        });
-
-        $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.FileNameModal($(this).data("id"));
-        });
-
         $("[id^='SubscribeModal']").click(function (e) {
             e.preventDefault();
             data.Dataset.SubscribeModal($(this).data("id"));
         });
-
 
         $("[id^='detailSectionHeader_']").click(function (e) {
             e.preventDefault();
@@ -1554,56 +1541,6 @@ data.Dataset = {
         }
     },
 
-    PushToSAS_Filename: function (id, filename, delimiter, guessingrows) {
-        /// Download dataset from S3 and push to SAS file share
-        var modal = Sentry.ShowModalWithSpinner("PushToMessage");
-        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename) + "&delimiter=" + encodeURI(delimiter) + "&guessingrows=" + encodeURI(guessingrows);
-        $.post(controllerURL, function (result) {
-            modal.ReplaceModalBody(result);
-        });
-    },
-
-    PushToBundleInit: function () {
-        //Initialize the PushToFilenameOverride partial view
-        $("[id^='BundleFilename']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.PushToSAS_Filename($(this).data("id"), $("#BundleFilename").val());
-        });
-    },
-
-    PushToOverrideInit: function () {
-        ///Initialize the PushToFilenameOverride partial view
-        $("PushToForm").validateBootstrap(true);
-
-        $("[id^='FilenameOverride']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.PushToSAS_Filename($(this).data("id"), $("#FileNameOverride").val(), $("#Delimiter").val(), $("#GuessingRows").val());
-        });
-    },
-
-    startPushToSAS: function () {
-        Sentry.HideAllModals();
-        ProgressModalStatus();
-    },
-
-    ProgressModalStatus: function () {
-        // Reference the auto-generated proxy for the hub.
-        var progress = $.connection.progressHub;
-        // Create a function that the hub can call back to display messages.
-        progress.client.AddProgress = function (message, percentage) {
-            ProgressBarModal("show", message, "Progress: " + percentage);
-            $('#ProgressMessage').width(percentage);
-            if (percentage === "100%") {
-                ProgressBarModal();
-            }
-        };
-
-        connectionId = $.connection.hub.start()
-            .done(function () {
-                var connectionId = $.connection.hub.id;
-            });
-    },
-
     DownloadLatestDatasetFile: function (id) {
         /// Send temp URL (containing the dataset, from S3) to a new window
         /// This will initiate the download process
@@ -1630,16 +1567,6 @@ data.Dataset = {
         var modal = Sentry.ShowModalWithSpinner("Subscribe");
         $.get("/Dataset/Subscribe/?id=" + encodeURI(id), function (e) {
             modal.ReplaceModalBody(e);
-        });
-    },
-
-    FileNameModal: function (id) {
-
-        var modal = Sentry.ShowModalWithSpinner("File Name Override");
-
-        $.get("/Dataset/PushToFileNameOverride/" + id, function (result) {
-            modal.ReplaceModalBody(result);
-            modal.SetFocus("#FileNameOverride");
         });
     },
 
@@ -1858,7 +1785,8 @@ data.Dataset = {
         parent.parent().css("align-items", "end");
 
         if (datasetDetailModel.DisplayDatasetFileUpload) {
-            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button"><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>');
+            parent.append('<button type="button" id="data-file-upload-open-modal" data-toggle="modal" data-target="#data-file-upload-modal" class="btn btn-primary waves-effect waves-light data-file-button d-none"><em class="fas fa-cloud-upload-alt button-icon"></em>Upload</button>');
+            data.Dataset.updateUploadButtonOnSchemaChange();
         }
 
         //use the global search location to add delete button even though we are going to remove global search from the dom
@@ -2832,5 +2760,20 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     copyTextToClipboard: function (text) {
         navigator.clipboard.writeText(text);
         data.Dataset.makeToast("success","Copied " + text + " to clipboard")
+    },
+
+    updateUploadButtonOnSchemaChange: function () {
+        $.ajax({
+            type: "GET",
+            url: '/Config/Dataset/ShowFileUpload/' + $('#datasetConfigList').val(),
+            success: function (data) {
+                if (data === 'True') {
+                    $("#data-file-upload-open-modal").removeClass("d-none")
+                }
+                else {
+                    $("#data-file-upload-open-modal").addClass("d-none")
+                }
+            }
+        });
     }
 };

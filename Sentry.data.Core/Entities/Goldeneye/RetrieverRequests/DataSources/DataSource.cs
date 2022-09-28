@@ -24,14 +24,6 @@ namespace Sentry.data.Core
         public virtual List<AuthenticationType> ValidAuthTypes { get; set; }
         public virtual AuthenticationType SourceAuthType { get; set; }
 
-        //#region Token Authentication properties
-        //// Only used for TokenAuthentication type
-        //public virtual string AuthHeaderName { get; set; }
-        //// Only used for TokenAuthentication type
-        //public virtual string AuthHeaderValue { get; set; }
-        //public virtual string IVKey { get; set; }
-        //#endregion
-
         public virtual Boolean IsUriEditable { get; set; }
         public virtual Uri BaseUri { get; set; }
         public virtual string KeyCode { get; set; }
@@ -67,5 +59,18 @@ namespace Sentry.data.Core
         {
             return (this is T) ? true : false;
         }
+        public abstract void Validate(RetrieverJob job, Sentry.Core.ValidationResults validationResults);
+
+        public static class ValidationErrors
+        {
+            public const string googleApiRelativeUriIsBlank = "googleApiRelativeUriIsBlank";
+            public const string httpsRequestMethodNotSelected = "httpsRequestMethodNotSelected";
+            public const string httpsRequestDataFormatNotSelected = "httpsRequestDataFormateNotSelected";
+            public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
+            public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
+            public const string ftpPatternNotSelected = "ftpPatternNotSelected";
+            public const string relativeUriNotSpecified = "relativeUriNotSpecified";
+            public const string relativeUriStartsWithForwardSlash = "relativeUriStartsWithForwardSlash";
+        } 
     }
 }
