@@ -2,17 +2,14 @@
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using Sentry.data.Core.DTO.Admin;
-using Sentry.data.Core.Interfaces;
 using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Sentry.data.Web.Models;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -41,7 +38,7 @@ namespace Sentry.data.Web.Controllers
             return await _connectorService.GetS3ConnectorConfigJSONAsync(ConnectorId);
         }
 
-        [HttpPost]
+        [System.Web.Http.HttpPost]
         public async Task<ActionResult> GetConnectorStatus(string ConnectorId)
         {
             JObject JConnectorStatus = await _connectorService.GetS3ConnectorStatusJSONAsync(ConnectorId);
@@ -62,20 +59,26 @@ namespace Sentry.data.Web.Controllers
             BaseAuditModel tableModel = new BaseAuditModel();
             
             string viewPath = "";
-
-            switch (auditType)
+            try
             {
-                case AuditType.NonParquetFiles:
-                    tableModel =_auditSerivce.GetExceptRows(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
-                    viewPath = "_NonParquetFilesTable";
-                    break;
-                case AuditType.RowCountCompare:
-                    tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
-                    viewPath = "_RowCountCompareTable";
-                    break;
-            }
+                switch (auditType)
+                {
+                    case AuditType.NonParquetFiles:
+                        tableModel = _auditSerivce.GetExceptRows(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        viewPath = "_NonParquetFilesTable";
+                        break;
+                    case AuditType.RowCountCompare:
+                        tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        viewPath = "_RowCountCompareTable";
+                        break;
+                }
 
-            return PartialView(viewPath, tableModel);
+                return PartialView(viewPath, tableModel);
+            } 
+            catch (ArgumentException ex)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), ex.Message);
+            }
         }
 
         public AuditSelectionModel GetAuditSelectionModel()
