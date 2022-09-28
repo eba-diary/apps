@@ -18,7 +18,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.DFS_CUSTOM;
+                return GlobalConstants.DataSourceDiscriminator.DFS_CUSTOM;
             }
         }
     }

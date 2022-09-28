@@ -113,7 +113,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsSourceMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DFS_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DFS_SOURCE);
         }
     }
 
@@ -121,7 +121,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsBasicMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DEFAULT_DROP_LOCATION);
         }
     }
 
@@ -129,7 +129,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsDataFlowBasicMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
         }
     }
 
@@ -137,7 +137,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsCustomMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DFS_CUSTOM);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DFS_CUSTOM);
         }
     }
 
@@ -145,7 +145,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public FtpSourceMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.FTP_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.FTP_SOURCE);
         }
     }
 
@@ -153,7 +153,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public S3SourceMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.S3_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.S3_SOURCE);
         }
     }
 
@@ -161,7 +161,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public S3BasicMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION);
         }
     }
 
@@ -169,7 +169,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public SFtpSourceMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.SFTP_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.SFTP_SOURCE);
         }
     }
 
@@ -177,7 +177,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public HTTPSSourceMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE);
 
 
             Property(x => x.AuthenticationHeaderName, m =>
@@ -263,7 +263,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public JavaAppSourceMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.JAVA_APP_SOURCE);
 
             Property(x => x.Options, m =>
             {
@@ -279,7 +279,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsBasicHszMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DEFAULT_HSZ_DROP_LOCATION);
         }
     }
 
@@ -287,7 +287,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public GoogleApiMapping()
         {
-            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE);
+        }
+    }
+
+    public class GoogleBigQueryApiMapping : SubclassMapping<GoogleBigQueryApiSource>
+    {
+        public GoogleBigQueryApiMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
         }
     }
 }

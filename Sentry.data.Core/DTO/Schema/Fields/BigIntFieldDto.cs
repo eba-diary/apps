@@ -5,6 +5,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class BigIntFieldDto : BaseFieldDto
     {
+        public BigIntFieldDto() : base() { }
         public BigIntFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int rowPosition, bool array) : base(prop, rowPosition, array) { }
 
         public BigIntFieldDto(BigIntField field) : base(field) { }

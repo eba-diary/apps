@@ -69,6 +69,7 @@ namespace Sentry.data.Core
         IQueryable<UncompressGzipAction> UncompressGzipAction { get; }
         IQueryable<SchemaMapAction> SchemaMapAction { get; }
         IQueryable<GoogleApiAction> GoogleApiAction { get; }
+        IQueryable<GoogleBigQueryApiAction> GoogleBigQueryApiAction { get; }
         IQueryable<FixedWidthAction> FixedWidthAction { get; }
         IQueryable<XMLAction> XMLAction { get; }
         IQueryable<JsonFlatteningAction> JsonFlatteningAction { get; }

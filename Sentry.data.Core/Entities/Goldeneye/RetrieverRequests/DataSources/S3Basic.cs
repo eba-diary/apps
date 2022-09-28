@@ -18,7 +18,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION;
+                return GlobalConstants.DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION;
             }
         }
 

@@ -1,0 +1,2027 @@
+{
+  "kind": "bigquery#tableDataList",
+  "etag": "GqDsAfVnLjQ8QivdGYCntQ==",
+  "totalRows": "10",
+  "rows": [
+    {
+      "f": [
+        {
+          "v": "20220918"
+        },
+        {
+          "v": "1663527408781106"
+        },
+        {
+          "v": "session_start"
+        },
+        {
+          "v": [
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_number"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "3"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_title"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "Affordable auto and motorcycle insurance | Dairyland® insurance"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "session_engaged"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_id"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1663527409"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "engaged_session_event"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_location"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "/"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "675694386"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "1775023230.1663131512"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "No"
+              }
+            ]
+          }
+        },
+        {
+          "v": []
+        },
+        {
+          "v": "1663131511858370"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "0.0"
+              },
+              {
+                "v": "USD"
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "mobile"
+              },
+              {
+                "v": "Google"
+              },
+              {
+                "v": "Pixel 4a (5G)"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "Android"
+              },
+              {
+                "v": "Android 12"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "en-us"
+              },
+              {
+                "v": "No"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": {
+                  "f": [
+                    {
+                      "v": "Samsung Internet"
+                    },
+                    {
+                      "v": "18.0"
+                    },
+                    {
+                      "v": ""
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "Americas"
+              },
+              {
+                "v": "United States"
+              },
+              {
+                "v": "Colorado"
+              },
+              {
+                "v": "Brighton"
+              },
+              {
+                "v": "Northern America"
+              },
+              {
+                "v": "Denver CO"
+              }
+            ]
+          }
+        },
+        {
+          "v": null
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "(direct)"
+              },
+              {
+                "v": "(none)"
+              },
+              {
+                "v": "(direct)"
+              }
+            ]
+          }
+        },
+        {
+          "v": "2196525053"
+        },
+        {
+          "v": "WEB"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": []
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "20220918"
+        },
+        {
+          "v": "1663527408781106"
+        },
+        {
+          "v": "page_view"
+        },
+        {
+          "v": [
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_location"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "/"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "entrances"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_id"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1663527409"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "engaged_session_event"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "gtm_version"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "GTM-5FN84F:221"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_number"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "3"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_title"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "Affordable auto and motorcycle insurance | Dairyland® insurance"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "atlas_yob"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "NaN"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "session_engaged"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "0"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "675694386"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "1775023230.1663131512"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "No"
+              }
+            ]
+          }
+        },
+        {
+          "v": []
+        },
+        {
+          "v": "1663131511858370"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "0.0"
+              },
+              {
+                "v": "USD"
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "mobile"
+              },
+              {
+                "v": "Google"
+              },
+              {
+                "v": "Pixel 4a (5G)"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "Android"
+              },
+              {
+                "v": "Android 12"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "en-us"
+              },
+              {
+                "v": "No"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": {
+                  "f": [
+                    {
+                      "v": "Samsung Internet"
+                    },
+                    {
+                      "v": "18.0"
+                    },
+                    {
+                      "v": ""
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "Americas"
+              },
+              {
+                "v": "United States"
+              },
+              {
+                "v": "Colorado"
+              },
+              {
+                "v": "Brighton"
+              },
+              {
+                "v": "Northern America"
+              },
+              {
+                "v": "Denver CO"
+              }
+            ]
+          }
+        },
+        {
+          "v": null
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "(direct)"
+              },
+              {
+                "v": "(none)"
+              },
+              {
+                "v": "(direct)"
+              }
+            ]
+          }
+        },
+        {
+          "v": "2196525053"
+        },
+        {
+          "v": "WEB"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": []
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "20220918"
+        },
+        {
+          "v": "1663527413738659"
+        },
+        {
+          "v": "page_view"
+        },
+        {
+          "v": [
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "engaged_session_event"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_id"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1663527409"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "session_engaged"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_title"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "Affordable auto and motorcycle insurance | Dairyland® insurance"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_location"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "https://www.dairylandinsurance.com/"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_number"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "3"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "680651939"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "1775023230.1663131512"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "No"
+              }
+            ]
+          }
+        },
+        {
+          "v": []
+        },
+        {
+          "v": "1663131511858370"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "0.0"
+              },
+              {
+                "v": "USD"
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "mobile"
+              },
+              {
+                "v": "Google"
+              },
+              {
+                "v": "Pixel 4a (5G)"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "Android"
+              },
+              {
+                "v": "Android 12"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "en-us"
+              },
+              {
+                "v": "No"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": {
+                  "f": [
+                    {
+                      "v": "Samsung Internet"
+                    },
+                    {
+                      "v": "18.0"
+                    },
+                    {
+                      "v": "www.dairylandinsurance.com"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "Americas"
+              },
+              {
+                "v": "United States"
+              },
+              {
+                "v": "Colorado"
+              },
+              {
+                "v": "Brighton"
+              },
+              {
+                "v": "Northern America"
+              },
+              {
+                "v": "Denver CO"
+              }
+            ]
+          }
+        },
+        {
+          "v": null
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "(direct)"
+              },
+              {
+                "v": "(none)"
+              },
+              {
+                "v": "(direct)"
+              }
+            ]
+          }
+        },
+        {
+          "v": "2196525053"
+        },
+        {
+          "v": "WEB"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": []
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "20220918"
+        },
+        {
+          "v": "1663527413738659"
+        },
+        {
+          "v": "uniform_event"
+        },
+        {
+          "v": [
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_number"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "3"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "engaged_session_event"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "sitecore_id"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "0b7123c1-8643-477c-bdf1-4f84147a485f"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "session_engaged"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "event_category"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "Sitecore Page View"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_location"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "https://www.dairylandinsurance.com/"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_title"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "Affordable auto and motorcycle insurance | Dairyland® insurance"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_id"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1663527409"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "event_data"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "110d559f-dea5-42ea-9c1c-8a5df7e70ef9|home"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "680651939"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "1775023230.1663131512"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "No"
+              }
+            ]
+          }
+        },
+        {
+          "v": []
+        },
+        {
+          "v": "1663131511858370"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "0.0"
+              },
+              {
+                "v": "USD"
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "mobile"
+              },
+              {
+                "v": "Google"
+              },
+              {
+                "v": "Pixel 4a (5G)"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "Android"
+              },
+              {
+                "v": "Android 12"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "en-us"
+              },
+              {
+                "v": "No"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": {
+                  "f": [
+                    {
+                      "v": "Samsung Internet"
+                    },
+                    {
+                      "v": "18.0"
+                    },
+                    {
+                      "v": "www.dairylandinsurance.com"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "Americas"
+              },
+              {
+                "v": "United States"
+              },
+              {
+                "v": "Colorado"
+              },
+              {
+                "v": "Brighton"
+              },
+              {
+                "v": "Northern America"
+              },
+              {
+                "v": "Denver CO"
+              }
+            ]
+          }
+        },
+        {
+          "v": null
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "(direct)"
+              },
+              {
+                "v": "(none)"
+              },
+              {
+                "v": "(direct)"
+              }
+            ]
+          }
+        },
+        {
+          "v": "2196525053"
+        },
+        {
+          "v": "WEB"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": []
+        }
+      ]
+    },
+    {
+      "f": [
+        {
+          "v": "20220918"
+        },
+        {
+          "v": "1663527421304154"
+        },
+        {
+          "v": "navigation"
+        },
+        {
+          "v": [
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_number"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "3"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_title"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "Affordable auto and motorcycle insurance | Dairyland® insurance"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "engaged_session_event"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "engagement_time_msec"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "5035"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "session_engaged"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "1"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "link_text"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "make a payment"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "page_location"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "https://www.dairylandinsurance.com/"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "type"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "top"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "link_url"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": "https://my.dairylandinsurance.com/"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "v": {
+                "f": [
+                  {
+                    "v": "ga_session_id"
+                  },
+                  {
+                    "v": {
+                      "f": [
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": "1663527409"
+                        },
+                        {
+                          "v": null
+                        },
+                        {
+                          "v": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "688217434"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": "1775023230.1663131512"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "No"
+              }
+            ]
+          }
+        },
+        {
+          "v": []
+        },
+        {
+          "v": "1663131511858370"
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "0.0"
+              },
+              {
+                "v": "USD"
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "mobile"
+              },
+              {
+                "v": "Google"
+              },
+              {
+                "v": "Pixel 4a (5G)"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "Android"
+              },
+              {
+                "v": "Android 12"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": "en-us"
+              },
+              {
+                "v": "No"
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": null
+              },
+              {
+                "v": {
+                  "f": [
+                    {
+                      "v": "Samsung Internet"
+                    },
+                    {
+                      "v": "18.0"
+                    },
+                    {
+                      "v": "www.dairylandinsurance.com"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "Americas"
+              },
+              {
+                "v": "United States"
+              },
+              {
+                "v": "Colorado"
+              },
+              {
+                "v": "Brighton"
+              },
+              {
+                "v": "Northern America"
+              },
+              {
+                "v": "Denver CO"
+              }
+            ]
+          }
+        },
+        {
+          "v": null
+        },
+        {
+          "v": {
+            "f": [
+              {
+                "v": "(direct)"
+              },
+              {
+                "v": "(none)"
+              },
+              {
+                "v": "(direct)"
+              }
+            ]
+          }
+        },
+        {
+          "v": "2196525053"
+        },
+        {
+          "v": "WEB"
+        },
+        {
+          "v": null
+        },
+        {
+          "v": null
+        },
+        {
+          "v": []
+        }
+      ]
+    }
+  ]
+}

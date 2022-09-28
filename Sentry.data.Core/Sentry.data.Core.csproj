@@ -233,6 +233,7 @@
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\GoogleBigQueryApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
@@ -268,6 +269,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleBigQueryApiSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Goldeneye\FileProcess.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
@@ -411,6 +413,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\IAuthorizationProvider.cs" />
+    <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
+    <Compile Include="Interfaces\IHttpClientGenerator.cs" />
     <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\Entities\IFilterSearchable.cs" />
     <Compile Include="Interfaces\IAdSecurityAdminProvider.cs" />

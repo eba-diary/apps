@@ -6,6 +6,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class StructFieldDto : BaseFieldDto
     {
+        public StructFieldDto() : base() { }
         public StructFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array) : base(prop, position, array) { }
 
         public StructFieldDto(StructField field) : base(field) { }

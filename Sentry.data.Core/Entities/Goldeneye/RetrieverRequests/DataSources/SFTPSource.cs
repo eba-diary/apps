@@ -41,7 +41,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.SFTP_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.SFTP_SOURCE;
             }
         }
         public override AuthenticationType SourceAuthType { get; set; }

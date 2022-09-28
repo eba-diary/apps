@@ -1,6 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Rhino.Mocks.Constraints;
+using Sentry.Core;
+using System.Collections.Generic;
 using System.Linq;
+using static Sentry.data.Core.DataSource;
 
 namespace Sentry.data.Core.Tests
 {
@@ -206,6 +210,70 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(DataSource.ValidationErrors.ftpPatternNotSelected, results_NoFtpPattern.GetAll().First().Id);
             Assert.AreEqual(1, results_NoRelativeUri.GetAll().Count);
             Assert.AreEqual(DataSource.ValidationErrors.relativeUriNotSpecified, results_NoRelativeUri.GetAll().First().Id);
+        }
+
+        [TestMethod]
+        public void GoogleBigQueryApiSource_Validate_Success()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            RetrieverJob job = new RetrieverJob()
+            {
+                RelativeUri = "RelativeUri",
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        RequestMethod = HttpMethods.get
+                    },
+                    TargetFileName = "FileName"
+                }
+            };
+
+            GoogleBigQueryApiSource source = new GoogleBigQueryApiSource();
+
+            source.Validate(job, validationResults);
+
+            Assert.IsTrue(validationResults.IsValid());
+        }
+
+        [TestMethod]
+        public void GoogleBigQueryApiSource_Validate_Fail()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            RetrieverJob job = new RetrieverJob()
+            {
+                RelativeUri = "/RelativeUri",
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        RequestMethod = HttpMethods.none
+                    }
+                }
+            };
+
+            GoogleBigQueryApiSource source = new GoogleBigQueryApiSource();
+
+            source.Validate(job, validationResults);
+
+            Assert.IsFalse(validationResults.IsValid());
+
+            List<ValidationResult> results = validationResults.GetAll();
+            Assert.AreEqual(3, results.Count);
+
+            ValidationResult result = results.First();
+            Assert.AreEqual(ValidationErrors.httpsTargetFileNameIsBlank, result.Id);
+            Assert.AreEqual("Target file name is required for HTTPS data sources", result.Description);
+
+            result = results[1];
+            Assert.AreEqual(ValidationErrors.relativeUriStartsWithForwardSlash, result.Id);
+            Assert.AreEqual("Relative Uri cannot start with '/' for HTTPS data sources", result.Description);
+
+            result = results.Last();
+            Assert.AreEqual(ValidationErrors.httpsRequestMethodNotSelected, result.Id);
+            Assert.AreEqual("Request method is required", result.Description);
         }
     }
 }

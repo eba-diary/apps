@@ -121,6 +121,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_Submission_RetrieverJob");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(Submission))));
+
+            Property(x => x.ExecutionParameters, m =>
+            {
+                m.Column("ExecutionParameters");
+                m.Access(Accessor.Field);
+                m.Type(NHibernateUtil.StringClob);
+            });
         }
     }
 }

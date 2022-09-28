@@ -359,7 +359,35 @@ namespace Sentry.data.Core
                 throw;
             }
         }
-        
+
+        public static bool AreEqualTo(this List<BaseFieldDto> existingFields, List<BaseFieldDto> newFields)
+        {
+            if (existingFields.Count == newFields.Count)
+            {
+                for (int i = 0; i < existingFields.Count; i++)
+                {
+                    if (!existingFields[i].IsEqualTo(newFields[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsEqualTo(this BaseFieldDto existingField, BaseFieldDto newField)
+        {
+            return existingField.FieldType == newField.FieldType &&
+                existingField.Name == newField.Name &&
+                existingField.IsArray == newField.IsArray &&
+                existingField.Scale == newField.Scale &&
+                existingField.Precision == newField.Precision &&
+                existingField.ChildFields.AreEqualTo(newField.ChildFields);
+        }
+
         private static FieldDtoFactory BuildDecimalFactory(KeyValuePair<string, JsonSchemaProperty> prop, JsonObjectType objectType, int rowPosition, bool isArray = false)
         {
             FieldDtoFactory fieldFactory;
@@ -445,7 +473,6 @@ namespace Sentry.data.Core
                 parentRow.ChildFields.Add(objectStructfield);
                 parentRow.HasChildren = true;
             }
-        }
-        
+        }        
     }
 }
