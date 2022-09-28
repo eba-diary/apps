@@ -4,17 +4,6 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<script>
-    $(document).ready(function () {
-        data.Admin.AuditInit();
-        $("#tab-spinner").hide();
-        $("#auditReprocessButton").hide();
-        $('select.admin-audit-dropdown.active option[value=-1]').each(function () {
-            $(this).prop('disabled', true);
-        });
-    });
-</script>
-
 <div>
     <h1>General Rawquery/Parquet Audit</h1>
 </div>
@@ -139,3 +128,13 @@
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="auditReprocessButton" disabled>Reprocess Selected</button>
 
+<script>
+    $(document).ready(function () {
+        data.Admin.AuditInit();
+        $("#tab-spinner").hide();
+        $("#auditReprocessButton").hide();
+        $('select.admin-audit-dropdown.active option[value=-1]').each(function () {
+            $(this).prop('disabled', true);
+        });
+    });
+</script>
