@@ -1,0 +1,31 @@
+﻿@model BaseAuditModel
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        data.Admin.AuditTableInit();
+        data.Admin.AuditReprocessButton();
+    });
+</script>
+
+<table id="AuditTable" aria-label="table of all audited files" data-schema-group=@Model.DataFlowStepId class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
+    <thead>
+        <tr>
+            <th scope="col"><input type="checkbox" id="data-file-select-all" class="generic-checkbox form-check-input"><label for="data-file-select-all" class="form-check-label">Select Files</label></th>
+            <th scope="col">File Name</th>
+            <th scope="col">Rawquery Row Count</th>
+            <th scope="col">Parquet Row Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (CompareAuditDataFileModel file in Model.DatafileModels)
+        {
+        <tr>
+            <td><input type="checkbox" data-file-id="@file.DatasetFileId" id=@file.DatasetFileId class="generic-checkbox select-all-target form-check-input"><label for=@file.DatasetFileId class="form-check-label"></label></td>
+            <td>@file.DatasetFileName</td>
+            <td>@file.RawqueryRowCount</td>
+            <td>@file.ParquetRowCount</td>
+        </tr>
+        }
+    </tbody>
+</table>

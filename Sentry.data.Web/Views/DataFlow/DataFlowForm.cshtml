@@ -34,13 +34,23 @@
                 @Html.DropDownListFor(
                     x => x.IngestionTypeSelection,
                     Model.IngestionTypeDropDown,
-                    new { @class = "mdb-select" })  
+                    new { @class = "mdb-select" })
             </div>
 
             <div id="topicNameContainer" class="md-form">
                 <h4>What is the Kafka Topic Name?</h4>
                 @Html.TextBoxFor((m) => m.TopicName, Model.TopicName, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => Model.TopicName, "", new { @class = "text-danger" })
+            </div>
+
+            <div id="isBackFillRequiredContainer" style="display:none;">
+                <div class="md-form">
+                    <h4>Do you need to backfill data from DFS Drop Location?</h4>
+                    <a data-toggle="tooltip" class="material-tooltip-main" title="Yes, if you need to backfill from DFSDropLocation.">
+                        @Html.DropDownListFor((m) => m.IsBackFillRequired, Model.IsBackFillRequiredDropdown, new { @class = "mdb-select" })
+                    </a>
+                </div>
+
             </div>
 
         </div>
@@ -60,6 +70,7 @@
                 @Html.ValidationMessageFor(model => Model.Name, "", new { @class = "text-danger" })
             </div>
         </div>
+
         <div class="compressionPanel" style="display:none;">
             <div class="md-form">
                 <h4>Is your incoming data compressed?</h4>
@@ -80,10 +91,10 @@
                     }
                 </div>
             </div>
+        </div>
 
 
         @*DSC PULL*@
-        </div>
         <div class="retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
                 @Html.EditorFor(model => Model.RetrieverJob)

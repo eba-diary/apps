@@ -119,6 +119,17 @@ namespace Sentry.data.Web.Controllers
             return View(GetDatasetFileConfigsModel(id));
         }
 
+        [Route("Config/Dataset/ShowFileUpload/{configId}")]
+        [HttpGet]
+        public bool ShowFileUpload(int configId)
+        {
+            var userSecurity = _configService.GetUserSecurityForConfig(configId);
+            var uploadFlag = _featureFlags.CLA4152_UploadFileFromUI.GetValue();
+            var schemaId = _datasetContext.DatasetFileConfigs.Where(c => c.ConfigId == configId).First().Schema.SchemaId;
+            var hasDataflow = _datasetContext.DataFlow.Any(df => df.SchemaId == schemaId);
+            return userSecurity.CanUploadToDataset && uploadFlag && hasDataflow;
+        }
+
         [HttpGet]
         public PartialViewResult _DatasetFileConfigCreate(int id)
         {

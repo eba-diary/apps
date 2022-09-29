@@ -694,6 +694,43 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void DeleteParquetFileByDatsetFile_DeleteDatasetFile()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Dataset ds = MockClasses.MockDataset();
+
+            DatasetFileConfig dfc = new DatasetFileConfig()
+            {
+                ConfigId = 1,
+                Schema = new FileSchema()
+                {
+                    SchemaId = 1
+                }
+            };
+
+            Mock<IApplicationUser> user1 = new Mock<IApplicationUser>();
+            user1.Setup(f => f.AssociateId).Returns("123456");
+
+            DateTime dtm = DateTime.Now;
+            DatasetFile datasetFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
+            datasetFile.FileKey = "test/rawquery";
+            datasetFile.CreatedDTM = dtm;
+            datasetFile.ModifiedDTM = dtm;
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>(MockBehavior.Strict);
+
+            Mock<IS3ServiceProvider> s3ServiceProvider = mockRepository.Create<IS3ServiceProvider>();
+            s3ServiceProvider.Setup(x => x.DeleteS3Prefix(It.IsAny<string>(), It.IsAny<string>()));
+
+            DatasetFileService datasetFileService = new DatasetFileService(datasetContext.Object, null, null, null, s3ServiceProvider.Object, null, null);
+
+            datasetFileService.DeleteParquetFileByDatsetFile(datasetFile);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
         public void DatasetFileService_UpdateDataFile()
         {
             // Arrage
@@ -749,7 +786,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(datasetFileDto.FileBucket,      datasetFile_To_Update.FileBucket);
             Assert.AreEqual(datasetFileDto.VersionId,       datasetFile_To_Update.VersionId);
         }
-
 
         [TestMethod]
         public void DatasetFileService_Delete()

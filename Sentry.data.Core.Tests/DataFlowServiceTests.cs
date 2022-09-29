@@ -1010,6 +1010,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(flowDto.DeleteIssueDTM,             DateTime.MaxValue,                      $"{nameof(DataFlow.DeleteIssueDTM)} mappping failed");
             Assert.AreEqual(flowDto.IngestionType,              flow.IngestionType,                     $"{nameof(DataFlow.IngestionType)} mappping failed");
             Assert.AreEqual(flowDto.IsCompressed,               flow.IsDecompressionRequired,           $"{nameof(DataFlow.IsDecompressionRequired)} mapping failed");
+            Assert.AreEqual(flowDto.IsBackFillRequired,               flow.IsBackFillRequired,                      $"{nameof(DataFlow.IsBackFillRequired)} mapping failed");
             Assert.AreEqual(flowDto.CompressionType,            flow.CompressionType,                   $"{nameof(DataFlow.CompressionType)} mappping failed");
             Assert.AreEqual(flowDto.IsPreProcessingRequired,    flow.IsPreProcessingRequired,           $"{nameof(DataFlow.IsPreProcessingRequired)} mappping failed");
             Assert.AreEqual(flowDto.PreProcessingOption,        flow.PreProcessingOption,               $"{nameof(DataFlow.PreProcessingOption)} mappping failed");
@@ -1076,7 +1077,51 @@ namespace Sentry.data.Core.Tests
         }
 
 
+        [TestMethod]
+        public void Verify_BackFill_Dataflow_NO_DFS_CREATED()
+        {
+            //ARRANGE
+            DataFlow df = MockClasses.MockDataFlowIsBackFilledNo();
+            Mock<IDataFeatures> mockDataFeatures = new Mock<IDataFeatures>();
+            mockDataFeatures.Setup(s => s.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
 
+            //ACT
+            bool test = df.ShouldCreateDFSDropLocations(mockDataFeatures.Object);
+
+            //ASSERT
+            Assert.AreEqual(false, test, $"Verify_BackFill_Dataflow failed");
+        }
+
+
+        [TestMethod]
+        public void Verify_BackFill_Dataflow_NO_DFS_CREATED_BECAUSE_FEATURE_FLAG()
+        {
+            //ARRANGE
+            DataFlow df = MockClasses.MockDataFlowIsBackFilledYes();
+            Mock<IDataFeatures> mockDataFeatures = new Mock<IDataFeatures>();
+            mockDataFeatures.Setup(s => s.CLA3241_DisableDfsDropLocation.GetValue()).Returns(true);
+
+            //ACT
+            bool test = df.ShouldCreateDFSDropLocations(mockDataFeatures.Object);
+
+            //ASSERT
+            Assert.AreEqual(false, test, $"Verify_BackFill_Dataflow failed");
+        }
+
+        [TestMethod]
+        public void Verify_BackFill_Dataflow_YES_DFS_CREATED()
+        {
+            //ARRANGE
+            DataFlow df = MockClasses.MockDataFlowIsBackFilledYes();
+            Mock<IDataFeatures> mockDataFeatures = new Mock<IDataFeatures>();
+            mockDataFeatures.Setup(s => s.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+
+            //ACT
+            bool test = df.ShouldCreateDFSDropLocations(mockDataFeatures.Object);
+
+            //ASSERT
+            Assert.AreEqual(true, test, $"Verify_BackFill_Dataflow failed");
+        }
 
 
         [TestMethod]
