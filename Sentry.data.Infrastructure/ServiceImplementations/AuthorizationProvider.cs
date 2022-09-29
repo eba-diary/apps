@@ -44,17 +44,24 @@ namespace Sentry.data.Infrastructure
 
                 string response = oAuthPostResult.Content.ReadAsStringAsync().Result;
 
-                JObject responseAsJson = JObject.Parse(response);
-                string accessToken = responseAsJson.Value<string>("access_token");
-                string expires_in = responseAsJson.Value<string>("expires_in");
-                string token_type = responseAsJson.Value<string>("token_type");
+                if (oAuthPostResult.IsSuccessStatusCode)
+                {
+                    JObject responseAsJson = JObject.Parse(response);
+                    string accessToken = responseAsJson.Value<string>("access_token");
+                    string expires_in = responseAsJson.Value<string>("expires_in");
+                    string token_type = responseAsJson.Value<string>("token_type");
 
-                Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
+                    Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
 
-                DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
-                SaveOAuthToken(source, accessToken, newTokenExp);
+                    DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
+                    SaveOAuthToken(source, accessToken, newTokenExp);
 
-                return accessToken;
+                    return accessToken;
+                }
+                else
+                {
+                    throw new OAuthException($"Failed to retrieve OAuth Access Token from {source.TokenUrl}. Response: {response}");
+                }
             }
 
             return _encryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
