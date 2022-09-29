@@ -4,73 +4,89 @@
     ViewBag.Title = "_AdminTest";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div id="main-div">
-    <h1>My Links</h1>
-    <br />
-    <button type="button" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#AddLinkModal" id="addLinkButton">
-        Add Link
-    </button>
-
-    <div class="modal fade" id="AddLinkModal" tabindex="-1" aria-labelledby="AddLinkModalLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="AddLinkeModalLabel"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
+<div class="container body-content">
+    <div class="tab-content">
+        <div id="divWrapper" class="container-fluid dt-bhootstrap4 no-footer">
+            <br />
+            <div class="row" style="align-items: end;">
+                <div class="col-sm-12 col-md-6">
+                    <h1>My Links</h1>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                    <button type="button" class="btn btn-primary waves-effect waves-light right-aligned" data-toggle="modal" data-target="#AddLinkModal" id="addLinkButton">
+                        <em>Add Link</em>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="card form-wrapper" id="toggleDiv">
-                        <div class="card-body">
+            </div>
 
-                            <h3 class="card-title">Add Support Link</h3>
 
-                            <div class="md-form">
 
-                                <input type="text" id="name" class="form-control" required />
-                                <label for="name" class="">Enter Link Name</label>
+            <div id="supportLinkList" class="list-group col-sm-12">
+
+                @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
+                {
+
+                    <div class="list-group-item">
+                        <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
+                        <a href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px; padding-right: 60px">@supportLinkModel.Name</a>
+                        @supportLinkModel.Description
+                    </div>
+
+
+                }
+            </div>
+        </div>
+    </div>
+    
+
+
+        <div class="modal fade" id="AddLinkModal" tabindex="-1" aria-labelledby="AddLinkModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="AddLinkeModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card form-wrapper" id="toggleDiv">
+                            <div class="card-body">
+
+                                <h3 class="card-title">Add Support Link</h3>
+
+                                <div class="md-form">
+
+                                    <input type="text" id="name" class="form-control" required />
+                                    <label for="name" class="">Enter Link Name</label>
+
+                                </div>
+                                <div class="md-form">
+
+                                    <label for="description" class="">Enter Description For Link</label>
+                                    <input type="text" id="description" class="form-control" />
+
+                                </div>
+                                <div class="bs-component">
+
+
+                                    <label for="url">Enter an https:// URL:</label>
+                                    <input type="url" id="url" class="form-control" placeholder="https://example.com" required />
+
+                                </div>
 
                             </div>
-                            <div class="md-form">
-
-                                <label for="description" class="">Enter Description For Link</label>
-                                <input type="text" id="description" class="form-control" />
-
-                            </div>
-                            <div class="bs-component">
-
-
-                                <label for="url">Enter an https:// URL:</label>
-                                <input type="url" id="url" class="form-control" placeholder="https://example.com" required />
-
-                            </div>
-
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="ModalCloseButton" class="btn btn-primary waves-effect waves-light">Close</button>
-                    <button type="button" id="LinkSubmitButton" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    <div class="modal-footer">
+                        <button type="button" id="ModalCloseButton" class="btn btn-primary waves-effect waves-light">Close</button>
+                        <button type="button" id="LinkSubmitButton" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="supportLinkList" class="list-group">
-        @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
-        {
-
-            <div class="list-group-item">
-                <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
-                <a href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px; padding-right: 60px">@supportLinkModel.Name</a>
-                @supportLinkModel.Description
-            </div>
-
-
-        }
-    </div> <br />
-</div>
+    
            
 
 <script>
@@ -82,13 +98,17 @@
 
 <style>
     #supportLinkList {
-        width: 50%;
         margin: auto;
+    }
+       
+
+    #addLinkButton {
+        float: right;
     }
 
-    #main-div {
-        background-color: lightgray;
-        width: 75%;
-        margin: auto;
+    #divWrapper {
+        width: 100%!important;
     }
+
+
 </style>
