@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure
             return response;
         }
 
-        public virtual async Task<HttpResponseMessage> GetRequestAsync(string resource)
+        public virtual Task<HttpResponseMessage> GetRequestAsync(string resource)
         {
             if (string.IsNullOrEmpty(_baseUrl)) { throw new ArgumentNullException(nameof(resource),"Client url is required"); }
             if (string.IsNullOrEmpty(resource)) { throw new ArgumentNullException(nameof(resource),"resource is required"); }
@@ -67,17 +67,28 @@ namespace Sentry.data.Infrastructure
             Logger.Debug($"{nameof(GetRequestAsync)} - baseurl:{_baseUrl}");
             Logger.Debug($"{nameof(GetRequestAsync)} - resource:{resource}");
 
-            var pollyResponse = await _asyncProviderPolicy.ExecuteAsync(async () =>
+            return GetRequestAsync();
+            async Task<HttpResponseMessage> GetRequestAsync()
+            {
+                return await _asyncProviderPolicy.ExecuteAsync(async () =>
+                {
+                    var x = await _httpClient.GetAsync(_baseUrl + resource).ConfigureAwait(false);
+
+                    return x;
+
+                }).ConfigureAwait(false);
+            }
+        }
+
+        internal virtual async Task<HttpResponseMessage> GetRequestInternalAsync(string resource)
+        {
+            return await _asyncProviderPolicy.ExecuteAsync(async () =>
             {
                 var x = await _httpClient.GetAsync(_baseUrl + resource).ConfigureAwait(false);
 
                 return x;
 
             }).ConfigureAwait(false);
-
-            HttpResponseMessage response = pollyResponse;
-
-            return response;
         }
 
         public async Task<HttpResponseMessage> DeleteRequestAsync(string resource)

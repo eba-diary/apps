@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Nest;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core.DTO.Job;

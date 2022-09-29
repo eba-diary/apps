@@ -65,20 +65,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             providerB.Object.SetBaseUrl("www.abc.com");
 
-            AggregateException ex2 = Assert.ThrowsException<AggregateException>(
-                () => providerB.Object.GetRequestAsync(String.Empty).Wait());
-
-            int nullExceptionCnt = 0;
-
-            foreach(var inner in ex2.InnerExceptions)
-            {
-                if(inner is ArgumentNullException)
-                {
-                    nullExceptionCnt++;
-                }
-            }
-
-            Assert.AreEqual(1, nullExceptionCnt);
+            Assert.ThrowsException<ArgumentNullException>(() => providerB.Object.GetRequestAsync(String.Empty).Wait());
         }
 
         [TestMethod]
@@ -92,20 +79,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
-            AggregateException ex2 = Assert.ThrowsException<AggregateException>(
-                () => providerB.Object.GetRequestAsync("/batches").Wait());
-
-            int nullExceptionCnt = 0;
-
-            foreach (var inner in ex2.InnerExceptions)
-            {
-                if (inner is ArgumentNullException)
-                {
-                    nullExceptionCnt++;
-                }
-            }
-
-            Assert.AreEqual(1, nullExceptionCnt);
+            Assert.ThrowsException<ArgumentNullException>(() => providerB.Object.GetRequestAsync("/batches").Wait());
         }
 
         [TestMethod]
