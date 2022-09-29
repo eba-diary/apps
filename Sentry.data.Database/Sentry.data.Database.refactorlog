@@ -1036,4 +1036,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="SupportLink_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="05b83a7b-1f33-4fa9-90f5-e1272596f638" ChangeDateTime="09/13/2022 17:57:48">
+    <Property Name="ElementName" Value="[dbo].[Submission].[ApacheLivyUrl]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Submission]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ClusterUrl" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cdc7259d-8ab4-4330-857b-b54608e4aaac" ChangeDateTime="09/13/2022 17:57:57">
+    <Property Name="ElementName" Value="[dbo].[JobHistory].[ApacheLivyUrl]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[JobHistory]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ClusterUrl" />
+  </Operation>
 </Operations>

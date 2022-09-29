@@ -27,11 +27,17 @@ namespace Sentry.data.Infrastructure
         private IFtpProvider _ftpProvider;
         private IDatasetContext _requestContext;
         private IJobService _jobService;
+        private readonly IDatasetContext _datasetContext;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
         };
 
+        public RetrieverJobService(IJobService jobService, IDatasetContext datasetContext)
+        {
+            _jobService = jobService;
+            _datasetContext = datasetContext;
+        }
         /// <summary>
         /// Implementation of core job logic for each DataSOurce type.
         /// </summary>
@@ -1135,19 +1141,21 @@ namespace Sentry.data.Infrastructure
         #endregion
 
 
-        public static async Task UpdateJobStatesAsync()
+        public async Task UpdateJobStatesAsync()
         {
+
             try
             {
-                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                var jobList = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList();
+
+                List<Task<HttpResponseMessage>> taskList = new List<Task<HttpResponseMessage>>();
+
+                foreach(var job in jobList)
                 {
-                    IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
-                    HttpClient client = Container.GetInstance<HttpClient>();
+                    taskList.Add(_jobService.GetApacheLivyBatchStatusAsync(job));
+                }                
 
-                    var tasks = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
-
-                    var results = await Task.WhenAll(tasks);
-                }
+                await Task.WhenAll(taskList);
             }
             catch (Exception ex)
             {

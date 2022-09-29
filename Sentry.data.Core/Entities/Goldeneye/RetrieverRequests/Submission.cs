@@ -17,5 +17,6 @@ namespace Sentry.data.Core
         public virtual DateTime Created { get; set; }
         public virtual string FlowExecutionGuid { get; set; }
         public virtual string RunInstanceGuid { get; set; }
+        public virtual string ClusterUrl { get; set; }
     }
 }

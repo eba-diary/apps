@@ -467,6 +467,7 @@
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileReprocessModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
+    <Compile Include="Models\ApiModels\Job\JavaOptionsOverride.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionTypeEnum.cs" />

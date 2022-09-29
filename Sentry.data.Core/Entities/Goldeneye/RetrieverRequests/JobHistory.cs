@@ -26,5 +26,6 @@ namespace Sentry.data.Core
         public virtual DateTime Modified { get; set; }
         public virtual Boolean Active { get; set; }
         public virtual Submission Submission { get; set; }
+        public virtual string ClusterUrl { get; set; }
     }
 }

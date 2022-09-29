@@ -19,119 +19,115 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public async Task ApacheLivyProvider_GetRequestAsync_BadRequest()
         {
-            //Arrange
-            /*Setup Polly Policy*/
             var policyRegistry = new PolicyRegistry();
-            ApacheLivyProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<ApacheLivyProviderPolicy>(policyRegistry);
-            pollyPolicyLivy.Register();
+            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Object.Register();
 
-            /*Setup provider*/
-            var StubIHttpClientProvider = MockRepository.GenerateMock<IHttpClientProvider>();
-            StubIHttpClientProvider.Stub(a => a.GetAsync(Arg<string>.Is.Anything))
-                .Return(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
+            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(h => h.GetAsync(Moq.It.IsAny<string>())).Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
 
-            //Setup provider
-            ApacheLivyProvider providerA = MockRepository.GenerateMock<ApacheLivyProvider>(StubIHttpClientProvider, policyRegistry);
+            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            providerB.Object.SetBaseUrl("www.abc.com");
+            var result = await providerB.Object.GetRequestAsync("/batches");
 
-            //Act
-            var x = await providerA.GetRequestAsync("/batches");
-
-            Assert.AreEqual(x.StatusCode, HttpStatusCode.BadRequest);
+            Assert.AreEqual(result.StatusCode, HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
         [ExpectedException(typeof(HttpRequestException))]
         public async Task ApacheLivyProvider_GetRequestAsync_HttpRequestException()
         {
-            //Arrange
-            /*Setup Polly Policy*/
             var policyRegistry = new PolicyRegistry();
-            ApacheLivyProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<ApacheLivyProviderPolicy>(policyRegistry);
-            pollyPolicyLivy.Register();
+            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Object.Register();
 
-            var StubIHttpClientProvider = MockRepository.GenerateMock<IHttpClientProvider>();
+            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(h => h.GetAsync(Moq.It.IsAny<string>())).Throws(new HttpRequestException());
 
-            StubIHttpClientProvider.Expect(_ => _.GetAsync(Arg<string>.Is.Anything)).Throw(new HttpRequestException());
+            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
-            /*Setup provider*/
-            ApacheLivyProvider providerA = MockRepository.GenerateMock<ApacheLivyProvider>(StubIHttpClientProvider, policyRegistry);
+            providerB.Object.SetBaseUrl("www.abc.com");
+            var result = await providerB.Object.GetRequestAsync("/batches");
 
-            //Act
-            await providerA.GetRequestAsync("/batches");
-
-            //Assert
-            //The method ExpectedException attribute is performing assert
+            Assert.AreEqual(result.StatusCode, HttpStatusCode.BadRequest);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ApacheLivyProvider_GetRequestAsync_ArgumentNullException()
+        public void ApacheLivyProvider_GetRequestAsync_NoResource_ArgumentNullException()
         {
-            //Arrange
-            /*Setup Polly Policy*/
             var policyRegistry = new PolicyRegistry();
-            ApacheLivyProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<ApacheLivyProviderPolicy>(policyRegistry);
-            pollyPolicyLivy.Register();
+            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Object.Register();
 
-            var StubIHttpClientProvider = MockRepository.GenerateMock<IHttpClientProvider>();
+            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
 
-            StubIHttpClientProvider.Expect(_ => _.GetAsync(Arg<string>.Is.Anything)).Throw(new ArgumentNullException());
+            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
-            /*Setup provider*/
-            ApacheLivyProvider providerA = MockRepository.GenerateMock<ApacheLivyProvider>(StubIHttpClientProvider, policyRegistry);
+            providerB.Object.SetBaseUrl("www.abc.com");
 
-            //Act
-            await providerA.GetRequestAsync("/batches");
-
-            //Assert
-            //The method ExpectedException attribute is performing assert
+            Assert.ThrowsException<ArgumentNullException>(() => providerB.Object.GetRequestAsync(String.Empty).Wait());
         }
 
         [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
-        public async Task ApacheLivyProvider_GetRequestAsync_TaskCanceledException()
+        public void ApacheLivyProvider_GetRequestAsync_NoBaseUrl_ArgumentNullException()
         {
-            //Arrange
-            /*Setup Polly Policy*/
             var policyRegistry = new PolicyRegistry();
-            ApacheLivyProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<ApacheLivyProviderPolicy>(policyRegistry);
-            pollyPolicyLivy.Register();
+            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Object.Register();
 
-            var StubIHttpClientProvider = MockRepository.GenerateMock<IHttpClientProvider>();
+            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
 
-            StubIHttpClientProvider.Expect(_ => _.GetAsync(Arg<string>.Is.Anything)).Throw(new TaskCanceledException());
+            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
-            /*Setup provider*/
-            ApacheLivyProvider providerA = MockRepository.GenerateMock<ApacheLivyProvider>(StubIHttpClientProvider, policyRegistry);
+            Assert.ThrowsException<ArgumentNullException>(() => providerB.Object.GetRequestAsync("/batches").Wait());
+        }
 
-            //Act
-            await providerA.GetRequestAsync("/batches");
+        [TestMethod]
+        public void ApacheLivyProvider_GetRequestAsync_TaskCanceledException()
+        {
+            var policyRegistry = new PolicyRegistry();
+            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Object.Register();
 
-            //Assert
-            //The method ExpectedException attribute is performing assert
+            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(x => x.GetAsync(Moq.It.IsAny<string>())).Throws<TaskCanceledException>();
+
+            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+
+            providerB.Object.SetBaseUrl("www.abc.com");
+
+            AggregateException ex2 = Assert.ThrowsException<AggregateException>(
+                () => providerB.Object.GetRequestAsync("/batches").Wait());
+
+            int nullExceptionCnt = 0;
+
+            foreach (var inner in ex2.InnerExceptions)
+            {
+                if (inner is TaskCanceledException)
+                {
+                    nullExceptionCnt++;
+                }
+            }
+
+            Assert.AreEqual(1, nullExceptionCnt);
         }
 
         [TestMethod]
         public async Task ApacheLivyProvider_PostRequestAsync_BadRequest()
         {
-            //Arrange
-            /*Setup Polly Policy*/
+
             var policyRegistry = new PolicyRegistry();
-            ApacheLivyProviderPolicy pollyPolicyLivy = MockRepository.GenerateMock<ApacheLivyProviderPolicy>(policyRegistry);
-            pollyPolicyLivy.Register();
+            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            pollyPolicyLivy.Object.Register();
 
-            /*Setup provider*/
-            var StubIHttpClientProvider = MockRepository.GenerateMock<IHttpClientProvider>();
-            StubIHttpClientProvider.Stub(a => a.PostAsync(Arg<string>.Is.Anything, Arg<HttpContent>.Is.Anything))
-                .Return(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
+            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(h => h.PostAsync(Moq.It.IsAny<string>(), Moq.It.IsAny<HttpContent>())).Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
 
-            //Setup provider
-            ApacheLivyProvider providerA = MockRepository.GenerateMock<ApacheLivyProvider>(StubIHttpClientProvider, policyRegistry);
+            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
-            //Act
-            var x = await providerA.PostRequestAsync("/batches", new StringContent(""));
+            var result = await providerB.Object.PostRequestAsync("/batches", new StringContent(""));
 
-            Assert.AreEqual(x.StatusCode, HttpStatusCode.BadRequest);
+            Assert.AreEqual(result.StatusCode, HttpStatusCode.BadRequest);
         }
     }
 }

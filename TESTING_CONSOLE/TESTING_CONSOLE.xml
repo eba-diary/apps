@@ -4,6 +4,16 @@
         <name>TESTING_CONSOLE</name>
     </assembly>
     <members>
+        <member name="T:TESTING_CONSOLE.Class1.ExampleofThread">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TESTING_CONSOLE.Class1.ExampleofThread.Thread2">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:SentryConsoleApplicationTemplateCSharp.ConsoleAppMyProject.Resources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
