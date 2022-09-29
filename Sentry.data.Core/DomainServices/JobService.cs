@@ -490,7 +490,7 @@ namespace Sentry.data.Core
 
             System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
 
-            string result = response.Content.ReadAsStringAsync().Result;
+            string result = await response.Content.ReadAsStringAsync();
             string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
 
             Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
@@ -558,7 +558,7 @@ namespace Sentry.data.Core
 
             System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", postContent);
 
-            string result = response.Content.ReadAsStringAsync().Result;
+            string result = await response.Content.ReadAsStringAsync();
             string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
 
             Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode}:::result:{postResult}");
@@ -687,25 +687,25 @@ namespace Sentry.data.Core
 
         internal virtual string GenerateUniqueLivySessionName(JavaAppSource dsrc)
         {
-            var RNGCrypto = new RNGCryptoServiceProvider();
-
-            string validCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             StringBuilder randomCharacterSting = new StringBuilder();
 
-            for (int i = 0; i < 6; i++)
+            using (var rngCryptoProvider = new RNGCryptoServiceProvider())
             {
-                byte[] randomNumber = new byte[1];
-                do
+                string validCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+                for (int i = 0; i < 6; i++)
                 {
-                    RNGCrypto.GetBytes(randomNumber);
+                    byte[] randomNumber = new byte[1];
+                    do
+                    {
+                        rngCryptoProvider.GetBytes(randomNumber);
+                    }
+                    while (!IsWithinBounds(randomNumber[0], (byte)validCharacters.Length));
+                    randomCharacterSting.Append(new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 1).Select(s => s[randomNumber[0]]).ToArray()));
+
+                    Console.WriteLine($"{randomNumber[0]}:::{randomNumber[0] % 6}");
                 }
-                while (!IsWithinBounds(randomNumber[0], (byte)validCharacters.Length));
-                randomCharacterSting.Append(new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 1).Select(s => s[randomNumber[0]]).ToArray()));
-
-                Console.WriteLine($"{randomNumber[0]}:::{randomNumber[0] % 6}");
             }
-
-            RNGCrypto.Dispose();
 
             string livySessionName = $"{dsrc.Name}_{randomCharacterSting}";
             return livySessionName;    
