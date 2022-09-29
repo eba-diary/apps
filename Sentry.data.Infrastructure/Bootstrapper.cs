@@ -99,14 +99,14 @@ namespace Sentry.data.Infrastructure
             //Register other services
             registry.For<IBaseJobProvider>().AddInstances(x =>
             {
-                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
-                x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
-                x.Type<DfsDataFlowBasicProvider>().Named(GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
-                x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
-                x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
-                x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE);
+                x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE);
+                x.Type<DfsDataFlowBasicProvider>().Named(GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+                x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE);
+                x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
+                x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                x.Type<GoogleBigQueryJobProvider>().Named(DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
             });
-
 
             //Register event handlers for MetadataProcessorService
             registry.For<IMessageHandler<string>>().Add<HiveMetadataService>();
@@ -127,7 +127,6 @@ namespace Sentry.data.Infrastructure
             registry.For<ILdClient>().Singleton().Use(LdClientFactory.BuildLdClient());
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
-            registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();

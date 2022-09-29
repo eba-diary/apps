@@ -70,6 +70,7 @@ namespace Sentry.data.Core
             public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
             public const string ftpPatternNotSelected = "ftpPatternNotSelected";
             public const string relativeUriNotSpecified = "relativeUriNotSpecified";
+            public const string relativeUriStartsWithForwardSlash = "relativeUriStartsWithForwardSlash";
         } 
     }
 }

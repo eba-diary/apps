@@ -18,7 +18,7 @@ using Sentry.data.Core.GlobalEnums;
 namespace Sentry.data.Infrastructure.Tests
 { 
     [TestClass]
-    public class ConfluentConnectorProviderTests
+    public class ConfluentConnectorProviderTests : BaseInfrastructureUnitTest
     {
         [TestMethod]
         public async Task ConfluentConnectorProvider_GetS3ConnectorsStatus_ReturnCorrectConnectorStatus()
@@ -129,14 +129,6 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(ConnectorState.RUNNING, rootDtos[0].ConnectorState);
             Assert.AreEqual(ConnectorState.DEGRADED, rootDtos[1].ConnectorState);
             Assert.AreEqual(ConnectorState.FAILED, rootDtos[2].ConnectorState);
-        }
-
-        protected JObject GetData(string fileName)
-        {
-            using (StreamReader rdr = new StreamReader($@"ExpectedJSON\{fileName}"))
-            {
-                return JObject.Parse(rdr.ReadToEnd().Replace("\r\n", string.Empty));
-            }
         }
     }
 }

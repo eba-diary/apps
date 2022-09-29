@@ -5,6 +5,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class IntegerFieldDto : BaseFieldDto
     {
+        public IntegerFieldDto() : base() { }
         public IntegerFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int rowPosition, bool array) : base(prop, rowPosition, array) { }
 
         public IntegerFieldDto(IntegerField field) : base(field) { }

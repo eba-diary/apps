@@ -52,7 +52,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE;
             }
         }
         public virtual List<HttpMethods> ValidHttpMethods { get; set; }
@@ -132,6 +132,10 @@ namespace Sentry.data.Core
             if (String.IsNullOrWhiteSpace(job.RelativeUri))
             {
                 validationResults.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for HTTPS data sources");
+            }
+            else if (job.RelativeUri.StartsWith("/"))
+            {
+                validationResults.Add(ValidationErrors.relativeUriStartsWithForwardSlash, "Relative Uri cannot start with '/' for HTTPS data sources");
             }
         }
     }

@@ -114,7 +114,7 @@ namespace Sentry.data.Core
         /// Creates jobs to create new consumption layer(s) for a schema.
         /// </summary>
         /// <param name="schemaIdList">List of schemas to create a job for.</param>
-        void EnqueueCreateConsumptionLayersForSchemaList(int[] schemaIdList);
+        void CreateConsumptionLayersForSchemaList(int[] schemaIdList);
         /// <summary>
         /// Creates new consumption layer(s) for a schema.
         /// </summary>

@@ -519,8 +519,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return BadRequest($"Schema with ID \"{schemaId}\" could not be found.");
                 }
             }
-            //queue jobs
-            _schemaService.EnqueueCreateConsumptionLayersForSchemaList(schemaIdList);
+            //run jobs
+            _schemaService.CreateConsumptionLayersForSchemaList(schemaIdList);
             return Ok();
         }
 

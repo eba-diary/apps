@@ -235,6 +235,7 @@
                     $('.httpSourcePanel').hide();
                     $('.httpPostPanel').hide();
                     break;
+                case "googlebigqueryapi":
                 case "googleapi":
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.targetFileName').show();
@@ -393,7 +394,7 @@
         
         var val = $("[id$='SelectedSourceType'] :selected").val().toLowerCase();
 
-        if (val == 'https' || val == 'googleapi') {
+        if (val == 'https' || val == 'googleapi' || val == 'googlebigqueryapi') {
             $("#targetfilenamequestion").text("What should target file be named?");
             $("#targetfilenamedesc").text("Due to the type of data source, a target file name is required as we are receiving raw data and not a file.");
             $('#targetfilenamelabel').removeClass("optional");

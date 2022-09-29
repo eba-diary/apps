@@ -3,6 +3,7 @@
     ViewBag.Title = "_AdminTest";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
+
 <div>
     <h1>General Rawquery/Parquet Audit</h1>
 </div>
@@ -90,9 +91,11 @@
             </select>
         </div>
     </div>
-     <div class="d-inline-block col">
+</div>
+<div class="row">
+    <div class="d-inline-block col">
         <button type="button" class="btn btn-primary waves-effect waves-light" id="auditSearchButton" disabled>Search</button>
-     </div>
+    </div>
 </div>
 
 
@@ -100,27 +103,38 @@
 <br />
 <br />
 
-<!--Table-->
-@*<table id="auditResults" aria-label="table of all audited files" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
-        <thead>
-            <tr>
-                <th scope="col">ETL File Name</th>
-            </tr>
-        </thead>
-    </table>*@
+<!-- Spinner -->
+<div class="text-center" id="tab-spinner">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle">
+                </div>
+            </div>
 
+        </div>
+    </div>
+</div>
+
+<!--Table-->
 <div id="AuditResultTable"></div>
 
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="auditReprocessButton" disabled>Reprocess Selected</button>
 
 <script>
-    $(function () {
+    $(document).ready(function () {
         data.Admin.AuditInit();
-
+        $("#tab-spinner").hide();
+        $("#auditReprocessButton").hide();
         $('select.admin-audit-dropdown.active option[value=-1]').each(function () {
             $(this).prop('disabled', true);
         });
     });
 </script>
-

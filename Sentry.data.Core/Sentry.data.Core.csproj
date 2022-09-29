@@ -234,6 +234,7 @@
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\GoogleBigQueryApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
@@ -269,6 +270,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleBigQueryApiSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Goldeneye\FileProcess.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
@@ -354,7 +356,6 @@
     <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\KafkaProducerException.cs" />
     <Compile Include="Exceptions\RetrieverJobProcessingException.cs" />
-    <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
@@ -415,6 +416,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\IAuthorizationProvider.cs" />
+    <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
+    <Compile Include="Interfaces\IHttpClientGenerator.cs" />
     <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\Entities\IFilterSearchable.cs" />
     <Compile Include="Interfaces\IAdSecurityAdminProvider.cs" />
@@ -497,7 +501,6 @@
     <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
-    <Compile Include="Extensions\DataElementExtensions.cs" />
     <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
@@ -624,7 +627,6 @@
     <Compile Include="Interfaces\IMessagePublisher.cs" />
     <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
-    <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IBaseJobProvider.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IGoogleApiProvider.cs" />

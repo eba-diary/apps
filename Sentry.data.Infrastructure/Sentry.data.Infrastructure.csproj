@@ -266,6 +266,8 @@
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\ElasticContext.cs" />
+    <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
+    <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
     <Compile Include="Exceptions\InfrastructureEventingException.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
     <Compile Include="Exceptions\SecBotProviderException.cs" />
@@ -290,6 +292,7 @@
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleBigQueryApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\JsonFlatteningActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ProducerS3DropActionMapping.cs" />
@@ -373,12 +376,16 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\AuthorizationProvider.cs" />
     <Compile Include="ServiceImplementations\ConfluentConnectorProvider.cs" />
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
+    <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
+    <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
+    <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />
     <Compile Include="ServiceImplementations\HangfireJobScheduler.cs" />
     <Compile Include="ServiceImplementations\DeadSparkJobSqlExecuter.cs" />
     <Compile Include="ServiceImplementations\DataInventorySqlExecuter.cs" />
@@ -404,6 +411,7 @@
     <Compile Include="ServiceImplementations\ElasticSchemaSearchProvider.cs" />
     <Compile Include="ServiceImplementations\FilterSearchService.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
+    <Compile Include="ServiceImplementations\HttpClientGenerator.cs" />
     <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevRestClient.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevService.cs" />
@@ -465,8 +473,6 @@
     <Compile Include="ServiceImplementations\ExtendedUserInfo.cs" />
     <Compile Include="ServiceImplementations\ExtendedUserInfoProvider.cs" />
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
-    <Compile Include="ServiceImplementations\SASProvider.cs" />
-    <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
     <Compile Include="ServiceImplementations\UserFavoriteService.cs" />
     <Compile Include="ServiceImplementations\WallEService.cs" />
