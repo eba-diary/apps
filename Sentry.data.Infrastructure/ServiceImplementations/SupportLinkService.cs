@@ -80,7 +80,20 @@ namespace Sentry.data.Infrastructure
                 };
                 supportLinkDtos.Add(supportLinkDto);
             }
-            return supportLinkDtos;
+            List<SupportLinkDto> sortedSupportLinkDtos = new List<SupportLinkDto>();
+            var sortedQuery = supportLinkDtos.OrderBy(x => x.Name).ToList();
+            foreach(var obj in sortedQuery)
+            {
+                var supportLinkDto = new SupportLinkDto()
+                {
+                    Name = obj.Name,
+                    Url = obj.Url,
+                    Description = obj.Description,
+                };
+                sortedSupportLinkDtos.Add(supportLinkDto);
+            }
+
+            return sortedSupportLinkDtos;
         }
         
     }
