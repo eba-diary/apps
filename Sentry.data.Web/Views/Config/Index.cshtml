@@ -63,7 +63,7 @@
 
                                 if (Model.DatasetFileConfigs.Where(x => x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active).Count() > 1)
                                 {
-                                    <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" title="Delete Schema"></a>
+                                    <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" data-toggle="tooltip" data-placement="top" title="Delete Schema"></a>
                                 }
                             }
                         </div>
@@ -172,12 +172,12 @@
                                 {
                                     if (hasRevisions)
                                     {
-                                        <a class="far fa-edit" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Edit Columns"></a>
-                                        <a class="fas fa-sync schema-sync-icon ml-3" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId" title="Sync Consumption Layer"></a>
+                                        <a class="far fa-edit" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" data-toggle="tooltip" data-placement="top" title="Edit Columns"></a>
+                                        <a class="fas fa-sync schema-sync-icon ml-3" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId" data-toggle="tooltip" data-placement="top" title="Sync Consumption Layer"></a>
                                     }
                                     else
                                     {
-                                        <a class="fas fa-plus schema-add-icon" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" title="Add Columns"></a>
+                                        <a class="fas fa-plus schema-add-icon" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields" data-toggle="tooltip" data-placement="top" title="Add Columns"></a>
                                     }
                                 }
                             </div>
@@ -204,11 +204,11 @@
                                 {
                                     if (ext == null)
                                     {
-                                    <a class="fas fa-plus schema-add-icon" href="/DataFlow/Create" title="Add DataFlow"></a>
+                                    <a class="fas fa-plus schema-add-icon" href="/DataFlow/Create" data-toggle="tooltip" data-placement="top" title="Add DataFlow"></a>
                                     }
                                     else if (Model.DisplayDataflowEdit)
                                     {
-                                    <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" title="Edit DataFlow"></a>
+                                    <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" data-toggle="tooltip" data-placement="top" title="Edit DataFlow"></a>
                                     }
                                 }
                             </div>

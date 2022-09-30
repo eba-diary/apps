@@ -63,10 +63,57 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void GetSearchableTiles_DatasetTileDtos()
+        public void GetSearchableTiles_DatasetTileDtos_Admin()
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            DatasetTileSearchService searchService = GetSearchService(repository);
+            DatasetTileSearchService searchService = GetSearchService(repository, true);
+
+            List<DatasetTileDto> tileDtos = searchService.GetSearchableTiles();
+
+            Assert.AreEqual(5, tileDtos.Count);
+
+            DatasetTileDto tile = tileDtos.First(x => x.Name == "Dataset1");
+            Assert.IsTrue(tile.IsFavorite);
+            Assert.AreEqual(new DateTime(2022, 8, 8), tile.LastActivityDateTime);
+            Assert.AreEqual(1, tile.ProducerAssets.Count);
+            Assert.AreEqual("SAID", tile.ProducerAssets.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
+
+            tile = tileDtos.First(x => x.Name == "Dataset2");
+            Assert.IsFalse(tile.IsFavorite);
+            Assert.AreEqual(new DateTime(2022, 8, 8), tile.LastActivityDateTime);
+            Assert.AreEqual(2, tile.ProducerAssets.Count);
+            Assert.AreEqual("SAID", tile.ProducerAssets.First());
+            Assert.AreEqual("SAID3", tile.ProducerAssets.Last());
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
+
+            tile = tileDtos.First(x => x.Name == "Dataset3");
+            Assert.IsTrue(tile.IsFavorite);
+            Assert.AreEqual(new DateTime(2022, 8, 12), tile.LastActivityDateTime);
+            Assert.AreEqual(1, tile.ProducerAssets.Count);
+            Assert.AreEqual("SAID3", tile.ProducerAssets.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
+
+            tile = tileDtos.First(x => x.Name == "Foo Bar");
+            Assert.IsTrue(tile.IsFavorite);
+            Assert.AreEqual(new DateTime(2022, 8, 20), tile.LastActivityDateTime);
+            Assert.AreEqual(0, tile.ProducerAssets.Count);
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
+
+            tile = tileDtos.First(x => x.Name == "Pending Delete");
+            Assert.IsFalse(tile.IsFavorite);
+            Assert.AreEqual(new DateTime(2022, 8, 21), tile.LastActivityDateTime);
+            Assert.AreEqual(0, tile.ProducerAssets.Count);
+            Assert.AreEqual(ObjectStatusEnum.Pending_Delete, tile.Status);
+
+            repository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetSearchableTiles_DatasetTileDtos_NonAdmin()
+        {
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
+            DatasetTileSearchService searchService = GetSearchService(repository, false);
 
             List<DatasetTileDto> tileDtos = searchService.GetSearchableTiles();
 
@@ -77,6 +124,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(new DateTime(2022, 8, 8), tile.LastActivityDateTime);
             Assert.AreEqual(1, tile.ProducerAssets.Count);
             Assert.AreEqual("SAID", tile.ProducerAssets.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
 
             tile = tileDtos.First(x => x.Name == "Dataset2");
             Assert.IsFalse(tile.IsFavorite);
@@ -84,17 +132,20 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(2, tile.ProducerAssets.Count);
             Assert.AreEqual("SAID", tile.ProducerAssets.First());
             Assert.AreEqual("SAID3", tile.ProducerAssets.Last());
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
 
             tile = tileDtos.First(x => x.Name == "Dataset3");
             Assert.IsTrue(tile.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 12), tile.LastActivityDateTime);
             Assert.AreEqual(1, tile.ProducerAssets.Count);
             Assert.AreEqual("SAID3", tile.ProducerAssets.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
 
             tile = tileDtos.First(x => x.Name == "Foo Bar");
             Assert.IsTrue(tile.IsFavorite);
             Assert.AreEqual(new DateTime(2022, 8, 20), tile.LastActivityDateTime);
             Assert.AreEqual(0, tile.ProducerAssets.Count);
+            Assert.AreEqual(ObjectStatusEnum.Active, tile.Status);
 
             repository.VerifyAll();
         }
@@ -118,7 +169,7 @@ namespace Sentry.data.Core.Tests
         public void SearchTiles_TileSearchDto_DatasetTileDto_EmptySearchableTiles_SortByRecentActivity_TileSearchResultDto()
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            DatasetTileSearchService searchService = GetSearchService(repository);
+            DatasetTileSearchService searchService = GetSearchService(repository, false);
 
             TileSearchDto<DatasetTileDto> tileSearchDto = new TileSearchDto<DatasetTileDto>()
             {
@@ -390,14 +441,15 @@ namespace Sentry.data.Core.Tests
         }
 
         #region Private
-        private DatasetTileSearchService GetSearchService(MockRepository repository)
+        private DatasetTileSearchService GetSearchService(MockRepository repository, bool isAdmin)
         {
             List<Dataset> datasets = new List<Dataset>()
             {
-                GetDataset(1, "Dataset1", "Category1", "000000", true, 5),
-                GetDataset(2, "Dataset2", "Category2", "000001", false, 8),
-                GetDataset(3, "Dataset3", "Category1", "000000", false, 12),
-                GetDataset(4, "Foo Bar", "Category1", "000000", false, 20),
+                GetDataset(1, "Dataset1", "Category1", "000000", true, 5, ObjectStatusEnum.Active),
+                GetDataset(2, "Dataset2", "Category2", "000001", false, 8, ObjectStatusEnum.Active),
+                GetDataset(3, "Dataset3", "Category1", "000000", false, 12, ObjectStatusEnum.Active),
+                GetDataset(4, "Foo Bar", "Category1", "000000", false, 20, ObjectStatusEnum.Active),
+                GetDataset(5, "Pending Delete", "Category3", "000002", false, 21, ObjectStatusEnum.Pending_Delete),
                 new Dataset()
                 {
                     DatasetId = 98,
@@ -476,6 +528,7 @@ namespace Sentry.data.Core.Tests
 
             Mock<IApplicationUser> appUser = repository.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
+            appUser.SetupGet(x => x.IsAdmin).Returns(isAdmin);
 
             Mock<IUserService> userService = repository.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object);
@@ -483,7 +536,7 @@ namespace Sentry.data.Core.Tests
             return new DatasetTileSearchService(datasetContext.Object, userService.Object, null);
         }
 
-        private Dataset GetDataset(int id, string name, string category, string favoriteId, bool isSecured, int changeDay)
+        private Dataset GetDataset(int id, string name, string category, string favoriteId, bool isSecured, int changeDay, ObjectStatusEnum status)
         {
             return new Dataset()
             {
@@ -491,7 +544,7 @@ namespace Sentry.data.Core.Tests
                 DatasetType = DataEntityCodes.DATASET,
                 Security = new Security(),
                 DatasetName = name,
-                ObjectStatus = ObjectStatusEnum.Active,
+                ObjectStatus = status,
                 IsSecured = isSecured,
                 ChangedDtm = new DateTime(2022, 8, changeDay),
                 DatasetCategories = new List<Category>()
