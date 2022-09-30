@@ -2,7 +2,6 @@
 {
     public class GoogleBigQueryConfiguration
     {
-        public string BaseUri { get; set; }
         public string RelativeUri { get; set; }
         public string ProjectId { get; set; }
         public string DatasetId { get; set; }

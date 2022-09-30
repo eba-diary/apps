@@ -44,6 +44,7 @@ namespace Sentry.data.Infrastructure
 
             //get Google schema
             HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
+            httpClient.BaseAddress = job.DataSource.BaseUri;
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             httpClient.Timeout = new TimeSpan(0, 10, 0);
 
@@ -123,7 +124,6 @@ namespace Sentry.data.Infrastructure
 
             GoogleBigQueryConfiguration config = new GoogleBigQueryConfiguration()
             {
-                BaseUri = job.DataSource.BaseUri.ToString(),
                 ProjectId = uriParts[1],
                 DatasetId = uriParts[3],
                 TableId = uriParts[5],
@@ -166,15 +166,15 @@ namespace Sentry.data.Infrastructure
 
         private JArray GetBigQueryFields(HttpClient httpClient, GoogleBigQueryConfiguration config)
         {
-            string removeSuffix = "/data";
-            string uri = config.BaseUri + config.RelativeUri.Remove(config.RelativeUri.Length - removeSuffix.Length);
+            List<string> uriParts = config.RelativeUri.Split('/').ToList();
+            string uri = string.Join("/", uriParts.GetRange(0, 6));
             JObject response = GetBigQueryResponse(httpClient, uri);
             return (JArray)response.SelectToken("schema.fields");
         }
 
         private MemoryStream GetBigQueryDataStream(HttpClient httpClient, GoogleBigQueryConfiguration config)
         {
-            string uri = config.BaseUri + config.RelativeUri;
+            string uri = config.RelativeUri;
 
             if (!string.IsNullOrEmpty(config.PageToken)) //if have a page token use it
             {
@@ -202,7 +202,7 @@ namespace Sentry.data.Infrastructure
 
         private void AddUriParameter(ref string uri, string parameterKey, string parameterValue)
         {
-            uri += uri.Contains("?") ? "&" : "?" + $"{parameterKey}={Uri.EscapeDataString(parameterValue)}";
+            uri += (uri.Contains("?") ? "&" : "?") + $"{parameterKey}={Uri.EscapeDataString(parameterValue)}";
         }
 
         private JObject GetBigQueryResponse(HttpClient httpClient, string uri)
