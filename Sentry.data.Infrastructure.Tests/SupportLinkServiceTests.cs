@@ -78,6 +78,5 @@ namespace Sentry.data.Infrastructure.Tests
             datasetContext.VerifyAll();
         }
 
-        
     }
 }
