@@ -12,7 +12,7 @@ namespace Sentry.data.Core
     public abstract class TileSearchService<T> : ITileSearchService<T> where T : DatasetTileDto
     {
         protected readonly IDatasetContext _datasetContext;
-        private readonly IUserService _userService;
+        protected readonly IUserService _userService;
         private readonly IEventService _eventService;
 
         protected TileSearchService(IDatasetContext datasetContext, IUserService userService, IEventService eventService)
