@@ -1222,7 +1222,7 @@ data.Dataset = {
                     dataType: 'json',
                     success: function (obj) {
                         Sentry.ShowModalAlert(obj.Message, function () {
-                            window.location = "/Dataset";
+                            window.location = "/Search/Datasets";
                         })
                     },
                     failure: function (obj) {
