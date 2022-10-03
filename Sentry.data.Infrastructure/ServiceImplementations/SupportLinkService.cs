@@ -49,6 +49,7 @@ namespace Sentry.data.Infrastructure
                 // Does SupportLink with Id exist
                 SupportLink supportLinkExists = _datasetContext.SupportLinks.Where(w => w.SupportLinkId == id).FirstOrDefault();
                 
+                // if this link does exist with this specified id, delete it
                 if(supportLinkExists != null)
                 {
                     Logger.Error($"Found Support Link {id} to remove");
