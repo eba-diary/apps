@@ -87,6 +87,7 @@ namespace Sentry.data.Infrastructure
             {
                 var supportLinkDto = new SupportLinkDto()
                 {
+                    SupportLinkId=obj.SupportLinkId,
                     Name = obj.Name,
                     Url = obj.Url,
                     Description = obj.Description,

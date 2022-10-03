@@ -4,35 +4,57 @@
     ViewBag.Title = "_AdminTest";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div class="col-lg-10">
-    <div id="body">
-        <div id="divWrapper" class="container-fluid dt-bhootstrap4 no-footer">
-            <br />
-            <div class="row" style="align-items: end;">
-                <div class="col-sm-12 col-md-6">
-                    <h1>My Links</h1>
-                </div>
-                <div class="col-sm-12 col-md-6">
-                    <button type="button" class="btn btn-primary waves-effect waves-light right-aligned" data-toggle="modal" data-target="#AddLinkModal" id="addLinkButton">
-                        Add Link
-                    </button>
-                </div>
+<div>
+    
+    <div class="container-fluid dt-bhootstrap4 no-footer">
+        <br />
+        <div class="row" style="align-items: end;">
+            <div class="col-sm-12 col-md-6">
+                <h1>My Links</h1>
             </div>
+            <div class="col-sm-12 col-md-6">
+                <button type="button" class="btn btn-primary waves-effect waves-light right-aligned" data-toggle="modal" data-target="#AddLinkModal" id="addLinkButton">
+                    Add Link
+                </button>
+            </div>
+        </div>
 
+            
+        
+        <div  class="list-group">
 
+            @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
+            {
 
-            <div id="supportLinkList" class="list-group col-sm-12">
-
-                @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
+                <div class="list-group-item">
+                    <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
+                    <a id="supportLinkName" href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px;">@supportLinkModel.Name</a>       
+                    <p style="padding-left: 100px">@supportLinkModel.Description</p>
+                </div>
+            }
+        </div>
+                
+        <!--
+        <div class="tile-result-content" style="background-color: lightgray">
+            <ul class="list-unstyled">
+                @foreach (Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
                 {
-
-                    <div class="list-group-item">
-                        <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
-                        <a id="supportLinkName" href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px;">@supportLinkModel.Name</a>       
-                        <p style="padding-left: 100px">@supportLinkModel.Description</p>
+                <li class="tile-result">
+                    <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
+                    <div class="dataset-list-content">
+                        <span class="search-dataset-name">
+                            <a id="supportLinkName" href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px;">@supportLinkModel.Name</a>
+                        </span>
                     </div>
+                    <div class="dataset-list-content tile-description">
+                        @supportLinkModel.Description
+                    </div>
+                </li>
                 }
-            </div>
+            </ul>
+        </div>
+        -->    
+
         </div>
     </div>
     
@@ -94,29 +116,11 @@
 </script>
 
 <style>
-    #supportLinkList {
-        margin: auto;
-    }
-       
+
 
     #addLinkButton {
         float: right;
     }
 
-    #divWrapper {
-        width: 100%!important;
-    }
-
-    #tabSupportLinks {
-        box-sizing: border-box;
-    }
-
-    #body {
-        box-sizing: border-box;
-    }
-
-    #supportLinkName {
-        font-size: 20px;
-    }
 
 </style>
