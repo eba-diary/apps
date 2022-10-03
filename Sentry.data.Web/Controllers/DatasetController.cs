@@ -11,7 +11,6 @@ using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.DataTables.Shared;
-using StructureMap.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +20,6 @@ using System.Linq.Dynamic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
 
@@ -35,7 +33,6 @@ namespace Sentry.data.Web.Controllers
         public readonly IDatasetContext _datasetContext;
         private readonly UserService _userService;
         private readonly S3ServiceProvider _s3Service;
-        private readonly ISASService _sasService;
         private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
@@ -52,7 +49,6 @@ namespace Sentry.data.Web.Controllers
             IDatasetContext dsCtxt,
             S3ServiceProvider dsSvc,
             UserService userService,
-            ISASService sasService,
             IAssociateInfoProvider associateInfoService,
             IObsidianService obsidianService,
             IDatasetService datasetService,
@@ -69,7 +65,6 @@ namespace Sentry.data.Web.Controllers
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
             _userService = userService;
-            _sasService = sasService;
             _associateInfoProvider = associateInfoService;
             _obsidianService = obsidianService;
             _datasetService = datasetService;
@@ -855,128 +850,6 @@ namespace Sentry.data.Web.Controllers
                 return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
             }
 
-
-        }
-
-
-        [HttpPost]
-        public ActionResult PushToSAS(int id, string fileOverride, string delimiter, int guessingrows)
-        {
-            Event _event = new Event
-            {
-                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Pushed Data File to SAS").FirstOrDefault(),
-                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId
-            };
-
-            try
-            {
-                DatasetFile ds = _datasetContext.GetById<DatasetFile>(id);
-
-                _event.DataFile = ds.DatasetFileId;
-                _event.Dataset = ds.Dataset.DatasetId;
-                _event.DataConfig = ds.DatasetFileConfig.ConfigId;
-
-                string filename = null;
-                string filename_orig = null;
-
-                Sentry.Common.Logging.Logger.Debug("DatasetId: " + id);
-                Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + fileOverride);
-
-                //Test for an override name; if empty or null, use current value on dataset model
-                if (!String.IsNullOrWhiteSpace(fileOverride))
-                {
-                    //Test if override name includes an extension; if exists, replace with current value in dataset model
-                    if (Path.HasExtension(fileOverride))
-                    {
-                        Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(fileOverride));
-                        Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
-                        filename = fileOverride.Replace(System.IO.Path.GetExtension(fileOverride), System.IO.Path.GetExtension(ds.FileName));
-                    }
-                    else
-                    {
-                        Sentry.Common.Logging.Logger.Debug("Has No File Extension");
-                        Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
-                        filename = (fileOverride + System.IO.Path.GetExtension(ds.FileName));
-                    }
-                }
-                else
-                {
-                    Sentry.Common.Logging.Logger.Debug(" No Override Value");
-                    Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.FileLocation));
-                    filename = System.IO.Path.GetFileName(ds.FileLocation);
-                }
-
-                filename_orig = filename;
-
-                //Gerenate SAS friendly file name.
-                filename = _sasService.GenerateSASFileName(filename);
-
-                //Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
-
-                string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
-
-                string category = ds.Dataset.DatasetCategories.First().Name;
-                //creates category directory if does not exist, otherwise does nothing.
-                System.IO.Directory.CreateDirectory(BaseTargetPath + category);
-
-                try
-                {
-
-                    _s3Service.TransferUtilityDownload(BaseTargetPath, category, filename, ds.FileLocation, ds.VersionId);
-
-                }
-                catch (Exception e)
-                {
-                    Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
-                    return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
-                }
-
-
-                //Converting file to .sas7bdat format
-                try
-                {
-                    // Pass preview object key for data file to ConvertToSASFormat  
-                    _sasService.ConvertToSASFormat(ds.DatasetFileId, filename, delimiter, guessingrows);
-
-                }
-                catch (WebException we)
-                {
-                    Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
-                    return PartialView("_Success", new SuccessModel("Push to SAS Error", we.Message, false));
-                }
-                catch (Exception e)
-                {
-                    Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
-                    return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
-                }
-
-                _event.Reason = "Successfully Pushed to SAS";
-                _event.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(_event), TaskCreationOptions.LongRunning);
-
-                return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename_orig} has been converted to {filename.Replace(Path.GetExtension(filename), ".sas7bdat")}. The file can be found at {BaseTargetPath.Replace("\\sentry.com\appfs_nonprod", "S: ")}.", true));
-            }
-            catch (Exception e)
-            {
-                _event.Reason = "Error calling SAS Stored Process";
-                _event.Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(_event), TaskCreationOptions.LongRunning);
-
-                Logger.Error("Error calling SAS Stored Process", e);
-                return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
-            }
-        }
-
-        [HttpGet()]
-        public PartialViewResult PushToFileNameOverride(int id)
-        {
-            PushToDatasetModel model = new PushToDatasetModel();
-
-            DatasetFile datafile = _datasetContext.GetById<DatasetFile>(id);
-            model.DatasetFileId = datafile.DatasetFileId;
-            model.DatasetFileName = datafile.FileName;
-
-            return PartialView("_PushToFilenameOverride_new", model);
 
         }
 

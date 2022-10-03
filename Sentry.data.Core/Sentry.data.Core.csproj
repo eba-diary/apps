@@ -147,6 +147,7 @@
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
+    <Compile Include="DomainServices\AuditService.cs" />
     <Compile Include="DomainServices\ConnectorService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceTileSearchService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
@@ -162,6 +163,8 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DTO\AuditDto.cs" />
+    <Compile Include="DTO\BaseAuditDto.cs" />
     <Compile Include="DTO\Admin\SupportLinkDto.cs" />
     <Compile Include="DomainServices\TileSearchService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceTileDto.cs" />
@@ -193,6 +196,7 @@
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetTileDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
+    <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
@@ -230,6 +234,7 @@
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\GoogleBigQueryApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ProducerS3DropAction.cs" />
@@ -257,6 +262,7 @@
     <Compile Include="Entities\DataProcessing\Log_Level.cs" />
     <Compile Include="Entities\DataProcessing\RunInstance.cs" />
     <Compile Include="Entities\Datasets\Asset.cs" />
+    <Compile Include="Entities\Datasets\SnowCompareConfig.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Elastic\ElasticResult.cs" />
@@ -264,11 +270,13 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleBigQueryApiSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Goldeneye\FileProcess.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Entities\Livy\LivyBatch.cs" />
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseDeletedFileModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseSingleStatusModel.cs" />
@@ -289,10 +297,13 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
+    <Compile Include="GlobalEnums\AuditSearchType.cs" />
+    <Compile Include="GlobalEnums\AuditType.cs" />
     <Compile Include="GlobalEnums\DatasetFileStatusType.cs" />
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\LayoutOption.cs" />
@@ -345,7 +356,6 @@
     <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\KafkaProducerException.cs" />
     <Compile Include="Exceptions\RetrieverJobProcessingException.cs" />
-    <Compile Include="Exceptions\SASNotificationNotSentException.cs" />
     <Compile Include="Exceptions\SchemaInUseException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaConversionException.cs" />
@@ -385,6 +395,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
+    <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
@@ -405,6 +416,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressGzipProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
+    <Compile Include="Interfaces\IAuthorizationProvider.cs" />
+    <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
+    <Compile Include="Interfaces\IHttpClientGenerator.cs" />
     <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\Entities\IFilterSearchable.cs" />
     <Compile Include="Interfaces\IAdSecurityAdminProvider.cs" />
@@ -487,7 +501,6 @@
     <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
-    <Compile Include="Extensions\DataElementExtensions.cs" />
     <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
@@ -614,7 +627,6 @@
     <Compile Include="Interfaces\IMessagePublisher.cs" />
     <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
-    <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IBaseJobProvider.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IGoogleApiProvider.cs" />

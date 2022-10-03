@@ -442,6 +442,7 @@
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
+    <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\ConnectorExtensions.cs" />
@@ -451,6 +452,8 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Extensions\TileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
+    <Compile Include="Models\AdminPage\BaseAuditModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
@@ -464,6 +467,7 @@
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileReprocessModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DatasetFileModel.cs" />
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
+    <Compile Include="Models\ApiModels\Job\JavaOptionsOverride.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionTypeEnum.cs" />
@@ -1249,11 +1253,10 @@
     <Content Include="Views\Dataset\Permission\_RequestInheritanceModal.cshtml" />
     <Content Include="Views\Dataset\Details\_TabUnauthorized.cshtml" />
     <Content Include="Views\Dataset\Permission\RequestAccessCLA3723.cshtml" />
+    <Content Include="Views\Shared\_NonParquetFilesTable.cshtml" />
+    <Content Include="Views\Shared\_RowCountCompareTable.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\Admin\DataFileReprocessing.cshtml" />
-    <Content Include="Views\Shared\_AdminTest2.cshtml" />
-    <Content Include="Views\Shared\_AdminTest4.cshtml" />
-    <Content Include="Views\Shared\_AdminTest3.cshtml" />
     <Content Include="Views\Admin\ConnectorStatus.cshtml" />
     <Content Include="Views\Dataset\Permission\_RemovePermissionModal.cshtml" />
     <Content Include="Views\Dataset\Details\_DeleteDatasetFiles.cshtml" />
@@ -1263,8 +1266,11 @@
     <Content Include="Views\Admin\DataFlowMetrics.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_AdminSideNav.cshtml" />
+    <Content Include="Views\Admin\RawqueryParquetAudit.cshtml" />
     <Content Include="Views\Admin\SupportLinks.cshtml" />
     <Content Include="Views\Search\TileResults.cshtml" />
+    <Content Include="Views\Config\Index.cshtml" />
+    <Content Include="Views\Config\_DataFlowStepAccordion.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -1913,9 +1919,7 @@
     <Content Include="Views\Dataset\_ListItem.cshtml" />
     <Content Include="Views\Dataset\Detail.cshtml" />
     <Content Include="_status\web.config" />
-    <Content Include="Views\Dataset\_PushToFilenameOverride.cshtml" />
     <Content Include="Views\Shared\_Success.cshtml" />
-    <Content Include="Views\Dataset\_PushToFilenameOverride_new.cshtml" />
     <Content Include="Views\DataAsset\Index.cshtml" />
     <Content Include="Views\DataAsset\_ConsumptionLayerComponent.cshtml" />
     <Content Include="Views\DataAsset\_ComponentTableRow.cshtml" />
@@ -1923,19 +1927,17 @@
     <Content Include="Views\Home\_GridTwo.cshtml" />
     <Content Include="Views\Home\_Feed.cshtml" />
     <Content Include="Views\Dataset\_HomeDataset.cshtml" />
-    <Content Include="Views\Dataset\_ListDatasetFile.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFileForm.cshtml" />
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />
-    <Content Include="Views\Dataset\_BundleFilename.cshtml" />
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Config\Create.cshtml" />
     <Content Include="Views\Dataset\_Subscribe.cshtml" />
     <Content Include="Views\Home\ReleaseNotes.cshtml" />
     <Content Include="Views\Dataset\QueryTool.cshtml" />
     <Content Include="Views\DataAsset\Lineage.cshtml" />
-    <Content Include="Views\Config\Index.cshtml" />
+    <Content Include="Views\Config\Index_v1.cshtml" />
     <Content Include="Views\Config\CreateRetrievalJob.cshtml" />
     <Content Include="Views\Config\Edit.cshtml" />
     <Content Include="Views\Config\EditRetrievalJob.cshtml" />
@@ -2110,7 +2112,6 @@
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
-      <UserProperties _1_1_4localfeatureflags_4localfeatureflags_1json__JsonSchema="https://gitlab.com/appsemble/appsemble/-/raw/HEAD/packages/cli/assets/appsemblerc.schema.json" />
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />

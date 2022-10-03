@@ -12,6 +12,7 @@ namespace Sentry.data.Core
     public class RetrieverJob : IRetrieverJob, IValidatable
     {
         private string _jobOptions;
+        private string _executionParameters;
 
         public RetrieverJob()
         {
@@ -112,7 +113,24 @@ namespace Sentry.data.Core
         public virtual ObjectStatusEnum ObjectStatus { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
+        public virtual Dictionary<string, string> ExecutionParameters
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_executionParameters) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(_executionParameters);
+            }
+            set
+            {
+                _executionParameters = JsonConvert.SerializeObject(value);
+            }
+        }
 
+        public virtual void AddOrUpdateExecutionParameter(string key, string value)
+        {
+            Dictionary<string, string> parameters = ExecutionParameters;
+            parameters[key] = value;
+            ExecutionParameters = parameters;
+        }
 
         public virtual Uri GetUri()
         {
@@ -218,31 +236,15 @@ namespace Sentry.data.Core
             //Validations specific for HTTPSSource
             if ( /* Need to take into consideration pre-v3 dataflows may be associated with DatasetConfig and when saved for delete 
                  *   this validaiton will kick off.  Therefore, the the || is needed. */
-                ((DataFlow != null && DataFlow.IngestionType == (int)IngestionType.DSC_Pull) || DatasetConfig != null)
-                && DataSource.Is<HTTPSSource>()
-                && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+                ((DataFlow != null && DataFlow.IngestionType == (int)IngestionType.DSC_Pull) || DatasetConfig != null))
             {
-                vr.Add(ValidationErrors.httpsTargetFileNameBlank, "Target file name is required for HTTPS data sources");
+                DataSource.Validate(this, vr);
+            }
+            if (String.IsNullOrWhiteSpace(Schedule))
+            {
+                vr.Add(ValidationErrors.scheduleIsNull, "Schedule is required");
             }
 
-            if (/* Need to take into consideration pre-v3 dataflows may be associated with DatasetConfig and when saved for delete 
-                 *   this validaiton will kick off.  Therefore, the the || is needed. */
-                ((DataFlow != null && DataFlow.IngestionType == (int)IngestionType.DSC_Pull) || DatasetConfig != null)
-                && DataSource.Is<FtpSource>())
-            {
-                if (String.IsNullOrWhiteSpace(this.RelativeUri))
-                {
-                    vr.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for FTP data sources");
-                }
-                if (string.IsNullOrEmpty(this.Schedule))
-                {
-                    vr.Add(ValidationErrors.scheduleIsNull, "Schedule is required");
-                }
-                if (this.JobOptions.FtpPattern == FtpPattern.None)
-                {
-                    vr.Add(ValidationErrors.ftpPatternNotSelected, "The FTP Pattern field is required");
-                }
-            }
             return vr;
         }
 
@@ -250,16 +252,9 @@ namespace Sentry.data.Core
         {
             return new ValidationResults();
         }
+
         public static class ValidationErrors
         {
-            public const string httpsTargetFileNameBlank = "keyIsBlank";
-            public const string googleApiRelativeUriIsBlank = "googleApiRelativeUriIsBlank";
-            public const string httpsRequestMethodNotSelected = "httpsRequestMethodNotSelected";
-            public const string httpsRequestDataFormatNotSelected = "httpsRequestDataFormateNotSelected";
-            public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
-            public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
-            public const string ftpPatternNotSelected = "ftpPatternNotSelected";
-            public const string relativeUriNotSpecified = "relativeUriNotSpecified";
             public const string scheduleIsNull = "scheduleIsNull";
         }
 

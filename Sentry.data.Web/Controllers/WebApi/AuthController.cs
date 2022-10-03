@@ -31,11 +31,11 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
-        public IHttpActionResult CreateDefaultSecurity(int[] idList)
+        public IHttpActionResult CreateDefaultSecurity(int[] datasetIdList)
         {
-            Sentry.Common.Logging.Logger.Info($"{_userService.GetCurrentRealUser().AssociateId} called CreateDefaultSecurity on Dataset Id(s) {idList}");
+            Sentry.Common.Logging.Logger.Info($"{_userService.GetCurrentRealUser().AssociateId} called CreateDefaultSecurity on Dataset Id(s) {datasetIdList}");
             //validate
-            foreach (int datasetId in idList)
+            foreach (int datasetId in datasetIdList)
             {
                 var ds = _dsContext.GetById<Dataset>(datasetId);
                 if (ds == null)
@@ -44,9 +44,8 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
             }
             //queue jobs
-            _securityService.EnqueueCreateDefaultSecurityForDatasetList(idList);
+            _securityService.EnqueueCreateDefaultSecurityForDatasetList(datasetIdList);
             return Ok();
         }
-
     }
 }

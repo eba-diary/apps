@@ -30,7 +30,7 @@
         </div>
 
         <div id="search-box" class="md-form input-group has-feedback has-feedback-left filter-search-box">
-            <input type="text" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
+            <input type="search" class="form-control text-box single-line" id="filter-search-text" placeholder="Search @Model.PageTitle" value="@Model.DefaultSearch.SearchText" disabled>
             <span class="input-group-append filter-search-start sentry-blue white-text icon-search clickable display-none"></span>
         </div>
     </div>
@@ -46,7 +46,7 @@
         <div class="filter-search-title-container bottom-border">
             <h4 class="filter-search-title">Filter</h4>
             <span class="filter-search-clear-container">
-                <button class="btn btn-warning display-none filter-search-option-button" id="filter-search-clear">Clear All</button>
+                <button class="btn btn-warning display-none filter-search-option-button" id="filter-search-clear"><em class="fas fa-filter filter-search-apply-icon"></em>Clear</button>
             </span>
             <span class="filter-search-clear-container">
                 <button class="btn btn-primary display-none filter-search-option-button filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>

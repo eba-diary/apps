@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces;
+using Sentry.data.Infrastructure;
 using System.Threading;
 using System;
 using Moq;

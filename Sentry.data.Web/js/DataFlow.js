@@ -75,6 +75,7 @@
         $(document).ready(function () {
             $("#SAIDAssetKeyCode").materialSelect();
             $("#IsCompressed").materialSelect();
+            $("#IsBackFillRequired").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
             $("#NamedEnvironmentPartial select").materialSelect();
@@ -212,9 +213,11 @@
 
         if (val == data.DataFlow.IngestionType_TOPIC) {
             $('#topicNameContainer').show();
+            $('#isBackFillRequiredContainer').show();
         }
         else {
             $('#topicNameContainer').hide();
+            $('#isBackFillRequiredContainer').hide();
         }
     },
 

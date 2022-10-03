@@ -11,7 +11,7 @@
     <h2 class="pt-3 pl-0">
         DataFlow Details (<span>@Model.Name</span>)@if (Model.DisplayDataflowEdit && Model.UserSecurity.CanModifyDataflow)
         {
-            <span id="edit-dataflow-icon" class="clickable" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" onclick="data.DataFlow.EditUrlRedirect(@Model.Id)"><span class="far fa-edit"></span></span>
+            <a id="edit-dataflow-icon" class="far fa-edit" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" href="/DataFlow/Edit/@Model.Id"></a>
         }
     </h2>
     @if (Model.DisplayDataflowEdit && Model.CLA3718_Authorization && !Model.UserSecurity.CanModifyDataflow)

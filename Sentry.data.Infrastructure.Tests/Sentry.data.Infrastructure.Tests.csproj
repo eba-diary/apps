@@ -160,6 +160,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BaseInfrastructureUnitTest.cs" />
     <Compile Include="ConfluentConnectorProviderTests.cs" />
     <Compile Include="DeadJobProviderTests.cs" />
     <Compile Include="ApacheLivyProviderTests.cs" />
@@ -174,6 +175,8 @@
     <Compile Include="InevServiceTests.cs" />
     <Compile Include="SupportLinkServiceTests.cs" />
     <Compile Include="SecBotProviderTests.cs" />
+    <Compile Include="GoogleBigQueryServiceTests.cs" />
+    <Compile Include="GoogleBigQueryJobProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -197,9 +200,31 @@
     <Content Include="ExpectedJSON\ConfluentConnector_Status.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_EventsSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_BasicSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_Data_NoPageToken.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_NotFound.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_Data_PageToken.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\GoogleBigQuery_Data_PageTokenLast.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Core.Tests\Sentry.data.Core.Tests.csproj">
+      <Project>{d871509a-ab3d-4b70-b1f1-23bf5f807d0d}</Project>
+      <Name>Sentry.data.Core.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>

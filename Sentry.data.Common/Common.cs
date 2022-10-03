@@ -895,22 +895,6 @@ namespace Sentry.data.Common
                     return false;
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="extension"></param>
-        /// <returns></returns>
-        public static Boolean IsExtentionPushToSAScompatible(string extension)
-        {
-            switch (extension)
-            {
-                case "csv":
-                case ".csv":
-                    return true;
-                default:
-                    return false;
-            }
-        }
 
         /// <summary>
         /// Generates hash based on input, returns GUID 

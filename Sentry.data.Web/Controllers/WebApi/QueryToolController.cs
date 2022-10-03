@@ -34,14 +34,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         private IConfigService _configService;
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
-        private readonly IDataFeatures _featureFlags;
         private IDatasetService _datasetService;
         private string _bucket;
         private IApacheLivyProvider _apacheLivyProvider;
 
-        public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
-            ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            ISchemaService schemaService, ISecurityService securityService, IDataFeatures dataFeatures, IDatasetService datasetService,
+        public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, IAssociateInfoProvider associateInfoService, IConfigService configService,
+            ISchemaService schemaService, ISecurityService securityService, IDatasetService datasetService,
             IApacheLivyProvider apacheLivyProvider)
         {
             _datasetContext = dsCtxt;
@@ -53,7 +51,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             _configService = configService;
             _schemaService = schemaService;
             _securityService = securityService;
-            _featureFlags = dataFeatures;
             _datasetService = datasetService;
             _apacheLivyProvider = apacheLivyProvider;
         }
@@ -466,7 +463,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
-            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", null).ConfigureAwait(false);
+            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", content:null).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {

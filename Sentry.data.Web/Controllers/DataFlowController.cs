@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Sentry.data.Web;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -100,11 +100,12 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = new DataFlowModel();
             model.CreatedBy = SharedContext.CurrentUser.AssociateId;
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
 
-
+            
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
@@ -148,6 +149,7 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = ToDataFlowModel(dto);
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
@@ -168,7 +170,6 @@ namespace Sentry.data.Web.Controllers
             UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);            
 
             AddCoreValidationExceptionsToModel(model.Validate());
-
 
             DataFlowDto dfDto = ModelToDto(model);
 
@@ -247,13 +248,13 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(ex);
             }
 
-
             /*
              *  At this point, something has failed 
              * 
              */
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
@@ -345,6 +346,7 @@ namespace Sentry.data.Web.Controllers
                 Name = dto.Name,
                 IngestionTypeSelection = dto.IngestionType,
                 IsCompressed = dto.IsCompressed,
+                IsBackFillRequired = dto.IsBackFillRequired,
                 IsPreProcessingRequired = dto.IsPreProcessingRequired,
                 PreProcessingSelection = (dto.PreProcessingOption.HasValue) ? (int)dto.PreProcessingOption : 0,
                 SAIDAssetKeyCode = dto.SaidKeyCode,
@@ -392,7 +394,7 @@ namespace Sentry.data.Web.Controllers
 
         private JobModel ToJobModel(RetrieverJobDto dto)
         {
-            JobModel model = new JobModel()
+            JobModel model = new JobModel
             {
                 Schedule = dto.Schedule,
                 SchedulePicker = dto.SchedulePicker.ToString(),
@@ -405,10 +407,11 @@ namespace Sentry.data.Web.Controllers
                 SelectedSourceType = dto.DataSourceType,
                 SelectedRequestMethod = dto.RequestMethod ?? Core.HttpMethods.none,
                 SelectedRequestDataFormat = dto.RequestDataFormat ?? Core.HttpDataFormat.none,
-                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern
+                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern,
+                ExecutionParameters = dto.ExecutionParameters,
+                SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule)
             };
 
-            model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule);
             model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault().ToString();
 
             return model;
@@ -501,10 +504,16 @@ namespace Sentry.data.Web.Controllers
 
         private void CreateDropDownSetup(JobModel model)
         {
+            List<string> sources = new List<string>()
+            {
+                DataSourceDiscriminator.FTP_SOURCE,
+                DataSourceDiscriminator.GOOGLE_API_SOURCE,
+                DataSourceDiscriminator.HTTPS_SOURCE,
+                DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE
+            };
+
             var temp = _dataFlowService.GetDataSourceTypes()
-                .Where(w => w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE ||
-                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE ||
-                    w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE)
+                .Where(w => sources.Contains(w.DiscrimatorValue))
                 .Select(v => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue })
                 .ToList();
 
@@ -634,40 +643,44 @@ namespace Sentry.data.Web.Controllers
 
             switch (sourceType)
             {
-                case "FTP":
+                case DataSourceDiscriminator.FTP_SOURCE:
                     List<DataSource> fTpList = _dataFlowService.GetDataSources().Where(x => x is FtpSource).ToList();
                     output.AddRange(fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "SFTP":
+                case DataSourceDiscriminator.SFTP_SOURCE:
                     List<DataSource> sfTpList = _dataFlowService.GetDataSources().Where(x => x is SFtpSource).ToList();
                     output.AddRange(sfTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "DFSBasic":
+                case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                     List<DataSource> dfsBasicList = _dataFlowService.GetDataSources().Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "DFSCustom":
+                case DataSourceDiscriminator.DFS_CUSTOM:
                     List<DataSource> dfsCustomList = _dataFlowService.GetDataSources().Where(x => x is DfsCustom).ToList();
                     output.AddRange(dfsCustomList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "S3Basic":
+                case DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION:
                     List<DataSource> s3BasicList = _dataFlowService.GetDataSources().Where(x => x is S3Basic).ToList();
                     output.AddRange(s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "HTTPS":
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     List<DataSource> HttpsList = _dataFlowService.GetDataSources().Where(x => x is HTTPSSource).ToList();
                     output.AddRange(HttpsList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case "GOOGLEAPI":
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     List<DataSource> GApiList = _dataFlowService.GetDataSources().Where(x => x is GoogleApiSource).ToList();
                     output.AddRange(GApiList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
+                    break;
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                    List<DataSource> bigQueryList = _dataFlowService.GetDataSources().Where(x => x is GoogleBigQueryApiSource).ToList();
+                    output.AddRange(bigQueryList.Select(v => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
                 default:
                     throw new NotImplementedException();
@@ -710,25 +723,23 @@ namespace Sentry.data.Web.Controllers
                     case "SchedulePicker":
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.googleApiRelativeUriIsBlank:
-                        ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
-                        break;
-                    case RetrieverJob.ValidationErrors.httpsRequestBodyIsBlank:
+                    case DataSource.ValidationErrors.httpsRequestBodyIsBlank:
                         ModelState.AddModelError("RetrieverJob.HttpRequestBody", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.httpsRequestDataFormatNotSelected:
+                    case DataSource.ValidationErrors.httpsRequestDataFormatNotSelected:
                         ModelState.AddModelError("RetrieverJob.SelectedRequestDataFormat", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.httpsRequestMethodNotSelected:
+                    case DataSource.ValidationErrors.httpsRequestMethodNotSelected:
                         ModelState.AddModelError("RetrieverJob.SelectedRequestMethod", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.httpsTargetFileNameIsBlank:
+                    case DataSource.ValidationErrors.httpsTargetFileNameIsBlank:
                         ModelState.AddModelError("RetrieverJob.TargetFileName", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.ftpPatternNotSelected:
+                    case DataSource.ValidationErrors.ftpPatternNotSelected:
                         ModelState.AddModelError("RetrieverJob.FtpPattern", vr.Description);
                         break;
-                    case RetrieverJob.ValidationErrors.relativeUriNotSpecified:
+                    case DataSource.ValidationErrors.relativeUriNotSpecified:
+                    case DataSource.ValidationErrors.relativeUriStartsWithForwardSlash:
                         ModelState.AddModelError("RetrieverJob.RelativeUri", vr.Description);
                         break;
                     case RetrieverJob.ValidationErrors.scheduleIsNull:
@@ -756,6 +767,7 @@ namespace Sentry.data.Web.Controllers
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionTypeSelection,
                 IsCompressed = model.IsCompressed,
+                IsBackFillRequired = model.IsBackFillRequired,
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,

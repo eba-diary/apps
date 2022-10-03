@@ -804,7 +804,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void DeleteMultipleS3Keys(List<ObjectKeyVersion> keyversionids)
+        public void DeleteMultipleS3Keys(List<ObjectKeyVersion> keyversionids, string bucket)
         {
             List<KeyVersion> objects = new List<KeyVersion>();
             List<ObjectKeyVersion> deletedObjects = new List<ObjectKeyVersion>();
@@ -817,7 +817,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 DeleteObjectsRequest dosReq = new DeleteObjectsRequest();
-                dosReq.BucketName = RootBucket;
+                dosReq.BucketName = bucket;
                 dosReq.Objects = objects;
                 DeleteObjectsResponse dosRsp = S3Client.DeleteObjects(dosReq);
                 Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count}");
@@ -861,7 +861,7 @@ namespace Sentry.data.Infrastructure
             }
         }
         #endregion
-        public void DeleteMulitpleS3Keys(List<string> keys)
+        public void DeleteMulitpleS3Keys(List<string> keys, string bucket)
         {
             List<ObjectKeyVersion> keyList = new List<ObjectKeyVersion>();
             foreach (string key in keys)
@@ -873,7 +873,7 @@ namespace Sentry.data.Infrastructure
                 });
             }
 
-            DeleteMultipleS3Keys(keyList);
+            DeleteMultipleS3Keys(keyList, bucket);
         }
         /// <summary>
         /// Get list of datasets currently on S3, within the given parentDir
@@ -1240,7 +1240,12 @@ namespace Sentry.data.Infrastructure
 
         public void DeleteS3Prefix(string prefix)
         {
-            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(RootBucket, prefix).ToList());
+            DeleteS3Prefix(prefix, RootBucket);
+        }
+
+        public void DeleteS3Prefix(string prefix, string bucket)
+        {
+            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(bucket, prefix).ToList());
             if (s3Keys.Count == 0)
             {
                 Logger.Info($"deleteS3Prefix-nofilesdetected - prefix:{prefix}");
@@ -1248,7 +1253,7 @@ namespace Sentry.data.Infrastructure
             else
             {
                 Logger.Info($"deleteS3Prefix-detectedfiles - prefix:{prefix} count:{s3Keys.Count.ToString()}");
-                DeleteMultipleS3Keys(s3Keys);
+                DeleteMultipleS3Keys(s3Keys, bucket);
             }
         }
 

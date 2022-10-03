@@ -31,6 +31,15 @@ table#deadJobs td.dropdown-control {
 table#metricGroupsTable td.dt-control {
     cursor: pointer;
 }
+
+.audit-search-selection.hidden {
+    display: none !important;
+}
+
+.audit-search-selection.active {
+    display: inline-block !important;
+}
+
 .metricsButton{
     margin-top:20px;
     margin-bottom:20px;

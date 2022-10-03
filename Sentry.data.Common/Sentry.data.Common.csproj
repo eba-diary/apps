@@ -159,7 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
-      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
+      <Project>{EA9EE762-CE32-4410-B2B6-367A0985645B}</Project>
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Infrastructure\Sentry.data.Infrastructure.csproj">

@@ -111,6 +111,7 @@
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
@@ -137,6 +138,7 @@
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="ConfigServiceTests.cs" />
+    <Compile Include="DataSourceTests.cs" />
     <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
@@ -169,6 +171,7 @@
     <Compile Include="DatasetFileConfigExtensionsTests.cs" />
     <Compile Include="DatasetExtensionsTests.cs" />
     <Compile Include="ServiceImplementationTests\DatasetTileSearchServiceTests.cs" />
+    <Compile Include="SchemaExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -223,6 +226,10 @@
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sentry.data.Web\Sentry.data.Web.csproj">
+      <Project>{42c330e1-e605-487f-979d-635597d1c88d}</Project>
+      <Name>Sentry.data.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
       <Project>{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}</Project>

@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using Sentry.data.Core.DTO.Admin;
 using Sentry.data.Core.DTO;
 using Sentry.data.Core.Interfaces;
 using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,13 +22,15 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IKafkaConnectorService _connectorService;
         private readonly IDatasetService _datasetService;
+        private readonly IAuditService _auditSerivce;
         private readonly IDeadSparkJobService _deadSparkJobService;
         private readonly ISupportLinkService _supportLinkService;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService, IAuditService auditSerivce)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
+            _auditSerivce = auditSerivce;
             _deadSparkJobService = deadSparkJobService;
             _supportLinkService = supportLinkService;
         }
@@ -38,7 +42,7 @@ namespace Sentry.data.Web.Controllers
             return await _connectorService.GetS3ConnectorConfigJSONAsync(ConnectorId);
         }
 
-        [HttpPost]
+        [System.Web.Http.HttpPost]
         public async Task<ActionResult> GetConnectorStatus(string ConnectorId)
         {
             JObject JConnectorStatus = await _connectorService.GetS3ConnectorStatusJSONAsync(ConnectorId);
@@ -48,6 +52,63 @@ namespace Sentry.data.Web.Controllers
             return Content(json, "application/json");
         }
 
+        [HttpPost]
+        public ActionResult GetAuditTableResults(int datasetId, int schemaId, int auditId, int searchTypeId, string searchParameter)
+        {
+            // find audit and search enum types 
+            AuditType auditType = Utility.FindEnumFromId<AuditType>(auditId);
+
+            AuditSearchType auditSearchType = Utility.FindEnumFromId<AuditSearchType>(searchTypeId);
+
+            BaseAuditModel tableModel = new BaseAuditModel();
+            
+            string viewPath = "";
+            try
+            {
+                switch (auditType)
+                {
+                    case AuditType.NonParquetFiles:
+                        tableModel = _auditSerivce.GetExceptRows(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        viewPath = "_NonParquetFilesTable";
+                        break;
+                    case AuditType.RowCountCompare:
+                        tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        viewPath = "_RowCountCompareTable";
+                        break;
+                }
+
+                return PartialView(viewPath, tableModel);
+            } 
+            catch (ArgumentException ex)
+            {
+                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), ex.Message);
+            }
+        }
+
+        public AuditSelectionModel GetAuditSelectionModel()
+        {
+            AuditSelectionModel model = new AuditSelectionModel(); 
+
+            // Define specific AuditType enum id's that will have added search features
+            model.AuditAddedSearchKey = new int[]{ 0,1 };
+
+            List<DatasetDto> dtoTestList = _datasetService.GetAllDatasetDto();
+
+            model.AllDatasets = new List<SelectListItem>();
+
+            model.AllDatasets.Add(new SelectListItem() { Disabled=true, Text = "Please select Dataset", Value="-1"});
+            dtoTestList.ForEach(d => model.AllDatasets.Add(new SelectListItem { Text = d.DatasetName, Value = d.DatasetId.ToString() }));
+
+            model.AllAuditTypes = Utility.BuildSelectListFromEnum<AuditType>(0);
+            model.AllAuditTypes.Insert(0, new SelectListItem() { Disabled = true, Text = "Please select Audit Type", Value = "-1" });
+
+            model.AllAuditSearchTypes = Utility.BuildSelectListFromEnum<AuditSearchType>(0);
+            model.AllAuditSearchTypes.Insert(0, new SelectListItem() { Disabled = true, Text = "Please select a Search Type", Value = "-1" });
+
+            return model;
+        }
+
+        
         [Route("Admin/GetDeadJobs/{selectedDate?}")]
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)
@@ -69,11 +130,21 @@ namespace Sentry.data.Web.Controllers
             List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
             dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
             model.AllDatasets = new List<SelectListItem>();
+
+            model.AllDatasets.Add(new SelectListItem()
+            {
+                Value = "None",
+                Text = "Please select a dataset...",
+                Selected = true,
+                Disabled = true,
+            });
+
             foreach (DatasetDto dto in dtoList)
             {
                 SelectListItem item = new SelectListItem();
                 item.Text = dto.DatasetName;
                 item.Value = dto.DatasetId.ToString();
+                item.Selected = false;
                 model.AllDatasets.Add(item);
             }
 
@@ -177,6 +248,12 @@ namespace Sentry.data.Web.Controllers
                 AllSupportLinks = supportLinks,
             };
             return View(supportLinkWrapper);
+        }
+       
+        public ActionResult RawqueryParquetAudit()
+        {
+            AuditSelectionModel model = GetAuditSelectionModel();
+            return View(model);
         }
     }
 }

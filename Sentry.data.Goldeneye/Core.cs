@@ -286,7 +286,7 @@ namespace Sentry.data.Goldeneye
             RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
             //Schedule Livy Job state monitor to run every minute
-            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate<IRetrieverJobService>("LivyJobStateMonitor", x => x.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
             //Schedule the Ticket Monitor to run based on cron within configuration file.
             RecurringJob.AddOrUpdate<TicketMonitorService>("HPSMTicketMonitor", x => x.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));

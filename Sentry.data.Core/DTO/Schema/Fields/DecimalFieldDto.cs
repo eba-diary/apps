@@ -8,6 +8,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class DecimalFieldDto : BaseFieldDto
     {
+        public DecimalFieldDto() : base() { }
         public DecimalFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int rowPosition, bool array) : base(prop, rowPosition, array)
         {
             SetPrecisionScale(prop.Value.IsArray ? prop.FindArraySchema().ExtensionData : prop.Value.ExtensionData);

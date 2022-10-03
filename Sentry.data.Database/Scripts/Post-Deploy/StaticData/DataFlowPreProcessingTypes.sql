@@ -3,7 +3,8 @@
         MERGE INTO [DataFlowPreProcessingTypes] AS Target    
         USING (VALUES 
           (1,	'googleapi', 'Google API'),
-		  (2,	'claimiq', 'Claim IQ')
+		  (2,	'claimiq', 'Claim IQ'),
+		  (3,	'googlebigqueryapi', 'Google BigQuery API')
         )
         AS Source ([ID], [Name], [Description])
         ON Target.[ID] = Source.[ID]   

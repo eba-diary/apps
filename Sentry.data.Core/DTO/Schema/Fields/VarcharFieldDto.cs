@@ -7,6 +7,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 {
     public class VarcharFieldDto : BaseFieldDto
     {
+        public VarcharFieldDto() : base() { }
         public VarcharFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int rowPosition, bool array) : base(prop, rowPosition, array)
         {
             if (prop.Value.IsArray)

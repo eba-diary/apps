@@ -496,6 +496,34 @@ namespace Sentry.data.Web.WebApi.Controllers
             return ApiTryCatch(nameof(MetadataController), nameof(SyncConsumptionLayer), $"datasetid:{datasetId} schemaId{schemaId}", SyncConsumptionLayerFunction);
         }
 
+
+        /// <summary>
+        /// Creates consumption layers for schema Id(s) provided.
+        /// </summary>
+        [HttpPost]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [Route("CreateConsumptionLayers")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
+        public IHttpActionResult CreateConsumptionLayers(int[] schemaIdList)
+        {
+            Sentry.Common.Logging.Logger.Info($"{_userService.GetCurrentRealUser().AssociateId} called CreateConsumptionLayers on Dataset Id(s) {schemaIdList}");
+            //validate
+            foreach (int schemaId in schemaIdList)
+            {
+                var schema = _dsContext.GetById<Schema>(schemaId);
+                if (schema == null)
+                {
+                    return BadRequest($"Schema with ID \"{schemaId}\" could not be found.");
+                }
+            }
+            //run jobs
+            _schemaService.CreateConsumptionLayersForSchemaList(schemaIdList);
+            return Ok();
+        }
+
         /// <summary>
         /// gets dataset metadata
         /// </summary>

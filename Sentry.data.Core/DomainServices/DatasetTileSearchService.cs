@@ -9,7 +9,18 @@ namespace Sentry.data.Core
 
         protected override IQueryable<Dataset> GetDatasets()
         {
-            return _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET && w.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted);
+            IQueryable<Dataset> datasets = _datasetContext.Datasets.Where(w => w.DatasetType == DataEntityCodes.DATASET);
+
+            if (_userService.GetCurrentUser().IsAdmin)
+            {
+                datasets = datasets.Where(x => x.ObjectStatus != GlobalEnums.ObjectStatusEnum.Deleted);
+            }
+            else
+            {
+                datasets = datasets.Where(x => x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+            }
+
+            return datasets;
         }
 
         protected override DatasetTileDto MapToTileDto(Dataset dataset)

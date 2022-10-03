@@ -27,11 +27,17 @@ namespace Sentry.data.Infrastructure
         private IFtpProvider _ftpProvider;
         private IDatasetContext _requestContext;
         private IJobService _jobService;
+        private readonly IDatasetContext _datasetContext;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
         };
 
+        public RetrieverJobService(IJobService jobService, IDatasetContext datasetContext)
+        {
+            _jobService = jobService;
+            _datasetContext = datasetContext;
+        }
         /// <summary>
         /// Implementation of core job logic for each DataSOurce type.
         /// </summary>
@@ -58,9 +64,9 @@ namespace Sentry.data.Infrastructure
                     {
                         switch (_job.DataSource.SourceType)
                         {
-                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
-                            case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
-                            case GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE:
+                            case GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE:
+                            case GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE:
+                            case GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE:
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
 
                                 // Execute job
@@ -80,16 +86,19 @@ namespace Sentry.data.Infrastructure
                         switch (_job.DataSource.SourceType)
                         {
                             //Map exising source type to new Dataflow Provider
-                            case GlobalConstants.DataSoureDiscriminator.FTP_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.FTP_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                            case GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
+                            case GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+                                break;
+                            case GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
                                 includeFilename = true;
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
                                 break;
@@ -1132,19 +1141,21 @@ namespace Sentry.data.Infrastructure
         #endregion
 
 
-        public static async Task UpdateJobStatesAsync()
+        public async Task UpdateJobStatesAsync()
         {
+
             try
             {
-                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                var jobList = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList();
+
+                List<Task<HttpResponseMessage>> taskList = new List<Task<HttpResponseMessage>>();
+
+                foreach(var job in jobList)
                 {
-                    IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
-                    HttpClient client = Container.GetInstance<HttpClient>();
+                    taskList.Add(_jobService.GetApacheLivyBatchStatusAsync(job));
+                }                
 
-                    var tasks = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
-
-                    var results = await Task.WhenAll(tasks);
-                }
+                await Task.WhenAll(taskList);
             }
             catch (Exception ex)
             {

@@ -74,16 +74,18 @@ namespace Sentry.data.Core
         void DeleteS3Key(ObjectKeyVersion keyVersion);
 
         /// <summary>
-        /// Deletes all s3 object keys in list.  Uses specific version id if specified
+        /// Deletes all s3 object keys in list.  Uses specific version id if specified and s3 bucket location
         /// </summary>
         /// <param name="keyversionids"></param>
-        void DeleteMultipleS3Keys(List<ObjectKeyVersion> keyversionids);
+        /// <param name="bucket"></param>
+        void DeleteMultipleS3Keys(List<ObjectKeyVersion> keyversionids, string bucket);
         /// <summary>
         /// Deletes all s3 object keys in list.  Will specify null for version id.  In versioned bucket, this will delete all versions of s3 object key.
         /// </summary>
         /// <param name="keys"></param>
+        /// <param name="bucket"></param>
         #endregion
-        void DeleteMulitpleS3Keys(List<string> keys);
+        void DeleteMulitpleS3Keys(List<string> keys, string bucket);
 
         string MultiPartUpload(string sourceFilePath, string targetBucket, string targetKey, List<KeyValuePair<string, string>> UploadTagKeyValuePairs);
 
@@ -122,6 +124,11 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="prefix"></param>
         void DeleteS3Prefix(string prefix);
+        /// <summary>
+        /// Will delete prefix and all child prefixes. 
+        /// </summary>
+        /// <param name="prefix"></param>
+        void DeleteS3Prefix(string prefix, string bucket);
         /// <summary>
         /// Will delete prefix and all child prefixes.  For all prefixes in the list.
         /// </summary>

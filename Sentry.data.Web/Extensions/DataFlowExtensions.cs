@@ -98,6 +98,7 @@ namespace Sentry.data.Web
             model.DFQuestionnaire = dto.DFQuestionnaire;
             model.IngestionType = dto.IngestionType;
             model.IsCompressed = dto.IsCompressed;
+            model.IsBackFillRequired = dto.IsBackFillRequired;
             model.IsPreProcessingRequired = dto.IsPreProcessingRequired;
             model.PreProcessingOption = dto.PreProcessingOption;
             model.FlowStorageCode = dto.FlowStorageCode;
@@ -137,6 +138,7 @@ namespace Sentry.data.Web
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionTypeSelection,
                 IsCompressed = model.IsCompressed,
+                IsBackFillRequired = model.IsBackFillRequired,      
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,
@@ -208,9 +210,9 @@ namespace Sentry.data.Web
             return dto;
         }
 
-        public static Core.RetrieverJobDto ToDto(this JobModel model)
+        public static RetrieverJobDto ToDto(this JobModel model)
         {
-            Core.RetrieverJobDto dto = new Core.RetrieverJobDto()
+            return new RetrieverJobDto()
             {
                 DataSourceId = (string.IsNullOrEmpty(model.SelectedDataSource)) ? 0 : Int32.Parse(model.SelectedDataSource),
                 DataSourceType = model.SelectedSourceType,
@@ -227,10 +229,9 @@ namespace Sentry.data.Web
                 RequestMethod = model.SelectedRequestMethod,
                 Schedule = model.Schedule,
                 SearchCriteria = model.SearchCriteria,
-                TargetFileName = model.TargetFileName
-        };
-
-            return dto;
+                TargetFileName = model.TargetFileName,
+                ExecutionParameters = model.ExecutionParameters
+            };
         }
 
         public static DataFlowModel ToModel(this Core.DataFlowDetailDto dto)
@@ -240,7 +241,8 @@ namespace Sentry.data.Web
                 CreatedBy = dto.CreatedBy,
                 DataFlowId = dto.Id,
                 CreatedDTM = dto.CreateDTM,
-                IsCompressed = dto.IsCompressed
+                IsCompressed = dto.IsCompressed,
+                IsBackFillRequired = dto.IsBackFillRequired
             };
 
             if (dto.RetrieverJob != null)
@@ -253,7 +255,8 @@ namespace Sentry.data.Web
                     IsRegexSearch = true,
                     OverwriteDataFile = false,
                     RelativeUri = dto.RetrieverJob.RelativeUri,
-                    Schedule = dto.RetrieverJob.Schedule
+                    Schedule = dto.RetrieverJob.Schedule,
+                    ExecutionParameters = dto.RetrieverJob.ExecutionParameters
                 };
             }
             return model;

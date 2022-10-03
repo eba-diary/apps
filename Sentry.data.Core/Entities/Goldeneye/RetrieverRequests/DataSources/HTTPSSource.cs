@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE;
             }
         }
         public virtual List<HttpMethods> ValidHttpMethods { get; set; }
@@ -120,6 +121,22 @@ namespace Sentry.data.Core
         public override string GetDropPrefix(RetrieverJob Job)
         {
             throw new NotImplementedException();
+        }
+
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
+        {
+            if (String.IsNullOrWhiteSpace(job.JobOptions.TargetFileName))
+            {
+                validationResults.Add(ValidationErrors.httpsTargetFileNameIsBlank, "Target file name is required for HTTPS data sources");
+            }
+            if (String.IsNullOrWhiteSpace(job.RelativeUri))
+            {
+                validationResults.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for HTTPS data sources");
+            }
+            else if (job.RelativeUri.StartsWith("/"))
+            {
+                validationResults.Add(ValidationErrors.relativeUriStartsWithForwardSlash, "Relative Uri cannot start with '/' for HTTPS data sources");
+            }
         }
     }
 }
