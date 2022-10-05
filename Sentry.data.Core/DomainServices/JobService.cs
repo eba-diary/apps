@@ -536,7 +536,7 @@ namespace Sentry.data.Core
 
 #region Private Methods
 
-        private JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
+        internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
         {
             //create history record and set it active
             return new JobHistory()
@@ -549,7 +549,7 @@ namespace Sentry.data.Core
                 LivyAppId = (reply != null) ? reply.appId : previousHistoryRec.LivyAppId,
                 LivyDriverLogUrl = (reply != null) ? reply.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault() : previousHistoryRec.LivyDriverLogUrl,
                 LivySparkUiUrl = (reply != null) ? reply.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault() : previousHistoryRec.LivySparkUiUrl,
-                LogInfo = (reply != null) ? null : "Livy did not return a status for this batch job.",
+                LogInfo = (reply?.log != null) ? string.Join("",reply.log) : "Livy did not return a status for this batch job.",
                 Active = (reply != null) ? reply.IsActive() : false,
                 JobGuid = previousHistoryRec.JobGuid,
                 Submission = previousHistoryRec.Submission,
