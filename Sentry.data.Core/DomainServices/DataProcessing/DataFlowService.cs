@@ -23,11 +23,12 @@ namespace Sentry.data.Core
         private readonly IQuartermasterService _quartermasterService;
         private readonly IDataFeatures _dataFeatures;
         private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
+        private readonly IEmailService _emailService;
 
         public DataFlowService(IDatasetContext datasetContext, 
             IUserService userService, IJobService jobService,
             ISecurityService securityService, IQuartermasterService quartermasterService, 
-            IDataFeatures dataFeatures, IBackgroundJobClient backgroundJobClient)
+            IDataFeatures dataFeatures, IBackgroundJobClient backgroundJobClient,IEmailService emailService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -36,6 +37,7 @@ namespace Sentry.data.Core
             _quartermasterService = quartermasterService;
             _dataFeatures = dataFeatures;
             _hangfireBackgroundJobClient = backgroundJobClient;
+            _emailService = emailService;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -341,6 +343,9 @@ namespace Sentry.data.Core
                     _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
                 }
 
+                
+                SendS3SinkConnectorRequestEmail(df);
+
                 return df.Id;
             }
             catch (ValidationException)
@@ -383,6 +388,8 @@ namespace Sentry.data.Core
             {
                 DataFlow newDataFlow = CreateDataFlow(dfDto);
                 _datasetContext.SaveChanges();
+
+                SendS3SinkConnectorRequestEmail(newDataFlow);
 
                 return newDataFlow.Id;
             }
@@ -717,6 +724,15 @@ namespace Sentry.data.Core
         }
 
         #region Private Methods        
+        
+        private void SendS3SinkConnectorRequestEmail(DataFlow df)
+        {
+            if (df.IngestionType == (int)IngestionType.Topic)
+            {
+                _emailService.SendS3SinkConnectorRequestEmail(df);
+            }
+        }
+
         private DataFlow CreateDataFlow(DataFlowDto dto)
         {
             Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method Start");

@@ -546,5 +546,13 @@ namespace Sentry.data.Core
                 public const string TOTALROWS = "TotalRows";
             }
         }
+
+        public static class HostSettings
+        {
+            public const string SMTPCLIENT = "SmtpClient";
+            public const string DATASETEMAIL = "DatasetMgmtEmail";
+            public const string S3SINKEMAILTO = "S3SinkEmailRequestTO";
+            public const string MAIN_WEB_URL = "SentryDataBaseUrl";
+        }
     }
 }
