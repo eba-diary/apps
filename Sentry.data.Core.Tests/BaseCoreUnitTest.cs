@@ -106,6 +106,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation => new MockBooleanFeatureFlag(false);
             public IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand => new MockStringFeatureFlag("2022-08-15");
             public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion => new MockBooleanFeatureFlag(true);
+
+            public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL => new MockBooleanFeatureFlag(true);
         }
     }
 }

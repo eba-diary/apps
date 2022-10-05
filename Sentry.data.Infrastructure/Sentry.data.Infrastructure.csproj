@@ -412,6 +412,7 @@
     <Compile Include="ServiceImplementations\ElasticSchemaSearchProvider.cs" />
     <Compile Include="ServiceImplementations\FilterSearchService.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
+    <Compile Include="ServiceImplementations\EmailClient.cs" />
     <Compile Include="ServiceImplementations\HttpClientGenerator.cs" />
     <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevRestClient.cs" />

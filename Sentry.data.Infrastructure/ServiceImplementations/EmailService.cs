@@ -4,16 +4,22 @@ using Sentry.data.Core;
 using System.Linq;
 using System.Text;
 using System;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
     public class EmailService : IEmailService
     {
         private IAssociateInfoProvider _associateInfoProvider;
+        private readonly IDataFeatures _dataFeatures;
+        private readonly IEmailClient _emailClient;
 
-        public EmailService(IAssociateInfoProvider associateInfoProvider)
+        public EmailService(IAssociateInfoProvider associateInfoProvider, IDataFeatures dataFeatures,IEmailClient emailClient)
         {
             _associateInfoProvider = associateInfoProvider;
+            _dataFeatures = dataFeatures;
+            _emailClient = emailClient;
         }
 
 
@@ -198,8 +204,6 @@ namespace Sentry.data.Infrastructure
         }
 
 
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -222,14 +226,102 @@ namespace Sentry.data.Infrastructure
             foreach (var address in emailAddress.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
             {
                 myMail.To.Add(address);
-            }            
+            }
 
             foreach (var address in cc.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
             {
                 myMail.CC.Add(address);
-            }            
+            }
 
             smtpClient.Send(myMail);
+        }
+
+        //SEND S3 CONNECTOR SINK EMAIL TO DSCSUPPORT TO submit a request to the apache platform admins for the creation of the S3 Connector based on the Topic Name
+        public void SendS3SinkConnectorRequestEmail(DataFlow df)
+        {
+            //ONLY SEND EMAIL IF FEATURE FLAG IS ON
+            if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
+            {
+                Logger.Info($"Method <SendS3SinkConnectorRequestEmail> Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
+                return;
+            }
+
+            //GET EMAIL INFO FROM CONFIG FILE AND VERIFY IT EXISTS
+            string toString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.S3SINKEMAILTO);
+            string fromString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.DATASETEMAIL);
+            if(String.IsNullOrWhiteSpace(toString) || String.IsNullOrWhiteSpace(fromString))
+            {
+                return;
+            }
+
+            //START GETTING PARTS OF EMAIL
+            MailAddress mailAddress = new MailAddress(fromString);
+            MailMessage myMail = new System.Net.Mail.MailMessage();
+            myMail.From = mailAddress;
+            myMail.Subject = "S3 SINK CONNECTOR CREATE REMINDER"; 
+            myMail.IsBodyHtml = true;
+            myMail.Body = GetS3SinkConnectorEmailBody(df);
+
+            foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }
+
+            //SEND EMAIL
+            _emailClient.Send(myMail);
+
+            Logger.Info($"Method <SendS3SinkConnectorRequestEmail> S3_SINK_CONNECTOR_REQUEST_EMAIL Successfully Sent. Here are Details.  FROM: {fromString} TO: {toString} Body: {myMail.Body}");
+        }
+
+        //GET BODY OF S3 SINK EMAIL
+        private string GetS3SinkConnectorEmailBody(DataFlow df)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            //TABLE HEADER
+            builder.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>S3 SINK CONNECTOR CREATE REMINDER DETAILS:</b></td></table></p>");
+
+            //TABLE THAT HOLDS ROWS
+            builder.Append(@"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %""  style=""background-color: aliceblue; "" > ");
+
+            //SINGLE ROWS
+            builder.Append(GetS3SinkConnectorEmailSingleRow("DataFlowURL", GetS3SinkConnectorDataFlowUrl(df)));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.TopicName), df.TopicName));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.S3ConnectorName), df.S3ConnectorName));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.FlowStorageCode), df.FlowStorageCode));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.NamedEnvironment), df.NamedEnvironment));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.SaidKeyCode), df.SaidKeyCode));
+            builder.Append(GetS3SinkConnectorEmailSingleRow("DataFlowName", df.Name));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.CreatedBy), df.CreatedBy));
+            builder.Append(GetS3SinkConnectorEmailSingleRow("DataFlowId", df.Id.ToString()));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.IngestionType), df.IngestionType.ToString()));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.DatasetId), df.DatasetId.ToString()));
+            builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.SchemaId), df.SchemaId.ToString()));
+            builder.Append(@"</table>");
+
+            return builder.ToString();
+        }
+
+        //CREATE S3 SINK URL
+        private string GetS3SinkConnectorDataFlowUrl(DataFlow df)
+        {
+            string url = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.MAIN_WEB_URL);
+            url += $"/DataFlow/{df.Id}/Detail";
+            return url;
+        }
+
+
+        //BUILD SINGLE S3 SINK EMAIL ROW
+        private string GetS3SinkConnectorEmailSingleRow(string label, string value)
+        {
+            StringBuilder builder = new StringBuilder();
+            
+            builder.Append(@" <tr>");
+            builder.Append(@"<td>" + label + @"</td>");
+            builder.Append(@"<td>" + value + @" </td>");
+            builder.Append(@" </tr>");
+
+            return builder.ToString();
         }
     }
 }
