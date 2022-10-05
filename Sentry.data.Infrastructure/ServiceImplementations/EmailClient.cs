@@ -11,7 +11,10 @@ namespace Sentry.data.Infrastructure
         public void Send(MailMessage mailMessage)
         {
             string smtpClientString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.SMTPCLIENT);
-            SmtpClient client = new SmtpClient(smtpClientString);
+            using (SmtpClient client = new SmtpClient(smtpClientString))
+            {
+               client.Send(mailMessage);
+            }
             client.Send(mailMessage);
         }
     }
