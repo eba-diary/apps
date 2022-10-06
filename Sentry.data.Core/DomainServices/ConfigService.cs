@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -140,13 +141,13 @@ namespace Sentry.data.Core
 
             switch (dto.SourceType)
             {
-                case "DFSCustom":
+                case DataSourceDiscriminator.DFS_CUSTOM:
                     if (dto.OriginatingId == 0 && _datasetContext.DataSources.Where(w => w is DfsCustom && w.Name == dto.Name).Count() > 0)
                     {
                         errors.Add("An DFS Custom Data Source is already exists with this name.");
                     }
                     break;
-                case "FTP":
+                case DataSourceDiscriminator.FTP_SOURCE:
                     if (dto.OriginatingId == 0 && _datasetContext.DataSources.Where(w => w is FtpSource && w.Name == dto.Name).Count() > 0)
                     {
                         errors.Add("An FTP Data Source is already exists with this name.");
@@ -156,7 +157,7 @@ namespace Sentry.data.Core
                         errors.Add("A valid FTP URI starts with ftp:// (i.e. ftp://foo.bar.com/base/dir)");
                     }
                     break;
-                case "SFTP":
+                case DataSourceDiscriminator.SFTP_SOURCE:
                     if (dto.OriginatingId == 0 && _datasetContext.DataSources.Where(w => w is SFtpSource && w.Name == dto.Name).Count() > 0)
                     {
                         errors.Add("An SFTP Data Source is already exists with this name.");
@@ -166,7 +167,7 @@ namespace Sentry.data.Core
                         errors.Add("A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)");
                     }
                     break;
-                case "HTTPS":
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     if (dto.OriginatingId == 0 && _datasetContext.DataSources.Where(w => w is HTTPSSource && w.Name == dto.Name).Count() > 0)
                     {
                         errors.Add("An HTTPS Data Source is already exists with this name.");
@@ -198,7 +199,7 @@ namespace Sentry.data.Core
                         }
                     }
                     break;
-                case "GOOGLEAPI":
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     if (!(dto.BaseUri.ToString().StartsWith("https://")))
                     {
                         errors.Add("A valid GoogleApi URI starts with https:// (i.e. https://analyticsreporting.googleapis.com/)");
@@ -208,7 +209,13 @@ namespace Sentry.data.Core
                         errors.Add("An invalid GoogleApi URI");
                     }
                     break;
-                case "DFSBasic":
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                    if (!(dto.BaseUri.ToString().StartsWith("https://bigquery.googleapis.com")))
+                    {
+                        errors.Add("An invalid Google BigQuery URI");
+                    }
+                    break;
+                case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                 default:
                     throw new NotImplementedException();
             }
@@ -1166,19 +1173,19 @@ namespace Sentry.data.Core
 
             switch (dto.SourceType)
             {
-                case "DFSBasic":
+                case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                     source = new DfsBasic();
                     break;
-                case "DFSCustom":
+                case DataSourceDiscriminator.DFS_CUSTOM:
                     source = new DfsCustom();
                     break;
-                case "FTP":
+                case DataSourceDiscriminator.FTP_SOURCE:
                     source = new FtpSource();
                     break;
-                case "SFTP":
+                case DataSourceDiscriminator.SFTP_SOURCE:
                     source = new SFtpSource();
                     break;
-                case "HTTPS":
+                case DataSourceDiscriminator.HTTPS_SOURCE:
                     source = new HTTPSSource();
                     ((HTTPSSource)source).IVKey = _encryptService.GenerateNewIV();
 
@@ -1203,7 +1210,7 @@ namespace Sentry.data.Core
                         ((HTTPSSource)source).Scope = dto.Scope;
                     }
                     break;
-                case "GOOGLEAPI":
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
                     source = new GoogleApiSource();
                     ((GoogleApiSource)source).IVKey = _encryptService.GenerateNewIV();
 
@@ -1227,6 +1234,18 @@ namespace Sentry.data.Core
                         ((GoogleApiSource)source).TokenExp = dto.TokenExp;
                         ((GoogleApiSource)source).Scope = dto.Scope;
                     }
+                    break;
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                    string ivKey = _encryptService.GenerateNewIV();
+                    source = new GoogleBigQueryApiSource()
+                    {
+                        IVKey = ivKey,
+                        ClientId = dto.ClientId,
+                        ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Config.GetHostSetting("EncryptionServiceKey"), ivKey).Item1,
+                        TokenUrl = dto.TokenUrl,
+                        TokenExp = dto.TokenExp,
+                        Scope = dto.Scope
+                    };
                     break;
                 default:
                     throw new NotImplementedException("SourceType is not configured for save");

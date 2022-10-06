@@ -210,9 +210,9 @@ namespace Sentry.data.Web
             return dto;
         }
 
-        public static Core.RetrieverJobDto ToDto(this JobModel model)
+        public static RetrieverJobDto ToDto(this JobModel model)
         {
-            Core.RetrieverJobDto dto = new Core.RetrieverJobDto()
+            return new RetrieverJobDto()
             {
                 DataSourceId = (string.IsNullOrEmpty(model.SelectedDataSource)) ? 0 : Int32.Parse(model.SelectedDataSource),
                 DataSourceType = model.SelectedSourceType,
@@ -229,10 +229,9 @@ namespace Sentry.data.Web
                 RequestMethod = model.SelectedRequestMethod,
                 Schedule = model.Schedule,
                 SearchCriteria = model.SearchCriteria,
-                TargetFileName = model.TargetFileName
-        };
-
-            return dto;
+                TargetFileName = model.TargetFileName,
+                ExecutionParameters = model.ExecutionParameters
+            };
         }
 
         public static DataFlowModel ToModel(this Core.DataFlowDetailDto dto)
@@ -256,7 +255,8 @@ namespace Sentry.data.Web
                     IsRegexSearch = true,
                     OverwriteDataFile = false,
                     RelativeUri = dto.RetrieverJob.RelativeUri,
-                    Schedule = dto.RetrieverJob.Schedule
+                    Schedule = dto.RetrieverJob.Schedule,
+                    ExecutionParameters = dto.RetrieverJob.ExecutionParameters
                 };
             }
             return model;

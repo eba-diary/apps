@@ -123,7 +123,7 @@ namespace Sentry.data.Core
             public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "Default DataFlow DFS Drop Location";
         }
 
-        public static class DataSoureDiscriminator
+        public static class DataSourceDiscriminator
         {
             public const string DFS_SOURCE = "DFS";
             public const string DEFAULT_DROP_LOCATION = "DFSBasic";
@@ -141,6 +141,7 @@ namespace Sentry.data.Core
             public const string FTP_DATAFLOW_SOURCE = "FTPDATAFLOW";
             public const string GOOGLE_API_DATAFLOW_SOURCE = "GOOGLEAPIDATAFLOW";
             public const string GENERIC_HTTPS_DATAFLOW_SOURCE = "GENERICHTTPSDATAFLOW";
+            public const string GOOGLE_BIG_QUERY_API_SOURCE = "GoogleBigQueryApi";
         }
 
         public static class DataFeedType
@@ -535,6 +536,15 @@ namespace Sentry.data.Core
             public const string PAGENUMBER = "PageNumber";
             public const string PAGESIZE = "PageSize";
             public const string LAYOUT = "Layout";
+        }
+
+        public static class ExecutionParameterKeys
+        {
+            public static class GoogleBigQueryApi
+            {
+                public const string LASTINDEX = "LastIndex";
+                public const string TOTALROWS = "TotalRows";
+            }
         }
     }
 }

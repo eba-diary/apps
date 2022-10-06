@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.Core;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -42,8 +43,33 @@ namespace Sentry.data.Core
         {
             get
             {
-                return GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE;
+                return GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE;
             }
+        }
+
+        public override void Validate(RetrieverJob job, ValidationResults validationResults)
+        {
+            ValidateBase(job, validationResults);
+
+            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
+            {
+                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
+            }
+
+            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.post && job.JobOptions.HttpOptions.RequestDataFormat == HttpDataFormat.none)
+            {
+                validationResults.Add(ValidationErrors.httpsRequestDataFormatNotSelected, "Request Body Format is required");
+            }
+
+            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.post && string.IsNullOrWhiteSpace(job.JobOptions.HttpOptions.Body))
+            {
+                validationResults.Add(ValidationErrors.httpsRequestBodyIsBlank, "Request body is required");
+            }
+        }
+
+        protected internal virtual void ValidateBase(RetrieverJob Job, ValidationResults validationResults)
+        {
+            base.Validate(Job, validationResults);
         }
     }
 }
