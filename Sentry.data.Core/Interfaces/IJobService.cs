@@ -1,7 +1,9 @@
-﻿using Sentry.data.Core.DTO.Job;
+﻿using Sentry.data.Core;
+using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -44,6 +46,16 @@ namespace Sentry.data.Core
         List<RetrieverJob> GetDfsRetrieverJobs();
 
         Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);
+
+        /// <summary>
+        /// Gets status of batch job from apache livy.  Prevents any concurrent executions of this method
+        /// with same paramenter arguements.
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <param name="batchId"></param>
+        /// <returns></returns>
+        [SkipConcurrentExecution(0)]
+        [DisplayName("Get Batch Status [JobId:{0} BatchId:{1}]")] /* Used for displaying useful name in hangfire */
         Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(int jobId, int batchId);
         Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(JobHistory historyRecord);
     }

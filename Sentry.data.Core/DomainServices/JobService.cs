@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Livy;
