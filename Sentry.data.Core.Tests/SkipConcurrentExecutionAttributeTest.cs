@@ -4,13 +4,8 @@ using Hangfire.Server;
 using Hangfire.Storage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Sentry.data.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Tests
 {
@@ -78,34 +73,6 @@ namespace Sentry.data.Core.Tests
             string result = attribute.GetResource(mockJob);
 
             Assert.AreEqual("Sentry.data.Core.IJobService.GetApacheLivyBatchStatusAsync.123.999", result);
-        }
-
-        [TestMethod]
-        public async Task OnPerforming_AcquerDistributedLock()
-        {
-            int jobId = 19;
-            int batchId = 99;
-            Mock<IJobService> jobService = new Mock<IJobService>() { CallBase = true };
-
-            List<JobHistory> jobHistoryList = new List<JobHistory>();
-            JobHistory jobHistory = new JobHistory()
-            {
-                JobId = new RetrieverJob()
-                {
-                    Id = jobId
-                },
-                BatchId = batchId,
-                Active = true
-            };
-            jobHistoryList.Add(jobHistory);
-            
-
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
-            context.Setup(s => s.JobHistory).Returns(jobHistoryList.AsQueryable());
-
-
-
-            
         }
     }
 
