@@ -825,7 +825,7 @@ data.Admin = {
             $("#url").val("");
             $("#AddLinkModal").modal("hide");
         })
-        $("#supportLinkList").on("click", "#delete-icon", function () {
+        $("#link-results").on("click", "#delete-icon", function () {
             var icon = $(this);
             var model = new Object();
             model.SupportLinkId = icon.data("supportlinkid");

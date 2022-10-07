@@ -19,29 +19,28 @@
             </div>
         </div>
 
-            
+
         <!--
-        <div class="list-group">
+    <div class="list-group supportLinkList">
 
-            @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
-            {
+        @foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
+        {
 
-                <div class="list-group-item">
-                    <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
-                    <a id="supportLinkName" href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px;">@supportLinkModel.Name</a>       
-                    <p style="padding-left: 100px">@supportLinkModel.Description</p>
-                </div>
-            }
-        </div>
-            -->
-             
-        
-        <div class="tile-result-content">
+            <div class="list-group-item">
+                <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
+                <a id="supportLinkName" href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px;">@supportLinkModel.Name</a>
+                <p style="padding-left: 100px">@supportLinkModel.Description</p>
+            </div>
+        }
+    </div>
+        -->
+
+
+        <div class="tile-result-content supportLinkList">
             <h1></h1>
             <ul id="link-results" class="list-unstyled">
                 @foreach (Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
                 {
-                
                     <li class="tile-result tile-mr borderSide_blue boxShadowSm tile-active tile-result-layout-0">
                         <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="icon-trash" style="cursor: pointer; color: red"></em>
                         <div class="dataset-list-content">
@@ -56,9 +55,9 @@
                 }
             </ul>
         </div>
-        
 
-       </div>
+
+    </div>
     
 
         <div class="modal fade" id="AddLinkModal" tabindex="-1" aria-labelledby="AddLinkModalLabel" aria-hidden="true" style="display: none;">
