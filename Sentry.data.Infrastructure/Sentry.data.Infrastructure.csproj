@@ -525,9 +525,6 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
-    <Content Include="Scripts\jquery-1.6.4-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.6.4.js" />
-    <Content Include="Scripts\jquery-1.6.4.min.js" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
