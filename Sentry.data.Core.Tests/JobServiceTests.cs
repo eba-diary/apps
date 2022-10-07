@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -826,6 +827,111 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(14, result.Length);
         }
 
-         
+        [TestMethod]
+        public async Task GetApacheLivyBatchStatusInternalAsync_BatchNotFound()
+        {
+            Guid jobGuid = Guid.NewGuid();
+            string flowExecutionGuid = "10000001";
+            string runInstanceGuid = "00000000";
+
+            JobHistory jobHistory = new JobHistory()
+            {
+                HistoryId = 123,
+                JobId = new RetrieverJob()
+                {
+                    Id = 999,
+                    JobGuid = jobGuid
+                },
+                JobGuid = jobGuid,
+                BatchId = 777,
+                Submission = new Submission()
+                {
+                    FlowExecutionGuid = flowExecutionGuid,
+                    RunInstanceGuid = runInstanceGuid
+                },
+                Active = true
+            };
+
+            var responseContent = $"{{ \"msg\":\"Session '777' not found.\"}}";
+
+            System.Net.Http.HttpResponseMessage response = new System.Net.Http.HttpResponseMessage()
+            {
+                Content = new System.Net.Http.StringContent(JsonConvert.SerializeObject(responseContent)),
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+
+            Mock<IApacheLivyProvider> apacheProvider = new Mock<IApacheLivyProvider>();
+            apacheProvider.Setup(x => x.GetRequestAsync(It.IsAny<string>())).Returns(Task.FromResult(response));
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object) { CallBase = true };
+            jobService.Setup(s => s.GetClusterUrl(It.IsAny<JobHistory>())).Returns("abc.com");
+
+            _ = await jobService.Object.GetApacheLivyBatchStatusAsync(jobHistory);
+
+            context.Verify(v => v.SaveChanges(It.IsAny<bool>()), Times.Once);
+
+        }
+
+        [TestMethod]
+        public void MaptoJobHistory()
+        {
+            Guid jobGuid = Guid.NewGuid();
+            string flowExecutionGuid = "10000001";
+            string runInstanceGuid = "00000000";
+
+            JobHistory jobHistory = new JobHistory()
+            {
+                HistoryId = 123,
+                JobId = new RetrieverJob()
+                {
+                    Id = 999,
+                    JobGuid = jobGuid
+                },
+                JobGuid = jobGuid,
+                BatchId = 777,
+                Submission = new Submission()
+                {
+                    FlowExecutionGuid = flowExecutionGuid,
+                    RunInstanceGuid = runInstanceGuid
+                },
+                Active = true
+            };
+
+            string livyResponse = @"{
+            ""id"": 1034,
+            ""name"": ""CloudAnalyticsApp01_D9KYX0"",
+            ""owner"": null,
+            ""proxyUser"": null,
+            ""state"": ""dead"",
+            ""appId"": ""application_1657659422545_1035"",
+            ""appInfo"": {
+                ""driverLogUrl"": ""http://ip-10-84-88-142.us-east-2.compute.internal:8188/applicationhistory/logs/ip-10-84-88-226.us-east-2.compute.internal:8041/container_1657659422545_1035_02_000001/container_1657659422545_1035_02_000001/livy"",
+                ""sparkUiUrl"": ""http://ip-10-84-88-142.us-east-2.compute.internal:20888/proxy/application_1657659422545_1035/""
+            },
+            ""log"": [
+                ""\t start time: 1664900013804"",
+                ""\t final status: UNDEFINED"",
+                ""\t tracking URL: http://ip-10-84-88-142.us-east-2.compute.internal:20888/proxy/application_1657659422545_1035/"",
+                ""\t user: livy"",
+                ""22/10/04 16:13:33 INFO ShutdownHookManager: Shutdown hook called"",
+                ""22/10/04 16:13:33 INFO ShutdownHookManager: Deleting directory /mnt/tmp/spark-6d126217-a18b-4add-9ac7-46b9852c91ab"",
+                ""22/10/04 16:13:33 INFO ShutdownHookManager: Deleting directory /mnt/tmp/spark-5baf2392-8fe3-42be-97ee-4df71c104f1b"",
+                ""\nstderr: "",
+                ""\nYARN Diagnostics: "",
+                ""Shutdown hook called before final status was reported.""
+            ]
+            }";
+
+            var lr = JsonConvert.DeserializeObject<LivyReply>(livyResponse);
+
+            JobService jobService = new JobService(null, null, null, null, null);
+
+            JobHistory result = jobService.MapToJobHistory(jobHistory, lr);
+
+            Assert.IsNotNull(result.LogInfo);
+        }
     }
 }

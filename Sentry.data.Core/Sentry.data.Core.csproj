@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
+    <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\AuditService.cs" />

@@ -28,15 +28,17 @@ namespace Sentry.data.Infrastructure
         private IDatasetContext _requestContext;
         private IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
+        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
         };
 
-        public RetrieverJobService(IJobService jobService, IDatasetContext datasetContext)
+        public RetrieverJobService(IJobService jobService, IDatasetContext datasetContext, IBackgroundJobClient backgroundJobClient)
         {
             _jobService = jobService;
             _datasetContext = datasetContext;
+            _backgroundJobClient = backgroundJobClient;
         }
         /// <summary>
         /// Implementation of core job logic for each DataSOurce type.
@@ -1143,7 +1145,6 @@ namespace Sentry.data.Infrastructure
 
         public async Task UpdateJobStatesAsync()
         {
-
             try
             {
                 var jobList = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList();
@@ -1152,10 +1153,8 @@ namespace Sentry.data.Infrastructure
 
                 foreach(var job in jobList)
                 {
-                    taskList.Add(_jobService.GetApacheLivyBatchStatusAsync(job));
-                }                
-
-                await Task.WhenAll(taskList);
+                    _backgroundJobClient.Enqueue<IJobService>(s => s.GetApacheLivyBatchStatusAsync(job.JobId.Id, job.BatchId));
+                }
             }
             catch (Exception ex)
             {
