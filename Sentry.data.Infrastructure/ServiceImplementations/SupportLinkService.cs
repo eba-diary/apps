@@ -83,14 +83,14 @@ namespace Sentry.data.Infrastructure
             }
             List<SupportLinkDto> sortedSupportLinkDtos = new List<SupportLinkDto>();
             var sortedQuery = supportLinkDtos.OrderBy(x => x.Name).ToList();
-            foreach(var obj in sortedQuery)
+            foreach(var query in sortedQuery)
             {
                 var supportLinkDto = new SupportLinkDto()
                 {
-                    SupportLinkId=obj.SupportLinkId,
-                    Name = obj.Name,
-                    Url = obj.Url,
-                    Description = obj.Description,
+                    SupportLinkId=query.SupportLinkId,
+                    Name = query.Name,
+                    Url = query.Url,
+                    Description = query.Description,
                 };
                 sortedSupportLinkDtos.Add(supportLinkDto);
             }

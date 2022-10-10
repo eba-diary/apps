@@ -2,8 +2,6 @@
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
 using Sentry.data.Core.DTO.Admin;
-using Sentry.data.Core.DTO;
-using Sentry.data.Core.Interfaces;
 using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Helpers;
 using System;
@@ -12,8 +10,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Sentry.data.Web.Models;
-using Sentry.data.Core.DTO.Admin;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -197,16 +193,13 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                int id = supportLinkModel.SupportLinkId;
-                _supportLinkService.RemoveSupportLink(id);
+                _supportLinkService.RemoveSupportLink(supportLinkModel.SupportLinkId);
                 return Json(new { redirectToUrl = Url.Action("SupportLinks", "Admin") });
             }
             catch (Exception)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Removing Support Link failed");
             }
-
-            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was successfully removed from database");
         }
 
         //below methods all return admin page views

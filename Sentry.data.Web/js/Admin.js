@@ -802,9 +802,9 @@ data.Admin = {
     SupportLinkInit: function () {
         $("#LinkSubmitButton").click(function () {
             var model = new Object();
-            model.Name = $("#name").val();
-            model.Description = $("#description").val();
-            model.Url = $("#url").val();
+            model.Name = $("#LinkName").val();
+            model.Description = $("#LinkDescription").val();
+            model.Url = $("#LinkUrl").val();
             $.ajax({
                 type: "POST",
                 url: "/Admin/AddSupportLink",
@@ -814,18 +814,18 @@ data.Admin = {
                     window.location.href = data.redirectToUrl;
                 }
             })
-            $("#name").val("");
-            $("#description").val("");
-            $("#url").val("");
+            $("#LinkName").val("");
+            $("#LinkDescription").val("");
+            $("#LinkUrl").val("");
             $("#AddLinkModal").modal("hide");
         })
         $("#ModalCloseButton").click(function () {
-            $("#name").val("");
-            $("#description").val("");
-            $("#url").val("");
+            $("#LinkName").val("");
+            $("#LinkDescription").val("");
+            $("#LinkUrl").val("");
             $("#AddLinkModal").modal("hide");
         })
-        $("#link-results").on("click", "#delete-icon", function () {
+        $("#link-results").on("click", ".delete-icon", function () {
             var icon = $(this);
             var model = new Object();
             model.SupportLinkId = icon.data("supportlinkid");
