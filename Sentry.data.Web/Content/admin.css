@@ -68,3 +68,7 @@ table#metricGroupsTable td.dt-control {
     cursor: pointer;
     color: red;
 }
+
+.LinksRow {
+    align-items: end;
+}
