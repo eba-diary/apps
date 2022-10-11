@@ -32,11 +32,8 @@
             {
                 //convert to use User Favorites
                 <li class="tile-result tile-mr borderSide_@tile.Color boxShadowSm @(tile.Status == "Active" ? "tile-active" : "")" data-id="@tile.Id" title="@tile.TileTitle">
-                    <div class="category-type-wrap">
+                    <div class="">
                         <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
-                        <div class="category-type categoryBanner-@tile.Color" title="@tile.Category">
-                            <span>@tile.AbbreviatedCategory</span>
-                        </div>
                     </div>
 
                     <div class="dataset-list-content">
@@ -62,8 +59,17 @@
                         <div class="dataset-detail-content-info-row">
                             <span class="bold ownerDate dsc-@tile.Color-text">Last Activity Date:</span>
                             <span>@tile.LastActivityShortDate</span>
-                        </div>
+                            @if (tile.EnvironmentType != "Prod")
+                            {
+                                <span class="chip chip-outline btn-outline-warning named-environment">@tile.Environment</span>
+                            }
+                            else
+                            {
+                                <span class="chip chip-outline btn-outline-primary named-environment">@tile.Environment</span>
+                            }
 
+                        </div>
+                        
                         @if (tile.IsReport)
                         {
                             <div class="SentryOwner col-lg-12 dataset-detail-content-info-row">
