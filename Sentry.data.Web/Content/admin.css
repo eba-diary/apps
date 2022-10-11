@@ -56,6 +56,15 @@ table#metricGroupsTable td.dt-control {
     float: right;
 }
 
-.LinkDescription{
+.LinkDescription {
     padding-left: 95px;
+}
+
+.LinkUrlName {
+    padding-left: 60px;
+}
+
+.delete-icon {
+    cursor: pointer;
+    color: red;
 }
