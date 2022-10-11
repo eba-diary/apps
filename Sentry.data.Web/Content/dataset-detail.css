@@ -73,9 +73,22 @@
     width: 100%;
 }
 
+    .dataset-list-content.dataset-detail-content-info .chip.named-environment {
+        float: right;
+        margin-bottom: 0px;
+        margin-right:4px;
+        height: 20px;
+        padding: 0 4px;
+        line-height: 18px;
+    }
+
 .dataset-detail-content-info-row {
     padding-left: 0px;
     padding-top: 6px;
+}
+
+.dataset-detail-content-info-row > span {
+    vertical-align: bottom;
 }
 
     .dataset-detail-content-info-row .info-detail {
