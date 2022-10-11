@@ -32,9 +32,7 @@
             {
                 //convert to use User Favorites
                 <li class="tile-result tile-mr borderSide_@tile.Color boxShadowSm @(tile.Status == "Active" ? "tile-active" : "")" data-id="@tile.Id" title="@tile.TileTitle">
-                    <div class="">
-                        <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
-                    </div>
+                    <div class="@(tile.IsFavorite ? "fas" : "far") fa-star tile-favorite disregardParentClick" id="tileFavorite_@tile.Id" data-id="@tile.Id" title="@tile.FavoriteTitle"></div>
 
                     <div class="dataset-list-content">
 
