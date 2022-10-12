@@ -74,7 +74,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [ApiVersionBegin(WebAPI.Version.v2)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<Models.ApiModels.Dataflow.DataFlowDetailModel>))]
         [Route("")]
         [HttpGet]
         public IHttpActionResult GetDataFlowMetadata([FromUri] int? datasetId = null, [FromUri] int? schemaId = null, [FromUri] string storagecode = null)
