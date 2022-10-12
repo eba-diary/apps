@@ -98,7 +98,7 @@ data.Admin = {
 
     //generates table with datafiles from selected dataset and schema
     PopulateTable: function (url) {
-        $("#results").DataTable({
+        $("#dataFileTableResults").DataTable({
             destroy: true,
             ajax: {
                 url: url,
@@ -138,12 +138,12 @@ data.Admin = {
             $.ajax({
                 type: "GET",
                 url: url,
-                success: function (data) {
+                success: function (datasetFileApiResponse) {
                     $("#datasetFileDropdown").materialSelect({ destroy: true });
                     datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
 
-                    for (var d of data.Records) {
-                        datasetFileDropdown += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>';
+                    for (let datasetFile of datasetFileApiResponse.Records) {
+                        datasetFileDropdown += '<option value="' + datasetFile.DatasetFileId + '">' + datasetFile.FileName + '</option>';
                     }
 
                     $("#datasetFileDropdown").html(datasetFileDropdown);
@@ -162,7 +162,7 @@ data.Admin = {
         $.ajax({
             type: "GET",
             url: url,
-            success: function (data) {
+            success: function (schemaApiResponse) {
                 data.sort(function (a, b) {
                     if (a.Name < b.Name) {
                         return -1;
@@ -176,8 +176,8 @@ data.Admin = {
                 });
                 var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
 
-                for (var d of data) {
-                    scheamDropdown += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
+                for (let schema of schemaApiResponse) {
+                    scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
                 $("#schemaDropdown").html(scheamDropdown);
@@ -197,11 +197,11 @@ data.Admin = {
             url: url,
             dataType: "Json",
             dataSrc: "Records",
-            success: function (data) {
+            success: function (fileApiResponse) {
                 var fileDropdown = '<option id="defaultFileSelection" selected value="-1">All Files</option>';
 
-                for (var d of data.Records) {
-                    fileDropdown += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
+                for (let file of fileApiResponse.Records) {
+                    fileDropdown += '<option value="' + file.DatasetFileId + '">' + file.FileName + '</option>'
                 }
 
                 $("#fileDropdown").html(fileDropdown);
@@ -219,12 +219,12 @@ data.Admin = {
         $.ajax({
             type: "GET",
             url: url,
-            success: function (data) {
+            success: function (flowStepApiResponse) {
                 $("#flowStepsDropdown").materialSelect({ destroy: true });
                 var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
-                for (var d of data[0].steps) {
-                    if (d.ActionName == "Raw Storage") {
-                        flowStepDropDown += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
+                for (var flowStep of flowStepApiResponse[0].steps) {
+                    if (flowStep.ActionName == "Raw Storage") {
+                        flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
                     }
                 }
                 $("#flowStepsDropdown").html(flowStepDropDown);
@@ -330,8 +330,8 @@ data.Admin = {
                         // Append table to parent div
                         $("#deadJobTable").html(msg);
                     },
-                    error: function (req, status, error) {
-                        alert("Error try again");
+                    error: function (msg) {
+                        alert(msg);
                     },
                     complete: function (msg) {
                         // Hide spinner
