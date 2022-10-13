@@ -68,6 +68,7 @@ namespace Sentry.data.Core
             public const string httpsRequestDataFormatNotSelected = "httpsRequestDataFormateNotSelected";
             public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
             public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
+            public const string httpsTargetFileNameContainsSpace = "httpsTargetFileNameContainsSpace";
             public const string ftpPatternNotSelected = "ftpPatternNotSelected";
             public const string relativeUriNotSpecified = "relativeUriNotSpecified";
             public const string relativeUriStartsWithForwardSlash = "relativeUriStartsWithForwardSlash";

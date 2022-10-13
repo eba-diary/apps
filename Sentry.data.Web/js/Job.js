@@ -27,6 +27,8 @@
             data.Job.targetFileNameDescUpdate();
         });
 
+        data.Job.RequestMethodDropdownPopulate();
+
         $("[id$='SelectedRequestMethod']").change(function () {
             data.Job.DisplayHttpPostPanel();
         });
