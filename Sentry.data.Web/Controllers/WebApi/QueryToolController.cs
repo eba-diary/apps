@@ -463,7 +463,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
-            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", null).ConfigureAwait(false);
+            HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", content:null).ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
             {

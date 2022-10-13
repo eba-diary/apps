@@ -412,6 +412,7 @@
     <Compile Include="ServiceImplementations\ElasticSchemaSearchProvider.cs" />
     <Compile Include="ServiceImplementations\FilterSearchService.cs" />
     <Compile Include="ServiceImplementations\HiveOdbcProvider.cs" />
+    <Compile Include="ServiceImplementations\EmailClient.cs" />
     <Compile Include="ServiceImplementations\HttpClientGenerator.cs" />
     <Compile Include="ServiceImplementations\HttpClientProvider.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevRestClient.cs" />
@@ -431,6 +432,7 @@
     <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
+    <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />

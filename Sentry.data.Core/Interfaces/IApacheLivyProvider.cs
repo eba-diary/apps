@@ -6,6 +6,9 @@ namespace Sentry.data.Core
 {
     public interface IApacheLivyProvider
     {
+        void SetBaseUrl(string baseUrl);
+        string GetBaseUrl();
+        Task<HttpResponseMessage> PostRequestAsync(string resource, string content);
         Task<HttpResponseMessage> PostRequestAsync(string resource, HttpContent postContent);
 
         /// <summary>

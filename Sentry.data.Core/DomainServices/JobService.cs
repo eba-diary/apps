@@ -1,12 +1,18 @@
 ﻿using Hangfire;
-using Nest;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using Sentry.data.Core;
+using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core
@@ -16,13 +22,18 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IDataFeatures _dataFeatures;
+        private readonly IApacheLivyProvider _apacheLivyProvider;
 
         public JobService(IDatasetContext datasetContext, IUserService userService,
-            IRecurringJobManager recurringJobManager)
+            IRecurringJobManager recurringJobManager, IDataFeatures dataFeatures,
+            IApacheLivyProvider apacheLivyProvider)
         {
             _datasetContext = datasetContext;
             _userService = userService;
             _recurringJobManager = recurringJobManager;
+            _dataFeatures = dataFeatures;
+            _apacheLivyProvider = apacheLivyProvider;
         }
 
         public JobHistory GetLastExecution(RetrieverJob job)
@@ -403,8 +414,392 @@ namespace Sentry.data.Core
             }
         }
 
+        public Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, Guid JobGuid, JavaOptionsOverrideDto dto)
+        {
+            if (JobId == 0)
+            {
+                throw new ArgumentNullException(nameof(JobId), "JobId required");
+            }
 
-        #region Private Methods
+            if (JobGuid == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(JobGuid), "JobGuid required");
+            }
+
+            RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.Id == JobId && JobGuid == w.JobGuid);
+
+            if (job == null)
+            {
+                throw new JobNotFoundException($"JobId:{JobId} | JobGuid:{JobGuid}");
+            }
+
+            if (!job.DataSource.Is<JavaAppSource>())
+            {
+                throw new ArgumentOutOfRangeException(nameof(JobId), "This only submits job defined with a data source type of JavaApp");
+            }
+
+
+
+            return SubmitApacheLivyJobInternalAsync(job, JobGuid, dto);
+
+        }
+
+        public Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(JobHistory historyRecord)
+        {
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method Start");
+            if (historyRecord == null)
+            {
+                throw new ArgumentNullException(nameof(historyRecord), "History Record Required");
+            }
+
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method End");
+            return GetApacheLivyBatchStatusInternalAsync(historyRecord);
+        }
+
+        public Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(int jobId, int batchId)
+        {
+            if (jobId == 0)
+            {
+                throw new ArgumentNullException(nameof(jobId), "Job Id Required");
+            }
+            if (batchId == 0)
+            {
+                throw new ArgumentNullException(nameof(batchId), "Batch Id Required");
+            }
+
+            JobHistory hr = _datasetContext.JobHistory.FirstOrDefault(w => w.JobId.Id == jobId && w.BatchId == batchId && w.Active);
+
+            if (hr == null)
+            {
+                throw new JobNotFoundException("No history of Job\\Batch ID combination");
+            }
+
+            return GetApacheLivyBatchStatusInternalAsync(hr);
+        }
+
+        private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
+        {
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
+            /*
+            * Add flowexecutionguid context variable
+            */
+            string flowExecutionGuid = (historyRecord.Submission != null && historyRecord.Submission.FlowExecutionGuid != null) ? historyRecord.Submission.FlowExecutionGuid : "00000000000000000";
+            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+
+            /*
+             * Add runinstanceguid context variable
+             */
+            string runInstanceGuid = (historyRecord.Submission != null && historyRecord.Submission.RunInstanceGuid != null) ? historyRecord.Submission.RunInstanceGuid : "00000000000000000";
+            Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+
+            string clusterUrl = GetClusterUrl(historyRecord);
+
+            Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
+
+            _apacheLivyProvider.SetBaseUrl(clusterUrl);
+
+            System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
+
+            string result = await response.Content.ReadAsStringAsync();
+            string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+            Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
+
+            LivyReply lr = null;
+
+            if (response.IsSuccessStatusCode)
+            {
+                if (result == $"Session '{historyRecord.BatchId}' not found.")
+                {
+                    throw new LivyBatchNotFoundException("Session not found");
+                }
+                lr = JsonConvert.DeserializeObject<LivyReply>(result);
+            }
+
+            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                JobHistory newHistoryRecord = MapToJobHistory(historyRecord, lr);
+
+                if (string.IsNullOrEmpty(newHistoryRecord.ClusterUrl)) { newHistoryRecord.ClusterUrl = clusterUrl; }
+
+                _datasetContext.Add(newHistoryRecord);
+
+                //set previous active record to inactive
+                historyRecord.Modified = DateTime.Now;
+                historyRecord.Active = false;
+
+                _datasetContext.SaveChanges();
+            }            
+
+            Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
+            return response;
+        }
+
+#region Private Methods
+
+        internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
+        {
+            //create history record and set it active
+            return new JobHistory()
+            {
+                JobId = previousHistoryRec.JobId,
+                BatchId = previousHistoryRec.BatchId,
+                Created = previousHistoryRec.Created,
+                Modified = DateTime.Now,
+                State = (reply != null) ? reply.state : "Unknown",
+                LivyAppId = (reply != null) ? reply.appId : previousHistoryRec.LivyAppId,
+                LivyDriverLogUrl = (reply != null) ? reply.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault() : previousHistoryRec.LivyDriverLogUrl,
+                LivySparkUiUrl = (reply != null) ? reply.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault() : previousHistoryRec.LivySparkUiUrl,
+                LogInfo = (reply?.log != null) ? string.Join("",reply.log) : "Livy did not return a status for this batch job.",
+                Active = (reply != null) ? reply.IsActive() : false,
+                JobGuid = previousHistoryRec.JobGuid,
+                Submission = previousHistoryRec.Submission,
+                ClusterUrl = previousHistoryRec.ClusterUrl
+            };
+        }
+
+        internal async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobInternalAsync(RetrieverJob job, Guid JobGuid, JavaOptionsOverrideDto dto)
+        {
+            string postContent = BuildLivyPostContent(dto, job);
+
+            string clusterUrl = GetClusterUrl(dto);
+
+            _apacheLivyProvider.SetBaseUrl(clusterUrl);
+
+            System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", postContent);
+
+            string result = await response.Content.ReadAsStringAsync();
+            string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+            Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode}:::result:{postResult}");
+
+            //Record submission regardless if target deems it a bad request.
+            Submission sub = MapToSubmission(job, dto);
+            sub.Serialized_Job_Options = postContent;
+            sub.ClusterUrl = clusterUrl;
+
+            _datasetContext.Add(sub);
+            _datasetContext.SaveChanges();
+
+            if (response.IsSuccessStatusCode)
+            {
+                LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);
+
+                JobHistory histRecord = new JobHistory()
+                {
+                    JobId = job,
+                    BatchId = batchResult.Id,
+                    JobGuid = JobGuid,
+                    State = batchResult.State,
+                    LivyAppId = batchResult.Appid,
+                    LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                    LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                    Active = true,
+                    Submission = sub,
+                    ClusterUrl = clusterUrl
+                };
+
+                _datasetContext.Add(histRecord);
+                _datasetContext.SaveChanges();
+            }
+
+            return response;
+        }
+
+        internal virtual string GetClusterUrl(JavaOptionsOverrideDto dto)
+        {
+            return (!string.IsNullOrWhiteSpace(dto.ClusterUrl)) ? dto.ClusterUrl : Configuration.Config.GetHostSetting("ApacheLivy");
+        }
+        internal virtual string GetClusterUrl(JobHistory historyRecord)
+        {
+            return (!string.IsNullOrWhiteSpace(historyRecord.ClusterUrl)) ? historyRecord.ClusterUrl : Configuration.Config.GetHostSetting("ApacheLivy");
+        }
+
+        internal virtual Submission MapToSubmission(RetrieverJob job, JavaOptionsOverrideDto dto)
+        {
+            var submission = new Submission()
+            {
+                JobId = job,
+                JobGuid = job.JobGuid,
+                Created = DateTime.Now,
+                FlowExecutionGuid = dto.FlowExecutionGuid,
+                RunInstanceGuid = dto.RunInstanceGuid,
+                ClusterUrl = dto.ClusterUrl
+            };
+            return submission;
+        }
+
+        internal virtual string BuildLivyPostContent(JavaOptionsOverrideDto dto, RetrieverJob job)
+        {
+            JavaAppSource dsrc = _datasetContext.GetById<JavaAppSource>(job.DataSource.Id);
+
+            StringBuilder json = new StringBuilder();
+            json.Append($"{{\"file\": \"{dsrc.Options.JarFile}\"");
+
+            AddElement(json, "className", dsrc.Options.ClassName, null);
+
+            if (_dataFeatures.CLA3497_UniqueLivySessionName.GetValue())
+            {
+                string livySessionName = GenerateUniqueLivySessionName(dsrc);
+                AddElement(json, "name", livySessionName, null);
+                Logger.AddContextVariable(new TextVariable("livysessionname", livySessionName));
+            }
+            else
+            {
+                json.Append($", \"name\": \"{dsrc.Name}\"");
+            }
+
+            if (dto != null)
+            {
+
+                AddElement(json, "driverMemory", dto.DriverMemory, job.JobOptions?.JavaAppOptions?.DriverMemory);
+
+                AddElement(json, "driverCores", dto.DriverCores, job.JobOptions?.JavaAppOptions?.DriverCores);
+
+                AddElement(json, "executorMemory", dto.ExecutorMemory, job.JobOptions?.JavaAppOptions?.ExecutorMemory);
+
+                AddElement(json, "executorCores", dto.ExecutorCores, job.JobOptions?.JavaAppOptions?.ExecutorCores);
+
+                AddElement(json, "numExecutors", dto.NumExecutors, job.JobOptions?.JavaAppOptions?.NumExecutors);
+
+
+                AddLivyConfigElement(json, dto.ConfigurationParameters, job.JobOptions?.JavaAppOptions?.ConfigurationParameters);
+
+                // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
+                AddLivyArgumentsElement(json, dto.Arguments, job.JobOptions?.JavaAppOptions?.Arguments);
+            }            
+
+            string[] jars = dsrc.Options.JarDepenencies;
+
+            for (int i = 0; i < jars.Count(); i++)
+            {
+                if (i == 0)
+                {
+                    json.Append($", \"jars\": [");
+                }
+                json.Append($"\"{jars[i]}\"");
+                if (i != jars.Count() - 1)
+                {
+                    json.Append(",");
+                }
+                else
+                {
+                    json.Append("]");
+                }
+            }
+
+
+            //DO NOT KILL THIS
+            json.Append("}");
+
+            return json.ToString();
+        }
+
+        internal virtual string GenerateUniqueLivySessionName(JavaAppSource dsrc)
+        {
+            StringBuilder randomCharacterSting = new StringBuilder();
+
+            using (var rngCryptoProvider = new RNGCryptoServiceProvider())
+            {
+                string validCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+                for (int i = 0; i < 6; i++)
+                {
+                    byte[] randomNumber = new byte[1];
+                    do
+                    {
+                        rngCryptoProvider.GetBytes(randomNumber);
+                    }
+                    while (!IsWithinBounds(randomNumber[0], (byte)validCharacters.Length));
+                    randomCharacterSting.Append(new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 1).Select(s => s[randomNumber[0]]).ToArray()));
+
+                    Console.WriteLine($"{randomNumber[0]}:::{randomNumber[0] % 6}");
+                }
+            }
+
+            string livySessionName = $"{dsrc.Name}_{randomCharacterSting}";
+            return livySessionName;    
+        }
+        private static bool IsWithinBounds(byte value, byte maxValue)
+        {
+            return value < maxValue;
+        }
+
+        internal void AddLivyConfigElement(StringBuilder content, string newValue, string defaultValue)
+        {
+            string configValue = null;
+
+            if (newValue != null && newValue.Any())
+            {
+                configValue = newValue;
+            }
+            else if (defaultValue != null && defaultValue.Any())
+            {
+                configValue = defaultValue;
+            }
+
+            if (configValue != null)
+            {
+                content.Append($", \"conf\":{configValue}");
+            }
+        }
+        internal void AddLivyArgumentsElement(StringBuilder content, string[] newValue, string[] defaultValue)
+        {
+            if (newValue != null && newValue.Any())
+            {
+                GenerateLivyArguments(newValue, content);
+            }
+            else if (defaultValue != null && defaultValue.Any())
+            {
+                GenerateLivyArguments(defaultValue, content);
+            }
+        }
+        internal void AddElement(StringBuilder content, string elementName, string newValue, string defaultValue)
+        {
+            if (String.IsNullOrEmpty(elementName) || (String.IsNullOrEmpty(newValue) && String.IsNullOrEmpty(defaultValue)))
+            {
+                throw new ArgumentNullException(nameof(newValue));
+            }
+
+            if (!String.IsNullOrWhiteSpace(newValue))
+            {
+                content.Append($", \"{elementName}\": \"{newValue}\"");
+            }
+            else
+            {
+                content.Append($", \"{elementName}\": \"{defaultValue}\"");
+            }
+        }
+
+        internal void AddElement(StringBuilder content, string elementName, int? newValue, int? defaultValue)
+        {
+            if (elementName == null || (newValue == null && defaultValue == null))
+            {
+                throw new ArgumentNullException(nameof(newValue));
+            }
+
+            if (newValue != null)
+            {
+                content.Append($", \"{elementName}\": {newValue}");
+            }
+            else
+            {
+                content.Append($", \"{elementName}\": {defaultValue}");
+            }
+        }
+
+        private static void GenerateLivyArguments(string[] arguments, StringBuilder json)
+        {
+            json.Append($", \"args\": [");
+            int iteration = 1;
+            int argcnt = arguments.Count();
+            foreach (string arg in arguments)
+            {
+                string argString = (iteration < argcnt) ? $"\"{arg}\"," : $"\"{arg}\"]";
+                json.Append(argString);
+                iteration++;
+            }
+        }
 
         private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
         {
@@ -553,6 +948,6 @@ namespace Sentry.data.Core
 
             Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method End");
         }
-        #endregion
+#endregion
     }
 }
