@@ -87,97 +87,18 @@ data.Admin = {
         return "../../api/v2/metadata/dataset/" + datasetId + "/schema";
     },
 
-    // creates schema dropdown for selected dataset
-    GetSchemaDropdown: function (url) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (data) {
-                data.sort(function (a, b) {
-                    if (a.Name < b.Name) {
-                        return -1;
-                    }
-                    else if (a.Name > b.Name) {
-                        return 1;
-                    }
-                    else {
-                        return 0;
-                    }
-                });
-                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
-                scheamDropdown += '<option value="-1">Please Select a Schema</option>';
-
-                for (var d of data) {
-                    scheamDropdown += '<option value="' + d.SchemaId + '">' + d.Name + '</option>';
-                }
-
-                $("#schemaDropdown").html(scheamDropdown);
-                // proof of concept, alternate method of input validation for dropdown menues rather than current if(selected val!=-1) 
-                $("#defaultSchemaSelection").prop("disabled", true);
-                $("#schemaDropdown").materialSelect();
-            }
-        });
-    },
-
-    // creates dataset file dropdown for selected dataset
-    GetDatasetFileDropdown: function (url, isBaseInit) {
-        // Check if the dataset file drop down is being reinitialized on a dataset select dropwdown change
-        var datasetFileDropdown = "";
-
-        if (isBaseInit) {
-            $("#datasetFileDropdown").materialSelect({ destroy: true });
-            datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
-
-            $("#datasetFileDropdown").html(datasetFileDropdown);
-            $("#defaultDatasetFileSelection").prop("disabled", true);
-            $("#datasetFileDropdown").materialSelect();
-        } else {
-            $.ajax({
-                type: "GET",
-                url: url,
-                success: function (data) {
-                    $("#datasetFileDropdown").materialSelect({ destroy: true });
-                    datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
-
-                    for (var d of data.Records) {
-                        datasetFileDropdown += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>';
-                    }
-
-                    $("#datasetFileDropdown").html(datasetFileDropdown);
-                    $("#defaultDatasetFileSelection").prop("disabled", true);
-                    $("#datasetFileDropdown").materialSelect();
-                }
-            });
-        }
-    },
-
-
     GetFileUrl: function (datasetId, schemaId) {
-        // creates url for Ajax call to get data files
-        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true&fileStatusType=ActiveFiles";
+    // creates url for Ajax call to get data files
+        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
     },
 
-    GetFileDropdown: function (url) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "Json",
-            dataSrc: "Records",
-            success: function (data) {
-                $("#fileDropdown").materialSelect({ destroy: true });
-                var s = '<option value="-1"id="defaultFileSelection">All Files</option>';
-                for (var d of data.Records) {
-                    s += '<option value="' + d.DatasetFileId + '">' + d.FileName + '</option>'
-                }
-                $("#fileDropdown").html(s);
-                $("#fileDropdown").materialSelect();
-            }
-        })
+    GetFlowStepUrl: function (schemaId) {
+        return "../../api/v2/dataflow?schemaId=" + schemaId;
     },
 
     //generates table with datafiles from selected dataset and schema
     PopulateTable: function (url) {
-        $("#results").DataTable({
+        $("#dataFileTableResults").DataTable({
             destroy: true,
             ajax: {
                 url: url,
@@ -201,8 +122,96 @@ data.Admin = {
         });
     },
 
-    GetFlowStepUrl: function (schemaId) {
-        return "../../api/v2/dataflow?schemaId=" + schemaId;
+    // creates dataset file dropdown for selected dataset
+    GetDatasetFileDropdown: function (url, isBaseInit) {
+        // Check if the dataset file drop down is being reinitialized on a dataset select dropwdown change
+        var datasetFileDropdown = "";
+
+        if (isBaseInit) {
+            $("#datasetFileDropdown").materialSelect({ destroy: true });
+            datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
+
+            $("#datasetFileDropdown").html(datasetFileDropdown);
+            $("#defaultDatasetFileSelection").prop("disabled", true);
+            $("#datasetFileDropdown").materialSelect();
+        } else {
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function (datasetFileApiResponse) {
+                    $("#datasetFileDropdown").materialSelect({ destroy: true });
+                    datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
+
+                    for (let datasetFile of datasetFileApiResponse.Records) {
+                        datasetFileDropdown += '<option value="' + datasetFile.DatasetFileId + '">' + datasetFile.FileName + '</option>';
+                    }
+
+                    $("#datasetFileDropdown").html(datasetFileDropdown);
+                    $("#defaultDatasetFileSelection").prop("disabled", true);
+                    $("#datasetFileDropdown").materialSelect();
+                },
+                complete: function () {
+                    data.Admin.DatasetDropdownScrollToTop();
+                }
+            });
+        }
+    },
+
+    // creates schema dropdown for selected dataset
+    GetSchemaDropdown: function (url) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function (schemaApiResponse) {
+                data.sort(function (a, b) {
+                    if (a.Name < b.Name) {
+                        return -1;
+                    }
+                    else if (a.Name > b.Name) {
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+                });
+                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
+
+                for (let schema of schemaApiResponse) {
+                    scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
+                }
+
+                $("#schemaDropdown").html(scheamDropdown);
+
+                $("#defaultSchemaSelection").prop("disabled", true);
+                $("#schemaDropdown").materialSelect();
+            },
+            complete: function () {
+                data.Admin.DatasetDropdownScrollToTop();
+            }
+        });
+    },
+
+    GetFileDropdown: function (url) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "Json",
+            dataSrc: "Records",
+            success: function (fileApiResponse) {
+                var fileDropdown = '<option id="defaultFileSelection" selected value="-1">All Files</option>';
+
+                for (let file of fileApiResponse.Records) {
+                    fileDropdown += '<option value="' + file.DatasetFileId + '">' + file.FileName + '</option>'
+                }
+
+                $("#fileDropdown").html(fileDropdown);
+
+                $("#fileDropdown").materialSelect();
+            },
+            complete: function () {
+                data.Admin.DatasetDropdownScrollToTop();
+            }
+        });
     },
 
     // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
@@ -210,18 +219,23 @@ data.Admin = {
         $.ajax({
             type: "GET",
             url: url,
-            success: function (data) {
+            success: function (flowStepApiResponse) {
                 $("#flowStepsDropdown").materialSelect({ destroy: true });
-                var s = '<option value="-1">Please Select a Flow Step</option>';
-                for (var d of data[0].steps) {
-                    if (d.ActionName == "Raw Storage") {
-                        s += '<option value="' + d.Id + '">' + d.ActionName + '</option>';
+                var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
+                for (var flowStep of flowStepApiResponse[0].steps) {
+                    if (flowStep.ActionName == "Raw Storage") {
+                        flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
                     }
                 }
-                $("#flowStepsDropdown").html(s);
+                $("#flowStepsDropdown").html(flowStepDropDown);
+
                 $("#flowStepsDropdown").materialSelect();
             },
+            complete: function () {
+                data.Admin.DatasetDropdownScrollToTop();
+            }
         });
+
     },
 
     // activate or deactivate reprocess button based on input list of checked boxes
@@ -259,17 +273,6 @@ data.Admin = {
         $("#auditSearchButton").prop("disabled", searchStatus);
     },
 
-    /*// activate or deactivate reprocess button based on input list of checked boxes
-    ActivateDeactivateReprocessButton: function () {
-        var checkedBoxes = $(".select-all-target:checkbox:checked");
-        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100) {
-            $("#auditReprocessButton").prop("disabled", false);
-        }
-        else {
-            $("#auditReprocessButton").prop("disabled", true);
-        }
-    },*/
-
     AuditReprocessButton: function () {
         // activate or deactivate button
         $("#AuditTable").on("click", ".generic-checkbox", function () {
@@ -301,6 +304,44 @@ data.Admin = {
         });
     },
 
+    RetrieveDeadSparkJobListButton: function () {
+
+        // Get all dead spark jobs within chosen time span
+        $("#timeCheck").click(function () {
+
+            // Ensure table parent div is empty
+            $("#deadJobTable").html("");
+
+            // Show spinner 
+            $("#tab-spinner").show();
+
+            // Retrieve seleced date
+            var selectedDate = $('#datetime-picker').val();
+
+            var timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+
+            // Check if selected date is within a month (720hrs) of current date
+            if (timeCheck) {
+                $.ajax({
+                    type: "GET",
+                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
+                    dataType: "html",
+                    success: function (msg) {
+                        // Append table to parent div
+                        $("#deadJobTable").html(msg);
+                    },
+                    error: function (msg) {
+                        alert(msg);
+                    },
+                    complete: function (msg) {
+                        // Hide spinner
+                        $("#tab-spinner").hide();
+                    }
+                });
+            }
+        });
+    },
+
     AuditInit: function () {
         $("#AllDatasets").materialSelect();
         $("#AllAuditTypes").materialSelect();
@@ -317,7 +358,6 @@ data.Admin = {
 
             // Init an empty Dataset File Dropwdown on dataset selection change
             data.Admin.GetDatasetFileDropdown("empty", true);
-
         });
 
         $("#schemaDropdown").change(function (event) {
@@ -419,43 +459,6 @@ data.Admin = {
         admin.data.DataFileSelectAll();
     },
 
-    RetrieveDeadSparkJobListButton: function () {
-
-        // Get all dead spark jobs within chosen time span
-        $("#timeCheck").click(function () {
-
-            // Ensure table parent div is empty
-            $("#deadJobTable").html("");
-
-            // Show spinner 
-            $("#tab-spinner").show();
-
-            // Retrieve seleced date
-            var selectedDate = $('#datetime-picker').val();
-
-            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
-
-            // Check if selected date is within a month (720hrs) of current date
-            if (timeCheck) {
-                $.ajax({
-                    type: "GET",
-                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
-                    dataType: "html",
-                    success: function (msg) {
-                        // Append table to parent div
-                        $("#deadJobTable").html(msg);
-                    },
-                    error: function (req, status, error) {
-                        alert("Error try again");
-                    },
-                    complete: function () { 
-                        // Hide spinner
-                        $("#tab-spinner").hide();
-                    }
-                });
-            }
-        });
-    },
 
     ReprocessJobDateRangeCheck: function (selectedDate, rangeMax) {
         // Calculate hours between current date and selected date
@@ -569,8 +572,6 @@ data.Admin = {
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
-
-                data.Admin.DatasetDropdownScrollToTop();
             }
 
         });
@@ -582,15 +583,9 @@ data.Admin = {
                 data.Admin.PopulateTable(url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
                 data.Admin.GetFlowStepDropdown(url);
-
-                data.Admin.DatasetDropdownScrollToTop();
             }
         });
-        // activate or deactivate button
-        $("#results").on("click", ".select-all-target", function () {
 
-            data.Admin.ActivateDeactivateReprocessButton();
-        });
         // submit selected file list
         $("#reprocessButton").click(function (event) {
             var filesToReprocess = [];
@@ -641,6 +636,7 @@ data.Admin = {
     //loads dataflow metric page events
     DataFlowMetricsInit: function () {
         var table;
+
         $("#AllDatasets").materialSelect();
         $("#schemaDropdown").materialSelect();
         $("#fileDropdown").materialSelect();
@@ -649,38 +645,42 @@ data.Admin = {
 
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
+
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
-
-                data.Admin.DatasetDropdownScrollToTop();
             }
-            data.Admin.ActivateDeactivateSubmitButton();
 
+            data.Admin.ActivateDeactivateSubmitButton();
         });
+
         $("#schemaDropdown").change(function (event) {
             var schemaId = $("#schemaDropdown").find(":selected").val();
             var datasetId = $("#AllDatasets").find(":selected").val();
+
             if (schemaId != -1 && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
                 data.Admin.GetFileDropdown(url);
-
-                data.Admin.DatasetDropdownScrollToTop();
             }
+
             data.Admin.ActivateDeactivateSubmitButton();
         });
+
         $("#EventContentModal").on("show.bs.modal", function (event) {
             var link = $(event.relatedTarget);
             var content = JSON.stringify(link.data("eventcontent"), null, "\t");
             var modalBody = "<textarea class='form-control' style = 'height: 500px'>" + content + "</textarea>"
-            $("#EventDetails").html(modalBody);
 
-        })
+            $("#EventDetails").html(modalBody);
+        });
+
         $("#submitButton").click(function (event) {
             var dto = new Object();
+
             dto.DatasetFileId = $("#fileDropdown").find(":selected").val();
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
             dto.SchemaId = $("#schemaDropdown").find(":selected").val();
+
             table = $('#metricGroupsTable').DataTable({
                 destroy: true,
                 ajax: {
@@ -739,7 +739,8 @@ data.Admin = {
                     }
                 ],
             });
-        })
+        });
+
         // Add event listener for opening and closing details
         $('#metricGroupsTable').on('click', 'td.dt-control', function () {
             var tr = $(this).closest('tr');

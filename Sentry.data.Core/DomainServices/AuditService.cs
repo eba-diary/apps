@@ -23,7 +23,7 @@ namespace Sentry.data.Core
 
         public BaseAuditDto GetExceptRows(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
-            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
+            SchemaConsumptionSnowflakeDto schemaObject = getSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
@@ -78,7 +78,7 @@ namespace Sentry.data.Core
 
         public BaseAuditDto GetRowCountCompare(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
-            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
+            SchemaConsumptionSnowflakeDto schemaObject = getSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
@@ -149,7 +149,7 @@ namespace Sentry.data.Core
             return snowCompareConfig;
         }
 
-        private SchemaConsumptionSnowflakeDto GetSchemaObjectBySchemaId(int datasetId, int schemaId)
+        private SchemaConsumptionSnowflakeDto getSchemaObjectBySchemaId(int datasetId, int schemaId)
         {
             //find DatasetFileConfigDto by parameter datasetId + schemaId 
             DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
