@@ -68,9 +68,9 @@
                                     @Html.LabelFor(model => model.supportLinkModel.Description, htmlAttributes: new { @class = "" })
                                     @Html.ValidationMessageFor(model => model.supportLinkModel.Description, "", new { @class = "text-danger" })
                                 </div>
-                                <div class="bs-component">
-                                    @Html.LabelFor(model => model.supportLinkModel.Url)
+                                <div class="md-form">
                                     @Html.TextAreaFor(model => model.supportLinkModel.Url, new { @class = "md-textarea form-control", @id = "LinkUrl" })
+                                    @Html.LabelFor(model => model.supportLinkModel.Url, htmlAttributes: new { @class = "" })
                                     @Html.ValidationMessageFor(model => model.supportLinkModel.Url, "", new { @class = "text-danger" })
                                 </div>
 
