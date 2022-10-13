@@ -733,6 +733,7 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError("RetrieverJob.SelectedRequestMethod", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsTargetFileNameIsBlank:
+                    case DataSource.ValidationErrors.httpsTargetFileNameContainsSpace:
                         ModelState.AddModelError("RetrieverJob.TargetFileName", vr.Description);
                         break;
                     case DataSource.ValidationErrors.ftpPatternNotSelected:
