@@ -1,4 +1,4 @@
-﻿\.side-nav-wrapper 
+﻿.side-nav-wrapper 
 {
     border: 4px solid #00A3E0;
     padding-left: 0px;
@@ -50,10 +50,6 @@ table#metricGroupsTable td.dt-control {
     flex-direction: row;
     justify-content: flex-start;
     width: 100%;
-}
-
-#addLinkButton {
-    float: right;
 }
 
 .LinkDescription {

@@ -13,7 +13,7 @@
                 <h1>My Links</h1>
             </div>
             <div class="col-sm-12 col-md-6">
-                <button type="button" class="btn btn-primary waves-effect waves-light right-aligned" data-toggle="modal" data-target="#AddLinkModal" id="addLinkButton">
+                <button type="button" class="btn btn-primary waves-effect waves-light right-aligned float-r" data-toggle="modal" data-target="#AddLinkModal">
                     Add Link
                 </button>
             </div>
@@ -57,7 +57,7 @@
                             <div class="card-body">
 
                                 <h3 class="card-title">Add Support Link</h3>
-
+                                
                                 <div class="md-form">
                                     @Html.TextAreaFor(model => model.supportLinkModel.Name, new { @class = "md-textarea form-control", @id = "LinkName" })
                                     @Html.LabelFor(model => model.supportLinkModel.Name, htmlAttributes: new { @class = "" })

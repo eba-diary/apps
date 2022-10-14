@@ -801,15 +801,11 @@ data.Admin = {
     //support link init function
     SupportLinkInit: function () {
         $("#LinkSubmitButton").click(function () {
-            var model = new Object();
-            model.Name = $("#LinkName").val();
-            model.Description = $("#LinkDescription").val();
-            model.Url = $("#LinkUrl").val();
             $.ajax({
                 type: "POST",
                 url: "/Admin/AddSupportLink",
                 datatype: "json",
-                data: model,
+                data: $("#SupportLinkForm").serialize(),
                 success: function (data) {
                     window.location.href = data.redirectToUrl;
                 }
