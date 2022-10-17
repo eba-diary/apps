@@ -510,7 +510,14 @@ namespace Sentry.data.Infrastructure
             switch (model.Type)
             {
                 case AccessRequestType.AwsArn:
-                    sb.Append($"Please {(model.IsAddingPermission ? "grant" : "remove")} the AWS ARN {model.AwsArn} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
+                    if (model.IsAddingPermission)
+                    {
+                        sb.Append($"Please grant the AWS ARN {model.AwsArn} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
+                    }
+                    else
+                    {
+                        sb.Append($"Please remove the following permissions for the AWS ARN {model.AwsArn} from {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
+                    }
 
                     foreach (Permission item in model.Permissions)
                     {
