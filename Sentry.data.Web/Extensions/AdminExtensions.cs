@@ -14,6 +14,7 @@ namespace Sentry.data.Web.Extensions
         {
             SupportLinkDto dto = new SupportLinkDto()
             {
+                SupportLinkId = supportLinkModel.SupportLinkId,
                 Name = supportLinkModel.Name,
                 Description = supportLinkModel.Description,
                 Url = supportLinkModel.Url,
@@ -25,6 +26,7 @@ namespace Sentry.data.Web.Extensions
         {
             SupportLinkModel model = new SupportLinkModel()
             {
+                SupportLinkId= supportLinkDto.SupportLinkId,
                 Name = supportLinkDto.Name,
                 Description = supportLinkDto.Description,
                 Url = supportLinkDto.Url,

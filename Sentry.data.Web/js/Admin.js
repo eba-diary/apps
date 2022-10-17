@@ -799,7 +799,43 @@ data.Admin = {
             });
         });
     },
-
+    //support link init function
+    SupportLinkInit: function () {
+        $("#LinkSubmitButton").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Admin/AddSupportLink",
+                datatype: "json",
+                data: $("#SupportLinkForm").serialize(),
+                success: function (data) {
+                    window.location.href = data.redirectToUrl;
+                }
+            })
+            $("#LinkName").val("");
+            $("#LinkDescription").val("");
+            $("#LinkUrl").val("");
+            $("#AddLinkModal").modal("hide");
+        })
+        $("#ModalCloseButton").click(function () {
+            $("#LinkName").val("");
+            $("#LinkDescription").val("");
+            $("#LinkUrl").val("");
+            $("#AddLinkModal").modal("hide");
+        })
+        $("#link-results").on("click", ".delete-icon", function () {
+            var icon = $(this);
+            var model = new Object();
+            model.SupportLinkId = icon.data("supportlinkid");
+            $.ajax({
+                type: "POST",
+                url: "/Admin/RemoveSupportLink",
+                data: model,
+                success: function (data) {
+                    window.location.href = data.redirectToUrl;
+                }
+            })
+        })
+    },
     // makeToast config
     makeToast: function (severity, message) {
 

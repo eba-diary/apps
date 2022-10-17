@@ -9,5 +9,6 @@ namespace Sentry.data.Web
     public class SupportLinkWrapper
     {
         public List<SupportLinkModel> AllSupportLinks { get; set; }
+        public SupportLinkModel supportLinkModel { get; set; }
     }
 }
