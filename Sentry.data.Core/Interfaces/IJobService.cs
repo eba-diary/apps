@@ -55,7 +55,8 @@ namespace Sentry.data.Core
         /// <param name="batchId"></param>
         /// <returns></returns>
         [SkipConcurrentExecution(0)]
-        [DisplayName("Get Batch Status [JobId:{0} BatchId:{1}]")] /* Used for displaying useful name in hangfire */
+        [DisplayName("Get Batch Status [JobId:{0} BatchId:{1}]")]   /* Used for displaying useful name in hangfire */
+        [Hangfire.AutomaticRetry(Attempts = 0)]                     /* Hangfire should not retry this call */
         Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(int jobId, int batchId);
         Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(JobHistory historyRecord);
     }
