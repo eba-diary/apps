@@ -9,6 +9,7 @@ namespace Sentry.data.Core
         public int SecurableObjectId { get; set; }
         public Guid SecurityId { get; set; }
         public string SecurableObjectName { get; set; }
+        public string SecurableObjectNamedEnvironment { get; set; }
         public string AdGroupName { get; set; }
         public string PermissionForUserId { get; set; }
         public string PermissionForUserName { get; set; }

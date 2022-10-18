@@ -479,12 +479,6 @@
     <Compile Include="ServiceImplementations\WallEService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
-      <Project>{bd4b0624-03a2-4896-b46e-4eb35e9efe6c}</Project>
-      <Name>Sentry.Messaging.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\.sonarlint\data_data.sentry.comcsharp.ruleset">
       <Link>data_data.sentry.comcsharp.ruleset</Link>
     </None>
@@ -531,11 +525,14 @@
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
+      <Project>{bd4b0624-03a2-4896-b46e-4eb35e9efe6c}</Project>
+      <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
