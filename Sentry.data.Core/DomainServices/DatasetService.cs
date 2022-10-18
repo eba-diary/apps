@@ -281,6 +281,7 @@ namespace Sentry.data.Core
                 IApplicationUser user = _userService.GetCurrentUser();
                 
                 request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : ds.DatasetName;
+                request.SecurableObjectNamedEnvironment = request.Scope == AccessScope.Asset ? null : ds.NamedEnvironment;
                 request.SecurableObjectId = request.Scope == AccessScope.Asset ? ds.Asset.AssetId : request.SecurableObjectId;
                 request.SecurityId = ds.Security.SecurityId;
                 request.SaidKeyCode = ds.Asset.SaidKeyCode;
@@ -305,6 +306,7 @@ namespace Sentry.data.Core
             var security = _datasetContext.Security.Where(s => s.Tickets.Any(t => t.TicketId == request.TicketId)).FirstOrDefault();
 
             request.SecurableObjectName = request.Scope == AccessScope.Asset ? ds.Asset.SaidKeyCode : ds.DatasetName;
+            request.SecurableObjectNamedEnvironment = request.Scope == AccessScope.Asset ? null : ds.NamedEnvironment;
             request.SecurableObjectId = request.Scope == AccessScope.Asset ? ds.Asset.AssetId : request.SecurableObjectId;
             if (security != null)
             {

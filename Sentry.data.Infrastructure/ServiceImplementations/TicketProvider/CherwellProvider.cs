@@ -512,11 +512,11 @@ namespace Sentry.data.Infrastructure
                 case AccessRequestType.AwsArn:
                     if (model.IsAddingPermission)
                     {
-                        sb.Append($"Please grant the AWS ARN {model.AwsArn} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
+                        sb.Append($"Please grant the AWS ARN {model.AwsArn} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)}{(model.Scope != AccessScope.Asset ? $" ({model.SecurableObjectNamedEnvironment})" : String.Empty)} data. <br>");
                     }
                     else
                     {
-                        sb.Append($"Please remove the following permissions for the AWS ARN {model.AwsArn} from {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} data. <br>");
+                        sb.Append($"Please remove the following permissions for the AWS ARN {model.AwsArn} from {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)}{(model.Scope != AccessScope.Asset ? $" ({model.SecurableObjectNamedEnvironment})" : String.Empty)} data. <br>");
                     }
 
                     foreach (Permission item in model.Permissions)
@@ -530,7 +530,7 @@ namespace Sentry.data.Infrastructure
                 default:
                     if (model.IsAddingPermission)
                     {
-                        sb.Append($"Please grant {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)} in Data.sentry.com. <br>");
+                        sb.Append($"Please grant {(model.AdGroupName ?? model.PermissionForUserName)} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)}{(model.Scope != AccessScope.Asset ? $" ({model.SecurableObjectNamedEnvironment})" : String.Empty )} in Data.sentry.com. <br>");
                     }
                     else
                     {

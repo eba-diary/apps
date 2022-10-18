@@ -409,55 +409,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> AccessRequest(int datasetId)
-        {
-            DatasetAccessRequestModel model;
-
-            if (_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-                model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-                return PartialView("Permission/RequestAccessCLA3723", model);
-            }
-            model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("DatasetAccessRequest", model);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
-        {
-            AccessRequest ar = model.ToCore();
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
-            
-            if (string.IsNullOrEmpty(ticketId))
-            {
-                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
-            }
-            else
-            {
-                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
-            }
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> SubmitAccessRequestCLA3723([Bind(Prefix = "RequestAccess")] DatasetAccessRequestModel model)
-        {
-            model.IsAddingPermission = true;
-            AccessRequest ar = model.ToCore();
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
-
-            if (string.IsNullOrEmpty(ticketId))
-            {
-                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
-            }
-            else
-            {
-                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
-            }
-        }
-
-        [HttpGet]
         public ActionResult CheckAdGroup(string adGroup)
         {
             return Json(_obsidianService.DoesGroupExist(adGroup), JsonRequestBehavior.AllowGet);
@@ -743,6 +694,56 @@ namespace Sentry.data.Web.Controllers
         #endregion
 
         #region Manage Permissions
+
+        [HttpGet]
+        public async Task<ActionResult> AccessRequest(int datasetId)
+        {
+            DatasetAccessRequestModel model;
+
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+                model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+                return PartialView("Permission/RequestAccessCLA3723", model);
+            }
+            model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+            return PartialView("DatasetAccessRequest", model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SubmitAccessRequestCLA3723([Bind(Prefix = "RequestAccess")] DatasetAccessRequestModel model)
+        {
+            model.IsAddingPermission = true;
+            AccessRequest ar = model.ToCore();
+            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
+            }
+        }
+
 
         [Route("Dataset/Detail/{datasetId}/Permissions")]
         [HttpGet]
