@@ -119,6 +119,7 @@ data.Admin = {
                 },
             ],
             searchable: true,
+            order: [4, 'desc']
         });
     },
 
