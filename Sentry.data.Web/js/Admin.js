@@ -163,7 +163,7 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (schemaApiResponse) {
-                data.sort(function (a, b) {
+                schemaApiResponse.sort(function (a, b) {
                     if (a.Name < b.Name) {
                         return -1;
                     }
@@ -222,7 +222,7 @@ data.Admin = {
             success: function (flowStepApiResponse) {
                 $("#flowStepsDropdown").materialSelect({ destroy: true });
                 var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
-                for (var flowStep of flowStepApiResponse[0].steps) {
+                for (let flowStep of flowStepApiResponse[0].steps) {
                     if (flowStep.ActionName == "Raw Storage") {
                         flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
                     }
@@ -543,7 +543,7 @@ data.Admin = {
 
     GetFlowEvents: function (data) {
         var s = '<table><tr><th>Event Metric ID</th><th>Flow Step Name</th><th>Execution Order</th><th>Status Code</th><th>Offset</th><th>Partition</th><th>Run Instance Guid</th><th>Event Contents</th></tr>';
-        for (var flowEvent of data.FlowEvents) {
+        for (let flowEvent of data.FlowEvents) {
             s += '<tr><td>' + flowEvent.EventMetricId + '</td><td>' + flowEvent.DataFlowStepName + '</td><td>' + flowEvent.CurrentFlowStep + '/' + flowEvent.TotalFlowSteps + '</td><td>' + flowEvent.StatusCode + '</td><td>' + flowEvent.Offset + '</td><td>' + flowEvent.Partition + '</td><td>' + flowEvent.RunInstanceGuid + '</td><td><a href="#EventContentModal" id="EventContentLink" data-toggle="modal" data-eventContent=' + flowEvent.EventContents + '>View Contents</a></td></tr>';
         }
         s += '</table>';
