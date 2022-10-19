@@ -157,6 +157,7 @@ namespace Sentry.data.Web.Controllers
 
 
         // adds a support link to the link farm
+        [HttpPost]
         public ActionResult AddSupportLink(SupportLinkModel supportLinkModel)
         {
             if (supportLinkModel.Name == null || supportLinkModel.Url == null)
@@ -176,6 +177,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 _supportLinkService.AddSupportLink(supportLinkDto);
+                return Json(new { redirectToUrl = Url.Action("SupportLinks", "Admin") });
             }
             catch (Exception)
             {
@@ -186,18 +188,18 @@ namespace Sentry.data.Web.Controllers
         }
 
         // removes a support link from the link farm
-        public ActionResult RemoveSupportLink(int id)
+        [HttpPost]
+        public ActionResult RemoveSupportLink(SupportLinkModel supportLinkModel)
         {
             try
             {
-                _supportLinkService.RemoveSupportLink(id);
+                _supportLinkService.RemoveSupportLink(supportLinkModel.SupportLinkId);
+                return Json(new { redirectToUrl = Url.Action("SupportLinks", "Admin") });
             }
             catch (Exception)
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Removing Support Link failed");
             }
-
-            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was successfully removed from database");
         }
 
         //below methods all return admin page views
@@ -225,7 +227,7 @@ namespace Sentry.data.Web.Controllers
             ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
             return View(reprocessDeadSparkJobModel);
         }
-
+        [HttpGet]
         public ActionResult SupportLinks()
         {
             List<SupportLinkDto> supportLinkDtos = _supportLinkService.GetSupportLinks();

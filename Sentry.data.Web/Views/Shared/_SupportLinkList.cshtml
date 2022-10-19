@@ -1,0 +1,10 @@
+﻿
+
+@model SupportLinkWrapper
+
+@foreach (@Sentry.data.Web.SupportLinkModel supportLinkModel in Model.AllSupportLinks)
+{
+    <em id="delete-icon" data-supportLinkId=@supportLinkModel.SupportLinkId class="fas fa-trash" style="cursor: pointer; color: red"></em>
+    <a href="@supportLinkModel.Url" target="_blank" style="padding-left: 60px">@supportLinkModel.Name</a>
+    <br />
+}

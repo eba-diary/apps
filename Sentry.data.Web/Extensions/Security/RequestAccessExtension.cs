@@ -74,7 +74,7 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = new List<string>() { model.Code },
                 SelectedApprover = model.SelectedApprover,
-                Type = AccessRequestType.RemovePermission,
+                Type = model.Code == GlobalConstants.PermissionCodes.S3_ACCESS ? AccessRequestType.AwsArn : AccessRequestType.RemovePermission,
                 IsAddingPermission = false,
                 AwsArn = model.Identity,
                 SaidKeyCode = model.SaidKeyCode,

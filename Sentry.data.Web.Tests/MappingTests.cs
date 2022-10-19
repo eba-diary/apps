@@ -419,7 +419,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(dto.SaidKeyCode, model.SaidKeyCode);
             Assert.AreEqual(dto.SchemaId, model.SchemaId);
             Assert.AreEqual(dto.Name, model.Name);
-            Assert.AreEqual(dto.CreateDTM, model.CreateDTM);
+            Assert.AreEqual(dto.CreateDTM.ToString("s"), model.CreateDTM);
             Assert.AreEqual(dto.CreatedBy, model.CreatedBy);
             Assert.AreEqual(dto.DFQuestionnaire, model.DFQuestionnaire);
             Assert.AreEqual(dto.IngestionType, model.IngestionType);
@@ -429,7 +429,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(dto.AssociatedJobs, model.AssociatedJobs);
             Assert.AreEqual(dto.ObjectStatus, model.ObjectStatus);
             Assert.AreEqual(dto.DeleteIssuer, model.DeleteIssuer);
-            Assert.AreEqual(dto.DeleteIssueDTM, model.DeleteIssueDTM);
+            Assert.AreEqual(dto.DeleteIssueDTM.ToString("s"), model.DeleteIssueDTM);
             Assert.AreEqual(dto.NamedEnvironment, model.NamedEnvironment);
             Assert.AreEqual(dto.NamedEnvironmentType, model.NamedEnvironmentType);
         }
