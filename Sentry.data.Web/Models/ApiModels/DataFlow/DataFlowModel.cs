@@ -11,7 +11,7 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
         public int DatasetId { get; set; }
         public int SchemaId { get; set; }
         public string Name { get; set; }
-        public DateTime CreateDTM { get; set; }
+        public string CreateDTM { get; set; }
         public string CreatedBy { get; set; }
         public string DFQuestionnaire { get; set; }
         public int IngestionType { get; set; }
@@ -27,7 +27,7 @@ namespace Sentry.data.Web.Models.ApiModels.Dataflow
         public List<int> AssociatedJobs { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
         public string DeleteIssuer { get; set; }
-        public DateTime DeleteIssueDTM { get; set; }
+        public string DeleteIssueDTM { get; set; }
         public string NamedEnvironment { get; set; }
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
         public string TopicName { get; set; }
