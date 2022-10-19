@@ -292,7 +292,7 @@ namespace Sentry.data.Core
             //Do nothing if there is no revision associated with schema
             if (latestRevision == null)
             {
-                Logger.Debug($"<generateconsumptionlayercreateevent> - consumption layer event not generated - no schema revision");
+                Logger.Info($"<generateconsumptionlayercreateevent> - consumption layer event not generated - no schema revision");
                 return;
             }
                         
@@ -326,11 +326,11 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
 
                     _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
@@ -350,9 +350,9 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
                     _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
