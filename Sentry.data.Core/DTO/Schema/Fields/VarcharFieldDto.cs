@@ -81,12 +81,14 @@ namespace Sentry.data.Core.DTO.Schema.Fields
 
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
-            BaseField newEntityField = new VarcharField()
-            {
-                //Apply defaults if neccessary
-                FieldLength = (this.Length == 0) ? GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT : this.Length
-            };
+            BaseField newEntityField = new VarcharField();
             base.ToEntity(newEntityField, parentField, parentRevision);
+
+            if (newEntityField.FieldLength == 0)
+            {
+                newEntityField.FieldLength = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
+            }
+
             return newEntityField;
         }
 

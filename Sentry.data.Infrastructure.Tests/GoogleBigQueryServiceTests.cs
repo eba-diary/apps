@@ -19,6 +19,7 @@ namespace Sentry.data.Infrastructure.Tests
             JObject rawFields = GetData("GoogleBigQuery_BasicSchema.json");
 
             Mock<ISchemaService> schemaService = new Mock<ISchemaService>(MockBehavior.Strict);
+            schemaService.Setup(x => x.ValidateCleanedFields(1, It.IsAny<List<BaseFieldDto>>()));
             schemaService.Setup(x => x.GetLatestSchemaRevisionDtoBySchema(1)).Returns<SchemaRevisionDto>(null);
             schemaService.Setup(x => x.CreateAndSaveSchemaRevision(1, It.IsAny<List<BaseFieldDto>>(), $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}", null))
                 .Callback<int, List<BaseFieldDto>, string, string>((id, fields, name, json) =>
@@ -29,6 +30,7 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("string_field", field.Name);
                     Assert.AreEqual(1, field.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, field.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, field.Length);
                     Assert.IsFalse(field.IsArray);
 
                     field = fields[1];
@@ -63,6 +65,7 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("child_string_field", childField.Name);
                     Assert.AreEqual(6, childField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, childField.Length);
                     Assert.IsFalse(childField.IsArray);
 
                     childField = field.ChildFields.Last();
@@ -83,6 +86,7 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("grandchild_float_field", grandChildField.Name);
                     Assert.AreEqual(9, grandChildField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, grandChildField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, grandChildField.Length);
                     Assert.IsFalse(grandChildField.IsArray);
 
                     field = fields[5];
@@ -97,18 +101,21 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("key", childField.Name);
                     Assert.AreEqual(11, childField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, childField.Length);
                     Assert.IsFalse(childField.IsArray);
 
                     childField = field.ChildFields.Last();
                     Assert.AreEqual("value", childField.Name);
                     Assert.AreEqual(12, childField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, childField.Length);
                     Assert.IsFalse(childField.IsArray);
 
                     field = fields[6];
                     Assert.AreEqual("string_field_2", field.Name);
                     Assert.AreEqual(13, field.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, field.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, field.Length);
                     Assert.IsFalse(field.IsArray);
                 }).Returns(1);
 
@@ -125,6 +132,7 @@ namespace Sentry.data.Infrastructure.Tests
             JObject rawFields = GetData("GoogleBigQuery_BasicSchema.json");
 
             Mock<ISchemaService> schemaService = new Mock<ISchemaService>(MockBehavior.Strict);
+            schemaService.Setup(x => x.ValidateCleanedFields(1, It.IsAny<List<BaseFieldDto>>()));
             schemaService.Setup(x => x.GetLatestSchemaRevisionDtoBySchema(1)).Returns(new SchemaRevisionDto() { RevisionId = 2 });
             schemaService.Setup(x => x.GetBaseFieldDtoBySchemaRevision(2)).Returns(new List<BaseFieldDto>()
             {
@@ -139,6 +147,7 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("string_field", field.Name);
                     Assert.AreEqual(1, field.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, field.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, field.Length);
                     Assert.IsFalse(field.IsArray);
 
                     field = fields[1];
@@ -173,6 +182,7 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("child_string_field", childField.Name);
                     Assert.AreEqual(6, childField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, childField.Length);
                     Assert.IsFalse(childField.IsArray);
 
                     childField = field.ChildFields.Last();
@@ -193,6 +203,7 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("grandchild_float_field", grandChildField.Name);
                     Assert.AreEqual(9, grandChildField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, grandChildField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, grandChildField.Length);
                     Assert.IsFalse(grandChildField.IsArray);
 
                     field = fields[5];
@@ -207,18 +218,21 @@ namespace Sentry.data.Infrastructure.Tests
                     Assert.AreEqual("key", childField.Name);
                     Assert.AreEqual(11, childField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, childField.Length);
                     Assert.IsFalse(childField.IsArray);
 
                     childField = field.ChildFields.Last();
                     Assert.AreEqual("value", childField.Name);
                     Assert.AreEqual(12, childField.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, childField.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, childField.Length);
                     Assert.IsFalse(childField.IsArray);
 
                     field = fields[6];
                     Assert.AreEqual("string_field_2", field.Name);
                     Assert.AreEqual(13, field.OrdinalPosition);
                     Assert.AreEqual(GlobalConstants.Datatypes.VARCHAR, field.FieldType);
+                    Assert.AreEqual(GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT, field.Length);
                     Assert.IsFalse(field.IsArray);
                 }).Returns(1);
 
@@ -246,14 +260,14 @@ namespace Sentry.data.Infrastructure.Tests
             childStructField.ChildFields = new List<BaseFieldDto>()
             {
                 GetField<TimestampFieldDto>("grandchild_timestamp_field", false, 8),
-                GetField<VarcharFieldDto>("grandchild_float_field", false, 9)
+                GetVarcharField("grandchild_float_field", false, 9)
             };
 
             StructFieldDto structField = GetField<StructFieldDto>("struct_field", true, 5);
             structField.HasChildren = true;
             structField.ChildFields = new List<BaseFieldDto>
             {
-                GetField<VarcharFieldDto>("child_string_field", false, 6),
+                GetVarcharField("child_string_field", false, 6),
                 childStructField
             };
 
@@ -261,19 +275,19 @@ namespace Sentry.data.Infrastructure.Tests
             keyValueField.HasChildren = true;
             keyValueField.ChildFields = new List<BaseFieldDto>
             {
-                GetField<VarcharFieldDto>("key", false, 11),
-                GetField<VarcharFieldDto>("value", false, 12)
+                GetVarcharField("key", false, 11),
+                GetVarcharField("value", false, 12)
             };
 
             schemaService.Setup(x => x.GetBaseFieldDtoBySchemaRevision(2)).Returns(new List<BaseFieldDto>()
             {
-                GetField<VarcharFieldDto>("string_field", false, 1),
+                GetVarcharField("string_field", false, 1),
                 GetField<BigIntFieldDto>("integer_field", false, 2),
                 GetField<DateFieldDto>("date_field", false, 3),
                 decimalField,
                 structField,
                 keyValueField,
-                GetField<VarcharFieldDto>("string_field_2", false, 13)
+                GetVarcharField("string_field_2", false, 13)
             });
 
             GoogleBigQueryService service = new GoogleBigQueryService(schemaService.Object);
@@ -289,6 +303,7 @@ namespace Sentry.data.Infrastructure.Tests
             JObject rawFields = GetData("GoogleBigQuery_EventsSchema.json");
 
             Mock<ISchemaService> schemaService = new Mock<ISchemaService>(MockBehavior.Strict);
+            schemaService.Setup(x => x.ValidateCleanedFields(1, It.IsAny<List<BaseFieldDto>>()));
             schemaService.Setup(x => x.GetLatestSchemaRevisionDtoBySchema(1)).Returns<SchemaRevisionDto>(null);
             schemaService.Setup(x => x.CreateAndSaveSchemaRevision(1, It.IsAny<List<BaseFieldDto>>(), $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}", null))
                 .Callback<int, List<BaseFieldDto>, string, string>((id, fields, name, json) => Assert.AreEqual(23, fields.Count)).Returns(1);
@@ -308,6 +323,13 @@ namespace Sentry.data.Infrastructure.Tests
             fieldDto.IsArray = isArray;
             fieldDto.OrdinalPosition = position;
 
+            return fieldDto;
+        }
+
+        private VarcharFieldDto GetVarcharField(string name, bool isArray, int position)
+        {
+            VarcharFieldDto fieldDto = GetField<VarcharFieldDto>(name, isArray, position);
+            fieldDto.Length = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
             return fieldDto;
         }
         #endregion
