@@ -2,6 +2,7 @@
 using Moq;
 using Newtonsoft.Json.Linq;
 using NHibernate.Util;
+using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.DTO.Schema.Fields;
 using System;
@@ -313,6 +314,46 @@ namespace Sentry.data.Infrastructure.Tests
             service.UpdateSchemaFields(1, (JArray)rawFields.SelectToken("schema.fields"));
 
             schemaService.Verify();
+        }
+
+        [TestMethod]
+        public void UpdateSchemaFields_FailValidateCleanedFields()
+        {
+            JObject rawFields = GetData("GoogleBigQuery_EventsSchema.json");
+
+            Mock<ISchemaService> schemaService = new Mock<ISchemaService>(MockBehavior.Strict);
+            schemaService.Setup(x => x.ValidateCleanedFields(1, It.IsAny<List<BaseFieldDto>>()));
+            schemaService.Setup(x => x.GetLatestSchemaRevisionDtoBySchema(1)).Returns<SchemaRevisionDto>(null);
+            schemaService.Setup(x => x.CreateAndSaveSchemaRevision(1, It.IsAny<List<BaseFieldDto>>(), $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}", null)).Returns(0);
+
+            GoogleBigQueryService service = new GoogleBigQueryService(schemaService.Object);
+
+            Assert.ThrowsException<GoogleBigQuerySchemaException>(() => service.UpdateSchemaFields(1, (JArray)rawFields.SelectToken("schema.fields")));
+
+            schemaService.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateSchemaFields_FailCreateAndSaveSchemaRevision()
+        {
+            JArray jArray = new JArray()
+            {
+                new JObject()
+                {
+                    { "name", "123" },
+                    { "type", "STRING" }
+                }
+            };
+
+            Mock<ISchemaService> schemaService = new Mock<ISchemaService>(MockBehavior.Strict);
+            schemaService.Setup(x => x.ValidateCleanedFields(1, It.IsAny<List<BaseFieldDto>>())).Throws(new ValidationException("invalid"));
+            schemaService.Setup(x => x.GetLatestSchemaRevisionDtoBySchema(1)).Returns<SchemaRevisionDto>(null);
+
+            GoogleBigQueryService service = new GoogleBigQueryService(schemaService.Object);
+
+            Assert.ThrowsException<ValidationException>(() => service.UpdateSchemaFields(1, jArray));
+
+            schemaService.VerifyAll();
         }
 
         #region Helpers

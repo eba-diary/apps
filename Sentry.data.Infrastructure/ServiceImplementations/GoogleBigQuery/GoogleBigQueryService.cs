@@ -38,7 +38,13 @@ namespace Sentry.data.Infrastructure
             }
 
             _schemaService.ValidateCleanedFields(schemaId, fieldDtos);
-            _schemaService.CreateAndSaveSchemaRevision(schemaId, fieldDtos, $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}");
+
+            int revisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, fieldDtos, $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}");
+            if (revisionId == 0)
+            {
+                throw new GoogleBigQuerySchemaException("Google BigQuery service failed to create and save schema revision");
+            }
+
             Logger.Info($"Google Big Query schema has been updated - SchemaId: {schemaId}");
         }
 
