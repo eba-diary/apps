@@ -17,31 +17,32 @@ namespace Sentry.data.Infrastructure
         {
             _elasticContext = elasticContext;
         }
+
         //returns list of data flow metrics matching searchdto criteria
         public List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto)
         {
-            List<QueryContainer> must = new List<QueryContainer>();
-            must.AddMatch<DataFlowMetric>(x => x.DatasetId, dto.DatasetId.ToString());
-            must.AddMatch<DataFlowMetric>(x => x.SchemaId, dto.SchemaId.ToString());
-            if(dto.DatasetFileId != -1)
-            {
-                must.AddMatch<DataFlowMetric>(x => x.DatasetFileId, dto.DatasetFileId.ToString());
-            }
-            BoolQuery boolQuery = new BoolQuery();
-            boolQuery.Must = must;
+            // List of query container decriptors to filter elastic search
+            List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> filters = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
+            
+            // Filters added to query container list to search for selecteds dataset and schema id's
+            filters.Add(fq => fq.Terms(t => t.Field(f => f.DatasetId).Terms(dto.DatasetId.ToString())));
+            filters.Add(fq => fq.Terms(t => t.Field(f => f.SchemaId).Terms(dto.SchemaId.ToString())));
 
-            SearchRequest<DataFlowMetric> request = new SearchRequest<DataFlowMetric>()
+            // Checks if a specific dataset file has been selected
+            if (!dto.DatasetFileIds.Contains(-1))
             {
-                Sort = new List<ISort>()
+                // Loops through all dataset file ids assocaited with the selected dataset file
+                foreach (int datasetFileId in dto.DatasetFileIds)
                 {
-                    new FieldSort(){Field = Infer.Field<DataFlowMetric>(x => x.EventMetricId), Order = SortOrder.Descending}
-                },
-                Size = 10000,
-                Query = boolQuery,
-            };
+                    filters.Add(fq => fq.Terms(c => c.Field(p => p.DatasetFileId).Terms<int>(dto.DatasetFileIds)));
+                }
+            }
 
-            ElasticResult<DataFlowMetric> elasticResult = _elasticContext.SearchAsync(request).Result;
-            return elasticResult.Documents.ToList();
+            ElasticResult<DataFlowMetric> test = _elasticContext.SearchAsync<DataFlowMetric>(s => s
+                                            .Query(q => q.Bool(bq => bq.Filter(filters)))
+                                            .Size(10000).Sort(sq=>sq.Descending(dq=>dq.EventMetricId))).Result;
+
+            return test.Documents.ToList();
         }
     }
 }

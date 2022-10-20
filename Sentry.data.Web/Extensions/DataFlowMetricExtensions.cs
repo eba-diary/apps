@@ -14,7 +14,7 @@ namespace Sentry.data.Web
             {
                 DatasetId = model.DatasetId,
                 SchemaId = model.SchemaId,
-                DatasetFileId = model.DatasetFileId,
+                DatasetFileIds = model.DatasetFileIds,
             };
             return dto;
         }

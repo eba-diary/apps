@@ -29,9 +29,9 @@ data.Admin = {
 
     // Reduce and group json fields by specified key
     JsonReduce: function (jsonObject, groupByField, selectedField) {
-        var returnJson = jsonObject.reduce(function (rv, x) {
-            (rv[x[groupByField]] = rv[x[groupByField]] || []).push(x[selectedField]);
-            return rv;
+        var returnJson = jsonObject.reduce(function (previousValue, currentValue) {
+            (previousValue[currentValue[groupByField]] = previousValue[currentValue[groupByField]] || []).push(currentValue[selectedField]);
+            return previousValue;
         }, {});
 
         return returnJson;
@@ -211,15 +211,13 @@ data.Admin = {
             dataType: "Json",
             dataSrc: "Records",
             success: function (fileApiResponse) {
-                fileApiResponse = { "Records": [{ "DatasetFileId": 288882, "FileName": "zzzcsv02_20211214203104091.csv", "DatasetId": 381, "SchemaRevisionId": 3298, "SchemaId": 1386, "DatasetFileConfigId": 1148, "UploadUserName": "", "CreateDTM": "2021-12-14T20:31:04", "ModifiedDTM": "2021-12-14T20:31:04", "FileLocation": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "ParentDatasetFileId": 585205, "VersionId": null, "Information": null, "Size": 110, "FlowExecutionGuid": "20211214203104091", "RunInstanceGuid": null, "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": null, "ObjectStatus": "Active" }, { "DatasetFileId": 585205, "FileName": "zzzcsv02_20211214203104091.csv", "DatasetId": 381, "SchemaRevisionId": 3298, "SchemaId": 1386, "DatasetFileConfigId": 1148, "UploadUserName": "", "CreateDTM": "2021-12-14T20:31:04", "ModifiedDTM": "2021-12-14T20:31:04", "FileLocation": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "ParentDatasetFileId": 585206, "VersionId": "vlyp7WJ5ZFKh2DAnrY9t790pFoF3BBEP", "Information": null, "Size": 236, "FlowExecutionGuid": "20211214203104091", "RunInstanceGuid": null, "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "26fea843d51b5e574536b1f2c1fe3e98", "ObjectStatus": "Active" }, { "DatasetFileId": 585206, "FileName": "zzzcsv02_20211214203104091.csv", "DatasetId": 381, "SchemaRevisionId": 3298, "SchemaId": 1386, "DatasetFileConfigId": 1148, "UploadUserName": "", "CreateDTM": "2021-12-14T20:31:04", "ModifiedDTM": "2021-12-14T20:31:04", "FileLocation": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "ParentDatasetFileId": 585207, "VersionId": "KOIcGv_y_mbtkQdBwpDIE_jxfbPzGd7Z", "Information": null, "Size": 236, "FlowExecutionGuid": "20211214203104091", "RunInstanceGuid": "20220929133815000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "26fea843d51b5e574536b1f2c1fe3e98", "ObjectStatus": "Active" }, { "DatasetFileId": 585207, "FileName": "zzzcsv02_20211214203104091.csv", "DatasetId": 381, "SchemaRevisionId": 3298, "SchemaId": 1386, "DatasetFileConfigId": 1148, "UploadUserName": "", "CreateDTM": "2021-12-14T20:31:04", "ModifiedDTM": "2021-12-14T20:31:04", "FileLocation": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "ParentDatasetFileId": 0, "VersionId": "CJhnYiC52579AzPafEDYYb5hk5RavToM", "Information": null, "Size": 236, "FlowExecutionGuid": "20211214203104091", "RunInstanceGuid": "20220929133815000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "26fea843d51b5e574536b1f2c1fe3e98", "ObjectStatus": "Active" }, { "DatasetFileId": 123123, "FileName": "test.csv", "DatasetId": 381, "SchemaRevisionId": 3298, "SchemaId": 1386, "DatasetFileConfigId": 1148, "UploadUserName": "", "CreateDTM": "2021-12-14T20:31:04", "ModifiedDTM": "2021-12-14T20:31:04", "FileLocation": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "ParentDatasetFileId": 0, "VersionId": "CJhnYiC52579AzPafEDYYb5hk5RavToM", "Information": null, "Size": 236, "FlowExecutionGuid": "20211214203104091", "RunInstanceGuid": "20220929133815000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "26fea843d51b5e574536b1f2c1fe3e98", "ObjectStatus": "Active" }, { "DatasetFileId": 321321, "FileName": "test.csv", "DatasetId": 381, "SchemaRevisionId": 3298, "SchemaId": 1386, "DatasetFileConfigId": 1148, "UploadUserName": "", "CreateDTM": "2021-12-14T20:31:04", "ModifiedDTM": "2021-12-14T20:31:04", "FileLocation": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "ParentDatasetFileId": 0, "VersionId": "CJhnYiC52579AzPafEDYYb5hk5RavToM", "Information": null, "Size": 236, "FlowExecutionGuid": "20211214203104091", "RunInstanceGuid": "20220929133815000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/6171319/2021/12/14/zzzcsv02_20211214203104091.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "26fea843d51b5e574536b1f2c1fe3e98", "ObjectStatus": "Active" }], "Metadata": { "CurrentPage": 1, "TotalPages": 1, "PageSize": 1000, "TotalCount": 292, "HasPrevious": false, "HasNext": false } };
-
-                let fileDropdown = '<option id="defaultFileSelection" selected value="-1">All Files</option>';
+                let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">All Files</option>';
 
                 // groups dataset file id's by shared file names and store them in a JSON object
                 var groupedFiles = data.Admin.JsonReduce(fileApiResponse.Records, "FileName", "DatasetFileId");
 
                 for (let file in groupedFiles) {
-                    fileDropdown += '<option value="[' + groupedFiles[file] + ']">' + file + '</option>'
+                    fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
                 }
 
                 $("#fileDropdown").html(fileDropdown);
@@ -691,8 +689,9 @@ data.Admin = {
 
         $("#submitButton").click(function (event) {
             var dto = new Object();
+             
+            dto.DatasetFileIds = $("#fileDropdown").find(":selected").data('datasetids');
 
-            dto.DatasetFileId = $("#fileDropdown").find(":selected").val();
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
             dto.SchemaId = $("#schemaDropdown").find(":selected").val();
 
