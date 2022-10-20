@@ -28,13 +28,25 @@ data.Admin = {
     },
 
     // Reduce and group json fields by the specified key
-    JsonReduce: function (jsonObject, groupByKey, selectedField) {
-        var returnJson = jsonObject.reduce(function (previousValue, currentValue) {
-            (previousValue[currentValue[groupByKey]] = previousValue[currentValue[groupByKey]] || []).push(currentValue[selectedField]);
-            return previousValue;
+    JsonReduce: function (jsonObject, groupKey, itemsKey) {    
+        
+        return jsonObject.reduce(function (returnedObject, iterationVariable) {
+
+            // Checks if the current iteration variable object already exists inside of the returnedObject
+            if (!returnedObject[iterationVariable[groupKey]]) {
+
+                // If it does not, create a new new object inside of the returnedObject
+                returnedObject[iterationVariable[groupKey]] = [];
+            }
+
+            // Push the current interation variable (which will only be the value defined by the items key passed in)
+            // into the correlated location inside of the returnedObject.
+            returnedObject[iterationVariable[groupKey]].push(iterationVariable[itemsKey]);
+
+            // Returns the returnedObject for the next iteration
+            return returnedObject;
         }, {});
 
-        return returnJson;
     },
 
     // load and initialize dead job data table
@@ -209,6 +221,7 @@ data.Admin = {
             dataType: "Json",
             dataSrc: "Records",
             success: function (fileApiResponse) {
+                fileApiResponse = { "Records": [{ "DatasetFileId": 387133, "FileName": "ddm_csv_03_001_20220513154736000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-05-13T15:47:36", "ModifiedDTM": "2022-05-13T15:47:36", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/5/13/ddm_csv_03_001_20220513154736000.csv", "ParentDatasetFileId": 0, "VersionId": "Ak2R5fX1mAyAx8cshb5bzEcCL_qc8yYV", "Information": null, "Size": 88, "FlowExecutionGuid": "20220513154736000", "RunInstanceGuid": null, "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/5/13/ddm_csv_03_001_20220513154736000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }, { "DatasetFileId": 603090, "FileName": "test_2_csv_03_20221019185833000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-10-19T18:58:33", "ModifiedDTM": "2022-10-19T18:58:33", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "ParentDatasetFileId": 603094, "VersionId": "81AchxivKKbus6GWOH7Is_KL2N80UU_.", "Information": null, "Size": 88, "FlowExecutionGuid": "20221019185833000", "RunInstanceGuid": null, "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }, { "DatasetFileId": 603094, "FileName": "test_2_csv_03_20221019185833000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-10-19T18:58:33", "ModifiedDTM": "2022-10-19T18:58:33", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "ParentDatasetFileId": 603124, "VersionId": "Xzci3AB.htrXvlL65F8a3hRW_AMtjtNU", "Information": null, "Size": 88, "FlowExecutionGuid": "20221019185833000", "RunInstanceGuid": "20221019190742000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }, { "DatasetFileId": 603095, "FileName": "test_csv_03_20221019185634000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-10-19T18:56:34", "ModifiedDTM": "2022-10-19T18:56:34", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/10/19/test_csv_03_20221019185634000.csv", "ParentDatasetFileId": 603159, "VersionId": "4._mtOoRoz91qssgRxRpcHsC60q4dVPF", "Information": null, "Size": 88, "FlowExecutionGuid": "20221019185634000", "RunInstanceGuid": null, "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/10/19/test_csv_03_20221019185634000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }, { "DatasetFileId": 603124, "FileName": "test_2_csv_03_20221019185833000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-10-19T18:58:33", "ModifiedDTM": "2022-10-19T18:58:33", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "ParentDatasetFileId": 603160, "VersionId": "eqPUNMO924PIF34rCEhgf7J3.vmYIG0r", "Information": null, "Size": 88, "FlowExecutionGuid": "20221019185833000", "RunInstanceGuid": "20221019192142000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }, { "DatasetFileId": 603159, "FileName": "test_csv_03_20221019185634000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-10-19T18:56:34", "ModifiedDTM": "2022-10-19T18:56:34", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/10/19/test_csv_03_20221019185634000.csv", "ParentDatasetFileId": 0, "VersionId": "NUw1h4.2NBw.WPl37YtzBNWs304mueKj", "Information": null, "Size": 88, "FlowExecutionGuid": "20221019185634000", "RunInstanceGuid": "20221019211345000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/10/19/test_csv_03_20221019185634000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }, { "DatasetFileId": 603160, "FileName": "test_2_csv_03_20221019185833000.csv", "DatasetId": 381, "SchemaRevisionId": 4022, "SchemaId": 2028, "DatasetFileConfigId": 1784, "UploadUserName": "", "CreateDTM": "2022-10-19T18:58:33", "ModifiedDTM": "2022-10-19T18:58:33", "FileLocation": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "ParentDatasetFileId": 0, "VersionId": "MtMeH.3EI6peufzL_9gxPIJEIq6AjlC7", "Information": null, "Size": 88, "FlowExecutionGuid": "20221019185833000", "RunInstanceGuid": "20221019211345000", "FileExtension": null, "FileKey": "rawquery/DATA/QUAL/8532319/2022/10/19/test_2_csv_03_20221019185833000.csv", "FileBucket": "sentry-dlst-qual-dataset-ae2", "ETag": "8b5c402e77d33864c4700593ef32ded7", "ObjectStatus": "Active" }], "Metadata": { "CurrentPage": 1, "TotalPages": 1, "PageSize": 1000, "TotalCount": 7, "HasPrevious": false, "HasNext": false } };
                 let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">All Files</option>';
 
                 // groups dataset file id's by shared file names and store them in a JSON object
