@@ -292,7 +292,7 @@ namespace Sentry.data.Core
             //Do nothing if there is no revision associated with schema
             if (latestRevision == null)
             {
-                Logger.Info($"<generateconsumptionlayercreateevent> - consumption layer event not generated - no schema revision");
+                Logger.Debug($"<generateconsumptionlayercreateevent> - consumption layer event not generated - no schema revision");
                 return;
             }
                         
@@ -326,11 +326,11 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Info($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
 
                     _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
-                    Logger.Info($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
