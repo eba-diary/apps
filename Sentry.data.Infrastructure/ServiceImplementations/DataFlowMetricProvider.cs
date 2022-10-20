@@ -31,18 +31,18 @@ namespace Sentry.data.Infrastructure
             // Checks if a specific dataset file has been selected
             if (!dto.DatasetFileIds.Contains(-1))
             {
-                // Loops through all dataset file ids assocaited with the selected dataset file
+                // Loops through all dataset file ids associated with the selected dataset file
                 foreach (int datasetFileId in dto.DatasetFileIds)
                 {
                     filters.Add(fq => fq.Terms(c => c.Field(p => p.DatasetFileId).Terms<int>(dto.DatasetFileIds)));
                 }
             }
 
-            ElasticResult<DataFlowMetric> test = _elasticContext.SearchAsync<DataFlowMetric>(s => s
+            ElasticResult<DataFlowMetric> elasticResult = _elasticContext.SearchAsync<DataFlowMetric>(s => s
                                             .Query(q => q.Bool(bq => bq.Filter(filters)))
                                             .Size(10000).Sort(sq=>sq.Descending(dq=>dq.EventMetricId))).Result;
 
-            return test.Documents.ToList();
+            return elasticResult.Documents.ToList();
         }
     }
 }

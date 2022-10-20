@@ -27,10 +27,10 @@ data.Admin = {
         });
     },
 
-    // Reduce and group json fields by specified key
-    JsonReduce: function (jsonObject, groupByField, selectedField) {
+    // Reduce and group json fields by the specified key
+    JsonReduce: function (jsonObject, groupByKey, selectedField) {
         var returnJson = jsonObject.reduce(function (previousValue, currentValue) {
-            (previousValue[currentValue[groupByField]] = previousValue[currentValue[groupByField]] || []).push(currentValue[selectedField]);
+            (previousValue[currentValue[groupByKey]] = previousValue[currentValue[groupByKey]] || []).push(currentValue[selectedField]);
             return previousValue;
         }, {});
 
@@ -91,8 +91,6 @@ data.Admin = {
             }
         });
     },
-
-
 
     // creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
@@ -691,6 +689,8 @@ data.Admin = {
             var dto = new Object();
              
             dto.DatasetFileIds = $("#fileDropdown").find(":selected").data('datasetids');
+
+            if (dto.DatasetFileIds == null || dto.DatasetFileIds == 0) dto.DatasetFileIds = -1;
 
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
             dto.SchemaId = $("#schemaDropdown").find(":selected").val();
