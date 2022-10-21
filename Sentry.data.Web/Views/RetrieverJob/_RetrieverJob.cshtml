@@ -1,7 +1,7 @@
 ﻿@model Sentry.data.Core.RetrieverJob
 
 @{ 
-    string color = this.ViewData.ContainsKey("Color") ? this.ViewData["Color"].ToString() : string.Empty;
+    string color = "blue";
     bool enableJobControls = this.ViewData.ContainsKey("EnableJobControls") ? Convert.ToBoolean(this.ViewData["EnableJobControls"]) : true;
 }
     <div class="retJob @Model.DataSource.SourceType">
