@@ -16,6 +16,7 @@
             $("#SourceType").materialSelect();
         }
         $("#AuthID").materialSelect();
+        $("#GrantType").materialSelect();
 
     },
 

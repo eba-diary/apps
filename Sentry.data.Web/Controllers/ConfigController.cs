@@ -552,6 +552,12 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_Headers");
         }
 
+        [Route("Config/AddToken")]
+        public ActionResult AddToken()
+        {
+            return PartialView("_DataSourceToken");
+        }
+
         public ActionResult FieldEntryRow()
         {
             return PartialView("_Fields", new FieldRowModel());

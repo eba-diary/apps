@@ -334,6 +334,7 @@
     <Compile Include="Mappings\Primary\ApplicationConfigurationMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFunctionMapping.cs" />
     <Compile Include="Mappings\Primary\ImageMapping.cs" />
+    <Compile Include="Mappings\Primary\Retriever\DataSourceTokenMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\OAuthClaimMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceMapping.cs" />

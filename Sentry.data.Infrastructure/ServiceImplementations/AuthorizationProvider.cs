@@ -29,7 +29,7 @@ namespace Sentry.data.Infrastructure
 
         public string GetOAuthAccessToken(HTTPSSource source)
         {
-            if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
+            if (source.Tokens.FirstOrDefault().CurrentToken == null || source.Tokens.FirstOrDefault().CurrentTokenExp == null || source.Tokens.FirstOrDefault().CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                 HttpClientHandler httpHandler = new HttpClientHandler();
                 if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
@@ -40,7 +40,7 @@ namespace Sentry.data.Infrastructure
                 HttpClient httpClient = new HttpClient(httpHandler);
 
                 FormUrlEncodedContent oAuthPostContent = GetOAuthContent(source);
-                HttpResponseMessage oAuthPostResult = httpClient.PostAsync(source.TokenUrl, oAuthPostContent).Result;
+                HttpResponseMessage oAuthPostResult = httpClient.PostAsync(source.Tokens.FirstOrDefault().TokenUrl, oAuthPostContent).Result;
 
                 string response = oAuthPostResult.Content.ReadAsStringAsync().Result;
 
@@ -60,11 +60,11 @@ namespace Sentry.data.Infrastructure
                 }
                 else
                 {
-                    throw new OAuthException($"Failed to retrieve OAuth Access Token from {source.TokenUrl}. Response: {response}");
+                    throw new OAuthException($"Failed to retrieve OAuth Access Token from {source.Tokens.FirstOrDefault().TokenUrl}. Response: {response}");
                 }
             }
 
-            return _encryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            return _encryptionService.DecryptString(source.Tokens.FirstOrDefault().CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
         }
 
         #region Private
@@ -97,7 +97,7 @@ namespace Sentry.data.Infrastructure
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.TokenExp)).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.Tokens.FirstOrDefault().TokenExp)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);
@@ -157,8 +157,8 @@ namespace Sentry.data.Infrastructure
             //test if this is even needed, or will saving source as is will update
             HTTPSSource updatedSource = (HTTPSSource)_datasetContext.GetById<DataSource>(source.Id);
 
-            updatedSource.CurrentToken = _encryptionService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
-            updatedSource.CurrentTokenExp = tokenExpTime;
+            updatedSource.Tokens.FirstOrDefault().CurrentToken = _encryptionService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
+            updatedSource.Tokens.FirstOrDefault().CurrentTokenExp = tokenExpTime;
 
             _datasetContext.SaveChanges();
         }

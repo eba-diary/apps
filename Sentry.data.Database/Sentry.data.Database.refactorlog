@@ -1050,4 +1050,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ClusterUrl" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="f38f0388-8ba7-47ee-8fcf-ada2935e3f30" ChangeDateTime="10/20/2022 18:17:33">
+    <Property Name="ElementName" Value="[dbo].[DataSourceTokens].[DataSourceTokenId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSourceTokens]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b8aca0bd-a27e-4118-b7d0-05e4bb85faed" ChangeDateTime="10/20/2022 18:17:41">
+    <Property Name="ElementName" Value="[dbo].[DataSourceTokens].[DataSourceId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSourceTokens]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataSource_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="af214bc0-689a-43b8-8949-50b3ae2e3954" ChangeDateTime="10/20/2022 18:53:40">
+    <Property Name="ElementName" Value="[dbo].[DataSourceTokens].[AccessToken]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSourceTokens]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CurrentToken" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2082c1c2-9559-43b8-a44d-a0fdcad09d8a" ChangeDateTime="10/20/2022 18:53:48">
+    <Property Name="ElementName" Value="[dbo].[DataSourceTokens].[AccessTokenExp]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSourceTokens]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CurrentTokenExp" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c011ebde-bee5-45f1-8490-738af6e44557" ChangeDateTime="10/20/2022 20:02:48">
+    <Property Name="ElementName" Value="[dbo].[DataSourceTokens].[DataSource_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSourceTokens]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentDataSource_Id" />
+  </Operation>
 </Operations>

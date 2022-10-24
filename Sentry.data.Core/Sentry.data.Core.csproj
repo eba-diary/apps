@@ -269,6 +269,7 @@
     <Compile Include="Entities\Elastic\ElasticResult.cs" />
     <Compile Include="Entities\Favorites\UserFavorite.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DataSourceToken.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleBigQueryApiSource.cs" />

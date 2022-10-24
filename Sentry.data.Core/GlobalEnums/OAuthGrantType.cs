@@ -8,6 +8,8 @@ namespace Sentry.data.Core.GlobalEnums
 
         //https://tools.ietf.org/html/rfc7523
         [Description("JWT Bearer")]
-        jwtbearer = 0,
+        JwtBearer = 0,
+        [Description("Refresh Token")]
+        RefreshToken = 1
     }
 }
