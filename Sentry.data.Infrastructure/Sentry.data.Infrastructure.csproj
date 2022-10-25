@@ -269,6 +269,7 @@
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
     <Compile Include="Exceptions\InfrastructureEventingException.cs" />
+    <Compile Include="Exceptions\JiraServiceException.cs" />
     <Compile Include="Exceptions\OAuthException.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
     <Compile Include="Exceptions\SecBotProviderException.cs" />

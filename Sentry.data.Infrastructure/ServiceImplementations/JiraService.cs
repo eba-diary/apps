@@ -4,6 +4,7 @@ using RestSharp.Authenticators;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Jira;
+using Sentry.data.Infrastructure.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Sentry.data.Infrastructure
     public class JiraService : IJiraService
     {
         private const string JiraBaseUrl = "https://jira.sentry.com/rest/api/2/";
-        private HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         public JiraService(HttpClient httpClient)
         {
@@ -41,7 +42,7 @@ namespace Sentry.data.Infrastructure
                 catch (NullReferenceException ex)
                 {
                     Logger.Error($"Issue type {ticket.IssueType} not found in {ticket.Project}", ex);
-                    throw new Exception($"Issue type {ticket.IssueType} not found in {ticket.Project}");
+                    throw new JiraServiceException($"Issue type {ticket.IssueType} not found in {ticket.Project}");
                 }
 
                 var customFields = GetCustomFields(projectKey, issueTypeId).ToList();
@@ -88,7 +89,7 @@ namespace Sentry.data.Infrastructure
             if (!response.IsSuccessStatusCode)
             {
                 Logger.Error(response.Content.ToString());
-                throw new Exception($"Unable to search for issues with following JQL: {jql}. Status code: {response.StatusCode}.");
+                throw new JiraServiceException($"Unable to search for issues with following JQL: {jql}. Status code: {response.StatusCode}.");
             }
             return JsonConvert.DeserializeObject<dynamic>(response.Content.ToString());
         }
@@ -104,7 +105,7 @@ namespace Sentry.data.Infrastructure
             if (response.IsSuccessStatusCode == false)
             {
                 Logger.Error(response.Content.ToString());
-                throw new Exception($"Unable to validate project with key: {projectKey}. Status code: {response.StatusCode}.");
+                throw new JiraServiceException($"Unable to validate project with key: {projectKey}. Status code: {response.StatusCode}.");
             }
             var projResponse = JsonConvert.DeserializeObject<JiraProjectResponse>(response.Content.ReadAsStringAsync().Result);
             return projResponse.Id;
@@ -135,7 +136,7 @@ namespace Sentry.data.Infrastructure
         {
             if(components == null)
             {
-                return null;
+                return new List<string>();
             }
             var response = _httpClient.GetAsync(JiraBaseUrl + $"project/{projectKey}/components").Result;
             var componentResponse = JsonConvert.DeserializeObject<List<JiraComponentResponse>>(response.Content.ReadAsStringAsync().Result);
@@ -174,7 +175,7 @@ namespace Sentry.data.Infrastructure
         {
             var response = _httpClient.GetAsync(JiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes").Result;
             var r = JsonConvert.DeserializeObject<JiraIssuetypeResponse>(response.Content.ReadAsStringAsync().Result);
-            var issueTypeId = r.Values.Where(x => x.Name == issueType).FirstOrDefault().Id;
+            var issueTypeId = r.Values.FirstOrDefault(x => x.Name == issueType).Id;
             return issueTypeId;
         }
 
@@ -189,7 +190,7 @@ namespace Sentry.data.Infrastructure
         {
             var response = _httpClient.GetAsync(JiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes/{issueTypeId}").Result;
             var r = JsonConvert.DeserializeObject<JiraMetaResponse>(response.Content.ReadAsStringAsync().Result);
-            return r.Values.Where(x => x.Name == fieldName).Any();
+            return r.Values.Any(x => x.Name == fieldName);
         }
 
         /// <summary>
@@ -202,7 +203,7 @@ namespace Sentry.data.Infrastructure
             var response = CreateJiraIssue(issueInfo);
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"Creating Jira issue resulted in error. Status code: {response.StatusCode}. Error: {response.Content}");
+                throw new JiraServiceException($"Creating Jira issue resulted in error. Status code: {response.StatusCode}. Error: {response.Content}");
             }
             var issueResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(response.Content.ReadAsStringAsync().Result);
             Logger.Info($"Jira issue {issueResponse.key} created.");
