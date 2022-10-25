@@ -227,6 +227,18 @@ namespace Sentry.data.Core
             return true;
         }
 
+        private string GetDSCEventTopic(int datasetId)
+        {
+            string topicName;
+            Helpers.DscEventTopicHelper helper = new Helpers.DscEventTopicHelper();
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            topicName = helper.GetDSCTopic(ds);
+            if (string.IsNullOrEmpty(topicName))
+            {
+                throw new ArgumentException("Topic Name is null");
+            }
+            return topicName;
+        }
         public int GetFileExtensionIdByName(string extensionName)
         {
             FileExtension extension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Name == extensionName);
@@ -327,8 +339,16 @@ namespace Sentry.data.Core
                 try
                 {
                     Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
-
-                    _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+                    string topicName = null;
+                    if (_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    {
+                        topicName = GetDSCEventTopic(dsId);
+                        _messagePublisher.Publish(topicName, schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate), topicName);
+                    }
 
                     Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
                 }
@@ -351,7 +371,16 @@ namespace Sentry.data.Core
                 try
                 {
                     Logger.Info($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
-                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    string topicName = null;
+                    if (_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    {
+                        topicName = GetDSCEventTopic(dsId);
+                        _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                    }
                     Logger.Info($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
