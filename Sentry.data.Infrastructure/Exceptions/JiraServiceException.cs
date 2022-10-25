@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Exceptions
 {
+    [Serializable]
     public class JiraServiceException : Exception
     {
         public JiraServiceException(string message) : base(message)

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using RestSharp;
-using RestSharp.Authenticators;
 using Sentry.Common.Logging;
+using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Infrastructure.Exceptions;
@@ -15,7 +14,7 @@ namespace Sentry.data.Infrastructure
 {
     public class JiraService : IJiraService
     {
-        private const string JiraBaseUrl = "https://jira.sentry.com/rest/api/2/";
+        private readonly string JiraBaseUrl = Config.GetHostSetting("JiraServiceUrl");
         private readonly HttpClient _httpClient;
 
         public JiraService(HttpClient httpClient)
@@ -57,7 +56,7 @@ namespace Sentry.data.Infrastructure
                 var fields = jiraIssue.JiraFields.fields;
                 foreach (var field in ticket.CustomFields)
                 {
-                    var customField = customFields.Where(x => x.Name == field.Name).FirstOrDefault();
+                    var customField = customFields.FirstOrDefault(x => x.Name == field.Name);
 
                     if (customField != null)
                     {
@@ -101,8 +100,9 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         private string ValidateAndReturnProject(string projectKey)
         {
-            var response = _httpClient.GetAsync("https://jira.sentry.com/rest/api/2/project/CLA").Result;
-            if (response.IsSuccessStatusCode == false)
+            var response = _httpClient.GetAsync(JiraBaseUrl + $"project/{projectKey}").Result;
+
+            if (response.IsSuccessStatusCode)
             {
                 Logger.Error(response.Content.ToString());
                 throw new JiraServiceException($"Unable to validate project with key: {projectKey}. Status code: {response.StatusCode}.");
