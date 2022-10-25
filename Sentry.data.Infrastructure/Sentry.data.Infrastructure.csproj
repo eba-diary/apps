@@ -418,6 +418,7 @@
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevRestClient.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevService.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\DatasetPermissionsUpdatedDto.cs" />
+    <Compile Include="ServiceImplementations\JiraService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />

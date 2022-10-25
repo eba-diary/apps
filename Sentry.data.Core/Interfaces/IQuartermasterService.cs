@@ -26,7 +26,5 @@ namespace Sentry.data.Core
         /// <param name="saidAssetKeyCode">The four-character key code for an asset</param>
         /// <returns>A list of NamedEnvironmentDto objects</returns>
         Task<List<NamedEnvironmentDto>> GetNamedEnvironmentsAsync(string saidAssetKeyCode);
-        void BuildJiraTicketAndRequest(string project, IList<string> components, IList<string> labels, string description, string summary, string issueType, IList<JiraCustomField> customFields);
-
     }
 }
