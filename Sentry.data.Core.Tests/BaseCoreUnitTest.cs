@@ -34,6 +34,7 @@ namespace Sentry.data.Core.Tests
             registry.For<IDataFeatures>().Use(new MockDataFeatures());
             registry.For<IInevService>().Use(() => new Mock<IInevService>().Object);
             registry.For<IQuartermasterService>().Use(() => new Mock<IQuartermasterService>().Object);
+            registry.For<IJiraService>().Use(() => new Mock<IJiraService>().Object);
             registry.For<Hangfire.IBackgroundJobClient>().Use(() => new Mock<Hangfire.IBackgroundJobClient>().Object);
             registry.For<IObsidianService>().Use(() => new Mock<IObsidianService>().Object);
             registry.For<IAdSecurityAdminProvider>().Use(() => new Mock<IAdSecurityAdminProvider>().Object);
