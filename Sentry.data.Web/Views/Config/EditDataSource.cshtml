@@ -132,20 +132,19 @@
                 @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control" })
                 @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
             </div>
-            <div class="md-form">
-                @Html.LabelFor(m => m.TokenUrl, new { @class = "control-label" })
-                @Html.TextBoxFor((model) => model.TokenUrl, new { @class = "form-control" })
-                @Html.ValidationMessageFor((model) => model.TokenUrl, "", new { @class = "text-danger" })
+            <div class="row">
+                <div class="col align-self-end">
+                    <h4 class="pt-3">OAuth Tokens</h4>
+                </div>
+                <div class="col">
+                    <button id="AddToken" type="button" class="btn btn-success waves-effect waves-light float-r">Add Token</button>
+                </div>
             </div>
-            <div class="md-form">
-                @Html.LabelFor(m => m.TokenExp, new { @class = "control-label" })
-                @Html.TextBoxFor((model) => model.TokenExp, new { @value = "", @class = "form-control" })
-                @Html.ValidationMessageFor((model) => model.TokenExp, "", new { @class = "text-danger" })
-            </div>
-            <div class="md-form">
-                @Html.LabelFor(m => m.Scope, new { @class = "control-label" })
-                @Html.TextBoxFor((model) => model.Scope, new { @class = "form-control" })
-                @Html.ValidationMessageFor((model) => model.Scope, "", new { @class = "text-danger" })
+            <div id="TokenContainer">
+                @foreach (DataSourceToken token in Model.Tokens)
+                {
+                    Html.RenderPartial("_DataSourceToken", token);
+                }
             </div>
         </div>
         <div id="portNumberPanel">

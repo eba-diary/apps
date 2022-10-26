@@ -224,6 +224,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag(x => x.Tokens, m =>
             {
+                m.Inverse(true);
                 m.Table("DataSourceTokens");
                 m.Cascade(Cascade.All);
                 m.Key((k) =>

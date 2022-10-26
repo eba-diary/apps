@@ -27,10 +27,11 @@ namespace Sentry.data.Infrastructure
             _dataFeatures = dataFeatures;
         }
 
-        public string GetOAuthAccessToken(HTTPSSource source)
+        public string GetOAuthAccessTokenForToken(HTTPSSource source, DataSourceToken token)
         {
-            if (source.Tokens.FirstOrDefault().CurrentToken == null || source.Tokens.FirstOrDefault().CurrentTokenExp == null || source.Tokens.FirstOrDefault().CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
+            if (token.CurrentToken == null || token.CurrentTokenExp == null || token.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
+                bool isRefreshToken = source.GrantType == Core.GlobalEnums.OAuthGrantType.RefreshToken;
                 HttpClientHandler httpHandler = new HttpClientHandler();
                 if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
                 {
@@ -39,8 +40,15 @@ namespace Sentry.data.Infrastructure
 
                 HttpClient httpClient = new HttpClient(httpHandler);
 
-                FormUrlEncodedContent oAuthPostContent = GetOAuthContent(source);
-                HttpResponseMessage oAuthPostResult = httpClient.PostAsync(source.Tokens.FirstOrDefault().TokenUrl, oAuthPostContent).Result;
+                HttpResponseMessage oAuthPostResult = new HttpResponseMessage();
+                if (isRefreshToken)
+                {
+                    oAuthPostResult = GetOAuthResponseForRefreshToken(source, token, httpClient);
+                }
+                else
+                {
+                    oAuthPostResult = GetOAuthResponseForJwt(source, token, httpClient);
+                }
 
                 string response = oAuthPostResult.Content.ReadAsStringAsync().Result;
 
@@ -54,20 +62,48 @@ namespace Sentry.data.Infrastructure
                     Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
 
                     DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
-                    SaveOAuthToken(source, accessToken, newTokenExp);
+                    if (isRefreshToken)
+                    {
+                        SaveOAuthToken(source, accessToken, newTokenExp, token, responseAsJson.Value<string>("refresh_token"));
+                    }
+                    else
+                    {
+                        SaveOAuthToken(source, accessToken, newTokenExp, token);
+                    }
 
                     return accessToken;
                 }
                 else
                 {
-                    throw new OAuthException($"Failed to retrieve OAuth Access Token from {source.Tokens.FirstOrDefault().TokenUrl}. Response: {response}");
+                    throw new OAuthException($"Failed to retrieve OAuth Access Token from {token.TokenUrl}. Response: {response}");
                 }
             }
 
-            return _encryptionService.DecryptString(source.Tokens.FirstOrDefault().CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            return _encryptionService.DecryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+        }
+
+        public string GetOAuthAccessToken(HTTPSSource source)
+        {
+            return GetOAuthAccessTokenForToken(source, source.Tokens.FirstOrDefault());
         }
 
         #region Private
+        private HttpResponseMessage GetOAuthResponseForJwt(HTTPSSource source, DataSourceToken token, HttpClient httpClient)
+        {
+            FormUrlEncodedContent oAuthPostContent = GetOAuthContent(source);
+            return httpClient.PostAsync(token.TokenUrl, oAuthPostContent).Result;
+        }
+
+        private HttpResponseMessage GetOAuthResponseForRefreshToken(HTTPSSource source, DataSourceToken token, HttpClient httpClient)
+        {
+            var client_id_val = source.ClientId;
+            var client_secret_val = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            var refresh_token_val = _encryptionService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            var redirect = $"https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id={client_id_val}&client_secret={client_secret_val}";
+            var motiveUrl = $"https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token={refresh_token_val}&redirect_uri={redirect}";
+            return httpClient.PostAsync(motiveUrl, new StringContent("")).Result;
+        }
+
         private FormUrlEncodedContent GetOAuthContent(HTTPSSource source)
         {
             List<KeyValuePair<string, string>> content = new List<KeyValuePair<string, string>>()
@@ -152,13 +188,23 @@ namespace Sentry.data.Infrastructure
             return output;
         }
 
-        private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime)
+        private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token, string newRefreshToken)
+        {
+            //test if this is even needed, or will saving source as is will update
+            SaveOAuthToken(source, newToken, tokenExpTime, token);
+
+            token.RefreshToken = _encryptionService.EncryptString(newRefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
+
+            _datasetContext.SaveChanges();
+        }
+
+        private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token)
         {
             //test if this is even needed, or will saving source as is will update
             HTTPSSource updatedSource = (HTTPSSource)_datasetContext.GetById<DataSource>(source.Id);
 
-            updatedSource.Tokens.FirstOrDefault().CurrentToken = _encryptionService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
-            updatedSource.Tokens.FirstOrDefault().CurrentTokenExp = tokenExpTime;
+            token.CurrentToken = _encryptionService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
+            token.CurrentTokenExp = tokenExpTime;
 
             _datasetContext.SaveChanges();
         }

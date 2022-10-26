@@ -22,8 +22,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("ParentDataSource_Id");
                 m.ForeignKey("FK_DataSourceTokens_DataSource");
                 m.Class(typeof(DataSource));
-                m.Cascade(Cascade.All);
-                m.NotNullable(true);
             });
 
             Property(x => x.TokenName, m =>

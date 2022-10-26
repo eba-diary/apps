@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Sentry.data.Core
     public class DataSourceToken
     {
         public virtual int Id { get; set; }
+
+        [JsonIgnore]
         public virtual DataSource ParentDataSource { get; set; }
         
         [DisplayName("Value")]

@@ -1,4 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
@@ -1034,12 +1035,17 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public JsonResult SourceDetails (int Id)
+        public ContentResult SourceDetails (int Id)
         {            
             DataSourceDto dto = _configService.GetDataSourceDto(Id);
             DataSourceModel model = new DataSourceModel(dto);
-
-            return Json(model, JsonRequestBehavior.AllowGet);
+            var jsonSource = JsonConvert.SerializeObject(model,
+                Formatting.None,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+            return Content(jsonSource, "application/json");
         }
 
         [HttpGet]

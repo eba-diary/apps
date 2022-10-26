@@ -1216,6 +1216,8 @@ namespace Sentry.data.Core
                         foreach(var token in ((HTTPSSource)source).Tokens)
                         {
                             token.ParentDataSource = ((HTTPSSource)source);
+                            token.CurrentToken = _encryptService.EncryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                            token.RefreshToken = _encryptService.EncryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
                         }
                         ((HTTPSSource)source).GrantType = dto.GrantType;
                     }
@@ -1267,18 +1269,7 @@ namespace Sentry.data.Core
             source.IsSecured = dto.IsSecured;
             source.PrimaryContactId = dto.PrimaryContactId;
 
-            if (source.Is<HTTPSSource>() && ((HTTPSSource)source).Tokens.Any())
-            {
-                var tokenTemp = ((HTTPSSource)source).Tokens;
-                ((HTTPSSource)source).Tokens = null;
-                _datasetContext.Add(source);
-                ((HTTPSSource)source).Tokens = tokenTemp;
-                _datasetContext.Add(source);
-            }
-            else
-            {
-                _datasetContext.Add(source);
-            }
+            _datasetContext.Add(source);
 
             if (source.Is<HTTPSSource>() && auth.Is<OAuthAuthentication>())
             {

@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[DataSourceTokens]
 (
-    [Id] INT NOT NULL, 
+    [Id] INT Identity(1,1) NOT NULL, 
     [ParentDataSource_Id] INT NOT NULL, 
-    [CurrentToken] VARCHAR(50) NULL, 
-    [RefreshToken] VARCHAR(50) NULL, 
+    [CurrentToken] NVARCHAR(MAX) NULL, 
+    [RefreshToken] NVARCHAR(MAX) NULL, 
     [CurrentTokenExp] DATETIME NULL, 
     [TokenName] VARCHAR(50) NOT NULL, 
     [TokenUrl] VARCHAR(50) NULL, 
