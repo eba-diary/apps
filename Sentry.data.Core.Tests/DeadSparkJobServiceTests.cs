@@ -42,7 +42,7 @@ namespace Sentry.data.Core.Tests
                 DatasetName = "DatasetName",
                 SchemaName = "SchemaName",
                 SourceKey = "SourceKey",
-                TargetKey = "parquet/PLAD/QUAL/120001/2022/7/6/PayPlanCriteria_20220706T1002_125a53f0-a559-4713-afa7-f8c1814402bb_20220706100210000.csv",
+                TargetKey = "_FAILED",
                 FlowExecutionGuid = "FlowExecutionGuid",
                 SubmissionID = 2,
                 SourceBucketName = "SourceBucketName",
@@ -70,7 +70,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("SchemaName", deadSparkJobDtoList[0].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobDtoList[0].SourceKey);
             Assert.AreEqual("FlowExecutionGuid", deadSparkJobDtoList[0].FlowExecutionGuid);
-            Assert.AreEqual("No", deadSparkJobDtoList[0].ReprocessingRequired);
+            Assert.AreEqual("Yes", deadSparkJobDtoList[0].ReprocessingRequired);
             Assert.AreEqual(1, deadSparkJobDtoList[0].SubmissionID);
             Assert.AreEqual("SourceBucketName", deadSparkJobDtoList[0].SourceBucketName);
             Assert.AreEqual(1, deadSparkJobDtoList[0].BatchID);
@@ -85,7 +85,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("SchemaName", deadSparkJobDtoList[1].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobDtoList[1].SourceKey);
             Assert.AreEqual("FlowExecutionGuid", deadSparkJobDtoList[1].FlowExecutionGuid);
-            Assert.AreEqual("Yes", deadSparkJobDtoList[1].ReprocessingRequired);
+            Assert.AreEqual("No", deadSparkJobDtoList[1].ReprocessingRequired);
             Assert.AreEqual(2, deadSparkJobDtoList[1].SubmissionID);
             Assert.AreEqual("SourceBucketName", deadSparkJobDtoList[1].SourceBucketName);
             Assert.AreEqual(2, deadSparkJobDtoList[1].BatchID);
