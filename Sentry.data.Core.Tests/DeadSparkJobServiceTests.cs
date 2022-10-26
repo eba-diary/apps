@@ -15,6 +15,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             Mock<IDeadJobProvider> mockProvider = new Mock<IDeadJobProvider>();
+            Mock<IS3ServiceProvider> s3Provider = new Mock<IS3ServiceProvider>();
 
             List<DeadSparkJob> deadSparkJobsSetupList = new List<DeadSparkJob>();
 
@@ -27,7 +28,7 @@ namespace Sentry.data.Core.Tests
                 TargetKey = "_SUCCESS",
                 FlowExecutionGuid = "FlowExecutionGuid",
                 SubmissionID = 1,
-                SourceBucketName = "SourceBucketName",
+                SourceBucketName = "SourceBucketName1",
                 BatchID = 1,
                 LivyAppID = "LivyAppID",
                 LivyDriverlogUrl = "LivyDriverlogUrl",
@@ -45,7 +46,7 @@ namespace Sentry.data.Core.Tests
                 TargetKey = "_FAILED",
                 FlowExecutionGuid = "FlowExecutionGuid",
                 SubmissionID = 2,
-                SourceBucketName = "SourceBucketName",
+                SourceBucketName = "SourceBucketName2",
                 BatchID = 2,
                 LivyAppID = "LivyAppID",
                 LivyDriverlogUrl = "LivyDriverlogUrl",
@@ -55,7 +56,10 @@ namespace Sentry.data.Core.Tests
             });
 
             mockProvider.Setup(e => e.GetDeadSparkJobs(DateTime.Today)).Returns(deadSparkJobsSetupList);
-            DeadSparkJobService jobService = new DeadSparkJobService(mockProvider.Object);
+            s3Provider.Setup(s3 => s3.ListObjects("SourceBucketName1", It.IsAny<string>(),null)).Returns(new List<string>(){ "_SUCCESS", "File" });
+            s3Provider.Setup(s3 => s3.ListObjects("SourceBucketName2", It.IsAny<string>(), null)).Returns(new List<string>() { "File" });
+
+            DeadSparkJobService jobService = new DeadSparkJobService(mockProvider.Object, s3Provider.Object);
 
 
 
@@ -70,9 +74,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("SchemaName", deadSparkJobDtoList[0].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobDtoList[0].SourceKey);
             Assert.AreEqual("FlowExecutionGuid", deadSparkJobDtoList[0].FlowExecutionGuid);
-            Assert.AreEqual("Yes", deadSparkJobDtoList[0].ReprocessingRequired);
+            Assert.AreEqual("No", deadSparkJobDtoList[0].ReprocessingRequired);
             Assert.AreEqual(1, deadSparkJobDtoList[0].SubmissionID);
-            Assert.AreEqual("SourceBucketName", deadSparkJobDtoList[0].SourceBucketName);
+            Assert.AreEqual("SourceBucketName1", deadSparkJobDtoList[0].SourceBucketName);
             Assert.AreEqual(1, deadSparkJobDtoList[0].BatchID);
             Assert.AreEqual("LivyAppID", deadSparkJobDtoList[0].LivyAppID);
             Assert.AreEqual("LivyDriverlogUrl", deadSparkJobDtoList[0].LivyDriverlogUrl);
@@ -85,9 +89,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("SchemaName", deadSparkJobDtoList[1].SchemaName);
             Assert.AreEqual("SourceKey", deadSparkJobDtoList[1].SourceKey);
             Assert.AreEqual("FlowExecutionGuid", deadSparkJobDtoList[1].FlowExecutionGuid);
-            Assert.AreEqual("No", deadSparkJobDtoList[1].ReprocessingRequired);
+            Assert.AreEqual("Yes", deadSparkJobDtoList[1].ReprocessingRequired);
             Assert.AreEqual(2, deadSparkJobDtoList[1].SubmissionID);
-            Assert.AreEqual("SourceBucketName", deadSparkJobDtoList[1].SourceBucketName);
+            Assert.AreEqual("SourceBucketName2", deadSparkJobDtoList[1].SourceBucketName);
             Assert.AreEqual(2, deadSparkJobDtoList[1].BatchID);
             Assert.AreEqual("LivyAppID", deadSparkJobDtoList[1].LivyAppID);
             Assert.AreEqual("LivyDriverlogUrl", deadSparkJobDtoList[1].LivyDriverlogUrl);
