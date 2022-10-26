@@ -24,7 +24,7 @@ namespace Sentry.data.Core
 
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
         {
-            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "Yes" : "No";
+            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "No" : "Yes";
 
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {
