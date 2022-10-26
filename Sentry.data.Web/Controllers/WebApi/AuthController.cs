@@ -14,7 +14,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly UserService _userService;
         private readonly ISecurityService _securityService;
 
-        public AuthController(IDatasetContext dsContext, UserService userService, ISecurityService securityService, IMessagePublisher messagePublisher)
+        public AuthController(IDatasetContext dsContext, UserService userService, ISecurityService securityService)
         {
             _dsContext = dsContext;
             _userService = userService;

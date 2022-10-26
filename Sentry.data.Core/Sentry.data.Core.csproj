@@ -276,6 +276,19 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Entities\Jira\JiraComponentResponse.cs" />
+    <Compile Include="Entities\Jira\JiraCustomField.cs" />
+    <Compile Include="Entities\Jira\JiraField.cs" />
+    <Compile Include="Entities\Jira\JiraFields.cs" />
+    <Compile Include="Entities\Jira\JiraIssue.cs" />
+    <Compile Include="Entities\Jira\JiraIssueCreateRequest.cs" />
+    <Compile Include="Entities\Jira\JiraIssueResponse.cs" />
+    <Compile Include="Entities\Jira\JiraIssueType.cs" />
+    <Compile Include="Entities\Jira\JiraIssueTypeResponse.cs" />
+    <Compile Include="Entities\Jira\JiraMetaResponse.cs" />
+    <Compile Include="Entities\Jira\JiraProjectResponse.cs" />
+    <Compile Include="Entities\Jira\JiraSearchRequest.cs" />
+    <Compile Include="Entities\Jira\JiraTicket.cs" />
     <Compile Include="Entities\Livy\LivyBatch.cs" />
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseDeletedFileModel.cs" />
@@ -420,6 +433,7 @@
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
     <Compile Include="Interfaces\IHttpClientGenerator.cs" />
+    <Compile Include="Interfaces\IJiraService.cs" />
     <Compile Include="Interfaces\IKafkaConnectorProvider.cs" />
     <Compile Include="Interfaces\Entities\IFilterSearchable.cs" />
     <Compile Include="Interfaces\IAdSecurityAdminProvider.cs" />
