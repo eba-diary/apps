@@ -9,11 +9,13 @@ namespace Sentry.data.Core
     public class DeadSparkJobService : IDeadSparkJobService
     {
         private readonly IDeadJobProvider _deadJobProvider;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
-        public DeadSparkJobService(IDeadJobProvider deadJobProvider)
+        public DeadSparkJobService(IDeadJobProvider deadJobProvider, IS3ServiceProvider s3ServiceProvider)
         {
             _deadJobProvider = deadJobProvider;
-        }  
+            _s3ServiceProvider = s3ServiceProvider;
+        }   
 
         public List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime timeCreated)
         {
@@ -22,9 +24,20 @@ namespace Sentry.data.Core
             return MapToDtoList(deadSparkJobList);
         }
 
+        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
+        {
+            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
+
+            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
+
+            return deadSparkJobDtoList;
+        }
+
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
         {
-            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "No" : "Yes";
+            IList<string> s3ObjectList = _s3ServiceProvider.ListObjects(deadSparkJob.SourceBucketName, deadSparkJob.TargetKey);
+
+            string isReprocessingRequired = s3ObjectList.Contains("_SUCCESS") ? "No" : "Yes";
 
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {
@@ -46,15 +59,6 @@ namespace Sentry.data.Core
             };
 
             return deadSparkJobDto;
-        }
-
-        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
-        {
-            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
-
-            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
-
-            return deadSparkJobDtoList;
         }
     }
 }
