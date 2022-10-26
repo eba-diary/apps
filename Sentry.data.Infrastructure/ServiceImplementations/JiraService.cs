@@ -102,7 +102,7 @@ namespace Sentry.data.Infrastructure
         {
             var response = _httpClient.GetAsync(JiraBaseUrl + $"project/{projectKey}").Result;
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 Logger.Error(response.Content.ToString());
                 throw new JiraServiceException($"Unable to validate project with key: {projectKey}. Status code: {response.StatusCode}.");
