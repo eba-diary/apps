@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Nest;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Interfaces;
@@ -268,7 +269,102 @@ namespace Sentry.data.Infrastructure.Tests
             stubIDatasetContext.VerifyAll();
             stubDataFlowMetricProvider.VerifyAll();
         }
-      
-      
+
+        [TestMethod]
+        public void GetDataFlowMetrics_MappedReturn()
+        {
+            //arrange
+            var stubIElasticContext = new Mock<IElasticContext>();
+
+            DataFlowMetricSearchDto dto = new DataFlowMetricSearchDto()
+            {
+                DatasetFileIds = new int[] { 1, 2, 3 },
+                DatasetId = 1,
+                SchemaId = 1
+            };
+
+            stubIElasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<Nest.SearchDescriptor<DataFlowMetric>, ISearchRequest>>())).ReturnsAsync(GetDataFlowMetricList);
+
+            DataFlowMetricProvider stubDataFlowMetricProvider = new DataFlowMetricProvider(stubIElasticContext.Object);
+
+            //act
+            List<DataFlowMetric> metricList = stubDataFlowMetricProvider.GetDataFlowMetrics(dto);
+
+            //assert
+            Assert.IsNotNull(metricList);
+
+            stubIElasticContext.VerifyAll();
+        }
+
+        private ElasticResult<DataFlowMetric> GetDataFlowMetricList()
+        {
+            return new ElasticResult<DataFlowMetric>()
+            {
+                SearchTotal = 1,
+                Documents = new List<DataFlowMetric>()
+                {
+                    new DataFlowMetric()
+                    {
+                        QueryMadeDateTime = DateTime.Now,
+                        SchemaId = 1,
+                        EventContents = "eventContents",
+                        MaxExecutionOrder = 0,
+                        FileModifiedDateTime = DateTime.Now,
+                        OriginalFileName = "ogFileName",
+                        DatasetId = 1,
+                        ExecutionOrder = 1,
+                        DataActionId = 1,
+                        Partition = 1,
+                        DataActionTypeId = 1,
+                        MessageKey = "messageKey",
+                        Duration = 1,
+                        Offset = 0,
+                        DataFlowName = "flowName",
+                        DataFlowStepId = 1,
+                        FlowExecutionGuid = "executionGuid",
+                        FileSize = 1,
+                        EventMetricId = 1,
+                        StorageCode = "storageCode",
+                        FileCreatedDateTime = DateTime.Now,
+                        FileName = "fileName",
+                        SaidKeyCode = "keyCode",
+                        EventMetricCreatedDateTime = DateTime.Now,
+                        DatasetFileId = 1,
+                        ProcessStartDateTime = DateTime.Now,
+                        StatusCode = "statusCode"
+                    },
+                    new DataFlowMetric()
+                    {
+                        QueryMadeDateTime = DateTime.Now,
+                        SchemaId = 2,
+                        EventContents = "eventContents",
+                        MaxExecutionOrder = 0,
+                        FileModifiedDateTime = DateTime.Now,
+                        OriginalFileName = "ogFileName",
+                        DatasetId = 2,
+                        ExecutionOrder = 2,
+                        DataActionId = 2,
+                        Partition = 2,
+                        DataActionTypeId = 2,
+                        MessageKey = "messageKey",
+                        Duration = 2,
+                        Offset = 0,
+                        DataFlowName = "flowName",
+                        DataFlowStepId = 2,
+                        FlowExecutionGuid = "executionGuid",
+                        FileSize = 1,
+                        EventMetricId = 2,
+                        StorageCode = "storageCode",
+                        FileCreatedDateTime = DateTime.Now,
+                        FileName = "fileName",
+                        SaidKeyCode = "keyCode",
+                        EventMetricCreatedDateTime = DateTime.Now,
+                        DatasetFileId = 2,
+                        ProcessStartDateTime = DateTime.Now,
+                        StatusCode = "statusCode"
+                    }
+        }
+            };
+        }
     }
 }
