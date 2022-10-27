@@ -350,9 +350,9 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
                     _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {

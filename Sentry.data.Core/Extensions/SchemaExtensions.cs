@@ -385,6 +385,7 @@ namespace Sentry.data.Core
                 existingField.IsArray == newField.IsArray &&
                 existingField.Scale == newField.Scale &&
                 existingField.Precision == newField.Precision &&
+                existingField.Length == newField.Length &&
                 existingField.ChildFields.AreEqualTo(newField.ChildFields);
         }
 

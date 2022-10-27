@@ -59,12 +59,8 @@
                         <div class="schema-modify-icons">
                             @if (isActive)
                             {
-                                <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" title="Edit Schema"></a>
-
-                                if (Model.DatasetFileConfigs.Where(x => x.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active).Count() > 1)
-                                {
-                                    <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" data-toggle="tooltip" data-placement="top" title="Delete Schema"></a>
-                                }
+                                <a class="far fa-edit" href="/Config/Edit/@item.ConfigId" data-toggle="tooltip" data-placement="top" title="Edit Schema"></a>
+                                <a class="icon-trash schema-delete-icon ml-3" id="btnDeleteConfig" data-id="@item.ConfigId" data-toggle="tooltip" data-placement="top" title="Delete Schema"></a>
                             }
                         </div>
                     </div>
