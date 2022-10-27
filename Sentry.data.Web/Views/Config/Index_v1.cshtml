@@ -35,7 +35,7 @@
                 @* Only show ACTIVE objects to users.  Administrators can see ACTIVE\PENDING DELETE objects *@
                 @if ((item.ObjectStatus == Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active && !Model.Security.ShowAdminControls) || (Model.Security.ShowAdminControls && item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Deleted))
                 {
-                    <div class="configHeader categoryBanner-@Model.CategoryColor">
+                    <div class="configHeader categoryBanner-blue">
                         @if (item.ObjectStatus != Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Active)
                         {
                             <h2 class="@color pt-3">@item.ConfigFileName<strong> <em>(@Sentry.data.Core.GlobalEnums.ObjectStatusEnum.Pending_Delete.ToString())</em></strong><em class="fas fa-chevron-up tracker-menu-icon fa-sm"></em></h2>
@@ -187,7 +187,7 @@
                             foreach (var ext in item.ExternalDataFlowJobs)
                             {
                                 <div class="retJob">
-                                    <div class="jobHeader categoryBanner-@color">
+                                    <div class="jobHeader categoryBanner-blue">
                                         <h6 class="pt-2">@ext.Name<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
 
                                         @if (Model.DisplayDataflowEdit)
@@ -215,7 +215,7 @@
                                         @foreach (DataFlowStepModel stepModel in ext.Step.Where(w => w.ActionName == "S3 Drop" || w.ActionName == "Producer S3 Drop"))
                                         {
                                             <div class="retJob @stepModel.ActionName">
-                                                <div class="jobHeader categoryBanner-@color">
+                                                <div class="jobHeader categoryBanner-blue">
                                                     <h6 class="pt-1">@stepModel.ActionName<em class="retJobDetails tracker-menu-icon fas fa-chevron-up"></em></h6>
 
                                                 </div>

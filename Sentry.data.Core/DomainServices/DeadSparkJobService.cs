@@ -24,10 +24,18 @@ namespace Sentry.data.Core
             return MapToDtoList(deadSparkJobList);
         }
 
+        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
+        {
+            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
+
+            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
+
+            return deadSparkJobDtoList;
+        }
+
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
         {
             List<string> s3ObjectList = (List<string>)_s3ServiceProvider.ListObjects(deadSparkJob.SourceBucketName, deadSparkJob.TargetKey);
-            string isReprocessingRequired = s3ObjectList.Contains("_SUCCESS") ? "No" : "Yes";
 
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {
@@ -37,7 +45,7 @@ namespace Sentry.data.Core
                 SourceKey = deadSparkJob.SourceKey,
                 FlowExecutionGuid = deadSparkJob.FlowExecutionGuid,
                 RunInstanceGuid = deadSparkJob.RunInstanceGuid,
-                ReprocessingRequired = isReprocessingRequired,
+                ReprocessingRequired = s3ObjectList.Contains("_SUCCESS") ? false : true,
                 SubmissionID = deadSparkJob.SubmissionID,
                 SourceBucketName = deadSparkJob.SourceBucketName,
                 BatchID = deadSparkJob.BatchID,
@@ -49,15 +57,6 @@ namespace Sentry.data.Core
             };
 
             return deadSparkJobDto;
-        }
-
-        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
-        {
-            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
-
-            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
-
-            return deadSparkJobDtoList;
         }
     }
 }

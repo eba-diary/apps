@@ -471,9 +471,10 @@ namespace Sentry.data.Core
 
             if (hr == null)
             {
-                throw new JobNotFoundException("No history of Job\\Batch ID combination");
+                Logger.Info($"{nameof(GetApacheLivyBatchStatusAsync)} - No history record returned.");
+                return (Task<System.Net.Http.HttpResponseMessage>)Task.CompletedTask;
             }
-
+                
             return GetApacheLivyBatchStatusInternalAsync(hr);
         }
 
@@ -511,9 +512,12 @@ namespace Sentry.data.Core
             {
                 if (result == $"Session '{historyRecord.BatchId}' not found.")
                 {
-                    throw new LivyBatchNotFoundException("Session not found");
+                    Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Session not found");
                 }
-                lr = JsonConvert.DeserializeObject<LivyReply>(result);
+                else
+                {
+                    lr = JsonConvert.DeserializeObject<LivyReply>(result);
+                }
             }
 
             if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NotFound)

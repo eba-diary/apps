@@ -266,8 +266,10 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\ElasticContext.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
+    <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
     <Compile Include="Exceptions\InfrastructureEventingException.cs" />
+    <Compile Include="Exceptions\JiraServiceException.cs" />
     <Compile Include="Exceptions\OAuthException.cs" />
     <Compile Include="Exceptions\S3ServiceProviderException.cs" />
     <Compile Include="Exceptions\SecBotProviderException.cs" />
@@ -417,6 +419,7 @@
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevRestClient.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\InevService.cs" />
     <Compile Include="ServiceImplementations\InfrastructureEventing\DatasetPermissionsUpdatedDto.cs" />
+    <Compile Include="ServiceImplementations\JiraService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\DfsEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\Events\DfsEvent.cs" />

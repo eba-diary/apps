@@ -15,7 +15,7 @@ namespace Sentry.data.Core
         public string SourceKey { get; set; }
         public string FlowExecutionGuid { get; set; }
         public string RunInstanceGuid { get; set; }
-        public string ReprocessingRequired { get; set; }
+        public bool ReprocessingRequired { get; set; }
         public int SubmissionID { get; set; }
         public string SourceBucketName { get; set; }
         public int BatchID { get; set; }

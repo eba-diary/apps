@@ -27,6 +27,28 @@ data.Admin = {
         });
     },
 
+    // Reduce and group json fields by the specified key
+    JsonReduce: function (jsonObject, groupKey, itemsKey) {    
+        
+        return jsonObject.reduce(function (returnedObject, iterationVariable) {
+
+            // Checks if the current iteration variable object already exists inside of the returnedObject
+            if (!returnedObject[iterationVariable[groupKey]]) {
+
+                // If it does not, create a new new object inside of the returnedObject
+                returnedObject[iterationVariable[groupKey]] = [];
+            }
+
+            // Push the current interation variable (which will only be the value defined by the items key passed in)
+            // into the correlated location inside of the returnedObject.
+            returnedObject[iterationVariable[groupKey]].push(iterationVariable[itemsKey]);
+
+            // Returns the returnedObject for the next iteration
+            return returnedObject;
+        }, {});
+
+    },
+
     // load and initialize dead job data table
     DeadJobTableInit: function () {
         $('#deadJobs').DataTable({
@@ -199,10 +221,13 @@ data.Admin = {
             dataType: "Json",
             dataSrc: "Records",
             success: function (fileApiResponse) {
-                var fileDropdown = '<option id="defaultFileSelection" selected value="-1">All Files</option>';
+                let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">All Files</option>';
 
-                for (let file of fileApiResponse.Records) {
-                    fileDropdown += '<option value="' + file.DatasetFileId + '">' + file.FileName + '</option>'
+                // groups dataset file id's by shared file names and store them in a JSON object
+                var groupedFiles = data.Admin.JsonReduce(fileApiResponse.Records, "FileName", "DatasetFileId");
+
+                for (let file in groupedFiles) {
+                    fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
                 }
 
                 $("#fileDropdown").html(fileDropdown);
@@ -505,11 +530,8 @@ data.Admin = {
                 files.push(obj);
             });
 
-            // groups file id's by step id's and stores them in a JSON object
-            var returnJson = files.reduce(function (rv, x) {
-                (rv[x["groupId"]] = rv[x["groupId"]] || []).push(x["fileId"]);
-                return rv;
-            }, {});
+            // groups file id's by shared step id's and store them in a JSON object
+            var returnJson = data.Admin.JsonReduce(files, "groupId", "fileId");
 
             var tempArr = [];
 
@@ -677,8 +699,11 @@ data.Admin = {
 
         $("#submitButton").click(function (event) {
             var dto = new Object();
+             
+            dto.DatasetFileIds = $("#fileDropdown").find(":selected").data('datasetids');
 
-            dto.DatasetFileId = $("#fileDropdown").find(":selected").val();
+            if (dto.DatasetFileIds == null || dto.DatasetFileIds == 0) dto.DatasetFileIds = -1;
+
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
             dto.SchemaId = $("#schemaDropdown").find(":selected").val();
 

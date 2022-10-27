@@ -114,7 +114,49 @@ namespace Sentry.data.Web.Controllers
 
             List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
 
-            List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
+            DeadSparkJobModel test1 = new DeadSparkJobModel()
+            {
+                SubmissionTime = DateTime.Now,
+                DatasetName = "test",
+                SchemaName = "test",
+                SourceKey = "test",
+                FlowExecutionGuid = "test",
+                RunInstanceGuid = "test",
+                ReprocessingRequired = true,
+                SubmissionID = 1,
+                SourceBucketName = "test",
+                BatchID = 1,
+                LivyAppID = "test",
+                LivyDriverlogUrl = "test",
+                LivySparkUiUrl = "test",
+                DatasetFileID = 1,
+                DataFlowStepID = 1
+            };
+
+            DeadSparkJobModel test2 = new DeadSparkJobModel()
+            {
+                SubmissionTime = DateTime.Now,
+                DatasetName = "test1",
+                SchemaName = "test1",
+                SourceKey = "test1",
+                FlowExecutionGuid = "test1",
+                RunInstanceGuid = "test1",
+                ReprocessingRequired = false,
+                SubmissionID = 2,
+                SourceBucketName = "test1",
+                BatchID = 2,
+                LivyAppID = "test1",
+                LivyDriverlogUrl = "test1",
+                LivySparkUiUrl = "test1",
+                DatasetFileID = 2,
+                DataFlowStepID = 2
+            };
+
+            List<DeadSparkJobModel> deadSparkJobModelList = new List<DeadSparkJobModel>();
+            deadSparkJobModelList.Add(test1);
+            deadSparkJobModelList.Add(test2);
+
+            /*List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();*/
 
             return PartialView("_DeadJobTable", deadSparkJobModelList);
         }
