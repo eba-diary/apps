@@ -10,6 +10,6 @@ namespace Sentry.data.Core
     {
         public int DatasetId { get; set; }
         public int SchemaId { get; set; }
-        public int DatasetFileId { get; set; }
+        public int[] DatasetFileIds { get; set; }
     }
 }

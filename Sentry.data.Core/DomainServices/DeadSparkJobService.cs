@@ -13,13 +13,22 @@ namespace Sentry.data.Core
         public DeadSparkJobService(IDeadJobProvider deadJobProvider)
         {
             _deadJobProvider = deadJobProvider;
-        }  
+        }   
 
         public List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime timeCreated)
         {
             List<DeadSparkJob> deadSparkJobList = _deadJobProvider.GetDeadSparkJobs(timeCreated);
 
             return MapToDtoList(deadSparkJobList);
+        }
+
+        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
+        {
+            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
+
+            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
+
+            return deadSparkJobDtoList;
         }
 
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
@@ -46,15 +55,6 @@ namespace Sentry.data.Core
             };
 
             return deadSparkJobDto;
-        }
-
-        private List<DeadSparkJobDto> MapToDtoList(List<DeadSparkJob> deadSparkJobList)
-        {
-            List<DeadSparkJobDto> deadSparkJobDtoList = new List<DeadSparkJobDto>();
-
-            deadSparkJobList.ForEach(x => deadSparkJobDtoList.Add(MapToDto(x)));
-
-            return deadSparkJobDtoList;
         }
     }
 }
