@@ -379,12 +379,12 @@ namespace Sentry.data.Core
             try
             {
                 string topicName = null;
-                if (_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
                     DscEventTopicHelper helper = new DscEventTopicHelper();
                     Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
                     topicName = helper.GetDSCTopic(ds);
-                    if (string.IsNullOrEmpty(topicName))
+                    if (string.IsNullOrWhiteSpace(topicName))
                     {
                         throw new ArgumentException("Topic Name is null");
                     }
@@ -401,7 +401,7 @@ namespace Sentry.data.Core
                     DeleteFilesRequestModel model = CreateDeleteFilesRequestModel(datasetId,schemaId,buffer);
 
                     //PUBLISH DSC DELETE EVENT
-                    if (_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
                         _messagePublisher.Publish(topicName, schemaId.ToString(), JsonConvert.SerializeObject(model));
                     }

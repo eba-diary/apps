@@ -892,7 +892,7 @@ namespace Sentry.data.Core
                 Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {hiveDelete.EventType.ToLower()} event...");
 
                 string topicName = null;
-                if (_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
                     topicName = GetDSCEventTopic(config);
                     _messagePublisher.Publish(topicName, config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
@@ -922,7 +922,7 @@ namespace Sentry.data.Core
                 Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {snowDelete.EventType.ToLower()} event...");
 
                 string topicName = null;
-                if (_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
                     topicName = GetDSCEventTopic(config);
                     _messagePublisher.Publish(topicName, config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
@@ -973,7 +973,7 @@ namespace Sentry.data.Core
                     Logger.Debug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
 
                     string topicName = null;
-                    if (_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
                         topicName = GetDSCEventTopic(config);
                         _messagePublisher.Publish(topicName, hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
@@ -1005,7 +1005,7 @@ namespace Sentry.data.Core
                     Logger.Debug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
 
                     string topicName = null;
-                    if (_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
                         topicName = GetDSCEventTopic(config);
                         _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));

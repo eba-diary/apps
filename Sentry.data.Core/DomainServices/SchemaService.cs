@@ -340,7 +340,7 @@ namespace Sentry.data.Core
                 {
                     Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
                     string topicName = null;
-                    if (_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
                         topicName = GetDSCEventTopic(dsId);
                         _messagePublisher.Publish(topicName, schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
@@ -372,7 +372,7 @@ namespace Sentry.data.Core
                 {
                     Logger.Info($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
                     string topicName = null;
-                    if (_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue() == "All")
+                    if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
                         topicName = GetDSCEventTopic(dsId);
                         _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
