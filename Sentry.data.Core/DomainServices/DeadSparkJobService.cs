@@ -45,7 +45,7 @@ namespace Sentry.data.Core
                 SourceKey = deadSparkJob.SourceKey,
                 FlowExecutionGuid = deadSparkJob.FlowExecutionGuid,
                 RunInstanceGuid = deadSparkJob.RunInstanceGuid,
-                ReprocessingRequired = s3ObjectList.Contains("_SUCCESS") ? false : true,
+                ReprocessingRequired = s3ObjectList.Contains("_SUCCESS"),
                 SubmissionID = deadSparkJob.SubmissionID,
                 SourceBucketName = deadSparkJob.SourceBucketName,
                 BatchID = deadSparkJob.BatchID,
