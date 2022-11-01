@@ -26,7 +26,7 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
         private readonly IEmailService _emailService;
-        private readonly ConnectorService _connectorService;
+        private readonly IKafkaConnectorService _connectorService;
 
         public DataFlowService(
                 IDatasetContext datasetContext, 
@@ -37,7 +37,7 @@ namespace Sentry.data.Core
                 IDataFeatures dataFeatures, 
                 IBackgroundJobClient backgroundJobClient,
                 IEmailService emailService,
-                ConnectorService connectorService)
+                IKafkaConnectorService connectorService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -797,8 +797,8 @@ namespace Sentry.data.Core
 
             ConnectorCreateRequestDto request = new ConnectorCreateRequestDto()
             {
-                name = df.S3ConnectorName,
-                config = config
+                Name = df.S3ConnectorName,
+                Config = config
             };
 
             return request;

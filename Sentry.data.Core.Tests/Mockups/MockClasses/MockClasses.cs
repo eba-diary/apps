@@ -1092,8 +1092,8 @@ namespace Sentry.data.Core.Tests
 
             ConnectorCreateRequestDto request = new ConnectorCreateRequestDto()
             {
-                name = "S3_Gojira_001",
-                config = config
+                Name = "S3_Gojira_001",
+                Config = config
             };
 
             return request;

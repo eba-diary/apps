@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
@@ -9,9 +10,11 @@ namespace Sentry.data.Core
 {
     public class ConnectorCreateRequestDto
     {
-        public string name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
-        public ConnectorCreateRequestConfigDto config { get; set; }
+        [JsonProperty("config")]
+        public ConnectorCreateRequestConfigDto Config { get; set; }
 
     }
 }
