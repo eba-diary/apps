@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.Common.Logging;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Infrastructure
 {
@@ -236,16 +237,9 @@ namespace Sentry.data.Infrastructure
             smtpClient.Send(myMail);
         }
 
-        //SEND S3 CONNECTOR SINK EMAIL TO DSCSUPPORT TO submit a request to the apache platform admins for the creation of the S3 Connector based on the Topic Name
-        public void SendS3SinkConnectorRequestEmail(DataFlow df)
+        //SEND S3 CONNECTOR SINK EMAIL TO DSCSUPPORT TO INDICATE S3 SINK CONNECTOR RESULT
+        public void SendS3SinkConnectorRequestEmail(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto)
         {
-            //ONLY SEND EMAIL IF FEATURE FLAG IS ON
-            if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
-            {
-                Logger.Info($"Method <SendS3SinkConnectorRequestEmail> Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
-                return;
-            }
-
             //GET EMAIL INFO FROM CONFIG FILE AND VERIFY IT EXISTS
             string toString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.S3SINKEMAILTO);
             string fromString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.DATASETEMAIL);
@@ -258,9 +252,9 @@ namespace Sentry.data.Infrastructure
             MailAddress mailAddress = new MailAddress(fromString);
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = mailAddress;
-            myMail.Subject = "S3 SINK CONNECTOR CREATE REMINDER"; 
+            myMail.Subject = $"S3 SINK CONNECTOR CREATE {responseDto.SuccessStatusCodeDescription}"; 
             myMail.IsBodyHtml = true;
-            myMail.Body = GetS3SinkConnectorEmailBody(df);
+            myMail.Body = GetS3SinkConnectorEmailBody(df, requestDto, responseDto);
 
             foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
             {
@@ -274,12 +268,49 @@ namespace Sentry.data.Infrastructure
         }
 
         //GET BODY OF S3 SINK EMAIL
-        private string GetS3SinkConnectorEmailBody(DataFlow df)
+        private string GetS3SinkConnectorEmailBody(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto)
         {
             StringBuilder builder = new StringBuilder();
 
+            /***********************************************************************************************************************************
+            S3 SINK CONNECTOR REQUEST RESPONSE
+            ***********************************************************************************************************************************/
             //TABLE HEADER
-            builder.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>S3 SINK CONNECTOR CREATE REMINDER DETAILS:</b></td></table></p>");
+            builder.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>S3SinkConnector Response from API:</b></td></table></p>");
+
+            //TABLE THAT HOLDS DETAIL
+            builder.Append(@"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %""  style=""background-color: aliceblue; "" > ");
+            //DETAIL
+            builder.Append(GetS3SinkConnectorEmailSingleRow("Success Status", responseDto.SuccessStatusCodeDescription));
+            builder.Append(GetS3SinkConnectorEmailSingleRow("Status Code", responseDto.StatusCode));
+            builder.Append(GetS3SinkConnectorEmailSingleRow("Reason Phrase", responseDto.ReasonPhrase));
+            builder.Append(@"</table>");
+
+
+
+
+            /***********************************************************************************************************************************
+             S3 SINK CONNECTOR REQUEST
+            ***********************************************************************************************************************************/
+            //TABLE HEADER
+            builder.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>S3SinkConnector Request to API:</b></td></table></p>");
+
+            //TABLE THAT HOLDS DETAIL
+            builder.Append(@"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %""  style=""background-color: aliceblue; "" > ");
+            
+            //DETAIL
+            builder.Append(@" <tr>");
+            builder.Append(@"<td>" + JsonConvert.SerializeObject(requestDto) + @" </td>");
+            builder.Append(@" </tr>");
+            builder.Append(@"</table>");
+
+
+
+            /***********************************************************************************************************************************
+             DATAFLOW INFO
+            ***********************************************************************************************************************************/
+            //TABLE HEADER
+            builder.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>DATAFLOW DETAILS:</b></td></table></p>");
 
             //TABLE THAT HOLDS ROWS
             builder.Append(@"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %""  style=""background-color: aliceblue; "" > ");
@@ -298,6 +329,7 @@ namespace Sentry.data.Infrastructure
             builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.DatasetId), df.DatasetId.ToString()));
             builder.Append(GetS3SinkConnectorEmailSingleRow(nameof(df.SchemaId), df.SchemaId.ToString()));
             builder.Append(@"</table>");
+
 
             return builder.ToString();
         }

@@ -1,4 +1,6 @@
 ﻿using Hangfire;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.DTO.Security;
@@ -24,11 +26,18 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
         private readonly IEmailService _emailService;
+        private readonly IKafkaConnectorService _connectorService;
 
-        public DataFlowService(IDatasetContext datasetContext, 
-            IUserService userService, IJobService jobService,
-            ISecurityService securityService, IQuartermasterService quartermasterService, 
-            IDataFeatures dataFeatures, IBackgroundJobClient backgroundJobClient,IEmailService emailService)
+        public DataFlowService(
+                IDatasetContext datasetContext, 
+                IUserService userService, 
+                IJobService jobService,
+                ISecurityService securityService, 
+                IQuartermasterService quartermasterService, 
+                IDataFeatures dataFeatures, 
+                IBackgroundJobClient backgroundJobClient,
+                IEmailService emailService,
+                IKafkaConnectorService connectorService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -38,6 +47,7 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
             _hangfireBackgroundJobClient = backgroundJobClient;
             _emailService = emailService;
+            _connectorService = connectorService;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -344,7 +354,7 @@ namespace Sentry.data.Core
                 }
 
                 
-                SendS3SinkConnectorRequestEmail(df);
+                CreateS3SinkConnector(df);
 
                 return df.Id;
             }
@@ -389,7 +399,7 @@ namespace Sentry.data.Core
                 DataFlow newDataFlow = CreateDataFlow(dfDto);
                 _datasetContext.SaveChanges();
 
-                SendS3SinkConnectorRequestEmail(newDataFlow);
+                CreateS3SinkConnector(newDataFlow);
 
                 return newDataFlow.Id;
             }
@@ -725,12 +735,73 @@ namespace Sentry.data.Core
 
         #region Private Methods        
         
-        private void SendS3SinkConnectorRequestEmail(DataFlow df)
+        private void CreateS3SinkConnector(DataFlow df)
         {
+            //ONLY SEND EMAIL IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
+            if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
+            {
+                Logger.Info($"Method <SendS3SinkConnectorRequestEmail> Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
+                return;
+            }
+
             if (df.IngestionType == (int)IngestionType.Topic)
             {
-                _emailService.SendS3SinkConnectorRequestEmail(df);
+                ConnectorCreateRequestDto requestDto = CreateConnectorRequestDto(df);
+
+                //NOTE: CreateS3SinkConnectorAsync is Async but we are CHOOSING to call CALL SYNCRONOUSLY WITHOUT AWAIT which releases caller BECAUSE CreateS3SinkConnectorAsync Actually returns immediately 
+                Task<ConnectorCreateResponseDto> task = _connectorService.CreateS3SinkConnectorAsync(requestDto);       
+                ConnectorCreateResponseDto responseDto = task.Result;                                                   //USE Task.Result to essentially Syncronously wait for Result of task, here we need to know if call to S3Sink was successful or not
+                _emailService.SendS3SinkConnectorRequestEmail(df, requestDto,responseDto);                              //Send email with success or failure
             }
+        }
+
+        private ConnectorCreateRequestDto CreateConnectorRequestDto(DataFlow df)
+        {
+            DataFlowStep step = df.Steps.FirstOrDefault(w => w.DataAction_Type_Id == DataActionType.ProducerS3Drop);
+
+            ConnectorCreateRequestConfigDto config = new ConnectorCreateRequestConfigDto()
+            {
+                ConnectorClass = "io.confluent.connect.s3.S3SinkConnector",
+                S3Region = "us-east-2",
+                TopicsDir = "topics_2",
+                FlushSize = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.CONFLUENT_CONNECTOR_FLUSH_SIZE),
+                TasksMax = "1",
+                Timezone = "UTC",
+                Transforms = "InsertMetadata",
+                Locale = "en-US",
+                S3PathStyleAccessEnabled = "false",
+                FormatClass = "io.confluent.connect.s3.format.json.JsonFormat",
+                S3AclCanned = "bucket-owner-full-control",
+                TransformsInsertMetadataPartitionField = "kafka_partition",
+                ValueConverter = "org.apache.kafka.connect.json.JsonConverter",
+                S3ProxyPassword = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.CONFLUENT_CONNECTOR_PASSWORD),
+                KeyConverter = "org.apache.kafka.connect.converters.ByteArrayConverter",
+                S3BucketName = (step != null && step.TriggerBucket != null)? step.TriggerBucket : String.Empty,  //"sentry-dlst-qual-droplocation-ae2",
+                PartitionDurationMs = "86400000",
+                S3ProxyUser = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.CONFLUENT_CONNECTOR_USERNAME), //"SV_DATA_S3CON_I_Q_V1",
+                S3SseaName = "AES256",
+                TransformsInsertMetadataOffsetField = "kafka_offset",
+                FileDelim = "_",
+                Topics = df.TopicName,  //"topics": "CKMT-QUAL-INTENTIONALLOGMARKERS-01",
+                PartitionerClass = "io.confluent.connect.storage.partitioner.TimeBasedPartitioner",
+                ValueConverterSchemasEnable = "false",
+                TransformsInsertMetadataTimestampField = "kafka_timestamp",
+                Name = df.S3ConnectorName,   //"name": "S3_CKMT_QUAL_INTENTIONALLOGMARKERS_01_001",
+                StorageClass = "io.confluent.connect.s3.storage.S3Storage",
+                RotateScheduleIntervalMs = "86400000",
+                PathFormat = "YYYY/MM/dd",
+                TimestampExtractor = "Record",
+                TransformsInsertMetadataType = "org.apache.kafka.connect.transforms.InsertField$Value",
+                S3ProxyUrl = "https://app-proxy-nonprod.sentry.com:8080"
+            };
+
+            ConnectorCreateRequestDto request = new ConnectorCreateRequestDto()
+            {
+                Name = df.S3ConnectorName,
+                Config = config
+            };
+
+            return request;
         }
 
         private DataFlow CreateDataFlow(DataFlowDto dto)
