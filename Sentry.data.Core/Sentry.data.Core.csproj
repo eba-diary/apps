@@ -182,6 +182,9 @@
     <Compile Include="DTO\DataInventory\DataInventoryUpdateDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorCreateRequestConfigDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorCreateResponseDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorCreateRequestDto.cs" />
     <Compile Include="DTO\DataProcessing\ConnectorDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
