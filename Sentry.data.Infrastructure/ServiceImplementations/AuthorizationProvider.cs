@@ -64,7 +64,7 @@ namespace Sentry.data.Infrastructure
                     DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
                     if (isRefreshToken)
                     {
-                        SaveOAuthToken(source, accessToken, newTokenExp, token, responseAsJson.Value<string>("refresh_token"));
+                        SaveOAuthToken(source, accessToken, newTokenExp, token, responseAsJson.Value<string>("refresh_token"), responseAsJson.Value<string>("scope"));
                     }
                     else
                     {
@@ -188,12 +188,19 @@ namespace Sentry.data.Infrastructure
             return output;
         }
 
-        private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token, string newRefreshToken)
+        private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token, string newRefreshToken, string newScope)
         {
             //test if this is even needed, or will saving source as is will update
             SaveOAuthToken(source, newToken, tokenExpTime, token);
 
             token.RefreshToken = _encryptionService.EncryptString(newRefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
+            
+            if(newScope.Length > 500)
+            {
+                newScope.Substring(0, 500);
+            }
+
+            token.Scope = newScope;
 
             _datasetContext.SaveChanges();
         }

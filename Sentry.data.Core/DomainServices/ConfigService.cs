@@ -1112,11 +1112,23 @@ namespace Sentry.data.Core
             if (dsrc.Is<HTTPSSource>())
             {
                 ((HTTPSSource)dsrc).ClientId = dto.ClientId;
-                ((HTTPSSource)dsrc).Tokens = dto.Tokens;
                 ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
                 ((HTTPSSource)dsrc).RequestHeaders = (dto.RequestHeaders.Any()) ? dto.RequestHeaders : null;
+                if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
+                {
+                    ((HTTPSSource)dsrc).ClientId = dto.ClientId;
+                    ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey).Item1;
+                    ((HTTPSSource)dsrc).Tokens = dto.Tokens;
+                    foreach (var token in ((HTTPSSource)dsrc).Tokens)
+                    {
+                        token.ParentDataSource = ((HTTPSSource)dsrc);
+                        token.CurrentToken = _encryptService.EncryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey).Item1;
+                        token.RefreshToken = _encryptService.EncryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey).Item1;
+                    }
+                    ((HTTPSSource)dsrc).GrantType = dto.GrantType;
+                }
 
-                UpdateClaims((HTTPSSource)dsrc, dto);
+                //UpdateClaims((HTTPSSource)dsrc, dto);
             }
 
             // only update if new value is supplied

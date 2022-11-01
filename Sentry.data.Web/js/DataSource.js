@@ -20,6 +20,14 @@
 
     },
 
+    UpdateShowAddTokenButton: function () {
+
+    },
+
+    GetTokenFormCount: function() {
+        return $("#TokenContainer .card").length
+    },
+
     PopulateDataSources: function (in_val) {
         //var val = $('#SelectedSourceType :selected').val();
         $.ajax({
