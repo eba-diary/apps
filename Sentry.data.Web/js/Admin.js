@@ -208,6 +208,15 @@ data.Admin = {
                 $("#defaultSchemaSelection").prop("disabled", true);
                 $("#schemaDropdown").materialSelect();
             },
+            error: function (msg) {
+                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
+
+                $("#schemaDropdown").html(scheamDropdown);
+
+                $("#defaultSchemaSelection").prop("disabled", true);
+                $("#schemaDropdown").materialSelect();
+                data.Admin.DatasetDropdownScrollToTop();
+            },
             complete: function () {
                 data.Admin.DatasetDropdownScrollToTop();
             }
@@ -671,7 +680,7 @@ data.Admin = {
 
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
-                data.Admin.GetSchemaDropdown(url);
+                data.Admin.GetSchemaDropdown(url, true);
             }
 
             data.Admin.ActivateDeactivateSubmitButton();
