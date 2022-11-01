@@ -37,6 +37,8 @@ namespace Sentry.data.Core
         {
             List<string> s3ObjectList = (List<string>)_s3ServiceProvider.ListObjects(deadSparkJob.SourceBucketName, deadSparkJob.TargetKey);
 
+            bool reprocessingRequired = s3ObjectList.Contains("_SUCCESS") ? false : true;
+
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {
                 SubmissionTime = deadSparkJob.SubmissionCreated,
@@ -45,7 +47,7 @@ namespace Sentry.data.Core
                 SourceKey = deadSparkJob.SourceKey,
                 FlowExecutionGuid = deadSparkJob.FlowExecutionGuid,
                 RunInstanceGuid = deadSparkJob.RunInstanceGuid,
-                ReprocessingRequired = s3ObjectList.Contains("_SUCCESS"),
+                ReprocessingRequired = reprocessingRequired,
                 SubmissionID = deadSparkJob.SubmissionID,
                 SourceBucketName = deadSparkJob.SourceBucketName,
                 BatchID = deadSparkJob.BatchID,
