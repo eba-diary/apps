@@ -30,13 +30,16 @@ namespace Sentry.data.Core
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
         private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly Helpers.DscEventTopicHelper _dscEventTopicHelper;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
+            IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient,
+            Helpers.DscEventTopicHelper dscEventTopicHelper)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -50,6 +53,7 @@ namespace Sentry.data.Core
             _eventService = eventService;
             _elasticContext = elasticContext;
             _backgroundJobClient = backgroundJobClient;
+            _dscEventTopicHelper = dscEventTopicHelper;
         }
 
         private string RootBucket
@@ -230,9 +234,8 @@ namespace Sentry.data.Core
         private string GetDSCEventTopic(int datasetId)
         {
             string topicName;
-            Helpers.DscEventTopicHelper helper = new Helpers.DscEventTopicHelper();
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-            topicName = helper.GetDSCTopic(ds);
+            topicName = _dscEventTopicHelper.GetDSCTopic(ds);
             if (string.IsNullOrEmpty(topicName))
             {
                 throw new ArgumentException("Topic Name is null");

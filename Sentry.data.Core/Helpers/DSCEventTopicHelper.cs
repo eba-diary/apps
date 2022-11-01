@@ -45,7 +45,7 @@ namespace Sentry.data.Core.Helpers
             return topicName;
         }
 
-        private string GetDSCNamedEnvironment()
+        internal virtual string GetDSCNamedEnvironment()
         {
             return Config.GetDefaultEnvironmentName().ToUpper();
         }

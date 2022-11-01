@@ -11,6 +11,8 @@ namespace Sentry.data.Core.Tests.HelperTests
         public void GetDSCTopic_Internal()
         {
             //Arrange
+            
+
             Mock<DscEventTopicHelper> helper = new Mock<DscEventTopicHelper>();
             helper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("ConfigString");
 
