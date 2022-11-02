@@ -65,7 +65,8 @@ namespace Sentry.data.Web
 
                 foreach (RetrieverJob rj in dfc.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()))
                 {
-                    locations.Add(rj.GetUri().LocalPath);
+                    //directly calling CalcRelativeUri instead of going through JobService.GetDataSourceUri(), env type and feature flag not needed for DfsBasic
+                    locations.Add(rj.DataSource.CalcRelativeUri(rj, Core.GlobalEnums.NamedEnvironmentType.Prod, "").LocalPath);
                 }
             }
 

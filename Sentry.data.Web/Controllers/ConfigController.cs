@@ -398,7 +398,7 @@ namespace Sentry.data.Web.Controllers
                         ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
                     };
 
-                    rj.DataSource.CalcRelativeUri(rj);
+                    rj.DataSource.CalcRelativeUri(rj, dfc.ParentDataset.NamedEnvironmentType, _featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue());
 
                     jobList.Add(rj);
                     dfc.RetrieverJobs = jobList;
@@ -511,7 +511,7 @@ namespace Sentry.data.Web.Controllers
                     rj.DatasetConfig = dfc;
                     rj.Modified = DateTime.Now;
 
-                    rj.DataSource.CalcRelativeUri(rj);
+                    rj.DataSource.CalcRelativeUri(rj, dfc.ParentDataset.NamedEnvironmentType, _featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue());
 
                     _datasetContext.SaveChanges();
 

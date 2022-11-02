@@ -6,8 +6,10 @@ using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -200,9 +202,9 @@ namespace Sentry.data.Core
 
             try
             {
-                if ((job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>())  && !System.IO.Directory.Exists(job.GetUri().LocalPath))
+                if ((job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>())  && !Directory.Exists(GetDataSourceUri(job).LocalPath))
                 {
-                    System.IO.Directory.CreateDirectory(job.GetUri().LocalPath);
+                    Directory.CreateDirectory(GetDataSourceUri(job).LocalPath);
                 }
             }
             catch (Exception e)
@@ -212,7 +214,7 @@ namespace Sentry.data.Core
                 errmsg.AppendLine("Failed to Create Drop Location:");
                 errmsg.AppendLine($"DatasetId: {job.DatasetConfig.ParentDataset.DatasetId}");
                 errmsg.AppendLine($"DatasetName: {job.DatasetConfig.ParentDataset.DatasetName}");
-                errmsg.AppendLine($"DropLocation: {job.GetUri().LocalPath}");
+                errmsg.AppendLine($"DropLocation: {GetDataSourceUri(job).LocalPath}");
 
                 Logger.Error(errmsg.ToString(), e);
             }
@@ -397,6 +399,63 @@ namespace Sentry.data.Core
             }
         }
 
+        public Uri GetDataSourceUri(RetrieverJob job)
+        {
+            NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == job.DataFlow.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
+            return job.DataSource.CalcRelativeUri(job, datasetEnvironmentType, _dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue());
+        }
+
+        public string GetTargetPath(RetrieverJob basicJob, RetrieverJob executingJob)
+        {
+            string basepath;
+            if (basicJob.DataSource.Is<DfsBasic>())
+            {
+                basepath = GetDataSourceUri(basicJob).LocalPath + '\\';
+            }
+            else if (basicJob.DataSource.Is<S3Basic>())
+            {
+                basepath = basicJob.DataSource.GetDropPrefix(basicJob);
+            }
+            else
+            {
+                throw new NotImplementedException("Not Configured to determine target path for data source type");
+            }
+
+            string executingTargetFileName = executingJob.GetTargetFileName(Path.GetFileName(GetDataSourceUri(executingJob).ToString()));
+
+            string targetPath;
+            if (executingJob.DataSource.Is<HTTPSSource>())
+            {
+                targetPath = $"{basepath}{executingTargetFileName}";
+            }
+            else
+            {
+                targetPath = Path.Combine(basepath, executingTargetFileName);
+            }
+
+            return targetPath;
+        }
+
+        public string GetTargetPath(DataFlowStep s3DropStep, RetrieverJob executingJob)
+        {
+            string targetPath;
+
+            if (s3DropStep.DataAction_Type_Id != DataActionType.S3Drop && s3DropStep.DataAction_Type_Id != DataActionType.ProducerS3Drop)
+            {
+                throw new NotImplementedException("Only Configured to determine target path for S3DropSteps");
+            }
+
+            if (executingJob.DataSource.Is<HTTPSSource>())
+            {
+                targetPath = $"{s3DropStep.TriggerKey}{executingJob.GetTargetFileName(Path.GetFileName(GetDataSourceUri(executingJob).ToString()))}";
+            }
+            else
+            {
+                throw new NotImplementedException("retrieverjobextensions-gettargetpath - Only configured to get file name from https sources");
+            }
+
+            return targetPath;
+        }
 
         public List<RetrieverJob> GetDfsRetrieverJobs()
         {
@@ -926,7 +985,7 @@ namespace Sentry.data.Core
             //For DFS type jobs, remove drop folder from network location
             if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>())
             {
-                string dfsPath = job.GetUri().LocalPath;
+                string dfsPath = GetDataSourceUri(job).LocalPath;
 
                 if (System.IO.Directory.Exists(dfsPath))
                 {
