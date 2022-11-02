@@ -37,7 +37,14 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            _schemaService.CreateAndSaveSchemaRevision(schemaId, fieldDtos, $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}");
+            _schemaService.ValidateCleanedFields(schemaId, fieldDtos);
+
+            int revisionId = _schemaService.CreateAndSaveSchemaRevision(schemaId, fieldDtos, $"GoogleBigQuery_{DateTime.Today:yyyyMMdd}");
+            if (revisionId == 0)
+            {
+                throw new GoogleBigQuerySchemaException("Google BigQuery service failed to create and save schema revision");
+            }
+
             Logger.Info($"Google Big Query schema has been updated - SchemaId: {schemaId}");
         }
 
@@ -52,8 +59,8 @@ namespace Sentry.data.Infrastructure
                 JToken bigQueryField = bigQueryFields[i];
                 if (i + 1 < bigQueryFields.Count && FieldsAreKeyValuePair(bigQueryField, bigQueryFields[i + 1]))
                 {
-                    fieldDtos.Add(CreateField<VarcharFieldDto>(bigQueryField, index));
-                    fieldDtos.Add(CreateField<VarcharFieldDto>(bigQueryFields[i + 1], ++index));
+                    fieldDtos.Add(CreateVarcharField(bigQueryField, index));
+                    fieldDtos.Add(CreateVarcharField(bigQueryFields[i + 1], ++index));
                     i++; //skip next field
                 }
                 else
@@ -92,7 +99,7 @@ namespace Sentry.data.Infrastructure
                 case "STRUCT":
                     return CreateStructField(bigQueryField, ref index);
                 default:
-                    return CreateField<VarcharFieldDto>(bigQueryField, index);
+                    return CreateVarcharField(bigQueryField, index);
             }
         }
 
@@ -102,6 +109,14 @@ namespace Sentry.data.Infrastructure
             fieldDto.Name = bigQueryField.Value<string>("name");
             fieldDto.IsArray = bigQueryField.Value<string>("mode") == "REPEATED";
             fieldDto.OrdinalPosition = index;
+
+            return fieldDto;
+        }
+
+        private VarcharFieldDto CreateVarcharField(JToken bigQueryField, int index)
+        {
+            VarcharFieldDto fieldDto = CreateField<VarcharFieldDto>(bigQueryField, index);
+            fieldDto.Length = GlobalConstants.Datatypes.Defaults.VARCHAR_LENGTH_DEFAULT;
 
             return fieldDto;
         }

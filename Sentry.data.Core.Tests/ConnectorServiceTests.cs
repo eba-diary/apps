@@ -2,6 +2,7 @@
 using Moq;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace Sentry.data.Core.Tests
 {
@@ -25,6 +26,78 @@ namespace Sentry.data.Core.Tests
 
             //Assert
             Assert.AreEqual(false, configJObj.ContainsKey("s3.proxy.password"));
+        }
+
+        [TestMethod]
+        public async Task CreateS3ConnectorSuccess()
+        {
+            //Arrange
+            Mock<IKafkaConnectorProvider> mockProvider = new Mock<IKafkaConnectorProvider>();
+            
+            HttpResponseMessage httpResponse = new HttpResponseMessage() 
+            { 
+                StatusCode = System.Net.HttpStatusCode.Created,
+                ReasonPhrase = "Created",
+            };
+            mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
+            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+
+            ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
+
+            //Act
+            ConnectorCreateResponseDto responseDto= await mockService.CreateS3SinkConnectorAsync(requestDto);
+
+            //Assert
+            Assert.AreEqual(true, responseDto.SuccessStatusCode);
+        }
+
+        [TestMethod]
+        public async Task CreateS3ConnectorFailure()
+        {
+            //Arrange
+            Mock<IKafkaConnectorProvider> mockProvider = new Mock<IKafkaConnectorProvider>();
+
+            HttpResponseMessage httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = System.Net.HttpStatusCode.NotFound,
+                ReasonPhrase = "Not Found",
+            };
+            mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
+            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+
+            ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
+
+            //Act
+            ConnectorCreateResponseDto responseDto = await mockService.CreateS3SinkConnectorAsync(requestDto);
+
+            //Assert
+            Assert.AreEqual(false, responseDto.SuccessStatusCode);
+        }
+
+        [TestMethod]
+        public async Task CreateS3ConnectorUnknownStatusStillFails()
+        {
+            //Arrange
+            Mock<IKafkaConnectorProvider> mockProvider = new Mock<IKafkaConnectorProvider>();
+
+            HttpResponseMessage httpResponse = new HttpResponseMessage()
+            {
+                StatusCode = System.Net.HttpStatusCode.BadGateway,
+                ReasonPhrase = "Not Found",
+            };
+            mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
+            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+
+            ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
+
+            //Act
+            ConnectorCreateResponseDto responseDto = await mockService.CreateS3SinkConnectorAsync(requestDto);
+
+            //Assert
+            Assert.AreEqual(false, responseDto.SuccessStatusCode);
         }
     }
 }

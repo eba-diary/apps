@@ -30,13 +30,16 @@ namespace Sentry.data.Core
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
         private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly Helpers.DscEventTopicHelper _dscEventTopicHelper;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient)
+            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
+            IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient,
+            Helpers.DscEventTopicHelper dscEventTopicHelper)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -50,6 +53,7 @@ namespace Sentry.data.Core
             _eventService = eventService;
             _elasticContext = elasticContext;
             _backgroundJobClient = backgroundJobClient;
+            _dscEventTopicHelper = dscEventTopicHelper;
         }
 
         private string RootBucket
@@ -227,6 +231,17 @@ namespace Sentry.data.Core
             return true;
         }
 
+        private string GetDSCEventTopic(int datasetId)
+        {
+            string topicName;
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            topicName = _dscEventTopicHelper.GetDSCTopic(ds);
+            if (string.IsNullOrEmpty(topicName))
+            {
+                throw new ArgumentException("Topic Name is null");
+            }
+            return topicName;
+        }
         public int GetFileExtensionIdByName(string extensionName)
         {
             FileExtension extension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Name == extensionName);
@@ -327,8 +342,16 @@ namespace Sentry.data.Core
                 try
                 {
                     Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
-
-                    _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+                    string topicName = null;
+                    if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                    {
+                        topicName = GetDSCEventTopic(dsId);
+                        _messagePublisher.Publish(topicName, schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate), topicName);
+                    }
 
                     Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
                 }
@@ -350,9 +373,18 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
-                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                    Logger.Info($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    string topicName = null;
+                    if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                    {
+                        topicName = GetDSCEventTopic(dsId);
+                        _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                    }
+                    Logger.Info($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {

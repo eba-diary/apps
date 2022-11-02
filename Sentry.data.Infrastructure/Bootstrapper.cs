@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.Caching;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -172,6 +173,22 @@ namespace Sentry.data.Infrastructure
             registry.For<Sentry.data.Core.Interfaces.QuartermasterRestClient.IClient>().Singleton().Use<QuartermasterRestClient.Client>().
                 Ctor<HttpClient>().Is(qClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("QuartermasterServiceBaseUrl"));
+
+            var jClient = new HttpClient(new HttpClientHandler()
+            {
+                Credentials = new NetworkCredential(
+                    Configuration.Config.GetHostSetting("ServiceAccountID"),
+                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+            });
+            jClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+
+            var authenticationString = $"{Configuration.Config.GetHostSetting("ServiceAccountID")}:{Configuration.Config.GetHostSetting("ServiceAccountPassword")}";
+            var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+            jClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+
+            registry.For<IJiraService>().Singleton().Use<JiraService>().
+                Ctor<HttpClient>().Is(jClient);
 
             //register Inev client
             var inevClient = new HttpClient(new HttpClientHandler()

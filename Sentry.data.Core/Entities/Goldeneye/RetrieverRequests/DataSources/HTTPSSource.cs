@@ -120,11 +120,16 @@ namespace Sentry.data.Core
 
         public override void Validate(RetrieverJob job, ValidationResults validationResults)
         {
-            if (String.IsNullOrWhiteSpace(job.JobOptions.TargetFileName))
+            if (string.IsNullOrWhiteSpace(job.JobOptions.TargetFileName))
             {
                 validationResults.Add(ValidationErrors.httpsTargetFileNameIsBlank, "Target file name is required for HTTPS data sources");
             }
-            if (String.IsNullOrWhiteSpace(job.RelativeUri))
+            else if (job.JobOptions.TargetFileName.Contains(" "))
+            {
+                validationResults.Add(ValidationErrors.httpsTargetFileNameContainsSpace, "Target file name cannot contain spaces");
+            }
+
+            if (string.IsNullOrWhiteSpace(job.RelativeUri))
             {
                 validationResults.Add(ValidationErrors.relativeUriNotSpecified, "Relative Uri is required for HTTPS data sources");
             }

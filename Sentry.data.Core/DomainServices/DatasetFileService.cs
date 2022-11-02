@@ -11,6 +11,7 @@ using Sentry.data.Core.Interfaces;
 using Hangfire;
 using System.IO;
 using System.Text;
+using Sentry.data.Core.Helpers;
 
 namespace Sentry.data.Core
 {
@@ -24,8 +25,11 @@ namespace Sentry.data.Core
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IEventService _eventService;
         private readonly IJobScheduler _jobScheduler;
+        private readonly IDataFeatures _dataFeatures;
 
-        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IEventService eventService, IJobScheduler jobScheduler)
+        public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, 
+            IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
+            IEventService eventService, IJobScheduler jobScheduler, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -34,6 +38,7 @@ namespace Sentry.data.Core
             _s3ServiceProvider = s3ServiceProvider;
             _eventService = eventService;
             _jobScheduler = jobScheduler;
+            _dataFeatures = dataFeatures;
         }
 
         /// <summary>
@@ -373,6 +378,18 @@ namespace Sentry.data.Core
 
             try
             {
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    DscEventTopicHelper helper = new DscEventTopicHelper();
+                    Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+                    topicName = helper.GetDSCTopic(ds);
+                    if (string.IsNullOrWhiteSpace(topicName))
+                    {
+                        throw new ArgumentException("Topic Name is null");
+                    }
+                }
+
                 //CHUNK INTO 10 id's PER MESSAGE
                 int[] buffer;
                 for (int i = 0; i < idList.Length; i += 10)
@@ -384,7 +401,14 @@ namespace Sentry.data.Core
                     DeleteFilesRequestModel model = CreateDeleteFilesRequestModel(datasetId,schemaId,buffer);
 
                     //PUBLISH DSC DELETE EVENT
-                    _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model));
+                    if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                    {
+                        _messagePublisher.Publish(topicName, schemaId.ToString(), JsonConvert.SerializeObject(model));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(schemaId.ToString(), JsonConvert.SerializeObject(model), topicName);
+                    }
                 }
 
                 //PREP FOR EVENT

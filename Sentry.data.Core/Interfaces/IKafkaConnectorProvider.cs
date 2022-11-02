@@ -28,5 +28,6 @@ namespace Sentry.data.Core
         /// <param name="connectorName">Name of Connector to retrieve</param>
         /// <returns>Connector config JSON object</returns>
         Task<JObject> GetS3ConnectorConfigAsync(string connectorName);
+        Task<HttpResponseMessage> CreateS3SinkConnectorAsync(string requestJSON);
     }
 }

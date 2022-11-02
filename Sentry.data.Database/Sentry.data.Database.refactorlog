@@ -1050,6 +1050,13 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ClusterUrl" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="674e2fd1-0871-4a7f-9a9e-84a879ad611b" ChangeDateTime="09/27/2022 14:39:59">
+    <Property Name="ElementName" Value="[dbo].[SupportLink].[SupportLink_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SupportLink]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SupportLinkId" />
+  </Operation>
   <Operation Name="Rename Refactor" Key="f38f0388-8ba7-47ee-8fcf-ada2935e3f30" ChangeDateTime="10/20/2022 18:17:33">
     <Property Name="ElementName" Value="[dbo].[DataSourceTokens].[DataSourceTokenId]" />
     <Property Name="ElementType" Value="SqlSimpleColumn" />

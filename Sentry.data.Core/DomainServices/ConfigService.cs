@@ -4,6 +4,7 @@ using Sentry.Configuration;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -857,6 +858,18 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+        private string GetDSCEventTopic(DatasetFileConfig config)
+        {
+            string topicName = null;
+            DscEventTopicHelper helper = new DscEventTopicHelper();
+            topicName = helper.GetDSCTopic(config);
+            if (string.IsNullOrEmpty(topicName))
+            {
+                throw new ArgumentException("Topic Name is null");
+            }
+            return topicName;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -877,7 +890,17 @@ namespace Sentry.data.Core
             try
             {
                 Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {hiveDelete.EventType.ToLower()} event...");
-                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
+
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = GetDSCEventTopic(config);
+                    _messagePublisher.Publish(topicName, config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete), topicName);
+                }
                 Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {hiveDelete.EventType.ToLower()} event");
             }
             catch (Exception ex)
@@ -897,15 +920,25 @@ namespace Sentry.data.Core
             try
             {
                 Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {snowDelete.EventType.ToLower()} event...");
-                _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
-                Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {snowDelete.EventType.ToLower()} event");
+
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = GetDSCEventTopic(config);
+                    _messagePublisher.Publish(topicName, config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete), topicName);
+                }
+
+                Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {snowDelete.EventType.ToLower()} event");               
             }
             catch (Exception ex)
             {
                 Logger.Error($"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(snowDelete)}");
                 exceptionList.Add(ex);
             }
-
 
             if (exceptionList.Any())
             {
@@ -938,7 +971,18 @@ namespace Sentry.data.Core
                 try
                 {
                     Logger.Debug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
-                    _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+
+                    string topicName = null;
+                    if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                    {
+                        topicName = GetDSCEventTopic(config);
+                        _messagePublisher.Publish(topicName, hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel), topicName);
+                    }
+
                     Logger.Debug($"<generateschemacreateevent> sent {hiveModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
@@ -959,7 +1003,17 @@ namespace Sentry.data.Core
                 try
                 {
                     Logger.Debug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
-                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+
+                    string topicName = null;
+                    if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                    {
+                        topicName = GetDSCEventTopic(config);
+                        _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    }
+                    else
+                    {
+                        _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                    }
                     Logger.Debug($"<generateschemacreateevent> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)

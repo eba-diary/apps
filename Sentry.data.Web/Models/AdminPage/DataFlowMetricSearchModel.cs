@@ -9,6 +9,6 @@ namespace Sentry.data.Web
     {
         public int DatasetId { get; set; }
         public int SchemaId { get; set; }
-        public int DatasetFileId { get; set; }
+        public int[] DatasetFileIds { get; set; }
     }
 }

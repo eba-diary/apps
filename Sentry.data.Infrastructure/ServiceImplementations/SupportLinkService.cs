@@ -49,6 +49,7 @@ namespace Sentry.data.Infrastructure
                 // Does SupportLink with Id exist
                 SupportLink supportLinkExists = _datasetContext.SupportLinks.Where(w => w.SupportLinkId == id).FirstOrDefault();
                 
+                // if this link does exist with this specified id, delete it
                 if(supportLinkExists != null)
                 {
                     Logger.Error($"Found Support Link {id} to remove");
@@ -64,6 +65,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        
         public List<SupportLinkDto> GetSupportLinks()
         {
             List<SupportLink> supportLinks = _datasetContext.SupportLinks.ToList();
@@ -72,13 +74,29 @@ namespace Sentry.data.Infrastructure
             {
                 SupportLinkDto supportLinkDto = new SupportLinkDto()
                 {
+                    SupportLinkId = supportLink.SupportLinkId,
                     Name = supportLink.Name,
                     Description = supportLink.Description,
                     Url = supportLink.Url,
                 };
                 supportLinkDtos.Add(supportLinkDto);
             }
-            return supportLinkDtos;
+            List<SupportLinkDto> sortedSupportLinkDtos = new List<SupportLinkDto>();
+            var sortedQuery = supportLinkDtos.OrderBy(x => x.Name).ToList();
+            foreach(var query in sortedQuery)
+            {
+                var supportLinkDto = new SupportLinkDto()
+                {
+                    SupportLinkId=query.SupportLinkId,
+                    Name = query.Name,
+                    Url = query.Url,
+                    Description = query.Description,
+                };
+                sortedSupportLinkDtos.Add(supportLinkDto);
+            }
+
+            return sortedSupportLinkDtos;
         }
+        
     }
 }

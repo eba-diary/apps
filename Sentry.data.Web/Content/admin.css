@@ -44,3 +44,27 @@ table#metricGroupsTable td.dt-control {
     margin-top:20px;
     margin-bottom:20px;
 }
+#link-results {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.LinkDescription {
+    padding-left: 95px;
+}
+
+.LinkUrlName {
+    padding-left: 60px;
+}
+
+.delete-icon {
+    cursor: pointer;
+    color: red;
+}
+
+.LinksRow {
+    align-items: end;
+}

@@ -93,7 +93,7 @@ namespace Sentry.data.Web
             model.DatasetId = dto.DatasetId;
             model.SchemaId = dto.SchemaId;
             model.Name = dto.Name;
-            model.CreateDTM = dto.CreateDTM;
+            model.CreateDTM = dto.CreateDTM.ToString("s");
             model.CreatedBy = dto.CreatedBy;
             model.DFQuestionnaire = dto.DFQuestionnaire;
             model.IngestionType = dto.IngestionType;
@@ -105,7 +105,7 @@ namespace Sentry.data.Web
             model.AssociatedJobs = dto.AssociatedJobs;
             model.ObjectStatus = dto.ObjectStatus;
             model.DeleteIssuer = dto.DeleteIssuer;
-            model.DeleteIssueDTM = dto.DeleteIssueDTM;
+            model.DeleteIssueDTM = dto.DeleteIssueDTM.ToString("s");
             model.NamedEnvironment = dto.NamedEnvironment;
             model.NamedEnvironmentType = dto.NamedEnvironmentType;
             model.TopicName = dto.TopicName;
