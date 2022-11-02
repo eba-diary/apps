@@ -109,6 +109,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion => new MockBooleanFeatureFlag(true);
 
             public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA3945_Telematics => new MockBooleanFeatureFlag(true);
         }
     }
 }
