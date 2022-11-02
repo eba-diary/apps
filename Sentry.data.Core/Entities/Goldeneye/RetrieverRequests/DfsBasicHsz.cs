@@ -21,9 +21,9 @@ namespace Sentry.data.Core
                 return "DFSBasicHsz";
             }
         }
-        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
         {
-            string storageCode = Job.DatasetConfig.GetStorageCode();
+            string storageCode = job.DatasetConfig.GetStorageCode();
 
             Uri u = new Uri(Path.Combine(new string[] { BaseUri.ToString(), storageCode}).ToString());
 
