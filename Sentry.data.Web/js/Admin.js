@@ -492,7 +492,7 @@ data.Admin = {
             }
         });
 
-        admin.data.DataFileSelectAll();
+        data.Admin.DataFileSelectAll();
     },
 
 
@@ -528,7 +528,7 @@ data.Admin = {
     // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
     ReprocessDeadJobs: function () {
 
-        admin.data.DataFileSelectAll();
+        data.Admin.DataFileSelectAll();
 
         // submits selected jobs to be reprocessed
         $("#reprocessButton").click(function () {
