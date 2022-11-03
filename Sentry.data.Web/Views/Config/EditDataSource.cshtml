@@ -478,18 +478,6 @@
                 });
             });
 
-            $('body').on('click', '.removeToken', function () {
-                $(this).parent().parent().remove();
-            });
-
-            $('#AddToken').click(function () {
-                $("#AddToken").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
-                $.get("@Url.Action("AddToken", "Config")", function (template) {
-                    $('#TokenContainer').append(template);
-                    $("#AddToken").html("Add Token");
-                });
-            });
-
             // For certain types of Data Sources the isUserPassRequired checkbox required to be true.  Setting a checkboxfor to readonly still allows
             //   a user to change the value.  A workaround being used for this property is using jquery to disable the property
             //   for the specific data source types which require it to be true.  Then a $('form').on('submit') function
