@@ -148,27 +148,27 @@ namespace Sentry.data.Core
 
             string outFileName = null;
             // Are we overwritting target file
-                // Non-Regex and TargetFileName is null
-                // Use SearchCriteria value
-                if (!(JobOptions.IsRegexSearch) && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
-                {
-                    outFileName = JobOptions.SearchCriteria;
-                }
-                // Non-Regex and TargetFileName has value
-                // Use TargetFileName value
-                // or
-                // Regex and TargetFileName has value
-                // Use TargetFileName value
-                else if ((!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName))) ||
-                        JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
-                {
-                    outFileName = DataSource.Is<HTTPSSource>() ? JobOptions.TargetFileName : JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
+            // Non-Regex and TargetFileName is null
+            // Use SearchCriteria value
+            if (!(JobOptions.IsRegexSearch) && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+            {
+                outFileName = JobOptions.SearchCriteria;
             }
-                // Regex and TargetFileName is null - Use input file name
-                else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
-                {
-                    outFileName = incomingFileName;
-                }
+            // Non-Regex and TargetFileName has value
+            // Use TargetFileName value
+            // or
+            // Regex and TargetFileName has value
+            // Use TargetFileName value
+            else if ((!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName))) ||
+                    JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
+            {
+                outFileName = DataSource.Is<HTTPSSource>() ? JobOptions.TargetFileName : JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
+            }
+            // Regex and TargetFileName is null - Use input file name
+            else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+            {
+                outFileName = incomingFileName;
+            }
 
             return outFileName;
         }
