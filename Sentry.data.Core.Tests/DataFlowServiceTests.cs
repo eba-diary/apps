@@ -1152,7 +1152,7 @@ namespace Sentry.data.Core.Tests
             DataFlow flow = dataflowService.MapToDataFlow(flowDto);
 
             //Assert
-            Assert.AreEqual("S3_Topic_Name_Test_001", flow.S3ConnectorName, $"{nameof(DataFlow.S3ConnectorName)} mappping failed");
+            Assert.AreEqual("S3_TOPIC_NAME_TEST_001", flow.S3ConnectorName, $"{nameof(DataFlow.S3ConnectorName)} mappping failed");
 
             context.VerifyAll();
             mockUserService.VerifyAll();

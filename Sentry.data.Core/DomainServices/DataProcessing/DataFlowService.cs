@@ -878,7 +878,7 @@ namespace Sentry.data.Core
         //GENERATE S3ConnectorName
         private string GetS3ConnectorName(DataFlowDto dto)
         {
-            string cleansedTopicName = dto.TopicName.Replace("-", "_");
+            string cleansedTopicName = dto.TopicName.Replace("-", "_").ToUpper();
             return $"S3_{cleansedTopicName}_001";
         }
 
