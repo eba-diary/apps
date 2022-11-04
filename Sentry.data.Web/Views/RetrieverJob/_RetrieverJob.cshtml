@@ -17,7 +17,8 @@
             }
             <p><span class="schedule">@Model.Schedule</span></p>
             <p>We are watching for files within the following URL: </p>
-            <p class="filePath"">@Model.GetUri() </p>
+            @* commenting out because this partial view really isn't used with new manage schema page *@
+            @*<p class="filePath"">@Model.GetUri() </p>*@
 
             @if (Model.JobOptions != null)
             {
