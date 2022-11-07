@@ -1,6 +1,7 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -627,6 +628,11 @@ namespace Sentry.data.Core
             return _datasetContext.DatasetFileStatusActive.Where(x => x.DatasetFileConfig.ConfigId == configId && 
                                                                       x.ParentDatasetFileId == null &&
                                                                       !x.IsBundled);
+        }
+
+        public NamedEnvironmentType GetDatasetEnvironmentType(int datasetId)
+        {
+            return _datasetContext.Datasets.Where(x => x.DatasetId == datasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
         }
 
         #region "private functions"

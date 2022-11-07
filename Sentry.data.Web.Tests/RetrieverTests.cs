@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
-using Sentry.data.Web.Tests;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Sentry.Configuration;
-using System.IO;
 using Sentry.data.Core;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Sentry.data.Web.Tests
 {
@@ -29,7 +26,20 @@ namespace Sentry.data.Web.Tests
         {
             /// Arrange ///
             RetrieverJob rtjob = MockClasses.GetMockRetrieverJob(null, new DfsBasic(), new AnonymousAuthentication());
-            var vr = rtjob.GetUri().ToString();
+
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+            
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>().AsQueryable());
+
+            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
+            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            IJobService jobService = new JobService(context.Object, null, null, features.Object, null);
+
+            var vr = jobService.GetDataSourceUri(rtjob).ToString();
+
+            mockRepository.VerifyAll();
 
             Assert.IsTrue(vr == new Uri(Path.Combine("file:///", Config.GetHostSetting("FileShare"), "DatasetLoader/")).ToString()
                 + rtjob.DatasetConfig.ParentDataset.DatasetCategories.First().Name.ToLower() + "/" 
@@ -50,7 +60,19 @@ namespace Sentry.data.Web.Tests
         {
             /// Arrange ///
             RetrieverJob rtjob = MockClasses.GetMockRetrieverJob(null, new DfsCustom(), new AnonymousAuthentication());
-            var vr = rtjob.GetUri().ToString();
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>().AsQueryable());
+
+            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
+            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            IJobService jobService = new JobService(context.Object, null, null, features.Object, null);
+
+            var vr = jobService.GetDataSourceUri(rtjob).ToString();
+
+            mockRepository.VerifyAll();
             Assert.IsTrue(vr == new Uri(Path.Combine("file:///", Config.GetHostSetting("FileShare"), "Custom/Directory/")).ToString());
         }
 
@@ -58,7 +80,19 @@ namespace Sentry.data.Web.Tests
         public void FtpSource_RetrieverJob_GetUri_Return_BaseUri_With_RealtiveUri()
         {
             RetrieverJob rtjob = MockClasses.GetMockRetrieverJob(null, new FtpSource(), new AnonymousAuthentication());
-            var vr = rtjob.GetUri().ToString();
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>().AsQueryable());
+
+            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
+            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            IJobService jobService = new JobService(context.Object, null, null, features.Object, null);
+
+            var vr = jobService.GetDataSourceUri(rtjob).ToString();
+
+            mockRepository.VerifyAll();
             Assert.IsTrue(vr == @"ftp://ftp.sentry.com/SourceFolder/CurrentDirectory/");
         }
 

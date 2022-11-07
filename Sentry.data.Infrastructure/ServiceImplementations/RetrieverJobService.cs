@@ -139,7 +139,7 @@ namespace Sentry.data.Infrastructure
                     //            case 
                     //            FtpPattern.NoPattern: /* #0*/
                     //            default:
-                    //                RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
+                    //                RetrieveFTPFile(_jobService.GetDataSourceUri(_job).AbsoluteUri);                                    
                     //                break;
                     //            //case FtpPattern.SpecificFileNoDelete:
                     //            //    ProcessSpecificFileNoDelete();
@@ -172,7 +172,7 @@ namespace Sentry.data.Infrastructure
                     //    try
                     //    {
                     //        SftpProvider _sftpProvider = new SftpProvider();
-                    //        var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
+                    //        var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString()));
 
                     //        //If source file is compressed, need to save to temp location and send job to JAWS
                     //        if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
@@ -227,7 +227,7 @@ namespace Sentry.data.Infrastructure
                     //                }
 
                     //                _job.JobLoggerMessage("Info", "Found DfsBasic job for schema");
-                    //                targetpath = Path.Combine(TargetJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                    //                targetpath = Path.Combine(TargetJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString())));
 
                     //                try
                     //                {
@@ -290,7 +290,7 @@ namespace Sentry.data.Infrastructure
                     //        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
 
                     //        //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                    //        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                    //        foreach (var a in Directory.GetFiles(_jobService.GetDataSourceUri(_job).LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                     //        {
                     //            if (_job.JobOptions.CompressionOptions.IsCompressed)
                     //            {
@@ -323,7 +323,7 @@ namespace Sentry.data.Infrastructure
                     //    var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
 
                     //    //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                    //    foreach (var b in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                    //    foreach (var b in Directory.GetFiles(_jobService.GetDataSourceUri(_job).LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                     //    {                            
                     //        if (_job.JobOptions.CompressionOptions.IsCompressed)
                     //        {
@@ -445,7 +445,7 @@ namespace Sentry.data.Infrastructure
                         var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : Path.GetFileName(filePath);
 
                         //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                        foreach (var a in Directory.GetFiles(_jobService.GetDataSourceUri(_job).LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                         {
                             if (_job.JobOptions.CompressionOptions.IsCompressed)
                             {
@@ -521,7 +521,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 case FtpPattern.NoPattern:
                                 default:
-                                    GenericFtpExecution(_job.GetUri().AbsoluteUri);
+                                    GenericFtpExecution(_jobService.GetDataSourceUri(_job).AbsoluteUri);
                                     break;
                                 case FtpPattern.RegexFileNoDelete:
                                     ProcessRegexFileNoDelete();
@@ -550,7 +550,7 @@ namespace Sentry.data.Infrastructure
                     try
                     {
                         SftpProvider _sftpProvider = new SftpProvider();
-                        var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
+                        var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString()));
 
                         //If source file is compressed, need to save to temp location and send job to JAWS
                         if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
@@ -606,7 +606,7 @@ namespace Sentry.data.Infrastructure
                                 }
 
                                 _job.JobLoggerMessage("Info", "Found DfsBasic job for schema");
-                                targetpath = Path.Combine(TargetJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                                targetpath = Path.Combine(_jobService.GetDataSourceUri(TargetJob).LocalPath, _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString())));
 
                                 try
                                 {
@@ -669,7 +669,7 @@ namespace Sentry.data.Infrastructure
                         var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
 
                         //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                        foreach (var a in Directory.GetFiles(_jobService.GetDataSourceUri(_job).LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                         {
                             if (_job.JobOptions.CompressionOptions.IsCompressed)
                             {
@@ -702,7 +702,7 @@ namespace Sentry.data.Infrastructure
                     var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
 
                     //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                    foreach (var b in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                    foreach (var b in Directory.GetFiles(_jobService.GetDataSourceUri(_job).LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                     {
                         if (_job.JobOptions.CompressionOptions.IsCompressed)
                         {
@@ -788,7 +788,7 @@ namespace Sentry.data.Infrastructure
         {
             JobHistory lastExecution = _jobService.GetLastExecution(_job);
 
-            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+            string fileName = Path.GetFileName(_jobService.GetDataSourceUri(_job).AbsoluteUri);
 
             if (fileName != "")
             {
@@ -796,7 +796,7 @@ namespace Sentry.data.Infrastructure
                 return;
             }
             IList<RemoteFile> resultList = new List<RemoteFile>();
-            resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+            resultList = _ftpProvider.ListDirectoryContent(_jobService.GetDataSourceUri(_job).AbsoluteUri, "files");
 
             _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.count {resultList.Count.ToString()}");
 
@@ -809,12 +809,12 @@ namespace Sentry.data.Infrastructure
 
             if (lastExecution != null)
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_jobService.GetDataSourceUri(_job).AbsoluteUri}");
                 matchList = resultList.Where(w => w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
             }
             else
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_jobService.GetDataSourceUri(_job).AbsoluteUri}");
                 matchList = resultList.ToList();
             }
 
@@ -828,7 +828,7 @@ namespace Sentry.data.Infrastructure
             foreach (RemoteFile file in matchList)
             {
                 _job.JobLoggerMessage("Info", $"newfileslastexecution.search processing.file {file.Name}");
-                string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                string remoteUrl = _jobService.GetDataSourceUri(_job).AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
         }
@@ -837,7 +837,7 @@ namespace Sentry.data.Infrastructure
         {
             JobHistory lastExecution = _jobService.GetLastExecution(_job);
 
-            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+            string fileName = Path.GetFileName(_jobService.GetDataSourceUri(_job).AbsoluteUri);
 
             if (fileName != "")
             {
@@ -846,7 +846,7 @@ namespace Sentry.data.Infrastructure
             }
 
             IList<RemoteFile> resultList = new List<RemoteFile>();
-            resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+            resultList = _ftpProvider.ListDirectoryContent(_jobService.GetDataSourceUri(_job).AbsoluteUri, "files");
 
             _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.count {resultList.Count.ToString()}");
 
@@ -861,12 +861,12 @@ namespace Sentry.data.Infrastructure
 
             if (lastExecution != null)
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToString("s")} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToString("s")} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_jobService.GetDataSourceUri(_job).AbsoluteUri}");
                 matchList = resultList.Where(w => rx.IsMatch(w.Name) && w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
             }
             else
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:noexecutionhistory search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:noexecutionhistory search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_jobService.GetDataSourceUri(_job).AbsoluteUri}");
                 matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
             }
 
@@ -880,7 +880,7 @@ namespace Sentry.data.Infrastructure
             foreach (RemoteFile file in matchList)
             {
                 _job.JobLoggerMessage("Info", $"regexlastexecution.search processing.file {file.Name}");
-                string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                string remoteUrl = _jobService.GetDataSourceUri(_job).AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
         }
@@ -892,7 +892,7 @@ namespace Sentry.data.Infrastructure
         //    ProcessSpecificFileNoDelete();
 
         //    //Archive specific file
-        //    ArchiveSpecificFile(_job.GetUri().AbsoluteUri);
+        //    ArchiveSpecificFile(_jobService.GetDataSourceUri(_job).AbsoluteUri);
 
         //}
 
@@ -920,10 +920,10 @@ namespace Sentry.data.Infrastructure
         //{
         //    string remoteDir = null;
 
-        //    string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+        //    string fileName = Path.GetFileName(_jobService.GetDataSourceUri(_job).AbsoluteUri);
         //    if (fileName != "")
         //    {
-        //        remoteDir = _job.GetUri().AbsoluteUri.Replace(fileName, "");
+        //        remoteDir = _jobService.GetDataSourceUri(_job).AbsoluteUri.Replace(fileName, "");
         //    }
         //    else
         //    {
@@ -935,7 +935,7 @@ namespace Sentry.data.Infrastructure
 
         //    if (resultList.Where(w => w.Name == fileName).Any())
         //    {
-        //        RetrieveFTPFile(_job.GetUri().AbsoluteUri);
+        //        RetrieveFTPFile(_jobService.GetDataSourceUri(_job).AbsoluteUri);
         //    }
         //    else
         //    {
@@ -946,16 +946,16 @@ namespace Sentry.data.Infrastructure
 
         private void ProcessRegexFileNoDelete()
         {
-            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+            string fileName = Path.GetFileName(_jobService.GetDataSourceUri(_job).AbsoluteUri);
             if (fileName != "")
             {
                 _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
                 return;
             }
 
-            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_jobService.GetDataSourceUri(_job).AbsoluteUri, "files");
 
-            _job.JobLoggerMessage("Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+            _job.JobLoggerMessage("Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_jobService.GetDataSourceUri(_job).AbsoluteUri}");
             _job.JobLoggerMessage("Info", $"specificfile.search source.directory.count {resultList.Count.ToString()}");
 
             if (resultList.Any())
@@ -974,7 +974,7 @@ namespace Sentry.data.Infrastructure
             foreach (RemoteFile file in matchList)
             {
                 _job.JobLoggerMessage("Info", $"specificfile.search.processing.file {file.Name}");
-                string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                string remoteUrl = _jobService.GetDataSourceUri(_job).AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
         }
@@ -1113,7 +1113,7 @@ namespace Sentry.data.Infrastructure
                 //Short-Term establishes a new connection to the source and sends file to current files location
                 if (_job.JobOptions.CreateCurrentFile)
                 {
-                    string targetFullpath = Path.Combine(_job.DatasetConfig.GetCurrentFileDir().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                    string targetFullpath = Path.Combine(_job.DatasetConfig.GetCurrentFileDir().LocalPath, _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString())));
 
                     try
                     {
@@ -1169,7 +1169,7 @@ namespace Sentry.data.Infrastructure
             string targetPath = null;
             if (basicJob.DataSource.Is<DfsBasic>())
             {
-                basepath = basicJob.GetUri().LocalPath + '\\';                
+                basepath = _jobService.GetDataSourceUri(basicJob).LocalPath + '\\';                
             }
             else if (basicJob.DataSource.Is<S3Basic>())
             {                
@@ -1184,7 +1184,7 @@ namespace Sentry.data.Infrastructure
             if (_job.DataSource.Is<HTTPSSource>())
             {
                 filename = _job.GetTargetFileName(_job.GetTargetFileName(String.Empty));
-                targetPath = $"{basepath}{_job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))}";
+                targetPath = $"{basepath}{_job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString()))}";
             }
             else if (_job.DataSource.Is<DfsBasicHsz>())
             {
@@ -1192,8 +1192,8 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                filename = _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()));
-                targetPath = Path.Combine(basepath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                filename = _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString()));
+                targetPath = Path.Combine(basepath, _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString())));
             }            
 
             return targetPath;

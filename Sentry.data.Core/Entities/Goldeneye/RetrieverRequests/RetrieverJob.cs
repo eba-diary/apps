@@ -82,8 +82,8 @@ namespace Sentry.data.Core
         public virtual DatasetFileConfig DatasetConfig { get; set; }
         public virtual DateTime Created { get; set; }
         public virtual DateTime Modified { get; set; }
-        public virtual Boolean IsGeneric { get; set; }
-        public virtual Boolean IsEnabled { get; set; }
+        public virtual bool IsGeneric { get; set; }
+        public virtual bool IsEnabled { get; set; }
 
         //Property is stored within database as string
         public virtual RetrieverJobOptions JobOptions
@@ -132,11 +132,6 @@ namespace Sentry.data.Core
             ExecutionParameters = parameters;
         }
 
-        public virtual Uri GetUri()
-        {
-            return DataSource.CalcRelativeUri(this);
-        }
-
         /// <summary>
         /// Return file name which incoming file should be renamed too
         /// </summary>
@@ -153,27 +148,27 @@ namespace Sentry.data.Core
 
             string outFileName = null;
             // Are we overwritting target file
-                // Non-Regex and TargetFileName is null
-                // Use SearchCriteria value
-                if (!(JobOptions.IsRegexSearch) && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
-                {
-                    outFileName = JobOptions.SearchCriteria;
-                }
-                // Non-Regex and TargetFileName has value
-                // Use TargetFileName value
-                // or
-                // Regex and TargetFileName has value
-                // Use TargetFileName value
-                else if ((!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName))) ||
-                        JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
-                {
-                    outFileName = DataSource.Is<HTTPSSource>() ? JobOptions.TargetFileName : JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
+            // Non-Regex and TargetFileName is null
+            // Use SearchCriteria value
+            if (!(JobOptions.IsRegexSearch) && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+            {
+                outFileName = JobOptions.SearchCriteria;
             }
-                // Regex and TargetFileName is null - Use input file name
-                else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
-                {
-                    outFileName = incomingFileName;
-                }
+            // Non-Regex and TargetFileName has value
+            // Use TargetFileName value
+            // or
+            // Regex and TargetFileName has value
+            // Use TargetFileName value
+            else if ((!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName))) ||
+                    JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
+            {
+                outFileName = DataSource.Is<HTTPSSource>() ? JobOptions.TargetFileName : JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
+            }
+            // Regex and TargetFileName is null - Use input file name
+            else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+            {
+                outFileName = incomingFileName;
+            }
 
             return outFileName;
         }
