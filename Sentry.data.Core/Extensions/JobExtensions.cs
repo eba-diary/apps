@@ -53,11 +53,6 @@ namespace Sentry.data.Core
             return tree.ToList();
         }
 
-        public static IQueryable<RetrieverJob> WhereActive(this IQueryable<RetrieverJob> query)
-        {
-            return query.Where(w => w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
-        }
-
         public static RetrieverJobDto ToDto(this RetrieverJob job)
         {
             RetrieverJobDto dto = new RetrieverJobDto();

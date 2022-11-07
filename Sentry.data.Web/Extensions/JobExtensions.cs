@@ -34,7 +34,6 @@ namespace Sentry.data.Web.Extensions
 
             return (modelList);
         }
-
         public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList, Func<RetrieverJob, Uri> getUri)
         {
             List<DfsMonitorModel> modelList = new List<DfsMonitorModel>();
@@ -56,10 +55,19 @@ namespace Sentry.data.Web.Extensions
                     Sentry.Common.Logging.Logger.Error($"<jobextensions-tomodel> - failed creating model (retrieverjobid:{dto.Id}");
                     throw;
                 }
-                
+
             }
 
             return (modelList);
+        }
+
+        public static DfsMonitorModel ToModel(this DfsMonitorDto dto)
+        {
+            return new DfsMonitorModel()
+            {
+                JobId = dto.JobId,
+                MonitorTarget = dto.MonitorTarget
+            };
         }
 
         public static JavaOptionsOverrideDto ToDto(this JavaOptionsOverride options) 
