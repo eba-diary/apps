@@ -1165,8 +1165,7 @@ namespace Sentry.data.Infrastructure
         private string GetTargetPath(RetrieverJob basicJob)
         {
             string basepath;
-            string filename;
-            string targetPath = null;
+            string targetPath;
             if (basicJob.DataSource.Is<DfsBasic>())
             {
                 basepath = _jobService.GetDataSourceUri(basicJob).LocalPath + '\\';                
@@ -1183,7 +1182,6 @@ namespace Sentry.data.Infrastructure
 
             if (_job.DataSource.Is<HTTPSSource>())
             {
-                filename = _job.GetTargetFileName(_job.GetTargetFileName(String.Empty));
                 targetPath = $"{basepath}{_job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString()))}";
             }
             else if (_job.DataSource.Is<DfsBasicHsz>())
@@ -1192,7 +1190,6 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                filename = _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString()));
                 targetPath = Path.Combine(basepath, _job.GetTargetFileName(Path.GetFileName(_jobService.GetDataSourceUri(_job).ToString())));
             }            
 
