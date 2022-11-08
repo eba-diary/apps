@@ -50,6 +50,18 @@ namespace Sentry.data.Infrastructure
             return await RequestConfluentJsonAsync($"/connectors/{connectorName}/status");
         }
 
+        public async Task<HttpResponseMessage> CreateS3SinkConnectorAsync(string requestJSON)
+        {
+            StringContent stringContent = new StringContent(requestJSON, System.Text.Encoding.UTF8, "application/json");
+            string baseURLplusConnectorEndpoint = $"{_baseUrl}/connectors/";
+
+            //IMPORTANT! Use ConfigureAwait(false) to essentially return to original session/thread that called this since caller of this needs the result
+            HttpResponseMessage httpResponse = await _httpClient.PostAsync(baseURLplusConnectorEndpoint, stringContent).ConfigureAwait(false);
+            return httpResponse;
+        }
+
+
+
         /// <summary>
         /// Requests Connector config JSON object from Confluent API
         /// </summary>
@@ -59,6 +71,7 @@ namespace Sentry.data.Infrastructure
         {
             return await RequestConfluentJsonAsync($"/connectors/{connectorName}/config");
         }
+
 
         /// <summary>
         /// Requests Confluent API for HttpResponseMessage 

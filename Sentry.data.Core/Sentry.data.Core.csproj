@@ -182,6 +182,9 @@
     <Compile Include="DTO\DataInventory\DataInventoryUpdateDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchDto.cs" />
     <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorCreateRequestConfigDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorCreateResponseDto.cs" />
+    <Compile Include="DTO\DataProcessing\ConnectorCreateRequestDto.cs" />
     <Compile Include="DTO\DataProcessing\ConnectorDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
@@ -326,6 +329,7 @@
     <Compile Include="GlobalEnums\TileSearchSortByOption.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />
+    <Compile Include="Helpers\DSCEventTopicHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />

@@ -1,5 +1,6 @@
 ﻿using RestSharp;
 using RestSharp.Authenticators;
+using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
@@ -28,7 +29,7 @@ namespace Sentry.data.Infrastructure
         public const string INEV_TOPIC_DBA_PORTAL_COMPLETE = "INEV-DBAPortalRequestComplete";
         public const string INEV_TOPIC_DBA_PORTAL_APPROVED = "INEV-DBAPortalRequestApproved";
         public const string INEV_TOPIC_DBA_PORTAL_ADDED = "INEV-DBAPortalTicketAdded";
-        public const string INEV_GROUP_DSC_CONSUMER = "DATA-DSC-EVENT-CONSUMER";
+        public string INEV_GROUP_DSC_CONSUMER = Config.GetHostSetting("INEV-DATA-CONSUMER");
         public const string INEV_MESSAGE_SOURCE = "DSC";
         public const string INEV_SAID_KEY = "DATA";
         public const string INEV_EVENTTYPE_PERMSUPDATED = "DatasetPermissionsUpdated";
@@ -62,13 +63,13 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                Console.WriteLine("Checking for Infrastructure Events to Consume: ");
+                Sentry.Common.Logging.Logger.Info("Checking for Infrastructure Events to Consume: ");
 
                 List<Message> messages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_COMPLETE, INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
                 messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
                 messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
 
-                Console.WriteLine("Found " + messages.Count + " Events to Consume");
+                Sentry.Common.Logging.Logger.Info("Found " + messages.Count + " Events to Consume");
 
                 foreach (Message message in messages)
                 {
