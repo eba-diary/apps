@@ -34,6 +34,7 @@ namespace Sentry.data.Web.Extensions
 
             return (modelList);
         }
+
         public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList, Func<RetrieverJob, Uri> getUri)
         {
             List<DfsMonitorModel> modelList = new List<DfsMonitorModel>();

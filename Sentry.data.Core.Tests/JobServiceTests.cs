@@ -1187,5 +1187,205 @@ namespace Sentry.data.Core.Tests
 
             Assert.AreEqual("bucket\\key\\targetfilename", result);
         }
+
+        [TestMethod]
+        public void GetRetrieverJobs_All()
+        {
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new DfsDataFlowBasic()
+                },
+                new RetrieverJob()
+                {
+                    ObjectStatus = ObjectStatusEnum.Deleted
+                },
+                new RetrieverJob()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new HTTPSSource()
+                }
+            };
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
+            context.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            context.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
+            context.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>().AsQueryable());
+
+            JobService jobService = new JobService(context.Object, null, null, null, null);
+
+            List<RetrieverJob> results = jobService.GetDfsRetrieverJobs();
+
+            Assert.AreEqual(1, results.Count);
+
+            context.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetRetrieverJobs_All_ThrowsException()
+        {
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
+            context.SetupGet(x => x.RetrieverJob).Throws<Exception>();
+
+            JobService jobService = new JobService(context.Object, null, null, null, null);
+
+            Assert.ThrowsException<Exception>(() => jobService.GetDfsRetrieverJobs());
+
+            context.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetRetrieverJobs_NonProd()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = GetDatasetContextForDfsRetrieverJobs(mockRepository);
+
+            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
+            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
+
+            List<DfsMonitorDto> results = jobService.GetDfsRetrieverJobs(NamedEnvironmentType.NonProd);
+
+            Assert.AreEqual(1, results.Count);
+
+            DfsMonitorDto dto = results.First();
+            Assert.AreEqual(1, dto.JobId);
+            Assert.AreEqual("c:\\tmp\\DatasetLoaderDSC\\DevNP\\SAID\\DEV\\000001", dto.MonitorTarget);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetRetrieverJobs_Prod()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = GetDatasetContextForDfsRetrieverJobs(mockRepository);
+
+            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
+            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
+
+            List<DfsMonitorDto> results = jobService.GetDfsRetrieverJobs(NamedEnvironmentType.Prod);
+
+            Assert.AreEqual(1, results.Count);
+
+            DfsMonitorDto dto = results.First();
+            Assert.AreEqual(4, dto.JobId);
+            Assert.AreEqual("c:\\tmp\\DatasetLoaderDSC\\Dev\\DATA\\TEST\\000002", dto.MonitorTarget);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetRetrieverJobs_ThrowsException()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+            context.SetupGet(x => x.RetrieverJob).Throws<Exception>();
+
+            JobService jobService = new JobService(context.Object, null, null, null, null);
+
+            Assert.ThrowsException<Exception>(() => jobService.GetDfsRetrieverJobs(NamedEnvironmentType.Prod));
+
+            mockRepository.VerifyAll();
+        }
+
+        #region Helpers
+        private Mock<IDatasetContext> GetDatasetContextForDfsRetrieverJobs(MockRepository mockRepository)
+        {
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 1,
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new DfsDataFlowBasic() { Id = 1 },
+                    DataFlow = new DataFlow() { Id = 10 }
+                },
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataSource = new DfsDataFlowBasic() { Id = 1 },
+                    DataFlow = new DataFlow() { Id = 10 }
+                },
+                new RetrieverJob()
+                {
+                    Id = 3,
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new DfsDataFlowBasic() { Id = 2 },
+                    DataFlow = new DataFlow() { Id = 10 }
+                },
+                new RetrieverJob()
+                {
+                    Id = 4,
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new DfsDataFlowBasic() { Id = 1 },
+                    DataFlow = new DataFlow() { Id = 11 }
+                }
+            };
+
+            List<DataFlow> dataFlows = new List<DataFlow>()
+            {
+                new DataFlow()
+                {
+                    Id = 10,
+                    DatasetId = 20,
+                    SaidKeyCode = "SAID",
+                    NamedEnvironment = "DEV",
+                    FlowStorageCode = "000001"
+                },
+                new DataFlow()
+                {
+                    Id = 11,
+                    DatasetId = 21,
+                    SaidKeyCode = "DATA",
+                    NamedEnvironment = "TEST",
+                    FlowStorageCode = "000002"
+                }
+            };
+
+            List<DataSource> dataSources = new List<DataSource>()
+            {
+                new DfsDataFlowBasic()
+                {
+                    Id = 1
+                },
+                new HTTPSSource()
+                {
+                    Id = 2
+                }
+            };
+
+            List<Dataset> datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    DatasetId = 20,
+                    NamedEnvironmentType = NamedEnvironmentType.NonProd
+                },
+                new Dataset()
+                {
+                    DatasetId = 21,
+                    NamedEnvironmentType = NamedEnvironmentType.Prod
+                }
+            };
+
+            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
+            context.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            context.SetupGet(x => x.DataFlow).Returns(dataFlows.AsQueryable());
+            context.SetupGet(x => x.DataSources).Returns(dataSources.AsQueryable());
+            context.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
+
+            return context;
+        }
+        #endregion
     }
 }
