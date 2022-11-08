@@ -112,6 +112,13 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName)
+        {
+            //NOTE: AVOID ISSUES BY DOING TOUPPER, ALSO HAD ISSUES TO DB VALUES OF NULL AND TOUPPER SO PERFORM NULL CHECK FIRST
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.TopicName != null && w.TopicName.ToUpper() == topicName.ToUpper());
+            return dtoList;
+        }
+
         public List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key)
         {
             List<DataFlowStep> dfsList = _datasetContext.DataFlowStep.Where(w => w.TriggerKey == key).ToList();

@@ -22,6 +22,7 @@ namespace Sentry.data.Core
         List<DataFlowDetailDto> GetDataFlowDetailDtoByDatasetId(int datasetId);
         List<DataFlowDetailDto> GetDataFlowDetailDtoBySchemaId(int schemaId);
         List<DataFlowDetailDto> GetDataFlowDetailDtoByStorageCode(string storageCode);
+        List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName);
 
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         int CreateandSaveDataFlow(DataFlowDto dto);

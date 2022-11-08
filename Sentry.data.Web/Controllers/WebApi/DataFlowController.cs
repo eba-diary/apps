@@ -77,7 +77,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<Models.ApiModels.Dataflow.DataFlowDetailModel>))]
         [Route("")]
         [HttpGet]
-        public IHttpActionResult GetDataFlowMetadata([FromUri] int? datasetId = null, [FromUri] int? schemaId = null, [FromUri] string storagecode = null)
+        public IHttpActionResult GetDataFlowMetadata([FromUri] int? datasetId = null, [FromUri] int? schemaId = null, [FromUri] string storagecode = null, [FromUri] string topicName = null)
         {
             // Dictionary to manage and check method params
             IDictionary<string, object> parameters = new Dictionary<string, object>();
@@ -85,6 +85,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             parameters.Add(new KeyValuePair<string, object>(nameof(datasetId), datasetId));
             parameters.Add(new KeyValuePair<string, object>(nameof(schemaId), schemaId));
             parameters.Add(new KeyValuePair<string, object>(nameof(storagecode), storagecode));
+            parameters.Add(new KeyValuePair<string, object>(nameof(topicName), topicName));
 
             int counter = 0; // counter to check for excess amount of passed in params
 
@@ -125,6 +126,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                     break;
                 case "storagecode":
                     dtoList = _dataFlowService.GetDataFlowDetailDtoByStorageCode((string)itemCheck.Value);
+                    break;
+                case "topicName":
+                    dtoList = _dataFlowService.GetDataFlowDetailDtoByTopicName((string)itemCheck.Value);
                     break;
             }
 
