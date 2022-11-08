@@ -111,6 +111,12 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName)
+        {
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.TopicName == topicName);
+            return dtoList;
+        }
+
         public List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key)
         {
             List<DataFlowStep> dfsList = _datasetContext.DataFlowStep.Where(w => w.TriggerKey == key).ToList();

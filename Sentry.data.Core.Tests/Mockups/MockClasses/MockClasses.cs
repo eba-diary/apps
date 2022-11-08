@@ -907,6 +907,24 @@ namespace Sentry.data.Core.Tests
         }
 
 
+        public static DataFlow MockDataFlowTopic()
+        {
+            DataFlow df = new DataFlow()
+            {
+                Id = 90,
+                Name = "MockDataFlow",
+                SaidKeyCode = "DATA",
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssuer = null,
+                DeleteIssueDTM = DateTime.MaxValue,
+                TopicName = "TestTopic"
+            };
+            return df;
+        }
+
+
         public static DataFlow MockDataFlowIsBackFilledNo()
         {
             DataFlow df = new DataFlow()
