@@ -25,7 +25,8 @@ namespace Sentry.data.Infrastructure
 
         public void OnStart(RetrieverJob Job, CancellationToken token)
         {
-            Uri watchPath = Job.GetUri();
+            //throwing some garbage in here
+            Uri watchPath = new Uri("");
 
             try
             {
