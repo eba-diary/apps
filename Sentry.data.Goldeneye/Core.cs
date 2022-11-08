@@ -226,7 +226,7 @@ namespace Sentry.data.Goldeneye
         {
             //Starting MetadataProcessor Consumer
             Logger.Info("starting metadataprocessorservice");
-            MetadataProcessorService metaProcessor = new MetadataProcessorService();
+            MetadataProcessorService metaProcessor = Bootstrapper.Container.GetInstance<MetadataProcessorService>();
             currentTasks.Add(new RunningTask(
                             Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));
         }

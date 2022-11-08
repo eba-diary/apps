@@ -24,6 +24,7 @@ namespace Sentry.data.Core.Tests.HelperTests
 
             //Assert
             helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent"), Times.Exactly(4));
+            helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent_NP"), Times.Never);
         }
 
         [TestMethod]
@@ -38,8 +39,8 @@ namespace Sentry.data.Core.Tests.HelperTests
             helper.Object.GetDSCTopic_Internal("PROD", false);
 
             //Assert
-            helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent_QUALNP"), Times.Once);
-            helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent_PRODNP"), Times.Once);
+            helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent"), Times.Never);
+            helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent_NP"), Times.Exactly(2));
         }        
     }
 }
