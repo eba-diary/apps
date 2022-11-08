@@ -113,7 +113,8 @@ namespace Sentry.data.Core
 
         public List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName)
         {
-            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.TopicName == topicName);
+            //NOTE: AVOID ISSUES BY DOING TOUPPER, ALSO HAD ISSUES TO DB VALUES OF NULL AND TOUPPER SO PERFORM NULL CHECK FIRST
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.TopicName != null && w.TopicName.ToUpper() == topicName.ToUpper());
             return dtoList;
         }
 
