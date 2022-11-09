@@ -15,9 +15,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Sentry.Core;
 using static Sentry.data.Core.RetrieverJobOptions;
-using Nest;
 
 namespace Sentry.data.Core
 {
@@ -464,45 +462,10 @@ namespace Sentry.data.Core
         {
             try
             {
-                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Where(w => w.ObjectStatus == ObjectStatusEnum.Active).FetchAllConfiguration(_datasetContext).ToList();
+                List<RetrieverJob> jobs;
+                jobs = _datasetContext.RetrieverJob.WhereActive().FetchAllConfiguration(_datasetContext).ToList();
+
                 return jobs.Where(x => x.DataSource.Is<DfsDataFlowBasic>()).ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("<jobservice-getdfsretrieverjobs> Failed retrieving job list", ex);
-                throw;
-            }
-        }
-
-        public List<DfsMonitorDto> GetDfsRetrieverJobs(NamedEnvironmentType environmentType)
-        {
-            try
-            {
-                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Join(_datasetContext.Datasets, j => j.DataFlow.DatasetId, d => d.DatasetId, (job, ds) => new { job = job, ds = ds })
-                        .Where(x => x.job.ObjectStatus == ObjectStatusEnum.Active &&
-                            x.job.DataSource is DfsDataFlowBasic &&
-                            x.ds.NamedEnvironmentType == environmentType &&
-                            x.job.DataFlow.FlowStorageCode != "0")
-                        .Select(x => x.job)
-                        .Fetch(x => x.DataSource).ToFuture()
-                        .ToList();
-
-                string namedEnvFeature = _dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue();
-
-                List<DfsMonitorDto> dtos = new List<DfsMonitorDto>();
-                foreach (RetrieverJob job in jobs)
-                {
-                    Uri dataSourceUri = job.DataSource.CalcRelativeUri(job, environmentType, namedEnvFeature);
-                    DfsMonitorDto dto = new DfsMonitorDto()
-                    {
-                        JobId = job.Id,
-                        MonitorTarget = dataSourceUri.LocalPath
-                    };
-
-                    dtos.Add(dto);
-                }
-
-                return dtos;
             }
             catch (Exception ex)
             {
