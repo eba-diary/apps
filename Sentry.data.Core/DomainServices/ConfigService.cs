@@ -237,6 +237,39 @@ namespace Sentry.data.Core
                 {
                     errors.Add("OAuth requires a Token URL.");
                 }
+                if (dto.Tokens.Count() < 1)
+                {
+                    errors.Add("OAuth requires at least one token.");
+                }
+                foreach (var token in dto.Tokens)
+                {
+                    if (String.IsNullOrWhiteSpace(token.TokenName))
+                    {
+                        errors.Add("OAuth requires a Token Name.");
+                    }
+                    if (dto.GrantType == GlobalEnums.OAuthGrantType.JwtBearer)
+                    {
+                        if (String.IsNullOrWhiteSpace(token.TokenUrl))
+                        {
+                            errors.Add("OAuth JWT requires a Token URL.");
+                        }
+                        if (String.IsNullOrWhiteSpace(token.Scope))
+                        {
+                            errors.Add("OAuth JWT requires a Token Scope.");
+                        }
+                    }
+                    else
+                    {
+                        if (String.IsNullOrWhiteSpace(token.CurrentToken))
+                        {
+                            errors.Add("OAuth requires a Token Value.");
+                        }
+                        if (String.IsNullOrWhiteSpace(token.RefreshToken))
+                        {
+                            errors.Add("OAuth requires a Token Refresh Value.");
+                        }
+                    }
+                }
             }
 
             if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
@@ -471,6 +504,14 @@ namespace Sentry.data.Core
             DataSourceDto dto = new DataSourceDto();
             DataSource dsrc = _datasetContext.GetById<DataSource>(Id);
             MapToDto(dsrc, dto);
+            if (dto.Tokens.Any())
+            {
+                foreach (var token in dto.Tokens)
+                {
+                    token.CurrentToken = _encryptService.DecryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey);
+                    token.RefreshToken = _encryptService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey);
+                }
+            }
             return dto;
         }
 
@@ -1182,7 +1223,7 @@ namespace Sentry.data.Core
                     ((HTTPSSource)dsrc).GrantType = dto.GrantType;
                 }
 
-                //UpdateClaims((HTTPSSource)dsrc, dto);
+                UpdateClaims((HTTPSSource)dsrc, dto);
             }
 
             // only update if new value is supplied
@@ -1339,7 +1380,7 @@ namespace Sentry.data.Core
 
             if (source.Is<HTTPSSource>() && auth.Is<OAuthAuthentication>())
             {
-                //CreateClaims(dto, (HTTPSSource)source);
+                CreateClaims(dto, (HTTPSSource)source);
             }
 
             if (source.IsSecured)

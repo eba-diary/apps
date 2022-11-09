@@ -419,10 +419,6 @@
                 $(this).parent().parent().remove();
             });
 
-            $('body').on('click', '.removeToken', function () {
-                $(this).parent().parent().remove();
-            });
-
             $('#AddHeader').click(function () {
                 //This approach is described at the site below
                 // http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/
@@ -430,14 +426,6 @@
                 $.get("@Url.Action("HeaderEntryRow", "Config")", function (template) {
                     $('#RequestContainer').append(template);
                     $("#AddHeader").html("Add Header");
-                });
-            });
-
-            $('#AddToken').click(function () {
-                $("#AddToken").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
-                $.get("@Url.Action("AddToken", "Config")", function (template) {
-                    $('#TokenContainer').append(template);
-                    $("#AddToken").html("Add Token");
                 });
             });
 
