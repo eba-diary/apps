@@ -478,29 +478,24 @@ namespace Sentry.data.Core
         {
             try
             {
-                //workaround to get necessary retriever jobs and supplemental data in single query (prevents N+1 NHibernate lazy load issue)
-                var jobInfos = _datasetContext.RetrieverJob.Join(_datasetContext.DataFlow, rj => rj.DataFlow.Id, df => df.Id, (rj, df) => new
-                        { job = rj, dataFlow = df })
-                    .Join(_datasetContext.DataSources, j => j.job.DataSource.Id, s => s.Id, (j, s) => new
-                        { job = j.job, dataFlow = j.dataFlow, dataSource = s })
-                    .Join(_datasetContext.Datasets, j => j.dataFlow.DatasetId, d => d.DatasetId, (j, d) => new
-                        { job = j.job, dataFlow = j.dataFlow, dataSource = j.dataSource, dataset = d })
-                    .Where(x => x.job.ObjectStatus == ObjectStatusEnum.Active && 
-                        x.dataSource is DfsDataFlowBasic && 
-                        x.dataset.NamedEnvironmentType == environmentType)
-                    .Select(x => new { job = x.job, dataFlow = x.dataFlow, dataSource = x.dataSource })
-                    .ToList();
+                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Join(_datasetContext.Datasets, j => j.DataFlow.DatasetId, d => d.DatasetId, (job, ds) => new { job = job, ds = ds })
+                        .Where(x => x.job.ObjectStatus == ObjectStatusEnum.Active &&
+                            x.job.DataSource is DfsDataFlowBasic &&
+                            x.ds.NamedEnvironmentType == environmentType &&
+                            x.job.DataFlow.FlowStorageCode != "0")
+                        .Select(x => x.job)
+                        .Fetch(x => x.DataSource).ToFuture()
+                        .ToList();
 
                 string namedEnvFeature = _dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue();
 
                 List<DfsMonitorDto> dtos = new List<DfsMonitorDto>();
-                foreach (var jobInfo in jobInfos)
+                foreach (RetrieverJob job in jobs)
                 {
-                    jobInfo.job.DataFlow = jobInfo.dataFlow;
-                    Uri dataSourceUri = jobInfo.dataSource.CalcRelativeUri(jobInfo.job, environmentType, namedEnvFeature);
+                    Uri dataSourceUri = job.DataSource.CalcRelativeUri(job, environmentType, namedEnvFeature);
                     DfsMonitorDto dto = new DfsMonitorDto()
                     {
-                        JobId = jobInfo.job.Id,
+                        JobId = job.Id,
                         MonitorTarget = dataSourceUri.LocalPath
                     };
 
