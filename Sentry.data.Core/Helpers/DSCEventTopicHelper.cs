@@ -29,7 +29,7 @@ namespace Sentry.data.Core.Helpers
         internal string GetDSCTopic_Internal(string dscNamedEnvironment, bool isDatasetNamedEnvironmentTypeProd)
         {
             string topicName;
-            if ((dscNamedEnvironment == "QUAL" || dscNamedEnvironment == "PROD") && !isDatasetNamedEnvironmentTypeProd)
+            if ((dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD) && !isDatasetNamedEnvironmentTypeProd)
             {
                 topicName = GetDSCEventTopicConfig("DSCEventTopic_Confluent_NP");
             }

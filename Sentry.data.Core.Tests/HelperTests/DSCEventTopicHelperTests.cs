@@ -17,10 +17,10 @@ namespace Sentry.data.Core.Tests.HelperTests
             helper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("ConfigString");
 
             //Act
-            helper.Object.GetDSCTopic_Internal("TEST", true);
-            helper.Object.GetDSCTopic_Internal("TEST", false);
-            helper.Object.GetDSCTopic_Internal("QUAL", true);
-            helper.Object.GetDSCTopic_Internal("PROD", true);
+            helper.Object.GetDSCTopic_Internal(GlobalConstants.Environments.TEST, true);
+            helper.Object.GetDSCTopic_Internal(GlobalConstants.Environments.TEST, false);
+            helper.Object.GetDSCTopic_Internal(GlobalConstants.Environments.QUAL, true);
+            helper.Object.GetDSCTopic_Internal(GlobalConstants.Environments.PROD, true);
 
             //Assert
             helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent"), Times.Exactly(4));
@@ -35,8 +35,8 @@ namespace Sentry.data.Core.Tests.HelperTests
             helper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("ConfigString");
 
             //Act
-            helper.Object.GetDSCTopic_Internal("QUAL", false);
-            helper.Object.GetDSCTopic_Internal("PROD", false);
+            helper.Object.GetDSCTopic_Internal(GlobalConstants.Environments.QUAL, false);
+            helper.Object.GetDSCTopic_Internal(GlobalConstants.Environments.PROD, false);
 
             //Assert
             helper.Verify(v => v.GetDSCEventTopicConfig("DSCEventTopic_Confluent"), Times.Never);
