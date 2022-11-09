@@ -56,10 +56,19 @@ namespace Sentry.data.Web.Extensions
                     Sentry.Common.Logging.Logger.Error($"<jobextensions-tomodel> - failed creating model (retrieverjobid:{dto.Id}");
                     throw;
                 }
-                
+
             }
 
             return (modelList);
+        }
+
+        public static DfsMonitorModel ToModel(this DfsMonitorDto dto)
+        {
+            return new DfsMonitorModel()
+            {
+                JobId = dto.JobId,
+                MonitorTarget = dto.MonitorTarget
+            };
         }
 
         public static JavaOptionsOverrideDto ToDto(this JavaOptionsOverride options) 

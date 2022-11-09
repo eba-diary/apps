@@ -15,7 +15,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry.Core;
 using static Sentry.data.Core.RetrieverJobOptions;
+using Nest;
 
 namespace Sentry.data.Core
 {
@@ -209,11 +211,8 @@ namespace Sentry.data.Core
             }
             catch (Exception e)
             {
-
                 StringBuilder errmsg = new StringBuilder();
                 errmsg.AppendLine("Failed to Create Drop Location:");
-                errmsg.AppendLine($"DatasetId: {job.DatasetConfig.ParentDataset.DatasetId}");
-                errmsg.AppendLine($"DatasetName: {job.DatasetConfig.ParentDataset.DatasetName}");
                 errmsg.AppendLine($"DropLocation: {GetDataSourceUri(job).LocalPath}");
 
                 Logger.Error(errmsg.ToString(), e);
@@ -462,10 +461,50 @@ namespace Sentry.data.Core
         {
             try
             {
-                List<RetrieverJob> jobs;
-                jobs = _datasetContext.RetrieverJob.WhereActive().FetchAllConfiguration(_datasetContext).ToList();
-
+                List<RetrieverJob> jobs = _datasetContext.RetrieverJob.Where(w => w.ObjectStatus == ObjectStatusEnum.Active).FetchAllConfiguration(_datasetContext).ToList();
                 return jobs.Where(x => x.DataSource.Is<DfsDataFlowBasic>()).ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("<jobservice-getdfsretrieverjobs> Failed retrieving job list", ex);
+                throw;
+            }
+        }
+
+        public List<DfsMonitorDto> GetDfsRetrieverJobs(NamedEnvironmentType environmentType)
+        {
+            try
+            {
+                //workaround to get necessary retriever jobs and supplemental data in single query (prevents N+1 NHibernate lazy load issue)
+                var jobInfos = _datasetContext.RetrieverJob.Join(_datasetContext.DataFlow, rj => rj.DataFlow.Id, df => df.Id, (rj, df) => new
+                        { job = rj, dataFlow = df })
+                    .Join(_datasetContext.DataSources, j => j.job.DataSource.Id, s => s.Id, (j, s) => new
+                        { job = j.job, dataFlow = j.dataFlow, dataSource = s })
+                    .Join(_datasetContext.Datasets, j => j.dataFlow.DatasetId, d => d.DatasetId, (j, d) => new
+                        { job = j.job, dataFlow = j.dataFlow, dataSource = j.dataSource, dataset = d })
+                    .Where(x => x.job.ObjectStatus == ObjectStatusEnum.Active && 
+                        x.dataSource is DfsDataFlowBasic && 
+                        x.dataset.NamedEnvironmentType == environmentType)
+                    .Select(x => new { job = x.job, dataFlow = x.dataFlow, dataSource = x.dataSource })
+                    .ToList();
+
+                string namedEnvFeature = _dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue();
+
+                List<DfsMonitorDto> dtos = new List<DfsMonitorDto>();
+                foreach (var jobInfo in jobInfos)
+                {
+                    jobInfo.job.DataFlow = jobInfo.dataFlow;
+                    Uri dataSourceUri = jobInfo.dataSource.CalcRelativeUri(jobInfo.job, environmentType, namedEnvFeature);
+                    DfsMonitorDto dto = new DfsMonitorDto()
+                    {
+                        JobId = jobInfo.job.Id,
+                        MonitorTarget = dataSourceUri.LocalPath
+                    };
+
+                    dtos.Add(dto);
+                }
+
+                return dtos;
             }
             catch (Exception ex)
             {

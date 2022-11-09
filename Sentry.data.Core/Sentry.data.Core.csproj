@@ -199,6 +199,7 @@
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetTileDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
+    <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
