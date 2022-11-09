@@ -1,4 +1,5 @@
 ﻿using Namotion.Reflection;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Common;
@@ -560,6 +561,12 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_Headers");
         }
 
+        [Route("Config/AddToken")]
+        public ActionResult AddToken()
+        {
+            return PartialView("_DataSourceToken");
+        }
+
         public ActionResult FieldEntryRow()
         {
             return PartialView("_Fields", new FieldRowModel());
@@ -1036,12 +1043,17 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public JsonResult SourceDetails (int Id)
+        public ContentResult SourceDetails (int Id)
         {            
             DataSourceDto dto = _configService.GetDataSourceDto(Id);
             DataSourceModel model = new DataSourceModel(dto);
-
-            return Json(model, JsonRequestBehavior.AllowGet);
+            var jsonSource = JsonConvert.SerializeObject(model,
+                Formatting.None,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+            return Content(jsonSource, "application/json");
         }
 
         [HttpGet]

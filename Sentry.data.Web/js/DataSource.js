@@ -16,7 +16,39 @@
             $("#SourceType").materialSelect();
         }
         $("#AuthID").materialSelect();
+        $("#GrantType").materialSelect();
+        data.DataSource.UpdateShowAddTokenButton();
 
+        $('#AddToken').click(function () {
+            $("#AddToken").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
+            $.get("/Config/AddToken", function (template) {
+                $('#TokenContainer').append(template);
+                $("#AddToken").html("Add Token");
+                data.DataSource.UpdateShowAddTokenButton();
+            });
+        });
+
+        $("#GrantType").change(function () {
+            data.DataSource.UpdateShowAddTokenButton();
+        });
+
+        $('body').on('click', '.removeToken', function () {
+            $(this).parent().parent().remove();
+            data.DataSource.UpdateShowAddTokenButton();
+        });
+    },
+
+    UpdateShowAddTokenButton: function () {
+        if (data.DataSource.GetTokenFormCount() > 0 && $("#GrantType").val() == '0') {
+            $("#AddToken").addClass("d-none");
+        }
+        else {
+            $("#AddToken").removeClass("d-none");
+        }
+    },
+
+    GetTokenFormCount: function() {
+        return $("#TokenContainer .card").length
     },
 
     PopulateDataSources: function (in_val) {

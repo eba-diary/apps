@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ namespace Sentry.data.Web
         {
             Headers = new List<RequestHeader>();
             ContactIds = new List<string>();
+            Tokens = new List<DataSourceToken>();
 
             //this is needed for the associate picker js.
             this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
@@ -31,10 +33,10 @@ namespace Sentry.data.Web
             Headers = new List<RequestHeader>();
             SourceType = dto.SourceType;
             Headers = dto.RequestHeaders ?? new List<RequestHeader>();
+            Tokens = dto.Tokens ?? new List<DataSourceToken>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
-            TokenUrl = dto.TokenUrl;
-            TokenExp = dto.TokenExp;
+
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
             PrimaryContactEmail = dto.PrimaryContactEmail;
@@ -103,14 +105,10 @@ namespace Sentry.data.Web
         [DisplayName("Client Private Id")]
         public string ClientPrivateId { get; set; }
 
-        [DisplayName("Token Url")]
-        public string TokenUrl { get; set; }
+        [DisplayName("OAuth Grant Type")]
+        public OAuthGrantType GrantType { get; set; }
 
-        [DisplayName("Token Expiration (in Seconds)")]
-        public int TokenExp { get; set; }
-
-        [DisplayName("Scope")]
-        public string Scope { get; set; }
+        public IList<DataSourceToken> Tokens { get; set; }
         #endregion
 
         [DisplayName("Request Headers")]

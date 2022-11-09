@@ -1391,6 +1391,7 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\RetrieverJob\_RetrieverJobAccordionCards.cshtml" />
+    <Content Include="Views\Config\_DataSourceToken.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

@@ -234,7 +234,7 @@ namespace Sentry.data.Infrastructure
         {
             HTTPSSource source = (HTTPSSource)job.DataSource;
 
-            if (source.GrantType == Core.GlobalEnums.OAuthGrantType.jwtbearer)
+            if (source.GrantType == Core.GlobalEnums.OAuthGrantType.JwtBearer)
             {
                 req.AddHeader("Authorization", "Bearer " + GetOAuthAccessToken(source));
             }
@@ -247,7 +247,7 @@ namespace Sentry.data.Infrastructure
 
             string oAuthToken;
 
-            if (source.CurrentToken == null || source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
+            if (source.Tokens[0].CurrentToken == null || source.Tokens[0].CurrentTokenExp == null || source.Tokens[0].CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                 var httpHandler = new System.Net.Http.HttpClientHandler();
                 if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
@@ -261,7 +261,7 @@ namespace Sentry.data.Infrastructure
                 AddOAuthGrantType(keyValues, source);
                 keyValues.Add(new KeyValuePair<string, string>("assertion", GenerateJwtToken(source)));
                 var oAuthPostContent = new System.Net.Http.FormUrlEncodedContent(keyValues);
-                var oAuthPostResult = httpClient.PostAsync(source.TokenUrl, oAuthPostContent).Result;
+                var oAuthPostResult = httpClient.PostAsync(source.Tokens[0].TokenUrl, oAuthPostContent).Result;
                 var response = oAuthPostResult.Content.ReadAsStringAsync().Result;
                 var responseAsJson = Newtonsoft.Json.Linq.JObject.Parse(response);
                 var accessToken = responseAsJson.GetValue("access_token");
@@ -277,7 +277,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                oAuthToken = EncryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+                oAuthToken = EncryptionService.DecryptString(source.Tokens[0].CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
 
             Logger.Debug($"{methodName} Method End");
@@ -288,7 +288,7 @@ namespace Sentry.data.Infrastructure
         {
             switch (source.GrantType)
             {
-                case Core.GlobalEnums.OAuthGrantType.jwtbearer:
+                case Core.GlobalEnums.OAuthGrantType.JwtBearer:
                     list.Add(new KeyValuePair<string, string>("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer"));
                     break;
                 default:

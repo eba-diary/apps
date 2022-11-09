@@ -42,6 +42,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand { get; }
         public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
         public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; }
+        public IFeatureFlag<bool> CLA3945_Telematics { get; }
 
         public DataFeatures(UserService userService, ILdClient ldClient)
         {
@@ -73,6 +74,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA440_CategoryConsumptionLayerCreateLineInSand = new StringFeatureFlagAmbientContext("CLA440_CategoryConsumptionLayerCreateLineInSand", "2022-08-15", _ldClient, () => LdUser);
             CLA3878_ManageSchemasAccordion = new BooleanFeatureFlagAmbientContext("CLA3878_ManageSchemasAccordion", false, _ldClient, () => LdUser);
             CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL = new BooleanFeatureFlagAmbientContext("CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL", false, _ldClient, () => LdUser);
+            CLA3945_Telematics = new BooleanFeatureFlagAmbientContext("CLA3945_Telematics", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
