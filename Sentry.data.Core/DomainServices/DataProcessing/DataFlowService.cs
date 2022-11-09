@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
@@ -111,6 +112,13 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
+        public List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName)
+        {
+            //NOTE: AVOID ISSUES BY DOING TOUPPER, ALSO HAD ISSUES TO DB VALUES OF NULL AND TOUPPER SO PERFORM NULL CHECK FIRST
+            List<DataFlowDetailDto> dtoList = GetDataFlowDetailDto(w => w.TopicName != null && w.TopicName.ToUpper() == topicName.ToUpper());
+            return dtoList;
+        }
+
         public List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key)
         {
             List<DataFlowStep> dfsList = _datasetContext.DataFlowStep.Where(w => w.TriggerKey == key).ToList();
@@ -124,6 +132,11 @@ namespace Sentry.data.Core
             RetrieverJob job = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).First();
             RetrieverJobDto dto = job.ToDto();
             return dto;
+        }
+
+        public List<RetrieverJob> GetExternalRetrieverJobsByDataFlowId(int dataFlowId)
+        {
+            return _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == dataFlowId && !w.IsGeneric).ToList();
         }
 
         /// <summary>
@@ -878,7 +891,7 @@ namespace Sentry.data.Core
         //GENERATE S3ConnectorName
         private string GetS3ConnectorName(DataFlowDto dto)
         {
-            string cleansedTopicName = dto.TopicName.Replace("-", "_");
+            string cleansedTopicName = dto.TopicName.Replace("-", "_").ToUpper();
             return $"S3_{cleansedTopicName}_001";
         }
 

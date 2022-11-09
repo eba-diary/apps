@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 
 namespace Sentry.data.Core
 {
@@ -14,7 +10,6 @@ namespace Sentry.data.Core
         string RelativeUri { get; set; }
         DataSource DataSource { get; set; }
         DatasetFileConfig DatasetConfig { get; set; }
-        Boolean IsGeneric { get; set; }
-        Uri GetUri();
+        bool IsGeneric { get; set; }
     }
 }

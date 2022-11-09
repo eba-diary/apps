@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,9 +23,9 @@ namespace Sentry.data.Core
             }
         }
 
-        public override Uri CalcRelativeUri(RetrieverJob Job)
+        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
         {
-            string storageCode = Job.DatasetConfig.GetStorageCode();
+            string storageCode = job.DatasetConfig.GetStorageCode();
             //string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Id.ToString();
             //string dsname = Job.DatasetConfig.ParentDataset.DatasetId.ToString();
             //string dfcname = Job.DatasetConfig.ConfigId.ToString();

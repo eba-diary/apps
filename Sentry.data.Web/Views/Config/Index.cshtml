@@ -20,10 +20,6 @@
     <h1 class="detailName leftFloat @color pt-0">@Model.DatasetName</h1>
 
     <div>
-        @if (HttpContext.Current.IsDebuggingEnabled)
-        {
-            <a class="btn btn-success btnCreateDirectory mt-3"><em class="fas fa-plus mr-2"></em>Create Directories</a>
-        }
         <a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus mr-2"></em>Add Schema</a>
     </div>
 </div>
@@ -67,8 +63,8 @@
 
                     <div class="ml-3">
                         <div class="pb-3">
-                            <div class="font-weight-bold">Description:</div>
-                            <div class="ml-3">
+                            <div>
+                                <span class="font-weight-bold">Description:</span>
                                 @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
                                 {
                                     int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
@@ -234,7 +230,7 @@
                                         <div>This dataflow does not contain any special processing.</div>
                                     }
 
-                                    Html.RenderPartial("_DataFlowStepAccordion", ext, new ViewDataDictionary { { "Color", Model.CategoryColor } });
+                                    Html.RenderPartial("_DataFlowStepAccordion", ext);
                                 }
                             }
                         </div>

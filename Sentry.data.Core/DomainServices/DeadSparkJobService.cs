@@ -35,9 +35,9 @@ namespace Sentry.data.Core
 
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
         {
-            List<string> s3ObjectList = (List<string>)_s3ServiceProvider.ListObjects(deadSparkJob.SourceBucketName, deadSparkJob.TargetKey);
+            List<string> s3ObjectList = _s3ServiceProvider.ListObjects(deadSparkJob.SourceBucketName, deadSparkJob.TargetKey).ToList();
 
-            bool reprocessingRequired = s3ObjectList.Contains("_SUCCESS") ? false : true;
+            bool reprocessingRequired = s3ObjectList.Any(s3Object => s3Object.Contains("_SUCCESS")) ? false : true;
 
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {

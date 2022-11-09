@@ -173,6 +173,8 @@
     <Folder Include="Stored Procedure" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_18" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_01" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_07" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -327,6 +329,8 @@
     <Build Include="Tables\SupportLink.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_18\CLA-4353-HistoryFixIngestionType.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_01\CLA-4458-HistoryFixIsBackFill.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_07\CLA-4660-HistoryFixUpperCaseS3ConnectorName.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4668-Remove-Query-Permission-From-Default-Security.sql" />
     <Build Include="Tables\RetrieverJobs\DataSourceTokens.sql" />
   </ItemGroup>
   <ItemGroup>

@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure
 
         protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            IRestClient restClient, IDataFeatures dataFeatures)
+            IRestClient restClient, IDataFeatures dataFeatures, Lazy<IJobService> jobService) : base(jobService)
         {
             _dsContext = datasetContext;
             _configService = configService;
@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
         public override void ConfigureProvider(RetrieverJob job)
         {
             _job = job;
-            _uri = job.GetUri();
+            _uri = _jobService.Value.GetDataSourceUri(job);
             _request = new RestRequest();
 
             if (job.DataSource.SourceAuthType.Is<TokenAuthentication>())

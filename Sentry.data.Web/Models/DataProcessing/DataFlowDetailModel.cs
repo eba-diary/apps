@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
 
 namespace Sentry.data.Web
@@ -20,5 +21,7 @@ namespace Sentry.data.Web
         public bool DisplayDataflowEdit { get; set; }
         public string ProducerAssetGroupName { get; set; }
         public bool CLA3718_Authorization { get; set; }
+        public string CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; set; }
+        public NamedEnvironmentType DatasetEnvironmentType { get; set; }
     }
 }

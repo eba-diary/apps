@@ -485,7 +485,6 @@
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
-    <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />

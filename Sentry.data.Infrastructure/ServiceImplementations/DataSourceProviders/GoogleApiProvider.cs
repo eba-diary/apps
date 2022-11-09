@@ -19,7 +19,6 @@ namespace Sentry.data.Infrastructure
 {
     public class GoogleApiProvider : BaseHttpsProvider, IGoogleApiProvider
     {
-        private readonly Lazy<IJobService> _jobService;
         private readonly string _nextVal = "0";
         protected bool _IsTargetS3;
         protected string _targetPath;
@@ -27,15 +26,9 @@ namespace Sentry.data.Infrastructure
         public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
-            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures, jobService)
         {
-            _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
-        }
-
-        protected IJobService JobService
-        {
-            get { return _jobService.Value; }
         }
 
         protected override void ConfigureClient()
@@ -76,7 +69,7 @@ namespace Sentry.data.Infrastructure
             {
                 case HttpMethods.get:
                     _request.Method = Method.GET;
-                    _request.Resource = _job.GetUri().ToString();
+                    _request.Resource = _jobService.Value.GetDataSourceUri(_job).ToString();
                     break;
                 case HttpMethods.post:
                     _request.Method = Method.POST;
@@ -397,7 +390,7 @@ namespace Sentry.data.Infrastructure
         protected override void FindTargetJob()
         {
             //Find appropriate drop location (S3Basic or DfsBasic)
-            _targetJob = JobService.FindBasicJob(_job);
+            _targetJob = _jobService.Value.FindBasicJob(_job);
 
             _IsTargetS3 = _targetJob.DataSource.Is<S3Basic>();
         }
@@ -406,7 +399,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                _targetPath = $"{_targetJob.GetTargetPath(_job)}.{extension}";
+                _targetPath = $"{_jobService.Value.GetTargetPath(_targetJob, _job)}.{extension}";
             }
             catch (Exception ex)
             {
