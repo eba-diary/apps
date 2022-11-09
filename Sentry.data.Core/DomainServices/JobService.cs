@@ -421,8 +421,7 @@ namespace Sentry.data.Core
                 throw new NotImplementedException("Not Configured to determine target path for data source type");
             }
 
-            Uri executingJobUri = GetDataSourceUri(executingJob);
-            string executingTargetFileName = executingJob.GetTargetFileName(Path.GetFileName(executingJobUri.ToString()));
+            string executingTargetFileName = executingJob.GetTargetFileName(Path.GetFileName(GetDataSourceUri(executingJob).ToString()));
 
             string targetPath;
             if (executingJob.DataSource.Is<HTTPSSource>())
