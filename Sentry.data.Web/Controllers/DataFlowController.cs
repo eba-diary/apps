@@ -64,20 +64,17 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Detail(int id)
         {
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
-            AssociatedDataFlowModel model = new AssociatedDataFlowModel(dto)
-            {
-                DisplayDataflowEdit = _dataFeatures.Value.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
-                UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser),
-                CLA3718_Authorization = DataFeatures.CLA3718_Authorization.GetValue(),
-                CLA4260_QuartermasterNamedEnvironmentTypeFilter = _dataFeatures.Value.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue(),
-                RetrieverJobs = _dataFlowService.GetExternalRetrieverJobsByDataFlowId(id),
-                DatasetEnvironmentType = _datasetService.GetDatasetEnvironmentType(dto.DatasetId)
-            };
+            DataFlowDetailModel model = new DataFlowDetailModel(dto);
+
+            model.DisplayDataflowEdit = _dataFeatures.Value.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
+            model.UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             if (DataFeatures.CLA3718_Authorization.GetValue())
             {
                 model.ProducerAssetGroupName = _dataFlowService.GetSecurityGroup(id);
             }
+
+            model.CLA3718_Authorization = DataFeatures.CLA3718_Authorization.GetValue();
 
             return View(model);
         }
@@ -325,6 +322,13 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_CompressionJob", model);
 
+        }
+
+        public PartialViewResult NewRetrieverJob(JobModel model)
+        {
+            CreateDropDownSetup(model);
+
+            return PartialView("_RetrieverJob", model);
         }
 
         public PartialViewResult _SchemaMapDetail(int dataflowId)

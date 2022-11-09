@@ -21,15 +21,86 @@
             <!-- Card body -->
             <div id="collapse-step-@stepModel.Id" class="collapse" role="tabpanel" aria-labelledby="heading-step-@stepModel.Id" data-parent="#accordionSteps-@Model.Id">
                 <div class="card-body ml-3 mr-3">
-                    <div>
-                        <span class="font-weight-bold">AWS S3 Drop Location:</span>
-                        @stepModel.RootAwsUrl@stepModel.TriggetKey</div>
+                    <div class="font-weight-bold">AWS S3 Drop Location:</div>
+                    <div class="ml-3"><span>@stepModel.RootAwsUrl@stepModel.TriggetKey</span></div>
                 </div>
             </div>
         </div>
         <!-- Accordion card -->
     }
 
-    @Html.Partial("~/Views/RetrieverJob/_RetrieverJobAccordionCards.cshtml", new RetrieverJobAccordionModel("#accordionSteps-" + Model.Id, Model.DatasetEnvironmentType, Model.CLA4260_QuartermasterNamedEnvironmentTypeFilter, Model.RetrieverJobs))
+    @foreach (Sentry.data.Core.RetrieverJob extJob in Model.RetrieverJobs)
+    {
+        <!-- Accordion card -->
+        <div class="card data-flow-card-radius mr-3 mb-1">
+            <!-- Card header -->
+            <a class="collapsed" data-toggle="collapse" data-parent="#accordionSteps-@Model.Id" href="#collapse-job-@extJob.Id" aria-expanded="false" aria-controls="collapse-job-@extJob.Id">
+                <div class="card-header data-flow-card-radius @color" role="tab" id="heading-job-@extJob.Id">
+                    <h6 class="text-white mb-0 pt-0">@extJob.DataSource.Name <em class="fas fa-angle-down rotate-icon"></em></h6>
+                </div>
+            </a>
+
+            <!-- Card body -->
+            <div id="collapse-job-@extJob.Id" class="collapse" role="tabpanel" aria-labelledby="heading-job-@extJob.Id" data-parent="#accordionSteps-@Model.Id">
+                <div class="card-body ml-3 mr-3">
+                    @if (!string.IsNullOrWhiteSpace(extJob.DataSource.Description))
+                    {
+                        <div class="pb-3">
+                            <div class="font-weight-bold">Description:</div>
+                            <div class="ml-3">@extJob.DataSource.Description</div>
+                        </div>
+                    }
+
+                    @if (extJob.IsGeneric)
+                    {
+                        <div>This is the Generic Data File Configuration that was created when the Dataset was created. Certain fields cannot be modified.</div>
+                    }
+
+                    <div class="pb-3"><span class="schedule">@extJob.Schedule</span></div>
+                    <div class="font-weight-bold">Retrieving data from:</div>
+                    <div class="ml-3">@extJob.GetUri() </div>
+
+                    @if (extJob.JobOptions != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(extJob.JobOptions.SearchCriteria))
+                        {
+                            if (extJob.JobOptions.IsRegexSearch)
+                            {
+                                <div><span class="font-weight-bold">Regex search for:</span> @extJob.JobOptions.SearchCriteria</div>
+                            }
+                            else
+                            {
+                                <div><span class="font-weight-bold">Exact String search for:</span> @extJob.JobOptions.SearchCriteria</div>
+                            }
+                        }
+
+                        if (extJob.JobOptions.OverwriteDataFile)
+                        {
+                            <div>This job will overwrite exact file names with the same name and save them as versions.</div>
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(extJob.JobOptions.TargetFileName))
+                        {
+                            <div><span class="font-weight-bold">Target file name:</span> @extJob.JobOptions.TargetFileName</div>
+                        }
+                    }
+
+                    @if (extJob.JobOptions?.CompressionOptions?.IsCompressed == true)
+                    {
+                        <div>This job is uncompressing @extJob.JobOptions.CompressionOptions.CompressionType files.</div>
+
+                        foreach (var fileName in extJob.JobOptions.CompressionOptions.FileNameExclusionList)
+                        {
+                            <div>@fileName is being excluded.</div>
+                        }
+                    }
+
+                    <div><span class="font-weight-bold">Created on:</span> @extJob.Created</div>
+                    <div><span class="font-weight-bold">Last Modified on:</span> @extJob.Modified</div>
+                </div>
+            </div>
+        </div>
+        <!-- Accordion card -->
+    }
 </div>
 <!-- Accordion wrapper -->

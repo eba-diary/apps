@@ -120,9 +120,6 @@
             data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
         });
 
-        $(".schedule").each(function (index, element) {
-            $(this).text("Next processing time will be " + prettyCron.getNext($(this).text()));
-        });
     },
 
     InitIngestionType() {
