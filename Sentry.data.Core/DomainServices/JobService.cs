@@ -211,8 +211,11 @@ namespace Sentry.data.Core
             }
             catch (Exception e)
             {
+
                 StringBuilder errmsg = new StringBuilder();
                 errmsg.AppendLine("Failed to Create Drop Location:");
+                errmsg.AppendLine($"DatasetId: {job.DatasetConfig.ParentDataset.DatasetId}");
+                errmsg.AppendLine($"DatasetName: {job.DatasetConfig.ParentDataset.DatasetName}");
                 errmsg.AppendLine($"DropLocation: {GetDataSourceUri(job).LocalPath}");
 
                 Logger.Error(errmsg.ToString(), e);
