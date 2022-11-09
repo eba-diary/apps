@@ -20,6 +20,6 @@ namespace Sentry.data.Core
         Boolean IsUriEditable { get; set; }
         bool IsUserPassRequired { get; set; }
         bool IsSourceCompressed { get; set; }
-        Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter);
+        Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter);
     }
 }

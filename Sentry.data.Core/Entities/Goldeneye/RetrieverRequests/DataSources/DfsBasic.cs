@@ -28,11 +28,11 @@ namespace Sentry.data.Core
                 return GlobalConstants.DataSourceDiscriminator.DEFAULT_DROP_LOCATION;
             }
         }
-        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
         {
-            string cat = job.DatasetConfig.ParentDataset.DatasetCategories.First().Name.ToLower();
-            string dsname = job.DatasetConfig.ParentDataset.DatasetName.Replace(' ', '_').ToLower();
-            string dfcname = job.DatasetConfig.Name.Replace(' ', '_').ToLower();
+            string cat = Job.DatasetConfig.ParentDataset.DatasetCategories.First().Name.ToLower();
+            string dsname = Job.DatasetConfig.ParentDataset.DatasetName.Replace(' ', '_').ToLower();
+            string dfcname = Job.DatasetConfig.Name.Replace(' ', '_').ToLower();
 
             Uri u = new Uri(Path.Combine(new string[] { BaseUri.ToString(), cat, dsname, dfcname }).ToString());
 

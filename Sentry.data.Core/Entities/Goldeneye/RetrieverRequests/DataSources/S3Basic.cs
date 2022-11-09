@@ -23,9 +23,9 @@ namespace Sentry.data.Core
             }
         }
 
-        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
         {
-            string storageCode = job.DatasetConfig.GetStorageCode();
+            string storageCode = Job.DatasetConfig.GetStorageCode();
             //string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Id.ToString();
             //string dsname = Job.DatasetConfig.ParentDataset.DatasetId.ToString();
             //string dfcname = Job.DatasetConfig.ConfigId.ToString();
