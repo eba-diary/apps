@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +24,6 @@ namespace Sentry.data.Core
         [DisplayName("Expiration Time")]
         public virtual DateTime ?CurrentTokenExp { get; set; }
 
-        [Required]
         [DisplayName("Name")]
         public virtual string TokenName { get; set; }
 

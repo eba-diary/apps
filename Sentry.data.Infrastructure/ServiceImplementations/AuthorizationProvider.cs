@@ -197,7 +197,7 @@ namespace Sentry.data.Infrastructure
             
             if(newScope.Length > 500)
             {
-                newScope = newScope.Substring(0, 500);
+                newScope.Substring(0, 500);
             }
 
             token.Scope = newScope;
