@@ -1376,39 +1376,5 @@ namespace Sentry.data.Core.Tests
             // DataFlowDetailDto object mapped from the active object status DataFlow
             Assert.AreEqual(1, testFlow1.Count);
         }
-
-        [TestMethod]
-        public void GetExternalRetrieverJobsByDataFlowId_1_RetrieverJobs()
-        {
-            List<RetrieverJob> jobs = new List<RetrieverJob>()
-            {
-                new RetrieverJob()
-                {
-                    DataFlow = new DataFlow() { Id = 1 },
-                    IsGeneric = true
-                },
-                new RetrieverJob()
-                {
-                    DataFlow = new DataFlow() { Id = 2 },
-                    IsGeneric = true
-                },
-                new RetrieverJob()
-                {
-                    DataFlow = new DataFlow() { Id = 1 },
-                    IsGeneric = false
-                }
-            };
-
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
-            context.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
-
-            DataFlowService dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
-
-            List<RetrieverJob> results = dataFlowService.GetExternalRetrieverJobsByDataFlowId(1);
-
-            Assert.AreEqual(1, results.Count);
-
-            context.VerifyAll();
-        }
     }
 }

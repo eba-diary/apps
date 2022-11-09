@@ -1344,26 +1344,5 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Blue", dto.CategoryColor);
             Assert.AreEqual(1, dto.GroupAccessCount);
         }
-
-        [TestMethod]
-        public void GetDatasetEnvironmentType_1_NonProd()
-        {
-            List<Dataset> datasets = new List<Dataset>()
-            {
-                new Dataset() { DatasetId = 1, NamedEnvironmentType = NamedEnvironmentType.NonProd },
-                new Dataset() { DatasetId = 2, NamedEnvironmentType = NamedEnvironmentType.Prod }
-            };
-
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
-            context.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
-
-            DatasetService datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
-
-            NamedEnvironmentType result = datasetService.GetDatasetEnvironmentType(1);
-            
-            Assert.AreEqual(NamedEnvironmentType.NonProd, result);
-
-            context.VerifyAll();
-        }
     }
 }
