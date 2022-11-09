@@ -330,7 +330,7 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_18\CLA-4353-HistoryFixIngestionType.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_01\CLA-4458-HistoryFixIsBackFill.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_07\CLA-4660-HistoryFixUpperCaseS3ConnectorName.sql" />
-    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4668-Remove-Query-Permission-From-Default-Security.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4668-RemoveQueryPermissionFromDefaultSecurity.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
