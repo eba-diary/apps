@@ -948,7 +948,8 @@ namespace Sentry.data.Core
         {
             var consumerPermissionCodes = new List<string>() {
                 PermissionCodes.CAN_PREVIEW_DATASET,
-                PermissionCodes.CAN_VIEW_FULL_DATASET
+                PermissionCodes.CAN_VIEW_FULL_DATASET,
+                PermissionCodes.CAN_QUERY_DATASET
             };
             return _datasetContext.Permission.Where(x => consumerPermissionCodes.Contains(x.PermissionCode) &&
                                                          x.SecurableObject == SecurableEntityName.DATASET).ToList();
