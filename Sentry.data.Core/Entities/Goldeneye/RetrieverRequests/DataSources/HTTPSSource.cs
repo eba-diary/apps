@@ -113,7 +113,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             return new Uri(Path.Combine(BaseUri.ToString(), Job.RelativeUri).ToString());
         }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Web.Models.ApiModels.Job;
 
@@ -35,18 +34,18 @@ namespace Sentry.data.Web.Extensions
             return (modelList);
         }
 
-        public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList, Func<RetrieverJob, Uri> getUri)
+        public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList)
         {
             List<DfsMonitorModel> modelList = new List<DfsMonitorModel>();
 
-            foreach (RetrieverJob dto in dtoList)
+            foreach (Core.RetrieverJob dto in dtoList)
             {
                 try
                 {
                     DfsMonitorModel model = new DfsMonitorModel()
                     {
                         JobId = dto.Id,
-                        MonitorTarget = getUri(dto).LocalPath //.DataSource.CalcRelativeUri(dto).LocalPath
+                        MonitorTarget = dto.DataSource.CalcRelativeUri(dto).LocalPath
                     };
 
                     modelList.Add(model);

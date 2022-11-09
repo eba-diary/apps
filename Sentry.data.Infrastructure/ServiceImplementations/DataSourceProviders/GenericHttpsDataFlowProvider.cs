@@ -42,7 +42,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                _targetPath = $"{_jobService.Value.GetTargetPath(_targetStep, _job)}.{extension}";
+                _targetPath = $"{_targetStep.GetTargetPath(_job)}.{extension}";
             }
             catch (Exception ex)
             {

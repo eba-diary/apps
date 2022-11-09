@@ -122,7 +122,7 @@ namespace Sentry.data.Infrastructure
                             else if (defaultjob.DataSource.Is<DfsBasic>())
                             {
                                 //Set target path based on DfsBasic URI
-                                string targetPath = ""; //defaultjob.GetUri().LocalPath; Replaced with some junk
+                                string targetPath = defaultjob.GetUri().LocalPath;
 
                                 UncompressZipFile(filePath, targetPath);
 
@@ -184,7 +184,7 @@ namespace Sentry.data.Infrastructure
                             }
                             else if (defaultjob.DataSource.Is<DfsBasic>())
                             {
-                                string target = ""; //Replaced with some junk Path.Combine(defaultjob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath)));
+                                string target = Path.Combine(defaultjob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath)));
                                 File.Move(tempfile, target);
                                 _job.JobLoggerMessage("Info", $"Extracted File to DFS Drop Location ({target})");
                             }

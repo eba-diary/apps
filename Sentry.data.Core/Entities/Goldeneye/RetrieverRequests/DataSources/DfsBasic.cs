@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.Configuration;
 using System.IO;
-using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
@@ -28,7 +27,7 @@ namespace Sentry.data.Core
                 return GlobalConstants.DataSourceDiscriminator.DEFAULT_DROP_LOCATION;
             }
         }
-        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             string cat = Job.DatasetConfig.ParentDataset.DatasetCategories.First().Name.ToLower();
             string dsname = Job.DatasetConfig.ParentDataset.DatasetName.Replace(' ', '_').ToLower();

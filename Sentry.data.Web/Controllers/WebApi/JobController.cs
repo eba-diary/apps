@@ -114,7 +114,8 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             try
             {
-                model = _jobService.GetDfsRetrieverJobs().ToModel(job => _jobService.GetDataSourceUri(job));
+
+                model = _jobService.GetDfsRetrieverJobs().ToModel();
 
                 return Ok(model);
             }

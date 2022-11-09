@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.IO;
-using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
@@ -21,7 +20,7 @@ namespace Sentry.data.Core
                 return "DFSBasicHsz";
             }
         }
-        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             string storageCode = Job.DatasetConfig.GetStorageCode();
 

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.data.Core;
 using System.IO;
-using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
@@ -20,6 +19,6 @@ namespace Sentry.data.Core
         Boolean IsUriEditable { get; set; }
         bool IsUserPassRequired { get; set; }
         bool IsSourceCompressed { get; set; }
-        Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter);
+        Uri CalcRelativeUri(RetrieverJob Job);
     }
 }

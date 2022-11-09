@@ -2,7 +2,6 @@
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -43,9 +42,7 @@ namespace Sentry.data.Core
         void DisableJob(int id);
 
         bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
-        Uri GetDataSourceUri(RetrieverJob job);
-        string GetTargetPath(RetrieverJob basicJob, RetrieverJob executingJob);
-        string GetTargetPath(DataFlowStep s3DropStep, RetrieverJob executingJob);
+
         List<RetrieverJob> GetDfsRetrieverJobs();
 
         Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);

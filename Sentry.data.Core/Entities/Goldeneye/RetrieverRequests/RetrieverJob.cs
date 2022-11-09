@@ -82,8 +82,8 @@ namespace Sentry.data.Core
         public virtual DatasetFileConfig DatasetConfig { get; set; }
         public virtual DateTime Created { get; set; }
         public virtual DateTime Modified { get; set; }
-        public virtual bool IsGeneric { get; set; }
-        public virtual bool IsEnabled { get; set; }
+        public virtual Boolean IsGeneric { get; set; }
+        public virtual Boolean IsEnabled { get; set; }
 
         //Property is stored within database as string
         public virtual RetrieverJobOptions JobOptions
@@ -130,6 +130,11 @@ namespace Sentry.data.Core
             Dictionary<string, string> parameters = ExecutionParameters;
             parameters[key] = value;
             ExecutionParameters = parameters;
+        }
+
+        public virtual Uri GetUri()
+        {
+            return DataSource.CalcRelativeUri(this);
         }
 
         /// <summary>

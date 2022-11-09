@@ -1,18 +1,20 @@
-﻿using Sentry.data.Core.GlobalEnums;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public class DfsDataFlowBasic : DfsSource
     {
         public DfsDataFlowBasic()
-        
         {
             IsUriEditable = false;
-            BaseUri = new Uri($"{BaseUri}DatasetLoader/");
+            BaseUri = new Uri($"{BaseUri.ToString()}DatasetLoader/");
         }
-
+        
         //Setting Discriminator Value for NHibernate
         public override string SourceType
         {
@@ -22,7 +24,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public override Uri CalcRelativeUri(RetrieverJob Job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             var locbase = BaseUri.ToString();
             var storagecde = Job.DataFlow.FlowStorageCode;

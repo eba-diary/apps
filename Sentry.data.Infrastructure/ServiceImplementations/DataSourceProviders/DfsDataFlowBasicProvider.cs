@@ -15,8 +15,6 @@ namespace Sentry.data.Infrastructure
     {
         private string _filePath;
 
-        public DfsDataFlowBasicProvider(Lazy<IJobService> jobService) : base(jobService) { }
-
         public override void ConfigureProvider(RetrieverJob job)
         {
             throw new NotImplementedException();
@@ -51,10 +49,10 @@ namespace Sentry.data.Infrastructure
                     //find target s3 drop location
                     string targetPrefix = targetS3DropStep.TriggerKey;
 
-                    _job.JobLoggerMessage("Debug", $"directory:{_jobService.Value.GetDataSourceUri(_job).LocalPath} searchcriteria:{dirSearchCriteria}");
+                    _job.JobLoggerMessage("Debug", $"directory:{_job.GetUri().LocalPath} searchcriteria:{dirSearchCriteria}");
 
                     // Only search top directory and source files not locked and does not start with two exclamaition points !!
-                    string[] files = Directory.GetFiles(_jobService.Value.GetDataSourceUri(_job).LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w)).ToArray();
+                    string[] files = Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w)).ToArray();
 
                     _job.JobLoggerMessage("Debug", $"found {files.Length.ToString()}");
 
