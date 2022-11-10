@@ -5,7 +5,7 @@
     [CurrentToken] NVARCHAR(MAX) NULL, 
     [RefreshToken] NVARCHAR(MAX) NULL, 
     [CurrentTokenExp] DATETIME NULL, 
-    [TokenName] VARCHAR(50) NOT NULL, 
+    [TokenName] VARCHAR(50) NULL, 
     [TokenUrl] VARCHAR(50) NULL, 
     [Scope] VARCHAR(500) NULL, 
     [TokenExp] VARCHAR(50) NULL, 

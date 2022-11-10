@@ -10,8 +10,7 @@
     <ProjectGuid>{b07aace7-c256-4e7f-9007-b8ef19577cba}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
-    <RootPath>
-    </RootPath>
+    <RootPath />
     <RootNamespace>Sentry.data.Database</RootNamespace>
     <AssemblyName>Sentry.data.Database</AssemblyName>
     <ModelCollation>1033,CI</ModelCollation>
@@ -93,10 +92,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <!-- VS10 without SP1 will not have VisualStudioVersion set, so do that here -->
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <!-- Default to the v10.0 targets path if the targets file for the current VS version is not found -->
     <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
     <VisualStudioVersion Condition="'$(SSDTExists)' == ''">10.0</VisualStudioVersion>
   </PropertyGroup>
@@ -174,6 +171,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_01_18" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_01" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_07" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -423,6 +421,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_21_09_08\INSERT_SECURITY_DSC_BUSINESS_AREA.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4479-MigrateTokensFromDataSourceToTokenTable.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />

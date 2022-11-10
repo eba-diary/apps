@@ -25,7 +25,7 @@ namespace Sentry.data.Infrastructure
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
-            IRestClient restClient, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            IRestClient restClient, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, restClient, dataFeatures, jobService)
         {
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
             _authorizationProvider = authorizationProvider;
