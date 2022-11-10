@@ -2,7 +2,8 @@
 {
     public class DfsMonitorModel
     {
-        public int JobId { get; set; }      
+        public int JobId { get; set; }
+      
         public string MonitorTarget { get; set; }
     }
 }

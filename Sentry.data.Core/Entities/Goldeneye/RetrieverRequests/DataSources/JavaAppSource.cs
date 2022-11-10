@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
 using System;
 
 namespace Sentry.data.Core
@@ -27,7 +26,7 @@ namespace Sentry.data.Core
             }
         }
 
-        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             return null;
         }

@@ -1,5 +1,4 @@
-﻿using Sentry.data.Core.GlobalEnums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -50,7 +49,8 @@ namespace Sentry.data.Core
 
         #endregion
 
-        public abstract Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter);
+
+        public abstract Uri CalcRelativeUri(RetrieverJob Job);
         public abstract string GetDropPrefix(RetrieverJob Job);
 
         //https://stackoverflow.com/questions/2664245/identifying-nhibernate-proxy-classes

@@ -4,7 +4,6 @@ using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Job;
 using Sentry.WebAPI.Versioning;
@@ -29,7 +28,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly IDatasetContext _datasetContext;
         private readonly IJobService _jobService;
         private readonly IApacheLivyProvider _apacheLivyProvider;
-        private readonly IDataFeatures _dataFeatures;
 
         public JobController(IDatasetContext datasetContext, IJobService jobService, 
             IApacheLivyProvider apacheLivyProvider, IDataFeatures dataFeatures)
@@ -37,7 +35,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             _datasetContext = datasetContext;
             _jobService = jobService;
             _apacheLivyProvider = apacheLivyProvider;
-            _dataFeatures = dataFeatures;
         }
         /// <summary>
         /// Gets all Jobs
@@ -111,29 +108,16 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("DFSMonitorList")]
-        public IHttpActionResult GetDfsMonitorList(string environmentType = null)
+        public IHttpActionResult GetDfsMonitorList()
         {
+            List<DfsMonitorModel> model;
+
             try
             {
-                List<DfsMonitorModel> models;
-                if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
-                {
-                    if (Enum.TryParse(environmentType, true, out NamedEnvironmentType namedEnvironmentType))
-                    {
-                        List<DfsMonitorDto> dtos = _jobService.GetDfsRetrieverJobs(namedEnvironmentType);
-                        models = dtos.Select(x => x.ToModel()).ToList();
-                    }
-                    else
-                    {
-                        return Content(HttpStatusCode.BadRequest, "Valid types for environmentType are NonProd or Prod");
-                    }
-                }
-                else
-                {
-                    models = _jobService.GetDfsRetrieverJobs().ToModel(job => _jobService.GetDataSourceUri(job));
-                }                
 
-                return Ok(models);
+                model = _jobService.GetDfsRetrieverJobs().ToModel();
+
+                return Ok(model);
             }
             catch (Exception ex)
             {

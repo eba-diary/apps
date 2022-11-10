@@ -16,6 +16,7 @@ namespace Sentry.data.Infrastructure
 {
     public class GenericHttpsProvider : BaseHttpsProvider
     {
+        private readonly Lazy<IJobService> _jobService;
         private HttpClient _httpClient;
         protected bool _IsTargetS3;
         protected string _targetPath;
@@ -23,9 +24,14 @@ namespace Sentry.data.Infrastructure
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
-            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures, jobService)
+            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
+            _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
+        }
+        protected IJobService JobService
+        {
+            get { return _jobService.Value; }
         }
 
         public async Task ExecuteHttpClient(RetrieverJob job)
@@ -343,7 +349,7 @@ namespace Sentry.data.Infrastructure
             _request = new RestRequest();
 #pragma warning restore IDE0017 // Simplify object initialization
             _request.Method = Method.GET;
-            _request.Resource = _jobService.Value.GetDataSourceUri(_job).ToString();
+            _request.Resource = _job.GetUri().ToString();
 
             //Add datasource specific headers to request
             List<RequestHeader> headerList = ((HTTPSSource)_job.DataSource).RequestHeaders;
@@ -386,7 +392,7 @@ namespace Sentry.data.Infrastructure
         protected override void FindTargetJob()
         {
             //Find appropriate drop location (S3Basic or DfsBasic)
-            _targetJob = _jobService.Value.FindBasicJob(this._job);
+            _targetJob = JobService.FindBasicJob(this._job);
 
             _IsTargetS3 = _targetJob.DataSource.Is<S3Basic>();
         }
@@ -395,7 +401,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                _targetPath = $"{_jobService.Value.GetTargetPath(_targetJob, _job)}.{extension}";
+                _targetPath = $"{_targetJob.GetTargetPath(_job)}.{extension}";
             }
             catch (Exception ex)
             {
@@ -406,7 +412,7 @@ namespace Sentry.data.Infrastructure
 
         private async Task GetResponseIntoFileStream(RetrieverJob job, string tempFile)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync(_jobService.Value.GetDataSourceUri(job).ToString(), HttpCompletionOption.ResponseHeadersRead);
+            HttpResponseMessage response = await _httpClient.GetAsync(job.GetUri().ToString(), HttpCompletionOption.ResponseHeadersRead);
             using (Stream responseStream = await response.Content.ReadAsStreamAsync())
             {
                 using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))

@@ -1,5 +1,4 @@
 ﻿using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,8 +33,9 @@ namespace Sentry.data.Core
         List<string> GetDatasetNamesForAsset(string asset);
         List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset);
         List<Dataset> GetInheritanceEnabledDatasetsForAsset(string asset);
+
         Task<string> RequestAccessRemoval(AccessRequest request);
+
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
-        NamedEnvironmentType GetDatasetEnvironmentType(int datasetId);
     }
 }
