@@ -573,7 +573,6 @@
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
-    <Compile Include="Models\RetrieverJob\RetrieverJobAccordionModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -1390,7 +1389,6 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
-    <Content Include="Views\RetrieverJob\_RetrieverJobAccordionCards.cshtml" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
   </ItemGroup>
   <ItemGroup>

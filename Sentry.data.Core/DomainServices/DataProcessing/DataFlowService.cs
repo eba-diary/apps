@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
@@ -132,11 +131,6 @@ namespace Sentry.data.Core
             RetrieverJob job = _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == id).First();
             RetrieverJobDto dto = job.ToDto();
             return dto;
-        }
-
-        public List<RetrieverJob> GetExternalRetrieverJobsByDataFlowId(int dataFlowId)
-        {
-            return _datasetContext.RetrieverJob.Where(w => w.DataFlow.Id == dataFlowId && !w.IsGeneric).ToList();
         }
 
         /// <summary>

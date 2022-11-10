@@ -1,5 +1,4 @@
 ﻿using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 
@@ -27,7 +26,7 @@ namespace Sentry.data.Core
         }
 
         public override List<AuthenticationType> ValidAuthTypes { get; set; }
-        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             throw new NotImplementedException();
         }

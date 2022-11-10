@@ -106,7 +106,6 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
-        List<RetrieverJob> GetExternalRetrieverJobsByDataFlowId(int dataFlowId); 
 
         bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds);
 

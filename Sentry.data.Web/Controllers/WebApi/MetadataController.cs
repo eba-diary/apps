@@ -32,12 +32,11 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly ISecurityService _securityService;
         private readonly IMessagePublisher _messagePublisher;
         private readonly Lazy<IDatasetFileService> _datasetFileService;
-        private readonly Lazy<IJobService> _jobService;
 
         public MetadataController(IDatasetContext dsContext, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService,
-                                IMessagePublisher messagePublisher, Lazy<IDatasetFileService> datasetFileService, Lazy<IJobService> jobService)
+                                IMessagePublisher messagePublisher, Lazy<IDatasetFileService> datasetFileService)
         {
             _dsContext = dsContext;
             _userService = userService;
@@ -47,7 +46,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             _securityService = securityService;
             _messagePublisher = messagePublisher;
             _datasetFileService = datasetFileService;
-            _jobService = jobService;
         }
 
         public IDatasetFileService DatasetFileService
@@ -908,7 +906,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                             Name = (job.IsGeneric) ? job.DataSource.Name : $"{job.DataSource.SourceType} - {job.DataSource.Name}",
                             JobId = job.Id,
                             IsEnabled = job.IsEnabled,
-                            Location = _jobService.Value.GetDataSourceUri(job).AbsolutePath
+                            Location = job.GetUri().AbsolutePath
                         });                        
                     }
 
