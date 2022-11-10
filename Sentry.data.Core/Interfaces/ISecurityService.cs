@@ -42,6 +42,5 @@ namespace Sentry.data.Core
         /// <param name="dataflowId">The Dataflow that was just created</param>
         void EnqueueCreateDefaultSecurityForDataFlow(int dataflowId);
         void EnqueueCreateDefaultSecurityForDataFlowList(int[] dataflowIdList);
-
     }
 }

@@ -95,6 +95,5 @@ namespace Sentry.data.Core
         public string StatusCode { get; set; }
 
         #endregion
-
     }
 }

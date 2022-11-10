@@ -112,6 +112,10 @@
       <Link>FeatureFlagSettings.config</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\HiveODBC.config">
+      <Link>HiveODBC.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\KafkaSettings.config">
       <Link>KafkaSettings.config</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

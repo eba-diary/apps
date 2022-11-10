@@ -18,7 +18,7 @@ namespace Sentry.data.Core
     public class ConnectorService : IKafkaConnectorService
     {
         private readonly IKafkaConnectorProvider _connectorProvider;
-
+        
         public ConnectorService(IKafkaConnectorProvider connectorProvider)
         {
             _connectorProvider = connectorProvider;
@@ -63,6 +63,25 @@ namespace Sentry.data.Core
             JObject returnObj = new JObject(configJObj.Properties().OrderBy(p => p.Name));
 
             return returnObj;
+        }
+
+
+        public async Task<ConnectorCreateResponseDto> CreateS3SinkConnectorAsync(ConnectorCreateRequestDto request)
+        {
+            string requestJSON = JsonConvert.SerializeObject(request);
+
+            //IMPORTANT! Use ConfigureAwait(false) to essentially return to original session/thread that called this since caller of this needs the result
+            HttpResponseMessage httpResponse = await _connectorProvider.CreateS3SinkConnectorAsync(requestJSON).ConfigureAwait(false);
+            ConnectorCreateResponseDto responseDto = new ConnectorCreateResponseDto()
+            {
+                SuccessStatusCode = httpResponse.IsSuccessStatusCode,
+                SuccessStatusCodeDescription = (httpResponse.IsSuccessStatusCode)? "SUCCESS" : "FAILED",
+                StatusCode = ((int)httpResponse.StatusCode).ToString(),
+                ReasonPhrase = httpResponse.ReasonPhrase
+            };
+
+            Logger.Info($"Method <CreateS3SinkConnectorAsync> STATUS={responseDto.SuccessStatusCodeDescription} Creating: {requestJSON} ");
+            return responseDto;
         }
     }
 }

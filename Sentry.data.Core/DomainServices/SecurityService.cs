@@ -3,7 +3,6 @@ using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.FeatureFlags;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
-using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 using Hangfire;
 using Sentry.data.Core.DTO.Security;
+using Sentry.data.Core.Entities.Jira;
 
 namespace Sentry.data.Core
 {
@@ -27,6 +27,7 @@ namespace Sentry.data.Core
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IObsidianService _obsidianService;
         private readonly IAdSecurityAdminProvider _adSecurityAdminProvider;
+        private readonly IJiraService _jiraService;
 
         public SecurityService(IDatasetContext datasetContext,
                                IBaseTicketProvider baseTicketProvider,
@@ -35,7 +36,8 @@ namespace Sentry.data.Core
                                IQuartermasterService quartermasterService,
                                IBackgroundJobClient backgroundJobClient,
                                IObsidianService obsidianService,
-                               IAdSecurityAdminProvider adSecurityAdminProvider)
+                               IAdSecurityAdminProvider adSecurityAdminProvider,
+                               IJiraService jiraService)
         {
             _datasetContext = datasetContext;
             _baseTicketProvider = baseTicketProvider;
@@ -45,6 +47,7 @@ namespace Sentry.data.Core
             _backgroundJobClient = backgroundJobClient;
             _obsidianService = obsidianService;
             _adSecurityAdminProvider = adSecurityAdminProvider;
+            _jiraService = jiraService;
         }
 
         public async Task<string> RequestPermission(AccessRequest model)
@@ -642,7 +645,22 @@ namespace Sentry.data.Core
             acceptanceCriteria.Name = "Acceptance Criteria";
             acceptanceCriteria.Value = sb.ToString();
             customFields.Add(acceptanceCriteria);
-            _quartermasterService.BuildJiraTicketAndRequest(project, new List<string>(), new List<string>(), "", summary, issueType, customFields);
+
+            JiraIssueCreateRequest jiraRequest = new JiraIssueCreateRequest();
+
+            JiraTicket jiraTicket = new JiraTicket();
+            jiraTicket.Project = project;
+            jiraTicket.CustomFields = customFields;
+            jiraTicket.Reporter = ticket.RequestedById;
+            jiraTicket.IssueType = issueType;
+            jiraTicket.Summary = summary;
+            jiraTicket.Labels = new List<string>();
+            jiraTicket.Components = new List<string>();
+            jiraTicket.Description = "";
+
+            jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };
+
+            _jiraService.CreateJiraTickets(jiraRequest);
         }
 
         public void BuildS3RequestAssistance(IList<Dataset> datasets, SecurityTicket ticket)
