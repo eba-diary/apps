@@ -26,7 +26,6 @@ namespace Sentry.data.Core
         Submission SaveSubmission(RetrieverJob job, string options);
         void RecordJobState(Submission submission, RetrieverJob job, string state);
         RetrieverJob FindBasicJob(RetrieverJob job);
-        RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource);
         RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource);
         RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto);
         void CreateDropLocation(RetrieverJob job);
@@ -43,7 +42,7 @@ namespace Sentry.data.Core
 
         bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
 
-        List<RetrieverJob> GetDfsRetrieverJobs();
+        List<DfsMonitorDto> GetDfsRetrieverJobs(string namedEnvironment);
 
         Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);
 

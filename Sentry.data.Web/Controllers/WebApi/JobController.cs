@@ -108,16 +108,13 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("DFSMonitorList")]
-        public IHttpActionResult GetDfsMonitorList()
+        public IHttpActionResult GetDfsMonitorList(string namedEnvironment = null)
         {
-            List<DfsMonitorModel> model;
-
             try
             {
-
-                model = _jobService.GetDfsRetrieverJobs().ToModel();
-
-                return Ok(model);
+                List<DfsMonitorDto> dtos = _jobService.GetDfsRetrieverJobs(namedEnvironment);
+                List<DfsMonitorModel> models = dtos.Select(x => x.ToModel()).ToList();
+                return Ok(models);
             }
             catch (Exception ex)
             {

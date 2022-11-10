@@ -933,5 +933,38 @@ namespace Sentry.data.Core.Tests
 
             Assert.IsNotNull(result.LogInfo);
         }
+
+        [TestMethod]
+        public void GetRetrieverJobs_ActiveDfsDataFlowBasic()
+        {
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new DfsDataFlowBasic()
+                },
+                new RetrieverJob()
+                {
+                    ObjectStatus = ObjectStatusEnum.Deleted
+                },
+                new RetrieverJob()
+                {
+                    ObjectStatus = ObjectStatusEnum.Active,
+                    DataSource = new HTTPSSource()
+                }
+            };
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
+            context.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+
+            JobService jobService = new JobService(context.Object, null, null, null, null);
+
+            List<DfsMonitorDto> results = jobService.GetDfsRetrieverJobs();
+
+            Assert.AreEqual(1, results.Count);
+
+            context.VerifyAll();
+        }
     }
 }

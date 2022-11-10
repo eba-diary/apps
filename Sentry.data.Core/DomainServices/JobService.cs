@@ -1,11 +1,14 @@
 ﻿using Hangfire;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,22 +131,57 @@ namespace Sentry.data.Core
             return basicJob;
         }
 
-        public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
-        {
-            RetrieverJob newJob = InstantiateJob(dfc, dataSource, null);
-            //_datasetContext.Add(newJob);
-            return newJob;
-        }
-
         public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
         {
             string methodName = $"{nameof(JobService)}_{nameof(InstantiateJobsForCreation)}";
             Logger.Info($"{methodName} Method Start");
 
-            RetrieverJob newJob = InstantiateJob(null, dataSource, df);
+            RetrieverJob rj = new RetrieverJob()
+            {
+                TimeZone = "Central Standard Time",
+                RelativeUri = null,
+                DataSource = dataSource,
+                DatasetConfig = null,
+                FileSchema = null,
+                DataFlow = df,
+                Created = DateTime.Now,
+                Modified = DateTime.Now,
+                IsGeneric = true,
+                JobOptions = new RetrieverJobOptions()
+                {
+                    OverwriteDataFile = false,
+                    TargetFileName = "",
+                    CreateCurrentFile = false,
+                    IsRegexSearch = true,
+                    SearchCriteria = "\\.",
+                    CompressionOptions = new Compression()
+                    {
+                        IsCompressed = false,
+                        CompressionType = null,
+                        FileNameExclusionList = new List<string>()
+                    }
+                },
+                JobGuid = Guid.NewGuid(),
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssueDTM = DateTime.MaxValue
+            };
+
+            if (dataSource.Is<S3Basic>())
+            {
+                rj.Schedule = "*/1 * * * *";
+            }
+            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>() || dataSource is DfsEnvironmentSource)
+            {
+                rj.Schedule = "Instant";
+            }
+            else
+            {
+                throw new NotImplementedException("This method does not support this type of Data Source");
+            }
 
             Logger.Info($"{methodName} Method End");
-            return newJob;
+
+            return rj;
         }
 
         public RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto)
@@ -200,18 +238,19 @@ namespace Sentry.data.Core
 
             try
             {
-                if ((job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>())  && !System.IO.Directory.Exists(job.GetUri().LocalPath))
+                if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource is DfsEnvironmentSource)
                 {
-                    System.IO.Directory.CreateDirectory(job.GetUri().LocalPath);
+                    string localPath = job.GetUri().LocalPath;
+                    if (!System.IO.Directory.Exists(localPath))
+                    {
+                        System.IO.Directory.CreateDirectory(localPath);
+                    }
                 }
             }
             catch (Exception e)
             {
-
                 StringBuilder errmsg = new StringBuilder();
                 errmsg.AppendLine("Failed to Create Drop Location:");
-                errmsg.AppendLine($"DatasetId: {job.DatasetConfig.ParentDataset.DatasetId}");
-                errmsg.AppendLine($"DatasetName: {job.DatasetConfig.ParentDataset.DatasetName}");
                 errmsg.AppendLine($"DropLocation: {job.GetUri().LocalPath}");
 
                 Logger.Error(errmsg.ToString(), e);
@@ -398,14 +437,52 @@ namespace Sentry.data.Core
         }
 
 
-        public List<RetrieverJob> GetDfsRetrieverJobs()
+        public List<DfsMonitorDto> GetDfsRetrieverJobs(string namedEnvironment)
         {
+            //Changes needed in here to query based on the namedEnvironment and feature flag combination
             try
             {
-                List<RetrieverJob> jobs;
-                jobs = _datasetContext.RetrieverJob.WhereActive().FetchAllConfiguration(_datasetContext).ToList();
+                IQueryable<RetrieverJob> jobQueryable = _datasetContext.RetrieverJob.Where(w => w.ObjectStatus == ObjectStatusEnum.Active);
 
-                return jobs.Where(x => x.DataSource.Is<DfsDataFlowBasic>()).ToList();
+                if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    if (string.IsNullOrEmpty(namedEnvironment))
+                    {
+                        jobQueryable = jobQueryable.Where(x => x.DataSource is DfsDataFlowBasic || x.DataSource is DfsNonProdSource || x.DataSource is DfsProdSource);
+                    }
+                    else if (Enum.TryParse(namedEnvironment, out NamedEnvironmentType namedEnvironmentType))
+                    {
+                        if (namedEnvironmentType == NamedEnvironmentType.NonProd)
+                        {
+                            jobQueryable = jobQueryable.Where(x => x.DataSource is DfsNonProdSource);
+                        }
+                        else
+                        {
+                            jobQueryable = jobQueryable.Where(x => x.DataSource is DfsProdSource);
+                        }
+                    }
+                }
+                else
+                {
+                    jobQueryable = jobQueryable.Where(x => x.DataSource is DfsDataFlowBasic);
+                }
+                    
+                List<RetrieverJob> jobs = jobQueryable.Fetch(x => x.DataSource).Fetch(x => x.DataFlow).ToList();
+
+                List<DfsMonitorDto> dtos = new List<DfsMonitorDto>();
+                foreach (var job in jobs)
+                {
+                    Uri dataSourceUri = job.GetUri();
+                    DfsMonitorDto dto = new DfsMonitorDto()
+                    {
+                        JobId = job.Id,
+                        MonitorTarget = dataSourceUri.LocalPath
+                    };
+
+                    dtos.Add(dto);
+                }
+
+                return dtos;
             }
             catch (Exception ex)
             {
@@ -803,73 +880,6 @@ namespace Sentry.data.Core
                 json.Append(argString);
                 iteration++;
             }
-        }
-
-        private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
-        {
-            string methodName = $"{nameof(JobService)}_{nameof(InstantiateJob)}";
-            Logger.Info($"{methodName} Method Start");
-
-            Guid g = Guid.NewGuid();
-
-            Logger.Debug($"{methodName} compression object creation start");
-            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
-            {
-                IsCompressed = false,
-                CompressionType = null,
-                FileNameExclusionList = new List<string>()
-            };
-            Logger.Debug($"{methodName} compression object creation end");
-
-            Logger.Debug($"{methodName} retrieverjoboptions object creation start");
-            RetrieverJobOptions rjo = new RetrieverJobOptions()
-            {
-                OverwriteDataFile = false,
-                TargetFileName = "",
-                CreateCurrentFile = false,
-                IsRegexSearch = true,
-                SearchCriteria = "\\.",
-                CompressionOptions = compression
-            };
-            Logger.Debug($"{methodName} retrieverjoboptions object creation end");
-
-            Logger.Debug($"{methodName} retrieverjob object creation start");
-            RetrieverJob rj = new RetrieverJob()
-            {
-                TimeZone = "Central Standard Time",
-                RelativeUri = null,
-                DataSource = dataSource,
-                DatasetConfig = dfc,
-                FileSchema = null,
-                DataFlow = df,
-                Created = DateTime.Now,
-                Modified = DateTime.Now,
-                IsGeneric = true,
-                JobOptions = rjo,
-                JobGuid = g,
-                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
-                DeleteIssueDTM = DateTime.MaxValue
-            };
-            Logger.Debug($"{methodName} retrieverjob object creation End");
-
-            Logger.Debug($"{methodName} retrieverjob schedule creation start");
-            if (dataSource.Is<S3Basic>())
-            {
-                rj.Schedule = "*/1 * * * *";
-            }
-            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>())
-            {
-                rj.Schedule = "Instant";
-            }
-            else
-            {
-                throw new NotImplementedException("This method does not support this type of Data Source");
-            }
-            Logger.Debug($"{methodName} retrieverjob schedule creation end");
-
-            Logger.Info($"{methodName} Method End");
-
-            return rj;
         }
 
         private void MapToCompression(RetrieverJobDto dto, Compression compress)

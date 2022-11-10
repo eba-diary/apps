@@ -126,6 +126,8 @@ namespace Sentry.data.Core
         public static class DataSourceDiscriminator
         {
             public const string DFS_SOURCE = "DFS";
+            public const string DFS_NONPROD_SOURCE = "DFSNonProd";
+            public const string DFS_PROD_SOURCE = "DFSProd";
             public const string DEFAULT_DROP_LOCATION = "DFSBasic";
             public const string DFS_CUSTOM = "DFSCustom";
             public const string DEFAULT_S3_DROP_LOCATION = "S3Basic";
@@ -136,7 +138,6 @@ namespace Sentry.data.Core
             public const string JAVA_APP_SOURCE = "JavaApp";
             public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
             public const string DEFAULT_HSZ_DROP_LOCATION = "DFSBasicHsz";
-
             public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "DFSDataFlowBasic";
             public const string FTP_DATAFLOW_SOURCE = "FTPDATAFLOW";
             public const string GOOGLE_API_DATAFLOW_SOURCE = "GOOGLEAPIDATAFLOW";

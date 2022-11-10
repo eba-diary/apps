@@ -352,24 +352,13 @@ namespace Sentry.data.Core
             {
                 DataFlow df = CreateDataFlow(dto);
 
-                _datasetContext.SaveChanges();
-
                 if (_dataFeatures.CLA3718_Authorization.GetValue())
                 {
                     // Create a Hangfire job that will setup the default security groups for this new dataset
                     _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
                 }
 
-                
-                CreateS3SinkConnector(df);
-
                 return df.Id;
-            }
-            catch (ValidationException)
-            {
-                //throw validation errors for controller to handle
-                _datasetContext.Clear();
-                throw;
             }
             catch (Exception ex)
             {
@@ -401,21 +390,11 @@ namespace Sentry.data.Core
              *  - The incoming dto will have flowstoragecode and will
              *     be used by new dataflow as well  
             */
-            try
-            {
-                DataFlow newDataFlow = CreateDataFlow(dfDto);
-                _datasetContext.SaveChanges();
+            DataFlow newDataFlow = CreateDataFlow(dfDto);
 
-                CreateS3SinkConnector(newDataFlow);
-
-                return newDataFlow.Id;
-            }
-            catch (ValidationException)
-            {
-                _datasetContext.Clear();
-                throw;
-            }
+            return newDataFlow.Id;
         }
+
         public void CreateDataFlowForSchema(FileSchema scm)
         {
             DataFlow df = MapToDataFlow(scm);
@@ -813,26 +792,38 @@ namespace Sentry.data.Core
 
         private DataFlow CreateDataFlow(DataFlowDto dto)
         {
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method Start");
+            try 
+            { 
+                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method Start");
 
-            DataFlow df = MapToDataFlow(dto);
+                DataFlow df = MapToDataFlow(dto);
 
-            switch (dto.IngestionType)
-            {
-                case (int)GlobalEnums.IngestionType.DFS_Drop:
-                case (int)GlobalEnums.IngestionType.S3_Drop:
-                case (int)GlobalEnums.IngestionType.Topic:
-                    MapDataFlowStepsForPush(dto, df);
-                    break;
-                case (int)GlobalEnums.IngestionType.DSC_Pull:
-                    MapDataFlowStepsForPull(dto, df);
-                    break;
-                default:
-                    break;
+                switch (dto.IngestionType)
+                {
+                    case (int)GlobalEnums.IngestionType.DFS_Drop:
+                    case (int)GlobalEnums.IngestionType.S3_Drop:
+                    case (int)GlobalEnums.IngestionType.Topic:
+                        MapDataFlowStepsForPush(dto, df);
+                        break;
+                    case (int)GlobalEnums.IngestionType.DSC_Pull:
+                        MapDataFlowStepsForPull(dto, df);
+                        break;
+                    default:
+                        break;
+                }
+
+                _datasetContext.SaveChanges();
+
+                CreateS3SinkConnector(df);
+
+                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method End");
+                return df;
             }
-
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method End");
-            return df;
+            catch (ValidationException)
+            {
+                _datasetContext.Clear();
+                throw;
+            }
         }
 
         internal DataFlow MapToDataFlow(DataFlowDto dto)
@@ -930,16 +921,14 @@ namespace Sentry.data.Core
 
                 Logger.Debug($"{methodName} found {srcList.Count} sources");
                 StringBuilder sourceTypeList = new StringBuilder();
-                if (srcList != null && srcList.Any())
+                foreach (DataSource item in srcList)
                 {
-                    foreach (DataSource item in srcList)
-                    {
-                        string itemName = $"{item.SourceType}:::";
-                        sourceTypeList.Append(itemName);
-                    }
-                    Logger.Debug($"{methodName} source type list {sourceTypeList}");
+                    string itemName = $"{item.SourceType}:::";
+                    sourceTypeList.Append(itemName);
                 }
+                Logger.Debug($"{methodName} source type list {sourceTypeList}");
 
+                //This is where will check feature flag to determine what Source Type to use
                 RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
 
                 _datasetContext.Add(dfsDataFlowBasic);
