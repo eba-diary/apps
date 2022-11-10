@@ -6,7 +6,7 @@
     [RefreshToken] NVARCHAR(MAX) NULL, 
     [CurrentTokenExp] DATETIME NULL, 
     [TokenName] VARCHAR(50) NULL, 
-    [TokenUrl] VARCHAR(50) NULL, 
+    [TokenUrl] VARCHAR(300) NULL, 
     [Scope] VARCHAR(500) NULL, 
     [TokenExp] VARCHAR(50) NULL, 
     PRIMARY KEY ([Id]), 

@@ -96,11 +96,11 @@ namespace Sentry.data.Infrastructure
 
         private HttpResponseMessage GetOAuthResponseForRefreshToken(HTTPSSource source, DataSourceToken token, HttpClient httpClient)
         {
-            var client_id_val = source.ClientId;
-            var client_secret_val = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
-            var refresh_token_val = _encryptionService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
-            var redirect = $"https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id={client_id_val}&client_secret={client_secret_val}";
-            var motiveUrl = $"https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token={refresh_token_val}&redirect_uri={redirect}";
+            var motiveUrl = token.TokenUrl;
+            motiveUrl = motiveUrl.Replace("clientid", source.ClientId);
+            var privateId = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+            motiveUrl = motiveUrl.Replace("clientsecret", _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
+            motiveUrl = motiveUrl.Replace("refreshtoken", _encryptionService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
             return httpClient.PostAsync(motiveUrl, new StringContent("")).Result;
         }
 

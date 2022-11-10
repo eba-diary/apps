@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.TokenName, m =>
             {
                 m.Column("TokenName");
-                m.NotNullable(true);
+                m.NotNullable(false);
             });
 
             Property(x => x.RefreshToken, m =>

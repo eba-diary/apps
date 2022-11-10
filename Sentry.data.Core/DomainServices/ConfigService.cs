@@ -508,8 +508,14 @@ namespace Sentry.data.Core
             {
                 foreach (var token in dto.Tokens)
                 {
-                    token.CurrentToken = _encryptService.DecryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey);
-                    token.RefreshToken = _encryptService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey);
+                    if(token.CurrentToken != null)
+                    {
+                        token.CurrentToken = _encryptService.DecryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey);
+                    }
+                    if(token.RefreshToken != null)
+                    {
+                        token.RefreshToken = _encryptService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey);
+                    }
                 }
             }
             return dto;
@@ -1212,7 +1218,10 @@ namespace Sentry.data.Core
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
                     ((HTTPSSource)dsrc).ClientId = dto.ClientId;
-                    ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey).Item1;
+                    if (dto.ClientPrivateId != null)
+                    {
+                        ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dsrc).IVKey).Item1;
+                    }
                     ((HTTPSSource)dsrc).Tokens = dto.Tokens;
                     foreach (var token in ((HTTPSSource)dsrc).Tokens)
                     {
@@ -1232,12 +1241,6 @@ namespace Sentry.data.Core
                 ((HTTPSSource)dsrc).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), dto.IVKey).Item1;
             }
 
-            // only update if new value is supplied
-            if (dto.ClientPrivateId != null)
-            {
-                ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), dto.IVKey).Item1;
-            }
-
         }
 
         private DataSourceToken getTokenFromDataSourceDto(DataSourceDto dto, int tokenId)
@@ -1255,25 +1258,28 @@ namespace Sentry.data.Core
             foreach(DataSourceToken token in dsrc.Tokens)
             {
                 var dtoToken = getTokenFromDataSourceDto(dto, token.Id);
-                foreach(OAuthClaim claim in token.Claims)
+                if(token.Claims != null)
                 {
-                    //try get corresponding token from DTO 
-                    switch (claim.Type)
+                    foreach (OAuthClaim claim in token.Claims)
                     {
-                        case GlobalEnums.OAuthClaims.iss:
-                            if (dto.ClientId != null && dto.ClientId != claim.Value) { claim.Value = dto.ClientId; }
-                            break;
-                        case GlobalEnums.OAuthClaims.aud:
-                            if (dtoToken.TokenUrl != null && dtoToken.TokenUrl != claim.Value) { claim.Value = dtoToken.TokenUrl; }
-                            break;
-                        case GlobalEnums.OAuthClaims.exp:
-                            if (dtoToken.TokenExp != 0 && dtoToken.TokenExp.ToString() != claim.Value) { claim.Value = dtoToken.TokenExp.ToString(); }
-                            break;
-                        case GlobalEnums.OAuthClaims.scope:
-                            if (dtoToken.Scope != null && dtoToken.Scope != claim.Value) { claim.Value = dtoToken.Scope; }
-                            break;
-                        default:
-                            break;
+                        //try get corresponding token from DTO 
+                        switch (claim.Type)
+                        {
+                            case GlobalEnums.OAuthClaims.iss:
+                                if (dto.ClientId != null && dto.ClientId != claim.Value) { claim.Value = dto.ClientId; }
+                                break;
+                            case GlobalEnums.OAuthClaims.aud:
+                                if (dtoToken.TokenUrl != null && dtoToken.TokenUrl != claim.Value) { claim.Value = dtoToken.TokenUrl; }
+                                break;
+                            case GlobalEnums.OAuthClaims.exp:
+                                if (dtoToken.TokenExp != 0 && dtoToken.TokenExp.ToString() != claim.Value) { claim.Value = dtoToken.TokenExp.ToString(); }
+                                break;
+                            case GlobalEnums.OAuthClaims.scope:
+                                if (dtoToken.Scope != null && dtoToken.Scope != claim.Value) { claim.Value = dtoToken.Scope; }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
