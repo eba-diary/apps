@@ -27,16 +27,18 @@ namespace Sentry.data.Core
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly IDataFeatures _dataFeatures;
         private readonly IApacheLivyProvider _apacheLivyProvider;
+        private readonly IDfsRetrieverJobProvider _environmentRetrieverJobProvider;
 
         public JobService(IDatasetContext datasetContext, IUserService userService,
             IRecurringJobManager recurringJobManager, IDataFeatures dataFeatures,
-            IApacheLivyProvider apacheLivyProvider)
+            IApacheLivyProvider apacheLivyProvider, IDfsRetrieverJobProvider environmentRetrieverJobProvider)
         {
             _datasetContext = datasetContext;
             _userService = userService;
             _recurringJobManager = recurringJobManager;
             _dataFeatures = dataFeatures;
             _apacheLivyProvider = apacheLivyProvider;
+            _environmentRetrieverJobProvider = environmentRetrieverJobProvider;
         }
 
         public JobHistory GetLastExecution(RetrieverJob job)
@@ -436,59 +438,44 @@ namespace Sentry.data.Core
             }
         }
 
-
-        public List<DfsMonitorDto> GetDfsRetrieverJobs(string namedEnvironment)
+        public List<DfsMonitorDto> GetDfsRetrieverJobs(string requestingNamedEnvironment)
         {
-            //Changes needed in here to query based on the namedEnvironment and feature flag combination
-            try
-            {
-                IQueryable<RetrieverJob> jobQueryable = _datasetContext.RetrieverJob.Where(w => w.ObjectStatus == ObjectStatusEnum.Active);
+            List<RetrieverJob> jobs;
 
-                if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+            if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+            {
+                if (string.IsNullOrEmpty(requestingNamedEnvironment) || _environmentRetrieverJobProvider.AcceptedNamedEnvironments.Contains(requestingNamedEnvironment.ToUpper()))
                 {
-                    if (string.IsNullOrEmpty(namedEnvironment))
-                    {
-                        jobQueryable = jobQueryable.Where(x => x.DataSource is DfsDataFlowBasic || x.DataSource is DfsNonProdSource || x.DataSource is DfsProdSource);
-                    }
-                    else if (Enum.TryParse(namedEnvironment, out NamedEnvironmentType namedEnvironmentType))
-                    {
-                        if (namedEnvironmentType == NamedEnvironmentType.NonProd)
-                        {
-                            jobQueryable = jobQueryable.Where(x => x.DataSource is DfsNonProdSource);
-                        }
-                        else
-                        {
-                            jobQueryable = jobQueryable.Where(x => x.DataSource is DfsProdSource);
-                        }
-                    }
+                    jobs = _environmentRetrieverJobProvider.GetDfsRetrieverJobs(requestingNamedEnvironment);
                 }
                 else
                 {
-                    jobQueryable = jobQueryable.Where(x => x.DataSource is DfsDataFlowBasic);
+                    string validEnvs = string.Join(", ", _environmentRetrieverJobProvider.AcceptedNamedEnvironments);
+                    throw new DfsRetrieverJobException($"The requesting named environment '{requestingNamedEnvironment}' is not an accepted named environment ({validEnvs}).");
                 }
-                    
-                List<RetrieverJob> jobs = jobQueryable.Fetch(x => x.DataSource).Fetch(x => x.DataFlow).ToList();
-
-                List<DfsMonitorDto> dtos = new List<DfsMonitorDto>();
-                foreach (var job in jobs)
-                {
-                    Uri dataSourceUri = job.GetUri();
-                    DfsMonitorDto dto = new DfsMonitorDto()
-                    {
-                        JobId = job.Id,
-                        MonitorTarget = dataSourceUri.LocalPath
-                    };
-
-                    dtos.Add(dto);
-                }
-
-                return dtos;
             }
-            catch (Exception ex)
+            else
             {
-                Logger.Error("<jobservice-getdfsretrieverjobs> Failed retrieving job list", ex);
-                throw;
+                jobs = _datasetContext.RetrieverJob.Where(x => x.ObjectStatus == ObjectStatusEnum.Active && x.DataSource is DfsDataFlowBasic)
+                    .Fetch(x => x.DataSource)
+                    .Fetch(x => x.DataFlow)
+                    .ToList();
             }
+
+            List<DfsMonitorDto> dtos = new List<DfsMonitorDto>();
+            foreach (var job in jobs)
+            {
+                Uri dataSourceUri = job.GetUri();
+                DfsMonitorDto dto = new DfsMonitorDto()
+                {
+                    JobId = job.Id,
+                    MonitorTarget = dataSourceUri.LocalPath
+                };
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
         }
 
         public Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, Guid JobGuid, JavaOptionsOverrideDto dto)
@@ -934,7 +921,7 @@ namespace Sentry.data.Core
         {
             Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method Start");
             //For DFS type jobs, remove drop folder from network location
-            if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>())
+            if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource is DfsEnvironmentSource)
             {
                 string dfsPath = job.GetUri().LocalPath;
 

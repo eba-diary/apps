@@ -559,5 +559,22 @@ namespace Sentry.data.Core
             public const string CONFLUENT_CONNECTOR_PASSWORD = "ConfluentConnectorPassword";
             public const string CONFLUENT_CONNECTOR_FLUSH_SIZE = "ConfluentConnectorFlushSize";
         }
+
+        public static class DLPPEnvironments
+        {
+            public const string TEST = "TEST";
+            public const string NRTEST = "NRTEST";
+            public const string QUALNP = "QUALNP";
+            public const string QUAL = "QUAL";
+            public const string PRODNP = "PRODNP";
+            public const string PROD = "PROD";
+        }
+
+        public static class DfsRetrieverJobProviderTypes
+        {
+            public const string ALL = "ALL";
+            public const string QUAL = "QUAL";
+            public const string PROD = "PROD";
+        }
     }
 }

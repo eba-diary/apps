@@ -196,7 +196,7 @@ namespace Sentry.data.Web.Controllers
                      ************************************************/
                     if (dfDto.Id == 0)
                     {
-                        newFlowId = _dataFlowService.CreateandSaveDataFlow(dfDto);
+                        newFlowId = _dataFlowService.CreateDataFlow(dfDto);
                         if (newFlowId != 0)
                         {
                             return RedirectToAction("Detail", "DataFlow", new { id = newFlowId });
@@ -215,7 +215,7 @@ namespace Sentry.data.Web.Controllers
                             return View("Forbidden");
                         }
 
-                        newFlowId = _dataFlowService.UpdateandSaveDataFlow(dfDto);
+                        newFlowId = _dataFlowService.UpdateDataFlow(dfDto);
 
                         return RedirectToAction("Detail", "DataFlow", new { id = newFlowId });
                     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sentry.data.Core;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Job;
 
 namespace Sentry.data.Web.Tests

@@ -294,63 +294,13 @@ namespace Sentry.data.Core
             return jobIdList;
         }
 
-        public int CreateandSaveDataFlow(DataFlowDto dto)
+        public int CreateDataFlow(DataFlowDto dto)
         {
-            //Verify user has permissions to create Dataflow
-            UserSecurity us = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-
-            if (!us.CanCreateDataFlow)
-            {
-                throw new DataFlowUnauthorizedAccessException();
-            }
-
-            //Verify user has permissions to push data to each schema mapped to dataflow
-            StringBuilder datasetsWithNoPermissions = new StringBuilder();
-            foreach (SchemaMapDto scmMap in dto.SchemaMap)
-            {
-                Dataset ds = _datasetContext.GetById<Dataset>(scmMap.DatasetId);
-                bool IsDatasetDetected = datasetsWithNoPermissions.ToString().Split(',').Any(a => a == ds.DatasetName);
-
-                UserSecurity dsUs = null;
-                //If dataset name is already in list do not retrieve security object again
-                if (!IsDatasetDetected)
-                {
-                    dsUs = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-                }
-
-                //Only check permissions if security object is populated.  Also prevents
-                //  returning list with dataset name listed multiple times.
-                if (dsUs != null && !dsUs.CanManageSchema && !dsUs.CanEditDataset)
-                {
-                    if (datasetsWithNoPermissions.Length > 0)
-                    {
-                        datasetsWithNoPermissions.Append($", {ds.DatasetName}");
-                    }
-                    else
-                    {
-                        datasetsWithNoPermissions.Append($"{ds.DatasetName}");
-                    }
-                }
-            }
-
-            //If SchemaMapDto contains dataset which user does not have permissions to 
-            // push data too, then throw an unauthorized exception.
-            if (datasetsWithNoPermissions.Length > 0)
-            {
-                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions}");
-            }
-
-            //Verify that the schema selected is not already connected with a different dataflow
-            if (_datasetContext.DataFlow.Any(df => df.DatasetId == dto.SchemaMap.First().DatasetId &&
-                                                   df.SchemaId == dto.SchemaMap.First().SchemaId &&
-                                                   df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
-            {
-                throw new SchemaInUseException($"Schema ID {dto.SchemaMap.First().SchemaId} is already associated to another DataFlow.");
-            }
+            ValidateDataFlowDtoForCreate(dto);
 
             try
             {
-                DataFlow df = CreateDataFlow(dto);
+                DataFlow df = CreateAndSaveDataFlow(dto);
 
                 if (_dataFeatures.CLA3718_Authorization.GetValue())
                 {
@@ -367,14 +317,13 @@ namespace Sentry.data.Core
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dfDto"></param>
         /// <param name="deleteOriginal"></param>
         /// <returns></returns>
-        public int UpdateandSaveDataFlow(DataFlowDto dfDto)
+        public int UpdateDataFlow(DataFlowDto dfDto)
         {
             /*
              *  Logically delete the existing dataflow
@@ -390,7 +339,7 @@ namespace Sentry.data.Core
              *  - The incoming dto will have flowstoragecode and will
              *     be used by new dataflow as well  
             */
-            DataFlow newDataFlow = CreateDataFlow(dfDto);
+            DataFlow newDataFlow = CreateAndSaveDataFlow(dfDto);
 
             return newDataFlow.Id;
         }
@@ -505,8 +454,6 @@ namespace Sentry.data.Core
             return dataFlowDto;
         }
 
-
-
         /*
          *  Helper method for getting a dataFlotDto object from a DataflowStepid
          *  @param - User is required to pass Dataflowstep id to being processing from
@@ -566,9 +513,6 @@ namespace Sentry.data.Core
             return schemaId; // returns the schema id of the associated datasetFileId
         }
         
-        
-        
-
         /*
          * Validating that all datasetFileIds correspond to the stepId
          * @return true->passed validation, false->failed validation   determines whether reprocessing should be performed or not
@@ -614,10 +558,6 @@ namespace Sentry.data.Core
             return indicator;
         }
 
-        
-
-
-
         public List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId)
         {
             if (stepId == 0)
@@ -641,7 +581,6 @@ namespace Sentry.data.Core
 
             return steps;
         }
-
       
         public string GetSchemaStorageCodeForDataFlow(int Id)
         {
@@ -719,8 +658,62 @@ namespace Sentry.data.Core
             return new ValidationException(results);
         }
 
-        #region Private Methods        
-        
+        #region Private Methods
+        private void ValidateDataFlowDtoForCreate(DataFlowDto dto)
+        {
+            //Verify user has permissions to create Dataflow
+            UserSecurity us = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
+
+            if (!us.CanCreateDataFlow)
+            {
+                throw new DataFlowUnauthorizedAccessException();
+            }
+
+            //Verify user has permissions to push data to each schema mapped to dataflow
+            StringBuilder datasetsWithNoPermissions = new StringBuilder();
+            foreach (SchemaMapDto scmMap in dto.SchemaMap)
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(scmMap.DatasetId);
+                bool IsDatasetDetected = datasetsWithNoPermissions.ToString().Split(',').Any(a => a == ds.DatasetName);
+
+                UserSecurity dsUs = null;
+                //If dataset name is already in list do not retrieve security object again
+                if (!IsDatasetDetected)
+                {
+                    dsUs = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                }
+
+                //Only check permissions if security object is populated.  Also prevents
+                //  returning list with dataset name listed multiple times.
+                if (dsUs != null && !dsUs.CanManageSchema && !dsUs.CanEditDataset)
+                {
+                    if (datasetsWithNoPermissions.Length > 0)
+                    {
+                        datasetsWithNoPermissions.Append($", {ds.DatasetName}");
+                    }
+                    else
+                    {
+                        datasetsWithNoPermissions.Append($"{ds.DatasetName}");
+                    }
+                }
+            }
+
+            //If SchemaMapDto contains dataset which user does not have permissions to 
+            // push data too, then throw an unauthorized exception.
+            if (datasetsWithNoPermissions.Length > 0)
+            {
+                throw new DatasetUnauthorizedAccessException($"No permissions to push data to {datasetsWithNoPermissions}");
+            }
+
+            //Verify that the schema selected is not already connected with a different dataflow
+            if (_datasetContext.DataFlow.Any(df => df.DatasetId == dto.SchemaMap.First().DatasetId &&
+                                                   df.SchemaId == dto.SchemaMap.First().SchemaId &&
+                                                   df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active))
+            {
+                throw new SchemaInUseException($"Schema ID {dto.SchemaMap.First().SchemaId} is already associated to another DataFlow.");
+            }
+        }
+
         private void CreateS3SinkConnector(DataFlow df)
         {
             //ONLY SEND EMAIL IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
@@ -790,22 +783,22 @@ namespace Sentry.data.Core
             return request;
         }
 
-        private DataFlow CreateDataFlow(DataFlowDto dto)
+        private DataFlow CreateAndSaveDataFlow(DataFlowDto dto)
         {
             try 
             { 
-                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method Start");
+                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateAndSaveDataFlow).ToLower()} Method Start");
 
                 DataFlow df = MapToDataFlow(dto);
 
                 switch (dto.IngestionType)
                 {
-                    case (int)GlobalEnums.IngestionType.DFS_Drop:
-                    case (int)GlobalEnums.IngestionType.S3_Drop:
-                    case (int)GlobalEnums.IngestionType.Topic:
+                    case (int)IngestionType.DFS_Drop:
+                    case (int)IngestionType.S3_Drop:
+                    case (int)IngestionType.Topic:
                         MapDataFlowStepsForPush(dto, df);
                         break;
-                    case (int)GlobalEnums.IngestionType.DSC_Pull:
+                    case (int)IngestionType.DSC_Pull:
                         MapDataFlowStepsForPull(dto, df);
                         break;
                     default:
@@ -816,7 +809,7 @@ namespace Sentry.data.Core
 
                 CreateS3SinkConnector(df);
 
-                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlow).ToLower()} Method End");
+                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateAndSaveDataFlow).ToLower()} Method End");
                 return df;
             }
             catch (ValidationException)
@@ -916,20 +909,25 @@ namespace Sentry.data.Core
 
             if (df.ShouldCreateDFSDropLocations(_dataFeatures))
             {
-                //Add default DFS drop location for data flow
-                List<DataSource> srcList = _datasetContext.DataSources.ToList();
-
-                Logger.Debug($"{methodName} found {srcList.Count} sources");
-                StringBuilder sourceTypeList = new StringBuilder();
-                foreach (DataSource item in srcList)
+                DataSource dfsDataSource;
+                if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
-                    string itemName = $"{item.SourceType}:::";
-                    sourceTypeList.Append(itemName);
+                    NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == dto.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
+                    if (datasetEnvironmentType == NamedEnvironmentType.NonProd)
+                    {
+                        dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x.SourceType == GlobalConstants.DataSourceDiscriminator.DFS_NONPROD_SOURCE);
+                    }
+                    else
+                    {
+                        dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x.SourceType == GlobalConstants.DataSourceDiscriminator.DFS_PROD_SOURCE);
+                    }
                 }
-                Logger.Debug($"{methodName} source type list {sourceTypeList}");
+                else
+                {
+                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+                }
 
-                //This is where will check feature flag to determine what Source Type to use
-                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
+                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, dfsDataSource);
 
                 _datasetContext.Add(dfsDataFlowBasic);
 

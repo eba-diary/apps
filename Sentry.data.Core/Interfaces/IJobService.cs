@@ -42,7 +42,7 @@ namespace Sentry.data.Core
 
         bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
 
-        List<DfsMonitorDto> GetDfsRetrieverJobs(string namedEnvironment);
+        List<DfsMonitorDto> GetDfsRetrieverJobs(string requestingNamedEnvironment);
 
         Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);
 
