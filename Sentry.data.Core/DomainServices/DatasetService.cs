@@ -54,6 +54,16 @@ namespace Sentry.data.Core
             return dto;
         }
 
+        public DatasetDtoV2 GetDatasetDto(int id)
+        {
+            // TODO: CLA-2765 - Filter only datasets with ACTIVE or PENDING_DELETE status
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
+            DatasetDtoV2 dto = new DatasetDtoV2();
+            MapToDto(ds, dto);
+
+            return dto;
+        }
+
         public DatasetDetailDto GetDatasetDetailDto(int id)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
@@ -336,6 +346,13 @@ namespace Sentry.data.Core
                     break;
             }
             return request;
+        }
+
+        public int Create(DatasetDtoV2 dto)
+        {
+            Dataset ds = CreateDataset(dto);
+            _datasetContext.Add(ds);
+            return ds.DatasetId;
         }
 
         public int CreateAndSaveNewDataset(DatasetDto dto)
@@ -718,6 +735,62 @@ namespace Sentry.data.Core
             ds.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
         }
 
+        private Dataset CreateDataset(DatasetDtoV2 dto)
+        {
+            Asset asset = GetAsset(dto.SAIDAssetKeyCode);
+
+            Dataset ds = new Dataset()
+            {
+                DatasetId = dto.DatasetId,
+                DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList(),
+                DatasetName = dto.DatasetName,
+                ShortName = dto.ShortName,
+                DatasetDesc = dto.DatasetDesc,
+                DatasetInformation = dto.DatasetInformation,
+                CreationUserName = dto.CreationUserId,
+                PrimaryContactId = dto.PrimaryContactId,
+                UploadUserName = dto.UploadUserId,
+                OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
+                DatasetDtm = dto.DatasetDtm,
+                ChangedDtm = dto.ChangedDtm,
+                DatasetType = DataEntityCodes.DATASET,
+                DataClassification = dto.DataClassification,
+                IsSecured = dto.IsSecured,
+                CanDisplay = true,
+                DatasetFiles = null,
+                DatasetFileConfigs = null,
+                DeleteInd = false,
+                DeleteIssueDTM = DateTime.MaxValue,
+                ObjectStatus = GlobalEnums.ObjectStatusEnum.Active,
+                Asset = asset,
+                NamedEnvironment = dto.NamedEnvironment,
+                NamedEnvironmentType = dto.NamedEnvironmentType,
+                AlternateContactEmail = dto.AlternateContactEmail
+            };
+
+            switch (dto.DataClassification)
+            {
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    ds.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:
+                    ds.IsSecured = dto.IsSecured;
+                    break;
+                default:
+                    ds.IsSecured = false;
+                    break;
+            }
+
+            //All datasets get a Security entry regardless if restricted
+            //  this allows security process for internally managed permissions
+            //  which do not require dataset to be restricted (i.e. CanManageSchema).
+            ds.Security = new Security(SecurableEntityName.DATASET)
+            {
+                CreatedById = _userService.GetCurrentUser().AssociateId
+            };
+
+            return ds;
+        }
         private Dataset CreateDataset(DatasetDto dto)
         {
             Asset asset = GetAsset(dto.SAIDAssetKeyCode);
@@ -798,6 +871,48 @@ namespace Sentry.data.Core
             return asset;
         }
 
+        private void MapToDto(Dataset ds, DatasetDtoV2 dto)
+        {
+            IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);
+            IApplicationUser uploader = _userService.GetByAssociateId(ds.UploadUserName);
+
+            //map the ISecurable properties
+            dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            dto.PrimaryContactId = ds.PrimaryContactId;
+            dto.IsSecured = ds.IsSecured;
+
+            dto.DatasetId = ds.DatasetId;
+            dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
+            dto.DatasetName = ds.DatasetName;
+            dto.ShortName = ds.ShortName;
+            dto.DatasetDesc = ds.DatasetDesc;
+            dto.DatasetInformation = ds.DatasetInformation;
+            dto.DatasetType = ds.DatasetType;
+            dto.DataClassification = ds.DataClassification;
+            dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
+            dto.ObjectStatus = ds.ObjectStatus;
+
+            dto.CreationUserId = ds.CreationUserName;
+            dto.CreationUserName = ds.CreationUserName;
+            dto.PrimaryContactName = (primaryContact != null ? primaryContact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (primaryContact != null ? primaryContact.EmailAddress : "");
+            dto.UploadUserId = ds.UploadUserName;
+            dto.UploadUserName = (uploader != null ? uploader?.DisplayName : "Not Available");
+
+            dto.DatasetDtm = ds.DatasetDtm;
+            dto.ChangedDtm = ds.ChangedDtm;
+            dto.CanDisplay = ds.CanDisplay;
+            dto.TagIds = new List<string>();
+            dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
+            dto.CategoryName = ds.DatasetCategories.First().Name;
+            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
+            dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
+            dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
+            dto.NamedEnvironment = ds.NamedEnvironment;
+            dto.NamedEnvironmentType = ds.NamedEnvironmentType;
+            dto.AlternateContactEmail = ds.AlternateContactEmail;
+        }
+        
         private void MapToDto(Dataset ds, DatasetDto dto)
         {
             IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);

@@ -41,5 +41,10 @@ namespace Sentry.data.Core
         /// <returns>True = True if all dataflow deletes were successfully submitted to hangfire.</returns>
         bool DeleteDataFlow_Queue(List<int> deleteIdList, string userId, bool forceDelete = false);
 
+        // TODO: CLA4703 - Promotion mock out
+        bool PromoteDataset(int datasetId, string namedEnvironment);
+
+        // TODO: CLA4703 - Promotion mock out
+        bool PromoteSchema(int schemaId, int targetDatasetId);
     }
 }

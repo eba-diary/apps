@@ -9,6 +9,7 @@ namespace Sentry.data.Core
     public interface IDatasetService : IEntityService
     {
         Task<ValidationException> ValidateAsync(DatasetDto dto);
+        int Create(DatasetDto dto);
         int CreateAndSaveNewDataset(DatasetDto dto);
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
