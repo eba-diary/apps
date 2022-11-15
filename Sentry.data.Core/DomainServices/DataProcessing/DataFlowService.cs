@@ -730,7 +730,7 @@ namespace Sentry.data.Core
                 //NOTE: CreateS3SinkConnectorAsync is Async but we are CHOOSING to call CALL SYNCRONOUSLY WITHOUT AWAIT which releases caller BECAUSE CreateS3SinkConnectorAsync Actually returns immediately 
                 Task<ConnectorCreateResponseDto> task = _connectorService.CreateS3SinkConnectorAsync(requestDto);       
                 ConnectorCreateResponseDto responseDto = task.Result;                                                   //USE Task.Result to essentially Syncronously wait for Result of task, here we need to know if call to S3Sink was successful or not
-                _emailService.SendS3SinkConnectorRequestEmail(df, requestDto,responseDto);                              //Send email with success or failure
+                _emailService.SendS3SinkConnectorRequestEmail(df, requestDto, responseDto);                              //Send email with success or failure
             }
         }
 
@@ -787,7 +787,7 @@ namespace Sentry.data.Core
         {
             try 
             { 
-                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateAndSaveDataFlow).ToLower()} Method Start");
+                Logger.Info($"DataFlowService_CreateAndSaveDataFlow Method Start");
 
                 DataFlow df = MapToDataFlow(dto);
 
@@ -805,11 +805,13 @@ namespace Sentry.data.Core
                         break;
                 }
 
+                MapDataFlowSteps(dto, df);
+
                 _datasetContext.SaveChanges();
 
                 CreateS3SinkConnector(df);
 
-                Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(CreateAndSaveDataFlow).ToLower()} Method End");
+                Logger.Info($"DataFlowService_CreateAndSaveDataFlow Method End");
                 return df;
             }
             catch (ValidationException)
@@ -821,8 +823,7 @@ namespace Sentry.data.Core
 
         internal DataFlow MapToDataFlow(DataFlowDto dto)
         {
-            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(MapToDataFlow).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            Logger.Info($"MapToDataFlow Method Start");
 
             DataFlow df = new DataFlow
             {
@@ -862,7 +863,7 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(df);
 
-            Logger.Info($"{methodName} Method End");
+            Logger.Info($"MapToDataFlow Method End");
             return df;
         }
 
@@ -897,8 +898,7 @@ namespace Sentry.data.Core
 
         private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
         {
-            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPush).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            Logger.Info($"MapDataFlowStepsForPush Method Start");
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
 
@@ -915,41 +915,37 @@ namespace Sentry.data.Core
                     NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == dto.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
                     if (datasetEnvironmentType == NamedEnvironmentType.NonProd)
                     {
-                        dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x.SourceType == GlobalConstants.DataSourceDiscriminator.DFS_NONPROD_SOURCE);
+                        dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsNonProdSource);
                     }
                     else
                     {
-                        dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x.SourceType == GlobalConstants.DataSourceDiscriminator.DFS_PROD_SOURCE);
+                        dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsProdSource);
                     }
                 }
                 else
                 {
-                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(w => w is DfsDataFlowBasic);
                 }
 
-                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, dfsDataSource);
+                RetrieverJob dfsRetrieverJob = _jobService.InstantiateJobsForCreation(df, dfsDataSource);
 
-                _datasetContext.Add(dfsDataFlowBasic);
+                _datasetContext.Add(dfsRetrieverJob);
 
-                _jobService.CreateDropLocation(dfsDataFlowBasic);
+                _jobService.CreateDropLocation(dfsRetrieverJob);
             }
 
-            MapDataFlowSteps(dto, df);
-
-            Logger.Info($"{methodName} Method End");
+            Logger.Info($"MapDataFlowStepsForPush Method End");
         }
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
         {
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPull).ToLower()} Method Start");
+            Logger.Info($"DataFlowService_MapDataFlowStepsForPull Method Start");
 
             dto.RetrieverJob.DataFlow = df.Id;
             dto.RetrieverJob.FileSchema = df.SchemaId;
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
-            MapDataFlowSteps(dto, df);
-
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(MapDataFlowStepsForPull).ToLower()} Method End");
+            Logger.Info($"DataFlowService_MapDataFlowStepsForPull Method End");
         }
 
         private void MapDataFlowSteps(DataFlowDto dto, DataFlow df)
@@ -1325,7 +1321,9 @@ namespace Sentry.data.Core
             }
             else
             {
-                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{step.DataFlow.FlowStorageCode}/";
+                string datasetSaidAsset = GetDatasetSaidAsset(step.DataFlow.Id);
+                string datasetNamedEnv = GetDatasetNamedEnvironment(step.DataFlow.Id);
+                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{datasetSaidAsset}/{datasetNamedEnv}/{step.DataFlow.FlowStorageCode}/";
                 step.TriggerKey = triggerPrefix;
                 step.TriggerBucket = step.Action.TargetStorageBucket;
             }

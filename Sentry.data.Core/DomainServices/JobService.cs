@@ -135,8 +135,7 @@ namespace Sentry.data.Core
 
         public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
         {
-            string methodName = $"{nameof(JobService)}_{nameof(InstantiateJobsForCreation)}";
-            Logger.Info($"{methodName} Method Start");
+            Logger.Info($"InstantiateJobsForCreation Method Start");
 
             RetrieverJob rj = new RetrieverJob()
             {
@@ -172,16 +171,21 @@ namespace Sentry.data.Core
             {
                 rj.Schedule = "*/1 * * * *";
             }
-            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>() || dataSource is DfsEnvironmentSource)
+            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>())
             {
                 rj.Schedule = "Instant";
+            }
+            else if (dataSource.Is<DfsEnvironmentSource>())
+            {
+                rj.Schedule = "Instant";
+                rj.RelativeUri = $"{df.SaidKeyCode.ToUpper()}/{df.NamedEnvironment.ToUpper()}/{df.FlowStorageCode}";
             }
             else
             {
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
 
-            Logger.Info($"{methodName} Method End");
+            Logger.Info($"InstantiateJobsForCreation Method End");
 
             return rj;
         }
@@ -235,12 +239,11 @@ namespace Sentry.data.Core
 
         public void CreateDropLocation(RetrieverJob job)
         {
-            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(CreateDropLocation).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            Logger.Info($"CreateDropLocation Method Start");
 
             try
             {
-                if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource is DfsEnvironmentSource)
+                if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource.Is<DfsEnvironmentSource>())
                 {
                     string localPath = job.GetUri().LocalPath;
                     if (!System.IO.Directory.Exists(localPath))
@@ -257,7 +260,8 @@ namespace Sentry.data.Core
 
                 Logger.Error(errmsg.ToString(), e);
             }
-            Logger.Info($"{methodName} Method End");
+
+            Logger.Info($"CreateDropLocation Method End");
         }
 
         public void DisableJob(int id)
@@ -921,7 +925,7 @@ namespace Sentry.data.Core
         {
             Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method Start");
             //For DFS type jobs, remove drop folder from network location
-            if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource is DfsEnvironmentSource)
+            if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource.Is<DfsEnvironmentSource>())
             {
                 string dfsPath = job.GetUri().LocalPath;
 

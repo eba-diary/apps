@@ -8,7 +8,7 @@ namespace Sentry.data.Core
     {
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
-            return new Uri(Path.Combine(BaseUri.AbsolutePath, Job.RelativeUri).ToString());
+            return new Uri(Path.Combine(BaseUri.AbsolutePath, Job.RelativeUri));
         }
 
         public override string GetDropPrefix(RetrieverJob Job)

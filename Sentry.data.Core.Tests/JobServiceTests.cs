@@ -987,46 +987,145 @@ namespace Sentry.data.Core.Tests
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("NonProd");
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
 
             List<RetrieverJob> jobs = new List<RetrieverJob>()
             {
                 new RetrieverJob()
                 {
+                    Id = 1,
                     DataSource = new DfsDataFlowBasic() { BaseUri = new Uri(@"c:\tmp\DatasetLoader\") },
                     DataFlow = new DataFlow() { FlowStorageCode = "000001" }
                 },
                 new RetrieverJob()
                 {
-                    RelativeUri = "SAID/DEV/000002",
-                    DataSource = new DfsNonProdSource() {BaseUri = new Uri("c:/tmp/nonprod/") }
+                    Id = 2,
+                    RelativeUri = @"SAID\DEV\000002",
+                    DataSource = new DfsNonProdSource() {BaseUri = new Uri(@"c:\tmp\nonprod\") }
                 }
             };
 
-            RetrieverJob job = new RetrieverJob()
-            {
-                RelativeUri = "parent/childNP"
-            };
+            Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
+            dfsRetrieverJobProvider.Setup(x => x.GetDfsRetrieverJobs(null)).Returns(jobs);
 
-            DfsNonProdSource dataSource = new DfsNonProdSource()
-            {
-                BaseUri = new Uri("c:/tmp/nonprod/")
-            };
-
-            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
-            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
-
-            JobService service = new JobService(datasetContext.Object, null, null, dataFeatures.Object, null, null);
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
 
             List<DfsMonitorDto> results = service.GetDfsRetrieverJobs(null);
 
-            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual(2, results.Count);
 
             DfsMonitorDto dto = results.First();
             Assert.AreEqual(1, dto.JobId);
             Assert.AreEqual(@"c:\tmp\DatasetLoader\000001", dto.MonitorTarget);
 
+            dto = results.Last();
+            Assert.AreEqual(2, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\nonprod\SAID\DEV\000002", dto.MonitorTarget);
+
             mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetDfsRetrieverJobs_DEV_NamedEnvironmentTypeFeatureOn_DfsMonitorDtos()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 1,
+                    DataSource = new DfsDataFlowBasic() { BaseUri = new Uri(@"c:\tmp\DatasetLoader\") },
+                    DataFlow = new DataFlow() { FlowStorageCode = "000001" }
+                },
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    RelativeUri = @"SAID\DEV\000002",
+                    DataSource = new DfsNonProdSource() {BaseUri = new Uri(@"c:\tmp\nonprod\") }
+                }
+            };
+
+            Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
+            dfsRetrieverJobProvider.Setup(x => x.GetDfsRetrieverJobs("DEV")).Returns(jobs);
+            dfsRetrieverJobProvider.SetupGet(x => x.AcceptedNamedEnvironments).Returns(new List<string>() { "DEV" });
+
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+
+            List<DfsMonitorDto> results = service.GetDfsRetrieverJobs("DEV");
+
+            Assert.AreEqual(2, results.Count);
+
+            DfsMonitorDto dto = results.First();
+            Assert.AreEqual(1, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\DatasetLoader\000001", dto.MonitorTarget);
+
+            dto = results.Last();
+            Assert.AreEqual(2, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\nonprod\SAID\DEV\000002", dto.MonitorTarget);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetDfsRetrieverJobs_DEV_NamedEnvironmentTypeFeatureOn_DfsRetrieverJobException()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
+            dfsRetrieverJobProvider.SetupGet(x => x.AcceptedNamedEnvironments).Returns(new List<string>() { "TEST", "NRTEST" });
+
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+
+            Assert.ThrowsException<DfsRetrieverJobException>(() => service.GetDfsRetrieverJobs("DEV"), "The requesting named environment 'DEV' is not an accepted named environment (TEST, NRTEST).");
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void InstantiateJobsForCreation_DfsNonProdSource()
+        {
+            JobService service = new JobService(null, null, null, null, null, null);
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                FlowStorageCode = "000001"
+            };
+
+            DataSource dataSource = new DfsNonProdSource();
+
+            RetrieverJob result = service.InstantiateJobsForCreation(dataFlow, dataSource);
+
+            Assert.AreEqual("Instant", result.Schedule);
+            Assert.AreEqual("SAID/DEV/000001", result.RelativeUri);
+        }
+
+        [TestMethod]
+        public void InstantiateJobsForCreation_DfsProdSource()
+        {
+            JobService service = new JobService(null, null, null, null, null, null);
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                FlowStorageCode = "000001"
+            };
+
+            DataSource dataSource = new DfsProdSource();
+
+            RetrieverJob result = service.InstantiateJobsForCreation(dataFlow, dataSource);
+
+            Assert.AreEqual("Instant", result.Schedule);
+            Assert.AreEqual("SAID/DEV/000001", result.RelativeUri);
         }
     }
 }
