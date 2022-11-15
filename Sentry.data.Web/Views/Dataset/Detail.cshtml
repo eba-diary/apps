@@ -7,7 +7,7 @@
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
-@if (@Model.DatasetFileCount == 0)
+@if (@Model.HasSchema && @Model.DatasetFileCount == 0)
 {
     <div>
         <div id="alertInfoBanner" class="alert alert-dismissable alert-info mt-3">
@@ -176,46 +176,50 @@
                         Schemas:
                     </h4>
                 </div>
-
-                <div>
-                    <div class="row">
-                        <div class="col-lg-12" style="margin-left: 20px">
-                            <select class="form-control" style="margin:1em !important;" id="datasetConfigList" name="filterSelector">
-                                @foreach (var schema in Model.DatasetFileConfigSchemas)
-                                {
-                                    <option value="@schema.ConfigId" data-id="@schema.SchemaId">@schema.SchemaName</option>
-                                }
-                            </select>
+                if (Model.HasSchema)
+                {
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-12" style="margin-left: 20px">
+                                <select class="form-control" style="margin:1em !important;" id="datasetConfigList" name="filterSelector">
+                                    @foreach (var schema in Model.DatasetFileConfigSchemas)
+                                    {
+                                        <option value="@schema.ConfigId" data-id="@schema.SchemaId">@schema.SchemaName</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
-                                <h6 class="@textColor pt-2 mb-1">Schema Description:</h6>
-                                <span data-bind="text: LessDescription"></span>
-                                <span id="schemaHasMoreDescription">
-                                    <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
-                                    <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
-                                    <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
-                                    <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
-                                </span>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
+                                    <h6 class="@textColor pt-2 mb-1">Schema Description:</h6>
+                                    <span data-bind="text: LessDescription"></span>
+                                    <span id="schemaHasMoreDescription">
+                                        <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
+                                        <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
+                                        <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
+                                        <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @*ControlMTriggerName*@
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div style="margin-left: 35px;" data-bind="visible: ControlMTriggerName() != null" class="spanContainer">
+                                    <h6 class="@textColor pt-2 mb-1">Control-M Trigger Name:</h6>
+                                    <span data-bind="text: ControlMTriggerName"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    @*ControlMTriggerName*@
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div style="margin-left: 35px;" data-bind="visible: ControlMTriggerName() != null" class="spanContainer">
-                                <h6 class="@textColor pt-2 mb-1">Control-M Trigger Name:</h6>
-                                <span data-bind="text: ControlMTriggerName"></span>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
+                }
+                else
+                {
+                    <div><span>This dataset does not contain any schema</span></div>
+                }
             }
         </div>
 
@@ -236,7 +240,7 @@
 
                     <hr class="datasetMetadataBoxHr" />
 
-                    
+
                     <div class="row w-100">
 
                         @if (!@Model.CLA1130_SHOW_ALTERNATE_EMAIL)
@@ -316,41 +320,49 @@
     {
         @Html.Partial("Details/_SchemaAbout", Model)
     }
-    if (Model.Security.CanPreviewDataset)
+    if (Model.HasSchema)
     {
-        @Html.Partial("Details/_SchemaColumns", Model)
-    }
-    if (Model.HasDataAccess)
-    {
-        @Html.Partial("Details/_DataPreview", Model)
-    }
-    if (Model.Security.CanViewFullDataset)
-    {
-        @Html.Partial("Details/_DataFiles", Model)
+        if (Model.Security.CanPreviewDataset)
+        {
+            @Html.Partial("Details/_SchemaColumns", Model)
+        }
+        if (Model.HasDataAccess)
+        {
+            @Html.Partial("Details/_DataPreview", Model)
+        }
+        if ( Model.Security.CanViewFullDataset)
+        {
+            @Html.Partial("Details/_DataFiles", Model)
+        }
     }
 }
 else
 {
-    <div id="datasetDetailTabs">
+
+
+<div id="datasetDetailTabs">
         <div class="tabs-wrapper">
             <ul class="nav classic-tabs" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
-                </li>
-                @if (Model.DisplaySchemaSearch)
+                @if (Model.HasSchema)
                 {
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search Columns</a>
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
+                    </li>
+                    if (Model.DisplaySchemaSearch)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search Columns</a>
+                        </li>
+                    }
                 }
             </ul>
         </div>
@@ -387,43 +399,45 @@ else
                     @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
                 }
             </div>
-
-            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
-                @if (Model.Security.CanPreviewDataset)
-                {
-                    <div id="tabSchemaColumns"></div>
-                }
-                else
-                {
-                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
-                }
-            </div>
-
-            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                @if (Model.HasDataAccess)
-                {
-                    <div id="tabDataPreview"></div>
-                }
-                else
-                {
-                    @Html.Partial("Details/_TabUnauthorized", "Full Dataset");
-                }
-            </div>
-            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                @if (Model.Security.CanPreviewDataset)
-                {
-                    <div id="tabDataFiles"></div>
-                }
-                else
-                {
-                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
-                }
-            </div>
-            @if (Model.DisplaySchemaSearch)
+            @if (Model.HasSchema)
             {
-                <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
-                    <div id="tabSchemaSearch"></div>
+                <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div id="tabSchemaColumns"></div>
+                    }
+                    else
+                    {
+                        @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                    }
                 </div>
+
+                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                    @if (Model.HasDataAccess)
+                    {
+                        <div id="tabDataPreview"></div>
+                    }
+                    else
+                    {
+                        @Html.Partial("Details/_TabUnauthorized", "Full Dataset");
+                    }
+                </div>
+                <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <div id="tabDataFiles"></div>
+                    }
+                    else
+                    {
+                        @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                    }
+                </div>
+                if (Model.DisplaySchemaSearch)
+                {
+                    <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
+                        <div id="tabSchemaSearch"></div>
+                    </div>
+                }
             }
         </div>
     </div>

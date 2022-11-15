@@ -1318,11 +1318,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(new DateTime(2022, 6, 21, 9, 0, 0), dto.ChangedDtm);
             Assert.IsTrue(dto.CanDisplay);
             Assert.AreEqual(1, dto.OriginationId);
-            Assert.AreEqual("FileConfigDescription", dto.ConfigFileDesc);
-            Assert.AreEqual("FileConfigName", dto.ConfigFileName);
-            Assert.AreEqual(",", dto.Delimiter);
-            Assert.AreEqual(4, dto.FileExtensionId);
-            Assert.AreEqual(5, dto.DatasetScopeTypeId);
             Assert.AreEqual("CategoryName", dto.CategoryName);
             Assert.AreEqual(1, dto.CategoryNames.Count);
             Assert.IsTrue(dto.CategoryNames.Any(x => x == "CategoryName"));
@@ -1334,8 +1329,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(0, dto.AmountOfSubscriptions);
             Assert.AreEqual(0, dto.Views);
             Assert.IsTrue(dto.IsFavorite);
-            Assert.AreEqual(1, dto.DatasetFileConfigSchemas.Count);
-            Assert.IsTrue(dto.DatasetFileConfigSchemas.Any(x => x.ConfigId == 2 && x.SchemaId == 3 && x.SchemaName == "FileConfigName"));
             Assert.AreEqual(1, dto.DatasetScopeTypeNames.Count);
             Assert.IsTrue(dto.DatasetScopeTypeNames.Any(x => x.Key == "ScopeTypeName" && x.Value == "ScopeTypeDescription"));
             Assert.AreEqual(0, dto.DatasetFileCount);
