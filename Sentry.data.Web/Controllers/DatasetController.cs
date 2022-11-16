@@ -759,6 +759,7 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitInheritanceRequest([Bind(Prefix = "Inheritance")] RequestPermissionInheritanceModel model)
         {
             AccessRequest ar = model.ToCore();
+            ar.Type = AccessRequestType.Inheritance;
             string ticketId = await _datasetService.RequestAccessToDataset(ar);
 
             if (string.IsNullOrEmpty(ticketId))
