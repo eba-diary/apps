@@ -649,14 +649,22 @@ namespace Sentry.data.Core
             JiraIssueCreateRequest jiraRequest = new JiraIssueCreateRequest();
 
             JiraTicket jiraTicket = new JiraTicket();
+
+            string env = Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper();
+
+            if(env.Equals("PROD") || env.Equals("DEV"))
+            {
+
+            }
+
             jiraTicket.Project = project;
             jiraTicket.CustomFields = customFields;
             jiraTicket.Reporter = ticket.RequestedById;
             jiraTicket.IssueType = issueType;
             jiraTicket.Summary = summary;
-            jiraTicket.Labels = new List<string>();
-            jiraTicket.Components = new List<string>();
-            jiraTicket.Description = "";
+            jiraTicket.Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions"};
+            jiraTicket.Components = new List<string> { "ACID" };
+            jiraTicket.Description = sb.ToString();
 
             jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };
 
