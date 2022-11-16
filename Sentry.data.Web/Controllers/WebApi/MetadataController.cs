@@ -192,6 +192,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 var dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
                 var modelList = func.Invoke(dtoList);
+                modelList = modelList.OrderBy(x => x.Name).ToList();
                 return Ok(modelList);
             }
 

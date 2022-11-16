@@ -8,8 +8,14 @@ namespace Sentry.data.Core
         {
             public const string NAME = "Data.Sentry.Com";
             public const string ABBREVIATED_NAME = "DSC";
-            public const string PROD = "PROD";
             public const string REQUEST_CONTEXT_GUID_FORMAT = "yyyyMMddHHmmssfff";
+        }
+
+        public static class Environments
+        {
+            public const string TEST = "TEST";
+            public const string QUAL = "QUAL";
+            public const string PROD = "PROD";
         }
 
         public static class ValidationErrors
@@ -553,6 +559,10 @@ namespace Sentry.data.Core
             public const string DATASETEMAIL = "DatasetMgmtEmail";
             public const string S3SINKEMAILTO = "S3SinkEmailRequestTO";
             public const string MAIN_WEB_URL = "SentryDataBaseUrl";
+            public const string CONFLUENT_CONNECTOR_API = "ConfluentConnectorApi";
+            public const string CONFLUENT_CONNECTOR_USERNAME = "ConfluentConnectorUserName";
+            public const string CONFLUENT_CONNECTOR_PASSWORD = "ConfluentConnectorPassword";
+            public const string CONFLUENT_CONNECTOR_FLUSH_SIZE = "ConfluentConnectorFlushSize";
         }
     }
 }

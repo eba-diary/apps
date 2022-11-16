@@ -173,6 +173,16 @@ data.Admin = {
                 $("#defaultSchemaSelection").prop("disabled", true);
                 $("#AllSchemas").materialSelect();
             },
+            //upon error of a schema response, a blank drop down is createed, to ensure that a previous schema dropdown does not persist
+            error: function (msg) {
+                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
+
+                $("#schemaDropdown").html(scheamDropdown);
+
+                $("#defaultSchemaSelection").prop("disabled", true);
+                $("#schemaDropdown").materialSelect();
+                data.Admin.DatasetDropdownScrollToTop();
+            },
             complete: function () {
                 data.Admin.DatasetDropdownScrollToTop();
                 data.Admin.ActivateDeactivateAuditSearchButton();
@@ -292,7 +302,7 @@ data.Admin = {
             // Retrieve seleced date
             var selectedDate = $('#datetime-picker').val();
 
-            var timeCheck = data.admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {
@@ -481,7 +491,7 @@ data.Admin = {
     // group selected jobs by Dataset Name, Schema Name & DataFlowStepId and send them to be reprocessed
     ReprocessDeadJobs: function () {
 
-        admin.data.DataFileSelectAll();
+        data.Admin.DataFileSelectAll();
 
         // submits selected jobs to be reprocessed
         $("#reprocessButton").click(function () {

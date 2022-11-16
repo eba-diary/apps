@@ -132,11 +132,11 @@ namespace Sentry.data.Web.Controllers
 
             model.AllDatasets.Add(new SelectListItem()
             {
-                Value = "None",
+                Value = "0",
                 Text = "Please select a dataset...",
-                Selected = true,
-                Disabled = true,
+                Selected = true
             });
+
 
             foreach (DatasetDto dto in dtoList)
             {

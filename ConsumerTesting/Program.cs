@@ -39,9 +39,10 @@ namespace ConsumerTesting
             IList<IMessageHandler<string>> handlers = new List<IMessageHandler<string>>
             {
                 //new HiveMetadataHandler(_dsContext)
-                new HiveMetadataService(),
-                new S3EventService(),
-                new DataStepProcessorService()
+                //new HiveMetadataService(),
+                //new S3EventService(),
+                //new DataStepProcessorService()
+                new ConsoleWriteService()
             };
 
             return handlers;
@@ -52,7 +53,7 @@ namespace ConsumerTesting
             //domain context needed to retrieve config
             KafkaSettings settings = new KafkaSettings(groupId,
                                             KafkaHelper.GetKafkaBrokers(),
-                                            KafkaHelper.Get_Consumer_Topic_List_For_DSCEvents(),
+                                            Config.GetHostSetting("DSCEventTopic_Confluent"),
                                             Config.GetHostSetting("EnvironmentName").ToUpper(),
                                             bool.Parse(Config.GetHostSetting("KafkaDebugLogging")),
                                             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, KafkaHelper.GetCertPath()),
@@ -76,7 +77,11 @@ namespace ConsumerTesting
 
         public async Task HandleAsync(string msg)
         {
-            throw new NotImplementedException();
+            using (var Container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IMessageHandler<string> handler = Container.GetInstance<ConsoleWriteHandler>();
+                await handler.HandleAsync(msg);
+            }
         }
         public void Handle(string msg)
         {
@@ -110,7 +115,14 @@ namespace ConsumerTesting
 
         public async Task HandleAsync(string msg)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Console.WriteLine(msg);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"ConsoleWriteHandler failed to process message: Msg:({msg})", ex);
+            }
         }
 
         void IMessageHandler<string>.Handle(string msg)
@@ -121,7 +133,7 @@ namespace ConsumerTesting
             }
             catch (Exception ex)
             {
-                Logger.Error($"HiveMetadataHandler failed to process message: Msg:({msg})", ex);
+                Logger.Error($"ConsoleWriteHandler failed to process message: Msg:({msg})", ex);
             }
         }
 

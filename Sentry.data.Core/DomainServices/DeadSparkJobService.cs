@@ -9,11 +9,13 @@ namespace Sentry.data.Core
     public class DeadSparkJobService : IDeadSparkJobService
     {
         private readonly IDeadJobProvider _deadJobProvider;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
-        public DeadSparkJobService(IDeadJobProvider deadJobProvider)
+        public DeadSparkJobService(IDeadJobProvider deadJobProvider, IS3ServiceProvider s3ServiceProvider)
         {
             _deadJobProvider = deadJobProvider;
-        }   
+            _s3ServiceProvider = s3ServiceProvider;
+        }
 
         public List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime timeCreated)
         {
@@ -33,7 +35,9 @@ namespace Sentry.data.Core
 
         private DeadSparkJobDto MapToDto(DeadSparkJob deadSparkJob)
         {
-            string isReprocessingRequired = deadSparkJob.TargetKey.Contains("_SUCCESS") ? "Yes" : "No";
+            List<string> s3ObjectList = _s3ServiceProvider.ListObjects(deadSparkJob.SourceBucketName, deadSparkJob.TargetKey).ToList();
+
+            bool reprocessingRequired = s3ObjectList.Any(s3Object => s3Object.Contains("_SUCCESS")) ? false : true;
 
             DeadSparkJobDto deadSparkJobDto = new DeadSparkJobDto
             {
@@ -43,7 +47,7 @@ namespace Sentry.data.Core
                 SourceKey = deadSparkJob.SourceKey,
                 FlowExecutionGuid = deadSparkJob.FlowExecutionGuid,
                 RunInstanceGuid = deadSparkJob.RunInstanceGuid,
-                ReprocessingRequired = isReprocessingRequired,
+                ReprocessingRequired = reprocessingRequired,
                 SubmissionID = deadSparkJob.SubmissionID,
                 SourceBucketName = deadSparkJob.SourceBucketName,
                 BatchID = deadSparkJob.BatchID,
