@@ -4,7 +4,7 @@ namespace Sentry.data.Core
 {
     public static class DatasetFileConfigExtensions
     {
-        public static DatasetFileConfigDto ToConfigDto(this DatasetDto dsDto)
+        public static DatasetFileConfigDto ToConfigDto(this DatasetSchemaDto dsDto)
         {
             List<DataElementDto> delist = new List<DataElementDto>();
             delist.Add(dsDto.ToDataElementDto());
@@ -27,7 +27,7 @@ namespace Sentry.data.Core
             return dto;
         }
 
-        public static FileSchemaDto ToSchemaDto (this DatasetDto dsDto)
+        public static FileSchemaDto ToSchemaDto (this DatasetSchemaDto dsDto)
         {
             return new FileSchemaDto()
             {

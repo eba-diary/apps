@@ -208,7 +208,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             IHttpActionResult GetDatasetsFunction()
             {
-                List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+                List<DatasetSchemaDto> dtoList = _datasetService.GetAllDatasetDto();
                 List<DatasetInfoModel> modelList = dtoList.ToApiModel();
                 return Ok(modelList);
             }

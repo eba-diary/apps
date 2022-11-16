@@ -8,15 +8,15 @@ namespace Sentry.data.Core
 {
     public interface IDatasetService : IEntityService
     {
-        Task<ValidationException> ValidateAsync(DatasetDto dto);
+        Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
         int Create(DatasetDto dto);
-        int CreateAndSaveNewDataset(DatasetDto dto);
-        DatasetDto GetDatasetDto(int id);
-        List<DatasetDto> GetAllDatasetDto();
-        List<DatasetDto> GetAllActiveDatasetDto();
+        int CreateAndSaveNewDataset(DatasetSchemaDto dto);
+        DatasetSchemaDto GetDatasetDto(int id);
+        List<DatasetSchemaDto> GetAllDatasetDto();
+        List<DatasetSchemaDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
-        void UpdateAndSaveDataset(DatasetDto dto);
+        void UpdateAndSaveDataset(DatasetSchemaDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
         Task<AccessRequest> GetAccessRequestAsync(int datasetId);

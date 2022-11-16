@@ -46,12 +46,12 @@ namespace Sentry.data.Core.Tests
 
             return ds;
         }
-        public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
+        public static List<DatasetSchemaDto> MockDatasetDto(List<Dataset> dsList)
         {
-            List<DatasetDto> dtoList = new List<DatasetDto>();
+            List<DatasetSchemaDto> dtoList = new List<DatasetSchemaDto>();
             foreach (Dataset ds in dsList)
             {
-                DatasetDto dto = new DatasetDto()
+                DatasetSchemaDto dto = new DatasetSchemaDto()
                 {
                     DatasetId = ds.DatasetId,
                     DatasetDesc = ds.DatasetDesc
