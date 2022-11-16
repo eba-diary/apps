@@ -619,9 +619,9 @@ namespace Sentry.data.Core
         private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
             string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
-            string summary = "S3 Access " + (ticket.IsAddingPermission && isAddingPermission ? "Request" : "Removal");
+            string summary = "S3 Access Point " + (ticket.IsAddingPermission && isAddingPermission ? "Request" : "Removal") + "of the following policy";
             StringBuilder sb = new StringBuilder();
-            string issueType = "Request";
+            string issueType = "Issue";
 
             //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
@@ -629,7 +629,7 @@ namespace Sentry.data.Core
 
             sb.AppendLine("Account: " + account);
             sb.AppendLine("Name: " + name);
-            sb.AppendLine("Source Bucket: " + "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
+            sb.AppendLine("Source Bucket: " + "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
             sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
             sb.AppendLine("Action: s3.*");
             sb.AppendLine("Action Bucket: S3:ListBucket");
@@ -642,7 +642,7 @@ namespace Sentry.data.Core
             }
             List<JiraCustomField> customFields = new List<JiraCustomField>();
             JiraCustomField acceptanceCriteria = new JiraCustomField();
-            acceptanceCriteria.Name = "Acceptance Criteria";
+            acceptanceCriteria.Name = "Description";
             acceptanceCriteria.Value = sb.ToString();
             customFields.Add(acceptanceCriteria);
 

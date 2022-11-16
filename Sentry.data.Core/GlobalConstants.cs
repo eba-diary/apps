@@ -8,8 +8,14 @@ namespace Sentry.data.Core
         {
             public const string NAME = "Data.Sentry.Com";
             public const string ABBREVIATED_NAME = "DSC";
-            public const string PROD = "PROD";
             public const string REQUEST_CONTEXT_GUID_FORMAT = "yyyyMMddHHmmssfff";
+        }
+
+        public static class Environments
+        {
+            public const string TEST = "TEST";
+            public const string QUAL = "QUAL";
+            public const string PROD = "PROD";
         }
 
         public static class ValidationErrors
