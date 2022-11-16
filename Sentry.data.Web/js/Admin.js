@@ -171,6 +171,8 @@ data.Admin = {
                 $("#AllSchemas").html(scheamDropdown);
 
                 $("#defaultSchemaSelection").prop("disabled", true);
+
+                $("#AllSchemas").materialSelect({ destroy:true });
                 $("#AllSchemas").materialSelect();
             },
             //upon error of a schema response, a blank drop down is createed, to ensure that a previous schema dropdown does not persist
@@ -180,7 +182,10 @@ data.Admin = {
                 $("#schemaDropdown").html(scheamDropdown);
 
                 $("#defaultSchemaSelection").prop("disabled", true);
+
+                $("#schemaDropdown").materialSelect({ destroy: true });
                 $("#schemaDropdown").materialSelect();
+
                 data.Admin.DatasetDropdownScrollToTop();
             },
             complete: function () {
@@ -214,6 +219,8 @@ data.Admin = {
 
                     $("#defaultFileSelection").prop("disabled", true);
                     $("#fileDropdown").html(fileDropdown);
+
+                    $("#fileDropdown").materialSelect({ destroy:true });
                     $("#fileDropdown").materialSelect();
                 },
                 complete: function () {
@@ -224,6 +231,8 @@ data.Admin = {
             let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">No Files</option>';
             $("#defaultFileSelection").prop("disabled", true);
             $("#fileDropdown").html(fileDropdown);
+
+            $("#fileDropdown").materialSelect({ destroy:true });
             $("#fileDropdown").materialSelect();
         }
     },
@@ -243,6 +252,7 @@ data.Admin = {
                 }
                 $("#flowStepsDropdown").html(flowStepDropDown);
 
+                $("#flowStepsDropdown").materialSelect({ destroy:true });
                 $("#flowStepsDropdown").materialSelect();
             },
             complete: function () {
