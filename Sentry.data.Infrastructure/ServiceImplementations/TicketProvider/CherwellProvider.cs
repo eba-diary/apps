@@ -527,6 +527,25 @@ namespace Sentry.data.Infrastructure
                     sb.Append($"</ul>");
                     sb.Append($"<br>");
                     break;
+                case AccessRequestType.Inheritance:
+                    sb.Append($"Please {(model.IsAddingPermission ? "enable" : "disable")} inheritance for dataset {model.SecurableObjectName} from Data.Sentry.com. {(model.IsAddingPermission ? "Enabling" : "Disabling")} inheritance will {(model.IsAddingPermission ? "allow" : "prevent")} the dataset {(model.IsAddingPermission ? "to" : "from")} {(model.IsAddingPermission ? "inherit" : "inheriting")} permissions from its parent asset {model.SaidKeyCode}.");
+                    sb.Append($" When approved, users with access to {model.SaidKeyCode} in Data.Sentry.com {(model.IsAddingPermission ? "will" : "will not")} have access to {model.SecurableObjectName} data.");
+                    sb.Append($"<br>");
+                    sb.Append($"For more information on Authorization in DSC - <a href='https://confluence.sentry.com/pages/viewpage.action?pageId=361734893'>Auth Guide</a>");
+                    sb.Append($"<br>");
+                    if (!string.IsNullOrEmpty(model.SaidKeyCode))
+                    {
+                        sb.Append($"Said Asset: {model.SaidKeyCode} <br>");
+                        sb.Append($"<br>");
+                    }
+                    sb.Append($"<ul>");
+                    foreach (Permission item in model.Permissions)
+                    {
+                        sb.Append($"<li>{item.PermissionName} - {item.PermissionDescription} </li>");
+                    }
+                    sb.Append($"</ul>");
+                    sb.Append($"<br>");
+                    break;
                 default:
                     if (model.IsAddingPermission)
                     {
@@ -564,6 +583,8 @@ namespace Sentry.data.Infrastructure
             {
                 case AccessRequestType.AwsArn:
                     return $"Access {(model.IsAddingPermission ? "" : "Removal")} Request for AWS ARN {model.AwsArn}";
+                case AccessRequestType.Inheritance:
+                    return $"Inheritance {(model.IsAddingPermission ? "enable" : "disable")} request for {model.SecurableObjectName}";
                 default:
                     if (model.AdGroupName != null)
                     {
