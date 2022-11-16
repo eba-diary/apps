@@ -674,7 +674,6 @@
     <None Include="ClassDiagram4.cd" />
     <None Include="ClassDiagram5.cd" />
     <None Include="ClassDiagram6.cd" />
-    <None Include="ClassDiagram7.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

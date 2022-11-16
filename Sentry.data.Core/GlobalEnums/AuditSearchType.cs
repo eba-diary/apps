@@ -6,7 +6,7 @@ namespace Sentry.data.Core
     {
         [Description("Search Based On Date")]
         dateSelect = 0,
-        [Description("Search For Based On File")]
+        [Description("Search Based On File")]
         fileName = 1
     }
 }

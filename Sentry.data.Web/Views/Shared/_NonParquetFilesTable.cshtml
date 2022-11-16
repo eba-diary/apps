@@ -8,24 +8,6 @@
     });
 </script>
 
-@*<table id="AuditTable" aria-label="table of all audited files" data-schema-group=@Model.DataFlowStepId class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
-    <thead>
-        <tr>
-            <th scope="col"><input type="checkbox" id="data-file-select-all" class="generic-checkbox form-check-input"><label for="data-file-select-all" class="form-check-label">Select Files</label></th>
-            <th scope="col">ETL File Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (AuditDataFileModel file in Model.DatafileModels)
-        {
-        <tr>
-            <td><input type="checkbox" data-file-id="@file.DatasetFileId" id=@file.DatasetFileId class="generic-checkbox select-all-target form-check-input"><label for=@file.DatasetFileId class="form-check-label"></label></td>
-            <td>@file.DatasetFileName</td>
-        </tr>
-        }
-    </tbody>
-</table>*@
-
 
 <table id="AuditTable" aria-label="table of all audited files" data-schema-group=1 class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
     <thead>

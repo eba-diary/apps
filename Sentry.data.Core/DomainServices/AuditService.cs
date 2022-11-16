@@ -24,16 +24,16 @@ namespace Sentry.data.Core
         public BaseAuditDto GetNonParquetFiles(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
             // Create snowflake schema object
-            SchemaConsumptionSnowflakeDto schemaObject = getSchemaObjectBySchemaId(datasetId, schemaId);
+            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
             if (schemaObject != null) {
 
                 //create config object
-                SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
+                SnowCompareConfig snowCompareConfig = CreateConfigObject(schemaObject, queryParameter, auditSearchType);
 
-                checkIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
+                CheckIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
 
                 //calls to the snow provider to create call snowflake and return DataTable with resulting data
                 DataTable dataTable = _snowProvider.GetNonParquetFiles(snowCompareConfig);
@@ -62,16 +62,16 @@ namespace Sentry.data.Core
         public BaseAuditDto GetComparedRowCount(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
             // Create snowflake schema object
-            SchemaConsumptionSnowflakeDto schemaObject = getSchemaObjectBySchemaId(datasetId, schemaId);
+            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
             if (schemaObject != null)
             {
 
-                SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
+                SnowCompareConfig snowCompareConfig = CreateConfigObject(schemaObject, queryParameter, auditSearchType);
 
-                checkIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
+                CheckIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
 
                 //calls to the snow provider to create call snowflake and return DataTable with resulting data
                 DataTable dataTable = _snowProvider.GetComparedRowCount(snowCompareConfig);
@@ -99,7 +99,7 @@ namespace Sentry.data.Core
             return baseAuditDto;
         }
 
-        private void checkIfTableExists(string db, string schema, string table)
+        private void CheckIfTableExists(string db, string schema, string table)
         {
             try
             {
@@ -111,11 +111,11 @@ namespace Sentry.data.Core
             }
         }
 
-        private SnowCompareConfig createConfigObject(SchemaConsumptionSnowflakeDto schemaObject, string queryParameter, AuditSearchType auditSearchType)
+        private SnowCompareConfig CreateConfigObject(SchemaConsumptionSnowflakeDto schemaObject, string queryParameter, AuditSearchType auditSearchType)
         {
             SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
             {
-                SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
+                SourceDb = FindRawQueryDBName(schemaObject.SnowflakeDatabase),
                 TargetDb = schemaObject.SnowflakeDatabase,
                 Schema = schemaObject.SnowflakeSchema,
                 Table = schemaObject.SnowflakeTable,
@@ -126,7 +126,7 @@ namespace Sentry.data.Core
             return snowCompareConfig;
         }
 
-        private SchemaConsumptionSnowflakeDto getSchemaObjectBySchemaId(int datasetId, int schemaId)
+        private SchemaConsumptionSnowflakeDto GetSchemaObjectBySchemaId(int datasetId, int schemaId)
         {
             //find DatasetFileConfigDto by parameter datasetId + schemaId 
             DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
@@ -145,7 +145,7 @@ namespace Sentry.data.Core
         }
 
         //derive the rawquery database name from the passed in database name
-        private string findRawQueryDBName(string db)
+        private string FindRawQueryDBName(string db)
         {
             //derive rawquery db name from passerd in snowflake database name.
             string rawqueryDB = db.Replace("_", "_RAWQUERY_");

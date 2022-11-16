@@ -500,7 +500,7 @@ namespace Sentry.data.Core.Tests
         public void GetExceptRows_Test()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -548,6 +548,8 @@ namespace Sentry.data.Core.Tests
             BaseAuditDto baseAuditDto = auditService.GetNonParquetFiles(1,1,"query",AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -557,7 +559,7 @@ namespace Sentry.data.Core.Tests
         public void GetExceptRows_Test_Null_SchemaObject()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -605,6 +607,8 @@ namespace Sentry.data.Core.Tests
             BaseAuditDto baseAuditDto = auditService.GetNonParquetFiles(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -614,7 +618,7 @@ namespace Sentry.data.Core.Tests
         public void GetExceptRows_Check_If_Table_Exists_ArgumentException_Thrown()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -652,13 +656,15 @@ namespace Sentry.data.Core.Tests
 
             // Act/Assert
             Assert.ThrowsException<ArgumentException>(() => auditService.GetNonParquetFiles(1, 1, "query", AuditSearchType.dateSelect));
+
+            mr.VerifyAll();
         }
 
         [TestMethod]
         public void GetRowCountCompare_Test()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -706,6 +712,8 @@ namespace Sentry.data.Core.Tests
             BaseAuditDto baseAuditDto = auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -723,7 +731,7 @@ namespace Sentry.data.Core.Tests
         public void GetRowCountCompare_Test_Null_SchemaObject()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -771,6 +779,8 @@ namespace Sentry.data.Core.Tests
             BaseAuditDto baseAuditDto = auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
