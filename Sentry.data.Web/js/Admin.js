@@ -145,41 +145,6 @@ data.Admin = {
         });
     },
 
-    // creates dataset file dropdown for selected dataset
-    GetDatasetFileDropdown: function (url, isBaseInit) {
-        // Check if the dataset file drop down is being reinitialized on a dataset select dropwdown change
-        var datasetFileDropdown = "";
-
-        if (isBaseInit) {
-            $("#datasetFileDropdown").materialSelect({ destroy: true });
-            datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
-
-            $("#datasetFileDropdown").html(datasetFileDropdown);
-            $("#defaultDatasetFileSelection").prop("disabled", true);
-            $("#datasetFileDropdown").materialSelect();
-        } else {
-            $.ajax({
-                type: "GET",
-                url: url,
-                success: function (datasetFileApiResponse) {
-                    $("#datasetFileDropdown").materialSelect({ destroy: true });
-                    datasetFileDropdown = '<option id="defaultDatasetFileSelection" selected value="-1">Please Select a File</option>';
-
-                    for (let datasetFile of datasetFileApiResponse.Records) {
-                        datasetFileDropdown += '<option value="' + datasetFile.DatasetFileId + '">' + datasetFile.FileName + '</option>';
-                    }
-
-                    $("#datasetFileDropdown").html(datasetFileDropdown);
-                    $("#defaultDatasetFileSelection").prop("disabled", true);
-                    $("#datasetFileDropdown").materialSelect();
-                },
-                complete: function () {
-                    data.Admin.DatasetDropdownScrollToTop();
-                }
-            });
-        }
-    },
-
     // creates schema dropdown for selected dataset
     GetSchemaDropdown: function (url) {
         $.ajax({
@@ -203,41 +168,54 @@ data.Admin = {
                     scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
-                $("#schemaDropdown").html(scheamDropdown);
+                $("#AllSchemas").html(scheamDropdown);
 
                 $("#defaultSchemaSelection").prop("disabled", true);
-                $("#schemaDropdown").materialSelect();
+                $("#AllSchemas").materialSelect();
             },
             complete: function () {
                 data.Admin.DatasetDropdownScrollToTop();
+                data.Admin.ActivateDeactivateAuditSearchButton();
             }
         });
     },
 
-    GetFileDropdown: function (url) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "Json",
-            dataSrc: "Records",
-            success: function (fileApiResponse) {
-                let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">All Files</option>';
+    GetFileDropdown: function (isApiInit, url) {
 
-                // groups dataset file id's by shared file names and store them in a JSON object
-                var groupedFiles = data.Admin.JsonReduce(fileApiResponse.Records, "FileName", "DatasetFileId");
+        // clear file dropdown menu
+        $("#fileDropdown").empty();
 
-                for (let file in groupedFiles) {
-                    fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
+        if (isApiInit) {
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "Json",
+                dataSrc: "Records",
+                success: function (fileApiResponse) {
+                    let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">Please Select a File</option>';
+                    fileDropdown += '<option value="0" data-datasetIds="[-1]">All Files</option>';
+
+                    // groups dataset file id's by shared file names and store them in a JSON object
+                    var groupedFiles = data.Admin.JsonReduce(fileApiResponse.Records, "FileName", "DatasetFileId");
+
+                    for (let file in groupedFiles) {
+                        fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
+                    }
+
+                    $("#defaultFileSelection").prop("disabled", true);
+                    $("#fileDropdown").html(fileDropdown);
+                    $("#fileDropdown").materialSelect();
+                },
+                complete: function () {
+                    data.Admin.DatasetDropdownScrollToTop();
                 }
-
-                $("#fileDropdown").html(fileDropdown);
-
-                $("#fileDropdown").materialSelect();
-            },
-            complete: function () {
-                data.Admin.DatasetDropdownScrollToTop();
-            }
-        });
+            });
+        } else { 
+            let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">No Files</option>';
+            $("#defaultFileSelection").prop("disabled", true);
+            $("#fileDropdown").html(fileDropdown);
+            $("#fileDropdown").materialSelect();
+        }
     },
 
     // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
@@ -282,6 +260,8 @@ data.Admin = {
         var searchStatus = false;
 
         $("select.admin-audit-dropdown.active").each(function () {
+
+            console.log($(this).attr("id"));
             console.log($(this).find(":selected").val());
 
             // Checks if any acive dropdown items are not selected
@@ -293,41 +273,9 @@ data.Admin = {
             }
 
             console.log(searchStatus);
-            console.log($(this).attr("id"));
         })
 
         $("#auditSearchButton").prop("disabled", searchStatus);
-    },
-
-    AuditReprocessButton: function () {
-        // activate or deactivate button
-        $("#AuditTable").on("click", ".generic-checkbox", function () {
-            data.Admin.ActivateDeactivateReprocessButton();
-        });
-
-        $("#auditReprocessButton").click(function () {
-            let flowStep = $("#AuditTable").data("schema-group");
-
-            var filesToReprocess = [];
-
-            $(".select-all-target:checkbox:checked").each(function () {
-                filesToReprocess.push($(this).data("file-id"));
-            });
-
-            $.ajax({
-                type: "POST",
-                url: "../../api/v2/datafile/DataFile/Reprocess",
-                contentType: "application/json",
-                data: JSON.stringify({ DataFlowStepId: flowStep, DatasetFileIds: filesToReprocess }),
-                success: function () {
-                    data.Dataset.makeToast("success", "File Id(s) " + filesToReprocess + " posted for reprocessing at flow step " + flowStep + ".")
-                },
-                error: function () {
-                    data.Dataset.makeToast("error", "Selected file(s) could not be posted for reprocessing. Please try again.")
-                }
-
-            })
-        });
     },
 
     RetrieveDeadSparkJobListButton: function () {
@@ -370,51 +318,53 @@ data.Admin = {
 
     AuditInit: function () {
         $("#AllDatasets").materialSelect();
+        $("#AllSchemas").materialSelect();
         $("#AllAuditTypes").materialSelect();
         $("#AllAuditSearchTypes").materialSelect();
-        $("#schemaDropdown").materialSelect();
-        $("#datasetFileDropdown").materialSelect();
+
 
         $("#AllDatasets").change(function (event) {
+            $("#AuditResultTable").empty();
+
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
                 var url = data.Admin.GetSchemaUrl(datasetId);
-                data.Admin.GetSchemaDropdown(url);
+                data.Admin.GetSchemaDropdown(url);   
             }
 
             // Init an empty Dataset File Dropwdown on dataset selection change
-            data.Admin.GetDatasetFileDropdown("empty", true);
+            data.Admin.GetFileDropdown(false);
         });
 
-        $("#schemaDropdown").change(function (event) {
+        $("#AllSchemas").change(function (event) {
+            $("#AuditResultTable").empty();
+
             var datasetId = $("#AllDatasets").find(":selected").val();
-            var schemaId = $("#schemaDropdown").find(":selected").val();
+            var schemaId = $("#AllSchemas").find(":selected").val();
             if (datasetId != "" && schemaId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
-                data.Admin.GetDatasetFileDropdown(url, false);
+                data.Admin.GetFileDropdown(true, url);
             }
         });
 
         // Activates the selected search type element
         $("#AllAuditSearchTypes").change(function () {
-            console.log("search type defined")
-            // Define elements
             var searchId = $(this).find(":selected").val();
 
-            var currentAuditSelection = $(`#audit-selection-${searchId}`);
+            // Set's all search elements to default state
+            var AuditSearchTypeSelection = $(".audit-search-selection");
 
-            var selection = $(".audit-search-selection");
+            AuditSearchTypeSelection.removeClass("active");
+            AuditSearchTypeSelection.addClass("hidden");
 
-            // Set's all search elements to hidden
-            selection.removeClass("active");
-            selection.addClass("hidden");
+            $(`.audit-search-selection .admin-audit-dropdown`).removeClass("active");
 
             // Set's selected search element to active
-            currentAuditSelection.removeClass("hidden");
-            $(`#audit-selection-${searchId} .admin-audit-dropdown`).removeClass("hidden");
+            var AuditSelection = $(`#audit-selection-${searchId}`);
 
-            currentAuditSelection.addClass("active")
-            $(`#audit-selection-${searchId} .admin-audit-dropdown`).addClass("active")
+            AuditSelection.addClass("active")
+            $(`#audit-selection-${searchId} .admin-audit-dropdown`).addClass("active");
+            /*AuditSelection.childrem .admin-audit-dropdown`).addClass("active");*/
         });
 
         $("select.admin-audit-dropdown").change(function () {
@@ -423,7 +373,7 @@ data.Admin = {
 
         $("#auditSearchButton").click(function () {
             var datasetId = $("#AllDatasets").find(":selected").val();
-            var schemaId = $("#schemaDropdown").find(":selected").val();
+            var schemaId = $("#AllSchemas").find(":selected").val();
             var auditId = $("#AllAuditTypes").find(":selected").val();
 
             let searchTypeId = $("#AllAuditSearchTypes").find(":selected").val();
@@ -439,7 +389,9 @@ data.Admin = {
                     postCheck = data.Admin.ReprocessJobDateRangeCheck(searchParameter, 720);
                     break;
                 case "1":
-                    searchParameter = $("#datasetFileDropdown").find(":selected").text();
+                    searchParameter = $("#fileDropdown").find(":selected").text();
+
+                    if (searchParameter) 
                     break;
             }
 
@@ -454,16 +406,27 @@ data.Admin = {
                     contentType: "application/json",
                     data: JSON.stringify({ "datasetId": datasetId, "schemaId": schemaId, "auditId": auditId, "searchTypeId": searchTypeId, "searchParameter": searchParameter }),
                     success: function (result) {
-                        $("#AuditResultTable").html(result);
+                        if (result.failure) {
+                            // throw toast error
+                            data.Dataset.makeToast("error", result.message);
+
+                            // ensure the audit results table is cleared from any potential previous searches
+                            $("#AuditResultTable").empty();
+                        } else {
+                            $("#AuditResultTable").html(result);
+                        }
                     },
-                    error: function () {
-                        data.Dataset.makeToast("error", "Selected Audit function has failed to run. Please try again.")
+                    error: function (msg) {
+                        data.Dataset.makeToast("error", msg.responseText["title"]);
+                        $("#tab-spinner").hide();
                     },
                     complete: function (msg) {
                         // Hide spinner
                         $("#tab-spinner").hide();
                     }
                 })
+            } else {
+                $("#tab-spinner").hide();
             }
         });
     },
@@ -473,7 +436,7 @@ data.Admin = {
             columnDefs: [
                 {
                     targets: [0],
-                    orderable: false
+                    orderable: true
                 }
             ],
             drawCallback: function () {
@@ -482,7 +445,7 @@ data.Admin = {
             }
         });
 
-        admin.data.DataFileSelectAll();
+        data.Admin.DataFileSelectAll();
     },
 
 
@@ -574,7 +537,7 @@ data.Admin = {
     },
 
     ActivateDeactivateSubmitButton: function () {
-        if ($("#AllDatasets").find(":selected").val() != "" && $("#schemaDropdown").find(":selected").val() != "-1") {
+        if ($("#AllDatasets").find(":selected").val() != "" && $("#AllSchemas").find(":selected").val() != "-1") {
             $("#submitButton").prop("disabled", false);
         }
         else {
@@ -585,7 +548,7 @@ data.Admin = {
     // loads reprocessing page with event handlers
     ReprocessInit: function () {
         $("#AllDatasets").materialSelect();
-        $("#schemaDropdown").materialSelect()
+        $("#AllSchemas").materialSelect()
         $("#flowStepsDropdown").materialSelect();
 
         data.Admin.DatasetDropdownScrollToTop();
@@ -598,8 +561,8 @@ data.Admin = {
             }
 
         });
-        $("#schemaDropdown").change(function (event) {
-            var schemaId = $("#schemaDropdown").find(":selected").val();
+        $("#AllSchemas").change(function (event) {
+            var schemaId = $("#AllSchemas").find(":selected").val();
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (schemaId != "" && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
@@ -635,33 +598,14 @@ data.Admin = {
         $("#flowStepsDropdown").change(function (event) {
             data.Admin.ActivateDeactivateReprocessButton();
         });
-
-        // Uncomment this block and and replace final column header in _DataFileReprocessing.cshtml to activate select all functionality.
-        /*
-        $("#selectAll").click(function (event) {
-            var selectAllCheckbox = $(this);
-            if (selectAllCheckbox.is(":checked")) {
-                $(".select-all-target").each(function () {
-                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                });
-            }
-            else {
-                $(".select-all-target").each(function () {
-                    $(this).prop("checked", selectAllCheckbox.is(":checked"));
-                });
-            }
-
-            console.log(filesToReprocess);
-        });
-        */
-
     },
+
     //loads dataflow metric page events
     DataFlowMetricsInit: function () {
         var table;
 
         $("#AllDatasets").materialSelect();
-        $("#schemaDropdown").materialSelect();
+        $("#AllSchemas").materialSelect();
         $("#fileDropdown").materialSelect();
 
         data.Admin.DatasetDropdownScrollToTop();
@@ -677,13 +621,13 @@ data.Admin = {
             data.Admin.ActivateDeactivateSubmitButton();
         });
 
-        $("#schemaDropdown").change(function (event) {
-            var schemaId = $("#schemaDropdown").find(":selected").val();
+        $("#AllSchemas").change(function (event) {
+            var schemaId = $("#AllSchemas").find(":selected").val();
             var datasetId = $("#AllDatasets").find(":selected").val();
 
             if (schemaId != -1 && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
-                data.Admin.GetFileDropdown(url);
+                data.Admin.GetFileDropdown(true, url);
             }
 
             data.Admin.ActivateDeactivateSubmitButton();
@@ -705,7 +649,7 @@ data.Admin = {
             if (dto.DatasetFileIds == null || dto.DatasetFileIds == 0) dto.DatasetFileIds = -1;
 
             dto.DatasetId = $("#AllDatasets").find(":selected").val();
-            dto.SchemaId = $("#schemaDropdown").find(":selected").val();
+            dto.SchemaId = $("#AllSchemas").find(":selected").val();
 
             table = $('#metricGroupsTable').DataTable({
                 destroy: true,

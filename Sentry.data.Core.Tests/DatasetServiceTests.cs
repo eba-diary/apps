@@ -539,13 +539,13 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetExceptRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetNonParquetFiles(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetExceptRows(1,1,"query",AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetNonParquetFiles(1,1,"query",AuditSearchType.dateSelect);
 
             // Assert
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
@@ -596,13 +596,13 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetExceptRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetNonParquetFiles(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetExceptRows(1, 1, "query", AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetNonParquetFiles(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
@@ -651,7 +651,7 @@ namespace Sentry.data.Core.Tests
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => auditService.GetExceptRows(1, 1, "query", AuditSearchType.dateSelect));
+            Assert.ThrowsException<ArgumentException>(() => auditService.GetNonParquetFiles(1, 1, "query", AuditSearchType.dateSelect));
         }
 
         [TestMethod]
@@ -697,13 +697,13 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetCompareRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetComparedRowCount(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
@@ -762,13 +762,13 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetCompareRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetComparedRowCount(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
@@ -825,7 +825,7 @@ namespace Sentry.data.Core.Tests
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect));
+            Assert.ThrowsException<ArgumentException>(() => auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect));
         }
 
         [TestCategory("Core DatasetService")]

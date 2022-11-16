@@ -8,7 +8,7 @@
     });
 </script>
 
-<table id="AuditTable" aria-label="table of all audited files" data-schema-group=@Model.DataFlowStepId class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
+@*<table id="AuditTable" aria-label="table of all audited files" data-schema-group=@Model.DataFlowStepId class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
     <thead>
         <tr>
             <th scope="col"><input type="checkbox" id="data-file-select-all" class="generic-checkbox form-check-input"><label for="data-file-select-all" class="form-check-label">Select Files</label></th>
@@ -26,6 +26,26 @@
             <td>@file.RawqueryRowCount</td>
             <td>@file.ParquetRowCount</td>
         </tr>
+        }
+    </tbody>
+</table>*@
+
+<table id="AuditTable" aria-label="table of all audited files" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
+    <thead>
+        <tr>
+            <th scope="col">File Name</th>
+            <th scope="col">Rawquery Row Count</th>
+            <th scope="col">Parquet Row Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (AuditDataFileModel file in Model.DatafileModels)
+        {
+            <tr>
+                <td>@file.DatasetFileName</td>
+                <td>@file.RawqueryRowCount</td>
+                <td>@file.ParquetRowCount</td>
+            </tr>
         }
     </tbody>
 </table>
