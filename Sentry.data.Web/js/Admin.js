@@ -400,8 +400,6 @@ data.Admin = {
                     break;
                 case "1":
                     searchParameter = $("#fileDropdown").find(":selected").text();
-
-                    if (searchParameter) 
                     break;
             }
 
