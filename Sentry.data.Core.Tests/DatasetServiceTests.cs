@@ -646,7 +646,7 @@ namespace Sentry.data.Core.Tests
             datasetFileConfigDtos.Add(configDto);
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
-            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
@@ -820,7 +820,7 @@ namespace Sentry.data.Core.Tests
             datasetFileConfigDtos.Add(configDto);
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
-            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
