@@ -99,7 +99,7 @@ namespace Sentry.data.Core
             return baseAuditDto;
         }
 
-        private void checkIfTableExists(string db, string schema, string table)
+        private void CheckIfTableExists(string db, string schema, string table)
         {
             try
             {
