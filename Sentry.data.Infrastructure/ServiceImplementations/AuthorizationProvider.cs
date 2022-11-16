@@ -96,7 +96,7 @@ namespace Sentry.data.Infrastructure
 
         private HttpResponseMessage GetOAuthResponseForRefreshToken(HTTPSSource source, DataSourceToken token, HttpClient httpClient)
         {
-            var motiveUrl = token.TokenUrl;
+            var tokenUrl = token.TokenUrl;
             motiveUrl = motiveUrl.Replace("clientid", source.ClientId);
             var privateId = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             motiveUrl = motiveUrl.Replace("clientsecret", _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
