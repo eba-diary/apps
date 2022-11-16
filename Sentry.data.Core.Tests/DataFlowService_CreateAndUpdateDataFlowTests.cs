@@ -4,13 +4,14 @@ using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class DataFlowService_CreateDataFlowTests
+    public class DataFlowService_CreateAndUpdateDataFlowTests
     {
         [TestMethod]
         public void CreateDataFlow_FailCanCreateDataFlow_DataFlowUnauthorizedAccessException()
@@ -347,6 +348,73 @@ namespace Sentry.data.Core.Tests
             };
 
             Assert.ThrowsException<ValidationException>(() => service.CreateDataFlow(dto));
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateDataFlow_S3Drop_Id()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Dataset dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Dataset Name",
+                DatasetCategories = new List<Category>(),
+                Asset = new Asset() { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            Mock<IApplicationUser> appUser = GetApplicationUser(mockRepository);
+            Mock<IUserService> userService = GetUserService(mockRepository, appUser.Object);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mockRepository, dataset);
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                Id = 2,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DeleteIssueDTM = new DateTime()
+            };
+            datasetContext.Setup(x => x.GetById<DataFlow>(2)).Returns(dataFlow);
+
+            RetrieverJob retrieverJob = new RetrieverJob()
+            {
+                Id = 4,
+                DataFlow = dataFlow
+            };
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>() { retrieverJob }.AsQueryable());
+
+            Mock<IJobService> jobService = mockRepository.Create<IJobService>();
+            jobService.Setup(x => x.Delete(It.Is<List<int>>(i => i.Contains(4)), appUser.Object, false)).Returns(true);
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, null, null, dataFeatures.Object, null, null, null);
+
+            DataFlowDto dto = new DataFlowDto()
+            {
+                Id = 2,
+                SchemaMap = new List<SchemaMapDto>()
+                {
+                    new SchemaMapDto() { DatasetId = 1, SchemaId = 2 }
+                },
+                IngestionType = 3,
+                PreProcessingOption = 0,
+                DatasetId = 1,
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            int result = service.UpdateDataFlow(dto);
+
+            Assert.AreEqual(ObjectStatusEnum.Deleted, dataFlow.ObjectStatus);
+            Assert.AreEqual(3, result);
 
             mockRepository.VerifyAll();
         }
