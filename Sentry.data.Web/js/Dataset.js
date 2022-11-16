@@ -5,7 +5,15 @@
 data.Dataset = {
 
     DatasetFilesTable: {},
-    IngestionType_TOPIC: "4",              //IngestionType_TOPIC matches public enum IngestionType, MY WAY OF CREATING A CONST INSTEAD OF HARDCODE
+
+    //DECLARE CONSTANTS INSTEAD OF HARDCODE
+    IngestionType_TOPIC: "4",       //IngestionType_TOPIC matches public enum IngestionType
+    ObjectStatus_Active: 1,         //ObjectStatus_Active matches ObjectStatusEnum Active
+    ObjectStatus_Disabled: 4,       //ObjectStatus_Active matches ObjectStatusEnum Disabled
+
+    //DECLARE PROPERTIES
+    DataFlowIdSelected: 0,          //Use for dataFlowOnOffSwitch to know which DataFlowId to turn on or off
+
 
     ViewModel: function () {
         var self = this;
@@ -544,14 +552,18 @@ data.Dataset = {
             });
             self.vm.OtherJobs.notifySubscribers();
 
-            //Populate associated DataFlows
+            //Populate self.vm.DataFlows() for knockout
             self.vm.DataFlows.removeAll();
             $.each(result.DataFlows, function (i, val) {
+                //GRAB ITEM
                 var item = new data.Dataset.DataFlow(val);
 
-                //only add if data flow is active
-                if (val.ObjectStatus === 1) self.vm.DataFlows().push(item);
+                //DETERMINE IF ITEM SHOULD BE ADDED TO DataFlows() array based on ObjectStatus
+                if (val.ObjectStatus === data.Dataset.ObjectStatus_Active || val.ObjectStatus === data.Dataset.ObjectStatus_Disabled) {
+                    self.vm.DataFlows().push(item);
+                }
             });
+
             self.vm.DataFlows.notifySubscribers();
             self.vm.SchemaId = result.SchemaId;
             //Determine last
@@ -568,6 +580,7 @@ data.Dataset = {
             data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
             data.Dataset.UpdateConsumptionLayers();
             data.Dataset.tryUpdateSchemaSearchTab();
+
         });
     },
 
@@ -779,7 +792,9 @@ data.Dataset = {
         self.IngestionType_TOPIC = ko.observable(data.Dataset.IngestionType_TOPIC);         //WAY OF CREATING A CONST INSTEAD OF HARDCODE FOR EVALUATION IN KNOCKOUT
         self.S3ConnectorName = ko.observable(dataInput.S3ConnectorName);
 
-       
+        //SET ObjectSTatus TO DIRECT dataFlowOnOffSwitch TO BE ON OR OFF
+        self.DataFlowObjectStatus = ko.observable(dataInput.ObjectStatus);
+
         $.each(dataInput.RetrieverJobs, function (i, val) {
             var item = new data.Dataset.DropLocation(val);
 
@@ -791,9 +806,17 @@ data.Dataset = {
         self.DataFlowEditRedirect = function () {
             data.DataFlow.EditUrlRedirect(this.Id());
         }
-        self.RenderJobs = ko.pureComputed(function () {
-            return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
+        self.RenderJobs = ko.pureComputed(function ()
+        {
+            var jobs = "noRenderJobs";
+            if (ko.unwrap(self.Jobs) || self.DataFlowObjectStatus == "4") {
+                jobs = "RenderJobs";
+            }
+            return jobs;
         });
+
+        //SAVE OFF DataFlowId Selected
+        data.Dataset.DataFlowIdSelected = dataInput.Id
     },
 
 
@@ -1522,6 +1545,82 @@ data.Dataset = {
             tab = 'SchemaAbout';
         }
         $("#detailTab" + tab).trigger('click');
+
+
+
+        //************************************************************************************************************
+        //DataFlow ON OFF SWITCH CHANGE EVENT
+        //************************************************************************************************************
+        $('body').on('change', '#dataFlowOnOffSwitch', function () {
+
+            //DETERMINE CURRENT STATUS
+            var status = $('#dataFlowOnOffSwitchInput')[0].checked;
+            //alert(status);
+            //alert(data.Dataset.DataFlowIdSelected);
+
+            var ConfirmMessage = "";
+            if (status) {
+                ConfirmMessage = "<p>Are you sure?</p> <p> <h3><font color=\"green\">THIS WILL ENABLE DATA FLOW. </font></h3> </p> ";
+                Sentry.ShowModalCustom("Turn ON DataFlow", ConfirmMessage,
+                    '<button type="button" id="dataFlowOnBtn" data-dismiss="modal" class="btn btn-success waves-effect waves-light">Turn ON</button>'
+                );
+            }
+            else {
+                ConfirmMessage = "<p>Are you sure?</p> <p> <h3><font color=\"red\">THIS WILL DISABLE DATA FLOW. </font></h3> </p> ";
+                Sentry.ShowModalCustom("Turn OFF DataFlow", ConfirmMessage,
+                    '<button type="button" id="dataFlowOffBtn" data-dismiss="modal" class="btn btn-danger waves-effect waves-light">Turn Off</button>'
+                );
+            }
+            
+           //TODO: FINISH call to API to enable or disable
+
+            //$("#datasetDeleteBtn").click(function () {
+            //    $.ajax({
+            //        url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
+            //        method: "DELETE",
+            //        dataType: 'json',
+            //        success: function (obj) {
+            //            Sentry.ShowModalAlert(obj.Message, function () {
+            //                window.location = "/Search/Datasets";
+            //            })
+            //        },
+            //        failure: function (obj) {
+            //            Sentry.ShowModalAlert(
+            //                obj.Message, function () { })
+            //        },
+            //        error: function (obj) {
+            //            Sentry.ShowModalAlert(
+            //                obj.Message, function () { })
+            //        }
+            //    });
+            //});
+
+        });
+
+    },
+
+   
+    GetDataFlowOnOffSwitchStatus: function () {
+
+        //TODO: FINISH
+        alert(ko.observable(dataInput.TopicName));
+        //var schemaURL = "/api/v2/dataflow?topicName=";
+        //$.get(schemaURL, function (result) {
+
+        //    data.Dataset.delroyAddFieldArray(result.Fields);
+        //    data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
+        //    data.Dataset.delroyGridRefresh();
+        //    $('#delroySpinner').hide();
+
+        //}).fail(function (result) {
+        //    if (result.status === 404) {
+        //        $('#delroySpinner').hide();
+        //        data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
+        //        data.Dataset.makeToast("success", "No columns Exist.");
+        //    }
+        //});
+
+
     },
 
     toggleDeleteButton: function () {

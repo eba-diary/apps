@@ -422,6 +422,24 @@ namespace Sentry.data.Core
                 throw;
             }
         }
+
+        public void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status)
+        {
+            try
+            {
+                //Find DataFlow
+                DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
+                flow.ObjectStatus = status;
+                _datasetContext.SaveChanges();
+            }
+            catch (ValidationException)
+            {
+                throw;
+            }
+        }
+
+
+
         public void CreateDataFlowForSchema(FileSchema scm)
         {
             DataFlow df = MapToDataFlow(scm);

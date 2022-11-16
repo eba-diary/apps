@@ -1439,10 +1439,20 @@ namespace Sentry.data.Core
         public List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> GetExternalDataFlowsBySchema(DatasetFileConfig config)
         {
             List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> externalJobList = new List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>();
-            
-            ///Determine all SchemaMap steps which reference this schema
-            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).ToList();
 
+            //NOTE: BRING BACK ACTIVE/DISABLED DATAFLOWS TO ALLOW USER TO REACTIVATE IF DESIRED 
+            ///Determine all SchemaMap steps which reference this schema
+            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w =>   w.MappedSchema == config.Schema && 
+                                                                                    w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap && 
+                                                                                    (   w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active ||
+                                                                                        (   w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Disabled
+                                                                                            && _featureFlags.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()        //REMOVE THIS LINE WHEN REMOVING FEATURE FLAG
+                                                                                        )
+                                                                                    )
+                                                                            ).ToList();
+
+            
+            
             //For each dataflow, get the detaildto object and associated retrieverjobs.  Create new tuple and add to return list.
             foreach (SchemaMap item in schemaMappings)
             {
@@ -1455,8 +1465,16 @@ namespace Sentry.data.Core
                 externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList));
             }
 
+            //NOTE: BRING BACK ACTIVE/DISABLED DATAFLOWS TO ALLOW USER TO REACTIVATE IF DESIRED 
             //Get DataFlow id which populates data to schema
-            int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
+            int schemaDataFlowId = _datasetContext.DataFlow.Where(  w => w.SchemaId == config.Schema.SchemaId && 
+                                                                    (   w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active || 
+                                                                        (   w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Disabled
+                                                                            && _featureFlags.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()        //REMOVE THIS LINE WHEN REMOVING FEATURE FLAG
+                                                                        )
+                                                                    )
+                                                                  )
+                                                            .Select(s => s.Id).FirstOrDefault();
             if (schemaDataFlowId != 0)
             {
                 DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
@@ -1470,7 +1488,6 @@ namespace Sentry.data.Core
 
             return externalJobList;
         }
-
 
         public static Object TryConvertTo<T>(Object input)
         {
