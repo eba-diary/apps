@@ -275,6 +275,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsEnvironmentSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsNonProdSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsProdSource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DataSourceToken.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleBigQueryApiSource.cs" />
