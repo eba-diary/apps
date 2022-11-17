@@ -50,12 +50,12 @@ namespace Sentry.data.Infrastructure
                 {
                     _httpClient.BaseAddress = job.DataSource.BaseUri;
                     _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessTokenForToken((HTTPSSource)job.DataSource, token)}");
-                    ExecuteHttpClientCore(job);
+                    await ExecuteHttpClientCore(job);
                 }
             }
             else
             {
-                ExecuteHttpClientCore(job);
+                await ExecuteHttpClientCore(job);
             }
         }
 
@@ -359,7 +359,6 @@ namespace Sentry.data.Infrastructure
 
         protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "tokenval");
             throw new NotImplementedException();
         }
 

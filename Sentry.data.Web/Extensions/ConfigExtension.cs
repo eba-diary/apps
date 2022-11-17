@@ -6,6 +6,7 @@ using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sentry.data.Web.Extensions;
 
 namespace Sentry.data.Web
 {
@@ -70,7 +71,7 @@ namespace Sentry.data.Web
                 TokenAuthValue = model.TokenAuthValue,
                 ClientId = model.ClientId,
                 ClientPrivateId = model.ClientPrivateId,
-                Tokens = model.Tokens.ToList(),
+                Tokens = model.Tokens.Select(t => t.ToDto()).ToList(),
                 RequestHeaders = model.Headers,
                 IsSecured = model.IsSecured,
                 PrimaryContactId= model.PrimaryContactId,
