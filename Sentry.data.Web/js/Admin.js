@@ -168,21 +168,24 @@ data.Admin = {
                     scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
+
+                $("#AllSchemas").materialSelect({ destroy: true });
+
+                $("#AllSchemas").html(scheamDropdown);
                 $("#defaultSchemaSelection").prop("disabled", true);
 
-                $("#AllSchemas").materialSelect({ destroy:true });
-                $("#AllSchemas").html(scheamDropdown);
                 $("#AllSchemas").materialSelect();
             },
             //upon error of a schema response, a blank drop down is createed, to ensure that a previous schema dropdown does not persist
             error: function (msg) {
                 var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
 
-                $("#schemaDropdown").html(scheamDropdown);
-
-                $("#defaultSchemaSelection").prop("disabled", true);
 
                 $("#schemaDropdown").materialSelect({ destroy: true });
+
+                $("#schemaDropdown").html(scheamDropdown);
+                $("#defaultSchemaSelection").prop("disabled", true);
+
                 $("#schemaDropdown").materialSelect();
 
                 data.Admin.DatasetDropdownScrollToTop();
@@ -216,10 +219,12 @@ data.Admin = {
                         fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
                     }
 
+
+                    $("#fileDropdown").materialSelect({ destroy: true });
+
+                    $("#fileDropdown").html(fileDropdown);
                     $("#defaultFileSelection").prop("disabled", true);
 
-                    $("#fileDropdown").materialSelect({ destroy:true });
-                    $("#fileDropdown").html(fileDropdown);
                     $("#fileDropdown").materialSelect();
                 },
                 complete: function () {
@@ -228,10 +233,12 @@ data.Admin = {
             });
         } else { 
             let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">No Files</option>';
+
+            $("#fileDropdown").materialSelect({ destroy: true });
+
+            $("#fileDropdown").html(fileDropdown);
             $("#defaultFileSelection").prop("disabled", true);
 
-            $("#fileDropdown").materialSelect({ destroy:true });
-            $("#fileDropdown").html(fileDropdown);
             $("#fileDropdown").materialSelect();
         }
     },
@@ -242,7 +249,6 @@ data.Admin = {
             type: "GET",
             url: url,
             success: function (flowStepApiResponse) {
-                $("#flowStepsDropdown").materialSelect({ destroy: true });
                 var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
                 for (let flowStep of flowStepApiResponse[0].steps) {
                     if (flowStep.ActionName == "Raw Storage") {
