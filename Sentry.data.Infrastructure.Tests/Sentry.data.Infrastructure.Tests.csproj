@@ -182,6 +182,10 @@
     <Compile Include="GoogleBigQueryServiceTests.cs" />
     <Compile Include="GoogleBigQueryJobProviderTests.cs" />
     <Compile Include="EmailServiceTests.cs" />
+    <Compile Include="AllDfsRetrieverJobProviderTests.cs" />
+    <Compile Include="QualRetrieverJobProviderTests.cs" />
+    <Compile Include="ProdRetrieverJobProviderTests.cs" />
+    <Compile Include="BaseRetrieverJobProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
