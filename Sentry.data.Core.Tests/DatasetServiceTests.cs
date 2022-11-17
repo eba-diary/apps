@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null,null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -81,7 +81,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 ShortName = "Foo",
@@ -116,7 +116,7 @@ namespace Sentry.data.Core.Tests
 
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -153,7 +153,7 @@ namespace Sentry.data.Core.Tests
 
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -191,7 +191,7 @@ namespace Sentry.data.Core.Tests
 
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -218,7 +218,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -245,7 +245,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -281,7 +281,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 0,
                 DatasetName = "FooBar",
@@ -319,7 +319,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 0,
                 DatasetName = "FooBar",
@@ -358,7 +358,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 1000,
                 DatasetName = "FooBar",
@@ -382,7 +382,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_DatasetName_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.DatasetName = "NewName");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.DatasetName = "NewName");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -393,7 +393,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_ShortName_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.ShortName = "NewName");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.ShortName = "NewName");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -404,7 +404,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_SAIDKeyCode_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.SAIDAssetKeyCode = "NEWN");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.SAIDAssetKeyCode = "NEWN");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -415,7 +415,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_NamedEnvironment_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.NamedEnvironment = "PROD");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.NamedEnvironment = "PROD");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -426,13 +426,13 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_NamedEnvironmentType_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.NamedEnvironmentType = NamedEnvironmentType.Prod);
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.NamedEnvironmentType = NamedEnvironmentType.Prod);
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
         }
 
-        private static void Setup_UpdateAndSaveDataset(out DatasetDto newDataset, out DatasetService datasetService, Action<DatasetDto> datasetDtoUpdateAction)
+        private static void Setup_UpdateAndSaveDataset(out DatasetSchemaDto newDataset, out DatasetService datasetService, Action<DatasetSchemaDto> datasetDtoUpdateAction)
         {
             var context = new Mock<IDatasetContext>();
             var dataset = new Dataset()
@@ -445,7 +445,7 @@ namespace Sentry.data.Core.Tests
                 NamedEnvironment = "TEST",
                 NamedEnvironmentType = NamedEnvironmentType.NonProd
             };
-            newDataset = new DatasetDto()
+            newDataset = new DatasetSchemaDto()
             {
                 DatasetId = 1,
                 DatasetName = "Foo",

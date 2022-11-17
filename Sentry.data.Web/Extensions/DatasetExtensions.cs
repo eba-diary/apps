@@ -9,11 +9,11 @@ namespace Sentry.data.Web
 {
     public static class DatasetExtensions
     {
-        public static DatasetDto ToDto(this DatasetModel model)
+        public static DatasetSchemaDto ToDto(this DatasetModel model)
         {
-            if (model == null) { return new DatasetDto(); }
+            if (model == null) { return new DatasetSchemaDto(); }
 
-            return new DatasetDto()
+            return new DatasetSchemaDto()
             {
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
@@ -46,17 +46,17 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<DatasetInfoModel> ToApiModel(this List<DatasetDto> dtoList)
+        public static List<DatasetInfoModel> ToApiModel(this List<DatasetSchemaDto> dtoList)
         {
             List<DatasetInfoModel> modelList = new List<DatasetInfoModel>();
-            foreach (DatasetDto dto in dtoList)
+            foreach (DatasetSchemaDto dto in dtoList)
             {                
                 modelList.Add(dto.ToApiModel());
             }
             return modelList;
         }
 
-        public static DatasetInfoModel ToApiModel(this DatasetDto dto)
+        public static DatasetInfoModel ToApiModel(this DatasetSchemaDto dto)
         {
             return new DatasetInfoModel()
             {

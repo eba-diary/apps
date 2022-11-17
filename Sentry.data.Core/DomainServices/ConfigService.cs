@@ -783,18 +783,6 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
         }
 
-        //TODO CLA-2765 - Remove unused method DeleteParquetFilesByStorageCode
-        public void DeleteParquetFilesByStorageCode(string storageCode)
-        {
-            _s3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
-        }
-
-        //TODO CLA-2765 - Remove unused method DeleteRawFilesByStorageCode
-        public void DeleteRawFilesByStorageCode(string storageCode)
-        {
-            _s3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
-        }
-
         public bool SyncConsumptionLayer(int datasetId, int schemaId)
         {
             if (datasetId == 0)
@@ -1038,7 +1026,6 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(DatasetFileConfig dfc)
         {
-            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             dfc.DeleteInd = true;
             dfc.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             dfc.DeleteIssueDTM = DateTime.Now;
@@ -1047,7 +1034,6 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(FileSchema scm)
         {
-            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             scm.DeleteInd = true;
             scm.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             scm.DeleteIssueDTM = DateTime.Now;

@@ -134,11 +134,10 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public async Task<ActionResult> Edit(int id)
         {
-            // TODO: CLA-2765 - Add filtering to ensure EDIT only occurs for ACTIVE object status
             UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
             if (us != null && us.CanEditDataset)
             {
-                DatasetDto dto = _datasetService.GetDatasetDto(id);
+                DatasetSchemaDto dto = _datasetService.GetDatasetSchemaDto(id);
                 DatasetModel model = new DatasetModel(dto);
                 model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();          //REMOVE WHEN TURNED ON LATER
 
@@ -263,7 +262,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public async Task<ActionResult> DatasetForm(DatasetModel model)
         {
-            DatasetDto dto = model.ToDto();
+            DatasetSchemaDto dto = model.ToDto();
 
             //only validate config settings on dataset create
             if (model.DatasetId == 0)
