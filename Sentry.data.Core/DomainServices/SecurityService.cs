@@ -652,16 +652,17 @@ namespace Sentry.data.Core
 
             JiraIssueCreateRequest jiraRequest = new JiraIssueCreateRequest();
 
-            JiraTicket jiraTicket = new JiraTicket();
-
-            jiraTicket.Project = project;
-            jiraTicket.CustomFields = customFields;
-            jiraTicket.Reporter = ticket.RequestedById;
-            jiraTicket.IssueType = issueType;
-            jiraTicket.Summary = summary;
-            jiraTicket.Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions"};
-            jiraTicket.Components = new List<string> { "ACID" };
-            jiraTicket.Description = sb.ToString();
+            JiraTicket jiraTicket = new JiraTicket
+            {
+                Project = project,
+                CustomFields = customFields,
+                Reporter = ticket.RequestedById,
+                IssueType = issueType,
+                Summary = summary,
+                Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions" },
+                Components = new List<string> { "ACID" },
+                Description = sb.ToString()
+            };
 
             jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };
 
