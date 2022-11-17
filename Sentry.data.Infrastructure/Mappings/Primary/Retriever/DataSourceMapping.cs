@@ -275,4 +275,20 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
         }
     }
+
+    public class DfsNonProdSourceMapping : SubclassMapping<DfsNonProdSource>
+    {
+        public DfsNonProdSourceMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DFS_NONPROD_SOURCE);
+        }
+    }
+
+    public class DfsProdSourceMapping : SubclassMapping<DfsProdSource>
+    {
+        public DfsProdSourceMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DFS_PROD_SOURCE);
+        }
+    }
 }

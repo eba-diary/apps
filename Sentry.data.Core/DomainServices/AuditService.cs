@@ -21,39 +21,22 @@ namespace Sentry.data.Core
             _snowProvider = snowProvider;
         }
 
-        public BaseAuditDto GetExceptRows(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
+        public BaseAuditDto GetNonParquetFiles(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
-            SchemaConsumptionSnowflakeDto schemaObject = getSchemaObjectBySchemaId(datasetId, schemaId);
+            // Create snowflake schema object
+            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
             if (schemaObject != null) {
 
-                //query execution logger
-                Logger.Info("Audit Query Execution: Started");
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-
                 //create config object
-                SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
+                SnowCompareConfig snowCompareConfig = CreateConfigObject(schemaObject, queryParameter, auditSearchType);
 
-                if (!_snowProvider.CheckIfExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table))
-                {
-                    throw new ArgumentException($"The table ({snowCompareConfig.Table}) trying to be compared does not exist in the current context.");
-                }
+                CheckIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
 
                 //calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetExceptRows(snowCompareConfig);
-
-                stopWatch.Stop();
-
-                TimeSpan ts = stopWatch.Elapsed;
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                    ts.Hours, ts.Minutes, ts.Seconds,
-                    ts.Milliseconds / 10);
-
-                Logger.Info("Audit Query Execution: Complete");
-                Logger.Info($"Elapsed Time: {elapsedTime}");
+                DataTable dataTable = _snowProvider.GetNonParquetFiles(snowCompareConfig);
 
                 List<AuditDto> auditDtos = new List<AuditDto>();
 
@@ -76,40 +59,22 @@ namespace Sentry.data.Core
             return baseAuditDto;
         }
 
-        public BaseAuditDto GetRowCountCompare(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
+        public BaseAuditDto GetComparedRowCount(int datasetId, int schemaId, string queryParameter, AuditSearchType auditSearchType)
         {
-            SchemaConsumptionSnowflakeDto schemaObject = getSchemaObjectBySchemaId(datasetId, schemaId);
+            // Create snowflake schema object
+            SchemaConsumptionSnowflakeDto schemaObject = GetSchemaObjectBySchemaId(datasetId, schemaId);
 
             BaseAuditDto baseAuditDto = new BaseAuditDto();
 
             if (schemaObject != null)
             {
-                Logger.Info("Audit Query Execution: Started");
-                Stopwatch stopWatch = new Stopwatch();
 
-                stopWatch.Start();
+                SnowCompareConfig snowCompareConfig = CreateConfigObject(schemaObject, queryParameter, auditSearchType);
 
-                SnowCompareConfig snowCompareConfig = createConfigObject(schemaObject, queryParameter, auditSearchType);
+                CheckIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
 
-                if(!_snowProvider.CheckIfExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table))
-                {
-                    throw new ArgumentException($"Table: {snowCompareConfig.Table} does not exist in the current context");
-                }
-                
                 //calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetCompareRows(snowCompareConfig);
-
-                stopWatch.Stop();
-
-                TimeSpan ts = stopWatch.Elapsed;
-
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                    ts.Hours, ts.Minutes, ts.Seconds,
-                    ts.Milliseconds / 10);
-
-                Logger.Info("Audit Query Execution: Complete");
-                Logger.Info($"Elapsed Time: {elapsedTime}");
-
+                DataTable dataTable = _snowProvider.GetComparedRowCount(snowCompareConfig);
 
                 List<AuditDto> auditDtos = new List<AuditDto>();
 
@@ -134,11 +99,23 @@ namespace Sentry.data.Core
             return baseAuditDto;
         }
 
-        private SnowCompareConfig createConfigObject(SchemaConsumptionSnowflakeDto schemaObject, string queryParameter, AuditSearchType auditSearchType)
+        private void CheckIfTableExists(string db, string schema, string table)
+        {
+            try
+            {
+                _snowProvider.CheckIfExists(db, schema, table);
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException($"The table ({table}) trying to be compared does not exist in the current context.");
+            }
+        }
+
+        private SnowCompareConfig CreateConfigObject(SchemaConsumptionSnowflakeDto schemaObject, string queryParameter, AuditSearchType auditSearchType)
         {
             SnowCompareConfig snowCompareConfig = new SnowCompareConfig()
             {
-                SourceDb = findRawQueryDBName(schemaObject.SnowflakeDatabase),
+                SourceDb = FindRawQueryDBName(schemaObject.SnowflakeDatabase),
                 TargetDb = schemaObject.SnowflakeDatabase,
                 Schema = schemaObject.SnowflakeSchema,
                 Table = schemaObject.SnowflakeTable,
@@ -149,14 +126,14 @@ namespace Sentry.data.Core
             return snowCompareConfig;
         }
 
-        private SchemaConsumptionSnowflakeDto getSchemaObjectBySchemaId(int datasetId, int schemaId)
+        private SchemaConsumptionSnowflakeDto GetSchemaObjectBySchemaId(int datasetId, int schemaId)
         {
             //find DatasetFileConfigDto by parameter datasetId + schemaId 
             DatasetFileConfigDto datasetFileConfigDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
 
             //find SchemaConsumptionSnowflakeDto with snowflake consumption of dataset schema parquet
             SchemaConsumptionSnowflakeDto schemaObject = datasetFileConfigDto.Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>()
-                                                            .FirstOrDefault(x => x.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet);
+                                                            .FirstOrDefault(x => x.SnowflakeType == SnowflakeConsumptionType.CategorySchemaParquet);
 
             //if no object is found with a snowflake consumption of dataset schema parquet, set to first or default
             if (schemaObject is null)
@@ -167,7 +144,8 @@ namespace Sentry.data.Core
             return schemaObject;
         }
 
-        private string findRawQueryDBName(string db)
+        //derive the rawquery database name from the passed in database name
+        private string FindRawQueryDBName(string db)
         {
             //derive rawquery db name from passerd in snowflake database name.
             string rawqueryDB = db.Replace("_", "_RAWQUERY_");

@@ -96,7 +96,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
         }
 
-
         /// <summary>
         /// Gets all DFS from a job
         /// </summary>
@@ -108,16 +107,17 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("DFSMonitorList")]
-        public IHttpActionResult GetDfsMonitorList()
+        public IHttpActionResult GetDfsMonitorList(string requestingNamedEnvironment = null)
         {
-            List<DfsMonitorModel> model;
-
             try
             {
-
-                model = _jobService.GetDfsRetrieverJobs().ToModel();
-
-                return Ok(model);
+                List<DfsMonitorDto> dtos = _jobService.GetDfsRetrieverJobs(requestingNamedEnvironment);
+                List<DfsMonitorModel> models = dtos.Select(x => x.ToModel()).ToList();
+                return Ok(models);
+            }
+            catch (DfsRetrieverJobException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -125,7 +125,6 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return InternalServerError(ex);
             }
         }
-
 
         /// <summary>
         /// Get submission detail information
