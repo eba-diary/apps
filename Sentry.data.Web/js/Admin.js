@@ -293,7 +293,7 @@ data.Admin = {
     ActivateDeactivateReprocessButton: function () {
         var checkedBoxes = $(".select-all-target:checkbox:checked");
 
-        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1" && itemSelected != -1) {
+        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1") {
             $("#reprocessButton").prop("disabled", false);
         }
         else {
