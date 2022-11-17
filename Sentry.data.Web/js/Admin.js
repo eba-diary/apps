@@ -168,11 +168,10 @@ data.Admin = {
                     scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
-                $("#AllSchemas").html(scheamDropdown);
-
                 $("#defaultSchemaSelection").prop("disabled", true);
 
                 $("#AllSchemas").materialSelect({ destroy:true });
+                $("#AllSchemas").html(scheamDropdown);
                 $("#AllSchemas").materialSelect();
             },
             //upon error of a schema response, a blank drop down is createed, to ensure that a previous schema dropdown does not persist
@@ -218,9 +217,9 @@ data.Admin = {
                     }
 
                     $("#defaultFileSelection").prop("disabled", true);
-                    $("#fileDropdown").html(fileDropdown);
 
                     $("#fileDropdown").materialSelect({ destroy:true });
+                    $("#fileDropdown").html(fileDropdown);
                     $("#fileDropdown").materialSelect();
                 },
                 complete: function () {
@@ -230,9 +229,9 @@ data.Admin = {
         } else { 
             let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">No Files</option>';
             $("#defaultFileSelection").prop("disabled", true);
-            $("#fileDropdown").html(fileDropdown);
 
             $("#fileDropdown").materialSelect({ destroy:true });
+            $("#fileDropdown").html(fileDropdown);
             $("#fileDropdown").materialSelect();
         }
     },
@@ -250,9 +249,9 @@ data.Admin = {
                         flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
                     }
                 }
-                $("#flowStepsDropdown").html(flowStepDropDown);
 
                 $("#flowStepsDropdown").materialSelect({ destroy:true });
+                $("#flowStepsDropdown").html(flowStepDropDown);
                 $("#flowStepsDropdown").materialSelect();
             },
             complete: function () {
