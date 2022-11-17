@@ -145,87 +145,7 @@ namespace Sentry.data.Core.DomainServices
 
             Logger.Info($"{methodName} Method End");
             return successfullySubmitted;
-        }
-
-        // TODO: CLA4703 - Promotion mock out
-        public bool PromoteDataset()
-        {
-            try
-            {
-                DatasetDto dto = DatasetService.GetDatasetDto(datasetId);
-
-                dto.DatasetId = 0;
-                dto.NamedEnvironment = namedEnvironment;
-
-                int newDsId = Create(dto);
-
-                if (newDsId == 0)
-                {
-                    return false;
-                }
-
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        // TODO: CLA4703 - Promotion mock out
-        public bool PromoteSchema(int schemaId, int targetDatasetId)
-        {
-            try
-            {
-                FileSchemaDto schemaDto = SchemaService.GetFileSchemaDto(schemaId);
-                int sourceDatasetId = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == schemaId).ParentDataset.DatasetId;
-                DatasetFileConfigDto configDto = ConfigService.GetDatasetFileConfigDtoByDataset(sourceDatasetId).FirstOrDefault(x => x.Schema.SchemaId == schemaId);
-
-                schemaDto.ParentDatasetId = targetDatasetId;
-                int newSchemaId = SchemaService.CreateAndSaveSchema(schemaDto);
-
-                configDto.SchemaId = newSchemaId;
-                configDto.ParentDatasetId = targetDatasetId;
-
-                ConfigService.CreateAndSaveDatasetFileConfig(configDto);
-
-                int dataflowId = _datasetContext.DataFlow.FirstOrDefault(w => w.SchemaId == schemaId).Id;
-                DataFlowDetailDto dataflowDto = DataFlowService.GetDataFlowDetailDto(dataflowId);
-
-                dataflowDto.DatasetId = targetDatasetId;
-                dataflowDto.SchemaId = newSchemaId;
-
-                dataflowDto.SchemaMap.First().SchemaId = newSchemaId;
-                dataflowDto.SchemaMap.First().DatasetId = targetDatasetId;
-                dataflowDto.SchemaMap.First().StepId = 0;
-
-                int newDataflowId = DataFlowService.CreateandSaveDataFlow(dataflowDto);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public int CreateDatasetAndSchema(DatasetDto dto)
-        {
-            int newDatasetId = Create(dto);
-            dto.DatasetId = newDatasetId;
-
-            DatasetFileConfigDto configDto = dto.ToConfigDto();
-            FileSchemaDto fileDto = dto.ToSchemaDto();
-
-            int newFileSchemaId = Create(fileDto);
-            configDto.SchemaId = newFileSchemaId;
-
-            Create(configDto);
-
-            return newDatasetId;
-
-        }
+        }                
         #endregion
 
         #region Private methods        
@@ -234,7 +154,7 @@ namespace Sentry.data.Core.DomainServices
         /// </summary>
         /// <param name="dto">DatasetDto</param>
         /// <returns></returns>
-        private int Create(DatasetDto dto)
+        internal int Create(DatasetDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");

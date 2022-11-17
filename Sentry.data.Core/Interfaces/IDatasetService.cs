@@ -11,7 +11,15 @@ namespace Sentry.data.Core
         Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
         int Create(DatasetDto dto);
         int CreateAndSaveNewDataset(DatasetSchemaDto dto);
-        DatasetSchemaDto GetDatasetDto(int id);
+        DatasetDto GetDatasetDto(int id);
+
+        /// <summary>
+        /// Returns combination of dataset and schema metadata as a dto object.
+        /// For datasetdto only metdata, use <see cref="GetDatasetDto(int)"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        DatasetSchemaDto GetDatasetSchemaDto(int id);
         List<DatasetSchemaDto> GetAllDatasetDto();
         List<DatasetSchemaDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);

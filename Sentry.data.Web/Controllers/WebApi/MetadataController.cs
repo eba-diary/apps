@@ -56,12 +56,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             get { return _datasetFileService.Value; }
         }
 
-        // TODO: CLA4703 - Promotion mock out
-        public IDataApplicationService DataApplicationService
-        {
-            get { return _dataApplicationService.Value; }
-        }
-
         #region Classes
         public class OutputSchema
         {
@@ -137,63 +131,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
         #endregion
 
-        // TODO: CLA4703 - Promotion mock out
-        /// <summary>
-        /// List of all datasets
-        /// </summary>
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("PromoteDataset")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        public IHttpActionResult PromoteDataset(int datasetId, string targetNamedEnvironment)
-        {
-            IHttpActionResult PromoteDatasetFunction()
-            {
-                try
-                {
-                    DataApplicationService.PromoteDataset(datasetId, targetNamedEnvironment);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"metadatacontroller-promoteDatasetFunction failure", ex);
-                    return InternalServerError(ex);
-                }
-
-            }
-
-            return ApiTryCatch(nameof(MetadataController), nameof(PromoteDatasetFunction), null, PromoteDatasetFunction);
-        }
-
-        // TODO: CLA4703 - Promotion mock out
-        /// <summary>
-        /// List of all datasets
-        /// </summary>
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("PromoteSchema")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, null)]
-        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
-        public IHttpActionResult PromoteSchema(int schemaId, int targetDatasetId)
-        {
-            IHttpActionResult PromoteSchemaFunction()
-            {
-                try
-                {
-                    DataApplicationService.PromoteSchema(schemaId, targetDatasetId);
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error($"metadatacontroller-promoteSchemaFunction failure", ex);
-                    return InternalServerError(ex);
-                }
-
-            }
-
-            return ApiTryCatch(nameof(MetadataController), nameof(PromoteSchemaFunction), null, PromoteSchemaFunction);
-        }
 
         #region Dataset_Endpoints
         /// <summary>

@@ -44,9 +44,8 @@ namespace Sentry.data.Core
             _datasetFileService = datasetFileService;
         }
 
-        public DatasetSchemaDto GetDatasetDto(int id)
+        public DatasetSchemaDto GetDatasetSchemaDto(int id)
         {
-            // TODO: CLA-2765 - Filter only datasets with ACTIVE or PENDING_DELETE status
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetSchemaDto dto = new DatasetSchemaDto();
             MapToDto(ds, dto);
@@ -54,9 +53,8 @@ namespace Sentry.data.Core
             return dto;
         }
 
-        public DatasetDto GetDatasetDto2(int id)
+        public DatasetDto GetDatasetDto(int id)
         {
-            // TODO: CLA-2765 - Filter only datasets with ACTIVE or PENDING_DELETE status
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
@@ -865,53 +863,20 @@ namespace Sentry.data.Core
         
         private void MapToDto(Dataset ds, DatasetSchemaDto dto)
         {
-            IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);
-            IApplicationUser uploader = _userService.GetByAssociateId(ds.UploadUserName);
+            //Map DatasetDto properties
+            MapToDto(ds, (DatasetDto)dto);
 
-            //map the ISecurable properties
-            dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
-            dto.PrimaryContactId = ds.PrimaryContactId;
-            dto.IsSecured = ds.IsSecured;
-
-            dto.DatasetId = ds.DatasetId;
-            dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
-            dto.DatasetName = ds.DatasetName;
-            dto.ShortName = ds.ShortName;
-            dto.DatasetDesc = ds.DatasetDesc;
-            dto.DatasetInformation = ds.DatasetInformation;
-            dto.DatasetType = ds.DatasetType;
-            dto.DataClassification = ds.DataClassification;
-            dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
-            dto.ObjectStatus = ds.ObjectStatus;
-
-            dto.CreationUserId = ds.CreationUserName;
-            dto.CreationUserName = ds.CreationUserName;
-            dto.PrimaryContactName = (primaryContact != null ? primaryContact.DisplayName : "Not Available");
-            dto.PrimaryContactEmail = (primaryContact != null ? primaryContact.EmailAddress : "");
-            dto.UploadUserId = ds.UploadUserName;
-            dto.UploadUserName = (uploader != null ? uploader?.DisplayName : "Not Available");
-
-            dto.DatasetDtm = ds.DatasetDtm;
-            dto.ChangedDtm = ds.ChangedDtm;
-            dto.CanDisplay = ds.CanDisplay;
-            dto.TagIds = new List<string>();
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
             dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
             dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.Delimiter;
             dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
-            dto.CategoryName = ds.DatasetCategories.First().Name;
-            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
-            dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
-            dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
-            dto.NamedEnvironment = ds.NamedEnvironment;
-            dto.NamedEnvironmentType = ds.NamedEnvironmentType;
-            dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
 
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
         {
+            //Map DatasetSchemaDto properites
             MapToDto(ds, dto);
 
             IApplicationUser user = _userService.GetCurrentUser();
