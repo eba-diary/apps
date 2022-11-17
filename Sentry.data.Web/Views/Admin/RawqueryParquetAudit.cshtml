@@ -28,7 +28,7 @@
     <div class="d-inline-block col">
         <h3>Schema</h3>
         <div class="md-form">
-            <select class="mbd-select active admin-audit-dropdown" data-stop-refresh='true' id="schemaDropdown" style="display: none">
+            <select class="mbd-select active admin-audit-dropdown" data-stop-refresh='true' id="AllSchemas" style="display: none">
                 <option value="-1">Please Select a Schema</option>
                 <!--populated asyncronously via ajax-->
             </select>
@@ -53,7 +53,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="d-inline-block col">
+    <div class="d-inline-block col-md-4">
         <!-- Data Set Dropdown Menu-->
         <h3>Search Types</h3>
 
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <div id="audit-selection-0" class="audit-search-selection hidden col">
+    <div id="audit-selection-0" class="audit-search-selection hidden col-md-4">
         <h3>Date</h3>
         <div class="md-form">
             @Html.TextBoxFor(x => x.CurrentDate, "{0:yyyy-MM-dd}", new
@@ -82,11 +82,11 @@
         </div>
     </div>
 
-    <div id="audit-selection-1" class="audit-search-selection hidden col">
+    <div id="audit-selection-1" class="audit-search-selection hidden col-md-4">
         <h3>File Select</h3>
         <div class="md-form">
-            <select class="mbd-select admin-audit-dropdown" data-stop-refresh='true' id="datasetFileDropdown" style="display: none">
-                <option value="-1">Please Select a File</option>
+            <select class="mbd-select admin-audit-dropdown " searchable="Search Available Files" data-stop-refresh='true' id="fileDropdown" style="display: none">
+                <option value="0">All Files</option>
                 <!--populated asyncronously via ajax-->
             </select>
         </div>
@@ -125,14 +125,10 @@
 <!--Table-->
 <div id="AuditResultTable"></div>
 
-<!--Reprocess button-->
-<button type="button" class="btn btn-primary waves-effect waves-light" id="auditReprocessButton" disabled>Reprocess Selected</button>
-
 <script>
     $(document).ready(function () {
         data.Admin.AuditInit();
         $("#tab-spinner").hide();
-        $("#auditReprocessButton").hide();
         $('select.admin-audit-dropdown.active option[value=-1]').each(function () {
             $(this).prop('disabled', true);
         });
