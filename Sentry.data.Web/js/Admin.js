@@ -118,31 +118,47 @@ data.Admin = {
         return "../../api/v2/dataflow?schemaId=" + schemaId;
     },
 
-    //generates table with datafiles from selected dataset and schema
-    PopulateTable: function (url) {
-        $("#dataFileTableResults").DataTable({
-            destroy: true,
-            ajax: {
-                url: url,
-                dataSrc: "Records",
-            },
-            columns: [
-                { data: "DatasetFileId" },
-                { data: "FileName" },
-                { data: "UploadUserName" },
-                { data: "CreateDTM" },
-                { data: "ModifiedDTM" },
-                { data: "FileLocation" },
-                {
-                    data: null,
-                    render: (d) => function (data, type, row) {
-                        return '<center><input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input select-all-target" data-fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label><center>';
-                    }
+    /**
+    * generates table with datafiles from selected dataset and schema
+    * @param {Boolean} resetTable 
+    * @param {String} url
+    */
+    PopulateTable: function (resetTable, url) {
+
+        if (resetTable) {
+            // clears DataTabke of all data and redraws it to default state
+            $("#dataFileTableResults").DataTable().clear().draw();
+        } else {
+            // init table with DataTable data from the provided url
+            $("#dataFileTableResults").DataTable({
+                destroy: true,
+                ajax: {
+                    url: url,
+                    dataSrc: "Records",
                 },
-            ],
-            searchable: true,
-            order: [4, 'desc']
-        });
+                columns: [
+                    { data: "DatasetFileId" },
+                    { data: "FileName" },
+                    { data: "UploadUserName" },
+                    { data: "CreateDTM" },
+                    { data: "ModifiedDTM" },
+                    { data: "FileLocation" },
+                    {
+                        data: null,
+                        render: (d) => function (data, type, row) {
+                            return '<center><input type="checkbox" id= checkbox' + d.DatasetFileId + ' class="form-check-input select-all-target" data-fileId = ' + d.DatasetFileId + '><label for=checkbox' + d.DatasetFileId + ' class="form-check-label"></label><center>';
+                        }
+                    },
+                ],
+                searchable: true,
+                order: [4, 'desc'],
+                drawCallback: function () {
+                    $(".select-all-target").click(function () {
+                        data.Admin.ActivateDeactivateReprocessButton();
+                    });
+                }
+            });
+        }
     },
 
     // creates schema dropdown for selected dataset
@@ -244,33 +260,40 @@ data.Admin = {
     },
 
     // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
-    GetFlowStepDropdown: function (url) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (flowStepApiResponse) {
-                var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
-                for (let flowStep of flowStepApiResponse[0].steps) {
-                    if (flowStep.ActionName == "Raw Storage") {
-                        flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
+    GetFlowStepDropdown: function (resetDropdown, url) {
+        if (resetDropdown) {
+            var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
+            $("#flowStepsDropdown").materialSelect({ destroy: true });
+            $("#flowStepsDropdown").html(flowStepDropDown);
+            $("#flowStepsDropdown").materialSelect();
+        } else {
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function (flowStepApiResponse) {
+                    var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
+                    for (let flowStep of flowStepApiResponse[0].steps) {
+                        if (flowStep.ActionName == "Raw Storage") {
+                            flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
+                        }
                     }
+
+                    $("#flowStepsDropdown").materialSelect({ destroy: true });
+                    $("#flowStepsDropdown").html(flowStepDropDown);
+                    $("#flowStepsDropdown").materialSelect();
+                },
+                complete: function () {
+                    data.Admin.DatasetDropdownScrollToTop();
                 }
-
-                $("#flowStepsDropdown").materialSelect({ destroy:true });
-                $("#flowStepsDropdown").html(flowStepDropDown);
-                $("#flowStepsDropdown").materialSelect();
-            },
-            complete: function () {
-                data.Admin.DatasetDropdownScrollToTop();
-            }
-        });
-
+            });
+        }
     },
 
     // activate or deactivate reprocess button based on input list of checked boxes
     ActivateDeactivateReprocessButton: function () {
         var checkedBoxes = $(".select-all-target:checkbox:checked");
-        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1") {
+
+        if (checkedBoxes.length > 0 && checkedBoxes.length <= 100 && $("#flowStepsDropdown").find(":selected").val() != "-1" && itemSelected != -1) {
             $("#reprocessButton").prop("disabled", false);
         }
         else {
@@ -579,8 +602,15 @@ data.Admin = {
         $("#AllDatasets").change(function (event) {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (datasetId != "") {
+
+                // Init the schema dropdown
                 var url = data.Admin.GetSchemaUrl(datasetId);
                 data.Admin.GetSchemaDropdown(url);
+
+                // Reset the table and flow step dropdown to an empty or default state
+                data.Admin.PopulateTable(true, url);
+                data.Admin.GetFlowStepDropdown(true, url);
+                data.Admin.ActivateDeactivateReprocessButton();
             }
 
         });
@@ -589,11 +619,17 @@ data.Admin = {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (schemaId != "" && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
-                data.Admin.PopulateTable(url);
+                data.Admin.PopulateTable(false, url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
                 data.Admin.GetFlowStepDropdown(url);
             }
         });
+
+        // activate or deactivate button
+        $("#flowStepsDropdown").change(function () {
+            data.Admin.ActivateDeactivateReprocessButton();
+        });
+
 
         // submit selected file list
         $("#reprocessButton").click(function (event) {
@@ -616,10 +652,6 @@ data.Admin = {
                 }
 
             })
-        });
-        // activate or deactivate button
-        $("#flowStepsDropdown").change(function (event) {
-            data.Admin.ActivateDeactivateReprocessButton();
         });
     },
 
