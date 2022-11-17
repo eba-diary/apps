@@ -97,11 +97,11 @@ namespace Sentry.data.Infrastructure
         private HttpResponseMessage GetOAuthResponseForRefreshToken(HTTPSSource source, DataSourceToken token, HttpClient httpClient)
         {
             var tokenUrl = token.TokenUrl;
-            motiveUrl = motiveUrl.Replace("clientid", source.ClientId);
-            var privateId = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
-            motiveUrl = motiveUrl.Replace("clientsecret", _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
-            motiveUrl = motiveUrl.Replace("refreshtoken", _encryptionService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
-            return httpClient.PostAsync(motiveUrl, new StringContent("")).Result;
+            tokenUrl = tokenUrl.Replace("clientid", source.ClientId);
+            string encryptionkey = Configuration.Config.GetHostSetting("EncryptionServiceKey");
+            tokenUrl = tokenUrl.Replace("clientsecret", _encryptionService.DecryptString(source.ClientPrivateId, encryptionkey, source.IVKey));
+            tokenUrl = tokenUrl.Replace("refreshtoken", _encryptionService.DecryptString(token.RefreshToken, encryptionkey, source.IVKey));
+            return httpClient.PostAsync(tokenUrl, new StringContent("")).Result;
         }
 
         private FormUrlEncodedContent GetOAuthContent(HTTPSSource source)
