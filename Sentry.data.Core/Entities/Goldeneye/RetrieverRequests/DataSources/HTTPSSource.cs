@@ -92,6 +92,7 @@ namespace Sentry.data.Core
         public virtual string ClientId { get; set; }
         public virtual string ClientPrivateId { get; set; }
         public virtual OAuthGrantType GrantType { get; set; }
+        public virtual bool HasPaging { get; set; }
         public virtual List<RequestHeader> RequestHeaders
         {
             get
