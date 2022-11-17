@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -20,14 +21,16 @@ namespace Sentry.data.Infrastructure
         private HttpClient _httpClient;
         protected bool _IsTargetS3;
         protected string _targetPath;
+        private readonly IAuthorizationProvider _authorizationProvider;
 
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
-            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            IRestClient restClient, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
+            _authorizationProvider = authorizationProvider;
         }
         protected IJobService JobService
         {
@@ -41,7 +44,23 @@ namespace Sentry.data.Infrastructure
 
             ConfigureHttpClient();
             FindTargetJob();
+            if(job.DataSource.SourceAuthType.Is<OAuthAuthentication>())
+            {
+                foreach(var token in ((HTTPSSource)job.DataSource).Tokens)
+                {
+                    _httpClient.BaseAddress = job.DataSource.BaseUri;
+                    _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessTokenForToken((HTTPSSource)job.DataSource, token)}");
+                    await ExecuteHttpClientCore(job);
+                }
+            }
+            else
+            {
+                await ExecuteHttpClientCore(job);
+            }
+        }
 
+        private async Task ExecuteHttpClientCore(RetrieverJob job)
+        {
             //Setup temporary work space for job
             var tempFile = _job.SetupTempWorkSpace();
 
@@ -91,7 +110,7 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 }
-                else 
+                else
                 {
                     _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
 

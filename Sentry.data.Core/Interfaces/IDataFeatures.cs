@@ -37,5 +37,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
         IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; }
         IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }
+        IFeatureFlag<bool> CLA3945_Telematics { get; }
     }
 }

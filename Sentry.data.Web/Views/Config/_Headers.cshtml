@@ -3,14 +3,32 @@
 @using (Html.BeginCollectionItem("Headers"))
 {    
     <div class="container">
-        <div class="md-form headerEntry">
-            @Html.TextBoxFor(m => m.Key, new { @value = "", @class = "form-control" })
-            @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
+        <!-- Grid row -->
+        <div class="form-row">
+            <!-- Grid column -->
+            <div class="col-2 align-self-center mb-3">
+                <a class="removeHeader"><em class="fas fa-minus pr-3"></em>Remove Header</a>
+            </div>
+            <div class="col-5">
+                <!-- Material input -->
+                <div class="md-form mt-0">
+                    @Html.Label("Header Name", new { @value = "", @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Key, new { @value = "", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <!-- Grid column -->
+            <!-- Grid column -->
+            <div class="col-5">
+                <!-- Material input -->
+                <div class="md-form mt-0">
+                    @Html.Label("Header Value", new { @value = "", @class = "control-value" })
+                    @Html.TextBoxFor(m => m.Value, new { @value = "", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <!-- Grid column -->
         </div>
-        <div class="md-form headerEntry">
-            @Html.TextBoxFor(m => m.Value, new { @value = "", @class = "form-control" })
-            @Html.ValidationMessageFor(model => model, "", new { @class = "text-danger" })
-        </div>
-        <a class="removeHeader" style="display: inline-block; margin-left: 10px;"><em class="fas fa-minus pr-3"></em>Remove Header</a>
+        <!-- Grid row -->
     </div>
 }
