@@ -1,10 +1,14 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.DTO.Retriever;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Models.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Web.Mvc;
+using Sentry.data.Web.Extensions;
 
 namespace Sentry.data.Web
 {
@@ -14,7 +18,7 @@ namespace Sentry.data.Web
         {
             Headers = new List<RequestHeader>();
             ContactIds = new List<string>();
-            Tokens = new List<DataSourceToken>();
+            Tokens = new List<DataSourceTokenModel>();
 
             //this is needed for the associate picker js.
             this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
@@ -33,7 +37,7 @@ namespace Sentry.data.Web
             Headers = new List<RequestHeader>();
             SourceType = dto.SourceType;
             Headers = dto.RequestHeaders ?? new List<RequestHeader>();
-            Tokens = dto.Tokens ?? new List<DataSourceToken>();
+            Tokens = dto.Tokens.Select(t => t.ToModel()).ToList() ?? new List<DataSourceTokenModel>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
 
@@ -108,7 +112,7 @@ namespace Sentry.data.Web
         [DisplayName("OAuth Grant Type")]
         public OAuthGrantType GrantType { get; set; }
 
-        public IList<DataSourceToken> Tokens { get; set; }
+        public IList<DataSourceTokenModel> Tokens { get; set; }
         #endregion
 
         [DisplayName("Request Headers")]
@@ -137,5 +141,10 @@ namespace Sentry.data.Web
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }
         public string HrempServiceEnv { get; set; }
+
+        private List<DataSourceTokenModel> tokenDtoListToTokenModelList(IList<DataSourceTokenDto> tokenDtoList)
+        {
+            return (List<DataSourceTokenModel>)tokenDtoList.Cast<DataSourceModel>();
+        }
     }
 }

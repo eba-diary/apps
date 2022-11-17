@@ -1,4 +1,5 @@
 ﻿@using Sentry.data.Core;
+@using Sentry.data.Web.Models.Config
 @model Sentry.data.Web.DataSourceModel
 
 @{
@@ -130,7 +131,7 @@
                 </div>
             </div>
             <div id="TokenContainer">
-                @foreach (DataSourceToken token in Model.Tokens)
+                @foreach (DataSourceTokenModel token in Model.Tokens)
                 {
                     Html.RenderPartial("_DataSourceToken", token);
                 }

@@ -40,7 +40,7 @@ namespace Sentry.data.Infrastructure
 
                 HttpClient httpClient = new HttpClient(httpHandler);
 
-                HttpResponseMessage oAuthPostResult = new HttpResponseMessage();
+                HttpResponseMessage oAuthPostResult;
                 if (isRefreshToken)
                 {
                     oAuthPostResult = GetOAuthResponseForRefreshToken(source, token, httpClient);
@@ -70,7 +70,7 @@ namespace Sentry.data.Infrastructure
                     {
                         SaveOAuthToken(source, accessToken, newTokenExp, token);
                     }
-
+                    _datasetContext.SaveChanges();
                     return accessToken;
                 }
                 else
@@ -98,9 +98,8 @@ namespace Sentry.data.Infrastructure
         {
             var tokenUrl = token.TokenUrl;
             tokenUrl = tokenUrl.Replace("clientid", source.ClientId);
-            string encryptionkey = Configuration.Config.GetHostSetting("EncryptionServiceKey");
-            tokenUrl = tokenUrl.Replace("clientsecret", _encryptionService.DecryptString(source.ClientPrivateId, encryptionkey, source.IVKey));
-            tokenUrl = tokenUrl.Replace("refreshtoken", _encryptionService.DecryptString(token.RefreshToken, encryptionkey, source.IVKey));
+            tokenUrl = tokenUrl.Replace("clientsecret", _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
+            tokenUrl = tokenUrl.Replace("refreshtoken", _encryptionService.DecryptString(token.RefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
             return httpClient.PostAsync(tokenUrl, new StringContent("")).Result;
         }
 
@@ -201,19 +200,14 @@ namespace Sentry.data.Infrastructure
             }
 
             token.Scope = newScope;
-
-            _datasetContext.SaveChanges();
         }
 
         private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token)
         {
-            //test if this is even needed, or will saving source as is will update
-            HTTPSSource updatedSource = (HTTPSSource)_datasetContext.GetById<DataSource>(source.Id);
 
             token.CurrentToken = _encryptionService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
             token.CurrentTokenExp = tokenExpTime;
 
-            _datasetContext.SaveChanges();
         }
 
         private DateTime ConvertFromUnixTimestamp(double timestamp)
