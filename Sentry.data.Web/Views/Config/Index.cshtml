@@ -20,10 +20,6 @@
     <h1 class="detailName leftFloat @color pt-0">@Model.DatasetName</h1>
 
     <div>
-        @if (HttpContext.Current.IsDebuggingEnabled)
-        {
-            <a class="btn btn-success btnCreateDirectory mt-3"><em class="fas fa-plus mr-2"></em>Create Directories</a>
-        }
         <a class="btn btn-success mt-3" href="/Config/Dataset/@Model.DatasetId/Create"><em class="fas fa-plus mr-2"></em>Add Schema</a>
     </div>
 </div>
