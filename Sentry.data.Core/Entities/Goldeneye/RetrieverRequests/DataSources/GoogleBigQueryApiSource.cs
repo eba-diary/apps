@@ -11,18 +11,12 @@ namespace Sentry.data.Core
             IsUriEditable = true;
             IsSourceCompressed = false;
             KeyCode = Guid.NewGuid().ToString().Substring(0, 13);
-            PagingEnabled = true;
 
             //Control auth types which can be chosen for this source type.  As new
             // types are integrated, add the type to the list.
-            ValidAuthTypes = new List<AuthenticationType>();
-            ValidAuthTypes.Add(new OAuthAuthentication());
-
-            ValidHttpMethods = new List<HttpMethods>();
-            ValidHttpMethods.Add(HttpMethods.get);
-
-            ValidHttpDataFormats = new List<HttpDataFormat>();
-            ValidHttpDataFormats.Add(HttpDataFormat.json);
+            ValidAuthTypes = new List<AuthenticationType> { new OAuthAuthentication() };
+            ValidHttpMethods = new List<HttpMethods> { HttpMethods.get };
+            ValidHttpDataFormats = new List<HttpDataFormat> { HttpDataFormat.json };
 
             //Control compression types which can be chossen for this source type.  As new
             // types are integrated, add the type to the list.

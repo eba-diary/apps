@@ -79,7 +79,6 @@ namespace Sentry.data.Core
         public virtual string IVKey { get; set; }
         public virtual HttpMethods RequestMethod { get; set; }
         public virtual HttpDataFormat RequestDataFormat { get; set; }
-        public virtual bool PagingEnabled { get; set; }
         public virtual IList<DataSourceToken> Tokens { get; set; }
 
         #region OAuth
