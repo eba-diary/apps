@@ -1553,15 +1553,16 @@ data.Dataset = {
         //************************************************************************************************************
         $('body').on('change', '#dataFlowOnOffSwitch', function () {
 
-            //DETERMINE CURRENT STATUS
-            var status = $('#dataFlowOnOffSwitchInput')[0].checked;
+            
+            var status = $('#dataFlowOnOffSwitchInput')[0].checked;     //GET NEW STATUS WHICH IS AFTER THEY CLICKED THE BUTTON
             var actionTaken = "";
             var btnName = "";
             var btnStyle = "";
             var confirmMessage = "";
             var color = "";
             var apiErrorMessage = "Something went wrong. Please try again or reach out to DSCSupport@sentry.com.";
-            
+
+            //DEPENDING ON NEW STATUS SETUP OUR VARS WHICH DETERMINE LOOK OF CONFIRMATION MODAL
             if (status)
             {
                 //TURN ON
