@@ -1555,72 +1555,80 @@ data.Dataset = {
 
             //DETERMINE CURRENT STATUS
             var status = $('#dataFlowOnOffSwitchInput')[0].checked;
-            //alert(status);
-            //alert(data.Dataset.DataFlowIdSelected);
-
-            var ConfirmMessage = "";
-            if (status) {
-                ConfirmMessage = "<p>Are you sure?</p> <p> <h3><font color=\"green\">THIS WILL ENABLE DATA FLOW. </font></h3> </p> ";
-                Sentry.ShowModalCustom("Turn ON DataFlow", ConfirmMessage,
-                    '<button type="button" id="dataFlowOnBtn" data-dismiss="modal" class="btn btn-success waves-effect waves-light">Turn ON</button>'
-                );
+            var actionTaken = "";
+            var btnName = "";
+            var btnStyle = "";
+            var confirmMessage = "";
+            var color = "";
+            var apiErrorMessage = "Something went wrong. Please try again or reach out to DSCSupport@sentry.com.";
+            
+            if (status)
+            {
+                //TURN ON
+                actionTaken = "TURN ON DATA FLOW";
+                btnName = "dataFlowBtnOn";
+                btnStyle = "btn-success";
+                color = "green";
             }
             else {
-                ConfirmMessage = "<p>Are you sure?</p> <p> <h3><font color=\"red\">THIS WILL DISABLE DATA FLOW. </font></h3> </p> ";
-                Sentry.ShowModalCustom("Turn OFF DataFlow", ConfirmMessage,
-                    '<button type="button" id="dataFlowOffBtn" data-dismiss="modal" class="btn btn-danger waves-effect waves-light">Turn Off</button>'
-                );
+
+                //TURN OFF
+                actionTaken = "TURN OFF DATA FLOW";
+                btnName = "dataFlowBtnOff";
+                btnStyle = "btn-danger";
+                color = "red";
             }
+
+            confirmMessage = '<p>Are you sure?</p> <p> <h3><font color="' + color + '">THIS WILL ' + actionTaken + '. </font></h3> </p> ';
+            Sentry.ShowModalCustom(actionTaken, confirmMessage,
+                '<button type="button" id="' + btnName + '" data-dismiss="modal" class="btn ' + btnStyle + ' waves-effect waves-light">' + actionTaken + '</button>'
+                );
+
+           
+            //CLICK EVENT IF THEY CANCEL ON or OFF DECISION TO CHANGE SWITCH BACK TO ORIGINAL STATE
+            $(".modal-header .close").click(function () {   //pick the close class inside of the modal-header class just to be as safe as posssible when detecting click event
+
+                $('#dataFlowOnOffSwitchInput').prop('checked', !status);    //check opposite of original state
+
+            });
+
+
+            //CLICK EVENT IF THEY TURN DataFlow ON
+            $("#dataFlowBtnOn").click(function () {
+                $.ajax({
+                    url: "../../api/v2/dataflow/enable?dataFlowId=" + data.Dataset.DataFlowIdSelected,
+                    method: "PUT",
+                    success: function (obj)
+                    {
+                        data.Dataset.makeToast("success", actionTaken);
+                    },
+                    failure: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    },
+                    error: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    }
+                });
+            });
+
+            //CLICK EVENT IF THEY TURN DataFlow OFF
+            $("#dataFlowBtnOff").click(function () {
+                $.ajax({
+                    url: "../../api/v2/dataflow/disable?dataFlowId=" + data.Dataset.DataFlowIdSelected,
+                    method: "PUT",
+                    success: function (obj) {
+                        data.Dataset.makeToast("success", actionTaken);
+                    },
+                    failure: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    },
+                    error: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    }
+                });
+            });
             
-           //TODO: FINISH call to API to enable or disable
-
-            //$("#datasetDeleteBtn").click(function () {
-            //    $.ajax({
-            //        url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
-            //        method: "DELETE",
-            //        dataType: 'json',
-            //        success: function (obj) {
-            //            Sentry.ShowModalAlert(obj.Message, function () {
-            //                window.location = "/Search/Datasets";
-            //            })
-            //        },
-            //        failure: function (obj) {
-            //            Sentry.ShowModalAlert(
-            //                obj.Message, function () { })
-            //        },
-            //        error: function (obj) {
-            //            Sentry.ShowModalAlert(
-            //                obj.Message, function () { })
-            //        }
-            //    });
-            //});
-
         });
-
-    },
-
-   
-    GetDataFlowOnOffSwitchStatus: function () {
-
-        //TODO: FINISH
-        alert(ko.observable(dataInput.TopicName));
-        //var schemaURL = "/api/v2/dataflow?topicName=";
-        //$.get(schemaURL, function (result) {
-
-        //    data.Dataset.delroyAddFieldArray(result.Fields);
-        //    data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
-        //    data.Dataset.delroyGridRefresh();
-        //    $('#delroySpinner').hide();
-
-        //}).fail(function (result) {
-        //    if (result.status === 404) {
-        //        $('#delroySpinner').hide();
-        //        data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
-        //        data.Dataset.makeToast("success", "No columns Exist.");
-        //    }
-        //});
-
-
     },
 
     toggleDeleteButton: function () {
