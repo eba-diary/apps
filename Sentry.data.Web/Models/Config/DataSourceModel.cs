@@ -40,7 +40,7 @@ namespace Sentry.data.Web
             Tokens = dto.Tokens.Select(t => t.ToModel()).ToList() ?? new List<DataSourceTokenModel>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
-
+            HasPaging = dto.HasPaging;
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
             PrimaryContactEmail = dto.PrimaryContactEmail;
@@ -117,6 +117,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
+
+        [DisplayName("Page Requests")]
+        public bool HasPaging { get; set; }
 
 
         #region Security

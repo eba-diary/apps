@@ -71,6 +71,7 @@
             @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control" })
             @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
         </div>
+
         <div id="authPanel">
             <div class="md-form mb-0">
                 @Html.LabelFor((model) => model.AuthID, new { @class = "mdb-main-label" })
@@ -78,8 +79,13 @@
                 @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
                 <small id="authDescription" class="form-text text-muted"></small>
             </div>
-
         </div>
+
+        <div id="pagingPanel" class="form-group">
+            <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" data-val-required="The Restrict Data Source field is required." checked="@Model.IsSecured">
+            @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
+        </div>
+
         <div id="userPassPanel">
             <h4 class="pt-3">Credential Config</h4>
             <div class="form-check">

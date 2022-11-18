@@ -34,29 +34,9 @@ namespace Sentry.data.Web
             };
         }
 
-        public static Core.DataSourceDto ToDto(this CreateSourceModel model)
+        public static DataSourceDto ToDto(this DataSourceModel model)
         {
-            return new Core.DataSourceDto()
-            {
-                OriginatingId = model.Id,
-                RetrunUrl = model.ReturnUrl,
-                Name = model.Name,
-                SourceType = model.SourceType,
-                AuthID = model.AuthID,
-                IsUserPassRequired = model.IsUserPassRequired,
-                PortNumber = model.PortNumber,
-                BaseUri = model.BaseUri,
-                TokenAuthHeader = model.TokenAuthHeader,
-                TokenAuthValue = model.TokenAuthValue,
-                ClientId = model.ClientId,
-                ClientPrivateId = model.ClientPrivateId,
-                RequestHeaders = model.Headers
-            };
-        }
-
-        public static Core.DataSourceDto ToDto(this DataSourceModel model)
-        {
-            return new Core.DataSourceDto()
+            return new DataSourceDto()
             {
                 OriginatingId = model.Id,
                 RetrunUrl = model.ReturnUrl,
@@ -77,6 +57,7 @@ namespace Sentry.data.Web
                 PrimaryContactId= model.PrimaryContactId,
                 PrimaryContactName = model.PrimaryContactName,
                 GrantType = model.GrantType,
+                HasPaging = model.HasPaging
             };
         }
 

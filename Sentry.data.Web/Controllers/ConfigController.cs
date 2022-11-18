@@ -31,13 +31,14 @@ namespace Sentry.data.Web.Controllers
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
+        private readonly IDataSourceService _dataSourceService;
         #endregion
 
         #region Constructor
         public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
             IConfigService configService, IEventService eventService, IDatasetService datasetService, 
             IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
-            IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService)
+            IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService, IDataSourceService dataSourceService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -50,6 +51,7 @@ namespace Sentry.data.Web.Controllers
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
             _dataApplicationService = dataApplicationService;
+            _dataSourceService = dataSourceService;
         }
         #endregion
 
@@ -571,50 +573,33 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/DataSourceForm")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [AuthorizeByPermission(PermissionCodes.DATASET_MODIFY)]
         public ActionResult DataSourceForm(DataSourceModel model)
         {
             DataSourceDto dto = model.ToDto();
 
-            AddCoreValidationExceptionsToModel(_configService.Validate(dto));
+            List<string> validations = _configService.Validate(dto);
+            AddCoreValidationExceptionsToModel(validations);
 
             if (ModelState.IsValid)
             {
-                if (dto.OriginatingId == 0)
-                {
-                    bool IsSuccessful = _configService.CreateAndSaveNewDataSource(dto);
-                    if (IsSuccessful)
-                    {
-                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, dto.Name + " was created.");
+                bool isSuccessful = dto.OriginatingId == 0
+                    ? _configService.CreateAndSaveNewDataSource(dto)
+                    : _configService.UpdateAndSaveDataSource(dto);
 
-                        return !String.IsNullOrWhiteSpace(model.ReturnUrl) 
-                            ? Redirect(model.ReturnUrl) 
-                            : Redirect("/");
-                    }
-                }
-                else
+                if (isSuccessful)
                 {
-                    bool IsSuccessful = _configService.UpdateAndSaveDataSource(dto);
-                    if (IsSuccessful)
-                    {
-                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASOURCE, dto.Name + " was updated.");
-                        return !String.IsNullOrWhiteSpace(model.ReturnUrl) 
-                            ? Redirect(model.ReturnUrl) 
-                            : Redirect("/");
-                    }
+                    return Redirect(string.IsNullOrWhiteSpace(model.ReturnUrl) ? "/": model.ReturnUrl);
                 }
             }
 
-
             if (model.Id == 0)
             {
-                _datasetContext.Clear();
                 model = CreateSourceDropDown(model);
                 return View("CreateDataSource", model);
             }
             else
             {
-                _datasetContext.Clear();
                 EditSourceDropDown(model);
                 return View("EditDataSource", model);
             }
@@ -1337,15 +1322,14 @@ namespace Sentry.data.Web.Controllers
 
         private void EditSourceDropDown(DataSourceModel model)
         {
-            var temp = _datasetContext.DataSourceTypes.Select(v
-              => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
+            var temp = _datasetContext.DataSourceTypes.Select(v => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
 
             //set selected for current value
             temp.ForEach(x => x.Selected = model.SourceType.Equals(x.Value));
 
             model.SourceTypesDropdown = temp.Where(x => x.Value != DataSourceDiscriminator.DEFAULT_DROP_LOCATION && x.Value != DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION && x.Value != DataSourceDiscriminator.JAVA_APP_SOURCE).OrderBy(x => x.Value);
 
-            var temp2 = AuthenticationTypesByType(model.SourceType, Int32.TryParse(model.AuthID, out int intvalue) ? (int?)intvalue : null);
+            var temp2 = AuthenticationTypesByType(model.SourceType, int.TryParse(model.AuthID, out int intvalue) ? (int?)intvalue : null);
 
             model.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
         }
@@ -1398,73 +1382,26 @@ namespace Sentry.data.Web.Controllers
             {
                 output.Add(new SelectListItem()
                 {
-                    Text = "Pick a Authentication Type",
+                    Text = "Pick an Authentication Type",
                     Value = "0",
                     Selected = true,
                     Disabled = true
                 });
             }
 
-            DataSource dataSource;
+            List<AuthenticationTypeDto> authenticationTypeDtos = _dataSourceService.GetValidAuthenticationTypeDtosByType(sourceType);
+            List<SelectListItem> authenticationTypeItems = authenticationTypeDtos.Select(x => 
+                new SelectListItem() 
+                { 
+                    Text = x.AuthName,
+                    Value = x.AuthID.ToString(),
+                    Selected = selectedId == x.AuthID
+                })
+                .ToList();
 
-            switch (sourceType)
-            {
-                case DataSourceDiscriminator.FTP_SOURCE:
-                    dataSource = new FtpSource();
-                    break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    dataSource = new SFtpSource();
-                    break;
-                case DataSourceDiscriminator.DFS_CUSTOM:
-                    dataSource = new DfsCustom();
-                    break;
-                case DataSourceDiscriminator.HTTPS_SOURCE:
-                    dataSource = new HTTPSSource();
-                    break;
-                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
-                    dataSource = new GoogleApiSource();
-                    break;
-                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
-                    dataSource = new GoogleBigQueryApiSource();
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            foreach (AuthenticationType authtype in dataSource.ValidAuthTypes)
-            {
-                output.Add(GetAuthSelectedListItem(authtype, selectedId));
-            }
+            output.AddRange(authenticationTypeItems);
 
             return output;
-        }
-
-        private SelectListItem GetAuthSelectedListItem(AuthenticationType authtype, int? selectedId)
-        {
-            if (authtype.Is<BasicAuthentication>())
-            {
-                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is BasicAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
-            }
-            else if (authtype.Is<AnonymousAuthentication>())
-            {
-                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is AnonymousAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
-            }
-            else if (authtype.Is<TokenAuthentication>())
-            {
-                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is TokenAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
-            }
-            else if (authtype.Is<OAuthAuthentication>())
-            {
-                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is OAuthAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
         }
 
         private List<SelectListItem> DataSourcesByType(string sourceType, int? selectedId)
@@ -1526,51 +1463,50 @@ namespace Sentry.data.Web.Controllers
 
         private DataSourceModel CreateSourceDropDown(DataSourceModel csm)
         {
-            var temp = _datasetContext.DataSourceTypes.Select(v
-                 => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
-
-            temp.Add(new SelectListItem()
+            List<SelectListItem> sourceTypeDropdown = new List<SelectListItem>
             {
-                Text = "Pick a Source Type",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
-
-            csm.SourceTypesDropdown = temp.Where(x =>
-                    x.Value != DataSourceDiscriminator.DEFAULT_DROP_LOCATION &&
-                    x.Value != DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION &&
-                    x.Value != DataSourceDiscriminator.JAVA_APP_SOURCE &&
-                    x.Value != DataSourceDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
-
-            if (csm.SourceType == null)
-            {
-                var temp2 = _datasetContext.AuthTypes.Select(v
-             => new SelectListItem { Text = v.AuthName, Value = v.AuthID.ToString() }).ToList();
-
-                temp2.Add(new SelectListItem()
+                new SelectListItem()
                 {
-                    Text = "Pick a Authentication Type",
+                    Text = "Pick a Source Type",
                     Value = "0",
                     Selected = true,
                     Disabled = true
-                });
+                }
+            };
 
-                csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
+            List<DataSourceTypeDto> dataSourceTypeDtos = _dataSourceService.GetDataSourceTypeDtosForDropdown();
+            List<SelectListItem> dataSourceTypeItems = dataSourceTypeDtos.Select(x => new SelectListItem { Text = x.Name, Value = x.DiscrimatorValue }).ToList();
+
+            sourceTypeDropdown.AddRange(dataSourceTypeItems);
+
+            csm.SourceTypesDropdown = sourceTypeDropdown;
+
+            List<SelectListItem> authTypesDropdown = new List<SelectListItem> {
+                new SelectListItem()
+                {
+                    Text = "Pick an Authentication Type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                }
+            };
+
+            List<SelectListItem> authenticationTypeItems;
+
+            if (csm.SourceType == null)
+            {
+                List<AuthenticationTypeDto> authenticationTypeDtos = _dataSourceService.GetAuthenticationTypeDtos();
+                authenticationTypeItems = authenticationTypeDtos.Select(x => new SelectListItem { Text = x.AuthName, Value = x.AuthID.ToString() }).ToList();
             }
             else
             {
-                var temp2 = AuthenticationTypesByType(csm.SourceType, Int32.TryParse(csm.AuthID, out int intvalue) ? (int?)intvalue : null);
-                temp2.Add(new SelectListItem()
-                {
-                    Text = "Pick a Authentication Type",
-                    Value = "0",
-                    Selected = false,
-                    Disabled = true
-                });
-
-                csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
+                authTypesDropdown.First().Selected = false;
+                authenticationTypeItems = AuthenticationTypesByType(csm.SourceType, int.TryParse(csm.AuthID, out int intvalue) ? (int?)intvalue : null);
             }
+
+            authTypesDropdown.AddRange(authenticationTypeItems);
+            csm.AuthTypesDropdown = authTypesDropdown;
+
             return csm;
         }
 
