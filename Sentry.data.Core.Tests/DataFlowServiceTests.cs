@@ -1196,6 +1196,57 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(0,testFlow.Count);
         }
 
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void EnableDataFlow()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Disabled;
+            df.DatasetId = 1;
+            df.Id = 77;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+           
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+
+            // Act
+            dataFlowService.EnableOrDisableDataFlow(77,ObjectStatusEnum.Active);
+
+            // Assert
+            Assert.AreEqual(ObjectStatusEnum.Active, df.ObjectStatus );
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void DisableDataFlow()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Active;
+            df.DatasetId = 1;
+            df.Id = 77;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+
+            // Act
+            dataFlowService.EnableOrDisableDataFlow(77, ObjectStatusEnum.Disabled);
+
+            // Assert
+            Assert.AreEqual(ObjectStatusEnum.Disabled, df.ObjectStatus);
+        }
+
+
+
         [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void Get_DataFlowDetailDto_Where_Status_is_Active()
