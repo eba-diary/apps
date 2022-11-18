@@ -1082,13 +1082,6 @@ namespace Sentry.data.Core
                 throw new AggregateException("Failed sending consumption layer event", exceptionList);
             }
         }
-        private string GenerateHiveDatabaseName(Category cat)
-        {
-            string curEnv = Config.GetDefaultEnvironmentName().ToLower();
-            string dbName = "dsc_" + cat.Name.ToLower();
-
-            return (curEnv == "prod" || curEnv == "qual") ? dbName : $"{curEnv}_{dbName}";
-        }
 
         private void MarkForDelete(DatasetFileConfig dfc)
         {
@@ -1135,7 +1128,7 @@ namespace Sentry.data.Core
             dto.OriginatingId = dsrc.Id;
             dto.Name = dsrc.Name;
             dto.Description = dsrc.Description;
-            dto.RetrunUrl = null;
+            dto.ReturnUrl = null;
             dto.SourceType = dsrc.SourceType;
             dto.AuthID = dsrc.SourceAuthType.AuthID.ToString();
             dto.IsUserPassRequired = dsrc.IsUserPassRequired;
@@ -1163,6 +1156,7 @@ namespace Sentry.data.Core
                 MapDataSourceTokensToDtoTokens(((HTTPSSource)dsrc).Tokens, dto.Tokens);
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
+                dto.HasPaging = ((HTTPSSource)dsrc).HasPaging;
             }
         }
 
@@ -1273,7 +1267,6 @@ namespace Sentry.data.Core
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
-                    ((HTTPSSource)dsrc).ClientId = dto.ClientId;
                     if (dto.ClientPrivateId != null)
                     {
                         ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ((HTTPSSource)dsrc).IVKey).Item1;
@@ -1456,9 +1449,9 @@ namespace Sentry.data.Core
                     };
                     MapDtoTokensToDataSourceTokens(dto.Tokens, ((GoogleBigQueryApiSource)source).Tokens);
 
-            break;
-                default:
-                    throw new NotImplementedException("SourceType is not configured for save");
+                break;
+                    default:
+                        throw new NotImplementedException("SourceType is not configured for save");
             }
 
             source.Name = dto.Name;

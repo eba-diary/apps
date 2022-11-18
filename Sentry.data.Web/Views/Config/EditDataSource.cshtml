@@ -62,7 +62,7 @@
                 @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
             </div>
 
-            <div class="form-check">
+            <div class="form-group">
                 <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" checked="@Model.IsSecured">
                 @Html.LabelFor((model) => model.IsSecured, new { @class = "form-check-label" })
             </div>
@@ -99,6 +99,11 @@
                         <em id="authDescription"></em>
                     </span>
                 </div>
+            </div>
+
+            <div id="pagingPanel" class="form-group">
+                <input type="checkbox" value="true" class="form-check-input" id="HasPaging" name="HasPaging" checked="@Model.HasPaging">
+                @Html.LabelFor(m => m.HasPaging, htmlAttributes: new { @class = "form-check-label" })
             </div>
 
             <div id="userPassPanel">
@@ -272,6 +277,7 @@
                         $('#AuthID').attr('readonly', false); // enabling picker
                     }
 
+                    $('#pagingPanel').hide();
                     //$('#portNumberPanel').show();
                     //$('#userPassPanel').show();
                     //$('#authPanel').show();
@@ -281,6 +287,7 @@
                 else if (sourceType == "HTTPS") {
                     $('#IsUserPassRequired').attr('disabled', true);
                     $('#userPassPanel').hide();
+                    $('#pagingPanel').show();
                     if (authtxt == 'Token Authentication') {
                         $('#requestHeaderPanel').show();
                         $('#tokenAuthPanel').show();
@@ -312,6 +319,7 @@
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#pagingPanel').hide();
                 }
                 else {
                     $('#portNumberPanel').hide();
@@ -319,6 +327,7 @@
                     userpasschkbx.attr('disabled', false);
                     $('#userPassPanel').show();
                     $('#authPanel').hide();
+                    $('#pagingPanel').hide();
                 }
             }
 

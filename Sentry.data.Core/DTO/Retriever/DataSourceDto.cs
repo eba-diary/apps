@@ -8,7 +8,7 @@ namespace Sentry.data.Core
     public class DataSourceDto
     {
         public int OriginatingId { get; set; }
-        public string RetrunUrl { get; set; }
+        public string ReturnUrl { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string KeyCode { get; set; }

@@ -118,7 +118,7 @@ namespace Sentry.data.Web
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
 
-        [DisplayName("Page Requests")]
+        [DisplayName("Requires Paging Support")]
         public bool HasPaging { get; set; }
 
 

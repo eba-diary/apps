@@ -39,7 +39,7 @@ namespace Sentry.data.Web
             return new DataSourceDto()
             {
                 OriginatingId = model.Id,
-                RetrunUrl = model.ReturnUrl,
+                ReturnUrl = model.ReturnUrl,
                 Name = model.Name,
                 Description = model.Description,
                 SourceType = model.SourceType,

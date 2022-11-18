@@ -36,7 +36,7 @@
         <h2 class="card-title pt-4">Create Data Source</h2>
         @Html.ValidationSummary(false, "", new { @class = "text-danger" })
         <h4 class="pt-0">Source Metadata</h4>
-        <div class="md-form pt-0 mt-0">
+        <div class="md-form">
             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
             @Html.TextBoxFor(model => model.Name, new { @value = "", @class = "form-control" })
             @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
@@ -48,13 +48,13 @@
             @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
         </div>
 
-        <div class="md-form">
+        <div class="md-form mb-2">
             @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label" })
             @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control w-100", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
             @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
         </div>
 
-        <div class="form-check">
+        <div class="form-group">
             <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" data-val-required="The Restrict Data Source field is required." checked="@Model.IsSecured">
             @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
         </div>
@@ -73,7 +73,7 @@
         </div>
 
         <div id="authPanel">
-            <div class="md-form mb-0">
+            <div class="md-form">
                 @Html.LabelFor((model) => model.AuthID, new { @class = "mdb-main-label" })
                 @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "mdb-select" })
                 @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
@@ -82,8 +82,8 @@
         </div>
 
         <div id="pagingPanel" class="form-group">
-            <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" data-val-required="The Restrict Data Source field is required." checked="@Model.IsSecured">
-            @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "form-check-label" })
+            <input type="checkbox" value="true" class="form-check-input" id="HasPaging" name="HasPaging" checked="@Model.HasPaging">
+            @Html.LabelFor(m => m.HasPaging, htmlAttributes: new { @class = "form-check-label" })
         </div>
 
         <div id="userPassPanel">
@@ -202,6 +202,7 @@
                     $('#tokenAuthPanel').hide();
                     $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
+                    $('#pagingPanel').hide();
 
                     //User\Pass is required, so check and disable for changing
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -222,7 +223,12 @@
                     else if (sourceType == "GoogleBigQueryApi") {
                         $('#PortNumber').val('443');
                     }
-                    else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
+                    else if (sourceType == "HTTPS") {
+                        $('#PortNumber').val('443');
+                        $('#requestHeaderPanel').show();
+                        $('#pagingPanel').show();
+                    }
+                    else if (sourceType == "GOOGLEAPI") {
                         //Setting default values for port number
                         $('#PortNumber').val('443');
                         $('#requestHeaderPanel').show();
@@ -250,6 +256,7 @@
                     $('#authPanel').hide();
                     $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
+                    $('#pagingPanel').hide();
                 }
                 else {
                     $('#PortNumber').val('')
@@ -262,6 +269,7 @@
                     $('#tokenAuthPanel').hide();
                     $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
+                    $('#pagingPanel').hide();
                 }
             }
 

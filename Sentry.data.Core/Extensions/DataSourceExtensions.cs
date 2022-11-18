@@ -2,16 +2,6 @@
 {
     public static class DataSourceExtensions
     {
-        public static DataSourceTypeDto ToDto(this DataSourceType entity)
-        {
-            return new DataSourceTypeDto()
-            {
-                Name = entity.Name,
-                Description = entity.Description,
-                DiscrimatorValue = entity.DiscrimatorValue
-            };
-        }
-
         public static AuthenticationTypeDto ToDto(this AuthenticationType entity)
         {
             return new AuthenticationTypeDto()

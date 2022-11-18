@@ -583,9 +583,15 @@ namespace Sentry.data.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                bool isSuccessful = dto.OriginatingId == 0
-                    ? _configService.CreateAndSaveNewDataSource(dto)
-                    : _configService.UpdateAndSaveDataSource(dto);
+                bool isSuccessful;
+                if (dto.OriginatingId == 0)
+                {
+                    isSuccessful = _configService.CreateAndSaveNewDataSource(dto);
+                }
+                else
+                {
+                    isSuccessful = _configService.UpdateAndSaveDataSource(dto);
+                }
 
                 if (isSuccessful)
                 {

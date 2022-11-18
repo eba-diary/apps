@@ -21,14 +21,19 @@ namespace Sentry.data.Core
         #region IDataSourceService Implementations
         public List<DataSourceTypeDto> GetDataSourceTypeDtosForDropdown()
         {
-            List<DataSourceType> dataSourceTypes = _datasetContext.DataSourceTypes.Where(x => 
-                x.DiscrimatorValue != DataSourceDiscriminator.DEFAULT_DROP_LOCATION &&
-                x.DiscrimatorValue != DataSourceDiscriminator.DEFAULT_S3_DROP_LOCATION &&
-                x.DiscrimatorValue != DataSourceDiscriminator.JAVA_APP_SOURCE &&
-                x.DiscrimatorValue != DataSourceDiscriminator.DEFAULT_HSZ_DROP_LOCATION
-            ).ToList();
+            List<string> dropdownTypes = new List<string>
+            {
+                DataSourceDiscriminator.FTP_SOURCE,
+                DataSourceDiscriminator.SFTP_SOURCE,
+                DataSourceDiscriminator.DFS_CUSTOM,
+                DataSourceDiscriminator.HTTPS_SOURCE,
+                DataSourceDiscriminator.GOOGLE_API_SOURCE,
+                DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE
+            };
 
-            List<DataSourceTypeDto> dataSourceDtos = dataSourceTypes.Select(x => x.ToDto()).OrderBy(x => x.DiscrimatorValue).ToList();
+            List<DataSourceTypeDto> dataSourceDtos = _datasetContext.DataSourceTypes.Where(x => dropdownTypes.Contains(x.DiscrimatorValue))
+                .Select(x => new DataSourceTypeDto { Name = x.Name, Description = x.Description, DiscrimatorValue = x.DiscrimatorValue})
+                .ToList();
 
             return dataSourceDtos;
         }
@@ -63,8 +68,6 @@ namespace Sentry.data.Core
 
             List<string> validAuthTypeCodes = validAuthTypes.Select(x => x.AuthType).ToList();
 
-            var test = _datasetContext.AuthTypes.Where(x => validAuthTypeCodes.Contains(x.AuthType)).ToList();
-
             List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
             List<AuthenticationType> fullValidAuthTypes = allAuthTypes.Where(x => validAuthTypeCodes.Contains(x.AuthType)).ToList();
 
@@ -80,10 +83,6 @@ namespace Sentry.data.Core
 
             return authenticationTypeDtos;
         }
-        #endregion
-
-        #region Methods
-        private 
         #endregion
     }
 }
