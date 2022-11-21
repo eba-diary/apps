@@ -583,5 +583,10 @@ namespace Sentry.data.Core
             public const string QUAL = "QUAL";
             public const string PROD = "PROD";
         }
+
+        public static class Encryption
+        {
+            public const string ENCRYPTIONINDICATOR = "<--!-->";
+        }
     }
 }

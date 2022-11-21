@@ -266,7 +266,9 @@ namespace Sentry.data.Core.Tests
             Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
             encryptionService.Setup(x => x.GenerateNewIV()).Returns("IVKey");
             encryptionService.Setup(x => x.EncryptString("DecryptedClientPrivateId", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedClientPrivateId", ""));
+            encryptionService.Setup(x => x.IsEncrypted("DecryptedCurrentToken")).Returns(false);
             encryptionService.Setup(x => x.EncryptString("DecryptedCurrentToken", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedCurrentToken", ""));
+            encryptionService.Setup(x => x.IsEncrypted("DecryptedRefreshToken")).Returns(false);
             encryptionService.Setup(x => x.EncryptString("DecryptedRefreshToken", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedRefreshToken", ""));
 
             Mock<IUserService> userService = mock.Create<IUserService>();
@@ -382,14 +384,14 @@ namespace Sentry.data.Core.Tests
             MockRepository mock = new MockRepository(MockBehavior.Strict);
 
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
+            datasetContext.Setup(x => x.GetById<AuthenticationType>(2)).Throws<Exception>();
             datasetContext.Setup(x => x.Clear());
 
-            Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
-            encryptionService.Setup(x => x.GenerateNewIV()).Throws<Exception>();
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            
+            DataSourceDto dataSourceDto = new DataSourceDto { AuthID = "2" };
 
-            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, encryptionService.Object, null, null, null, null, null, null, null, null);
-
-            bool result = configService.CreateAndSaveNewDataSource(null);
+            bool result = configService.CreateAndSaveNewDataSource(dataSourceDto);
 
             Assert.IsFalse(result);
 

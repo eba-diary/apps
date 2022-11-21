@@ -26,10 +26,10 @@ BEGIN TRY
     INSERT INTO DataSourceTokens(ParentDataSource_Id, CurrentToken, CurrentTokenExp, TokenUrl, Scope, TokenExp)
     SELECT DataSource_Id,CurrentToken, CurrentTokenExp, TokenUrl, Scope, TokenExp
     FROM DataSource
-    WHERE SourceAuth_ID = 4 and OAuthGrantType = null
+    WHERE SourceAuth_ID = 4 and OAuthGrantType is null
 
     -- Set Existing OAuth Data sources to JWT --
-    UPDATE DataSource SET OAuthGrantType = 0 WHERE SourceAuth_ID = 4 and OAuthGrantType = null
+    UPDATE DataSource SET OAuthGrantType = 0 WHERE SourceAuth_ID = 4 and OAuthGrantType is null
 
     -- Add reference to token in addition to datasource for AuthenticationClaims
     UPDATE AuthenticationClaims 

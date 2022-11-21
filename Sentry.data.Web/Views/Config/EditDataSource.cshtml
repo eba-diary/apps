@@ -33,10 +33,8 @@
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
     @Html.HiddenFor(model => model.ReturnUrl)
-    @Html.HiddenFor(model => model.Name)
     @Html.HiddenFor(model => model.Id)
     @Html.HiddenFor(model => model.SourceType)
-    @Html.HiddenFor(model => model.BaseUri)
     @Html.HiddenFor(model => model.PrimaryContactId)
 
 <div class="card pt-3">
@@ -46,7 +44,7 @@
         <div id="informationPanel" class="form-horizontal">
             <div class="md-form">
                 @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
-                @Html.TextBoxFor(model => model.Name, new { @disabled = "disabled", @class = "form-control" })
+                @Html.TextBoxFor(model => model.Name, new { @readonly = "readonly", @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
 
@@ -79,10 +77,9 @@
                 </span>
             </div>
 
-
             <div class="md-form">
                 @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label" })
-                @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @disabled = "disabled", @class = "form-control" })
+                @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @readonly = "readonly", @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
             </div>
 
@@ -107,7 +104,7 @@
             </div>
 
             <div id="userPassPanel">
-                <div class="form-check">
+                <div class="form-group">
                     <input type="checkbox" value="true" class="form-check-input" id="IsUserPassRequired" name="IsUserPassRequired" checked="@Model.IsUserPassRequired">
                     @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "form-check-label" })
                     <div id="userPassNotificationPanel" class="credentialWarning">
@@ -284,10 +281,11 @@
                     //$('#tokenAuthPanel').hide();
                     //$('#requestHeaderPanel').hide();
                 }
-                else if (sourceType == "HTTPS") {
+                else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI" || sourceType == "GoogleBigQueryApi") {
                     $('#IsUserPassRequired').attr('disabled', true);
                     $('#userPassPanel').hide();
-                    $('#pagingPanel').show();
+                    $('#authPanel').show();
+
                     if (authtxt == 'Token Authentication') {
                         $('#requestHeaderPanel').show();
                         $('#tokenAuthPanel').show();
@@ -305,6 +303,13 @@
                         $('#tokenAuthPanel').hide();
                         $('#userPassPanel').hide();
                         $('#OAuthPanel').hide();
+                    }
+
+                    if (sourceType == "HTTPS") {
+                        $('#pagingPanel').show();
+                    }
+                    else if (sourceType == "GOOGLEAPI" || sourceType == "GoogleBigQueryApi") {
+                        $('#pagingPanel').hide();
                     }
                 }
                 else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
@@ -332,7 +337,6 @@
             }
 
             $('.backToList').attr("href", document.referrer);
-            $('#ReturnUrl').val(document.referrer);
 
             setSourceTypeDefaults($('#SourceType').val())
 

@@ -545,6 +545,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult CreateSource()
         {
             DataSourceModel dsm = CreateSourceDropDown(new DataSourceModel());
+            dsm.ReturnUrl = "/";
             CreateEvent("Viewed Data Source Creation Page");
             return View("CreateDataSource", dsm);
         }
@@ -613,7 +614,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Source/Edit/{sourceID}")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [AuthorizeByPermission(PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(int sourceID)
         {
             UserSecurity us = _configService.GetUserSecurityForDataSource(sourceID);
@@ -621,7 +622,7 @@ namespace Sentry.data.Web.Controllers
             {
                 DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
                 DataSourceModel model = new DataSourceModel(dto);
-
+                model.ReturnUrl = "/DataFlow/Create";
                 EditSourceDropDown(model);
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");

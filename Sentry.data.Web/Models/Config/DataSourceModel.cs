@@ -40,6 +40,7 @@ namespace Sentry.data.Web
             Tokens = dto.Tokens.Select(t => t.ToModel()).ToList() ?? new List<DataSourceTokenModel>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
+            ClientPrivateId = dto.ClientPrivateId;
             HasPaging = dto.HasPaging;
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
@@ -51,7 +52,6 @@ namespace Sentry.data.Web
             //We do not populate TokenAuthValue and ClientPrivateID.  On Post
             // if a value exists, then a new value is encrypted.  Otherwise, old value is unchanged.
             TokenAuthValue = null;
-            ClientPrivateId = null;
 
             //this is needed for the associate picker js.
             this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -12,5 +8,7 @@ namespace Sentry.data.Core
         string DecryptString(string inputString, string key, string IV);
         string GenerateNewIV();
         string DecryptEncryptUsingNewIV(string origValue, string key, string oldIv, string newIv);
+        bool IsEncrypted(string input);
+        string PrepEncryptedForDisplay(string encryptedString);
     }
 }
