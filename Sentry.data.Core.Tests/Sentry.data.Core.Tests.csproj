@@ -175,6 +175,8 @@
     <Compile Include="SchemaExtensionsTests.cs" />
     <Compile Include="SkipConcurrentExecutionAttributeTest.cs" />
     <Compile Include="DataFlowService_CreateAndUpdateDataFlowTests.cs" />
+    <Compile Include="DataSourceExtensionsTests.cs" />
+    <Compile Include="DataSourceServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

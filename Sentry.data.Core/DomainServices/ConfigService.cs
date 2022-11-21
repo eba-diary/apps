@@ -1146,38 +1146,40 @@ namespace Sentry.data.Core
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
                 dto.HasPaging = ((HTTPSSource)dsrc).HasPaging;
+                dto.GrantType = ((HTTPSSource)dsrc).GrantType;
             }
         }
 
-        private void MapDtoTokensToDataSourceTokens(IList<DataSourceTokenDto> dtoTokens, HTTPSSource httpsSource)
+        private void MapDtoTokensToDataSourceTokens(DataSourceDto dataSourceDto, HTTPSSource httpsSource)
         {
-            foreach(var dtoToken in dtoTokens)
+            foreach(DataSourceTokenDto dtoToken in dataSourceDto.Tokens)
             {
+                bool update = false;
+                DataSourceToken token = new DataSourceToken();
+
                 if (dtoToken.Id != 0 && httpsSource.Tokens.Any(dsToken => dsToken.Id == dtoToken.Id))
                 {
-                    var tokenToUpdate = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
-                    tokenToUpdate.ParentDataSource = httpsSource;
-                    tokenToUpdate.TokenName = dtoToken.TokenName;
-                    tokenToUpdate.RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey);
-                    tokenToUpdate.CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey);
-                    tokenToUpdate.CurrentTokenExp = dtoToken.CurrentTokenExp;
-                    tokenToUpdate.TokenExp = dtoToken.TokenExp;
-                    tokenToUpdate.TokenUrl = dtoToken.TokenUrl;
-                    tokenToUpdate.Scope = dtoToken.Scope;
+                    token = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
+                    update = true;
+                }
+
+                token.ParentDataSource = httpsSource;
+                token.TokenName = dtoToken.TokenName;
+                token.RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey);
+                token.CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey);
+                token.CurrentTokenExp = dtoToken.CurrentTokenExp;
+                token.TokenExp = dtoToken.TokenExp;
+                token.TokenUrl = dtoToken.TokenUrl;
+                token.Scope = dtoToken.Scope;
+
+                if (update)
+                {
+                    UpdateClaimsForToken(token, dataSourceDto);
                 }
                 else
                 {
-                    httpsSource.Tokens.Add(new DataSourceToken
-                    {
-                        ParentDataSource = httpsSource,
-                        CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey),
-                        RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey),
-                        CurrentTokenExp = dtoToken.CurrentTokenExp,
-                        TokenExp = dtoToken.TokenExp,
-                        TokenName = dtoToken.TokenName,
-                        TokenUrl = dtoToken.TokenUrl,
-                        Scope = dtoToken.Scope
-                    });
+                    CreateClaimsForToken(token, dataSourceDto, httpsSource);
+                    httpsSource.Tokens.Add(token);
                 }
             }
         }
@@ -1275,10 +1277,8 @@ namespace Sentry.data.Core
                 {
                     ((HTTPSSource)dsrc).ClientPrivateId = EncryptString(dto.ClientPrivateId, ((HTTPSSource)dsrc).IVKey);
                     ((HTTPSSource)dsrc).GrantType = dto.GrantType;
-                    MapDtoTokensToDataSourceTokens(dto.Tokens, (HTTPSSource)dsrc);
+                    MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)dsrc);
                 }
-
-                UpdateClaims((HTTPSSource)dsrc, dto);
             }
 
             // only update if new value is supplied
@@ -1313,48 +1313,6 @@ namespace Sentry.data.Core
             token.Scope = dto.Scope;
         }
 
-        private DataSourceTokenDto GetTokenFromDataSourceDto(DataSourceDto dto, int tokenId)
-        {
-            return dto.Tokens.First(token => token.Id == tokenId);
-        }
-
-        private void UpdateClaims(HTTPSSource dsrc, DataSourceDto dto)
-        {
-            //foreach claim type in dsrc
-            // does claim type exist in dto?
-            //if yes, update if value is different
-            //if no, create OAuthClaim with dto value
-
-            foreach(DataSourceToken token in dsrc.Tokens)
-            {
-                var dtoToken = GetTokenFromDataSourceDto(dto, token.Id);
-                if(token.Claims != null)
-                {
-                    foreach (OAuthClaim claim in token.Claims)
-                    {
-                        //try get corresponding token from DTO 
-                        switch (claim.Type)
-                        {
-                            case GlobalEnums.OAuthClaims.iss:
-                                if (dto.ClientId != null && dto.ClientId != claim.Value) { claim.Value = dto.ClientId; }
-                                break;
-                            case GlobalEnums.OAuthClaims.aud:
-                                if (dtoToken.TokenUrl != null && dtoToken.TokenUrl != claim.Value) { claim.Value = dtoToken.TokenUrl; }
-                                break;
-                            case GlobalEnums.OAuthClaims.exp:
-                                if (dtoToken.TokenExp != 0 && dtoToken.TokenExp.ToString() != claim.Value) { claim.Value = dtoToken.TokenExp.ToString(); }
-                                break;
-                            case GlobalEnums.OAuthClaims.scope:
-                                if (dtoToken.Scope != null && dtoToken.Scope != claim.Value) { claim.Value = dtoToken.Scope; }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
         private DataSource CreateDataSource(DataSourceDto dto)
         {
             AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(dto.AuthID));
@@ -1371,11 +1329,6 @@ namespace Sentry.data.Core
             source.PrimaryContactId = dto.PrimaryContactId;
 
             _datasetContext.Add(source);
-
-            if (source.Is<HTTPSSource>() && auth.Is<OAuthAuthentication>())
-            {
-                CreateClaims(dto, (HTTPSSource)source);
-            }
 
             if (source.IsSecured)
             {
@@ -1433,7 +1386,7 @@ namespace Sentry.data.Core
                         ((HTTPSSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1;
                         ((HTTPSSource)source).GrantType = dto.GrantType;
                         ((HTTPSSource)source).Tokens = new List<DataSourceToken>();
-                        MapDtoTokensToDataSourceTokens(dto.Tokens, (HTTPSSource)source);
+                        MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
                     }
                     break;
                 case DataSourceDiscriminator.GOOGLE_API_SOURCE:
@@ -1459,8 +1412,7 @@ namespace Sentry.data.Core
                         ((GoogleApiSource)source).ClientId = dto.ClientId;
                         ((GoogleApiSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1;
                         ((GoogleApiSource)source).Tokens = new List<DataSourceToken>();
-                        MapDtoTokensToDataSourceTokens(dto.Tokens, (HTTPSSource)source);
-
+                        MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
                     }
                     break;
                 case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
@@ -1471,7 +1423,7 @@ namespace Sentry.data.Core
                         ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1,
                         Tokens = new List<DataSourceToken>()
                     };
-                    MapDtoTokensToDataSourceTokens(dto.Tokens, (GoogleBigQueryApiSource)source);
+                    MapDtoTokensToDataSourceTokens(dto, (GoogleBigQueryApiSource)source);
 
                     break;
                 default:
@@ -1481,29 +1433,48 @@ namespace Sentry.data.Core
             return source;
         }
 
-        private void CreateClaims(DataSourceDto dto, HTTPSSource source)
+        private void CreateClaimsForToken(DataSourceToken token, DataSourceDto dto, HTTPSSource source)
         {
-            foreach(DataSourceTokenDto token in dto.Tokens)
+            token.Claims = new List<OAuthClaim>();
+
+            OAuthClaim claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.iss, Value = dto.ClientId };
+            _datasetContext.Add(claim);
+            token.Claims.Add(claim);
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.aud, Value = token.TokenUrl };
+            _datasetContext.Add(claim);
+            token.Claims.Add(claim);
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(token.TokenExp)).TotalSeconds.ToString() };
+            _datasetContext.Add(claim);
+            token.Claims.Add(claim);
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.scope, Value = token.Scope };
+            _datasetContext.Add(claim);
+            token.Claims.Add(claim);
+        }
+
+        private void UpdateClaimsForToken(DataSourceToken token, DataSourceDto dto)
+        {
+            var dtoToken = dto.Tokens.First(t => t.Id == token.Id);
+            foreach (OAuthClaim claim in token.Claims)
             {
-                List<OAuthClaim> claimsList = new List<OAuthClaim>();
-                source.Tokens.FirstOrDefault().Claims = claimsList;
-                OAuthClaim claim;
-
-                claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.iss, Value = dto.ClientId };
-                _datasetContext.Add(claim);
-                claimsList.Add(claim);
-
-                claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.scope, Value = token.Scope };
-                _datasetContext.Add(claim);
-                claimsList.Add(claim);
-
-                claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.aud, Value = token.TokenUrl };
-                _datasetContext.Add(claim);
-                claimsList.Add(claim);
-
-                claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(token.TokenExp)).TotalSeconds.ToString() };
-                _datasetContext.Add(claim);
-                claimsList.Add(claim);
+                if (claim.Type == GlobalEnums.OAuthClaims.iss && dto.ClientId != null && dto.ClientId != claim.Value)
+                {
+                    claim.Value = dto.ClientId;
+                }
+                else if (claim.Type == GlobalEnums.OAuthClaims.aud && dtoToken.TokenUrl != null && dtoToken.TokenUrl != claim.Value)
+                {
+                    claim.Value = dtoToken.TokenUrl;
+                }
+                else if (claim.Type == GlobalEnums.OAuthClaims.exp && dtoToken.TokenExp != 0 && dtoToken.TokenExp.ToString() != claim.Value)
+                {
+                    claim.Value = dtoToken.TokenExp.ToString();
+                }
+                else if (claim.Type == GlobalEnums.OAuthClaims.scope && dtoToken.Scope != null && dtoToken.Scope != claim.Value)
+                {
+                    claim.Value = dtoToken.Scope;
+                }
             }
         }
 

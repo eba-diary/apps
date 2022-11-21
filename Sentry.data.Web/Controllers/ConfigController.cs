@@ -623,6 +623,7 @@ namespace Sentry.data.Web.Controllers
                 DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
                 DataSourceModel model = new DataSourceModel(dto);
                 model.ReturnUrl = "/DataFlow/Create";
+
                 EditSourceDropDown(model);
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
