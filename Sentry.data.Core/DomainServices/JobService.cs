@@ -540,7 +540,7 @@ namespace Sentry.data.Core
             if (hr == null)
             {
                 Logger.Info($"{nameof(GetApacheLivyBatchStatusAsync)} - No history record returned.");
-                return (Task<System.Net.Http.HttpResponseMessage>)Task.CompletedTask;
+                return Task.FromResult(default(System.Net.Http.HttpResponseMessage));
             }
                 
             return GetApacheLivyBatchStatusInternalAsync(hr);

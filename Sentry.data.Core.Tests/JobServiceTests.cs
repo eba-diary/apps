@@ -262,7 +262,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("FileName2", compression.FileNameExclusionList.First());
 
             Assert.IsNotNull(jobOptions.HttpOptions);
-            
+
             HttpsOptions httpsOptions = jobOptions.HttpOptions;
             Assert.IsNull(httpsOptions.Body);
             Assert.AreEqual(HttpMethods.get, httpsOptions.RequestMethod);
@@ -530,7 +530,7 @@ namespace Sentry.data.Core.Tests
             //Arrange
             Mock<IDataFeatures> features = new Mock<IDataFeatures>();
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
-            features.Setup(s => s.CLA3497_UniqueLivySessionName.GetValue()).Returns(true);            
+            features.Setup(s => s.CLA3497_UniqueLivySessionName.GetValue()).Returns(true);
 
             var javaOptionsOverrideDto = new JavaOptionsOverrideDto()
             {
@@ -685,10 +685,10 @@ namespace Sentry.data.Core.Tests
             //Arrange
             RetrieverJob job = new RetrieverJob()
             {
-                Id= 22,
+                Id = 22,
                 JobGuid = Guid.NewGuid()
             };
-            
+
             JavaOptionsOverrideDto dto = new JavaOptionsOverrideDto();
 
             LivyBatch livyBatch = new LivyBatch()
@@ -696,7 +696,7 @@ namespace Sentry.data.Core.Tests
                 Id = 11,
                 State = "Success",
                 Appid = "App Id",
-                AppInfo = new System.Collections.Generic.Dictionary<string, string>() { { "driverLogUrl", "driver value" }, { "sparkUiUrl", "spark UI Url value"} }
+                AppInfo = new System.Collections.Generic.Dictionary<string, string>() { { "driverLogUrl", "driver value" }, { "sparkUiUrl", "spark UI Url value" } }
             };
 
             Submission sub = new Submission()
@@ -728,7 +728,7 @@ namespace Sentry.data.Core.Tests
             jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
             jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
 
-            
+
             Times jobHistoryAddCount = Times.Once();
             Times saveChancesCount = Times.Exactly(2);
 
@@ -873,6 +873,61 @@ namespace Sentry.data.Core.Tests
 
             context.Verify(v => v.SaveChanges(It.IsAny<bool>()), Times.Once);
 
+        }
+
+        [TestMethod]
+        public async Task GetApacheLivyBatchStatusAsync_No_History_Record()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            List<JobHistory> jobHistoryRecords = new List<JobHistory>();
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.JobHistory).Returns(jobHistoryRecords.AsQueryable());
+
+            JobService jobService = new JobService(context.Object, null, null, null, null, null);
+
+            _ = await jobService.GetApacheLivyBatchStatusAsync(1, 1);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task GetApacheLivyBatchStatusAsync_JobId_Required()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            List<JobHistory> jobHistoryRecords = new List<JobHistory>();
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.JobHistory).Returns(jobHistoryRecords.AsQueryable());
+
+            JobService jobService = new JobService(context.Object, null, null, null, null, null);
+
+            _ = await jobService.GetApacheLivyBatchStatusAsync(0, 1);
+
+            mr.VerifyAll();
+        }
+
+
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task GetApacheLivyBatchStatusAsync_BatchId_Required()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            List<JobHistory> jobHistoryRecords = new List<JobHistory>();
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.JobHistory).Returns(jobHistoryRecords.AsQueryable());
+
+            JobService jobService = new JobService(context.Object, null, null, null, null, null);
+
+            _ = await jobService.GetApacheLivyBatchStatusAsync(1, 0);
+
+            mr.VerifyAll();
         }
 
         [TestMethod]
