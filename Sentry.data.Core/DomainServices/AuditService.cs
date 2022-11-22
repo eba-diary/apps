@@ -65,13 +65,16 @@ namespace Sentry.data.Core
         {
             try
             {
-                //calls to the snow provider to create call snowflake and return DataTable with resulting data
+                //invokes passed in audit method to query snowflake and return DataTable with resulting data
                 return auditMethod(snowCompareConfig);
 
             }
             catch (Exception ex)
             {
-                throw new ArgumentException(ex.Message);
+                //returns descriptive error message, regardless if expection has inner exception or not
+                var errorMessage = (ex.InnerException != null) ? ex.InnerException.Message : ex.Message;
+
+                throw new ArgumentException(errorMessage);
             }
         }
 
