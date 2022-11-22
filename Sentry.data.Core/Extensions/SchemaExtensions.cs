@@ -82,7 +82,7 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public static DataElementDto ToDataElementDto(this DatasetDto dsDto)
+        public static DataElementDto ToDataElementDto(this DatasetSchemaDto dsDto)
         {
             return new DataElementDto()
             {

@@ -3,6 +3,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core.DomainServices
 {
@@ -19,13 +20,15 @@ namespace Sentry.data.Core.DomainServices
         private readonly Lazy<IDataFlowService> _dataFlowService;
         private readonly Lazy<IBackgroundJobClient> _hangfireBackgroundJobClient;
         private readonly Lazy<IUserService> _userService;
+        private readonly Lazy<IDataFeatures> _dataFeatures;
+        private readonly Lazy<ISecurityService> _securityService;
+        private readonly Lazy<ISchemaService> _schemaService;
 
         public DataApplicationService(IDatasetContext datasetContext,
-            Lazy<IDatasetService> datasetService,
-            Lazy<IConfigService> configService,
-            Lazy<IDataFlowService> dataFlowService,
-            Lazy<IBackgroundJobClient> hangfireBackgroundJobClient,
-            Lazy<IUserService> userService)
+            Lazy<IDatasetService> datasetService, Lazy<IConfigService> configService,
+            Lazy<IDataFlowService> dataFlowService, Lazy<IBackgroundJobClient> hangfireBackgroundJobClient,
+            Lazy<IUserService> userService, Lazy<IDataFeatures> dataFeatures,
+            Lazy<ISecurityService> securityService, Lazy<ISchemaService> schemaService)
         {
             _datasetContext = datasetContext;
             _datasetService = datasetService;
@@ -33,8 +36,12 @@ namespace Sentry.data.Core.DomainServices
             _dataFlowService = dataFlowService;
             _hangfireBackgroundJobClient = hangfireBackgroundJobClient;
             _userService = userService;
+            _dataFeatures = dataFeatures;
+            _securityService = securityService;
+            _schemaService = schemaService;
         }
 
+        #region Private Properties
         private IDatasetService DatasetService
         {
             get { return _datasetService.Value; }
@@ -55,8 +62,21 @@ namespace Sentry.data.Core.DomainServices
         {
             get { return _userService.Value; }
         }
+        private IDataFeatures DataFeatures
+        {
+            get { return _dataFeatures.Value; }
+        }
+        private ISecurityService SecurityService
+        {
+            get { return _securityService.Value; }
+        }
+        private ISchemaService SchemaService
+        {
+            get { return _schemaService.Value; }
+        }
+        #endregion
 
-
+        #region Public Methods        
         public bool DeleteDataset(List<int> deleteIdList, IApplicationUser user, bool forceDelete = false)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(DeleteDataset).ToLower()}";
@@ -125,6 +145,89 @@ namespace Sentry.data.Core.DomainServices
 
             Logger.Info($"{methodName} Method End");
             return successfullySubmitted;
+        }                
+        #endregion
+
+        #region Private methods        
+        /// <summary>
+        /// Creates new dataset entity object, adds to context, and saves changes.
+        /// </summary>
+        /// <param name="dto">DatasetDto</param>
+        /// <returns></returns>
+        internal int Create(DatasetDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            int newDatasetId = 0;
+            try
+            {
+                newDatasetId = DatasetService.Create(dto);
+
+                _datasetContext.SaveChanges();
+
+                if (DataFeatures.CLA3718_Authorization.GetValue())
+                {
+                    // Create a Hangfire job that will setup the default security groups for this new dataset
+                    SecurityService.EnqueueCreateDefaultSecurityForDataset(newDatasetId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to save Dataset", ex);
+                _datasetContext.Clear();
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newDatasetId;
+        }
+
+        /// <summary>
+        /// creates new datasetfileconfig entity object, adds to context, and saves changes
+        /// </summary>
+        /// <param name="dto">DatasetFileConfigDto</param>
+        private void Create(DatasetFileConfigDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            try
+            {
+                ConfigService.CreateAndSaveDatasetFileConfig(dto); 
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to save DatasetFileConfig", ex);
+                _datasetContext.Clear();
+                throw;
+            }
+            Logger.Info($"{methodName} Method End");
+        }
+
+        /// <summary>
+        /// Creates new fileschema entity object, adds to context, and saves changes
+        /// </summary>
+        /// <param name="dto">FileSchemaDto</param>
+        /// <returns></returns>
+        private int Create(FileSchemaDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            int newFileSchemaId = 0;
+            try
+            {
+                newFileSchemaId = SchemaService.Create(dto);
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to save FileSchema", ex);
+                _datasetContext.Clear();
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newFileSchemaId;
         }
 
         private bool Delete<T>(List<int> deleteIdList, IApplicationUser user, T instance, bool forceDelete = false) where T : IEntityService
@@ -165,5 +268,6 @@ namespace Sentry.data.Core.DomainServices
             Logger.Info($"{methodName} Method End");
             return IsSuccessful;
         }
+        #endregion
     }
 }

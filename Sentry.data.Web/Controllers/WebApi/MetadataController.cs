@@ -32,11 +32,13 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly ISecurityService _securityService;
         private readonly IMessagePublisher _messagePublisher;
         private readonly Lazy<IDatasetFileService> _datasetFileService;
+        private readonly Lazy<IDataApplicationService> _dataApplicationService;
 
         public MetadataController(IDatasetContext dsContext, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService,
-                                IMessagePublisher messagePublisher, Lazy<IDatasetFileService> datasetFileService)
+                                IMessagePublisher messagePublisher, Lazy<IDatasetFileService> datasetFileService,
+                                Lazy<IDataApplicationService> dataApplicationService)
         {
             _dsContext = dsContext;
             _userService = userService;
@@ -46,6 +48,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             _securityService = securityService;
             _messagePublisher = messagePublisher;
             _datasetFileService = datasetFileService;
+            _dataApplicationService = dataApplicationService;
         }
 
         public IDatasetFileService DatasetFileService
@@ -142,7 +145,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             IHttpActionResult GetDatasetsFunction()
             {
-                List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
+                List<DatasetSchemaDto> dtoList = _datasetService.GetAllDatasetDto();
                 List<DatasetInfoModel> modelList = dtoList.ToApiModel();
                 return Ok(modelList);
             }
