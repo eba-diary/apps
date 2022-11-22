@@ -89,7 +89,6 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public async Task<ViewResult> Create()
         {
-
             UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             if (!us.CanCreateDataFlow)
@@ -104,8 +103,7 @@ namespace Sentry.data.Web.Controllers
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
-
-            
+                        
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
@@ -230,13 +228,6 @@ namespace Sentry.data.Web.Controllers
                 results.Add(dsEx.Message);
                 AddCoreValidationExceptionsToModel(new ValidationException(results));
             }
-            //catch (DataFlowStepNotImplementedException stepEx)
-            //{
-            //    //User option selection not valid for dataflowstep mappings
-            //    ValidationResults results = new ValidationResults();
-            //    results.Add(stepEx.Message);
-            //    AddCoreValidationExceptionsToModel(new ValidationException(results));
-            //}
             catch (DataFlowUnauthorizedAccessException)
             {
                 //User should not get to this point via UI since navigating to Create page should give them Forbidden error
@@ -482,8 +473,7 @@ namespace Sentry.data.Web.Controllers
                 model.AllSchemas = scmList;
             }
         }
-
-        
+                
         [HttpGet]
         [Route("DataFlow/NamedEnvironment")]
         public async Task<PartialViewResult> _NamedEnvironment(string assetKeyCode, string namedEnvironment)
@@ -561,9 +551,7 @@ namespace Sentry.data.Web.Controllers
                 pickerval = 0;
             }
             model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
-        }
-
-        
+        }        
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
         {

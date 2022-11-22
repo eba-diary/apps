@@ -355,7 +355,7 @@
         $.getJSON(encodeURI("/Config/RequestMethodByType/" + val), function (data) {
             var subItems = "";
             $.each(data, function (index, item) {
-                subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                subItems += "<option value='" + item.Value + "' selected='" + item.Selected + "'>" + item.Text + "</option>";
             });
             
             $("[id$='SelectedRequestMethod']").html(subItems);
