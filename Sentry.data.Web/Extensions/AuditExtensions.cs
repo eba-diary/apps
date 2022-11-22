@@ -19,7 +19,8 @@ namespace Sentry.data.Core
                 {
                     DatasetFileName = compareAuditDto.DatasetFileName,
                     ParquetRowCount = compareAuditDto.ParquetRowCount,
-                    RawqueryRowCount = compareAuditDto.RawqueryRowCount
+                    RawqueryRowCount = compareAuditDto.RawqueryRowCount,
+                    HasCountDifference = compareAuditDto.RawqueryRowCount == compareAuditDto.ParquetRowCount ? false : true
                 });
             }
 
