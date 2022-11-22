@@ -140,14 +140,9 @@ namespace Sentry.data.Web
         public List<string> ContactIds { get; set; }
         public UserSecurityModel Security { get; set; }
 
-
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }
         public string HrempServiceEnv { get; set; }
-
-        private List<DataSourceTokenModel> tokenDtoListToTokenModelList(IList<DataSourceTokenDto> tokenDtoList)
-        {
-            return (List<DataSourceTokenModel>)tokenDtoList.Cast<DataSourceModel>();
-        }
+        public bool CLA2868_APIPaginationSupport { get; set; }
     }
 }
