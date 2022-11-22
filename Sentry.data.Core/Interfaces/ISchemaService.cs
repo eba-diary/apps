@@ -36,6 +36,18 @@ namespace Sentry.data.Core
         /// <returns></returns>
         SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId);
 
+        /// <summary>
+        /// Create new FileSchema entity and add it to context.  Does not save changes.
+        /// </summary>
+        /// <param name="dto">FileSchemaDto</param>
+        /// <returns></returns>
+        int Create(FileSchemaDto dto);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schemaDto"></param>
+        /// <returns></returns>
         int CreateAndSaveSchema(FileSchemaDto schemaDto);
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core.DTO.Retriever;
+using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -26,11 +28,10 @@ namespace Sentry.data.Core
         #endregion
 
         #region OAuthSpecific
+        public List<DataSourceTokenDto> Tokens { get; set; }
         public string ClientId { get; set; }
         public string ClientPrivateId { get; set; }
-        public string TokenUrl { get; set; }
-        public int TokenExp { get; set; }
-        public string Scope { get; set; }
+        public OAuthGrantType GrantType { get; set; }
         #endregion
 
         public List<RequestHeader> RequestHeaders { get; set; }

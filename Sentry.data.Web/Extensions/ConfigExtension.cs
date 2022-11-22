@@ -6,6 +6,7 @@ using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sentry.data.Web.Extensions;
 
 namespace Sentry.data.Web
 {
@@ -49,9 +50,6 @@ namespace Sentry.data.Web
                 TokenAuthValue = model.TokenAuthValue,
                 ClientId = model.ClientId,
                 ClientPrivateId = model.ClientPrivateId,
-                TokenUrl = model.TokenUrl,
-                TokenExp = model.TokenExp,
-                Scope = model.Scope,
                 RequestHeaders = model.Headers
             };
         }
@@ -73,13 +71,12 @@ namespace Sentry.data.Web
                 TokenAuthValue = model.TokenAuthValue,
                 ClientId = model.ClientId,
                 ClientPrivateId = model.ClientPrivateId,
-                TokenUrl = model.TokenUrl,
-                TokenExp = model.TokenExp,
-                Scope = model.Scope,
+                Tokens = model.Tokens.Select(t => t.ToDto()).ToList(),
                 RequestHeaders = model.Headers,
                 IsSecured = model.IsSecured,
                 PrimaryContactId= model.PrimaryContactId,
-                PrimaryContactName = model.PrimaryContactName
+                PrimaryContactName = model.PrimaryContactName,
+                GrantType = model.GrantType,
             };
         }
 

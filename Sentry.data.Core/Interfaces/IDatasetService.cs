@@ -8,14 +8,23 @@ namespace Sentry.data.Core
 {
     public interface IDatasetService : IEntityService
     {
-        Task<ValidationException> ValidateAsync(DatasetDto dto);
-        int CreateAndSaveNewDataset(DatasetDto dto);
+        Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
+        int Create(DatasetDto dto);
+        int CreateAndSaveNewDataset(DatasetSchemaDto dto);
         DatasetDto GetDatasetDto(int id);
-        List<DatasetDto> GetAllDatasetDto();
-        List<DatasetDto> GetAllActiveDatasetDto();
+
+        /// <summary>
+        /// Returns combination of dataset and schema metadata as a dto object.
+        /// For datasetdto only metdata, use <see cref="GetDatasetDto(int)"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        DatasetSchemaDto GetDatasetSchemaDto(int id);
+        List<DatasetSchemaDto> GetAllDatasetDto();
+        List<DatasetSchemaDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
-        void UpdateAndSaveDataset(DatasetDto dto);
+        void UpdateAndSaveDataset(DatasetSchemaDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
         Task<AccessRequest> GetAccessRequestAsync(int datasetId);

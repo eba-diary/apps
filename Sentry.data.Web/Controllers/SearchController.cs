@@ -130,7 +130,6 @@ namespace Sentry.data.Web.Controllers
 
             switch (searchType)
             {
-                // TODO: CLA-2765 - Add filtering on ObjectStatus = 'Active' || 'Delete Pending' status
                 case "BusinessIntelligence":
                     dsQuery = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT && x.CanDisplay);
                     break;

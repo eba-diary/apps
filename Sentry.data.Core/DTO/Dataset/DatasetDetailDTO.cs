@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
-    public class DatasetDetailDto : DatasetDto
+    public class DatasetDetailDto : DatasetSchemaDto
     {
         public int Downloads { get; set; }
         public List<DatasetFileConfigSchemaDto> DatasetFileConfigSchemas { get; set; }
