@@ -1,12 +1,8 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core.Helpers;
+﻿using Sentry.data.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -35,25 +31,9 @@ namespace Sentry.data.Core
 
                 CheckIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
 
-                //calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetNonParquetFiles(snowCompareConfig);
+                DataTable dataTable = InvokeAuditMethod(_snowProvider.GetNonParquetFiles, snowCompareConfig);
 
-                List<AuditDto> auditDtos = new List<AuditDto>();
-
-                //check if the data table is not null and then map it's values to the list of Audit Dto's
-                if (dataTable.Rows != null)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        auditDtos.Add(new AuditDto() {
-                            DatasetFileName = DatabaseHelper.SafeDatabaseString(row["ETL_FILE_NAME"]),
-                            ParquetRowCount = 0,
-                            RawqueryRowCount = 0
-                        });
-                    }
-                }
-
-                baseAuditDto.AuditDtos = auditDtos;
+                baseAuditDto = dataTable.NonParquetMapping();   
             }
 
             return baseAuditDto;
@@ -73,30 +53,26 @@ namespace Sentry.data.Core
 
                 CheckIfTableExists(snowCompareConfig.TargetDb, snowCompareConfig.Schema, snowCompareConfig.Table);
 
-                //calls to the snow provider to create call snowflake and return DataTable with resulting data
-                DataTable dataTable = _snowProvider.GetComparedRowCount(snowCompareConfig);
+                DataTable dataTable = InvokeAuditMethod(_snowProvider.GetComparedRowCount, snowCompareConfig);
 
-                List<AuditDto> auditDtos = new List<AuditDto>();
-
-                //check if the data table is not null and then map it's values to the list of Audit Dto's
-                if (dataTable.Rows != null)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {       
-                        auditDtos.Add(new AuditDto()
-                        {
-                            DatasetFileName = DatabaseHelper.SafeDatabaseString(row["ETL_FILE_NAME"]),
-                            RawqueryRowCount = DatabaseHelper.SafeDatabaseInt(row["RAW_COUNT"]),
-                            ParquetRowCount = DatabaseHelper.SafeDatabaseInt(row["PAR_COUNT"])
-                        });
-
-                    }
-                }
-
-                baseAuditDto.AuditDtos = auditDtos;
+                baseAuditDto = dataTable.ComparedRowCountMapping();
             }
 
             return baseAuditDto;
+        }
+
+        private DataTable InvokeAuditMethod(Func<SnowCompareConfig,DataTable> auditMethod, SnowCompareConfig snowCompareConfig)
+        {
+            try
+            {
+                //calls to the snow provider to create call snowflake and return DataTable with resulting data
+                return auditMethod(snowCompareConfig);
+
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
         }
 
         private void CheckIfTableExists(string db, string schema, string table)

@@ -323,6 +323,7 @@
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
+    <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
