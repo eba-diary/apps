@@ -123,7 +123,6 @@ namespace Sentry.data.Core
 
 
         int UpdateDataFlow(DataFlowDto dfDto);
-        int UpdateandSaveDataFlow(DataFlowDto dfDto);
 
         void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status);
     }
