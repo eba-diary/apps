@@ -18,6 +18,7 @@ namespace Sentry.data.Web
             DataClassificationDescription = dto.DataClassificationDescription;
             GroupAccessCount = dto.GroupAccessCount;
             HasDataAccess = dto.Security.CanViewData;
+            HasSchema = dto.DatasetFileConfigSchemas.Any();
         }
 
         public DatasetDetailModel() { }
@@ -41,6 +42,7 @@ namespace Sentry.data.Web
         public bool HasDataAccess { get; set; }
         public bool ShowManagePermissionsLink { get; set; }
         public bool UseUpdatedSearchPage { get; set; }
+        public bool HasSchema { get; set; }
         public bool CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; set; }
     }
 }

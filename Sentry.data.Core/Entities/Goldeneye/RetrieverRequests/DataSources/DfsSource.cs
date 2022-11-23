@@ -1,6 +1,5 @@
 ﻿using Sentry.Configuration;
 using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,9 +28,10 @@ namespace Sentry.data.Core
 
         public override List<AuthenticationType> ValidAuthTypes { get; set; }
         public override bool IsUriEditable { get; set; }
-        public override Uri CalcRelativeUri(RetrieverJob job, NamedEnvironmentType datasetEnvironmentType, string CLA4260_QuartermasterNamedEnvironmentTypeFilter)
+
+        public override Uri CalcRelativeUri(RetrieverJob Job)
         {
-            return new Uri(Path.Combine(BaseUri.AbsolutePath, job.RelativeUri).ToString());
+            return new Uri(Path.Combine(BaseUri.AbsolutePath, Job.RelativeUri).ToString());
         }
 
         public override string GetDropPrefix(RetrieverJob Job)

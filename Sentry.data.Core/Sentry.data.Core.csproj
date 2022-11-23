@@ -194,6 +194,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
+    <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
@@ -272,6 +274,10 @@
     <Compile Include="Entities\Elastic\ElasticResult.cs" />
     <Compile Include="Entities\Favorites\UserFavorite.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsEnvironmentSource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsNonProdSource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsProdSource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DataSourceToken.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleBigQueryApiSource.cs" />
@@ -314,6 +320,7 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
@@ -485,6 +492,7 @@
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
+    <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
@@ -540,7 +548,7 @@
     <Compile Include="DTO\BaseEntityDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceHomeDTO.cs" />
-    <Compile Include="DTO\Dataset\DatasetDTO.cs" />
+    <Compile Include="DTO\Dataset\DatasetSchemaDto.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
@@ -652,6 +660,7 @@
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IHszFileWatchService.cs" />
+    <Compile Include="Interfaces\Retriever\IEnvironmentRetrieverJobProvider.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
     <Compile Include="Interfaces\IJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />

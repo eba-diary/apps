@@ -1,5 +1,4 @@
 ﻿using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +8,23 @@ namespace Sentry.data.Core
 {
     public interface IDatasetService : IEntityService
     {
-        Task<ValidationException> ValidateAsync(DatasetDto dto);
-        int CreateAndSaveNewDataset(DatasetDto dto);
+        Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
+        int Create(DatasetDto dto);
+        int CreateAndSaveNewDataset(DatasetSchemaDto dto);
         DatasetDto GetDatasetDto(int id);
-        List<DatasetDto> GetAllDatasetDto();
-        List<DatasetDto> GetAllActiveDatasetDto();
+
+        /// <summary>
+        /// Returns combination of dataset and schema metadata as a dto object.
+        /// For datasetdto only metdata, use <see cref="GetDatasetDto(int)"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        DatasetSchemaDto GetDatasetSchemaDto(int id);
+        List<DatasetSchemaDto> GetAllDatasetDto();
+        List<DatasetSchemaDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
-        void UpdateAndSaveDataset(DatasetDto dto);
+        void UpdateAndSaveDataset(DatasetSchemaDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
         Task<AccessRequest> GetAccessRequestAsync(int datasetId);
@@ -34,8 +42,9 @@ namespace Sentry.data.Core
         List<string> GetDatasetNamesForAsset(string asset);
         List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset);
         List<Dataset> GetInheritanceEnabledDatasetsForAsset(string asset);
+
         Task<string> RequestAccessRemoval(AccessRequest request);
+
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
-        NamedEnvironmentType GetDatasetEnvironmentType(int datasetId);
     }
 }

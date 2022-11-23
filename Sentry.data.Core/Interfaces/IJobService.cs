@@ -1,9 +1,7 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -28,7 +26,6 @@ namespace Sentry.data.Core
         Submission SaveSubmission(RetrieverJob job, string options);
         void RecordJobState(Submission submission, RetrieverJob job, string state);
         RetrieverJob FindBasicJob(RetrieverJob job);
-        RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource);
         RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource);
         RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto);
         void CreateDropLocation(RetrieverJob job);
@@ -42,12 +39,11 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="id">Retriever job identifier</param>
         void DisableJob(int id);
+
         bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete);
-        Uri GetDataSourceUri(RetrieverJob job);
-        string GetTargetPath(RetrieverJob basicJob, RetrieverJob executingJob);
-        string GetTargetPath(DataFlowStep s3DropStep, RetrieverJob executingJob);
-        List<RetrieverJob> GetDfsRetrieverJobs();
-        List<DfsMonitorDto> GetDfsRetrieverJobs(NamedEnvironmentType environmentType);
+
+        List<DfsMonitorDto> GetDfsRetrieverJobs(string requestingNamedEnvironment);
+
         Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobAsync(int JobId, System.Guid JobGuid, JavaOptionsOverrideDto dto);
 
         /// <summary>

@@ -197,6 +197,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("IVKey");
                 m.NotNullable(false);
             });
+            
+            Property(x => x.GrantType, m =>
+            {
+                m.Column("OAuthGrantType");
+                m.NotNullable(false);
+            });
 
             Property(x => x.RequestHeaders, m =>
             {
@@ -216,46 +222,17 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.NotNullable(false);
             });
 
-            Property(x => x.Scope, m =>
-            {
-                m.Column("Scope");
-                m.NotNullable(false);
-            });
-
-            Property(x => x.TokenUrl, m =>
-            {
-                m.Column("TokenUrl");
-                m.NotNullable(false);
-            });
-
-            Property(x => x.TokenExp, m =>
-            {
-                m.Column("TokenExp");
-                m.NotNullable(false);
-            });
-
-            Property(x => x.CurrentToken, m =>
-            {
-                m.Column("CurrentToken");
-                m.NotNullable(false);
-            });
-
-            Property(x => x.CurrentTokenExp, m =>
-            {
-                m.Column("CurrentTokenExp");
-                m.NotNullable(false);
-            });
-
-            this.Bag(x => x.Claims, (m) =>
+            this.Bag(x => x.Tokens, m =>
             {
                 m.Inverse(true);
-                m.Table("AuthenticationClaims");
+                m.Table("DataSourceTokens");
+                m.Cascade(Cascade.All);
                 m.Key((k) =>
                 {
-                    k.Column("DataSource_Id");
-                    k.ForeignKey("FK_AuthenticationClaims_DataSource");
+                    k.Column("ParentDataSource_Id");
+                    k.ForeignKey("FK_DataSourceTokens_DataSource");
                 });
-            }, map => map.OneToMany(a => a.Class(typeof(OAuthClaim))));
+            }, map => map.OneToMany(a => a.Class(typeof(DataSourceToken))));
         }
     }
 
@@ -296,6 +273,22 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         public GoogleBigQueryApiMapping()
         {
             DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+        }
+    }
+
+    public class DfsNonProdSourceMapping : SubclassMapping<DfsNonProdSource>
+    {
+        public DfsNonProdSourceMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DFS_NONPROD_SOURCE);
+        }
+    }
+
+    public class DfsProdSourceMapping : SubclassMapping<DfsProdSource>
+    {
+        public DfsProdSourceMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.DFS_PROD_SOURCE);
         }
     }
 }

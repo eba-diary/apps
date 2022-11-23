@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null,null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -81,7 +81,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 ShortName = "Foo",
@@ -116,7 +116,7 @@ namespace Sentry.data.Core.Tests
 
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -153,7 +153,7 @@ namespace Sentry.data.Core.Tests
 
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -191,7 +191,7 @@ namespace Sentry.data.Core.Tests
 
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -218,7 +218,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -245,7 +245,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
@@ -281,7 +281,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 0,
                 DatasetName = "FooBar",
@@ -319,7 +319,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 0,
                 DatasetName = "FooBar",
@@ -358,7 +358,7 @@ namespace Sentry.data.Core.Tests
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
             var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, null, null);
-            var dataset = new DatasetDto()
+            var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 1000,
                 DatasetName = "FooBar",
@@ -382,7 +382,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_DatasetName_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.DatasetName = "NewName");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.DatasetName = "NewName");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -393,7 +393,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_ShortName_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.ShortName = "NewName");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.ShortName = "NewName");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -404,7 +404,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_SAIDKeyCode_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.SAIDAssetKeyCode = "NEWN");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.SAIDAssetKeyCode = "NEWN");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -415,7 +415,7 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_NamedEnvironment_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.NamedEnvironment = "PROD");
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.NamedEnvironment = "PROD");
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
@@ -426,13 +426,13 @@ namespace Sentry.data.Core.Tests
         public void UpdateAndSaveDataset_NamedEnvironmentType_Idempotent()
         {
             //Arrange
-            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetDto a) => a.NamedEnvironmentType = NamedEnvironmentType.Prod);
+            Setup_UpdateAndSaveDataset(out var newDataset, out var datasetService, (DatasetSchemaDto a) => a.NamedEnvironmentType = NamedEnvironmentType.Prod);
 
             //Act/Assert
             Assert.ThrowsException<ValidationException>(() => datasetService.UpdateAndSaveDataset(newDataset));
         }
 
-        private static void Setup_UpdateAndSaveDataset(out DatasetDto newDataset, out DatasetService datasetService, Action<DatasetDto> datasetDtoUpdateAction)
+        private static void Setup_UpdateAndSaveDataset(out DatasetSchemaDto newDataset, out DatasetService datasetService, Action<DatasetSchemaDto> datasetDtoUpdateAction)
         {
             var context = new Mock<IDatasetContext>();
             var dataset = new Dataset()
@@ -445,7 +445,7 @@ namespace Sentry.data.Core.Tests
                 NamedEnvironment = "TEST",
                 NamedEnvironmentType = NamedEnvironmentType.NonProd
             };
-            newDataset = new DatasetDto()
+            newDataset = new DatasetSchemaDto()
             {
                 DatasetId = 1,
                 DatasetName = "Foo",
@@ -500,7 +500,7 @@ namespace Sentry.data.Core.Tests
         public void GetExceptRows_Test()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -539,15 +539,17 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetExceptRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetNonParquetFiles(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetExceptRows(1,1,"query",AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetNonParquetFiles(1,1,"query",AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -557,7 +559,7 @@ namespace Sentry.data.Core.Tests
         public void GetExceptRows_Test_Null_SchemaObject()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -596,15 +598,17 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetExceptRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetNonParquetFiles(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetExceptRows(1, 1, "query", AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetNonParquetFiles(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -614,7 +618,7 @@ namespace Sentry.data.Core.Tests
         public void GetExceptRows_Check_If_Table_Exists_ArgumentException_Thrown()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -646,19 +650,21 @@ namespace Sentry.data.Core.Tests
             datasetFileConfigDtos.Add(configDto);
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
-            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => auditService.GetExceptRows(1, 1, "query", AuditSearchType.dateSelect));
+            Assert.ThrowsException<ArgumentException>(() => auditService.GetNonParquetFiles(1, 1, "query", AuditSearchType.dateSelect));
+
+            mr.VerifyAll();
         }
 
         [TestMethod]
         public void GetRowCountCompare_Test()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -697,15 +703,17 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetCompareRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetComparedRowCount(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -723,7 +731,7 @@ namespace Sentry.data.Core.Tests
         public void GetRowCountCompare_Test_Null_SchemaObject()
         {
             // Arrange 
-            MockRepository mr = new MockRepository(MockBehavior.Default);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             Mock<ISnowProvider> snowProvider = new Mock<ISnowProvider>();
 
@@ -762,15 +770,17 @@ namespace Sentry.data.Core.Tests
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
 
-            snowProvider.Setup(sp => sp.GetCompareRows(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
+            snowProvider.Setup(sp => sp.GetComparedRowCount(It.IsAny<SnowCompareConfig>())).Returns(dataTable);
             snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act
-            BaseAuditDto baseAuditDto = auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect);
+            BaseAuditDto baseAuditDto = auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect);
 
             // Assert
+            mr.VerifyAll();
+
             Assert.AreEqual("agentevents_20220827235951657_20220828045952000.json", baseAuditDto.AuditDtos[0].DatasetFileName);
             Assert.AreEqual("agentevents_20220911155957552_20220911205958000.json", baseAuditDto.AuditDtos[1].DatasetFileName);
             Assert.AreEqual("agentevents_20220818090453182_20220818140454000.json", baseAuditDto.AuditDtos[2].DatasetFileName);
@@ -820,12 +830,12 @@ namespace Sentry.data.Core.Tests
             datasetFileConfigDtos.Add(configDto);
 
             configService.Setup(cs => cs.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(datasetFileConfigDtos);
-            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            snowProvider.Setup(sp => sp.CheckIfExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
 
             AuditService auditService = new AuditService(configService.Object, snowProvider.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => auditService.GetRowCountCompare(1, 1, "query", AuditSearchType.dateSelect));
+            Assert.ThrowsException<ArgumentException>(() => auditService.GetComparedRowCount(1, 1, "query", AuditSearchType.dateSelect));
         }
 
         [TestCategory("Core DatasetService")]
@@ -1318,11 +1328,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(new DateTime(2022, 6, 21, 9, 0, 0), dto.ChangedDtm);
             Assert.IsTrue(dto.CanDisplay);
             Assert.AreEqual(1, dto.OriginationId);
-            Assert.AreEqual("FileConfigDescription", dto.ConfigFileDesc);
-            Assert.AreEqual("FileConfigName", dto.ConfigFileName);
-            Assert.AreEqual(",", dto.Delimiter);
-            Assert.AreEqual(4, dto.FileExtensionId);
-            Assert.AreEqual(5, dto.DatasetScopeTypeId);
             Assert.AreEqual("CategoryName", dto.CategoryName);
             Assert.AreEqual(1, dto.CategoryNames.Count);
             Assert.IsTrue(dto.CategoryNames.Any(x => x == "CategoryName"));
@@ -1334,8 +1339,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(0, dto.AmountOfSubscriptions);
             Assert.AreEqual(0, dto.Views);
             Assert.IsTrue(dto.IsFavorite);
-            Assert.AreEqual(1, dto.DatasetFileConfigSchemas.Count);
-            Assert.IsTrue(dto.DatasetFileConfigSchemas.Any(x => x.ConfigId == 2 && x.SchemaId == 3 && x.SchemaName == "FileConfigName"));
             Assert.AreEqual(1, dto.DatasetScopeTypeNames.Count);
             Assert.IsTrue(dto.DatasetScopeTypeNames.Any(x => x.Key == "ScopeTypeName" && x.Value == "ScopeTypeDescription"));
             Assert.AreEqual(0, dto.DatasetFileCount);
@@ -1343,27 +1346,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Public", dto.DataClassificationDescription);
             Assert.AreEqual("Blue", dto.CategoryColor);
             Assert.AreEqual(1, dto.GroupAccessCount);
-        }
-
-        [TestMethod]
-        public void GetDatasetEnvironmentType_1_NonProd()
-        {
-            List<Dataset> datasets = new List<Dataset>()
-            {
-                new Dataset() { DatasetId = 1, NamedEnvironmentType = NamedEnvironmentType.NonProd },
-                new Dataset() { DatasetId = 2, NamedEnvironmentType = NamedEnvironmentType.Prod }
-            };
-
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
-            context.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
-
-            DatasetService datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
-
-            NamedEnvironmentType result = datasetService.GetDatasetEnvironmentType(1);
-            
-            Assert.AreEqual(NamedEnvironmentType.NonProd, result);
-
-            context.VerifyAll();
         }
     }
 }

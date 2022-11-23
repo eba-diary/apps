@@ -70,7 +70,7 @@ namespace HSZGOLDENEYE
 
                     foreach (RetrieverJob job in rtjob)
                     {
-                        Uri watchPath = new Uri(""); //job.GetUri(); //replaced with some junk since HSZ isn't used
+                        Uri watchPath = job.GetUri();
                         int configID = job.DatasetConfig.ConfigId;
 
                         //On initial run start all watch tasks for all configs

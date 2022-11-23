@@ -158,6 +158,18 @@ namespace Sentry.data.Infrastructure
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
             registry.For<IRecurringJobManager>().Singleton().Use<RecurringJobManager>().SelectConstructor(() => new RecurringJobManager());
 
+            switch (Configuration.Config.GetHostSetting("DfsRetrieverJobProviderType"))
+            {
+                case DfsRetrieverJobProviderTypes.ALL:
+                    registry.For<IDfsRetrieverJobProvider>().Use<AllDfsRetrieverJobProvider>();
+                    break;
+                case DfsRetrieverJobProviderTypes.QUAL:
+                    registry.For<IDfsRetrieverJobProvider>().Use<QualRetrieverJobProvider>();
+                    break;
+                default:
+                    registry.For<IDfsRetrieverJobProvider>().Use<ProdRetrieverJobProvider>();
+                    break;
+            }
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

@@ -1,4 +1,4 @@
-﻿using Namotion.Reflection;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Common;
@@ -63,13 +63,14 @@ namespace Sentry.data.Web.Controllers
         [Route("Config/Dataset/{id}")]
         public ActionResult Index(int id)
         {
+
             Dataset ds = _datasetContext.GetById(id);
 
             UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
 
             if (us != null && us.CanManageSchema)
             {
-                DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
+                DatasetSchemaDto dsDto = _DatasetService.GetDatasetSchemaDto(id);
 
                 List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
                 foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
@@ -81,29 +82,21 @@ namespace Sentry.data.Web.Controllers
                     model.DataFlowJobs = (jobs2.Item1 != null) ? jobs2.ToModel() : null;
 
                     //Add External RetrieverJobs associated with DataFlows to Model
-                    model.ExternalDataFlowJobs = new List<AssociatedDataFlowModel>();
-                    List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> extDataFlows = _configService.GetExternalDataFlowsBySchema(config);
-                    foreach (Tuple<DataFlowDetailDto, List<RetrieverJob>> extDataFlow in extDataFlows)
-                    {
-                        AssociatedDataFlowModel dataFlowModel = extDataFlow.ToModel();
-                        dataFlowModel.CLA4260_QuartermasterNamedEnvironmentTypeFilter = _featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue();
-                        dataFlowModel.DatasetEnvironmentType = dsDto.NamedEnvironmentType;
-                        model.ExternalDataFlowJobs.Add(dataFlowModel);
-                    }
-                    
+                    model.ExternalDataFlowJobs = _configService.GetExternalDataFlowsBySchema(config).ToModel();
                     configModelList.Add(model);
                 }
 
-                ManageConfigsModel mcm = new ManageConfigsModel
+                ManageConfigsModel mcm = new ManageConfigsModel()
                 {
                     DatasetId = dsDto.DatasetId,
                     DatasetName = dsDto.DatasetName,
                     CategoryColor = dsDto.CategoryColor,
                     DatasetFileConfigs = configModelList,
                     DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
-                    DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
-                    Security = _DatasetService.GetUserSecurityForDataset(id)
+                    DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue()
                 };
+
+                mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
 
                 CreateEvent("Viewed Dataset Configuration Page", ds.DatasetId);
 
@@ -406,7 +399,7 @@ namespace Sentry.data.Web.Controllers
                         ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
                     };
 
-                    rj.DataSource.CalcRelativeUri(rj, dfc.ParentDataset.NamedEnvironmentType, _featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue());
+                    rj.DataSource.CalcRelativeUri(rj);
 
                     jobList.Add(rj);
                     dfc.RetrieverJobs = jobList;
@@ -519,7 +512,7 @@ namespace Sentry.data.Web.Controllers
                     rj.DatasetConfig = dfc;
                     rj.Modified = DateTime.Now;
 
-                    rj.DataSource.CalcRelativeUri(rj, dfc.ParentDataset.NamedEnvironmentType, _featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue());
+                    rj.DataSource.CalcRelativeUri(rj);
 
                     _datasetContext.SaveChanges();
 
@@ -558,6 +551,12 @@ namespace Sentry.data.Web.Controllers
         public ActionResult HeaderEntryRow()
         {
             return PartialView("_Headers");
+        }
+
+        [Route("Config/AddToken")]
+        public ActionResult AddToken()
+        {
+            return PartialView("_DataSourceToken");
         }
 
         public ActionResult FieldEntryRow()
@@ -1036,12 +1035,17 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public JsonResult SourceDetails (int Id)
+        public ContentResult SourceDetails (int Id)
         {            
             DataSourceDto dto = _configService.GetDataSourceDto(Id);
             DataSourceModel model = new DataSourceModel(dto);
-
-            return Json(model, JsonRequestBehavior.AllowGet);
+            var jsonSource = JsonConvert.SerializeObject(model,
+                Formatting.None,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+            return Content(jsonSource, "application/json");
         }
 
         [HttpGet]
@@ -1109,6 +1113,15 @@ namespace Sentry.data.Web.Controllers
             model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
 
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        public PartialViewResult _RetrieverJob(int jobId)
+        {
+            RetrieverJob job = _datasetContext.GetById<RetrieverJob>(jobId);
+
+            ViewData["EnableJobControls"] = "false";
+            ViewData["Color"] = "blue";
+            return PartialView("~/Views/RetrieverJob/_RetrieverJob.cshtml", job);
         }
 
         [HttpGet]

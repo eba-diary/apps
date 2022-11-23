@@ -12,7 +12,7 @@ namespace Sentry.data.Infrastructure
 
         public GenericHttpsDataFlowProvider(Lazy<IDatasetContext> datasetContext, Lazy<IConfigService> configService,
                 Lazy<IEncryptionService> encryptionService, Lazy<IJobService> jobService, IDataFlowService dataFlowService,
-                IRestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures)
+                IRestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures, authorizationProvider)
         {
             _dataFlowService = dataFlowService;
         }
@@ -42,7 +42,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                _targetPath = $"{_jobService.Value.GetTargetPath(_targetStep, _job)}.{extension}";
+                _targetPath = $"{_targetStep.GetTargetPath(_job)}.{extension}";
             }
             catch (Exception ex)
             {

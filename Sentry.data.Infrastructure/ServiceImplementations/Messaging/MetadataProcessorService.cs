@@ -1,4 +1,5 @@
-﻿using Sentry.Messaging.Common;
+﻿using Sentry.data.Core;
+using Sentry.Messaging.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,13 @@ namespace Sentry.data.Infrastructure
 {
     public class MetadataProcessorService
     {
-        
+        private readonly IDataFeatures dataFeatures;
+
+        public MetadataProcessorService(IDataFeatures dataFeatures)
+        {
+            this.dataFeatures = dataFeatures;
+        }
+
         public void Run()
         {
             ConsumptionConfig cfg = new ConsumptionConfig();
@@ -39,10 +46,16 @@ namespace Sentry.data.Infrastructure
 
         private IMessageConsumer<string> GetKafkamessageConsumer(string groupId)
         {
+            var topicList = Configuration.Config.GetHostSetting("DSCEventTopic_Confluent");
+            if (dataFeatures.CLA4411_Goldeneye_Consume_NP_Topics.GetValue() && !string.IsNullOrEmpty(Configuration.Config.GetHostSetting("DSCEventTopic_Confluent_NP")))
+            {
+                topicList += "," + Configuration.Config.GetHostSetting("DSCEventTopic_Confluent_NP");
+            }
+
             //domain context needed to retrieve config
             KafkaSettings settings = new KafkaSettings(groupId,
                                             KafkaHelper.GetKafkaBrokers(),
-                                            KafkaHelper.Get_Consumer_Topic_List_For_DSCEvents(),
+                                            topicList,
                                             Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
                                             (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false,
                                             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, KafkaHelper.GetCertPath()), 

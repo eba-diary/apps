@@ -1,7 +1,6 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
-using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -45,9 +44,17 @@ namespace Sentry.data.Core
             _datasetFileService = datasetFileService;
         }
 
+        public DatasetSchemaDto GetDatasetSchemaDto(int id)
+        {
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
+            DatasetSchemaDto dto = new DatasetSchemaDto();
+            MapToDto(ds, dto);
+
+            return dto;
+        }
+
         public DatasetDto GetDatasetDto(int id)
         {
-            // TODO: CLA-2765 - Filter only datasets with ACTIVE or PENDING_DELETE status
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
@@ -111,7 +118,7 @@ namespace Sentry.data.Core
 
             return summaryResults;
         }
-        private List<DatasetDto> GetDatasetDtos(bool active)
+        private List<DatasetSchemaDto> GetDatasetDtos(bool active)
         {
             IQueryable<Dataset> datasetQueryable = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS");
             if (active)
@@ -121,20 +128,20 @@ namespace Sentry.data.Core
 
                 List<Dataset> dsList = datasetQueryable.FetchAllChildren(_datasetContext).ToList();
 
-                List<DatasetDto> dtoList = new List<DatasetDto>();
+                List<DatasetSchemaDto> dtoList = new List<DatasetSchemaDto>();
                 foreach (Dataset ds in dsList)
                 {
-                    DatasetDto dto = new DatasetDto();
+                    DatasetSchemaDto dto = new DatasetSchemaDto();
                     MapToDto(ds, dto);
                     dtoList.Add(dto);
                 }
                 return dtoList;
         }
-        public List<DatasetDto> GetAllDatasetDto()
+        public List<DatasetSchemaDto> GetAllDatasetDto()
         {
             return GetDatasetDtos(false);
         } 
-        public List<DatasetDto> GetAllActiveDatasetDto()
+        public List<DatasetSchemaDto> GetAllActiveDatasetDto()
         {
             return GetDatasetDtos(true);
         }
@@ -339,7 +346,14 @@ namespace Sentry.data.Core
             return request;
         }
 
-        public int CreateAndSaveNewDataset(DatasetDto dto)
+        public int Create(DatasetDto dto)
+        {
+            Dataset ds = CreateDataset(dto);
+            _datasetContext.Add(ds);
+            return ds.DatasetId;
+        }
+
+        public int CreateAndSaveNewDataset(DatasetSchemaDto dto)
         {
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
@@ -362,7 +376,7 @@ namespace Sentry.data.Core
             return ds.DatasetId;
         }
 
-        public void UpdateAndSaveDataset(DatasetDto dto)
+        public void UpdateAndSaveDataset(DatasetSchemaDto dto)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
 
@@ -440,7 +454,7 @@ namespace Sentry.data.Core
         /// <summary>
         /// Verify that certain idempotent fields have not been changed
         /// </summary>
-        private static void ValidateIdempotentFields(DatasetDto dto, Dataset ds)
+        private static void ValidateIdempotentFields(DatasetSchemaDto dto, Dataset ds)
         {
             if (ds.DatasetName != dto.DatasetName)
             {
@@ -540,7 +554,7 @@ namespace Sentry.data.Core
 
        
 
-        public async Task<ValidationException> ValidateAsync(DatasetDto dto)
+        public async Task<ValidationException> ValidateAsync(DatasetSchemaDto dto)
         {
             ValidationResults results = new ValidationResults();
 
@@ -630,13 +644,8 @@ namespace Sentry.data.Core
                                                                       !x.IsBundled);
         }
 
-        public NamedEnvironmentType GetDatasetEnvironmentType(int datasetId)
-        {
-            return _datasetContext.Datasets.Where(x => x.DatasetId == datasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
-        }
-
         #region "private functions"
-        private static void ValidateDatasetCategories(DatasetDto dto, ValidationResults results)
+        private static void ValidateDatasetCategories(DatasetSchemaDto dto, ValidationResults results)
         {
             if (dto.DatasetCategoryIds == null)
             {
@@ -651,7 +660,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void ValidateDatasetName(DatasetDto dto, ValidationResults results)
+        private void ValidateDatasetName(DatasetSchemaDto dto, ValidationResults results)
         {
             if (string.IsNullOrEmpty(dto.DatasetName)) //if no name, add error
             {
@@ -667,7 +676,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void ValidateDatasetShortName(DatasetDto dto, ValidationResults results)
+        private void ValidateDatasetShortName(DatasetSchemaDto dto, ValidationResults results)
         {
             if (string.IsNullOrWhiteSpace(dto.ShortName))
             {
@@ -780,6 +789,12 @@ namespace Sentry.data.Core
 
             return ds;
         }
+        private Dataset CreateDataset(DatasetSchemaDto dto)
+        {
+            Dataset newDS = CreateDataset((DatasetDto)dto);            
+
+            return newDS;
+        }
 
         /// <summary>
         /// Retrieves the Asset for the given SAID Asset Key Code.
@@ -837,11 +852,6 @@ namespace Sentry.data.Core
             dto.CanDisplay = ds.CanDisplay;
             dto.TagIds = new List<string>();
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
-            dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
-            dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
-            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.Delimiter;
-            dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
-            dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
@@ -850,9 +860,23 @@ namespace Sentry.data.Core
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
             dto.AlternateContactEmail = ds.AlternateContactEmail;
         }
+        
+        private void MapToDto(Dataset ds, DatasetSchemaDto dto)
+        {
+            //Map DatasetDto properties
+            MapToDto(ds, (DatasetDto)dto);
+
+            dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
+            dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
+            dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
+            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.Delimiter;
+            dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
+            dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
+        }
 
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
         {
+            //Map DatasetSchemaDto properites
             MapToDto(ds, dto);
 
             IApplicationUser user = _userService.GetCurrentUser();

@@ -278,7 +278,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void DfsDataFlowBasic_CalcRelativeUri_FeatureOff()
+        public void DfsDataFlowBasic_CalcRelativeUri()
         {
             RetrieverJob job = new RetrieverJob()
             {
@@ -287,49 +287,9 @@ namespace Sentry.data.Core.Tests
 
             DfsDataFlowBasic dataSource = new DfsDataFlowBasic();
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.NonProd, "NonProd");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("file:///c:/tmp/DatasetLoader/000001", result.ToString());
-        }
-
-        [TestMethod]
-        public void DfsDataFlowBasic_CalcRelativeUri_FeatureOn_NonProdEnv()
-        {
-            RetrieverJob job = new RetrieverJob()
-            {
-                DataFlow = new DataFlow()
-                {
-                    FlowStorageCode = "000001",
-                    SaidKeyCode = "SAID",
-                    NamedEnvironment = "DEV"
-                }
-            };
-
-            DfsDataFlowBasic dataSource = new DfsDataFlowBasic();
-
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.NonProd, "");
-
-            Assert.AreEqual("file:///c:/tmp/DatasetLoaderDSC/DevNP/SAID/DEV/000001", result.ToString());
-        }
-
-        [TestMethod]
-        public void DfsDataFlowBasic_CalcRelativeUri_FeatureOn_ProdEnv()
-        {
-            RetrieverJob job = new RetrieverJob()
-            {
-                DataFlow = new DataFlow()
-                {
-                    FlowStorageCode = "000001",
-                    SaidKeyCode = "SAID",
-                    NamedEnvironment = "DEV"
-                }
-            };
-
-            DfsDataFlowBasic dataSource = new DfsDataFlowBasic();
-
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
-
-            Assert.AreEqual("file:///c:/tmp/DatasetLoaderDSC/Dev/SAID/DEV/000001", result.ToString());
         }
 
         [TestMethod]
@@ -353,7 +313,7 @@ namespace Sentry.data.Core.Tests
 
             DfsBasic dataSource = new DfsBasic();
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("file:///c:/tmp/DatasetLoader/sentry/dataset_name/config_name", result.ToString());
         }
@@ -368,9 +328,45 @@ namespace Sentry.data.Core.Tests
 
             DfsSource dataSource = new DfsSource();
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("file:///c:/tmp/parent/child", result.ToString());
+        }
+
+        [TestMethod]
+        public void DfsNonProdSource_CalcRelativeUri()
+        {
+            RetrieverJob job = new RetrieverJob()
+            {
+                RelativeUri = "parent/childNP"
+            };
+
+            DfsNonProdSource dataSource = new DfsNonProdSource()
+            {
+                BaseUri = new Uri("c:/tmp/nonprod/")
+            };
+
+            Uri result = dataSource.CalcRelativeUri(job);
+
+            Assert.AreEqual("file:///c:/tmp/nonprod/parent/childNP", result.ToString());
+        }
+
+        [TestMethod]
+        public void DfsProdSource_CalcRelativeUri()
+        {
+            RetrieverJob job = new RetrieverJob()
+            {
+                RelativeUri = "parent/child"
+            };
+
+            DfsProdSource dataSource = new DfsProdSource()
+            {
+                BaseUri = new Uri("c:/tmp/prod/")
+            };
+
+            Uri result = dataSource.CalcRelativeUri(job);
+
+            Assert.AreEqual("file:///c:/tmp/prod/parent/child", result.ToString());
         }
 
         [TestMethod]
@@ -386,7 +382,7 @@ namespace Sentry.data.Core.Tests
                 BaseUri = new Uri("c:/tmp")
             };
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("file:///c:/tmp/parent/child", result.ToString());
         }
@@ -404,7 +400,7 @@ namespace Sentry.data.Core.Tests
                 BaseUri = new Uri("https://www.google.com")
             };
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("https://www.google.com/parent/child", result.ToString());
         }
@@ -416,7 +412,7 @@ namespace Sentry.data.Core.Tests
 
             JavaAppSource dataSource = new JavaAppSource();
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.IsNull(result);
         }
@@ -440,7 +436,7 @@ namespace Sentry.data.Core.Tests
                 BaseUri = new Uri("http://s3-us-east-2.amazonaws.com/bucket")
             };
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("http://s3-us-east-2.amazonaws.com/bucket/000001", result.ToString());
         }
@@ -451,7 +447,7 @@ namespace Sentry.data.Core.Tests
             RetrieverJob job = new RetrieverJob();
             S3Source dataSource = new S3Source();
 
-            Assert.ThrowsException<NotImplementedException>(() => dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, ""));
+            Assert.ThrowsException<NotImplementedException>(() => dataSource.CalcRelativeUri(job));
         }
 
         [TestMethod]
@@ -467,7 +463,7 @@ namespace Sentry.data.Core.Tests
                 BaseUri = new Uri("c:/tmp")
             };
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("file:///c:/tmp/parent/child", result.ToString());
         }
@@ -488,7 +484,7 @@ namespace Sentry.data.Core.Tests
 
             DfsBasicHsz dataSource = new DfsBasicHsz();
 
-            Uri result = dataSource.CalcRelativeUri(job, GlobalEnums.NamedEnvironmentType.Prod, "");
+            Uri result = dataSource.CalcRelativeUri(job);
 
             Assert.AreEqual("file:///c:/tmp/DatasetLoader/000001", result.ToString());
         }

@@ -26,7 +26,7 @@ namespace Sentry.data.Core
         List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName);
 
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
-        int CreateandSaveDataFlow(DataFlowDto dto);
+        int CreateDataFlow(DataFlowDto dto);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);
@@ -107,7 +107,6 @@ namespace Sentry.data.Core
         /// <param name="id"></param>
         /// <returns></returns>
         RetrieverJobDto GetAssociatedRetrieverJobDto(int id);
-        List<RetrieverJob> GetExternalRetrieverJobsByDataFlowId(int dataFlowId); 
 
         bool ValidateStepIdAndDatasetFileIds(int stepId, List<int> datasetFileIds);
 
@@ -123,6 +122,7 @@ namespace Sentry.data.Core
         string GetSecurityGroup(int dataflowId);
 
 
+        int UpdateDataFlow(DataFlowDto dfDto);
         int UpdateandSaveDataFlow(DataFlowDto dfDto);
 
         void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status);

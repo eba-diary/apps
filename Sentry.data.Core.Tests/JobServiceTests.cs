@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace Sentry.data.Core.Tests
             Mock<IRecurringJobManager> jobManager = mr.Create<IRecurringJobManager>();
             jobManager.Setup(x => x.RemoveIfExists(It.IsAny<string>()));
 
-            var JobService = new JobService(context.Object, null, jobManager.Object, null, null);
+            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null);
 
             // Act
             JobService.Delete(job.Id, user.Object, true);
@@ -59,7 +60,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(job.Id)).Returns(job);
 
-            var JobService = new JobService(context.Object, null, null, null, null);
+            var JobService = new JobService(context.Object, null, null, null, null, null);
 
             // Act
             bool isSuccessfull = JobService.Delete(job.Id, user.Object, false);
@@ -84,7 +85,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(job.Id)).Returns(job);
 
-            var JobService = new JobService(context.Object, null, null, null, null);
+            var JobService = new JobService(context.Object, null, null, null, null, null);
 
             // Act
             bool isSuccessfull = JobService.Delete(job.Id, user.Object, true);
@@ -109,7 +110,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(It.IsAny<int>())).Returns((RetrieverJob)null);
 
-            var JobService = new JobService(context.Object, null, null, null, null);
+            var JobService = new JobService(context.Object, null, null, null, null, null);
 
             // Act
             bool isSuccessfull = JobService.Delete(1, user.Object, true);
@@ -134,7 +135,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(It.IsAny<int>())).Returns((RetrieverJob)null);
 
-            var JobService = new JobService(context.Object, null, null, null, null);
+            var JobService = new JobService(context.Object, null, null, null, null, null);
 
             // Act
             bool isSuccessfull = JobService.Delete(1, user.Object, false);
@@ -161,7 +162,7 @@ namespace Sentry.data.Core.Tests
             Mock<IRecurringJobManager> jobManager = mr.Create<IRecurringJobManager>();
             jobManager.Setup(x => x.RemoveIfExists(It.IsAny<string>()));
 
-            var JobService = new JobService(context.Object, null, jobManager.Object, null, null);
+            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null);
 
             // Act
             JobService.Delete(job.Id, user.Object, true);
@@ -188,7 +189,7 @@ namespace Sentry.data.Core.Tests
             Mock<IRecurringJobManager> jobManager = mr.Create<IRecurringJobManager>();
             jobManager.Setup(x => x.RemoveIfExists(It.IsAny<string>()));
 
-            var JobService = new JobService(context.Object, null, jobManager.Object, null, null);
+            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null);
 
             // Act
             JobService.Delete(job.Id, user.Object, false);
@@ -222,7 +223,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<DataFlow>(3)).Returns(new DataFlow() { Id = 31 });
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
             RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
 
@@ -306,7 +307,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
             RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
 
@@ -354,7 +355,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
             RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
 
@@ -406,7 +407,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
             RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
 
@@ -426,7 +427,7 @@ namespace Sentry.data.Core.Tests
             string newValue = "newValue";
             string defaultValue = "defaultValue";
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder_newValue, elName, newValue, defaultValue);
@@ -448,7 +449,7 @@ namespace Sentry.data.Core.Tests
             string newValue = null;
             string defaultValue = "defaultValue";
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder, elName, newValue, defaultValue);
@@ -469,7 +470,7 @@ namespace Sentry.data.Core.Tests
             int newValue = 1;
             int defaultValue = 99;
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder_newValue, elName, newValue, defaultValue);
@@ -491,7 +492,7 @@ namespace Sentry.data.Core.Tests
             int newValue = 1;
             int defaultValue = 99;
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder, elName, newValue, defaultValue);
@@ -511,7 +512,7 @@ namespace Sentry.data.Core.Tests
             string[] argsNewValue = new string[] { "\"type\":\"alpha\"", "\"count\":5678" };
             string[] argsDefaultValue = new string[] { "\"abc\":\"zyz\"", "\"123\":9999" };
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             //Act
             jobService.AddLivyArgumentsElement(builder_newValue, argsNewValue, argsDefaultValue);
@@ -574,7 +575,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<JavaAppSource>(It.IsAny<int>())).Returns(DataSource);
 
-            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null) { CallBase = true };
+            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null, null) { CallBase = true };
             service.Setup(s => s.GenerateUniqueLivySessionName(DataSource)).Returns("session_name");
 
             //Act
@@ -637,7 +638,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<JavaAppSource>(It.IsAny<int>())).Returns(DataSource);
 
-            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null) { CallBase = true };
+            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null, null) { CallBase = true };
             service.Setup(s => s.GenerateUniqueLivySessionName(DataSource)).Returns("session_name");
 
             //Act
@@ -664,7 +665,7 @@ namespace Sentry.data.Core.Tests
                 JobGuid = Guid.Parse("ADBB3009-2B71-4A20-B416-8858C77C216E"),
             };
 
-            JobService service = new JobService(null, null, null, null, null);
+            JobService service = new JobService(null, null, null, null, null, null);
 
             //Act
             var result = service.MapToSubmission(retrieverJob, javaOptionsOverrideDto);
@@ -723,7 +724,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Add(It.IsAny<JobHistory>()));
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object) { CallBase = true };
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null) { CallBase = true };
             jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
             jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
 
@@ -788,7 +789,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Add(It.IsAny<JobHistory>()));
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object) { CallBase = true };
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null) { CallBase = true };
             jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
             jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
 
@@ -816,7 +817,7 @@ namespace Sentry.data.Core.Tests
                 Name = "JavaSrc"
             };
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             //Act
             string result = jobService.GenerateUniqueLivySessionName(javaAppSource);
@@ -865,7 +866,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object) { CallBase = true };
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null) { CallBase = true };
             jobService.Setup(s => s.GetClusterUrl(It.IsAny<JobHistory>())).Returns("abc.com");
 
             _ = await jobService.Object.GetApacheLivyBatchStatusAsync(jobHistory);
@@ -926,7 +927,7 @@ namespace Sentry.data.Core.Tests
 
             var lr = JsonConvert.DeserializeObject<LivyReply>(livyResponse);
 
-            JobService jobService = new JobService(null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null);
 
             JobHistory result = jobService.MapToJobHistory(jobHistory, lr);
 
@@ -934,458 +935,197 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void GetDataSourceUri_ProdDataset()
+        public void GetDfsRetrieverJobs_Null_NamedEnvironmentTypeFeatureOff_DfsMonitorDtos()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
 
-            Dataset dataset = new Dataset()
-            { 
-                DatasetId = 1,
-                NamedEnvironmentType = NamedEnvironmentType.Prod
-            };
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("NonProd");
 
-            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
-            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset }.AsQueryable());
-
-            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-
-            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
-
-            RetrieverJob job = new RetrieverJob()
-            {
-                DataFlow = new DataFlow()
-                {
-                    FlowStorageCode = "000001",
-                    SaidKeyCode = "SAID",
-                    NamedEnvironment = "DEV",
-                    DatasetId = 1
-                },
-                DataSource = new DfsDataFlowBasic()
-            };
-
-            Uri result = jobService.GetDataSourceUri(job);
-
-            Assert.AreEqual("file:///c:/tmp/DatasetLoaderDSC/Dev/SAID/DEV/000001", result.ToString());
-
-            mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetTargetPath_DfsBasicJob_HTTPSSourceJob()
-        {
-            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
-
-            Dataset dataset = new Dataset()
-            {
-                DatasetId = 1,
-                NamedEnvironmentType = NamedEnvironmentType.Prod
-            }; 
-            
-            Dataset dataset2 = new Dataset()
-            {
-                DatasetId = 2,
-                NamedEnvironmentType = NamedEnvironmentType.Prod
-            };
-
-            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
-            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset, dataset2 }.AsQueryable());
-
-            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-
-            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
-
-            RetrieverJob dfsBasicJob = new RetrieverJob()
-            {
-                DatasetConfig = new DatasetFileConfig()
-                {
-                    Name = "Config Name",
-                    ParentDataset = new Dataset()
-                    {
-                        DatasetName = "Dataset Name",
-                        DatasetCategories = new List<Category>()
-                        {
-                            new Category() { Name = "Sentry" }
-                        }
-                    }
-                },
-                DataFlow = new DataFlow() { DatasetId = 1 },
-                DataSource = new DfsBasic()
-            };
-
-            RetrieverJob httpsSourceJob = new RetrieverJob()
-            {
-                RelativeUri = "parent/child",
-                JobOptions = new RetrieverJobOptions()
-                {
-                    TargetFileName = "targetfilename",
-                    CompressionOptions = new Compression() { IsCompressed = false }
-                },
-                DataFlow = new DataFlow() { DatasetId = 2 },
-                DataSource = new HTTPSSource()
-                {
-                    BaseUri = new Uri("https://www.google.com")
-                }
-            };
-
-            string result = jobService.GetTargetPath(dfsBasicJob, httpsSourceJob);
-
-            Assert.AreEqual("c:\\tmp\\DatasetLoader\\sentry\\dataset_name\\config_name\\targetfilename", result);
-
-            mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetTargetPath_S3BasicJob_FtpSourceJob()
-        {
-            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
-
-            Dataset dataset = new Dataset()
-            {
-                DatasetId = 1,
-                NamedEnvironmentType = NamedEnvironmentType.Prod
-            };
-
-            Dataset dataset2 = new Dataset()
-            {
-                DatasetId = 2,
-                NamedEnvironmentType = NamedEnvironmentType.Prod
-            };
-
-            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
-            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset, dataset2 }.AsQueryable());
-
-            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-
-            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
-
-            RetrieverJob s3BasicJob = new RetrieverJob()
-            {
-                DatasetConfig = new DatasetFileConfig()
-                {
-                    Schema = new FileSchema()
-                    {
-                        StorageCode = "000001"
-                    }
-                },
-                DataFlow = new DataFlow() { DatasetId = 1 },
-                DataSource = new S3Basic()
-                {
-                    BaseUri = new Uri("http://s3-us-east-2.amazonaws.com/bucket")
-                }
-            };
-
-            RetrieverJob ftpSourceJob = new RetrieverJob()
-            {
-                RelativeUri = "parent/child/filename.txt",
-                JobOptions = new RetrieverJobOptions()
-                {
-                    TargetFileName = "filename",
-                    CompressionOptions = new Compression() { IsCompressed = false }
-                },
-                DataFlow = new DataFlow() { DatasetId = 2 },
-                DataSource = new FtpSource()
-                {
-                    BaseUri = new Uri("c:/tmp")
-                }
-            };
-
-            string result = jobService.GetTargetPath(s3BasicJob, ftpSourceJob);
-
-            Assert.AreEqual("data-dev/droplocation/000001/filename.txt", result);
-
-            mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetTargetPath_NonBasicSource_Exception()
-        {
-            JobService jobService = new JobService(null, null, null, null, null);
-
-            RetrieverJob job = new RetrieverJob()
-            {
-                DataSource = new DfsDataFlowBasic()
-            };
-
-            Assert.ThrowsException<NotImplementedException>(() => jobService.GetTargetPath(job, null));
-        }
-
-        [TestMethod]
-        public void GetTargetPath_NotS3Drop_NotImplementedException()
-        {
-            JobService jobService = new JobService(null, null, null, null, null);
-
-            DataFlowStep step = new DataFlowStep()
-            {
-                DataAction_Type_Id = DataActionType.SchemaMap
-            };
-
-            Assert.ThrowsException<NotImplementedException>(() => jobService.GetTargetPath(step, null));
-        }
-
-        [TestMethod]
-        public void GetTargetPath_NotHttpsSource_NotImplementedException()
-        {
-            JobService jobService = new JobService(null, null, null, null, null);
-
-            DataFlowStep step = new DataFlowStep()
-            {
-                DataAction_Type_Id = DataActionType.ProducerS3Drop
-            };
-
-            RetrieverJob job = new RetrieverJob()
-            {
-                DataSource = new DfsDataFlowBasic()
-            };
-
-            Assert.ThrowsException<NotImplementedException>(() => jobService.GetTargetPath(step, job));
-        }
-
-        [TestMethod]
-        public void GetTargetPath_ProducerS3Drop_HttpsSource()
-        {
-            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
-
-            Dataset dataset = new Dataset()
-            {
-                DatasetId = 1,
-                NamedEnvironmentType = NamedEnvironmentType.Prod
-            };
-
-            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
-            context.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset }.AsQueryable());
-
-            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-
-            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
-
-            DataFlowStep step = new DataFlowStep()
-            {
-                DataAction_Type_Id = DataActionType.ProducerS3Drop,
-                TriggerKey = "bucket\\key\\"
-            };
-
-            RetrieverJob job = new RetrieverJob()
-            {
-                RelativeUri = "parent/child",
-                JobOptions = new RetrieverJobOptions()
-                {
-                    TargetFileName = "targetfilename",
-                    CompressionOptions = new Compression() { IsCompressed = false }
-                },
-                DataFlow = new DataFlow() { DatasetId = 2 },
-                DataSource = new HTTPSSource()
-                {
-                    BaseUri = new Uri("https://www.google.com")
-                }
-            };
-
-            string result = jobService.GetTargetPath(step, job);
-
-            Assert.AreEqual("bucket\\key\\targetfilename", result);
-        }
-
-        [TestMethod]
-        public void GetRetrieverJobs_All()
-        {
-            List<RetrieverJob> jobs = new List<RetrieverJob>()
-            {
-                new RetrieverJob()
-                {
-                    ObjectStatus = ObjectStatusEnum.Active,
-                    DataSource = new DfsDataFlowBasic()
-                },
-                new RetrieverJob()
-                {
-                    ObjectStatus = ObjectStatusEnum.Deleted
-                },
-                new RetrieverJob()
-                {
-                    ObjectStatus = ObjectStatusEnum.Active,
-                    DataSource = new HTTPSSource()
-                }
-            };
-
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
-            context.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
-            context.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
-            context.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>().AsQueryable());
-
-            JobService jobService = new JobService(context.Object, null, null, null, null);
-
-            List<RetrieverJob> results = jobService.GetDfsRetrieverJobs();
-
-            Assert.AreEqual(1, results.Count);
-
-            context.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetRetrieverJobs_All_ThrowsException()
-        {
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>(MockBehavior.Strict);
-            context.SetupGet(x => x.RetrieverJob).Throws<Exception>();
-
-            JobService jobService = new JobService(context.Object, null, null, null, null);
-
-            Assert.ThrowsException<Exception>(() => jobService.GetDfsRetrieverJobs());
-
-            context.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetRetrieverJobs_NonProd()
-        {
-            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
-
-            Mock<IDatasetContext> context = GetDatasetContextForDfsRetrieverJobs(mockRepository);
-
-            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-
-            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
-
-            List<DfsMonitorDto> results = jobService.GetDfsRetrieverJobs(NamedEnvironmentType.NonProd);
-
-            Assert.AreEqual(1, results.Count);
-
-            DfsMonitorDto dto = results.First();
-            Assert.AreEqual(1, dto.JobId);
-            Assert.AreEqual("c:\\tmp\\DatasetLoaderDSC\\DevNP\\SAID\\DEV\\000001", dto.MonitorTarget);
-
-            mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetRetrieverJobs_Prod()
-        {
-            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
-
-            Mock<IDatasetContext> context = GetDatasetContextForDfsRetrieverJobs(mockRepository);
-
-            Mock<IDataFeatures> features = mockRepository.Create<IDataFeatures>();
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-
-            JobService jobService = new JobService(context.Object, null, null, features.Object, null);
-
-            List<DfsMonitorDto> results = jobService.GetDfsRetrieverJobs(NamedEnvironmentType.Prod);
-
-            Assert.AreEqual(1, results.Count);
-
-            DfsMonitorDto dto = results.First();
-            Assert.AreEqual(4, dto.JobId);
-            Assert.AreEqual("c:\\tmp\\DatasetLoaderDSC\\Dev\\DATA\\TEST\\000002", dto.MonitorTarget);
-
-            mockRepository.VerifyAll();
-        }
-
-        [TestMethod]
-        public void GetRetrieverJobs_ThrowsException()
-        {
-            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
-
-            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
-            context.SetupGet(x => x.RetrieverJob).Throws<Exception>();
-
-            JobService jobService = new JobService(context.Object, null, null, null, null);
-
-            Assert.ThrowsException<Exception>(() => jobService.GetDfsRetrieverJobs(NamedEnvironmentType.Prod));
-
-            mockRepository.VerifyAll();
-        }
-
-        #region Helpers
-        private Mock<IDatasetContext> GetDatasetContextForDfsRetrieverJobs(MockRepository mockRepository)
-        {
             List<RetrieverJob> jobs = new List<RetrieverJob>()
             {
                 new RetrieverJob()
                 {
                     Id = 1,
                     ObjectStatus = ObjectStatusEnum.Active,
-                    DataSource = new DfsDataFlowBasic() { Id = 1 },
-                    DataFlow = new DataFlow() { Id = 10 }
+                    DataSource = new DfsDataFlowBasic() { BaseUri = new Uri(@"c:\tmp\DatasetLoader\") },
+                    DataFlow = new DataFlow() { FlowStorageCode = "000001" }
                 },
                 new RetrieverJob()
                 {
                     Id = 2,
                     ObjectStatus = ObjectStatusEnum.Deleted,
-                    DataSource = new DfsDataFlowBasic() { Id = 1 },
-                    DataFlow = new DataFlow() { Id = 10 }
+                    DataSource = new DfsDataFlowBasic()
                 },
                 new RetrieverJob()
                 {
                     Id = 3,
                     ObjectStatus = ObjectStatusEnum.Active,
-                    DataSource = new DfsDataFlowBasic() { Id = 2 },
-                    DataFlow = new DataFlow() { Id = 10 }
+                    DataSource = new HTTPSSource()
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+
+            JobService service = new JobService(datasetContext.Object, null, null, dataFeatures.Object, null, null);
+
+            List<DfsMonitorDto> results = service.GetDfsRetrieverJobs(null);
+
+            Assert.AreEqual(1, results.Count);
+
+            DfsMonitorDto dto = results.First();
+            Assert.AreEqual(1, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\DatasetLoader\000001", dto.MonitorTarget);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetDfsRetrieverJobs_Null_NamedEnvironmentTypeFeatureOn_DfsMonitorDtos()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 1,
+                    DataSource = new DfsDataFlowBasic() { BaseUri = new Uri(@"c:\tmp\DatasetLoader\") },
+                    DataFlow = new DataFlow() { FlowStorageCode = "000001" }
                 },
                 new RetrieverJob()
                 {
-                    Id = 4,
-                    ObjectStatus = ObjectStatusEnum.Active,
-                    DataSource = new DfsDataFlowBasic() { Id = 1 },
-                    DataFlow = new DataFlow() { Id = 11 }
+                    Id = 2,
+                    RelativeUri = @"SAID\DEV\000002",
+                    DataSource = new DfsNonProdSource() {BaseUri = new Uri(@"c:\tmp\nonprod\") }
                 }
             };
 
-            List<DataFlow> dataFlows = new List<DataFlow>()
-            {
-                new DataFlow()
-                {
-                    Id = 10,
-                    DatasetId = 20,
-                    SaidKeyCode = "SAID",
-                    NamedEnvironment = "DEV",
-                    FlowStorageCode = "000001"
-                },
-                new DataFlow()
-                {
-                    Id = 11,
-                    DatasetId = 21,
-                    SaidKeyCode = "DATA",
-                    NamedEnvironment = "TEST",
-                    FlowStorageCode = "000002"
-                }
-            };
+            Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
+            dfsRetrieverJobProvider.Setup(x => x.GetDfsRetrieverJobs(null)).Returns(jobs);
 
-            List<DataSource> dataSources = new List<DataSource>()
-            {
-                new DfsDataFlowBasic()
-                {
-                    Id = 1
-                },
-                new HTTPSSource()
-                {
-                    Id = 2
-                }
-            };
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
 
-            List<Dataset> datasets = new List<Dataset>()
-            {
-                new Dataset()
-                {
-                    DatasetId = 20,
-                    NamedEnvironmentType = NamedEnvironmentType.NonProd
-                },
-                new Dataset()
-                {
-                    DatasetId = 21,
-                    NamedEnvironmentType = NamedEnvironmentType.Prod
-                }
-            };
+            List<DfsMonitorDto> results = service.GetDfsRetrieverJobs(null);
 
-            Mock<IDatasetContext> context = mockRepository.Create<IDatasetContext>();
-            context.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
-            context.SetupGet(x => x.DataFlow).Returns(dataFlows.AsQueryable());
-            context.SetupGet(x => x.DataSources).Returns(dataSources.AsQueryable());
-            context.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
+            Assert.AreEqual(2, results.Count);
 
-            return context;
+            DfsMonitorDto dto = results.First();
+            Assert.AreEqual(1, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\DatasetLoader\000001", dto.MonitorTarget);
+
+            dto = results.Last();
+            Assert.AreEqual(2, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\nonprod\SAID\DEV\000002", dto.MonitorTarget);
+
+            mockRepository.VerifyAll();
         }
-        #endregion
+
+        [TestMethod]
+        public void GetDfsRetrieverJobs_DEV_NamedEnvironmentTypeFeatureOn_DfsMonitorDtos()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 1,
+                    DataSource = new DfsDataFlowBasic() { BaseUri = new Uri(@"c:\tmp\DatasetLoader\") },
+                    DataFlow = new DataFlow() { FlowStorageCode = "000001" }
+                },
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    RelativeUri = @"SAID\DEV\000002",
+                    DataSource = new DfsNonProdSource() {BaseUri = new Uri(@"c:\tmp\nonprod\") }
+                }
+            };
+
+            Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
+            dfsRetrieverJobProvider.Setup(x => x.GetDfsRetrieverJobs("DEV")).Returns(jobs);
+            dfsRetrieverJobProvider.SetupGet(x => x.AcceptedNamedEnvironments).Returns(new List<string>() { "DEV" });
+
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+
+            List<DfsMonitorDto> results = service.GetDfsRetrieverJobs("DEV");
+
+            Assert.AreEqual(2, results.Count);
+
+            DfsMonitorDto dto = results.First();
+            Assert.AreEqual(1, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\DatasetLoader\000001", dto.MonitorTarget);
+
+            dto = results.Last();
+            Assert.AreEqual(2, dto.JobId);
+            Assert.AreEqual(@"c:\tmp\nonprod\SAID\DEV\000002", dto.MonitorTarget);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetDfsRetrieverJobs_DEV_NamedEnvironmentTypeFeatureOn_DfsRetrieverJobException()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
+            dfsRetrieverJobProvider.SetupGet(x => x.AcceptedNamedEnvironments).Returns(new List<string>() { "TEST", "NRTEST" });
+
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+
+            Assert.ThrowsException<DfsRetrieverJobException>(() => service.GetDfsRetrieverJobs("DEV"), "The requesting named environment 'DEV' is not an accepted named environment (TEST, NRTEST).");
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void InstantiateJobsForCreation_DfsNonProdSource()
+        {
+            JobService service = new JobService(null, null, null, null, null, null);
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                FlowStorageCode = "000001"
+            };
+
+            DataSource dataSource = new DfsNonProdSource();
+
+            RetrieverJob result = service.InstantiateJobsForCreation(dataFlow, dataSource);
+
+            Assert.AreEqual("Instant", result.Schedule);
+            Assert.AreEqual("SAID/DEV/000001", result.RelativeUri);
+        }
+
+        [TestMethod]
+        public void InstantiateJobsForCreation_DfsProdSource()
+        {
+            JobService service = new JobService(null, null, null, null, null, null);
+
+            DataFlow dataFlow = new DataFlow()
+            {
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                FlowStorageCode = "000001"
+            };
+
+            DataSource dataSource = new DfsProdSource();
+
+            RetrieverJob result = service.InstantiateJobsForCreation(dataFlow, dataSource);
+
+            Assert.AreEqual("Instant", result.Schedule);
+            Assert.AreEqual("SAID/DEV/000001", result.RelativeUri);
+        }
     }
 }

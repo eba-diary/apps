@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure
 
         protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            IRestClient restClient, IDataFeatures dataFeatures, Lazy<IJobService> jobService) : base(jobService)
+            IRestClient restClient, IDataFeatures dataFeatures)
         {
             _dsContext = datasetContext;
             _configService = configService;
@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
         public override void ConfigureProvider(RetrieverJob job)
         {
             _job = job;
-            _uri = _jobService.Value.GetDataSourceUri(job);
+            _uri = job.GetUri();
             _request = new RestRequest();
 
             if (job.DataSource.SourceAuthType.Is<TokenAuthentication>())
@@ -202,7 +202,7 @@ namespace Sentry.data.Infrastructure
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.TokenExp)).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.Tokens.FirstOrDefault().TokenExp)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);

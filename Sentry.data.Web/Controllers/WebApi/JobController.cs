@@ -4,7 +4,6 @@ using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Job;
 using Sentry.WebAPI.Versioning;
@@ -29,7 +28,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly IDatasetContext _datasetContext;
         private readonly IJobService _jobService;
         private readonly IApacheLivyProvider _apacheLivyProvider;
-        private readonly IDataFeatures _dataFeatures;
 
         public JobController(IDatasetContext datasetContext, IJobService jobService, 
             IApacheLivyProvider apacheLivyProvider, IDataFeatures dataFeatures)
@@ -37,7 +35,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             _datasetContext = datasetContext;
             _jobService = jobService;
             _apacheLivyProvider = apacheLivyProvider;
-            _dataFeatures = dataFeatures;
         }
         /// <summary>
         /// Gets all Jobs
@@ -99,7 +96,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
         }
 
-
         /// <summary>
         /// Gets all DFS from a job
         /// </summary>
@@ -111,29 +107,17 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("DFSMonitorList")]
-        public IHttpActionResult GetDfsMonitorList(string environmentType = null)
+        public IHttpActionResult GetDfsMonitorList(string requestingNamedEnvironment = null)
         {
             try
             {
-                List<DfsMonitorModel> models;
-                if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
-                {
-                    if (Enum.TryParse(environmentType, true, out NamedEnvironmentType namedEnvironmentType))
-                    {
-                        List<DfsMonitorDto> dtos = _jobService.GetDfsRetrieverJobs(namedEnvironmentType);
-                        models = dtos.Select(x => x.ToModel()).ToList();
-                    }
-                    else
-                    {
-                        return Content(HttpStatusCode.BadRequest, "Valid types for environmentType are NonProd or Prod");
-                    }
-                }
-                else
-                {
-                    models = _jobService.GetDfsRetrieverJobs().ToModel(job => _jobService.GetDataSourceUri(job));
-                }                
-
+                List<DfsMonitorDto> dtos = _jobService.GetDfsRetrieverJobs(requestingNamedEnvironment);
+                List<DfsMonitorModel> models = dtos.Select(x => x.ToModel()).ToList();
                 return Ok(models);
+            }
+            catch (DfsRetrieverJobException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -141,7 +125,6 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return InternalServerError(ex);
             }
         }
-
 
         /// <summary>
         /// Get submission detail information

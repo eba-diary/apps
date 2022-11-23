@@ -7,6 +7,7 @@ using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -58,26 +59,28 @@ namespace Sentry.data.Web.Controllers
 
             BaseAuditModel tableModel = new BaseAuditModel();
             
+            searchParameter = searchParameter == "All Files" ? "%" : searchParameter;
+
             string viewPath = "";
             try
             {
                 switch (auditType)
                 {
                     case AuditType.NonParquetFiles:
-                        tableModel = _auditSerivce.GetExceptRows(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        tableModel = _auditSerivce.GetNonParquetFiles(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
                         viewPath = "_NonParquetFilesTable";
                         break;
                     case AuditType.RowCountCompare:
-                        tableModel = _auditSerivce.GetRowCountCompare(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        tableModel = _auditSerivce.GetComparedRowCount(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
                         viewPath = "_RowCountCompareTable";
                         break;
-                }
+                } 
 
                 return PartialView(viewPath, tableModel);
             } 
             catch (ArgumentException ex)
             {
-                return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), ex.Message);
+                return this.Json( new { failure = true, message = ex.Message });
             }
         }
 
@@ -88,12 +91,12 @@ namespace Sentry.data.Web.Controllers
             // Define specific AuditType enum id's that will have added search features
             model.AuditAddedSearchKey = new int[]{ 0,1 };
 
-            List<DatasetDto> dtoTestList = _datasetService.GetAllDatasetDto();
+            List<DatasetSchemaDto> datasetDtoList = _datasetService.GetAllDatasetDto();
 
             model.AllDatasets = new List<SelectListItem>();
 
             model.AllDatasets.Add(new SelectListItem() { Disabled=true, Text = "Please select Dataset", Value="-1"});
-            dtoTestList.ForEach(d => model.AllDatasets.Add(new SelectListItem { Text = d.DatasetName, Value = d.DatasetId.ToString() }));
+            datasetDtoList.ForEach(d => model.AllDatasets.Add(new SelectListItem { Text = d.DatasetName, Value = d.DatasetId.ToString() }));
 
             model.AllAuditTypes = Utility.BuildSelectListFromEnum<AuditType>(0);
             model.AllAuditTypes.Insert(0, new SelectListItem() { Disabled = true, Text = "Please select Audit Type", Value = "-1" });
@@ -123,7 +126,7 @@ namespace Sentry.data.Web.Controllers
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
             DatasetSelectionModel model = new DatasetSelectionModel();
-            List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
+            List<DatasetSchemaDto> dtoList = _datasetService.GetAllActiveDatasetDto();
             dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
             model.AllDatasets = new List<SelectListItem>();
 
@@ -135,7 +138,7 @@ namespace Sentry.data.Web.Controllers
             });
 
 
-            foreach (DatasetDto dto in dtoList)
+            foreach (DatasetSchemaDto dto in dtoList)
             {
                 SelectListItem item = new SelectListItem();
                 item.Text = dto.DatasetName;
