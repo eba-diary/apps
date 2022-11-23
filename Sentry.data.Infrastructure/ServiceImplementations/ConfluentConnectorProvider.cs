@@ -62,7 +62,7 @@ namespace Sentry.data.Infrastructure
                 //IMPORTANT! Use ConfigureAwait(false) to essentially return to original session/thread that called this since caller of this needs the result
                 httpResponse = await _httpClient.PostAsync(baseURLplusConnectorEndpoint, stringContent).ConfigureAwait(false);
             }
-            catch(Exception ex)
+            catch
             {
                 httpResponse = new HttpResponseMessage() { StatusCode = System.Net.HttpStatusCode.BadRequest};
             }

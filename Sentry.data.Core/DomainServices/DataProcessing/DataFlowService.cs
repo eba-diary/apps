@@ -347,6 +347,11 @@ namespace Sentry.data.Core
 
         public void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status)
         {
+            if (status != ObjectStatusEnum.Active && status != ObjectStatusEnum.Disabled)
+            {
+                throw new ArgumentException("Active or Disabled Object Status only allowed",nameof(status));
+            }
+
             try
             {
                 //Find DataFlow
@@ -354,7 +359,7 @@ namespace Sentry.data.Core
                 flow.ObjectStatus = status;
                 _datasetContext.SaveChanges();
             }
-            catch (ValidationException)
+            catch 
             {
                 throw;
             }

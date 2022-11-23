@@ -168,12 +168,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// </summary>
         /// <param name="dataFlowId"></param>
         /// <returns></returns>
-        [ApiVersionBegin(WebAPI.Version.v2)]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK)]
-        [Route("enable")]
-        [HttpPut]
+        [Route("{dataFlowId}/Enable")]
+        [HttpPost]
         public IHttpActionResult EnableDataFlow(int dataFlowId)
         {
             _dataFlowService.EnableOrDisableDataFlow(dataFlowId, Core.GlobalEnums.ObjectStatusEnum.Active);
@@ -185,12 +185,12 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// </summary>
         /// <param name="dataFlowId"></param>
         /// <returns></returns>
-        [ApiVersionBegin(WebAPI.Version.v2)]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.OK)]
-        [Route("disable")]
-        [HttpPut]
+        [Route("{dataFlowId}/Disable")]
+        [HttpPost]
         public IHttpActionResult DisableDataFlow(int dataFlowId)
         {
             _dataFlowService.EnableOrDisableDataFlow(dataFlowId, Core.GlobalEnums.ObjectStatusEnum.Disabled);

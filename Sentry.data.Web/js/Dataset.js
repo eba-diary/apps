@@ -1592,12 +1592,11 @@ data.Dataset = {
 
             });
 
-
             //CLICK EVENT IF THEY TURN DataFlow ON
             $("#dataFlowBtnOn").click(function () {
                 $.ajax({
-                    url: "../../api/v2/dataflow/enable?dataFlowId=" + data.Dataset.DataFlowIdSelected,
-                    method: "PUT",
+                    url: "../../api/v20220609/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Enable",
+                    method: "POST",
                     success: function (obj)
                     {
                         data.Dataset.makeToast("success", actionTaken);
@@ -1614,8 +1613,8 @@ data.Dataset = {
             //CLICK EVENT IF THEY TURN DataFlow OFF
             $("#dataFlowBtnOff").click(function () {
                 $.ajax({
-                    url: "../../api/v2/dataflow/disable?dataFlowId=" + data.Dataset.DataFlowIdSelected,
-                    method: "PUT",
+                    url: "../../api/v20220609/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Disable",
+                    method: "POST",
                     success: function (obj) {
                         data.Dataset.makeToast("success", actionTaken);
                     },
