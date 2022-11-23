@@ -872,7 +872,7 @@ namespace Sentry.data.Core
                 Questionnaire = dto.DFQuestionnaire,
                 FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
+                ObjectStatus = dto.ObjectStatus,    //in case they are changing an existing dataset that is disabled, keep status
                 DeleteIssuer = dto.DeleteIssuer,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,
