@@ -1,37 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <TEI xmlns="http://www.tei-c.org/ns/1.0">
-    <teiHeader>
-      <fileDesc>
-        <titleStmt>
-          <title>Diary of Mrs. Emma B. Andrews. Volume 4 1896-1897</title>
-          <author>
-            <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
-          </author>
-          <editor>
-            <persName ref="SK">Sarah Ketchley</persName>
-          </editor>
-        </titleStmt>
-        <publicationStmt>
-          <publisher>
-            <orgName ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</orgName>
-          </publisher>
-          <address>
-            <addrLine>University of Washington, Seattle, WA</addrLine>
-          </address>
-          <availability>
-            <licence target="https://creativecommons.org/licenses/by-nc-sa/4.0/">his work is licensed under a Creative Commons Attribution-NonCommercial Share-Alike 4.0 International License.</licence>
-          </availability>
-          <date>2021-07-28</date>
-        </publicationStmt>
-        <sourceDesc>
-          <p><name ref="#American_Philosophical_Society_Philadelphia">American Philosophical Society, Philadelphia</name></p>
-        </sourceDesc>
-        <encodingStmt>
-          <projectDesc>
-            <p>Established in 2010, the goals of the <name ref="#Emma_B_Andrews_Diary_Project">Emma B. Andrews Diary Project</name> include the transcription and digitization of a wide range of primary historical material from the <orgName ref="#'Golden_Age'">'Golden Age'</orgName> of <orgName ref="#Egyptian">Egyptian</orgName> archaeology at the end of the 19th and beginning of the 20th centuries. A founding partner of <name ref="#Newbook_Digital_Texts">Newbook Digital Texts</name> (www.newbookdigitaltexts.org), the <name ref="#EBA_Diary_Project">EBA Diary Project</name> offers undergraduate and graduate digital humanities education and internships at the University of Washington. <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her association with the millionaire lawyer turned archaeologist/art and antiquities collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis.</persName> Traveling to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1912, she kept detailed journals of these voyages along the <placeName ref="#Nile">Nile,</placeName> including his important yet under-reported excavations of over 20 significant tombs in the Valley of the Kings. <persName ref="#Emma">Emma</persName> provides a vital commentary on the archaeology and pioneering <orgName ref="#Egyptologists">Egyptologists</orgName> of the time, painting a revealing picture of the lives of the colonial gentry and the cultural and scientific literati in at the dawn of the twentieth century. Analysis of the content of her diaries, along with a broad range of additional primary source material, will afford scholars information about important historical resources for the first time.</p>
-          </projectDesc>
-        </encodingStmt>
-      </fileDesc>
-    </teiHeader>
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Diary of Mrs. Emma B. Andrews. Volume 3 1894-1895</title> <!-- replace with correct volume -->
+        <author>
+          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName>
+        </author>
+        <respStmt>
+          <resp>Originally prepared by</resp>
+          <persName ref="#SLK">Sarah L. Ketchley</persName>
+        </respStmt>
+        <respStmt>
+          <resp>TEIPublisher development</resp>
+          <persName ref="#EF">Emma Fritzberg</persName>
+        </respStmt>
+        <respStmt>
+          <resp>Historical Markup Tool development</resp>
+          <persName ref="#AH">Audrey Holmes</persName>
+        </respStmt>
+        <respStmt>
+          <resp>transcription</resp>
+          <persName>name name</persName> <!-- replace with correct names -->
+        </respStmt>
+        <respStmt>
+          <resp>proofreading and tagging</resp>
+          <persName ref="#SK">Sarah Ketchley</persName>
+          <persName ref="#IS">Isabelle Schelegel</persName>
+          <persName ref="#IW">Izzy Wiebe</persName> 
+          <persName ref="#BL">Benjamin Lewis</persName>
+          <persName ref="#SB">Selma El-Badawi</persName>
+        </respStmt>
+         <respStmt>
+                    <resp>biographical research and writing</resp>
+                    <persName ref="#SK">Sarah Ketchley</persName>
+                    <persName ref="#JJ">Jasmine Jones</persName>
+                    <persName ref="#JC">Jasmine Choi</persName>
+                    <persName ref="#SR">Samuel Roller</persName>
+                    <persName ref="#AAD">Avery Dahl</persName>
+                    <persName ref="#AD">Avneet Dhaliwal</persName>
+                    <persName ref="#IH">Iona Hillman</persName>
+                    <persName ref="#LK">Lexi Kinzer</persName>
+                    <persName ref="#PH">Priya Hariharan</persName>
+                </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <publisher>
+          <orgName ref="#EBA_Diary_Project">Emma B. Andrews Diary Project</orgName>
+        </publisher>
+        <address>
+          <addrLine>University of Washington, Seattle, WA</addrLine>
+        </address>
+        <availability>
+          <licence target="https://creativecommons.org/licenses/by-nc/4.0/">This work is
+            licensed under a Creative Commons Attribution-NonCommercial 4.0 International
+            License.</licence>
+        </availability>
+        <date>08-2020</date>
+      </publicationStmt>
+      <sourceDesc>
+        <p><orgName ref="#American_Philosophical_Society">American Philosophical
+          Society</orgName>,<placeName ref="#Philadelphia">Philadelphia</placeName></p>
+      </sourceDesc>
+    </fileDesc>
+    <encodingDesc>
+      <projectDesc>
+        <p>Established in 2010, the goals of the <orgName ref="#EBA_Diary_Project">Emma B.
+          Andrews Diary Project</orgName> include the transcription and digitization of a
+          wide range of primary historical material from the 'Golden Age' of Egyptian
+          archaeology at the end of the 19th and beginning of the 20th centuries. A founding
+          partner of <orgName ref="#Newbook_Digital_Texts">Newbook Digital Texts</orgName>
+          (www.newbookdigitaltexts.org), the <orgName ref="#EBA_Diary_Project">EBA Diary
+            Project</orgName> offers undergraduate and graduate digital humanities education
+          and internships at the <orgName ref="#University_of_Washington">University of
+            Washington</orgName>.
+          <persName ref="#Andrews_Emma_B">Emma B. Andrews</persName> is best remembered for her
+          association with the millionaire lawyer turned archaeologist/art and antiquities
+          collector, <persName ref="#Davis_Theodore_M">Theodore M. Davis</persName>. Traveling
+          to <placeName ref="#Egypt">Egypt</placeName> with him between 1889 and 1913, she kept
+          detailed journals of these voyages along the <placeName ref="#Nile">Nile</placeName>,
+          including his important yet under-reported excavations of over 20 significant tombs
+          in the <placeName ref="#Bībān al-Mulūk">Valley of the Kings</placeName>.
+          <persName ref="#Andrews_Emma_B">Emma</persName> provides a vital commentary on the
+          archaeology and pioneering Egyptologists of the time, painting a revealing picture of
+          the lives of the colonial gentry and the cultural and scientific literati in at the
+          dawn of the twentieth century. Analysis of the content of her diaries, along with a
+          broad range of additional primary source material, will afford scholars information
+          about important historical resources for the first time.</p>
+      </projectDesc>
+      <editorialDecl>
+        <correction>
+          <p>Obvious misspellings (eg place names and people's names) which are misreadings of original handwritten diary are corrected
+            with choice, sic and corr.</p>
+        </correction>
+        <normalization>
+          <p>Original spelling and typography is otherwise retained.</p>
+        </normalization>
+      </editorialDecl>
+    </encodingDesc>
+    <revisionDesc> <!-- update this with major revision list-->
+      <list>
+        <item>
+          <date when="2021-05-08">8 May 2021</date> Last checked by SLK. Updated header, fixed
+          placeName and name tags.</item>
+      </list>
+    </revisionDesc>
+  </teiHeader>
     <text>
       <body>
         <div xml:id="EBA-1896-11-17" type="entry">
@@ -364,7 +441,7 @@
           <dateline>
             <date when="1897-03-06">Saturday. March 6</date>.
           </dateline>
-          <p>Our men began rowing at 1 o'clock this morning - reached <placeName ref="#Balyana_Al">Balliana</placeName> at 10:30 and started immediately for <placeName ref="#Abydos">Abydos</placeName>. That pleasant ride of 7 miles out and 7 back, never seemed so tiresome - for the very worst donkeys of all the notorious bad donkeys of <placeName ref="#Abydos">Abydos</placeName> or rather <placeName ref="#Balyana_Al">Balliana</placeName> fell to our lot. The day was tremendously hot - the natives specially tormenting. I arrived at the temple more dead than alive - and by 3:30 we were in our saddles again - and I came home resolving <pb b="109"/> never to do that expedition again. The <name type="boat" ref="#Ammon_Ra">Ammon-Ra</name> and <name type="boat" ref="#Osiris">Osiris</name> did not stop - but the <name type="boat" ref="#Chonsu"><choice><sic>Chensu</sic><corr>Chonsu</corr></choice></name> (English) and the <name type="boat" ref="#Columbia">Columbia</name> (American Jews) did, and went to the <placeName ref="#Temple_of_Dendera">Temple</placeName>. We are having the most beautiful little new moon imaginable. For the first two nights it had the resplendent beams almost within its bow. The last winter we were here on the river we used constantly to see the Zodiacal lights - but I have not seen it this time. I saw in the <placeName ref="#Abydos">Abydos</placeName> fields today, the most beautiful light vivid green birds - large as our robin, but more slender and elegant.</p>
+          <p>Our men began rowing at 1 o'clock this morning - reached <placeName ref="#Balyana_Al">Balliana</placeName> at 10:30 and started immediately for <placeName ref="#Abydos">Abydos</placeName>. That pleasant ride of 7 miles out and 7 back, never seemed so tiresome - for the very worst donkeys of all the notorious bad donkeys of <placeName ref="#Abydos">Abydos</placeName> or rather <placeName ref="#Balyana_Al">Balliana</placeName> fell to our lot. The day was tremendously hot - the natives specially tormenting. I arrived at the temple more dead than alive - and by 3:30 we were in our saddles again - and I came home resolving <pb n="109"/> never to do that expedition again. The <name type="boat" ref="#Ammon_Ra">Ammon-Ra</name> and <name type="boat" ref="#Osiris">Osiris</name> did not stop - but the <name type="boat" ref="#Chonsu"><choice><sic>Chensu</sic><corr>Chonsu</corr></choice></name> (English) and the <name type="boat" ref="#Columbia">Columbia</name> (American Jews) did, and went to the <placeName ref="#Temple_of_Dendera">Temple</placeName>. We are having the most beautiful little new moon imaginable. For the first two nights it had the resplendent beams almost within its bow. The last winter we were here on the river we used constantly to see the Zodiacal lights - but I have not seen it this time. I saw in the <placeName ref="#Abydos">Abydos</placeName> fields today, the most beautiful light vivid green birds - large as our robin, but more slender and elegant.</p>
         </div>
         <div xml:id="EBA-1897-03-07" type="entry">
           <dateline>
@@ -521,7 +598,7 @@
           <dateline>
             <placeName ref="#Rome">Rome</placeName>. <name type="hotel" ref="#Hotel_Bristol">Bristol Hotel</name>. <date when="1897-04-15">April 15</date>.
           </dateline>
-          <p>A long interval in this journal. We left <placeName ref="#Alexandria">Alexandria</placeName> the afternoon of the 3d in the fine new <name type="boat" ref="#SS_Bohemia">S.S. Bohemia</name> for <placeName ref="#Brindisi">Brindisi</placeName>. Weather very warm - and we were glad of the welcome change which two or three hours at sea brought. Boat very comfortable - but passage rough - almost every one in his bed - I stayed in mine Sunday and Monday - and we landed at <placeName ref="#Brindisi">Brindisi</placeName> at 5 o'clock and made our train, because they were complaisant enough to hold our train 40 minutes for us. The long ride to <placeName ref="#Naples">Naples</placeName> was not so tiring, and seemed more pleasant than usual. So delightful the country seemed in its fresh spring greenness - and the huge vegetable garden which stretches as far as the eye can see, without boundaries, for miles before reaching <placeName ref="#Naples">Naples</placeName>, is something quite wonderful. Everything planted under the thin foliaged trees, with their garlands <pb n="119"/> of vines stretching from tree to tree. We found pleasant rooms at the <name type="hotel" ref="#Grand_Hotel">Grand Hotel</name>, but <persName ref="#Davis_Theodore_M">Theodore</persName> had taken a cold in crossing, which developed into a light form of grippe, which gave him much suffering and restlessness - and he had the <persName ref="#Malbranc_Dr">Doctor (Malbrane)</persName> who is always so simple and helpful, and stayed in the room all the time, and one day in bed. As the weather was not good, clouds everywhere, <placeName ref="#Vesuvius">Vesuvius</placeName> and the islands hidden from view most of the time, I stayed at home with <persName ref="#Davis_Theodore_M">Theodore</persName> - and on Saturday the 10th he was well enough to come on here - <persName ref="#Clarence">Clarence</persName>, <persName ref="#Parsons_Mary">Mary</persName>, <persName ref="#Burgnoyne_Amelie">Amilie</persName> and <persName ref="#Jones_Daniel">Jones</persName> spent one day at <placeName ref="#Pompeii">Pompeii</placeName>, and <persName ref="#Clarence">Clarence</persName> the next day at <placename ref="#Vesuvius">Vesuvius</placename>. We had rooms engaged at the <name type="hotel" ref="#Hotel_Quirinale">Quirinal</name>, but found them much too small and fortunately having had an offer from the <name type="hotel" ref="#Hotel_Bernini_Bristol">Bristol</name> we came here, which is always my favorite hotel in <placeName ref="#Rome">Rome</placeName>. But alas, I have since coming here developed the grippe also - and have been in bed and in the house all the time until yesterday, as uncomfortable as I ever remember of being - with <persName ref="#Bull_Dr">Dr. Bull</persName> in daily attendance. All the world more or less is in <placeName ref="#Rome">Rome</placeName> - and to my thinking <name type="event" ref="#Holy_Week">Holy Week</name> is not the time to visit <placeName ref="#Rome">Rome</placeName>, unless one is interested in church ceremonies. The pictures in churches covered, many galleries closed etc.</p>
+          <p>A long interval in this journal. We left <placeName ref="#Alexandria">Alexandria</placeName> the afternoon of the 3d in the fine new <name type="boat" ref="#SS_Bohemia">S.S. Bohemia</name> for <placeName ref="#Brindisi">Brindisi</placeName>. Weather very warm - and we were glad of the welcome change which two or three hours at sea brought. Boat very comfortable - but passage rough - almost every one in his bed - I stayed in mine Sunday and Monday - and we landed at <placeName ref="#Brindisi">Brindisi</placeName> at 5 o'clock and made our train, because they were complaisant enough to hold our train 40 minutes for us. The long ride to <placeName ref="#Naples">Naples</placeName> was not so tiring, and seemed more pleasant than usual. So delightful the country seemed in its fresh spring greenness - and the huge vegetable garden which stretches as far as the eye can see, without boundaries, for miles before reaching <placeName ref="#Naples">Naples</placeName>, is something quite wonderful. Everything planted under the thin foliaged trees, with their garlands <pb n="119"/> of vines stretching from tree to tree. We found pleasant rooms at the <name type="hotel" ref="#Grand_Hotel">Grand Hotel</name>, but <persName ref="#Davis_Theodore_M">Theodore</persName> had taken a cold in crossing, which developed into a light form of grippe, which gave him much suffering and restlessness - and he had the <persName ref="#Malbranc_Dr">Doctor (Malbrane)</persName> who is always so simple and helpful, and stayed in the room all the time, and one day in bed. As the weather was not good, clouds everywhere, <placeName ref="#Vesuvius">Vesuvius</placeName> and the islands hidden from view most of the time, I stayed at home with <persName ref="#Davis_Theodore_M">Theodore</persName> - and on Saturday the 10th he was well enough to come on here - <persName ref="#Clarence">Clarence</persName>, <persName ref="#Parsons_Mary">Mary</persName>, <persName ref="#Burgnoyne_Amelie">Amilie</persName> and <persName ref="#Jones_Daniel">Jones</persName> spent one day at <placeName ref="#Pompeii">Pompeii</placeName>, and <persName ref="#Clarence">Clarence</persName> the next day at <placeName ref="#Vesuvius">Vesuvius</placeName>. We had rooms engaged at the <name type="hotel" ref="#Hotel_Quirinale">Quirinal</name>, but found them much too small and fortunately having had an offer from the <name type="hotel" ref="#Hotel_Bernini_Bristol">Bristol</name> we came here, which is always my favorite hotel in <placeName ref="#Rome">Rome</placeName>. But alas, I have since coming here developed the grippe also - and have been in bed and in the house all the time until yesterday, as uncomfortable as I ever remember of being - with <persName ref="#Bull_Dr">Dr. Bull</persName> in daily attendance. All the world more or less is in <placeName ref="#Rome">Rome</placeName> - and to my thinking <name type="event" ref="#Holy_Week">Holy Week</name> is not the time to visit <placeName ref="#Rome">Rome</placeName>, unless one is interested in church ceremonies. The pictures in churches covered, many galleries closed etc.</p>
         </div>
         <div xml:id="EBA-1897-04-22" type="entry">
           <dateline>
