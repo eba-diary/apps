@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Web.Models.ApiModels.Job;
 
@@ -34,31 +35,13 @@ namespace Sentry.data.Web.Extensions
             return (modelList);
         }
 
-        public static List<DfsMonitorModel> ToModel(this List<Core.RetrieverJob> dtoList)
+        public static DfsMonitorModel ToModel(this DfsMonitorDto dto)
         {
-            List<DfsMonitorModel> modelList = new List<DfsMonitorModel>();
-
-            foreach (Core.RetrieverJob dto in dtoList)
+            return new DfsMonitorModel()
             {
-                try
-                {
-                    DfsMonitorModel model = new DfsMonitorModel()
-                    {
-                        JobId = dto.Id,
-                        MonitorTarget = dto.DataSource.CalcRelativeUri(dto).LocalPath
-                    };
-
-                    modelList.Add(model);
-                }
-                catch (Exception ex)
-                {
-                    Sentry.Common.Logging.Logger.Error($"<jobextensions-tomodel> - failed creating model (retrieverjobid:{dto.Id}");
-                    throw;
-                }
-                
-            }
-
-            return (modelList);
+                JobId = dto.JobId,
+                MonitorTarget = dto.MonitorTarget
+            };
         }
 
         public static JavaOptionsOverrideDto ToDto(this JavaOptionsOverride options) 

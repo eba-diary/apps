@@ -576,7 +576,6 @@ data.Dataset = {
         self.vm.FullyQualifiedSnowflakeViews.removeAll();
         $.get(schemaUrl, function (result) {
             var currentView = result.CurrentView;
-            console.log(result.ConsumptionDetails);
             $.each(result.ConsumptionDetails, function (arrayPosition, consumptionDetail) {
                 if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet" || consumptionDetail.SnowflakeType == "CategorySchemaParquet") {
                     var layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
@@ -2569,16 +2568,16 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.onAccessToSelection(e);
         });
         $("#RequestAccessTypeConsumeBtn").click(function (e) {
-            data.Dataset.editActiveRequestAccessBreadcrumb("Consume");
+            data.Dataset.editActiveRequestAccessBreadcrumb("Consumer");
             data.Dataset.requestAccessCleanActiveBreadcrumb();
-            data.Dataset.addRequestAccessBreadcrumb("Consume Type", "#RequestAccessConsumerTypeSection");
+            data.Dataset.addRequestAccessBreadcrumb("Consumer Type", "#RequestAccessConsumerTypeSection");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessConsumerTypeSection").removeClass("d-none");
         });
         $("#RequestAccessTypeManageBtn").click(function (e) {
-            data.Dataset.editActiveRequestAccessBreadcrumb("Manage");
+            data.Dataset.editActiveRequestAccessBreadcrumb("Producer");
             data.Dataset.requestAccessCleanActiveBreadcrumb();
-            data.Dataset.addRequestAccessBreadcrumb("Manage Request", "#RequestAccessManageTypeSection");
+            data.Dataset.addRequestAccessBreadcrumb("Producer Request", "#RequestAccessManageTypeSection");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessManageTypeSection").removeClass("d-none");
         });
@@ -2647,6 +2646,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             $('#AccessRequestForm div.requestAccessStage:not(.d-none)').addClass('d-none');
             $(jumpBackTo).removeClass('d-none');
             element.nextAll().remove();
+            element.children(":first").text(element.children(":first").attr("value"));
             element.addClass('active');
             if (jumpBackTo != "#RequestAccessFormSection") {
                 data.Dataset.requestAccessHideSaveChanges();
@@ -2659,7 +2659,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     addRequestAccessBreadcrumb(breadCrumbText, createdFrom) {
-        $("#RequestAccessBreadcrumb").append('<li class="breadcrumb-item active" value="' + createdFrom + '"><a href="#">' + breadCrumbText + '</a></li>');
+        $("#RequestAccessBreadcrumb").append('<li class="breadcrumb-item active" value="' + createdFrom + '"><a href="#" value="' + breadCrumbText + '">' + breadCrumbText + '</a></li>');
         data.Dataset.buildBreadcrumbReturnToStepHandler(data.Dataset.requestAccessGetActiveBreadcrumb());
     },
 

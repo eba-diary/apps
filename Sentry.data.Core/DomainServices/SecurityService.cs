@@ -619,44 +619,50 @@ namespace Sentry.data.Core
         private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
             string project = Sentry.Configuration.Config.GetHostSetting("S3_JiraTicketProject");
-            string summary = "S3 Access " + (ticket.IsAddingPermission && isAddingPermission ? "Request" : "Removal");
+            string summary = (ticket.IsAddingPermission && isAddingPermission ? "Create or Update" : "Remove") + " S3 Access Point with the following policy";
             StringBuilder sb = new StringBuilder();
-            string issueType = "Request";
+            string issueType = Sentry.Configuration.Config.GetHostSetting("S3_JiraIssueType");
 
             //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
-            string name = "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
+            string name = "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
 
             sb.AppendLine("Account: " + account);
-            sb.AppendLine("Name: " + name);
-            sb.AppendLine("Source Bucket: " + "sentry-dtlk-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
+            sb.AppendLine("S3 Access Point Name: " + name);
+            sb.AppendLine("Source Bucket: " + "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
+            sb.AppendLine("");
+
+            sb.AppendLine("With the following policy:");
+            sb.AppendLine("");
+
             sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
             sb.AppendLine("Action: s3.*");
-            sb.AppendLine("Action Bucket: S3:ListBucket");
-            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
             foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
             {
                 sb.AppendLine("Schema: " + dsfc.Schema.Name);
-                sb.AppendLine("\t\tBucket: " + dsfc.Schema.ParquetStorageBucket);
-                sb.AppendLine("\t\tPrefix: " + dsfc.Schema.ParquetStoragePrefix);
+                sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name + "/object/" + dsfc.Schema.ParquetStoragePrefix + "/*");
+                sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name + "/object/" + dsfc.Schema.ParquetStoragePrefix);
+                sb.AppendLine("");
             }
+            sb.AppendLine("Action: S3:ListBucket");
+            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
+
+
             List<JiraCustomField> customFields = new List<JiraCustomField>();
-            JiraCustomField acceptanceCriteria = new JiraCustomField();
-            acceptanceCriteria.Name = "Acceptance Criteria";
-            acceptanceCriteria.Value = sb.ToString();
-            customFields.Add(acceptanceCriteria);
 
             JiraIssueCreateRequest jiraRequest = new JiraIssueCreateRequest();
 
-            JiraTicket jiraTicket = new JiraTicket();
-            jiraTicket.Project = project;
-            jiraTicket.CustomFields = customFields;
-            jiraTicket.Reporter = ticket.RequestedById;
-            jiraTicket.IssueType = issueType;
-            jiraTicket.Summary = summary;
-            jiraTicket.Labels = new List<string>();
-            jiraTicket.Components = new List<string>();
-            jiraTicket.Description = "";
+            JiraTicket jiraTicket = new JiraTicket
+            {
+                Project = project,
+                CustomFields = customFields,
+                Reporter = ticket.RequestedById,
+                IssueType = issueType,
+                Summary = summary,
+                Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions" },
+                Components = new List<string> { "ACID" },
+                Description = sb.ToString()
+            };
 
             jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };
 
@@ -948,8 +954,7 @@ namespace Sentry.data.Core
         {
             var consumerPermissionCodes = new List<string>() {
                 PermissionCodes.CAN_PREVIEW_DATASET,
-                PermissionCodes.CAN_VIEW_FULL_DATASET,
-                PermissionCodes.CAN_QUERY_DATASET
+                PermissionCodes.CAN_VIEW_FULL_DATASET
             };
             return _datasetContext.Permission.Where(x => consumerPermissionCodes.Contains(x.PermissionCode) &&
                                                          x.SecurableObject == SecurableEntityName.DATASET).ToList();

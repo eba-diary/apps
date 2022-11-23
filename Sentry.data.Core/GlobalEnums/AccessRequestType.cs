@@ -8,6 +8,8 @@ namespace Sentry.data.Core
         [Description("AWS Consume")]
         AwsArn = 1,
         [Description("Remove Permission")]
-        RemovePermission
+        RemovePermission,
+        [Description("Inheritance")]
+        Inheritance
     }
 }

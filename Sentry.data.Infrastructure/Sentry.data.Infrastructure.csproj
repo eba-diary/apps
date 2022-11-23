@@ -436,6 +436,10 @@
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
+    <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
+    <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />
+    <Compile Include="ServiceImplementations\RetrieverJobProviders\QualRetrieverJobProvider.cs" />
+    <Compile Include="ServiceImplementations\RetrieverJobProviders\AllDfsRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\SecBotProvider.cs" />
@@ -488,6 +492,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ClassDiagram2.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

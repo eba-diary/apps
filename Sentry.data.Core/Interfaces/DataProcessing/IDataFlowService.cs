@@ -25,7 +25,7 @@ namespace Sentry.data.Core
         List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName);
 
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
-        int CreateandSaveDataFlow(DataFlowDto dto);
+        int CreateDataFlow(DataFlowDto dto);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);
@@ -121,6 +121,6 @@ namespace Sentry.data.Core
         string GetSecurityGroup(int dataflowId);
 
 
-        int UpdateandSaveDataFlow(DataFlowDto dfDto);
+        int UpdateDataFlow(DataFlowDto dfDto);
     }
 }
