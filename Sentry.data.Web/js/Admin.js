@@ -122,7 +122,7 @@ data.Admin = {
     * generates table with datafiles from selected dataset and schema
     * @param {String} url
     */
-    PopulateTable: function (url) {
+    DataFileReprocessTableInit: function (url) {
         // init table with DataTable data from the provided url
         $("#dataFileTableResults").DataTable({
             destroy: true,
@@ -154,7 +154,7 @@ data.Admin = {
         });
     },
 
-    ResetTable: function () {
+    ResetDataFileReprocessTable: function () {
         $("#dataFileTableResults").DataTable().clear().draw();
     },
 
@@ -606,7 +606,7 @@ data.Admin = {
                 data.Admin.GetSchemaDropdown(url);
 
                 // Reset the table and flow step dropdown to an empty or default state
-                data.Admin.ResetTable();
+                data.Admin.ResetDataFileReprocessTable();
                 data.Admin.ResetFlowStepDropdown();
                 data.Admin.ActivateDeactivateReprocessButton();
             }
@@ -617,7 +617,7 @@ data.Admin = {
             var datasetId = $("#AllDatasets").find(":selected").val();
             if (schemaId != "" && datasetId != "") {
                 var url = data.Admin.GetFileUrl(datasetId, schemaId);
-                data.Admin.PopulateTable(url);
+                data.Admin.DataFileReprocessTableInit(url);
                 url = data.Admin.GetFlowStepUrl(schemaId);
                 data.Admin.GetFlowStepDropdown(url);
             }
