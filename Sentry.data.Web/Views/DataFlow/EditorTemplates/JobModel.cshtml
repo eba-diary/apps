@@ -1,6 +1,4 @@
 ﻿@model Sentry.data.Web.JobModel
-@*@using (Html.BeginCollectionItem("RetrieverJob"))
-    {*@
 
 @if (Model.ExecutionParameters?.Any() == true)
 {
@@ -59,21 +57,7 @@
     </div>
 </div>
 
-@*@if (Model.Security.CanCreateDataSource)
-    {
-        <div class="form-group">
-            <label class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <a class="backToList" href="/Config/Source/Create"><span class="glyphicon glyphicon-plus"></span>Create new Data Source</a>
-            </div>
-        </div>
-    }*@
-
 <div class="questionairePanel" style="display:none">
-    @*<hr />
-        <h3>Job Configuration</h3>
-        <hr />*@
-
     <div class="jobquestion sourceLocation">
         <div class="configQuestion">
             <h5>Where will we find the data?</h5>
@@ -97,12 +81,31 @@
         </div>
 
         <div class="httpSourcePanel" style="display:none;">
-
             <div class="md-form">
                 @Html.LabelFor(model => model.SelectedRequestMethod, htmlAttributes: new { @class = "mdb-main-label" })
                 @Html.DropDownListFor(model => model.SelectedRequestMethod, Model.RequestMethodDropdown, new { @class = "mdb-select", })
                 @Html.ValidationMessageFor(model => model.SelectedRequestMethod, "", new { @class = "text-danger" })
             </div>
+
+            <div class="httpParameterPanel" style="display:none;">
+                <div class="md-form">
+                    @Html.LabelFor(model => model.PagingType, htmlAttributes: new { @class = "mdb-main-label" })
+                    @Html.DropDownListFor(model => model.PagingType, Model.PagingTypeDropdown, new { @class = "mdb-select", })
+                    @Html.ValidationMessageFor(model => model.PagingType, "", new { @class = "text-danger" })
+                </div>
+                <div class="md-form paging-token-field" style="display:none;">
+                    @Html.LabelFor(model => model.PageTokenField, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.PageTokenField, new { @class = "form-control", @placeholder = "Path to the token field on the response" })
+                    @Html.ValidationMessageFor(model => model.PageTokenField, "", new { @class = "text-danger" })
+                </div>
+                <div class="md-form paging-request-parameter" style="display:none;">
+                    @Html.LabelFor(model => model.PagingRequestParameterName, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.PagingRequestParameterName, new { @class = "form-control", @placeholder = "Parameter name to be added to the request" })
+                    @Html.ValidationMessageFor(model => model.PagingRequestParameterName, "", new { @class = "text-danger" })
+                </div>
+                <em class="text-muted">Full URL: <span id="base-url"></span><span id="relative-url"></span><span id="parameter-url"></span></em>
+            </div>
+
             <div class="httpPostPanel" style="display:none;">
                 <div class="md-form">
                     @Html.LabelFor(model => model.SelectedRequestDataFormat, htmlAttributes: new { @class = "mdb-main-label" })
@@ -169,7 +172,6 @@
 
     <div class="jobquestion targetFileName">
         <div class="md-form configQuestion">
-            <hr />
             <h5 id="targetfilenamequestion"></h5>
         </div>
 

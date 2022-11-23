@@ -1003,33 +1003,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Config/IsHttpSource/")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public JsonResult IsHttpSource(int dataSourceId)
-        {
-            if (dataSourceId == 0)
-            {
-                return Json(false, JsonRequestBehavior.AllowGet);
-            }
-
-            DataSourceDto dto = _configService.GetDataSourceDto(dataSourceId);
-            bool result;
-            switch (dto.SourceType)
-            {
-                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
-                case DataSourceDiscriminator.HTTPS_SOURCE:
-                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
-                    result = true;
-                    break;
-                default:
-                    result = false;
-                    break;
-            }
-
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpGet]
         public ContentResult SourceDetails (int Id)
         {            
             DataSourceDto dto = _configService.GetDataSourceDto(Id);

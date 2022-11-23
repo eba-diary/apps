@@ -119,8 +119,7 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            return View("DataFlowForm", model);
-            
+            return View("DataFlowForm", model);            
         }
 
         /// <summary>
@@ -535,10 +534,9 @@ namespace Sentry.data.Web.Controllers
             model.SourcesForDropdown = temp2.OrderBy(x => x.Value);
 
             model.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(model.SelectedRequestMethod);
-
             model.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(model.SelectedRequestDataFormat);
-
             model.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(model.FtpPattern);
+            model.PagingTypeDropdown = Utility.BuildSelectListFromEnum<PagingType>((int)model.PagingType);
 
             int s;
             int pickerval;

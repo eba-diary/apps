@@ -56,20 +56,14 @@
                                 $(".editDataSourceLink").hide();
                             }
 
-
                             data.Job.SetDataSourceSpecificPanels(datain.SourceType);
 
-
-                            $.getJSON("/Config/IsHttpSource/", { dataSourceId: val }, function (data) {
-                                if (data) {
-                                    $('.httpSourcePanel').show();
-                                    $('.httpPostPanel').hide();
-                                }
-                                else {
-                                    $('.httpSourcePanel').hide();
-                                    $('.httpPostPanel').hide();
-                                }
-                            });
+                            if (datain.HasPaging) {
+                                $('.httpParameterPanel').show();
+                            }
+                            else {
+                                $('.httpParameterPanel').hide();
+                            }
                         }
                         else {
                             $('.securityPanel').show();
@@ -82,10 +76,10 @@
 
                         $('#dataSourceContactEmail').attr("href", datain.MailToLink)
                         $('#dataSourceContactEmail').text(datain.PrimaryContactName);
-                        //$('#primaryContact.a').text("<a href/" + data.MailToLink + "/"adfad");
                         $('.dataSourceInfoPanel').show();
                         $("#dataSourceDescription").text(datain.Description);
                         $("#baseURLTextBox").val(datain.BaseUri);
+                        $("#base-url").text(datain.BaseUri);
                         $("#baseURL").text(" The Base URL of the Data Source you picked is " + datain.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
                     }
                 });
@@ -180,6 +174,59 @@
             $('.editDataSourceLink').hide();
         }
 
+        $("[id$='PagingType']").change(function () {
+            switch ($(this).val()) {
+                case '1':
+                    $('.paging-token-field').hide();
+                    $('.paging-request-parameter').show();
+                    $("[id$='PageTokenField']").val('');
+                    break;
+                case '2':
+                    $('.paging-token-field').show();
+                    $('.paging-request-parameter').show();
+                    break;
+                default:
+                    $('.paging-token-field').hide();
+                    $('.paging-request-parameter').hide();
+                    $("[id$='PageTokenField']").val('');
+                    $("[id$='PagingRequestParameterName']").val('');
+            }
+
+            data.Job.SetParameterUrl();
+        });
+
+        $("[id$='RelativeUri']").on('keyup', function () {
+            $("#relative-url")[0].textContent = $(this).val();
+            data.Job.SetParameterUrl();
+        })
+
+        $("[id$='PagingRequestParameterName']").on('keyup', data.Job.SetParameterUrl)
+    },
+
+    SetParameterUrl: function () {
+        let parameter = '';
+        let selectedType = $("[id$='PagingType'] :selected").val();
+        let parameterName = $("[id$='PagingRequestParameterName']").val();
+        
+        if (parameterName && selectedType != '0') {
+            if ($("[id$='RelativeUri']").val().includes('?')) {
+                parameter += "&";
+            }
+            else {
+                parameter += "?";
+            }
+
+            parameter += parameterName + "=";
+
+            if (selectedType == '1') {
+                parameter += "1";
+            }
+            else {
+                parameter += "tokenValue";
+            }
+        }
+
+        $("#parameter-url")[0].textContent = parameter;
     },
 
     SetFtpPatternDefaults: function (patternSelection) {
@@ -259,6 +306,7 @@
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.compression').show();
                     $('.jobquestion.searchCriteria').hide();
+                    $('.httpPostPanel').hide();
             }
 
             //show common questions

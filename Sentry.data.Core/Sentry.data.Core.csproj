@@ -337,6 +337,7 @@
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="GlobalEnums\ConnectorState.cs" />
+    <Compile Include="GlobalEnums\PagingType.cs" />
     <Compile Include="GlobalEnums\TileSearchSortByOption.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />
