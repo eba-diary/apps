@@ -57,7 +57,7 @@ namespace Sentry.data.Web
                 PrimaryContactId= model.PrimaryContactId,
                 PrimaryContactName = model.PrimaryContactName,
                 GrantType = model.GrantType,
-                HasPaging = model.HasPaging
+                SupportsPaging = model.SupportsPaging
             };
         }
 

@@ -41,7 +41,7 @@ namespace Sentry.data.Web
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
             ClientPrivateId = dto.ClientPrivateId;
-            HasPaging = dto.HasPaging;
+            SupportsPaging = dto.SupportsPaging;
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
             PrimaryContactEmail = dto.PrimaryContactEmail;
@@ -118,8 +118,8 @@ namespace Sentry.data.Web
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
 
-        [DisplayName("Requires Paging Support")]
-        public bool HasPaging { get; set; }
+        [DisplayName("Endpoint Supports Paging")]
+        public bool SupportsPaging { get; set; }
 
 
         #region Security

@@ -285,7 +285,7 @@ namespace Sentry.data.Core.Tests
                 Name = "DataFlowName",
                 AuthID = "2",
                 SourceType = DataSourceDiscriminator.HTTPS_SOURCE,
-                HasPaging = true,
+                SupportsPaging = true,
                 RequestHeaders = new List<RequestHeader>
                 {
                     new RequestHeader { Index = "0", Key = "HeaderKey", Value = "HeaderValue" }
@@ -333,7 +333,7 @@ namespace Sentry.data.Core.Tests
 
             HTTPSSource http = (HTTPSSource)dataSource;
             Assert.AreEqual("IVKey", http.IVKey);
-            Assert.IsTrue(http.HasPaging);
+            Assert.IsTrue(http.SupportsPaging);
             Assert.AreEqual(1, http.RequestHeaders.Count);
 
             RequestHeader header = http.RequestHeaders.First();
@@ -417,7 +417,7 @@ namespace Sentry.data.Core.Tests
                 ClientId = "ClientId",
                 AuthenticationHeaderName = "AuthHeaderName",
                 RequestHeaders = new List<RequestHeader>(),
-                HasPaging = false,
+                SupportsPaging = false,
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
                 GrantType = OAuthGrantType.RefreshToken,
@@ -483,7 +483,7 @@ namespace Sentry.data.Core.Tests
                 Name = "DataSourceNameUpdate",
                 AuthID = "2",
                 SourceType = DataSourceDiscriminator.HTTPS_SOURCE,
-                HasPaging = true,
+                SupportsPaging = true,
                 RequestHeaders = new List<RequestHeader>
                 {
                     new RequestHeader { Index = "0", Key = "HeaderKey", Value = "HeaderValue" }
@@ -543,7 +543,7 @@ namespace Sentry.data.Core.Tests
 
             HTTPSSource http = (HTTPSSource)dataSource;
             Assert.AreEqual("IVKey", http.IVKey);
-            Assert.IsTrue(http.HasPaging);
+            Assert.IsTrue(http.SupportsPaging);
             Assert.AreEqual(1, http.RequestHeaders.Count);
 
             RequestHeader header = http.RequestHeaders.First();
@@ -657,7 +657,7 @@ namespace Sentry.data.Core.Tests
                 {
                     new RequestHeader { Index = "0", Key = "HeaderKey", Value = "HeaderValue" }
                 },
-                HasPaging = true,
+                SupportsPaging = true,
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
                 GrantType = OAuthGrantType.JwtBearer,
@@ -729,7 +729,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual($"mailto:username@sentry.com?Subject=Data%20Source%20Inquiry%20-%20DataSourceName", dataSource.MailToLink);
             Assert.AreEqual("ClientId", dataSource.ClientId);
             Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedClientPrivateId{Encryption.ENCRYPTIONINDICATOR}", dataSource.ClientPrivateId);
-            Assert.IsTrue(dataSource.HasPaging);
+            Assert.IsTrue(dataSource.SupportsPaging);
             Assert.AreEqual("AuthHeaderName", dataSource.TokenAuthHeader);
             Assert.AreEqual(OAuthGrantType.JwtBearer, dataSource.GrantType);
             Assert.AreEqual(1, dataSource.RequestHeaders.Count);

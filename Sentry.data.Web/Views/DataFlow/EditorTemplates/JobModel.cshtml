@@ -99,11 +99,14 @@
                     @Html.ValidationMessageFor(model => model.PageTokenField, "", new { @class = "text-danger" })
                 </div>
                 <div class="md-form paging-request-parameter" style="display:none;">
-                    @Html.LabelFor(model => model.PagingRequestParameterName, htmlAttributes: new { @class = "control-label" })
-                    @Html.TextBoxFor(model => model.PagingRequestParameterName, new { @class = "form-control", @placeholder = "Parameter name to be added to the request" })
-                    @Html.ValidationMessageFor(model => model.PagingRequestParameterName, "", new { @class = "text-danger" })
+                    @Html.LabelFor(model => model.PageParameterName, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.PageParameterName, new { @class = "form-control", @placeholder = "Parameter name to include on paging requests" })
+                    @Html.ValidationMessageFor(model => model.PageParameterName, "", new { @class = "text-danger" })
                 </div>
-                <em class="text-muted">Full URL: <span id="base-url"></span><span id="relative-url"></span><span id="parameter-url"></span></em>
+            </div>
+
+            <div class="text-muted font-italic">
+                Full URL: <span id="base-url"></span><span id="relative-url"></span><span id="parameter-url"></span>
             </div>
 
             <div class="httpPostPanel" style="display:none;">
@@ -134,7 +137,6 @@
             @Html.ValidationMessageFor((model) => model.FtpPattern, "", new { @class = "text-danger" })
         </div>
     </div>
-
 
     <div class="jobquestion searchCriteria">
         <div class="configQuestion">

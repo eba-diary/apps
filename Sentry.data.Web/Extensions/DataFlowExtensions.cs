@@ -127,9 +127,9 @@ namespace Sentry.data.Web
             return detailModelList;
         }
 
-        public static Core.DataFlowDto ToDto(this DataFlowModel model)
+        public static DataFlowDto ToDto(this DataFlowModel model, string currentUser)
         {
-            Core.DataFlowDto dto = new Core.DataFlowDto
+            DataFlowDto dto = new Core.DataFlowDto
             {
                 Id = model.DataFlowId,
                 Name = model.Name,
@@ -138,13 +138,15 @@ namespace Sentry.data.Web
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionTypeSelection,
                 IsCompressed = model.IsCompressed,
-                IsBackFillRequired = model.IsBackFillRequired,      
+                IsBackFillRequired = model.IsBackFillRequired,
                 IsPreProcessingRequired = model.IsPreProcessingRequired,
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,
                 FlowStorageCode = model.StorageCode,
                 NamedEnvironment = model.NamedEnvironment,
                 NamedEnvironmentType = model.NamedEnvironmentType,
+                PrimaryContactId = (model.PrimaryContactId) ?? currentUser,
+                IsSecured = true,
                 TopicName = model.TopicName,
                 S3ConnectorName = model.S3ConnectorName
             };
@@ -214,7 +216,7 @@ namespace Sentry.data.Web
         {
             return new RetrieverJobDto()
             {
-                DataSourceId = (string.IsNullOrEmpty(model.SelectedDataSource)) ? 0 : Int32.Parse(model.SelectedDataSource),
+                DataSourceId = (string.IsNullOrEmpty(model.SelectedDataSource)) ? 0 : int.Parse(model.SelectedDataSource),
                 DataSourceType = model.SelectedSourceType,
                 IsCompressed = false, //for the data flow compression is handled outside of retriever job logic
                 CreateCurrentFile = model.CreateCurrentFile,
@@ -230,36 +232,11 @@ namespace Sentry.data.Web
                 Schedule = model.Schedule,
                 SearchCriteria = model.SearchCriteria,
                 TargetFileName = model.TargetFileName,
-                ExecutionParameters = model.ExecutionParameters
+                ExecutionParameters = model.ExecutionParameters,
+                PagingType = model.PagingType,
+                PageTokenField= model.PageTokenField,
+                PageParameterName= model.PageParameterName
             };
-        }
-
-        public static DataFlowModel ToModel(this Core.DataFlowDetailDto dto)
-        {
-            DataFlowModel model = new DataFlowModel()
-            {
-                CreatedBy = dto.CreatedBy,
-                DataFlowId = dto.Id,
-                CreatedDTM = dto.CreateDTM,
-                IsCompressed = dto.IsCompressed,
-                IsBackFillRequired = dto.IsBackFillRequired
-            };
-
-            if (dto.RetrieverJob != null)
-            {
-                JobModel jobModel = new JobModel()
-                {
-                    CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile,
-                    FtpPattern = dto.RetrieverJob.FtpPattern ?? FtpPattern.NoPattern,
-                    HttpRequestBody = dto.RetrieverJob.HttpRequestBody,
-                    IsRegexSearch = true,
-                    OverwriteDataFile = false,
-                    RelativeUri = dto.RetrieverJob.RelativeUri,
-                    Schedule = dto.RetrieverJob.Schedule,
-                    ExecutionParameters = dto.RetrieverJob.ExecutionParameters
-                };
-            }
-            return model;
         }
 
         public static DataFlowStepModel ToModel(this Core.DataFlowStepDto dto)

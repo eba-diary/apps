@@ -95,7 +95,7 @@ namespace Sentry.data.Infrastructure
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                                 break;
                             case GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE:
-                                _jobProvider = ((HTTPSSource)_job.DataSource).HasPaging
+                                _jobProvider = ((HTTPSSource)_job.DataSource).SupportsPaging
                                     ? Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.PAGING_HTTPS_SOURCE)
                                     : Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
                                 break;

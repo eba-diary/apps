@@ -214,7 +214,10 @@ namespace Sentry.data.Core.Tests
                 FileSchema = 2,
                 DataFlow = 3,
                 RelativeUri = "RelativeUri",
-                Schedule = "* * * * *"
+                Schedule = "* * * * *",
+                PagingType = PagingType.Token,
+                PageTokenField = "tokenField",
+                PageParameterName = "token_param"
             };
 
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
@@ -267,6 +270,9 @@ namespace Sentry.data.Core.Tests
             Assert.IsNull(httpsOptions.Body);
             Assert.AreEqual(HttpMethods.get, httpsOptions.RequestMethod);
             Assert.AreEqual(HttpDataFormat.none, httpsOptions.RequestDataFormat);
+            Assert.AreEqual(PagingType.Token, httpsOptions.PagingType);
+            Assert.AreEqual("tokenField", httpsOptions.PageTokenField);
+            Assert.AreEqual("token_param", httpsOptions.PageParameterName);
 
             datasetContext.VerifyAll();
         }
@@ -412,6 +418,74 @@ namespace Sentry.data.Core.Tests
             RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_PagingHTTPS_RetrieverJob()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                DataFlow = 3,
+                RelativeUri = "RelativeUri",
+                Schedule = "* * * * *",
+                RequestMethod = HttpMethods.get,
+                RequestDataFormat = HttpDataFormat.json,
+                PagingType = PagingType.Token,
+                PageTokenField = "tokenField",
+                PageParameterName = "token",
+                TargetFileName = "FileName"
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            DataSource dataSource = new HTTPSSource() { Id = 1 };
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(dataSource);
+            FileSchema fileSchema = new FileSchema() { SchemaId = 2 };
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(fileSchema);
+            DataFlow dataFlow = new DataFlow() { Id = 3 };
+            datasetContext.Setup(x => x.GetById<DataFlow>(3)).Returns(dataFlow);
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>())).Callback<RetrieverJob>(x => x.Id = 4);
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+
+            Assert.AreEqual(4, job.Id);
+            Assert.IsNull(job.DatasetConfig);
+            Assert.AreEqual(dataSource, job.DataSource);
+            Assert.AreEqual(fileSchema, job.FileSchema);
+            Assert.AreEqual(dataFlow, job.DataFlow);
+            Assert.IsFalse(job.IsGeneric);
+            Assert.AreNotEqual(Guid.Empty, job.JobGuid);
+            Assert.AreEqual("RelativeUri", job.RelativeUri);
+            Assert.AreEqual("* * * * *", job.Schedule);
+            Assert.AreEqual("Central Standard Time", job.TimeZone);
+            Assert.IsNull(job.DeleteIssuer);
+            Assert.AreEqual(DateTime.MaxValue, job.DeleteIssueDTM);
+            Assert.AreEqual(ObjectStatusEnum.Active, job.ObjectStatus);
+            Assert.IsFalse(job.ExecutionParameters.Any());
+            Assert.IsNotNull(job.JobOptions);
+
+            RetrieverJobOptions jobOptions = job.JobOptions;
+            Assert.IsTrue(jobOptions.IsRegexSearch);
+            Assert.IsFalse(jobOptions.OverwriteDataFile);
+            Assert.IsNull(jobOptions.SearchCriteria);
+            Assert.IsFalse(jobOptions.CreateCurrentFile);
+            Assert.AreEqual(FtpPattern.NoPattern, jobOptions.FtpPattern);
+            Assert.AreEqual("FileName", jobOptions.TargetFileName);
+            Assert.IsNotNull(jobOptions.CompressionOptions);
+            Assert.IsNotNull(jobOptions.HttpOptions);
+
+            HttpsOptions httpsOptions = jobOptions.HttpOptions;
+            Assert.IsNull(httpsOptions.Body);
+            Assert.AreEqual(HttpMethods.get, httpsOptions.RequestMethod);
+            Assert.AreEqual(HttpDataFormat.json, httpsOptions.RequestDataFormat);
+            Assert.AreEqual(PagingType.Token, httpsOptions.PagingType);
+            Assert.AreEqual("tokenField", httpsOptions.PageTokenField);
+            Assert.AreEqual("token", httpsOptions.PageParameterName);
 
             datasetContext.VerifyAll();
         }

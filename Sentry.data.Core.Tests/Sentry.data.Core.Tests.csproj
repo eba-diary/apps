@@ -177,6 +177,7 @@
     <Compile Include="DataFlowService_CreateAndUpdateDataFlowTests.cs" />
     <Compile Include="DataSourceExtensionsTests.cs" />
     <Compile Include="DataSourceServiceTests.cs" />
+    <Compile Include="JobExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

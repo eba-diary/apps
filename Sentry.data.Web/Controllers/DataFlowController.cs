@@ -168,7 +168,7 @@ namespace Sentry.data.Web.Controllers
 
             AddCoreValidationExceptionsToModel(model.Validate());
 
-            DataFlowDto dfDto = ModelToDto(model);
+            DataFlowDto dfDto = model.ToDto(_userService.GetCurrentUser().AssociateId);
 
             AddCoreValidationExceptionsToModel(await _dataFlowService.ValidateAsync(dfDto));
 
@@ -242,7 +242,6 @@ namespace Sentry.data.Web.Controllers
              *  At this point, something has failed 
              * 
              */
-
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
@@ -252,13 +251,11 @@ namespace Sentry.data.Web.Controllers
             {
                 CreateDropDownSetup(model.RetrieverJob);
             }
-            if (model.SchemaMaps != null && model.SchemaMaps.Count > 0)
-            {
-                foreach (SchemaMapModel mapModel in model.SchemaMaps)
-                {
-                    SetSchemaModelLists(mapModel);
-                }
-            }
+
+            //No point loading the dropdowns here because we do it again from JS
+            //Instead make sure we are keeping the what dataset and schema were selected
+            model.SelectedDataset = model.SchemaMaps.First().SelectedDataset;
+            model.SelectedSchema = model.SchemaMaps.First().SelectedSchema;
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
@@ -395,14 +392,17 @@ namespace Sentry.data.Web.Controllers
                 CreateCurrentFile = dto.CreateCurrentFile,
                 SelectedDataSource = dto.DataSourceId.ToString(),
                 SelectedSourceType = dto.DataSourceType,
-                SelectedRequestMethod = dto.RequestMethod ?? Core.HttpMethods.none,
-                SelectedRequestDataFormat = dto.RequestDataFormat ?? Core.HttpDataFormat.none,
-                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern,
+                SelectedRequestMethod = dto.RequestMethod ?? HttpMethods.none,
+                SelectedRequestDataFormat = dto.RequestDataFormat ?? HttpDataFormat.none,
+                FtpPattern = dto.FtpPattern ?? FtpPattern.NoPattern,
                 ExecutionParameters = dto.ExecutionParameters,
-                SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule)
+                SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule),
+                PagingType = dto.PagingType,
+                PageTokenField = dto.PageTokenField,
+                PageParameterName = dto.PageParameterName
             };
 
-            model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault().ToString();
+            model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => int.Parse(s.Value)).FirstOrDefault().ToString();
 
             return model;
         }
@@ -522,14 +522,16 @@ namespace Sentry.data.Web.Controllers
             {
                 temp2 = DataSourcesByType(model.SelectedSourceType, model.SelectedDataSource);
             }
-
-            temp2.Add(new SelectListItem()
+            else
             {
-                Text = "Pick a Source Type Above",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                temp2.Add(new SelectListItem()
+                {
+                    Text = "Pick a Source Type Above",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
 
             model.SourcesForDropdown = temp2.OrderBy(x => x.Value);
 
@@ -707,6 +709,8 @@ namespace Sentry.data.Web.Controllers
                     case "SelectedDataSource":
                     case "SelectedSourceType":
                     case "SchedulePicker":
+                    case "PageParameterName":
+                    case "PageTokenField":
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsRequestBodyIsBlank:
@@ -741,57 +745,6 @@ namespace Sentry.data.Web.Controllers
                         break;
                 }
             }
-        }
-
-        internal DataFlowDto ModelToDto(DataFlowModel model)
-        {
-            Core.DataFlowDto dto = new Core.DataFlowDto
-            {
-                Id = model.DataFlowId,
-                Name = model.Name,
-                SaidKeyCode = model.SAIDAssetKeyCode,
-                CreatedBy = model.CreatedBy,
-                CreateDTM = model.CreatedDTM,
-                IngestionType = model.IngestionTypeSelection,
-                IsCompressed = model.IsCompressed,
-                IsBackFillRequired = model.IsBackFillRequired,
-                IsPreProcessingRequired = model.IsPreProcessingRequired,
-                PreProcessingOption = model.PreProcessingSelection,
-                ObjectStatus = model.ObjectStatus,
-                FlowStorageCode = model.StorageCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType,
-                // Propagate primary contact otherwise specify current user
-                PrimaryContactId = (model.PrimaryContactId) ?? _userService.GetCurrentUser().AssociateId,
-                IsSecured = true,
-                TopicName = model.TopicName,
-                S3ConnectorName = model.S3ConnectorName
-            };
-
-            if (model.SchemaMaps != null)
-            {
-                dto.SchemaMap = model.SchemaMaps.ToDto();
-            }
-
-            if (model.RetrieverJob != null)
-            {
-                dto.RetrieverJob = model.RetrieverJob.ToDto();
-            }
-
-            if (model.IsCompressed)
-            {
-                CompressionJobDto cDto = model.CompressionJob.First().ToDto();
-                dto.CompressionJob = cDto;
-                dto.CompressionType = (int)cDto.CompressionType;
-            }
-            else
-            {
-                dto.CompressionType = null;
-            }
-
-            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
-
-            return dto;
         }
     }
 

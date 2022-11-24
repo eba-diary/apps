@@ -50,11 +50,6 @@ namespace Sentry.data.Core
         {
             ValidateBase(job, validationResults);
 
-            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
-            {
-                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
-            }
-
             if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.post && job.JobOptions.HttpOptions.RequestDataFormat == HttpDataFormat.none)
             {
                 validationResults.Add(ValidationErrors.httpsRequestDataFormatNotSelected, "Request Body Format is required");

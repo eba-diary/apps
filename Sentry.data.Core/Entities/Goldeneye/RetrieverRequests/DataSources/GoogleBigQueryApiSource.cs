@@ -38,15 +38,5 @@ namespace Sentry.data.Core
                 return GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE;
             }
         }
-
-        public override void Validate(RetrieverJob job, ValidationResults validationResults)
-        {
-            base.Validate(job, validationResults);
-
-            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
-            {
-                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
-            }
-        }
     }
 }

@@ -92,7 +92,7 @@ namespace Sentry.data.Core
         public virtual string ClientId { get; set; }
         public virtual string ClientPrivateId { get; set; }
         public virtual OAuthGrantType GrantType { get; set; }
-        public virtual bool HasPaging { get; set; }
+        public virtual bool SupportsPaging { get; set; }
         public virtual List<RequestHeader> RequestHeaders
         {
             get
@@ -143,6 +143,11 @@ namespace Sentry.data.Core
             else if (job.RelativeUri.StartsWith("/"))
             {
                 validationResults.Add(ValidationErrors.relativeUriStartsWithForwardSlash, "Relative Uri cannot start with '/' for HTTPS data sources");
+            }
+
+            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
+            {
+                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
             }
         }
         #endregion

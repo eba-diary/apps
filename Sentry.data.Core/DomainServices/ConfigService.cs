@@ -1145,7 +1145,7 @@ namespace Sentry.data.Core
                 MapDataSourceTokensToDtoTokens(((HTTPSSource)dsrc).Tokens, dto.Tokens);
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
-                dto.HasPaging = ((HTTPSSource)dsrc).HasPaging;
+                dto.SupportsPaging = ((HTTPSSource)dsrc).SupportsPaging;
                 dto.GrantType = ((HTTPSSource)dsrc).GrantType;
             }
         }
@@ -1271,7 +1271,7 @@ namespace Sentry.data.Core
                 ((HTTPSSource)dsrc).ClientId = dto.ClientId;
                 ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
                 ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders.Any() ? dto.RequestHeaders : null;
-                ((HTTPSSource)dsrc).HasPaging = dto.HasPaging;
+                ((HTTPSSource)dsrc).SupportsPaging = dto.SupportsPaging;
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
@@ -1365,7 +1365,7 @@ namespace Sentry.data.Core
                     source = new HTTPSSource()
                     {
                         IVKey = ivKey,
-                        HasPaging = dto.HasPaging
+                        SupportsPaging = dto.SupportsPaging
                     };
 
                     //Process only if headers exist

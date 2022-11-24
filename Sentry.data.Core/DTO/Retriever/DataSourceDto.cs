@@ -21,7 +21,7 @@ namespace Sentry.data.Core
         public bool UrlBasedRequest { get; set; }
         public bool ObjectBasedRequest { get; set; }
         public Uri BaseUri { get; set; }
-        public bool HasPaging { get; set; }
+        public bool SupportsPaging { get; set; }
 
         #region TokenAuthSpecific
         public string TokenAuthHeader { get; set; }

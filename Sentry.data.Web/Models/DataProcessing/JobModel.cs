@@ -61,9 +61,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Page Token Field")]
         public string PageTokenField { get; set; }
-        [DisplayName("Request Parameter Name")]
+        [DisplayName("Page Parameter Name")]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-zA-Z0-9_\-\~\.]*$", ErrorMessage = "GET parameter names can only be alphanumeric with -._~")]
-        public string PagingRequestParameterName { get; set; }
+        public string PageParameterName { get; set; }
         [DisplayName("Paging Type")]
         public PagingType PagingType { get; set; }
 
@@ -94,6 +94,24 @@ namespace Sentry.data.Web
             if (string.IsNullOrWhiteSpace(SchedulePicker) || SchedulePicker == "0" || string.IsNullOrWhiteSpace(Schedule))
             {
                 results.Add("SchedulePicker", "Schedule is required");
+            }
+
+            if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
+            {
+                results.Add("PageParameterName", "Page Parameter Name is required");
+            }
+
+            if (PagingType == PagingType.Token)
+            {
+                if (string.IsNullOrWhiteSpace(PageParameterName))
+                {
+                    results.Add("PageParameterName", "Page Parameter Name is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(PageTokenField))
+                {
+                    results.Add("PageTokenField", "Page Token Field is required");
+                }
             }
 
             return new ValidationException(results);
