@@ -85,7 +85,7 @@ namespace Sentry.data.Core
             List<DataFlow> dfList = null;
 
             dfList = _datasetContext.DataFlow.Where(expression)
-                .Where(x => x.ObjectStatus == ObjectStatusEnum.Active)
+                .Where(x => x.ObjectStatus == ObjectStatusEnum.Active || x.ObjectStatus == ObjectStatusEnum.Disabled)
                 .OrderByDescending(x => x.Id).ToList();
 
             List<DataFlowDetailDto> dtoList = new List<DataFlowDetailDto>();
