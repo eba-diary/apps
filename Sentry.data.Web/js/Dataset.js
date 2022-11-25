@@ -7,7 +7,7 @@ data.Dataset = {
     DatasetFilesTable: {},
 
     //DECLARE CONSTANTS INSTEAD OF HARDCODE
-    IngestionType_TOPIC: "4",       //IngestionType_TOPIC matches public enum IngestionType
+    IngestionType_TOPIC: 4,       //IngestionType_TOPIC matches public enum IngestionType
     ObjectStatus_Active: 1,         //ObjectStatus_Active matches ObjectStatusEnum Active
     ObjectStatus_Disabled: 4,       //ObjectStatus_Active matches ObjectStatusEnum Disabled
 
