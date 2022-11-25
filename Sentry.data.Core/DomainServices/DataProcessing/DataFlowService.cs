@@ -359,8 +359,9 @@ namespace Sentry.data.Core
                 flow.ObjectStatus = status;
                 _datasetContext.SaveChanges();
             }
-            catch 
+            catch(Exception ex) 
             {
+                Logger.Error($"{nameof(DataFlowService)}.{nameof(EnableOrDisableDataFlow)} failed", ex);
                 throw;
             }
         }

@@ -808,7 +808,7 @@ data.Dataset = {
         self.RenderJobs = ko.pureComputed(function ()
         {
             var jobs = "noRenderJobs";
-            if (ko.unwrap(self.Jobs) || self.DataFlowObjectStatus == "4") {
+            if (ko.unwrap(self.Jobs) || self.DataFlowObjectStatus == data.Dataset.ObjectStatus_Disabled) {
                 jobs = "RenderJobs";
             }
             return jobs;
