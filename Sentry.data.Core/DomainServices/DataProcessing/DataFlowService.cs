@@ -344,6 +344,29 @@ namespace Sentry.data.Core
             return newDataFlow.Id;
         }
 
+
+        public void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status)
+        {
+            if (status != ObjectStatusEnum.Active && status != ObjectStatusEnum.Disabled)
+            {
+                throw new ArgumentException("Active or Disabled Object Status only allowed",nameof(status));
+            }
+
+            try
+            {
+                //Find DataFlow
+                DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
+                flow.ObjectStatus = status;
+                _datasetContext.SaveChanges();
+            }
+            catch(Exception ex) 
+            {
+                Logger.Error($"{nameof(DataFlowService)}.{nameof(EnableOrDisableDataFlow)} failed", ex);
+                throw;
+            }
+        }
+
+
         public void CreateDataFlowForSchema(FileSchema scm)
         {
             DataFlow df = MapToDataFlow(scm);
@@ -833,7 +856,7 @@ namespace Sentry.data.Core
                 Questionnaire = dto.DFQuestionnaire,
                 FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
+                ObjectStatus = dto.ObjectStatus,    //in case they are changing an existing dataset that is disabled, keep status
                 DeleteIssuer = dto.DeleteIssuer,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,

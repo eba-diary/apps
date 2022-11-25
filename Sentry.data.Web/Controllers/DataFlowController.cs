@@ -142,7 +142,9 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
-            if (dto.ObjectStatus != ObjectStatusEnum.Active)
+
+            //ONLY ALLOW EDIT OF ACTIVE or DISABLED
+            if (dto.ObjectStatus != ObjectStatusEnum.Active && dto.ObjectStatus != ObjectStatusEnum.Disabled)
             {
                 return View("NotFound");
             }
