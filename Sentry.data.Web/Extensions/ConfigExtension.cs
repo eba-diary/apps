@@ -6,6 +6,7 @@ using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sentry.data.Web.Extensions;
 
 namespace Sentry.data.Web
 {
@@ -33,35 +34,12 @@ namespace Sentry.data.Web
             };
         }
 
-        public static Core.DataSourceDto ToDto(this CreateSourceModel model)
+        public static DataSourceDto ToDto(this DataSourceModel model)
         {
-            return new Core.DataSourceDto()
+            return new DataSourceDto()
             {
                 OriginatingId = model.Id,
-                RetrunUrl = model.ReturnUrl,
-                Name = model.Name,
-                SourceType = model.SourceType,
-                AuthID = model.AuthID,
-                IsUserPassRequired = model.IsUserPassRequired,
-                PortNumber = model.PortNumber,
-                BaseUri = model.BaseUri,
-                TokenAuthHeader = model.TokenAuthHeader,
-                TokenAuthValue = model.TokenAuthValue,
-                ClientId = model.ClientId,
-                ClientPrivateId = model.ClientPrivateId,
-                TokenUrl = model.TokenUrl,
-                TokenExp = model.TokenExp,
-                Scope = model.Scope,
-                RequestHeaders = model.Headers
-            };
-        }
-
-        public static Core.DataSourceDto ToDto(this DataSourceModel model)
-        {
-            return new Core.DataSourceDto()
-            {
-                OriginatingId = model.Id,
-                RetrunUrl = model.ReturnUrl,
+                ReturnUrl = model.ReturnUrl,
                 Name = model.Name,
                 Description = model.Description,
                 SourceType = model.SourceType,
@@ -73,13 +51,13 @@ namespace Sentry.data.Web
                 TokenAuthValue = model.TokenAuthValue,
                 ClientId = model.ClientId,
                 ClientPrivateId = model.ClientPrivateId,
-                TokenUrl = model.TokenUrl,
-                TokenExp = model.TokenExp,
-                Scope = model.Scope,
+                Tokens = model.Tokens.Select(t => t.ToDto()).ToList(),
                 RequestHeaders = model.Headers,
                 IsSecured = model.IsSecured,
                 PrimaryContactId= model.PrimaryContactId,
-                PrimaryContactName = model.PrimaryContactName
+                PrimaryContactName = model.PrimaryContactName,
+                GrantType = model.GrantType,
+                SupportsPaging = model.SupportsPaging
             };
         }
 

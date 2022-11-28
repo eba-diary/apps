@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Sentry.data.Core.DTO.Retriever;
+using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core
@@ -6,7 +8,7 @@ namespace Sentry.data.Core
     public class DataSourceDto
     {
         public int OriginatingId { get; set; }
-        public string RetrunUrl { get; set; }
+        public string ReturnUrl { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string KeyCode { get; set; }
@@ -19,6 +21,7 @@ namespace Sentry.data.Core
         public bool UrlBasedRequest { get; set; }
         public bool ObjectBasedRequest { get; set; }
         public Uri BaseUri { get; set; }
+        public bool SupportsPaging { get; set; }
 
         #region TokenAuthSpecific
         public string TokenAuthHeader { get; set; }
@@ -26,11 +29,10 @@ namespace Sentry.data.Core
         #endregion
 
         #region OAuthSpecific
+        public List<DataSourceTokenDto> Tokens { get; set; }
         public string ClientId { get; set; }
         public string ClientPrivateId { get; set; }
-        public string TokenUrl { get; set; }
-        public int TokenExp { get; set; }
-        public string Scope { get; set; }
+        public OAuthGrantType GrantType { get; set; }
         #endregion
 
         public List<RequestHeader> RequestHeaders { get; set; }

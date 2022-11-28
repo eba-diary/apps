@@ -40,8 +40,13 @@
             <td class="dropdown-toggle-col">
 <em id=@("dropdown-toggle-" + job.SubmissionID) class="fas fa-plus"></em></td>
             <td>
-<input data-file-id=@job.DatasetFileID data-group-id="@(String.Format("{0}/{1}/{2}", job.DatasetName, job.SchemaName, job.DataFlowStepID))" type="checkbox" id=@(job.SubmissionID + "-select-input") class="select-all-target form-check-input">
-<label for=@(job.SubmissionID + "-select-input") class="form-check-label"></label></td>
+            @*
+                Data-Group-Id's purpose to create a (1) unique identifier & (2) act as a string to store the correlated data flow step for each row. 
+
+                The data-group-id utilizes "/" as a delimter in order to extract the DataFlowStepID later when the job is being reprocessed.
+            *@
+            <input data-file-id=@job.DatasetFileID data-group-id="@(String.Format("{0}/{1}/{2}", job.DatasetName, job.SchemaName, job.DataFlowStepID))" type="checkbox" id=@(job.SubmissionID + "-select-input") class="select-all-target form-check-input">
+            <label for=@(job.SubmissionID + "-select-input") class="form-check-label"></label></td>
             <td>@job.SubmissionTime</td>
             <td>@job.DatasetName</td>
             <td>@((job.ReprocessingRequired) ? new HtmlString("Yes"): new HtmlString("No"))</td>

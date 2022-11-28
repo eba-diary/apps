@@ -25,8 +25,6 @@ namespace Sentry.data.Core
         public HttpMethods? RequestMethod { get; set; }
         public HttpDataFormat? RequestDataFormat { get; set; }
         public FtpPattern? FtpPattern { get; set; }
-
-
         public bool IsCompressed { get; set; }
         public string CompressionType { get; set; }
         public List<string> FileNameExclusionList { get; set; }
@@ -35,5 +33,8 @@ namespace Sentry.data.Core
         public string DeleteIssuer { get; set; }
         public DateTime DeleteIssueDTM { get; set; }
         public Dictionary<string, string> ExecutionParameters { get; set; }
+        public PagingType PagingType { get; set; }
+        public string PageTokenField { get; set; }
+        public string PageParameterName { get; set; }
     }
 }

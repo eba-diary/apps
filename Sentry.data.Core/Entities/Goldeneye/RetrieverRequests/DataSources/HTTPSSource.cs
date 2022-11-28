@@ -9,9 +9,12 @@ namespace Sentry.data.Core
 {
     public class HTTPSSource : DataSource
     {
+        #region Fields
         private Uri _baseUri;
         private string _requestHeaders;
+        #endregion
 
+        #region Constructor
         public HTTPSSource()
         {
             IsUriEditable = true;
@@ -20,22 +23,30 @@ namespace Sentry.data.Core
 
             //Control auth types which can be chosen for this source type.  As new
             // types are integrated, add the type to the list.
-            ValidAuthTypes = new List<AuthenticationType>();
-            ValidAuthTypes.Add(new AnonymousAuthentication());
-            ValidAuthTypes.Add(new TokenAuthentication());
-            ValidAuthTypes.Add(new OAuthAuthentication());
+            ValidAuthTypes = new List<AuthenticationType>
+            {
+                new AnonymousAuthentication(),
+                new TokenAuthentication(),
+                new OAuthAuthentication()
+            };
 
-            ValidHttpMethods = new List<HttpMethods>();
-            ValidHttpMethods.Add(HttpMethods.get);
+            ValidHttpMethods = new List<HttpMethods>
+            {
+                HttpMethods.get
+            };
 
-            ValidHttpDataFormats = new List<HttpDataFormat>();
-            ValidHttpDataFormats.Add(HttpDataFormat.json);
+            ValidHttpDataFormats = new List<HttpDataFormat>
+            {
+                HttpDataFormat.json
+            };
 
             //Control compression types which can be chossen for this source type.  As new
             // types are integrated, add the type to the list.
-            ValidCompressionTypes = new List<CompressionTypes>();
-            ValidCompressionTypes.Add(CompressionTypes.ZIP);
-            ValidCompressionTypes.Add(CompressionTypes.GZIP);
+            ValidCompressionTypes = new List<CompressionTypes>
+            {
+                CompressionTypes.ZIP,
+                CompressionTypes.GZIP
+            };
 
             //Default created and modified to same datetime value
             DateTime curDTM = DateTime.Now;
@@ -45,20 +56,12 @@ namespace Sentry.data.Core
             //Default Ftp Port is 21
             PortNumber = 443;
         }
+        #endregion
 
+        #region DataSource Overrides
+        public override string SourceType { get => GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE; }
         public override List<AuthenticationType> ValidAuthTypes { get; set; }
-        //Setting Discriminator Value for NHibernate
-        public override string SourceType
-        {
-            get
-            {
-                return GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE;
-            }
-        }
-        public virtual List<HttpMethods> ValidHttpMethods { get; set; }
-        public virtual List<HttpDataFormat> ValidHttpDataFormats { get; set; }
         public override AuthenticationType SourceAuthType { get; set; }
-        public virtual List<CompressionTypes> ValidCompressionTypes { get; set; }
         public override Uri BaseUri
         {
             get
@@ -72,6 +75,12 @@ namespace Sentry.data.Core
                 _baseUri = new Uri(u.ToString());
             }
         }
+        #endregion
+
+        #region Properties
+        public virtual List<HttpMethods> ValidHttpMethods { get; set; }
+        public virtual List<HttpDataFormat> ValidHttpDataFormats { get; set; }
+        public virtual List<CompressionTypes> ValidCompressionTypes { get; set; }
         // Only used for TokenAuthentication type
         public virtual string AuthenticationHeaderName { get; set; }
         // Only used for TokenAuthentication type
@@ -79,25 +88,16 @@ namespace Sentry.data.Core
         public virtual string IVKey { get; set; }
         public virtual HttpMethods RequestMethod { get; set; }
         public virtual HttpDataFormat RequestDataFormat { get; set; }
-        public virtual bool PagingEnabled { get; set; }
-
-        #region OAuth
+        public virtual IList<DataSourceToken> Tokens { get; set; }
         public virtual string ClientId { get; set; }
         public virtual string ClientPrivateId { get; set; }
-        public virtual string Scope { get; set; }
-        public virtual string TokenUrl { get; set; }
-        public virtual int TokenExp { get; set; }
-        public virtual string CurrentToken { get; set; }
-        public virtual DateTime ?CurrentTokenExp { get; set; }
-        public virtual IList<OAuthClaim> Claims { get; set; }
         public virtual OAuthGrantType GrantType { get; set; }
-        #endregion
-
+        public virtual bool SupportsPaging { get; set; }
         public virtual List<RequestHeader> RequestHeaders
         {
             get
             {
-                if (String.IsNullOrEmpty(_requestHeaders))
+                if (string.IsNullOrEmpty(_requestHeaders))
                 {
                     return null;
                 }
@@ -112,7 +112,9 @@ namespace Sentry.data.Core
                 _requestHeaders = JsonConvert.SerializeObject(value);
             }
         }
+        #endregion
 
+        #region Methods
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             return new Uri(Path.Combine(BaseUri.ToString(), Job.RelativeUri).ToString());
@@ -142,6 +144,12 @@ namespace Sentry.data.Core
             {
                 validationResults.Add(ValidationErrors.relativeUriStartsWithForwardSlash, "Relative Uri cannot start with '/' for HTTPS data sources");
             }
+
+            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
+            {
+                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
+            }
         }
+        #endregion
     }
 }

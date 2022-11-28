@@ -335,6 +335,7 @@
     <Compile Include="Mappings\Primary\ApplicationConfigurationMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFunctionMapping.cs" />
     <Compile Include="Mappings\Primary\ImageMapping.cs" />
+    <Compile Include="Mappings\Primary\Retriever\DataSourceTokenMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\OAuthClaimMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceMapping.cs" />
@@ -435,6 +436,7 @@
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />
+    <Compile Include="ServiceImplementations\PagingHttpsJobProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />

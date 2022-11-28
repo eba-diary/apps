@@ -15,7 +15,6 @@ namespace Sentry.data.Core
             IsUriEditable = true;
             IsSourceCompressed = false;
             KeyCode = Guid.NewGuid().ToString().Substring(0, 13);
-            PagingEnabled = false;
 
             //Control auth types which can be chosen for this source type.  As new
             // types are integrated, add the type to the list.
@@ -50,11 +49,6 @@ namespace Sentry.data.Core
         public override void Validate(RetrieverJob job, ValidationResults validationResults)
         {
             ValidateBase(job, validationResults);
-
-            if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
-            {
-                validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
-            }
 
             if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.post && job.JobOptions.HttpOptions.RequestDataFormat == HttpDataFormat.none)
             {

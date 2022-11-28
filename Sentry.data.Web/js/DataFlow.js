@@ -7,13 +7,13 @@
 
     DataFlowFormInit: function (datasetId, schemaId) {
 
+        data.DataFlow.InitIngestionType();
+
         //initially hide or show TopicName
         data.DataFlow.HideOrShowTopic();
 
         data.DataFlow.Orig_Dataset_Selection = datasetId;
         data.DataFlow.Orig_Schema_Selection = schemaId;
-
-        data.DataFlow.InitIngestionType();
 
         $("#PreprocessingOptions").materialSelect();
 

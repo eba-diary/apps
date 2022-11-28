@@ -182,7 +182,6 @@
     <Compile Include="CategoryTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="DataAssetTests.cs" />
-    <Compile Include="DataFlowControllerTests.cs" />
     <Compile Include="DatasetContextTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="DomainModelUnitTests.cs" />
