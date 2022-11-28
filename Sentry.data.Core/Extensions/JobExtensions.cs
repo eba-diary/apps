@@ -53,32 +53,30 @@ namespace Sentry.data.Core
             return tree.ToList();
         }
 
-        public static IQueryable<RetrieverJob> WhereActive(this IQueryable<RetrieverJob> query)
-        {
-            return query.Where(w => w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
-        }
-
         public static RetrieverJobDto ToDto(this RetrieverJob job)
         {
-            RetrieverJobDto dto = new RetrieverJobDto();
-
-            dto.JobId = job.Id;
-            dto.Schedule = job.Schedule;
-            dto.ReadableSchedule = job.ReadableSchedule;
-            dto.RelativeUri = job.RelativeUri;
-            dto.HttpRequestBody = job.JobOptions?.HttpOptions?.Body;
-            dto.SearchCriteria = job.JobOptions?.SearchCriteria;
-            dto.TargetFileName = job.JobOptions?.TargetFileName;
-            dto.CreateCurrentFile = job.JobOptions?.CreateCurrentFile ?? false;
-            dto.DataSourceId = job.DataSource.Id;
-            dto.DataSourceType = job.DataSource.SourceType;
-            //FileSchema = job.FileSchema?.SchemaId?? 0,
-            dto.DatasetFileConfig = job.DatasetConfig?.ConfigId?? 0;
-            dto.DataFlow = job.DataFlow.Id;
-            dto.RequestMethod = job.JobOptions?.HttpOptions?.RequestMethod ?? null;
-            dto.RequestDataFormat = job.JobOptions?.HttpOptions?.RequestDataFormat ?? null;
-            dto.FtpPattern = job.JobOptions?.FtpPattern ?? null;
-            dto.ExecutionParameters = job.ExecutionParameters;
+            RetrieverJobDto dto = new RetrieverJobDto
+            {
+                JobId = job.Id,
+                Schedule = job.Schedule,
+                ReadableSchedule = job.ReadableSchedule,
+                RelativeUri = job.RelativeUri,
+                HttpRequestBody = job.JobOptions?.HttpOptions?.Body,
+                SearchCriteria = job.JobOptions?.SearchCriteria,
+                TargetFileName = job.JobOptions?.TargetFileName,
+                CreateCurrentFile = job.JobOptions?.CreateCurrentFile ?? false,
+                DataSourceId = job.DataSource.Id,
+                DataSourceType = job.DataSource.SourceType,
+                DatasetFileConfig = job.DatasetConfig?.ConfigId ?? 0,
+                DataFlow = job.DataFlow.Id,
+                RequestMethod = job.JobOptions?.HttpOptions?.RequestMethod ?? null,
+                RequestDataFormat = job.JobOptions?.HttpOptions?.RequestDataFormat ?? null,
+                FtpPattern = job.JobOptions?.FtpPattern ?? null,
+                ExecutionParameters = job.ExecutionParameters,
+                PagingType = job.JobOptions?.HttpOptions?.PagingType ?? PagingType.None,
+                PageTokenField = job.JobOptions?.HttpOptions?.PageTokenField,
+                PageParameterName = job.JobOptions?.HttpOptions?.PageParameterName
+            };
 
             return dto;
         }

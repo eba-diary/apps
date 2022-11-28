@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
@@ -8,7 +7,6 @@ using System.Linq;
 
 namespace Sentry.data.Infrastructure.Tests
 {
-    [TestClass]
     public class BaseRetrieverJobProviderTests
     {
         protected Mock<IDatasetContext> GetDatasetContextForDfsRetrieverJobs()

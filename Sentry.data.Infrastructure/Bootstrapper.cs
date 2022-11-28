@@ -107,6 +107,7 @@ namespace Sentry.data.Infrastructure
                 x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                 x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
                 x.Type<GoogleBigQueryJobProvider>().Named(DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
+                x.Type<PagingHttpsJobProvider>().Named(DataSourceDiscriminator.PAGING_HTTPS_SOURCE);
             });
 
             //Register event handlers for MetadataProcessorService

@@ -12,12 +12,6 @@ namespace Sentry.data.Core
     {
         private string _compressionOptions;
         private string _httpsOptions;
-        private string _javaAppOptions;
-
-        //public RetrieverJobOptions()
-        //{
-        //    CompressionOptions = new Compression();
-        //}
 
         public Boolean OverwriteDataFile { get; set; }
         public string TargetFileName { get; set; }
@@ -52,7 +46,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                if (String.IsNullOrEmpty(_httpsOptions))
+                if (string.IsNullOrEmpty(_httpsOptions))
                 {
                     return null;
                 }
@@ -95,6 +89,9 @@ namespace Sentry.data.Core
             public string Body { get; set; }
             public HttpMethods RequestMethod { get; set; }
             public HttpDataFormat RequestDataFormat { get; set; }
+            public PagingType PagingType { get; set; }
+            public string PageTokenField { get; set; }
+            public string PageParameterName { get; set; }
         }
     }
 }

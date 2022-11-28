@@ -209,7 +209,7 @@ namespace Sentry.data.Core
             RetrieverJob job = new RetrieverJob();
             MapToRetrieverJob(dto, job);
             job.JobOptions = rjo;
-            job.ObjectStatus = GlobalEnums.ObjectStatusEnum.Active;
+            job.ObjectStatus = ObjectStatusEnum.Active;
             job.DeleteIssueDTM = DateTime.MaxValue;
 
             //if we have previous execution parameters from a data flow edit, only keep if RelativeUri did not change
@@ -217,7 +217,7 @@ namespace Sentry.data.Core
             {
                 //check that all jobs are currently deleted and get the most recent deleted job
                 RetrieverJob previousRetrieverJob = _datasetContext.RetrieverJob.OrderByDescending(x => x.Id).FirstOrDefault(w => w.DataFlow.SchemaId == dto.FileSchema);
-                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == GlobalEnums.ObjectStatusEnum.Deleted && previousRetrieverJob.RelativeUri == job.RelativeUri)
+                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && previousRetrieverJob.RelativeUri == job.RelativeUri)
                 {
                     job.ExecutionParameters = dto.ExecutionParameters;
                 }
@@ -886,7 +886,7 @@ namespace Sentry.data.Core
             jobOptions.OverwriteDataFile = false;
             jobOptions.SearchCriteria = dto.SearchCriteria;
             jobOptions.CreateCurrentFile = dto.CreateCurrentFile;
-            jobOptions.FtpPattern = dto.FtpPattern?? FtpPattern.NoPattern;
+            jobOptions.FtpPattern = dto.FtpPattern ?? FtpPattern.NoPattern;
             jobOptions.TargetFileName = dto.TargetFileName;
         }
 
@@ -895,6 +895,9 @@ namespace Sentry.data.Core
             httpOptions.Body = dto.HttpRequestBody;
             httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
             httpOptions.RequestDataFormat = dto.RequestDataFormat?? HttpDataFormat.none;
+            httpOptions.PagingType = dto.PagingType;
+            httpOptions.PageTokenField = dto.PageTokenField;
+            httpOptions.PageParameterName = dto.PageParameterName;
         }
 
         private void MapToRetrieverJob(RetrieverJobDto dto, RetrieverJob job)

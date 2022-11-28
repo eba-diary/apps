@@ -19,7 +19,8 @@ namespace Sentry.data.Web.Extensions
                 CurrentTokenExp = dataSourceTokenModel.CurrentTokenExp,
                 TokenName = dataSourceTokenModel.TokenName,
                 TokenUrl = dataSourceTokenModel.TokenUrl,
-                Scope = dataSourceTokenModel.Scope
+                Scope = dataSourceTokenModel.Scope,
+                TokenExp = dataSourceTokenModel.TokenExp
             };
         }
         public static DataSourceTokenModel ToModel(this DataSourceTokenDto dataSourceTokenDto)
@@ -32,7 +33,8 @@ namespace Sentry.data.Web.Extensions
                 CurrentTokenExp = dataSourceTokenDto.CurrentTokenExp,
                 TokenName = dataSourceTokenDto.TokenName,
                 TokenUrl = dataSourceTokenDto.TokenUrl,
-                Scope = dataSourceTokenDto.Scope
+                Scope = dataSourceTokenDto.Scope,
+                TokenExp = dataSourceTokenDto.TokenExp
             };
         }
     }
