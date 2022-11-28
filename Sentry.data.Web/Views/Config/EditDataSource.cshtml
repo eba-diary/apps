@@ -179,24 +179,19 @@
                     </div>
                 </div>
                 <div id="requestHeaderPanel">
-                    <div class="md-form">
-                        @Html.LabelFor((model) => model.Headers, new { @class = "control-label col-md-2" })
-                        <div id="requestHeader" class="col-md-10">
-                            <div class="md-form col-md-10 headerEntry">
-                                <a class="addHeader" style="display: inline-block; margin-left: 10px;"><em class="fas fa-plus"></em> Add Header</a>
-                            </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
-                            @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
-                            @foreach (RequestHeader header in Model.Headers)
-                            {
-                                Html.RenderPartial("_Headers", header);
-                            }
+                    <div class="row">
+                        <div class="col align-self-end">
+                            <h4 class="pt-3">Request Headers</h4>
                         </div>
+                        <div class="col">
+                            <button id="AddHeader" type="button" class="btn btn-success waves-effect waves-light float-r">Add Header</button>
+                        </div>
+                    </div>
+                    <div id="RequestContainer">
+                        @foreach (RequestHeader header in Model.Headers)
+                        {
+                            Html.RenderPartial("_Headers", header);
+                        }
                     </div>
                 </div>
             </div>
@@ -225,31 +220,26 @@
             function setAuthTypePanels(authType) {
 
                 if (authType == 'Anonymous Authentication') {
-                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').hide();
                     $('#OAuthPanel').hide();
                 }
                 else if (authType == 'Basic Authentication') {
-                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
                     $('#OAuthPanel').hide();
                 }
                 else if (authType == 'Token Authentication') {
-                    $('#requestHeaderPanel').show();
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').show();
                     $('#OAuthPanel').hide();
                 }
                 else if (authType == 'OAuth 2.0 Authentication') {
-                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').show();
                     $('#OAuthPanel').show();
                 }
                 else {
-                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
                     $('#OAuthPanel').hide();
@@ -258,6 +248,8 @@
 
             function setSourceTypeDefaults(sourceType) {
                 var authtxt = $('#AuthID').find(":selected").text()
+                $('#requestHeaderPanel').hide();
+                $('#pagingPanel').hide();
 
                 setAuthTypePanels(authtxt)
 
@@ -277,13 +269,6 @@
                         //Enable Auth picker and set to default value
                         $('#AuthID').attr('readonly', false); // enabling picker
                     }
-
-                    $('#pagingPanel').hide();
-                    //$('#portNumberPanel').show();
-                    //$('#userPassPanel').show();
-                    //$('#authPanel').show();
-                    //$('#tokenAuthPanel').hide();
-                    //$('#requestHeaderPanel').hide();
                 }
                 else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI" || sourceType == "GoogleBigQueryApi") {
                     $('#IsUserPassRequired').attr('disabled', true);
@@ -291,19 +276,16 @@
                     $('#authPanel').show();
 
                     if (authtxt == 'Token Authentication') {
-                        $('#requestHeaderPanel').show();
                         $('#tokenAuthPanel').show();
                         $('#userPassPanel').hide();
                         $('#OAuthPanel').hide();
                     }
                     else if (authtxt == 'OAuth 2.0 Authentication') {
-                        $('#requestHeaderPanel').hide();
                         $('#tokenAuthPanel').hide();
                         $('#userPassPanel').hide();
                         $('#OAuthPanel').show();
                     }
                     else {
-                        $('#requestHeaderPanel').hide();
                         $('#tokenAuthPanel').hide();
                         $('#userPassPanel').hide();
                         $('#OAuthPanel').hide();
@@ -311,9 +293,10 @@
 
                     if (sourceType == "HTTPS") {
                         $('#pagingPanel').show();
+                        $('#requestHeaderPanel').show();
                     }
-                    else if (sourceType == "GOOGLEAPI" || sourceType == "GoogleBigQueryApi") {
-                        $('#pagingPanel').hide();
+                    else if (sourceType == "GOOGLEAPI") {
+                        $('#requestHeaderPanel').show();
                     }
                 }
                 else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
@@ -328,7 +311,6 @@
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
                     $('#tokenAuthPanel').hide();
-                    $('#pagingPanel').hide();
                 }
                 else {
                     $('#portNumberPanel').hide();
@@ -336,7 +318,6 @@
                     userpasschkbx.attr('disabled', false);
                     $('#userPassPanel').show();
                     $('#authPanel').hide();
-                    $('#pagingPanel').hide();
                 }
             }
 

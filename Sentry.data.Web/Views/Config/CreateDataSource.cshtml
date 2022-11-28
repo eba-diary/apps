@@ -432,21 +432,6 @@
                 banner.show();
             }
 
-
-            $('body').on('click', '.removeHeader', function () {
-                $(this).parent().parent().remove();
-            });
-
-            $('#AddHeader').click(function () {
-                //This approach is described at the site below
-                // http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/
-                $("#AddHeader").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
-                $.get("@Url.Action("HeaderEntryRow", "Config")", function (template) {
-                    $('#RequestContainer').append(template);
-                    $("#AddHeader").html("Add Header");
-                });
-            });
-
             // For certain types of Data Sources the isUserPassRequired checkbox required to be true.  Setting a checkboxfor to readonly still allows
             //   a user to change the value.  A workaround being used for this property is using jquery to disable the property
             //   for the specific data source types which require it to be true.  Then a $('form').on('submit') function
