@@ -11,6 +11,7 @@
 
         $("#RetrieverJob_SelectedSourceType").change(function () {
             var selectBox = this;
+            $("[id$='PagingType']").val('0').change();
             data.Job.SetDataSourceSpecificPanels();
             data.Job.SetFtpPatternDefaults();
             $('.questionairePanel').hide();
@@ -73,6 +74,7 @@
                                 $('.httpParameterPanel').show();
                             }
                             else {
+                                $("[id$='PagingType']").val('0').change();
                                 $('.httpParameterPanel').hide();
                             }
                         }
@@ -185,7 +187,7 @@
             $('.editDataSourceLink').hide();
         }
 
-        $("#relative-url")[0].textContent = $("[id$='RelativeUri']").val();
+        $("#relative-url")[0].textContent = $("#RetrieverJob_RelativeUri").val();
         data.Job.SetPagingForm();
         data.Job.targetFileNameDescUpdate();
 
@@ -193,12 +195,12 @@
             data.Job.SetPagingForm();
         });
 
-        $("[id$='RelativeUri']").on('keyup', function () {
+        $("#RetrieverJob_RelativeUri").on('keyup', function () {
             $("#relative-url")[0].textContent = $(this).val();
             data.Job.SetParameterUrl();
         })
 
-        $("[id$='PageParameterName']").on('keyup', data.Job.SetParameterUrl)
+        $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl)
     },
 
     SetPagingForm: function () {
@@ -206,7 +208,7 @@
             case '1':
                 $('.paging-token-field').hide();
                 $('.paging-request-parameter').show();
-                $("[id$='PageTokenField']").val('');
+                $("#RetrieverJob_PageTokenField").val('');
                 break;
             case '2':
                 $('.paging-token-field').show();
@@ -215,8 +217,8 @@
             default:
                 $('.paging-token-field').hide();
                 $('.paging-request-parameter').hide();
-                $("[id$='PageTokenField']").val('');
-                $("[id$='PageParameterName']").val('');
+                $("#RetrieverJob_PageTokenField").val('');
+                $("#RetrieverJob_PageParameterName").val('');
         }
 
         data.Job.SetParameterUrl();
@@ -225,10 +227,10 @@
     SetParameterUrl: function () {
         let parameter = '';
         let selectedType = $("#RetrieverJob_PagingType :selected").val();
-        let parameterName = $("[id$='PageParameterName']").val();
+        let parameterName = $("#RetrieverJob_PageParameterName").val();
         
         if (parameterName && selectedType != '0') {
-            if ($("[id$='RelativeUri']").val().includes('?')) {
+            if ($("#RetrieverJob_RelativeUri").val().includes('?')) {
                 parameter += "&";
             }
             else {
@@ -302,7 +304,6 @@
                     $('.jobquestion.targetFileName').hide();
                     $('.httpSourcePanel').hide();
                     $('.httpPostPanel').hide();
-                    $("#RetrieverJob_PagingType").val('0').change();
                     break;
                 case "googlebigqueryapi":
                 case "googleapi":
@@ -311,7 +312,6 @@
                     $('.jobquestion.searchCriteria').hide();
                     $('.httpSourcePanel').show();
                     $('.httpPostPanel').hide();
-                    $("#RetrieverJob_PagingType").val('0').change();
                     break;
                 case "https":
                     $('.jobquestion.ftpPattern').hide();
@@ -328,7 +328,6 @@
                     $('.jobquestion.compression').show();
                     $('.jobquestion.searchCriteria').hide();
                     $('.httpPostPanel').hide();
-                    $("#RetrieverJob_PagingType").val('0').change();
             }
 
             //show common questions

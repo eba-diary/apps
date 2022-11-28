@@ -118,7 +118,7 @@ namespace Sentry.data.Web
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
 
-        [DisplayName("Endpoint Supports Paging")]
+        [DisplayName("Enable Paging Support For Source")]
         public bool SupportsPaging { get; set; }
 
 

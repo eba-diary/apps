@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
                     HttpOptions = new RetrieverJobOptions.HttpsOptions()
                     {
                         Body = "This is the body",
-                        RequestMethod = HttpMethods.none,
+                        RequestMethod = HttpMethods.get,
                         RequestDataFormat = HttpDataFormat.json
                     },
                     TargetFileName = "filename"
@@ -62,27 +62,46 @@ namespace Sentry.data.Core.Tests
                 RelativeUri = "relative_uri_value"
             };
 
-            Sentry.Core.ValidationResults results = new Sentry.Core.ValidationResults();
-            Sentry.Core.ValidationResults results_NoRelativeUri = new Sentry.Core.ValidationResults();
-            Sentry.Core.ValidationResults results_NoTargetFileName = new Sentry.Core.ValidationResults();
+            RetrieverJob retrieverJob_No_Request_Method = new RetrieverJob()
+            {
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        Body = "This is the body",
+                        RequestMethod = HttpMethods.none,
+                        RequestDataFormat = HttpDataFormat.none
+                    },
+                    TargetFileName = "filename"
+                },
+                RelativeUri = "relative_uri_value"
+            };
+
+            ValidationResults results = new ValidationResults();
+            ValidationResults results_NoRelativeUri = new ValidationResults();
+            ValidationResults results_NoTargetFileName = new ValidationResults();
+            ValidationResults results_NoRequestMethod = new ValidationResults();
 
             //Act
             httpsSource.Validate(retrieverJob, results);
             httpsSource.Validate(retrieverJob_No_Relative_Uri, results_NoRelativeUri);
             httpsSource.Validate(retrieverJob_No_Target_Filename, results_NoTargetFileName);
+            httpsSource.Validate(retrieverJob_No_Request_Method, results_NoRequestMethod);
 
             //
             Assert.IsFalse(results.GetAll().Any());
             Assert.AreEqual(1, results_NoRelativeUri.GetAll().Count);
-            Assert.AreEqual(DataSource.ValidationErrors.relativeUriNotSpecified, results_NoRelativeUri.GetAll().First().Id);
+            Assert.AreEqual(ValidationErrors.relativeUriNotSpecified, results_NoRelativeUri.GetAll().First().Id);
             Assert.AreEqual(1, results_NoTargetFileName.GetAll().Count);
-            Assert.AreEqual(DataSource.ValidationErrors.httpsTargetFileNameIsBlank, results_NoTargetFileName.GetAll().First().Id);
+            Assert.AreEqual(ValidationErrors.httpsTargetFileNameIsBlank, results_NoTargetFileName.GetAll().First().Id);
+            Assert.AreEqual(1, results_NoRequestMethod.GetAll().Count);
+            Assert.AreEqual(ValidationErrors.httpsRequestMethodNotSelected, results_NoRequestMethod.GetAll().First().Id);
         }
 
         [TestMethod]
         public void GoogleApiDataSourceValidations()
         {
-            Mock<GoogleApiSource> googleApiSource = new Mock<GoogleApiSource>() { CallBase = true };
+            GoogleApiSource googleApiSource = new GoogleApiSource();
             RetrieverJob retrieverJob = new RetrieverJob()
             {
                 JobOptions = new RetrieverJobOptions()
@@ -143,21 +162,17 @@ namespace Sentry.data.Core.Tests
                 RelativeUri = "relative_uri_value"
             };
 
-            googleApiSource.Setup(s => s.ValidateBase(It.IsAny<RetrieverJob>(), It.IsAny<Sentry.Core.ValidationResults>()));
-
-            Sentry.Core.ValidationResults results = new Sentry.Core.ValidationResults();
-            Sentry.Core.ValidationResults results_NoRequestMethod = new Sentry.Core.ValidationResults();
-            Sentry.Core.ValidationResults results_NoBodyFormat = new Sentry.Core.ValidationResults();
-            Sentry.Core.ValidationResults results_NoBody = new Sentry.Core.ValidationResults();
+            ValidationResults results = new ValidationResults();
+            ValidationResults results_NoRequestMethod = new ValidationResults();
+            ValidationResults results_NoBodyFormat = new ValidationResults();
+            ValidationResults results_NoBody = new ValidationResults();
 
             //Act
-            googleApiSource.Object.Validate(retrieverJob, results);
-            googleApiSource.Object.Validate(retrieverJob_No_Request_Method, results_NoRequestMethod);
-            googleApiSource.Object.Validate(retrieverJob_No_Body_Format, results_NoBodyFormat);
-            googleApiSource.Object.Validate(retrieverJob_No_Body, results_NoBody);
+            googleApiSource.Validate(retrieverJob, results);
+            googleApiSource.Validate(retrieverJob_No_Request_Method, results_NoRequestMethod);
+            googleApiSource.Validate(retrieverJob_No_Body_Format, results_NoBodyFormat);
+            googleApiSource.Validate(retrieverJob_No_Body, results_NoBody);
 
-            //
-            googleApiSource.Verify(v => v.ValidateBase(It.IsAny<RetrieverJob>(), It.IsAny<Sentry.Core.ValidationResults>()), Times.Exactly(4));
             Assert.IsFalse(results.GetAll().Any());
             Assert.AreEqual(1, results_NoRequestMethod.GetAll().Count);
             Assert.AreEqual(DataSource.ValidationErrors.httpsRequestMethodNotSelected, results_NoRequestMethod.GetAll().First().Id);
