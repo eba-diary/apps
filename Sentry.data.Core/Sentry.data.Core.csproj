@@ -195,6 +195,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
@@ -553,7 +554,7 @@
     <Compile Include="DTO\BaseEntityDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceHomeDTO.cs" />
-    <Compile Include="DTO\Dataset\DatasetDTO.cs" />
+    <Compile Include="DTO\Dataset\DatasetSchemaDto.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />

@@ -1,12 +1,8 @@
-﻿using Sentry.data.Core;
-using Sentry.data.Core.Entities.DataProcessing;
+﻿using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Sentry.data.Core.GlobalConstants;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core.Tests
@@ -48,10 +44,26 @@ namespace Sentry.data.Core.Tests
         }
         public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
         {
-            List<DatasetDto> dtoList = new List<DatasetDto>();
+            List<DatasetDto> dsDtoList = new List<DatasetDto>();
+            foreach (Dataset dsItem in dsList)
+            {
+                DatasetDto dsItemDto = new DatasetDto()
+                {
+                    DatasetId = dsItem.DatasetId,
+                    DatasetName = dsItem.DatasetName,
+                    DatasetDesc = dsItem.DatasetDesc
+                };
+                dsDtoList.Add(dsItemDto);
+            }
+            return dsDtoList;
+        }
+
+        public static List<DatasetSchemaDto> MockDatasetSchemaDto(List<Dataset> dsList)
+        {
+            List<DatasetSchemaDto> dtoList = new List<DatasetSchemaDto>();
             foreach (Dataset ds in dsList)
             {
-                DatasetDto dto = new DatasetDto()
+                DatasetSchemaDto dto = new DatasetSchemaDto()
                 {
                     DatasetId = ds.DatasetId,
                     DatasetDesc = ds.DatasetDesc

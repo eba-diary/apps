@@ -162,5 +162,40 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
             return Ok();
         }
+
+        /// <summary>
+        /// Enable dataflow associated with id provided
+        /// </summary>
+        /// <param name="dataFlowId"></param>
+        /// <returns></returns>
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [Route("{dataFlowId}/Enable")]
+        [HttpPost]
+        public IHttpActionResult EnableDataFlow(int dataFlowId)
+        {
+            _dataFlowService.EnableOrDisableDataFlow(dataFlowId, Core.GlobalEnums.ObjectStatusEnum.Active);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Disable dataflow associated with id provided
+        /// </summary>
+        /// <param name="dataFlowId"></param>
+        /// <returns></returns>
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [Route("{dataFlowId}/Disable")]
+        [HttpPost]
+        public IHttpActionResult DisableDataFlow(int dataFlowId)
+        {
+            _dataFlowService.EnableOrDisableDataFlow(dataFlowId, Core.GlobalEnums.ObjectStatusEnum.Disabled);
+            return Ok();
+        }
+
     }
 }

@@ -40,6 +40,5 @@ namespace Sentry.data.Core
         /// <param name="forceDelete">True = Will force objectstatus to deleted regardless of status.  False = Sets objectstatus to Pending_Delete if applicable</param>
         /// <returns>True = True if all dataflow deletes were successfully submitted to hangfire.</returns>
         bool DeleteDataFlow_Queue(List<int> deleteIdList, string userId, bool forceDelete = false);
-
     }
 }

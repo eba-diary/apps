@@ -91,7 +91,7 @@ namespace Sentry.data.Web.Controllers
             // Define specific AuditType enum id's that will have added search features
             model.AuditAddedSearchKey = new int[]{ 0,1 };
 
-            List<DatasetDto> datasetDtoList = _datasetService.GetAllDatasetDto();
+            List<DatasetSchemaDto> datasetDtoList = _datasetService.GetAllDatasetDto();
 
             model.AllDatasets = new List<SelectListItem>();
 
@@ -126,7 +126,7 @@ namespace Sentry.data.Web.Controllers
         private DatasetSelectionModel GetDatasetSelectionModel()
         {
             DatasetSelectionModel model = new DatasetSelectionModel();
-            List<DatasetDto> dtoList = _datasetService.GetAllActiveDatasetDto();
+            List<DatasetSchemaDto> dtoList = _datasetService.GetAllActiveDatasetDto();
             dtoList = dtoList.OrderBy(x => x.DatasetName).ToList();
             model.AllDatasets = new List<SelectListItem>();
 
@@ -138,7 +138,7 @@ namespace Sentry.data.Web.Controllers
             });
 
 
-            foreach (DatasetDto dto in dtoList)
+            foreach (DatasetSchemaDto dto in dtoList)
             {
                 SelectListItem item = new SelectListItem();
                 item.Text = dto.DatasetName;

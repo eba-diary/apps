@@ -826,18 +826,6 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
         }
 
-        //TODO CLA-2765 - Remove unused method DeleteParquetFilesByStorageCode
-        public void DeleteParquetFilesByStorageCode(string storageCode)
-        {
-            _s3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
-        }
-
-        //TODO CLA-2765 - Remove unused method DeleteRawFilesByStorageCode
-        public void DeleteRawFilesByStorageCode(string storageCode)
-        {
-            _s3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
-        }
-
         public bool SyncConsumptionLayer(int datasetId, int schemaId)
         {
             if (datasetId == 0)
@@ -1074,7 +1062,6 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(DatasetFileConfig dfc)
         {
-            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             dfc.DeleteInd = true;
             dfc.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             dfc.DeleteIssueDTM = DateTime.Now;
@@ -1083,7 +1070,6 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(FileSchema scm)
         {
-            // TODO: CLA-2765 - Set ObjectStatus to PENDING_DELETE status
             scm.DeleteInd = true;
             scm.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
             scm.DeleteIssueDTM = DateTime.Now;
@@ -1562,10 +1548,20 @@ namespace Sentry.data.Core
         public List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> GetExternalDataFlowsBySchema(DatasetFileConfig config)
         {
             List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> externalJobList = new List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>();
-            
-            ///Determine all SchemaMap steps which reference this schema
-            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w => w.MappedSchema == config.Schema && w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap && w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).ToList();
 
+            //NOTE: BRING BACK ACTIVE/DISABLED DATAFLOWS TO ALLOW USER TO REACTIVATE IF DESIRED 
+            ///Determine all SchemaMap steps which reference this schema
+            List<SchemaMap> schemaMappings = _datasetContext.SchemaMap.Where(w =>   w.MappedSchema == config.Schema && 
+                                                                                    w.DataFlowStepId.DataAction_Type_Id == DataActionType.SchemaMap && 
+                                                                                    (   w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active ||
+                                                                                        (   w.DataFlowStepId.DataFlow.ObjectStatus == GlobalEnums.ObjectStatusEnum.Disabled
+                                                                                            && _featureFlags.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()        //REMOVE THIS LINE WHEN REMOVING FEATURE FLAG
+                                                                                        )
+                                                                                    )
+                                                                            ).ToList();
+
+            
+            
             //For each dataflow, get the detaildto object and associated retrieverjobs.  Create new tuple and add to return list.
             foreach (SchemaMap item in schemaMappings)
             {
@@ -1578,8 +1574,16 @@ namespace Sentry.data.Core
                 externalJobList.Add(new Tuple<DataFlowDetailDto, List<RetrieverJob>>(dfDto, rjList));
             }
 
+            //NOTE: BRING BACK ACTIVE/DISABLED DATAFLOWS TO ALLOW USER TO REACTIVATE IF DESIRED 
             //Get DataFlow id which populates data to schema
-            int schemaDataFlowId = _datasetContext.DataFlow.Where(w => w.SchemaId == config.Schema.SchemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Id).FirstOrDefault();
+            int schemaDataFlowId = _datasetContext.DataFlow.Where(  w => w.SchemaId == config.Schema.SchemaId && 
+                                                                    (   w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active || 
+                                                                        (   w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Disabled
+                                                                            && _featureFlags.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()        //REMOVE THIS LINE WHEN REMOVING FEATURE FLAG
+                                                                        )
+                                                                    )
+                                                                  )
+                                                            .Select(s => s.Id).FirstOrDefault();
             if (schemaDataFlowId != 0)
             {
                 DataFlowDetailDto schemaFlowDto = _dataFlowService.GetDataFlowDetailDto(schemaDataFlowId);
@@ -1593,7 +1597,6 @@ namespace Sentry.data.Core
 
             return externalJobList;
         }
-
 
         public static Object TryConvertTo<T>(Object input)
         {

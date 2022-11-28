@@ -135,7 +135,7 @@ left join DatasetFile DF on
     DF.Dataset_Id = TSD.Dataset_ID and
     DF.Schema_ID = TSD.Schema_ID and
     DF.FlowExecutionGuid = TSD.FlowExecutionGuid and
-       DF.RunInstanceGuid = TSD.RunInstanceGuid and
+       COALESCE(DF.RunInstanceGuid, 'none') = COALESCE(TSD.RunInstanceGuid, 'none') and
     DF.FileKey = TSD.SourceKey
 left join DataFlow DFlow on
        TSD.Dataset_ID = DFlow.DatasetId and

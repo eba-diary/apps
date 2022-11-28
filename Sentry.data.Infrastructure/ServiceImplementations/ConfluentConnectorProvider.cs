@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
@@ -54,9 +55,20 @@ namespace Sentry.data.Infrastructure
         {
             StringContent stringContent = new StringContent(requestJSON, System.Text.Encoding.UTF8, "application/json");
             string baseURLplusConnectorEndpoint = $"{_baseUrl}/connectors/";
+            HttpResponseMessage httpResponse = null;
 
-            //IMPORTANT! Use ConfigureAwait(false) to essentially return to original session/thread that called this since caller of this needs the result
-            HttpResponseMessage httpResponse = await _httpClient.PostAsync(baseURLplusConnectorEndpoint, stringContent).ConfigureAwait(false);
+            //USE TRY CATCH IN THE EVENT THE PostAsync Fails because of _baseUrl that is bad
+            try
+            {
+                //IMPORTANT! Use ConfigureAwait(false) to essentially return to original session/thread that called this since caller of this needs the result
+                httpResponse = await _httpClient.PostAsync(baseURLplusConnectorEndpoint, stringContent).ConfigureAwait(false);
+            }
+            catch(Exception ex)
+            {
+                httpResponse = new HttpResponseMessage() { StatusCode = System.Net.HttpStatusCode.BadRequest};
+                Logger.Error($"{nameof(ConfluentConnectorProvider)}.{nameof(CreateS3SinkConnectorAsync)} failed {nameof(requestJSON)}={requestJSON} {nameof(baseURLplusConnectorEndpoint)}={baseURLplusConnectorEndpoint}", ex);
+            }
+
             return httpResponse;
         }
 

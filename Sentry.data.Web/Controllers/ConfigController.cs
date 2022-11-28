@@ -72,7 +72,7 @@ namespace Sentry.data.Web.Controllers
 
             if (us != null && us.CanManageSchema)
             {
-                DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
+                DatasetSchemaDto dsDto = _DatasetService.GetDatasetSchemaDto(id);
 
                 List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
                 foreach (DatasetFileConfig config in ds.DatasetFileConfigs)

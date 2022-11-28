@@ -68,12 +68,18 @@ namespace Sentry.data.Core
             }
         }
 
+        public int Create(FileSchemaDto dto)
+        {
+            FileSchema newSchema = MapToFileSchema(dto);
+            return newSchema.SchemaId;
+        }
+
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
         {
             FileSchema newSchema;
             try
             {
-                newSchema = CreateSchema(schemaDto);
+                newSchema = MapToFileSchema(schemaDto);
 
                 _datasetContext.SaveChanges();
             }
@@ -957,7 +963,7 @@ namespace Sentry.data.Core
 
         
 
-        private FileSchema CreateSchema(FileSchemaDto dto)
+        private FileSchema MapToFileSchema(FileSchemaDto dto)
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString().PadLeft(7, '0');
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
