@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NHibernate.Util;
 using Sentry.Core;
 using System.Collections.Generic;
 using static Sentry.data.Core.GlobalConstants;

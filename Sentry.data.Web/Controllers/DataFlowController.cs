@@ -255,7 +255,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             //No point loading the dropdowns here because we do it again from JS
-            //Instead make sure we are keeping the what dataset and schema were selected
+            //Instead make sure we are keeping the dataset and schema that were selected
             model.SelectedDataset = model.SchemaMaps.First().SelectedDataset;
             model.SelectedSchema = model.SchemaMaps.First().SelectedSchema;
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
@@ -420,59 +420,6 @@ namespace Sentry.data.Web.Controllers
             model.CompressionTypesDropdown = Utility.BuildCompressionTypesDropdown(model.CompressionType);
 
             return model;
-        }
-
-        private void SetSchemaModelLists(SchemaMapModel model)
-        {
-            List<SelectListItem> dsList = new List<SelectListItem>();
-            List<SelectListItem> scmList = new List<SelectListItem>();
-            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
-
-            if (model.SelectedDataset == 0)
-            {
-                dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Selected = true });
-            }
-
-            foreach (var group in groupedDatasets)
-            {
-                SelectListGroup curGroup = new SelectListGroup()
-                {
-                    Name = group.Key.Name
-                };
-
-                dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
-                {
-                    Text = $"{m.DatasetName} ({m.Asset.SaidKeyCode} - {m.NamedEnvironment})",
-                    Value = m.DatasetId.ToString(),
-                    Group = curGroup,
-                    Selected = (m.DatasetId == model.SelectedDataset)
-                }
-                ));
-            }
-
-            model.AllDatasets = dsList;
-
-            if (model.SelectedDataset > 0 && model.SelectedSchema == 0)
-            {
-                scmList.Add(new SelectListItem() { Text = "Select Schema", Value = "0", Selected = true });
-            }
-
-            if (model.SelectedDataset > 0)
-            {
-                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset).Where(w => !w.DeleteInd).OrderBy(o => o.Name);
-
-                foreach (var scm in datasetSchemaList)
-                {
-                    scmList.Add(new SelectListItem()
-                    {
-                        Text = scm.Name,
-                        Value = scm.Schema.SchemaId.ToString(),
-                        Selected = (scm.Schema.SchemaId == model.SelectedSchema)
-                    });
-                }
-
-                model.AllSchemas = scmList;
-            }
         }
                 
         [HttpGet]
