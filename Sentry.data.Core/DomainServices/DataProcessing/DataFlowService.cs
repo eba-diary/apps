@@ -294,6 +294,72 @@ namespace Sentry.data.Core
             return jobIdList;
         }
 
+        public DataFlow Create(DataFlowDto dto)
+        {
+            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Create).ToLower()}";
+            Logger.Info($"{methodName} Method Start");            
+
+            DataFlow newDataFlow;
+            try
+            {
+                ValidateDataFlowDtoForCreate(dto);
+
+                newDataFlow = CreateDataflow_Internal(dto);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{methodName} - Failed to create dataflow", ex);
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newDataFlow;
+        }
+
+        private DataFlow CreateDataflow_Internal(DataFlowDto dto)
+        {
+            DataFlow newDataFlow = MapToDataFlow(dto);
+            MapDataFlowSteps(dto, newDataFlow);
+
+            return newDataFlow;
+        }
+
+        public void CreateDataFlowRetrieverJobMetadata(DataFlow dataFlow)
+        {
+            switch (dataFlow.IngestionType)
+            {
+                case (int)IngestionType.DFS_Drop:
+                case (int)IngestionType.S3_Drop:
+                case (int)IngestionType.Topic:
+                    CreateDataFlowDfsRetrieverJobMetadata(dataFlow);
+                    break;
+                case (int)IngestionType.DSC_Pull:
+                    CreateDataFlowExternalRetrieverJobMetadata(null, dataFlow);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Create all dataflow external dependiences.
+        /// </summary>
+        /// <param name="dataFlow"></param>
+        public void CreateExternalDependencies(int dataFlowId)
+        {
+            DataFlow dataFlow = _datasetContext.GetById<DataFlow>(dataFlowId);
+
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataFlow(dataFlow.Id);
+            }
+            //Create S3 Sink Connectors
+            CreateS3SinkConnector(dataFlow);
+            //Create DFS Drop locations
+            CreateDataFlowDfsDropLocation(dataFlow);
+        }
+
         public int CreateDataFlow(DataFlowDto dto)
         {
             ValidateDataFlowDtoForCreate(dto);
@@ -659,7 +725,7 @@ namespace Sentry.data.Core
         }
 
         #region Private Methods
-        private void ValidateDataFlowDtoForCreate(DataFlowDto dto)
+        internal virtual void ValidateDataFlowDtoForCreate(DataFlowDto dto)
         {
             //Verify user has permissions to create Dataflow
             UserSecurity us = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
@@ -714,7 +780,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void CreateS3SinkConnector(DataFlow df)
+        internal void CreateS3SinkConnector(DataFlow df)
         {
             //ONLY SEND EMAIL IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
             if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
@@ -796,10 +862,10 @@ namespace Sentry.data.Core
                     case (int)IngestionType.DFS_Drop:
                     case (int)IngestionType.S3_Drop:
                     case (int)IngestionType.Topic:
-                        MapDataFlowStepsForPush(dto, df);
+                        CreateDataFlowDfsRetrieverJobMetadata(df);
                         break;
                     case (int)IngestionType.DSC_Pull:
-                        MapDataFlowStepsForPull(dto, df);
+                        CreateDataFlowExternalRetrieverJobMetadata(dto, df);
                         break;
                     default:
                         break;
@@ -810,6 +876,8 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
 
                 CreateS3SinkConnector(df);
+
+                CreateDataFlowDfsDropLocation(df);
 
                 Logger.Info($"DataFlowService_CreateAndSaveDataFlow Method End");
                 return df;
@@ -831,7 +899,6 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 CreatedBy = dto.CreatedBy,
                 Questionnaire = dto.DFQuestionnaire,
-                FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
                 DeleteIssuer = dto.DeleteIssuer,
@@ -846,13 +913,6 @@ namespace Sentry.data.Core
                 NamedEnvironmentType = dto.NamedEnvironmentType,
                 PrimaryContactId = dto.PrimaryContactId,
                 IsSecured = dto.IsSecured,
-
-                //All dataflows get a Security entry regardless
-                //  this allows security process for internally managed permissions
-                //  (i.e. CanManageDataflow)
-                Security = (dto.Id == 0)
-                                ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
-                                : _datasetContext.GetById<DataFlow>(dto.Id).Security,
                 DatasetId = dto.SchemaMap.First().DatasetId,
                 SchemaId = dto.SchemaMap.First().SchemaId,
 
@@ -861,6 +921,13 @@ namespace Sentry.data.Core
                 S3ConnectorName =   (dto.IngestionType == (int)IngestionType.Topic) ? GetS3ConnectorName(dto)   : null
             };
 
+            df.FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault();
+            //All dataflows get a Security entry regardless
+            //  this allows security process for internally managed permissions
+            //  (i.e. CanManageDataflow)
+            df.Security = (dto.Id == 0)
+                            ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
+                            : _datasetContext.GetById<DataFlow>(dto.Id).Security;
             _datasetContext.Add(df);
 
             Logger.Info($"MapToDataFlow Method End");
@@ -896,23 +963,21 @@ namespace Sentry.data.Core
             return group;
         }
 
-        private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
+        private void CreateDataFlowDfsRetrieverJobMetadata(DataFlow df)
         {
-            Logger.Info($"MapDataFlowStepsForPush Method Start");
+            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlowRetrieverJobMetadata).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
 
-            Logger.Debug($"Is DataFlowDto Null:{dto == null}");
             Logger.Debug($"Is DataFlow Null:{df == null}");
-            Logger.Debug($"IsCompressed:::{dto.IsCompressed}");
-            Logger.Debug($"IsPreProcessingRequired:::{dto.IsCompressed}");
 
             if (df.ShouldCreateDFSDropLocations(_dataFeatures))
             {
                 DataSource dfsDataSource;
                 if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
-                    NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == dto.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
+                    NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == df.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
                     if (datasetEnvironmentType == NamedEnvironmentType.NonProd)
                     {
                         dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsNonProdSource);
@@ -930,14 +995,26 @@ namespace Sentry.data.Core
                 RetrieverJob dfsRetrieverJob = _jobService.InstantiateJobsForCreation(df, dfsDataSource);
 
                 _datasetContext.Add(dfsRetrieverJob);
-
-                _jobService.CreateDropLocation(dfsRetrieverJob);
             }
 
-            Logger.Info($"MapDataFlowStepsForPush Method End");
+            Logger.Info($"{methodName} Method End");
         }
 
-        private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
+        private void CreateDataFlowDfsDropLocation(DataFlow dataflow)
+        {
+            if (dataflow.ShouldCreateDFSDropLocations(_dataFeatures))
+            {
+                //Get all jobs associated with dataflow
+                RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow.Id == dataflow.Id && w.ObjectStatus == ObjectStatusEnum.Active && (w.DataSource is DfsNonProdSource || w.DataSource is DfsProdSource || w.DataSource is DfsDataFlowBasic));
+
+                if (job != null)
+                {
+                    _jobService.CreateDropLocation(job);
+                }
+            }
+        }
+
+        private void CreateDataFlowExternalRetrieverJobMetadata(DataFlowDto dto, DataFlow df)
         {
             Logger.Info($"DataFlowService_MapDataFlowStepsForPull Method Start");
 

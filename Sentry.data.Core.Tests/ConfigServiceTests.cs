@@ -25,7 +25,7 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             FileSchema schema = MockClasses.MockFileSchema();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
@@ -52,7 +52,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
@@ -79,7 +79,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
@@ -106,7 +106,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Deleted;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
@@ -132,7 +132,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Deleted;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
@@ -160,7 +160,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             var dataflows = new[] { MockClasses.MockDataFlow() };
@@ -205,7 +205,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             var dataflows = new[] { MockClasses.MockDataFlow() };
@@ -237,6 +237,30 @@ namespace Sentry.data.Core.Tests
 
             // Assert
             dataFlowService.Verify(x => x.Delete(It.IsAny<List<int>>(), null, false), Times.Once);
+        }
+
+        [TestMethod]
+        public void Create()
+        {
+            //Arange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            var mockSchema = MockClasses.MockFileSchema();
+            var mockDataset = MockClasses.MockDataset();
+            var DatasetFileConfig = MockClasses.MockDatasetFileConfig(mockDataset,mockSchema);
+            DatasetFileConfigDto dto = MockClasses.MockDatasetFileConfigDtoList(new List<DatasetFileConfig>() { DatasetFileConfig }).First();
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<DatasetFileConfig>()));
+            context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(mockDataset);
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            _ = configService.Create(dto);
+
+            //Assert
+            mr.VerifyAll();
         }
     }
 }

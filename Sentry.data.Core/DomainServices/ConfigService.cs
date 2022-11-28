@@ -310,6 +310,28 @@ namespace Sentry.data.Core
             }
         }
 
+        public int Create(DatasetFileConfigDto dto)
+        {
+            DatasetFileConfig dfc;
+            try
+            {
+                dfc = CreateDatasetFileConfig(dto);
+
+                Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+                List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
+                dfcList.Add(dfc);
+                _datasetContext.Add(dfc);
+                parent.DatasetFileConfigs = dfcList;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error creating Dataset File Config", ex);
+                throw;
+            }
+
+            return dfc.ConfigId;
+        }
+
         public bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)
         {
             try
