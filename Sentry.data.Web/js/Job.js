@@ -1,9 +1,17 @@
 ﻿data.Job = {
 
     FormInit: function () {
-        $("[id$='SelectedDataSource'] select").val("0");
-        $("[id$='SelectedSourceType']").change(function () {
+        $("#RetrieverJob_SelectedSourceType").materialSelect();
+        $("#RetrieverJob_SelectedDataSource").materialSelect();
+        $("#RetrieverJob_SelectedRequestMethod").materialSelect();
+        $("#RetrieverJob_SelectedRequestDataFormat").materialSelect();
+        $("#RetrieverJob_PagingType").materialSelect();
+        $("#RetrieverJob_FtpPattern").materialSelect();
+        $("#RetrieverJob_SchedulePicker").materialSelect();
+
+        $("#RetrieverJob_SelectedSourceType").change(function () {
             var selectBox = this;
+            $("[id$='PagingType']").val('0').change();
             data.Job.SetDataSourceSpecificPanels();
             data.Job.SetFtpPatternDefaults();
             $('.questionairePanel').hide();
@@ -15,29 +23,33 @@
             $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {
-                    subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                    let selected = "";
+                    if (item.Value == "0") {
+                        selected = "selected='true'";
+                    }
+                    subItems += "<option value='" + item.Value + "' " + selected +">" + item.Text + "</option>";
                 });
-                $("[id$='SelectedDataSource']").html(subItems);
-                $("[id$='SelectedDataSource'] select").val("0");
+                $("#RetrieverJob_SelectedDataSource").materialSelect({ destroy: true });
+                $("#RetrieverJob_SelectedDataSource").html(subItems);
                 $("#RetrieverJob_SelectedDataSource").materialSelect();
             });
 
-            data.Job.RequestMethodDropdownPopulate();
+            data.Job.RequestMethodDropdownPopulate(false);
 
             data.Job.targetFileNameDescUpdate();
         });
 
-        data.Job.RequestMethodDropdownPopulate();
+        data.Job.RequestMethodDropdownPopulate(true);
 
-        $("[id$='SelectedRequestMethod']").change(function () {
+        $("#RetrieverJob_SelectedRequestMethod").change(function () {
             data.Job.DisplayHttpPostPanel();
         });
         
-        $("[id$='SelectedDataSource']").change(function () {
+        $("#RetrieverJob_SelectedDataSource").change(function () {
             var val = $(this).val();
             if (val != "0" && val != null) {
                 $.ajax({                    
-                    url: "/Config/SourceDetails/" + $("[id$='SelectedDataSource'] :selected").val(),
+                    url: "/Config/SourceDetails/" + $("#RetrieverJob_SelectedDataSource :selected").val(),
                     dataType: 'json',
                     type: "GET",
                     //data: { Id: $('#SelectedDataSource :selected').val() },
@@ -56,20 +68,15 @@
                                 $(".editDataSourceLink").hide();
                             }
 
-
                             data.Job.SetDataSourceSpecificPanels(datain.SourceType);
 
-
-                            $.getJSON("/Config/IsHttpSource/", { dataSourceId: val }, function (data) {
-                                if (data) {
-                                    $('.httpSourcePanel').show();
-                                    $('.httpPostPanel').hide();
-                                }
-                                else {
-                                    $('.httpSourcePanel').hide();
-                                    $('.httpPostPanel').hide();
-                                }
-                            });
+                            if (datain.SupportsPaging) {
+                                $('.httpParameterPanel').show();
+                            }
+                            else {
+                                $("[id$='PagingType']").val('0').change();
+                                $('.httpParameterPanel').hide();
+                            }
                         }
                         else {
                             $('.securityPanel').show();
@@ -82,10 +89,10 @@
 
                         $('#dataSourceContactEmail').attr("href", datain.MailToLink)
                         $('#dataSourceContactEmail').text(datain.PrimaryContactName);
-                        //$('#primaryContact.a').text("<a href/" + data.MailToLink + "/"adfad");
                         $('.dataSourceInfoPanel').show();
                         $("#dataSourceDescription").text(datain.Description);
                         $("#baseURLTextBox").val(datain.BaseUri);
+                        $("#base-url").text(datain.BaseUri);
                         $("#baseURL").text(" The Base URL of the Data Source you picked is " + datain.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
                     }
                 });
@@ -106,10 +113,10 @@
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
             e.preventDefault();
             
-            data.Job.AccessRequest($("[id$='SelectedDataSource'] :selected").val());
+            data.Job.AccessRequest($("#RetrieverJob_SelectedDataSource :selected").val());
         });
         
-        $("[id$='FtpPattern']").change(function () {
+        $("#RetrieverJob_FtpPattern").change(function () {
             data.Job.SetFtpPatternDefaults($("#RetrieverJob_FtpPattern").val());
         });
 
@@ -121,14 +128,14 @@
                 $('#TargetFileName').val("");
             }
             
-            if (!$(this).is(':checked') && $("[id$='SelectedSourceType']").val().toLowerCase() !== "ftp") {
+            if (!$(this).is(':checked') && $("#RetrieverJob_SelectedSourceType").val().toLowerCase() !== "ftp") {
                 $('.jobquestion.targetFileName').show();
             }
         });
 
-        if (($("#JobID").val() !== undefined && $("#JobID").val() !== "0") || ($('#JobID').val() === 0 && $("[id$='SelectedDataSource'] :selected").val() !== "0")) {
+        if (($("#JobID").val() !== undefined && $("#JobID").val() !== "0") || ($('#JobID').val() === 0 && $("#RetrieverJob_SelectedDataSource :selected").val() !== "0")) {
             $.ajax({                
-                url: "/Config/SourceDetails/" + $("[id$='SelectedDataSource'] :selected").val(),
+                url: "/Config/SourceDetails/" + $("#RetrieverJob_SelectedDataSource :selected").val(),
                 dataType: 'json',
                 type: "GET",
                 //data: { Id: $('#SelectedDataSource :selected').val() },
@@ -136,7 +143,7 @@
 
                     $('#dataSourceContactEmail').attr("href", datain.MailToLink)
                     $('#dataSourceContactEmail').text(datain.PrimaryContactName);
-                    $("#editDataSource").attr("href", "/Config/Source/Edit/" + $("[id$='SelectedDataSource'] :selected").val());
+                    $("#editDataSource").attr("href", "/Config/Source/Edit/" + $("#RetrieverJob_SelectedDataSource :selected").val());
                     $("#dataSourceDescription").text(datain.Description);
 
                     if (datain.Security.CanEditDataSource) {
@@ -147,7 +154,7 @@
                     data.Job.DisplayHttpPostPanel();
                     data.Job.targetFileNameDescUpdate();
                     
-                    if ($("[id$='SelectedSourceType']").val().toLowerCase() === "ftp") {
+                    if ($("#RetrieverJob_SelectedSourceType").val().toLowerCase() === "ftp") {
                         data.Job.SetFtpPatternDefaults($('#RetrieverJob_FtpPattern').val());
                     };
                 }
@@ -157,8 +164,8 @@
         $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
 
         // If this is an init of page with existing data
-        var dataSourceElement = $("[id$='SelectedDataSource']")[0];
-        var dataSourceVal = $("[id$='SelectedDataSource']").val();
+        var dataSourceElement = $("#RetrieverJob_SelectedDataSource")[0];
+        var dataSourceVal = $("#RetrieverJob_SelectedDataSource").val();
         if (dataSourceVal !== undefined && dataSourceVal !== null) {
             var element = dataSourceElement;
             var event = new Event('change');
@@ -168,9 +175,9 @@
         }
         else {
             //If Source Type is selected, trigger changed event to ensure data source dropdown is populated
-            var dataSourceTypeVal = $("[id$='SelectedSourceType']").val();
-            if (dataSourceTypeVal !== undefined && dataSourceTypeVal !== null) {
-                var element = document.querySelector("[id$='SelectedSourceType']");
+            var dataSourceTypeVal = $("#RetrieverJob_SelectedSourceType").val();
+            if (dataSourceTypeVal !== undefined && dataSourceTypeVal !== null && dataSourceTypeVal != "") {
+                var element = document.querySelector("#RetrieverJob_SelectedSourceType");
                 element.dispatchEvent(new Event('change'));
             }
             $('.securityPanel').hide();
@@ -180,6 +187,67 @@
             $('.editDataSourceLink').hide();
         }
 
+        $("#relative-url")[0].textContent = $("#RetrieverJob_RelativeUri").val();
+        data.Job.SetPagingForm();
+        data.Job.targetFileNameDescUpdate();
+
+        $("#RetrieverJob_PagingType").on('change', function () {
+            data.Job.SetPagingForm();
+        });
+
+        $("#RetrieverJob_RelativeUri").on('keyup', function () {
+            $("#relative-url")[0].textContent = $(this).val();
+            data.Job.SetParameterUrl();
+        })
+
+        $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl)
+    },
+
+    SetPagingForm: function () {
+        switch ($("#RetrieverJob_PagingType :selected").val()) {
+            case '1':
+                $('.paging-token-field').hide();
+                $('.paging-request-parameter').show();
+                $("#RetrieverJob_PageTokenField").val('');
+                break;
+            case '2':
+                $('.paging-token-field').show();
+                $('.paging-request-parameter').show();
+                break;
+            default:
+                $('.paging-token-field').hide();
+                $('.paging-request-parameter').hide();
+                $("#RetrieverJob_PageTokenField").val('');
+                $("#RetrieverJob_PageParameterName").val('');
+        }
+
+        data.Job.SetParameterUrl();
+    },
+
+    SetParameterUrl: function () {
+        let parameter = '';
+        let selectedType = $("#RetrieverJob_PagingType :selected").val();
+        let parameterName = $("#RetrieverJob_PageParameterName").val();
+        
+        if (parameterName && selectedType != '0') {
+            if ($("#RetrieverJob_RelativeUri").val().includes('?')) {
+                parameter += "&";
+            }
+            else {
+                parameter += "?";
+            }
+
+            parameter += parameterName + "=";
+
+            if (selectedType == '1') {
+                parameter += "1";
+            }
+            else {
+                parameter += "tokenValue";
+            }
+        }
+
+        $("#parameter-url")[0].textContent = parameter;
     },
 
     SetFtpPatternDefaults: function (patternSelection) {
@@ -259,6 +327,7 @@
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.compression').show();
                     $('.jobquestion.searchCriteria').hide();
+                    $('.httpPostPanel').hide();
             }
 
             //show common questions
@@ -348,17 +417,24 @@
         }
     },
 
-    RequestMethodDropdownPopulate: function () {
+    RequestMethodDropdownPopulate: function (setPreviousSelected) {
         
-        var val = $("[id$='SelectedSourceType'] :selected").val();
+        var val = $("#RetrieverJob_SelectedSourceType :selected").val();
+        let previousSelected = $("#RetrieverJob_SelectedRequestMethod :selected").val();
 
         $.getJSON(encodeURI("/Config/RequestMethodByType/" + val), function (data) {
             var subItems = "";
             $.each(data, function (index, item) {
-                subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                let selected = "";
+                if (setPreviousSelected && item.Value == previousSelected) {
+                    selected = "selected='true'";
+                }
+                subItems += "<option value='" + item.Value + "' " + selected + ">" + item.Text + "</option>";
             });
-            
-            $("[id$='SelectedRequestMethod']").html(subItems);
+
+            $("#RetrieverJob_SelectedRequestMethod").materialSelect({ destroy: true });
+            $("#RetrieverJob_SelectedRequestMethod").html(subItems);
+            $("#RetrieverJob_SelectedRequestMethod").materialSelect();
         });
 
         data.Job.DisplayHttpPostPanel();
@@ -366,7 +442,7 @@
 
     DisplayHttpPostPanel: function () {
         
-        var val = $("[id$='SelectedRequestMethod'] :selected").text();
+        var val = $("#RetrieverJob_SelectedRequestMethod :selected").text();
         if (val.toUpperCase() === 'POST') {
             //data.Job.RequestDataFormatDropdownPopulate();
             $('.httpPostPanel').show();
@@ -379,22 +455,24 @@
     RequestDataFormatDropdownPopulate: function () {
         if ($("#JobID").val() === undefined || $("#JobID").val() === "0") {
             
-            var val = $("[id$='SelectedSourceType'] :selected").val();
+            var val = $("#RetrieverJob_SelectedSourceType :selected").val();
 
             $.getJSON(encodeURI("/Config/RequestDataFormatByType/" + val), function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {
                     subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
                 });
-                
+
+                $("#RetrieverJob_SelectedRequestDataFormat").materialSelect({ destroy: true });
                 $("[id$ ='SelectedRequestDataFormat']").html(subItems);
+                $("#RetrieverJob_SelectedRequestDataFormat").materialSelect();
             });
         }        
     },
 
     targetFileNameDescUpdate: function () {
         
-        var val = $("[id$='SelectedSourceType'] :selected").val().toLowerCase();
+        var val = $("#RetrieverJob_SelectedSourceType :selected").val().toLowerCase();
 
         if (val == 'https' || val == 'googleapi' || val == 'googlebigqueryapi') {
             $("#targetfilenamequestion").text("What should target file be named?");
@@ -423,7 +501,7 @@
             $('#schedulePanel').show();
         }
 
-        $("[id$='RetrieverJob_SchedulePicker']").change(function () {
+        $("#RetrieverJob_SchedulePicker").change(function () {
 
             $('#hourlyPicker').hide();
             $('#dailyPicker').hide();

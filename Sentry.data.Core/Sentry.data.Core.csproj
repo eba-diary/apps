@@ -200,6 +200,8 @@
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetTileDto.cs" />
+    <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
+    <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
@@ -324,6 +326,8 @@
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
+    <Compile Include="Extensions\AuditExtensions.cs" />
+    <Compile Include="Extensions\DataSourceExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
@@ -335,6 +339,7 @@
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="GlobalEnums\ConnectorState.cs" />
+    <Compile Include="GlobalEnums\PagingType.cs" />
     <Compile Include="GlobalEnums\TileSearchSortByOption.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />

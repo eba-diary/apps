@@ -40,7 +40,8 @@ namespace Sentry.data.Web
             Tokens = dto.Tokens.Select(t => t.ToModel()).ToList() ?? new List<DataSourceTokenModel>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
-
+            ClientPrivateId = dto.ClientPrivateId;
+            SupportsPaging = dto.SupportsPaging;
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
             PrimaryContactEmail = dto.PrimaryContactEmail;
@@ -51,7 +52,6 @@ namespace Sentry.data.Web
             //We do not populate TokenAuthValue and ClientPrivateID.  On Post
             // if a value exists, then a new value is encrypted.  Otherwise, old value is unchanged.
             TokenAuthValue = null;
-            ClientPrivateId = null;
 
             //this is needed for the associate picker js.
             this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
@@ -118,6 +118,9 @@ namespace Sentry.data.Web
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
 
+        [DisplayName("Enable Paging Support For Source")]
+        public bool SupportsPaging { get; set; }
+
 
         #region Security
         [DisplayName("Contact")]
@@ -137,14 +140,9 @@ namespace Sentry.data.Web
         public List<string> ContactIds { get; set; }
         public UserSecurityModel Security { get; set; }
 
-
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }
         public string HrempServiceEnv { get; set; }
-
-        private List<DataSourceTokenModel> tokenDtoListToTokenModelList(IList<DataSourceTokenDto> tokenDtoList)
-        {
-            return (List<DataSourceTokenModel>)tokenDtoList.Cast<DataSourceModel>();
-        }
+        public bool CLA2868_APIPaginationSupport { get; set; }
     }
 }

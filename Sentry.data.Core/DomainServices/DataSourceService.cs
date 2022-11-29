@@ -8,12 +8,15 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
     public class DataSourceService : IDataSourceService
     {
+        #region Fields
         private readonly IDatasetContext _datasetContext;
+        #endregion
         private readonly IEncryptionService _encryptionService;
         private readonly IHttpClientProvider _httpClient;
 
@@ -25,13 +28,75 @@ namespace Sentry.data.Core
             _encryptionService = encryptionService;
             _httpClient = httpClient;
         }
+        #endregion
 
+        #region IDataSourceService Implementations
+        public List<DataSourceTypeDto> GetDataSourceTypeDtosForDropdown()
         public async void ExchangeAuthToken(DataSource dataSource, string authToken)
         {
+            List<string> dropdownTypes = new List<string>
             var content = new Dictionary<string, string>
             {
+                DataSourceDiscriminator.FTP_SOURCE,
+                DataSourceDiscriminator.SFTP_SOURCE,
+                DataSourceDiscriminator.DFS_CUSTOM,
+                DataSourceDiscriminator.HTTPS_SOURCE,
+                DataSourceDiscriminator.GOOGLE_API_SOURCE,
+                DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE
               {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "redirect"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
             };
+
+            List<DataSourceTypeDto> dataSourceDtos = _datasetContext.DataSourceTypes.Where(x => dropdownTypes.Contains(x.DiscrimatorValue))
+                .Select(x => new DataSourceTypeDto { Name = x.Name, Description = x.Description, DiscrimatorValue = x.DiscrimatorValue})
+                .ToList();
+
+            return dataSourceDtos;
+        }
+
+        public List<AuthenticationTypeDto> GetValidAuthenticationTypeDtosByType(string sourceType)
+        {
+            List<AuthenticationType> validAuthTypes;
+
+            switch (sourceType)
+            {
+                case DataSourceDiscriminator.FTP_SOURCE:
+                    validAuthTypes = new FtpSource().ValidAuthTypes;
+                    break;
+                case DataSourceDiscriminator.SFTP_SOURCE:
+                    validAuthTypes = new SFtpSource().ValidAuthTypes;
+                    break;
+                case DataSourceDiscriminator.DFS_CUSTOM:
+                    validAuthTypes = new DfsCustom().ValidAuthTypes;
+                    break;
+                case DataSourceDiscriminator.HTTPS_SOURCE:
+                    validAuthTypes = new HTTPSSource().ValidAuthTypes;
+                    break;
+                case DataSourceDiscriminator.GOOGLE_API_SOURCE:
+                    validAuthTypes = new GoogleApiSource().ValidAuthTypes;
+                    break;
+                case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
+                    validAuthTypes = new GoogleBigQueryApiSource().ValidAuthTypes;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            List<string> validAuthTypeCodes = validAuthTypes.Select(x => x.AuthType).ToList();
+
+            List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
+            List<AuthenticationType> fullValidAuthTypes = allAuthTypes.Where(x => validAuthTypeCodes.Contains(x.AuthType)).ToList();
+
+            List<AuthenticationTypeDto> authenticationTypeDtos = fullValidAuthTypes.Select(x => x.ToDto()).ToList();
+
+            return authenticationTypeDtos;
+        }
+
+        public List<AuthenticationTypeDto> GetAuthenticationTypeDtos()
+        {
+            List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
+            List<AuthenticationTypeDto> authenticationTypeDtos = allAuthTypes.Select(x => x.ToDto()).ToList();
+
+            return authenticationTypeDtos;
             var jsonContent = JsonConvert.SerializeObject(content);
             var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent);
@@ -47,5 +112,6 @@ namespace Sentry.data.Core
             });
             _datasetContext.SaveChanges();
         }
+        #endregion
     }
 }

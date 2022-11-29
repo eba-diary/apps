@@ -8,15 +8,16 @@
     @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
     {
         @Html.AntiForgeryToken()
-        <span id="DataFlowFormContainer_HiddenFor">
-            @Html.HiddenFor(x => x.DataFlowId)
-            @Html.HiddenFor(x => x.StorageCode)
-            @Html.HiddenFor(x => x.CreatedBy)
-            @Html.HiddenFor(x => x.PrimaryContactId)
-            @Html.HiddenFor(x => x.IsSecured)
-            @Html.HiddenFor(x => x.SelectedDataset)
-            @Html.HiddenFor(x => x.SelectedSchema)
-        </span>
+    <span id="DataFlowFormContainer_HiddenFor">
+        @Html.HiddenFor(x => x.DataFlowId)
+        @Html.HiddenFor(x => x.StorageCode)
+        @Html.HiddenFor(x => x.CreatedBy)
+        @Html.HiddenFor(x => x.PrimaryContactId)
+        @Html.HiddenFor(x => x.IsSecured)
+        @Html.HiddenFor(x => x.SelectedDataset)
+        @Html.HiddenFor(x => x.SelectedSchema)
+        @Html.HiddenFor(x => x.ObjectStatus)
+    </span>
         <div id="dataflow-home-wrapper" class="col-lg-12">
             <div class="dataflow-home-photo bg-photo-dataflow ic">
                 <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
@@ -33,13 +34,10 @@
         <div class="md-form">
             <h4>How will the data be sent to us?</h4>
             <div class="material-tooltip-main" data-toggle="tooltip" title="Will your process send a file to DSC (Drop/Topic)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
-                @Html.DropDownListFor(
-                    x => x.IngestionTypeSelection,
-                    Model.IngestionTypeDropDown,
-                    new { @class = "mdb-select" })
+                @Html.DropDownListFor(x => x.IngestionTypeSelection, Model.IngestionTypeDropDown, new { @class = "mdb-select" })
             </div>
 
-            <div id="topicNameContainer" class="md-form">
+            <div id="topicNameContainer" class="md-form" style="display:none;">
                 <h4>What is the Kafka Topic Name?</h4>
                 @Html.TextBoxFor((m) => m.TopicName, Model.TopicName, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => Model.TopicName, "", new { @class = "text-danger" })
@@ -95,14 +93,12 @@
             </div>
         </div>
 
-
         @*DSC PULL*@
         <div class="retrieverPanel" style="display:none">
             <div id="retrieverJobPanel">
                 @Html.EditorFor(model => model.RetrieverJob)
             </div>
         </div>
-
 
         <div class="preProcessingPanel" style="display:none;">
             <div class="md-form">
