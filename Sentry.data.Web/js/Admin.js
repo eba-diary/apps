@@ -461,7 +461,7 @@ data.Admin = {
                         }
                     },
                     error: function (msg) {
-                        data.Dataset.makeToast("error", msg.responseText["title"]);
+                        data.Dataset.makeToast("error", msg.responseText);
                         $("#tab-spinner").hide();
                     },
                     complete: function (msg) {
