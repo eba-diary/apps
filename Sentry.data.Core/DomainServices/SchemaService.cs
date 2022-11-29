@@ -74,6 +74,11 @@ namespace Sentry.data.Core
             return newSchema.SchemaId;
         }
 
+        public void CreateExternalDependencies(int schemaId)
+        {
+            //There are currently no schema external dependencies
+        }
+
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
         {
             FileSchema newSchema;

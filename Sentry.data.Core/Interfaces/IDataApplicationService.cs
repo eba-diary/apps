@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Sentry.data.Core.Entities.Migration;
+using Sentry.data.Core.Exceptions;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -40,5 +42,19 @@ namespace Sentry.data.Core
         /// <param name="forceDelete">True = Will force objectstatus to deleted regardless of status.  False = Sets objectstatus to Pending_Delete if applicable</param>
         /// <returns>True = True if all dataflow deletes were successfully submitted to hangfire.</returns>
         bool DeleteDataFlow_Queue(List<int> deleteIdList, string userId, bool forceDelete = false);
+        /// <summary>
+        /// Performs the migration of a dataset between named environments associated with the dataset SAID asset code.
+        /// <para>Optional: Schema, associated with source dataset, can be included in migration request.</para>
+        /// </summary>
+        /// <param name="migrationRequest"></param>
+        /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user not authorized to migrate dataset.</exception>
+        /// <returns></returns>
+        bool MigrateDataset(DatasetMigrationRequest migrationRequest);
+        /// <summary>
+        /// Performs the migration of a schema between named environemnts associated with parent dataset SAID asset code.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        bool MigrateSchema(SchemaMigrationRequest request);
     }
 }

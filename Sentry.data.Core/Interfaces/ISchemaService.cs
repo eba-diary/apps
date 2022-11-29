@@ -51,6 +51,13 @@ namespace Sentry.data.Core
         int CreateAndSaveSchema(FileSchemaDto schemaDto);
 
         /// <summary>
+        /// Performs all necessary external dependency creation statements.
+        /// </summary>
+        /// <remarks>To be called after creation of schema.</remarks>
+        /// <param name="schemaId"></param>
+        void CreateExternalDependencies(int schemaId);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="datasetId"></param>

@@ -262,6 +262,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
 
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
             jobService.Setup(x => x.CreateAndSaveRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Returns(new RetrieverJob());
@@ -535,8 +536,12 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.SetupGet(x => x.DataSources).Returns(new List<DataSource>() { dataSource }.AsQueryable());
 
+            RetrieverJob retrieverJob = MockClasses.GetMockRetrieverJob();
+            retrieverJob.DataFlow = new DataFlow() { Id = 3 };
+            retrieverJob.DataSource = dataSource;
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>() { retrieverJob }.AsQueryable());
+
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
-            RetrieverJob retrieverJob = new RetrieverJob();
             jobService.Setup(x => x.InstantiateJobsForCreation(It.Is<DataFlow>(d => d.Id == 3), dataSource)).Returns(retrieverJob);
             jobService.Setup(x => x.CreateDropLocation(retrieverJob));
 

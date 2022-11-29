@@ -15,12 +15,12 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             bool IsSuccessful = configService.Delete(config.ConfigId, null, true);
@@ -36,13 +36,13 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             configService.Delete(config.ConfigId, null, true);
@@ -60,7 +60,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -73,7 +73,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null);
 
             //Act
             configService.Delete(config.ConfigId, null, true);
@@ -90,13 +90,13 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Deleted;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             bool IsSuccessful = configService.Delete(config.ConfigId, null, true);
@@ -112,20 +112,14 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Deleted;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            //Mock<IJobService> jobService = mr.Create<IJobService>();
-            //jobService.Setup(x => x.DeleteJob(It.IsAny<List<int>>(), It.IsAny<string>(), It.IsAny<bool>()));
-
-            //Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            //dataFlowService.Setup(x => x.DeleteFlowsByFileSchema(It.IsAny<FileSchema>(), It.IsAny<bool>()));
-
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             configService.Delete(config.ConfigId, null, true);
@@ -141,7 +135,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Deleted;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -154,7 +148,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null);
 
             //Act
             configService.Delete(config.ConfigId, null, false);
@@ -171,7 +165,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            DatasetFileConfig config = MockClasses.MockDataFileConfig(null, null);
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig(null, null);
             config.ObjectStatus = ObjectStatusEnum.Deleted;
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
@@ -184,7 +178,7 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, null, dataFlowService.Object, null, null);
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null);
 
             //Act
             bool IsSuccessful = configService.Delete(config.ConfigId, null, false);
