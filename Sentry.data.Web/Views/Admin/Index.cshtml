@@ -8,7 +8,83 @@
 
 <html>
     <body>
-        <h1>Welcome to the Admin Page</h1>
-        <h4>There's plenty of space here for anything else you want.</h4>
+        <div>
+            
+            <div>
+                <h1>Welcome to the Admin Page</h1>
+            </div>
+            <div class="processingActivityDiv">
+                <h3>Processing Activity</h3>
+                <div class="row">
+                    <div class="column">
+                        <div class="container">
+                            Total Files Today<br />
+                            <a href="" target="_blank">
+                                <strong class="num_style">1,051</strong><br />
+                            </a>
+                            Click for Details
+                        </div>
+                        
+                    </div>
+                    <div class="column">
+                        <div class="container">
+                            Files In-Flight<br />
+                            <a href="" target="_blank">
+                                <strong class="num_style">306</strong><br />
+                            </a>
+                            Click for Details
+                        </div>
+                        
+                    </div>
+                    <div class="column">
+                        <div class="container">
+                            File Failures<br />
+                            <a href="" target="_blank">
+                                <strong class="failure_style">2</strong><br />
+                            </a>
+                            Click for Details
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </body>
 </html>
+
+<style>
+    .column{
+        text-align: center;
+        width: 20%;
+        
+    }
+
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    .failure_style {
+        color: red;
+        font-size: 45px;
+    }
+
+    .num_style{
+        font-size: 45px;
+    }
+
+    .container{
+        border: 2px solid lightgray;
+        width: 200px;
+    }
+
+    .processingActivityDiv {
+        padding: 40px;
+        width: 90%;
+        right: auto;
+        padding-right: 25px;
+    }
+
+</style>

@@ -44,5 +44,7 @@ namespace Sentry.data.Infrastructure
 
             return elasticResult.Documents.ToList();
         }
+
+        
     }
 }
