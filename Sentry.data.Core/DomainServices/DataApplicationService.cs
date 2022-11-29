@@ -167,7 +167,7 @@ namespace Sentry.data.Core.DomainServices
                     throw new DatasetUnauthorizedAccessException();
                 }
                 
-                //TODO: CLA-4712 Add migration request validation
+                //TODO: CLA-4780 Add migration request validation
 
                 DatasetDto dto = DatasetService.GetDatasetDto(migrationRequest.SourceDatasetId);
 
