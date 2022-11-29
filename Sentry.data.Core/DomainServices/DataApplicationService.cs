@@ -491,20 +491,10 @@ namespace Sentry.data.Core.DomainServices
         }
         internal void MigrateSchema_Internal(SchemaMigrationRequest migrationRequest)
         {
-            try
-            {
-                int newSchemaId = MigrateSchemaWithoutSave_Internal(migrationRequest);
-                _datasetContext.SaveChanges();
+            int newSchemaId = MigrateSchemaWithoutSave_Internal(migrationRequest);
+            _datasetContext.SaveChanges();
 
-                CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { newSchemaId });
-
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
+            CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { newSchemaId });
         }
 
 

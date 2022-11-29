@@ -249,7 +249,7 @@ namespace Sentry.data.Core.Tests
 
 
             //Act
-            _ = dataApplicationService.Object.MigrateDataset(request);
+            dataApplicationService.Object.MigrateDataset(request);
 
             //Arrage
             mr.VerifyAll();
@@ -293,7 +293,7 @@ namespace Sentry.data.Core.Tests
             };
 
             //Act
-            _ = dataApplicationService.MigrateDataset(request);
+            dataApplicationService.MigrateDataset(request);
         }
 
         [TestMethod]
