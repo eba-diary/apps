@@ -14,31 +14,15 @@ namespace Sentry.data.Core
     public class DataSourceService : IDataSourceService
     {
         private readonly IDatasetContext _datasetContext;
-        private readonly ISecurityService _securityService;
-        private readonly IUserService _userService;
-        private readonly IConfigService _configService;
-        private readonly ISchemaService _schemaService;
-        private readonly IQuartermasterService _quartermasterService;
-        private readonly IDataFeatures _featureFlags;
-        private readonly IDatasetFileService _datasetFileService;
+        private readonly IEncryptionService _encryptionService;
         private readonly IHttpClientProvider _httpClient;
 
-        public DataSourceService(IDatasetContext datasetContext, ISecurityService securityService,
-                            IUserService userService, IConfigService configService,
-                            ISchemaService schemaService,
-                            IQuartermasterService quartermasterService,
-                            IDataFeatures featureFlags,
-                            IDatasetFileService datasetFileService,
+        public DataSourceService(IDatasetContext datasetContext,
+                            IEncryptionService encryptionService,
                             IHttpClientProvider httpClient)
         {
             _datasetContext = datasetContext;
-            _securityService = securityService;
-            _userService = userService;
-            _configService = configService;
-            _schemaService = schemaService;
-            _quartermasterService = quartermasterService;
-            _featureFlags = featureFlags;
-            _datasetFileService = datasetFileService;
+            _encryptionService = encryptionService;
             _httpClient = httpClient;
         }
 
@@ -46,7 +30,7 @@ namespace Sentry.data.Core
         {
             var content = new Dictionary<string, string>
             {
-              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "redirect"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", ((HTTPSSource)dataSource).ClientPrivateId } //todo decrypt
+              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "redirect"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -54,7 +38,14 @@ namespace Sentry.data.Core
             JObject responseAsJson = JObject.Parse(await response.Content.ReadAsStringAsync());
             string accessToken = responseAsJson.Value<string>("access_token");
             string refreshToken = responseAsJson.Value<string>("refresh_token");
-            //((HTTPSSource)dataSource).Tokens;
+            ((HTTPSSource)dataSource).Tokens.Add(new DataSourceToken() {
+                CurrentToken = accessToken,
+                RefreshToken = refreshToken,
+                TokenExp = 7200,
+                TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret"
+                //company name as token name once we start dropping comapny file.
+            });
+            _datasetContext.SaveChanges();
         }
     }
 }

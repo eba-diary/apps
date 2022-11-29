@@ -11,18 +11,18 @@ namespace Sentry.data.Web.WebApi.Controllers
     [WebApiAuthorizeUseApp]
     public class DataSourceController : BaseWebApiController
     {
-        private readonly IDatasetContext _dsContext;
-        private readonly UserService _userService;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IDataSourceService _dataSourceService;
 
 
-        public DataSourceController(IDatasetContext dsContext, UserService userService)
+        public DataSourceController(IDatasetContext dsContext, IDataSourceService dataSourceService)
         {
-            _dsContext = dsContext;
-            _userService = userService;
+            _datasetContext = dsContext;
+            _dataSourceService = dataSourceService;
         }
 
         /// <summary>
-        /// Creates default security for dataset IDs provided
+        /// Exchanges an Auth Token to Add a new Access Token to a Data Source
         /// </summary>
         [HttpPost]
         [ApiVersionBegin(WebAPI.Version.v20220609)]
@@ -37,19 +37,13 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 return BadRequest($"No Auth Token provided.");
             }
-            var dataSource = _dsContext.DataSources.FirstOrDefault(ds => ds.Id == dataSourceId);
+            var dataSource = _datasetContext.DataSources.FirstOrDefault(ds => ds.Id == dataSourceId);
             if (dataSource == null)
             {
                 return BadRequest($"Datasource with ID \"{dataSourceId}\" could not be found.");
             }
-
-            //make call to exchange token
-
-            //add token to datasource
-
-            //drop companies file
-
-            //kick off backfill
+            //act
+            _dataSourceService.ExchangeAuthToken(dataSource, authToken);
             return Ok();
         }
     }
