@@ -253,10 +253,10 @@ namespace Sentry.data.Core.DomainServices
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int newObjectId;
+            int newDatasetFileConfigId;
             try
             {
-                newObjectId = CreateWithoutSave(dto);
+                newDatasetFileConfigId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -267,7 +267,7 @@ namespace Sentry.data.Core.DomainServices
             }
 
             Logger.Info($"{methodName} Method End");
-            return newObjectId;
+            return newDatasetFileConfigId;
         }
         /// <summary>
         /// Creates new dataflow entity object ans saves to domain context.  
@@ -279,10 +279,10 @@ namespace Sentry.data.Core.DomainServices
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int newObjectId;
+            int newDataFlowId;
             try
             {
-                newObjectId = CreateWithoutSave(dto);
+                newDataFlowId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -294,7 +294,7 @@ namespace Sentry.data.Core.DomainServices
 
             try
             {
-                CreateExternalDependenciesForDataFlow(new List<int>() { newObjectId });
+                CreateExternalDependenciesForDataFlow(new List<int>() { newDataFlowId });
             }
             catch (Exception ex)
             {
@@ -303,7 +303,7 @@ namespace Sentry.data.Core.DomainServices
 
 
             Logger.Info($"{methodName} Method End");
-            return newObjectId;
+            return newDataFlowId;
         }
         /// <summary>
         /// Creates new fileschema entity object and saves to domain context.
@@ -314,10 +314,10 @@ namespace Sentry.data.Core.DomainServices
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int newObjectId;
+            int newFileSchemaId;
             try
             {
-                newObjectId = CreateWithoutSave(dto);
+                newFileSchemaId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -328,7 +328,7 @@ namespace Sentry.data.Core.DomainServices
             }
 
             Logger.Info($"{methodName} Method End");
-            return newObjectId;
+            return newFileSchemaId;
         }
 
         /// <summary>
