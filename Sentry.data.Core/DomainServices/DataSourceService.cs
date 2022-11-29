@@ -16,9 +16,9 @@ namespace Sentry.data.Core
     {
         #region Fields
         private readonly IDatasetContext _datasetContext;
-        #endregion
         private readonly IEncryptionService _encryptionService;
         private readonly IHttpClientProvider _httpClient;
+        #endregion
 
         public DataSourceService(IDatasetContext datasetContext,
                             IEncryptionService encryptionService,
@@ -28,14 +28,11 @@ namespace Sentry.data.Core
             _encryptionService = encryptionService;
             _httpClient = httpClient;
         }
-        #endregion
 
         #region IDataSourceService Implementations
         public List<DataSourceTypeDto> GetDataSourceTypeDtosForDropdown()
-        public async void ExchangeAuthToken(DataSource dataSource, string authToken)
         {
             List<string> dropdownTypes = new List<string>
-            var content = new Dictionary<string, string>
             {
                 DataSourceDiscriminator.FTP_SOURCE,
                 DataSourceDiscriminator.SFTP_SOURCE,
@@ -43,7 +40,6 @@ namespace Sentry.data.Core
                 DataSourceDiscriminator.HTTPS_SOURCE,
                 DataSourceDiscriminator.GOOGLE_API_SOURCE,
                 DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE
-              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "redirect"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
             };
 
             List<DataSourceTypeDto> dataSourceDtos = _datasetContext.DataSourceTypes.Where(x => dropdownTypes.Contains(x.DiscrimatorValue))
@@ -91,19 +87,20 @@ namespace Sentry.data.Core
             return authenticationTypeDtos;
         }
 
-        public List<AuthenticationTypeDto> GetAuthenticationTypeDtos()
+        public async void ExchangeAuthToken(DataSource dataSource, string authToken)
         {
-            List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
-            List<AuthenticationTypeDto> authenticationTypeDtos = allAuthTypes.Select(x => x.ToDto()).ToList();
-
-            return authenticationTypeDtos;
+            var content = new Dictionary<string, string>
+            {
+              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "redirect"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
+            };
             var jsonContent = JsonConvert.SerializeObject(content);
             var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent);
             JObject responseAsJson = JObject.Parse(await response.Content.ReadAsStringAsync());
             string accessToken = responseAsJson.Value<string>("access_token");
             string refreshToken = responseAsJson.Value<string>("refresh_token");
-            ((HTTPSSource)dataSource).Tokens.Add(new DataSourceToken() {
+            ((HTTPSSource)dataSource).Tokens.Add(new DataSourceToken()
+            {
                 CurrentToken = accessToken,
                 RefreshToken = refreshToken,
                 TokenExp = 7200,
@@ -111,6 +108,14 @@ namespace Sentry.data.Core
                 //company name as token name once we start dropping comapny file.
             });
             _datasetContext.SaveChanges();
+        }
+
+
+        public List<AuthenticationTypeDto> GetAuthenticationTypeDtos()
+        {
+            List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
+            List<AuthenticationTypeDto> authenticationTypeDtos = allAuthTypes.Select(x => x.ToDto()).ToList();
+            return authenticationTypeDtos;
         }
         #endregion
     }
