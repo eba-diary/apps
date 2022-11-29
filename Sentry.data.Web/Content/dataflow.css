@@ -233,11 +233,11 @@ a.create-link:focus {
     display: flex;
 }
 
-.schema-delete-icon {
+.red-delete-icon {
     color: #B3140B !important;
 }
 
-    .schema-delete-icon:hover {
+    .red-delete-icon:hover {
         color: #f54940 !important;
     }
 

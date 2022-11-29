@@ -87,7 +87,7 @@
                 @Html.ValidationMessageFor(model => model.SelectedRequestMethod, "", new { @class = "text-danger" })
             </div>
 
-            <div class="httpParameterPanel" style="display:none;">
+            <div class="httpPagingPanel" style="display:none;">
                 <div class="md-form">
                     @Html.LabelFor(model => model.PagingType, htmlAttributes: new { @class = "mdb-main-label" })
                     @Html.DropDownListFor(model => model.PagingType, Model.PagingTypeDropdown, new { @class = "mdb-select", })
@@ -102,6 +102,23 @@
                     @Html.LabelFor(model => model.PageParameterName, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageParameterName, new { @class = "form-control", @placeholder = "Parameter name to include on paging requests" })
                     @Html.ValidationMessageFor(model => model.PageParameterName, "", new { @class = "text-danger" })
+                </div>
+
+                <div>
+                    <div class="row">
+                        <div class="col align-self-end">
+                            <h6 class="pt-3">Request Variables</h6>
+                        </div>
+                        <div class="col">
+                            <button id="AddRequestVariable" class="btn btn-success waves-effect waves-light float-r"><em class="fas fa-plus mr-2"></em>Variable</button>
+                        </div>
+                    </div>
+                    <div id="RequestVariableContainer">
+                        @foreach (RequestVariableModel variable in Model.RequestVariables)
+                        {
+                            Html.RenderPartial("_RequestVariable", variable);
+                        }
+                    </div>
                 </div>
             </div>
 

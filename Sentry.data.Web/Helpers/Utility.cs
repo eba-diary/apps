@@ -1,8 +1,10 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
@@ -208,6 +210,17 @@ namespace Sentry.data.Web.Helpers
         public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
         {
             List<SelectListItem> options = new List<SelectListItem>();
+
+            if (selectedValue == -1)
+            {                
+                options.Add(new SelectListItem
+                 {
+                     Selected = true,
+                     Text = $"Select {GetEnumDisplayName<T>()}",
+                     Value = "-1"
+                 });
+            }
+
             foreach (T item in Enum.GetValues(typeof(T)))
             {
                 int value = (int)Convert.ChangeType(item, item.GetTypeCode());
@@ -738,6 +751,18 @@ namespace Sentry.data.Web.Helpers
         private static void AddPageEllipsis(this List<PageItemModel> pageItems)
         {
             pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
+        }
+
+        private static string GetEnumDisplayName<T>() where T : Enum
+        {
+            try
+            {
+                return typeof(T).GetCustomAttribute<EnumDisplayName>().DisplayName;
+            }
+            catch (Exception)
+            {
+                return "Select an option";
+            }
         }
         #endregion
     }

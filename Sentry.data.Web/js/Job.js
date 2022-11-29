@@ -71,11 +71,11 @@
                             data.Job.SetDataSourceSpecificPanels(datain.SourceType);
 
                             if (datain.SupportsPaging) {
-                                $('.httpParameterPanel').show();
+                                $('.httpPagingPanel').show();
                             }
                             else {
                                 $("[id$='PagingType']").val('0').change();
-                                $('.httpParameterPanel').hide();
+                                $('.httpPagingPanel').hide();
                             }
                         }
                         else {
@@ -200,7 +200,20 @@
             data.Job.SetParameterUrl();
         })
 
-        $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl)
+        $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl);
+
+        $(document).on('click', '.RemoveRequestVariable', function () {
+            $(this).parent().parent().remove();
+        });
+
+        $('#AddRequestVariable').on('click', function () {
+            $("#AddRequestVariable").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
+            $.get("/DataFlow/RequestVariableEntryRow", function (template) {
+                $('#RequestVariableContainer').append(template);
+                //get last occurrence of dropdown list to init material select
+                $("#AddRequestVariable").html('<em class="fas fa-plus mr-2"></em>Add Variable');
+            });
+        });
     },
 
     SetPagingForm: function () {

@@ -1,4 +1,5 @@
-﻿using Sentry.Core;
+﻿using Azure.Storage.Sas;
+using Sentry.Core;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
@@ -66,7 +67,7 @@ namespace Sentry.data.Web
         public string PageParameterName { get; set; }
         [DisplayName("Paging Type")]
         public PagingType PagingType { get; set; }
-
+        public List<RequestVariableModel> RequestVariables { get; set; } = new List<RequestVariableModel>();
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }

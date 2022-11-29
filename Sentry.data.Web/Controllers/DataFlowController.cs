@@ -440,6 +440,16 @@ namespace Sentry.data.Web.Controllers
             return PartialView(model);
         }
 
+        public ActionResult RequestVariableEntryRow()
+        {
+            RequestVariableModel requestVariableModel = new RequestVariableModel
+            {
+                VariableIncrementTypeDropdown = Utility.BuildSelectListFromEnum<RequestVariableIncrementType>(-1)
+            };
+
+            return PartialView("_RequestVariable", requestVariableModel);
+        }
+
         private void CreateDropDownSetup(JobModel model)
         {
             List<string> sources = new List<string>()

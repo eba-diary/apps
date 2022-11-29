@@ -1,0 +1,26 @@
+﻿@model RequestVariableModel
+
+@using (Html.BeginCollectionItem("RequestVariables"))
+{
+    <div class="form-inline">
+        <div class="md-form">
+            @Html.LabelFor(model => model.VariableName, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.VariableName, new { @class = "form-control", @placeholder = "This should match the variable added in the Relative URI" })
+            @Html.ValidationMessageFor(model => model.VariableName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="md-form">
+            @Html.LabelFor(model => model.VariableValue, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.VariableValue, new { @class = "form-control", @placeholder = "This will replace the variable at run time" })
+            @Html.ValidationMessageFor(model => model.VariableValue, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="md-form">
+            @Html.LabelFor(model => model.VariableIncrementType, htmlAttributes: new { @class = "mdb-main-label" })
+            @Html.DropDownListFor(model => model.VariableIncrementType, Model.VariableIncrementTypeDropdown, new { @class = "mdb-select", data_toggle = "tooltip", title = "How should the variable value be incremented at scheduled run time?" })
+            @Html.ValidationMessageFor(model => model.VariableIncrementType, "", new { @class = "text-danger" })
+        </div>
+
+        <a class="icon-trash red-delete-icon" id="RemoveRequestVariable" data-toggle="tooltip" data-placement="top" title="Remove Variable"></a>
+    </div>
+}
