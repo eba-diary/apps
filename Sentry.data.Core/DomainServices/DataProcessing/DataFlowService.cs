@@ -1027,7 +1027,6 @@ namespace Sentry.data.Core
         {
             if (dataflow.ShouldCreateDFSDropLocations(_dataFeatures))
             {
-                //Get all jobs associated with dataflow
                 RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow.Id == dataflow.Id && w.ObjectStatus == ObjectStatusEnum.Active && (w.DataSource is DfsNonProdSource || w.DataSource is DfsProdSource || w.DataSource is DfsDataFlowBasic));
 
                 if (job != null)

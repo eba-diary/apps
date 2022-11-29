@@ -245,7 +245,6 @@ namespace Sentry.data.Core.Tests
             dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1).Callback<DatasetDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
             dataApplicationService.Setup(s => s.MigrateSchemaWithoutSave_Internal(It.IsAny<List<SchemaMigrationRequest>>())).Returns(new List<int>()).Callback<List<SchemaMigrationRequest>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}", ++callOrder)));
-            dataApplicationService.Setup(s => s.CreateExternalDependenciesForSchema(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataFlowBySchemaId(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}", ++callOrder)));
 
 
@@ -254,13 +253,12 @@ namespace Sentry.data.Core.Tests
 
             //Arrage
             mr.VerifyAll();
-            Assert.AreEqual(6, calls.Count);
+            Assert.AreEqual(5, calls.Count);
             Assert.AreEqual(1, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateWithoutSave)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateWithoutSave)} called out of order");
             Assert.AreEqual(2, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)} called out of order");
             Assert.AreEqual(3, calls.Where(w => w.Item1 == $"{nameof(IDatasetContext.SaveChanges)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
             Assert.AreEqual(4, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(IDatasetContext.SaveChanges)} called out of order");
-            Assert.AreEqual(5, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)} called out of order");
-            Assert.AreEqual(6, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
+            Assert.AreEqual(5, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
         }
 
         [TestMethod]
@@ -324,14 +322,14 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { datasetFileConfig }.AsQueryable());
-            context.Setup(s => s.DataFlow).Returns(new List<DataFlow>() { new DataFlow() { Id = 1, SchemaId = fileSchema.SchemaId } }.AsQueryable());
+            //context.Setup(s => s.DataFlow).Returns(new List<DataFlow>() { new DataFlow() { Id = 1, SchemaId = fileSchema.SchemaId } }.AsQueryable());
 
             Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
             schemaService.Setup(s => s.GetFileSchemaDto(It.IsAny<int>())).Returns(fileSchemaDto);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             configService.Setup(s => s.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(new List<DatasetFileConfigDto>() { datasetFileConfigDto });
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            dataFlowService.Setup(s => s.GetDataFlowDetailDto(It.IsAny<int>())).Returns(dataFlowDetailDto2);
+            dataFlowService.Setup(s => s.GetDataFlowDetailDtoBySchemaId(It.IsAny<int>())).Returns(new List<DataFlowDetailDto>() { dataFlowDetailDto2 });
 
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
             var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
@@ -758,16 +756,14 @@ namespace Sentry.data.Core.Tests
 
             Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1).Callback<FileSchemaDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
-            dataApplicationService.Setup(s => s.CreateExternalDependenciesForSchema(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}", ++callOrder)));
 
             //Act
             _ = dataApplicationService.Object.Create(dto);
 
             mr.VerifyAll();
-            Assert.AreEqual(3, calls.Count);
+            Assert.AreEqual(2, calls.Count);
             Assert.AreEqual(1, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateWithoutSave)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateWithoutSave)} call out of order");
             Assert.AreEqual(2, calls.Where(w => w.Item1 == $"{nameof(IDatasetContext.SaveChanges)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(IDatasetContext.SaveChanges)} call out of order");
-            Assert.AreEqual(3, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)} call out of order");
 
         }
 

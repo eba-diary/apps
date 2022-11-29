@@ -11,13 +11,29 @@ namespace Sentry.data.Web
     {
         public static DatasetMigrationRequest ToDto(this DatasetMigrationRequestModel model)
         {
-            DatasetMigrationRequest requset = new DatasetMigrationRequest()
+            DatasetMigrationRequest request = new DatasetMigrationRequest()
             {
                 SourceDatasetId = model.SourceDatasetId,
                 TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
             };
 
-            return requset;
+            foreach (SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
+            {
+                request.SchemaMigrationRequests.Add(schemaMigrationRequestModel.ToDto());
+            }
+
+            return request;
+        }
+
+        public static SchemaMigrationRequest ToDto(this SchemaMigrationRequestModel model)
+        {
+            return new SchemaMigrationRequest()
+            {
+                SourceSchemaId = model.SourceSchemaId,
+                TargetDataFlowNamedEnvironment = model.TargetDataFlowNamedEnviornment,
+                TargetDatasetId = model.TargetDatasetId,
+                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
+            };
         }
     }
 }

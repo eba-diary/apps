@@ -152,7 +152,7 @@ namespace Sentry.data.Core.DomainServices
         }
 
 
-        public bool MigrateDataset(DatasetMigrationRequest migrationRequest)
+        public void MigrateDataset(DatasetMigrationRequest migrationRequest)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateDataset).ToLower()}";
             Logger.Info($"{methodName} Method Start");
@@ -160,9 +160,8 @@ namespace Sentry.data.Core.DomainServices
             try
             {
                 IApplicationUser user = UserService.GetCurrentUser();
-                UserSecurity sc = SecurityService.GetUserSecurity(_datasetContext.GetById<Dataset>(migrationRequest.SourceDatasetId), user);
-                //if (!(sc.CanManageSchema || sc.CanCreateDataset))
-                if (!sc.CanEditDataset)
+                UserSecurity userSecurity = SecurityService.GetUserSecurity(_datasetContext.GetById<Dataset>(migrationRequest.SourceDatasetId), user);
+                if (!userSecurity.CanEditDataset)
                 {
                     throw new DatasetUnauthorizedAccessException();
                 }
@@ -189,9 +188,6 @@ namespace Sentry.data.Core.DomainServices
                 //Create dataset external dependencies
                 CreateExternalDependenciesForDataset(new List<int>() { newDsId });
 
-                //Create schema external dependencies
-                CreateExternalDependenciesForSchema(newSchemaIdList);
-
                 //Create dataflow external dependencies
                 CreateExternalDependenciesForDataFlowBySchemaId(newSchemaIdList);
 
@@ -204,21 +200,18 @@ namespace Sentry.data.Core.DomainServices
             }
 
             Logger.Info($"{methodName} Method End");
-            return true;
         }
 
-        public bool MigrateSchema(SchemaMigrationRequest request)
+        public void MigrateSchema(SchemaMigrationRequest request)
         {
-            return MigrateSchema_Internal(request);
+            MigrateSchema_Internal(request);
         }
         #endregion
 
         #region Private methods        
         /// <summary>
-        /// Creates new dataset entity object.  
-        /// <para>When saveChanges true, method will save changes to domain context and on failure clear domain context.</para>
-        /// <para>When saveChanges false, caller is responsible for saving to context and 
-        /// calling <see cref="SecurityService.EnqueueCreateDefaultSecurityForDataset(int)"></see> to create security groups.</para>
+        /// Creates new dataset entity object and saves domain context.
+        /// <para>Also calls <see cref="DatasetService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
         /// </summary>
         /// <param name="dto">DatasetDto</param>
         /// <returns>Id of new dataset object.</returns>
@@ -226,10 +219,10 @@ namespace Sentry.data.Core.DomainServices
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int newObjectId;
+            int newDatasetId;
             try
             {
-                newObjectId = CreateWithoutSave(dto);
+                newDatasetId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -241,7 +234,7 @@ namespace Sentry.data.Core.DomainServices
 
             try
             {
-                CreateExternalDependenciesForDataset(new List<int>() { newObjectId });
+                CreateExternalDependenciesForDataset(new List<int>() { newDatasetId });
             }
             catch (Exception ex)
             {
@@ -249,15 +242,12 @@ namespace Sentry.data.Core.DomainServices
             }
 
             Logger.Info($"{methodName} Method End");
-            return newObjectId;
+            return newDatasetId;
         }
         /// <summary>
-        /// Creates new datasetfileconfig entity object.  
-        /// <para>When saveChanges true, method will save changes to domain context and on failure clear domain context.</para> 
-        /// <para>If saveChanges false, calling method is in charge of save logic.</para>
+        /// Creates new datasetfileconfig entity object and saves to domain context.
         /// </summary>
         /// <param name="dto"></param>
-        /// <param name="saveChanges"></param>
         /// <returns>Id of new datasetfileconfig object.</returns>
         internal int Create(DatasetFileConfigDto dto)
         {
@@ -280,14 +270,11 @@ namespace Sentry.data.Core.DomainServices
             return newObjectId;
         }
         /// <summary>
-        /// Creates new dataflow entity object.  
-        /// <para>When saveChanges true, method will save changes to domain context and on failure clear domain context.</para> 
-        /// <para>When saveChanges false, caller is responsible for saving to context and 
-        /// calling <see cref="SecurityService.EnqueueCreateDefaultSecurityForDataFlow(int)"></see> to create security groups.</para>
+        /// Creates new dataflow entity object ans saves to domain context.  
+        /// <para>Also calls <see cref="DataFlowService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
         /// </summary>
         /// <param name="dto">DataFlowDtoDto</param>
-        /// <param name="saveChanges"></param>
-        /// <returns>Id of new fileschema object.</returns>
+        /// <returns>Id of new dataflow object.</returns>
         internal int Create(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
@@ -319,12 +306,9 @@ namespace Sentry.data.Core.DomainServices
             return newObjectId;
         }
         /// <summary>
-        /// Creates new fileschema entity object.  
-        /// <para>When saveChanges true, method will save changes to domain context and on failure clear domain context.</para> 
-        /// <para>If saveChanges false, calling method is in charge of save logic.</para>
+        /// Creates new fileschema entity object and saves to domain context.
         /// </summary>
         /// <param name="dto">FileSchemaDto</param>
-        /// <param name="saveChanges"></param>
         /// <returns>Id of new fileschema object.</returns>
         internal int Create(FileSchemaDto dto)
         {
@@ -343,20 +327,16 @@ namespace Sentry.data.Core.DomainServices
                 throw;
             }
 
-            try
-            {
-                CreateExternalDependenciesForSchema(new List<int>() { newObjectId });
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn($"{methodName} - Failed to create external dependencies for fileschema", ex);
-            }
-
             Logger.Info($"{methodName} Method End");
             return newObjectId;
         }
 
-
+        /// <summary>
+        ///  Creates new dataset entity object.    
+        /// <para>Caller is responsible for saving to domain context and calling <see cref="DatasetService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new dataset object.</returns>
         internal virtual int CreateWithoutSave(DatasetDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
@@ -375,14 +355,20 @@ namespace Sentry.data.Core.DomainServices
             Logger.Info($"{methodName} Method End");
             return newDatasetId;
         }
+        /// <summary>
+        ///  Creates new datasetfileconfig entity object.    
+        /// <para>Caller is responsible for saving to domain context.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new datasetfileconfig object.</returns>
         internal virtual int CreateWithoutSave(DatasetFileConfigDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int configId;
+            int newConfigId;
             try
             {
-                configId = ConfigService.Create(dto);
+                newConfigId = ConfigService.Create(dto);
             }
             catch (Exception ex)
             {
@@ -391,8 +377,14 @@ namespace Sentry.data.Core.DomainServices
             }
 
             Logger.Info($"{methodName} Method End");
-            return configId;
+            return newConfigId;
         }
+        /// <summary>
+        /// Creates new dataflow entity object and saves domain context.
+        /// <para>Also calls <see cref="DataFlowService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new dataflow object.</returns>
         internal virtual int CreateWithoutSave(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
@@ -414,6 +406,11 @@ namespace Sentry.data.Core.DomainServices
             Logger.Info($"{methodName} Method End");
             return newDataFlow.Id;
         }
+        /// <summary>
+        /// Creates new fileschema entity object and saves to domain context.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new fileschema object.</returns>
         internal virtual int CreateWithoutSave(FileSchemaDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
@@ -463,8 +460,7 @@ namespace Sentry.data.Core.DomainServices
                 int sourceDatasetId = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == request.SourceSchemaId).ParentDataset.DatasetId;
                 DatasetFileConfigDto configDto = ConfigService.GetDatasetFileConfigDtoByDataset(sourceDatasetId).FirstOrDefault(x => x.Schema.SchemaId == request.SourceSchemaId);
 
-                int dataflowId = _datasetContext.DataFlow.FirstOrDefault(w => w.SchemaId == request.SourceSchemaId).Id;
-                DataFlowDetailDto dataflowDto = DataFlowService.GetDataFlowDetailDto(dataflowId);
+                DataFlowDetailDto dataflowDto = DataFlowService.GetDataFlowDetailDtoBySchemaId(request.SourceSchemaId).FirstOrDefault();
 
                 //Adjust schemaDto associations and create new entity
                 schemaDto.ParentDatasetId = request.TargetDatasetId;
@@ -493,14 +489,12 @@ namespace Sentry.data.Core.DomainServices
             Logger.Info($"{methodName} Method End");
             return newSchemaId;
         }
-        internal bool MigrateSchema_Internal(SchemaMigrationRequest migrationRequest)
+        internal void MigrateSchema_Internal(SchemaMigrationRequest migrationRequest)
         {
             try
             {
                 int newSchemaId = MigrateSchemaWithoutSave_Internal(migrationRequest);
                 _datasetContext.SaveChanges();
-
-                CreateExternalDependenciesForSchema(new List<int>() { newSchemaId });
 
                 CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { newSchemaId });
 
@@ -519,13 +513,6 @@ namespace Sentry.data.Core.DomainServices
             foreach (int datasetId in datasetIdList)
             {
                 DatasetService.CreateExternalDependencies(datasetId);
-            }
-        }
-        internal virtual void CreateExternalDependenciesForSchema(List<int> schemaIdList)
-        {
-            foreach (int schemaId in schemaIdList)
-            {
-                SchemaService.CreateExternalDependencies(schemaId);
             }
         }
         internal virtual void CreateExternalDependenciesForDataFlow(List<int> dataFlowIdList)
