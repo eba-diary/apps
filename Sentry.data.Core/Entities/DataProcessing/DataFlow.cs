@@ -80,6 +80,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
             public const string stepsContainsAtLeastOneSchemaMap = "stepsContainsAtLeastOneSchemaMap";
 
             public const string topicNameIsBlank = "topicNameIsBlank";
+            public const string topicNameMustBeUnique = "topicNameMustBeUnique";
         }
     }
 }
