@@ -159,7 +159,7 @@ namespace Sentry.data.Web.Tests
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
             var cc = new ConfigController(mockDatasetContext, mockUserService, mockAssociateService, mockConfigService, mockEvensService, 
-                mockDatasetService, mockObsidianService, mockSecurityService, mockSchemaService, mockDataFeatures, null);
+                mockDatasetService, mockObsidianService, mockSecurityService, mockSchemaService, mockDataFeatures, null, null);
             cc.SharedContext = mockSharedContextModel;
 
             return cc;

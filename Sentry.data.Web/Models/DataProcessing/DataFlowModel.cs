@@ -112,20 +112,21 @@ namespace Sentry.data.Web
             }
 
             #region RetrieverJob validations
-            if (IngestionTypeSelection == (int)IngestionType.DSC_Pull && RetrieverJob == null)
+            if (IngestionTypeSelection == (int)IngestionType.DSC_Pull)
             {
-                results.Add(string.Empty, "Pull type data flows required retriever job configuration");
-            }
-            if(IngestionTypeSelection == (int)IngestionType.DSC_Pull && RetrieverJob != null)
-            {
-                foreach (ValidationResult result in RetrieverJob.Validate().ValidationResults.GetAll())
+                if (RetrieverJob == null)
                 {
-                    results.Add(result.Id, result.Description, result.Severity);
+                    results.Add(string.Empty, "Pull type data flows required retriever job configuration");
                 }
-            }
-            
+                else
+                {
+                    foreach (ValidationResult result in RetrieverJob.Validate().ValidationResults.GetAll())
+                    {
+                        results.Add(result.Id, result.Description, result.Severity);
+                    }
+                }
+            }            
             #endregion
-
 
             if (SchemaMaps == null || !SchemaMaps.Any(w => !w.IsDeleted))
             {
@@ -147,7 +148,7 @@ namespace Sentry.data.Web
                 results.Add("PreprocessingOptions", "Pre Processing selection is required");
             }
 
-            if (String.IsNullOrWhiteSpace(SAIDAssetKeyCode))
+            if (string.IsNullOrWhiteSpace(SAIDAssetKeyCode))
             {
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "Must associate data flow with SAID asset");
             }

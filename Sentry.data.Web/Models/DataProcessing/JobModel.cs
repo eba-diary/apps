@@ -59,6 +59,14 @@ namespace Sentry.data.Web
         [DisplayName("FTP Pattern")]
         public FtpPattern FtpPattern { get; set; }
 
+        [DisplayName("Page Token Field")]
+        public string PageTokenField { get; set; }
+        [DisplayName("Page Parameter Name")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-zA-Z0-9_\-\~\.]*$", ErrorMessage = "GET parameter names can only be alphanumeric with -._~")]
+        public string PageParameterName { get; set; }
+        [DisplayName("Paging Type")]
+        public PagingType PagingType { get; set; }
+
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
@@ -67,6 +75,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
         public IEnumerable<SelectListItem> FtpPatternDropDown { get; internal set; }
         public IEnumerable<SelectListItem> SchedulePickerDropdown { get; set; }
+        public IEnumerable<SelectListItem> PagingTypeDropdown { get; set; }
         public List<string> SourceIds { get; set; }
         public UserSecurity Security { get; set; }
         public Dictionary<string, string> ExecutionParameters { get; set; }
@@ -85,6 +94,24 @@ namespace Sentry.data.Web
             if (string.IsNullOrWhiteSpace(SchedulePicker) || SchedulePicker == "0" || string.IsNullOrWhiteSpace(Schedule))
             {
                 results.Add("SchedulePicker", "Schedule is required");
+            }
+
+            if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
+            {
+                results.Add("PageParameterName", "Page Parameter Name is required");
+            }
+
+            if (PagingType == PagingType.Token)
+            {
+                if (string.IsNullOrWhiteSpace(PageParameterName))
+                {
+                    results.Add("PageParameterName", "Page Parameter Name is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(PageTokenField))
+                {
+                    results.Add("PageTokenField", "Page Token Field is required");
+                }
             }
 
             return new ValidationException(results);

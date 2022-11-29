@@ -8,7 +8,7 @@ namespace Sentry.data.Core
     public class DataSourceDto
     {
         public int OriginatingId { get; set; }
-        public string RetrunUrl { get; set; }
+        public string ReturnUrl { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string KeyCode { get; set; }
@@ -21,6 +21,7 @@ namespace Sentry.data.Core
         public bool UrlBasedRequest { get; set; }
         public bool ObjectBasedRequest { get; set; }
         public Uri BaseUri { get; set; }
+        public bool SupportsPaging { get; set; }
 
         #region TokenAuthSpecific
         public string TokenAuthHeader { get; set; }

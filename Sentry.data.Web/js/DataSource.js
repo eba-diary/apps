@@ -36,6 +36,20 @@
             $(this).parent().parent().remove();
             data.DataSource.UpdateShowAddTokenButton();
         });
+
+        $('body').on('click', '.removeHeader', function () {
+            $(this).parent().parent().remove();
+        });
+
+        $('#AddHeader').on('click', function () {
+            //This approach is described at the site below
+            // http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/
+            $("#AddHeader").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
+            $.get("/Config/HeaderEntryRow", function (template) {
+                $('#RequestContainer').append(template);
+                $("#AddHeader").html("Add Header");
+            });
+        });
     },
 
     UpdateShowAddTokenButton: function () {

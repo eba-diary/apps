@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -102,6 +99,21 @@ namespace Sentry.data.Infrastructure
         public string DecryptEncryptUsingNewIV(string origValue, string key, string oldIv, string newIv)
         {
             return EncryptString(DecryptString(origValue, key, oldIv), key, newIv).Item1;
+        }
+
+        public bool IsEncrypted(string input)
+        {
+            return !string.IsNullOrEmpty(input) && input.StartsWith(Encryption.ENCRYPTIONINDICATOR) && input.EndsWith(Encryption.ENCRYPTIONINDICATOR);
+        }
+
+        public string PrepEncryptedForDisplay(string encryptedString)
+        {
+            if (!string.IsNullOrEmpty(encryptedString))
+            {
+                return Encryption.ENCRYPTIONINDICATOR + encryptedString + Encryption.ENCRYPTIONINDICATOR;
+            }
+
+            return encryptedString;
         }
 
         private byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
