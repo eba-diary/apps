@@ -142,21 +142,22 @@ namespace Sentry.data.Web.WebApi.Controllers
         #region Dataset_Endpoints
 
         /* This code will be used within next two iterations*/
-        [HttpPost]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
-        [Route("dataset")]
-        public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
-        {
-            IHttpActionResult MigrateDatasetFunction()
-            {
-                DatasetMigrationRequest request = model.ToDto();
-                DataApplicationService.MigrateDataset(request);
-                return Ok();
-            }
+        //[HttpPost]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        //[Route("dataset")]
+        //public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
+        //{
+        //    IHttpActionResult MigrateDatasetFunction()
+        //    {
+        //        DatasetMigrationRequest request = model.ToDto();
+        //        DataApplicationService.MigrateDataset(request);
+        //        return Ok();
+        //    }
 
-            return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
-        }
+        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        //}
 
+        /* This code will be used within next two iterations*/
         //[HttpPost]
         //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
         //[Route("dataset")]
