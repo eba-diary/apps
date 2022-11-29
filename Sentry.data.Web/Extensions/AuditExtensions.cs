@@ -15,7 +15,8 @@ namespace Sentry.data.Web
                 {
                     DatasetFileName = compareAuditDto.DatasetFileName,
                     ParquetRowCount = compareAuditDto.ParquetRowCount,
-                    RawqueryRowCount = compareAuditDto.RawqueryRowCount
+                    RawqueryRowCount = compareAuditDto.RawqueryRowCount,
+                    HasCountDifference = (compareAuditDto.RawqueryRowCount != compareAuditDto.ParquetRowCount)
                 });
             }
 
