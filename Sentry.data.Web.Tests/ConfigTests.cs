@@ -21,7 +21,7 @@ namespace Sentry.data.Web.Tests
             var user = MockUsers.App_DataMgmt_Upld();
 
             var ds = MockClasses.MockDataset();
-            var dfc = MockClasses.MockDataFileConfig(ds);
+            var dfc = MockClasses.MockDatasetFileConfig(ds);
 
             ds.DatasetFileConfigs.Add(dfc);
 
