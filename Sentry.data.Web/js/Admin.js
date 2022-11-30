@@ -475,6 +475,46 @@ data.Admin = {
         });
     },
 
+    AuditTableDiffFilter: function ()
+    {
+        var table = $('#AuditTable').DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex)
+            {
+                return $(table.row(dataIndex).node()).data("record-difference") == "True";
+            }
+        );
+
+        table.draw();
+    },
+
+    AuditTableSameFilter: function ()
+    {
+        var table = $('#AuditTable').DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex)
+            {
+                return $(table.row(dataIndex).node()).data("record-difference") == "False";
+            }
+        );
+
+        table.draw();
+    },
+
+    AuditTableAllFilter: function ()
+    {
+        var table = $('#AuditTable').DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+        table.draw();
+    },
+
     RowCountCompareTableInit: function () {
         var table = $('#AuditTable').DataTable({
             columnDefs: [
@@ -482,7 +522,48 @@ data.Admin = {
                     targets: [0],
                     orderable: true
                 }
-            ]
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: '<i class="fas fa-asterisk"></i> All',
+                    action: function (e, dt, node, config)
+                    {
+                        data.Admin.AuditTableAllFilter();
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+
+                },
+                {
+                    text: '<i class="text-warning fas fa-not-equal"></i> Diffs',
+                    action: function(e, dt, node, config)
+                    {
+                        data.Admin.AuditTableDiffFilter();
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    text: '<i class="text-dark fas fa-equals"></i> Same',
+                    action: function (e, dt, node, config)
+                    {
+                        data.Admin.AuditTableSameFilter();
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                }
+            ],
+            select: true
         });
 
         // ensures that table is reset of all filters that might have been applied
@@ -490,63 +571,35 @@ data.Admin = {
         table.draw();
 
         // event for applying solid bg color for selected filter btns
-        $("#audit-filter-buttons .btn").click(function ()
+        $(".dt-buttons .btn").click(function ()
         {
             // loops through all audit filtter buttons and reset them to default outline style
-            $("#audit-filter-buttons .btn").each(function ()
+            $(".dt-buttons .btn").each(function ()
             {
-                // grabs unique bg class from button attribute
-                bgClass = $(this).data("bg-class");
-
-                $(this).removeClass(`btn-${bgClass}`);
-                $(this).removeClass(`btn-outline-${bgClass}`);
-                $(this).addClass(`btn-outline-${bgClass}`);
+                $(this).removeClass("btn-primary");
+                $(this).removeClass("btn-outline-primary");
+                $(this).addClass("btn-outline-primary");
             });
 
-            // grabs unique bg class from selected button
-            bgClass = $(this).data("bg-class");
-
-            $(this).removeClass(`btn-outline-${bgClass}`);
-            $(this).removeClass(`btn-${bgClass}`);
-            $(this).addClass(`btn-${bgClass}`);
+            $(this).removeClass("btn-outline-primary");
+            $(this).removeClass("btn-primary");
+            $(this).addClass("btn-primary");
         });
 
         // pops all search filters on table 
         $("#resetFilters").click(function ()
         {
+            // loops through all audit filtter buttons and reset them to default outline style
+            $(".dt-buttons .btn").each(function ()
+            {
+                $(this).removeClass("btn-primary");
+                $(this).removeClass("btn-outline-primary");
+                $(this).addClass("btn-outline-primary");
+            });
+
             $.fn.dataTable.ext.search.pop();
-
-            table.draw();
+            table.search('').columns().search('').draw();
         });
-
-        // applies search filter on table for all rows with a 'false' record difference
-        $("#showEqualCountResults").click(function ()
-        {
-            $.fn.dataTable.ext.search.pop();
-
-            $.fn.dataTable.ext.search.push(
-                function (settings, data, dataIndex)
-                {
-                    return $(table.row(dataIndex).node()).data("record-difference") == "False";
-                }
-            );
-            table.draw();
-        });
-
-        // applies search filter on table for all rows with a 'true' record difference
-        $("#showNonEqualCountResults").click(function ()
-        {
-            $.fn.dataTable.ext.search.pop();
-
-            $.fn.dataTable.ext.search.push(
-                function (settings, data, dataIndex)
-                {
-                    return $(table.row(dataIndex).node()).data("record-difference") == "True";
-                }
-            );
-            table.draw();
-        });
-
     },
 
     NonParquetFilseTableInit: function ()
