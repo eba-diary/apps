@@ -475,7 +475,43 @@ data.Admin = {
         });
     },
 
-    AuditTableInit: function () {
+    RowCountCompareTableInit: function () {
+        $('#AuditTable').DataTable({
+            searchPanes: {
+                viewTotal: true,
+                columns:[1,2]
+            },
+            columnDefs: [
+                {
+                    targets: [0],
+                    orderable: true
+                },
+                {
+                    searchPanes: {
+                        options: [
+                            {
+                                label: '',
+                                value: function (rowData, rowIdx)
+                                {
+                                    return rowData[1] != rowData[2];
+                                }
+                            }
+                        ]
+                    },
+                    targets:[1,2]
+                }
+            ],
+            drawCallback: function () {
+                $('#data-file-select-all').prop('checked', false);
+                $('.select-all-target').prop('checked', false);
+            }
+        });
+
+        data.Admin.DataFileSelectAll();
+    },
+
+    NonParquetFilseTableInit: function ()
+    {
         $('#AuditTable').DataTable({
             columnDefs: [
                 {
@@ -483,7 +519,8 @@ data.Admin = {
                     orderable: true
                 }
             ],
-            drawCallback: function () {
+            drawCallback: function ()
+            {
                 $('#data-file-select-all').prop('checked', false);
                 $('.select-all-target').prop('checked', false);
             }

@@ -68,6 +68,13 @@ namespace Sentry.data.Web.Controllers
                 {
                     case AuditType.NonParquetFiles:
                         tableModel = _auditSerivce.GetNonParquetFiles(datasetId, schemaId, searchParameter, auditSearchType).MapToModel();
+                        List<AuditDataFileModel> list = new List<AuditDataFileModel>();
+                        list.Add(new AuditDataFileModel() { DatasetFileName = "test", ParquetRowCount = 1, RawqueryRowCount = 1 });
+                        list.Add(new AuditDataFileModel() { DatasetFileName = "test", ParquetRowCount = 1, RawqueryRowCount = 1 });
+                        list.Add(new AuditDataFileModel() { DatasetFileName = "test", ParquetRowCount = 1, RawqueryRowCount = 1 });
+                        list.Add(new AuditDataFileModel() { DatasetFileName = "test", ParquetRowCount = 1, RawqueryRowCount = 2 });
+                        list.Add(new AuditDataFileModel() { DatasetFileName = "test", ParquetRowCount = 1, RawqueryRowCount = 2 });
+                        list.Add(new AuditDataFileModel() { DatasetFileName = "test", ParquetRowCount = 1, RawqueryRowCount = 2 });
                         viewPath = "_NonParquetFilesTable";
                         break;
                     case AuditType.RowCountCompare:

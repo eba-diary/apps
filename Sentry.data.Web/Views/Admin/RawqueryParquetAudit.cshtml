@@ -122,6 +122,24 @@
     </div>
 </div>
 
+<!-- Comapred row count filter -->
+<div class="row">
+    <div class="d-inline-block col">
+        <h3>SFilter Results</h3>
+
+        <div class="md-form">
+            @Html.DropDownListFor(m => m.AllAuditSearchTypes,
+                                  new SelectList(Model.AllAuditSearchTypes, "Value", "Text"),
+                                  new
+                                  {
+                                      @class = "active admin-audit-dropdown",
+                                      @style = "display: none",
+                                      @searchable = "Search Available Search Types"
+                                  })
+        </div>
+    </div>
+</div>
+
 <!--Table-->
 <div id="AuditResultTable"></div>
 
