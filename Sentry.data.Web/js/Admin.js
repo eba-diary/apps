@@ -512,9 +512,10 @@ data.Admin = {
         });
 
         // pops all search filters on table 
-        $("#showAllResults").click(function ()
+        $("#resetFilters").click(function ()
         {
             $.fn.dataTable.ext.search.pop();
+
             table.draw();
         });
 

@@ -40,13 +40,14 @@ table#metricGroupsTable td.dt-control {
     display: inline-block !important;
 }
 
-#audit-filter-buttons .btn-primary,
+#audit-filter-buttons .btn-dark,
 #audit-filter-buttons .btn-warning,
 #audit-filter-buttons .btn-success {
     border: 2px solid #ffffff00 !important;
     padding-top: 10.5px !important;
     padding-bottom: 10.5px !important;
 }
+
 #link-results {
     display: flex;
     flex-wrap: wrap;
