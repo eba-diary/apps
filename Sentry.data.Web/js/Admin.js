@@ -177,7 +177,8 @@ data.Admin = {
                 });
                 var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
 
-                for (let schema of schemaApiResponse) {
+                for (let schema of schemaApiResponse)
+                {
                     scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
@@ -441,7 +442,6 @@ data.Admin = {
 
             // Show spinner + Reprocess button
             $("#tab-spinner").show();
-            $("#auditReprocessButton").show();
 
             if (postCheck) {
                 $.ajax({
@@ -476,38 +476,76 @@ data.Admin = {
     },
 
     RowCountCompareTableInit: function () {
-        $('#AuditTable').DataTable({
-            searchPanes: {
-                viewTotal: true,
-                columns:[1,2]
-            },
+        var table = $('#AuditTable').DataTable({
             columnDefs: [
                 {
                     targets: [0],
                     orderable: true
-                },
-                {
-                    searchPanes: {
-                        options: [
-                            {
-                                label: '',
-                                value: function (rowData, rowIdx)
-                                {
-                                    return rowData[1] != rowData[2];
-                                }
-                            }
-                        ]
-                    },
-                    targets:[1,2]
                 }
-            ],
-            drawCallback: function () {
-                $('#data-file-select-all').prop('checked', false);
-                $('.select-all-target').prop('checked', false);
-            }
+            ]
         });
 
-        data.Admin.DataFileSelectAll();
+        // ensures that table is reset of all filters that might have been applied
+        $.fn.dataTable.ext.search.pop();
+        table.draw();
+
+        // event for applying solid bg color for selected filter btns
+        $("#audit-filter-buttons .btn").click(function ()
+        {
+            // loops through all audit filtter buttons and reset them to default outline style
+            $("#audit-filter-buttons .btn").each(function ()
+            {
+                // grabs unique bg class from button attribute
+                bgClass = $(this).data("bg-class");
+
+                $(this).removeClass(`btn-${bgClass}`);
+                $(this).removeClass(`btn-outline-${bgClass}`);
+                $(this).addClass(`btn-outline-${bgClass}`);
+            });
+
+            // grabs unique bg class from selected button
+            bgClass = $(this).data("bg-class");
+
+            $(this).removeClass(`btn-outline-${bgClass}`);
+            $(this).removeClass(`btn-${bgClass}`);
+            $(this).addClass(`btn-${bgClass}`);
+        });
+
+        // pops all search filters on table 
+        $("#showAllResults").click(function ()
+        {
+            $.fn.dataTable.ext.search.pop();
+            table.draw();
+        });
+
+        // applies search filter on table for all rows with a 'false' record difference
+        $("#showEqualCountResults").click(function ()
+        {
+            $.fn.dataTable.ext.search.pop();
+
+            $.fn.dataTable.ext.search.push(
+                function (settings, data, dataIndex)
+                {
+                    return $(table.row(dataIndex).node()).data("record-difference") == "False";
+                }
+            );
+            table.draw();
+        });
+
+        // applies search filter on table for all rows with a 'true' record difference
+        $("#showNonEqualCountResults").click(function ()
+        {
+            $.fn.dataTable.ext.search.pop();
+
+            $.fn.dataTable.ext.search.push(
+                function (settings, data, dataIndex)
+                {
+                    return $(table.row(dataIndex).node()).data("record-difference") == "True";
+                }
+            );
+            table.draw();
+        });
+
     },
 
     NonParquetFilseTableInit: function ()

@@ -4,11 +4,18 @@
 
     $(document).ready(function () {
         data.Admin.RowCountCompareTableInit();
-        data.Admin.AuditReprocessButton();
     });
 </script>
 
+<div class="row">
+    <div id="audit-filter-buttons" class="d-flex col justify-content-end">
+        <button id="showAllResults" data-bg-class="primary" type="button" class="btn btn-primary waves-effect waves-light"><i class="fas fa-asterisk"></i> All</button>
+        <button id="showEqualCountResults" data-bg-class="success" type="button" class="btn btn-outline-success waves-effect waves-light"><i class="fas fa-equals"></i> Is Equal</button>
+        <button id="showNonEqualCountResults" data-bg-class="warning" type="button" class="btn btn-outline-warning waves-effect waves-light"><i class="fas fa-not-equal"></i> Not Equal</button>
+    </div>
+</div>
 
+<br>
 
 <table id="AuditTable" aria-label="table of all audited files" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
     <thead>
@@ -21,7 +28,7 @@
     <tbody>
         @foreach (AuditDataFileModel file in Model.DatafileModels)
         {
-            <tr class=@(file.HasCountDifference ? "text-danger" : "")>
+            <tr data-record-difference=@file.HasCountDifference data-row-count-difference=@file.HasCountDifference class=@(file.HasCountDifference ? "text-danger": "")>
                 <td>@file.DatasetFileName</td>
                 <td>@file.RawqueryRowCount</td>
                 <td>@file.ParquetRowCount</td>
