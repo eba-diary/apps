@@ -163,7 +163,15 @@ data.Admin = {
         $.ajax({
             type: "GET",
             url: url,
-            success: function (schemaApiResponse) {
+            success: function (schemaApiResponse)
+            {
+                // reduces api json response to only active schemas
+                schemaApiResponse = schemaApiResponse.filter(function (jsonObject)
+                {
+                    return jsonObject.ObjectStatus === 'ACTIVE';
+                });
+
+                // sort schema results alphabetically
                 schemaApiResponse.sort(function (a, b) {
                     if (a.Name < b.Name) {
                         return -1;
@@ -175,6 +183,8 @@ data.Admin = {
                         return 0;
                     }
                 });
+
+
                 var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
 
                 for (let schema of schemaApiResponse) {
