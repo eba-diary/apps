@@ -74,8 +74,9 @@
                                 $('.httpPagingPanel').show();
                             }
                             else {
-                                $("[id$='PagingType']").val('0').change();
                                 $('.httpPagingPanel').hide();
+                                $("[id$='PagingType']").val('0').change();
+                                $("#request-variable-container")[0].textContent = '';
                             }
                         }
                         else {
@@ -191,6 +192,14 @@
         data.Job.SetPagingForm();
         data.Job.targetFileNameDescUpdate();
 
+        $('[id$=_VariableIncrementType]').each(function () {
+            $(this).materialSelect();
+        });
+
+        $('.includes-tooltip').each(function () {
+            $(this).tooltip();
+        });
+
         $("#RetrieverJob_PagingType").on('change', function () {
             data.Job.SetPagingForm();
         });
@@ -202,18 +211,23 @@
 
         $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl);
 
-        $(document).on('click', '.RemoveRequestVariable', function () {
-            $(this).parent().parent().remove();
+        $(document).on('click', '.remove-request-variable', function () {
+            $(this).parent().remove();
+            data.Job.SetRelativeUriVariables();
         });
 
-        $('#AddRequestVariable').on('click', function () {
-            $("#AddRequestVariable").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
+        $('#add-request-variable').on('click', function () {
+            $("#add-request-variable").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
             $.get("/DataFlow/RequestVariableEntryRow", function (template) {
-                $('#RequestVariableContainer').append(template);
-                //get last occurrence of dropdown list to init material select
-                $("#AddRequestVariable").html('<em class="fas fa-plus mr-2"></em>Add Variable');
+                $('#request-variable-container').append(template);
+                $('.request-variable-row:last .includes-tooltip').tooltip();
+                $('.request-variable-row:last [id$=_VariableIncrementType]').materialSelect();
+                $("#add-request-variable").html('<em class="fas fa-plus"></em>');
             });
         });
+
+        $(document).on('keyup', '[id$=_VariableValue]', data.Job.SetRelativeUriVariables);
+        $(document).on('keyup', '[id$=_VariableName]', data.Job.SetRelativeUriVariables);
     },
 
     SetPagingForm: function () {
@@ -235,6 +249,18 @@
         }
 
         data.Job.SetParameterUrl();
+    },
+
+    SetRelativeUriVariables: function () {
+        let relativeUri = $("#RetrieverJob_RelativeUri").val();
+
+        $('[id$=_VariableValue]').each(function () {
+            let variableName = $('#' + this.id.replace('Value', 'Name')).val();
+            relativeUri = relativeUri.replace("<<" + variableName + ">>", $(this).val());
+        });
+
+
+        $("#relative-url")[0].textContent = relativeUri;
     },
 
     SetParameterUrl: function () {

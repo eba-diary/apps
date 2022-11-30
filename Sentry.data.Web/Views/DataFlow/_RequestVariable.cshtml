@@ -2,25 +2,25 @@
 
 @using (Html.BeginCollectionItem("RequestVariables"))
 {
-    <div class="form-inline">
-        <div class="md-form">
-            @Html.LabelFor(model => model.VariableName, htmlAttributes: new { @class = "control-label" })
-            @Html.TextBoxFor(model => model.VariableName, new { @class = "form-control", @placeholder = "This should match the variable added in the Relative URI" })
+    <div class="request-variable-row">
+        <div class="md-form w-100 mr-3">
+            @Html.LabelFor(model => model.VariableName, htmlAttributes: new { @class = "control-label active" })
+            @Html.TextBoxFor(model => model.VariableName, new { @class = "form-control", @placeholder = "Do not include << >>" })
             @Html.ValidationMessageFor(model => model.VariableName, "", new { @class = "text-danger" })
         </div>
 
-        <div class="md-form">
+        <div class="md-form w-100 mr-3">
             @Html.LabelFor(model => model.VariableValue, htmlAttributes: new { @class = "control-label" })
-            @Html.TextBoxFor(model => model.VariableValue, new { @class = "form-control", @placeholder = "This will replace the variable at run time" })
+            @Html.TextBoxFor(model => model.VariableValue, new { @class = "form-control" })
             @Html.ValidationMessageFor(model => model.VariableValue, "", new { @class = "text-danger" })
         </div>
 
-        <div class="md-form">
+        <div class="md-form w-75 mr-3 includes-tooltip" data-toggle="tooltip" data-placement="left" title="Variable value will be incremented as selected each scheduled run time">
             @Html.LabelFor(model => model.VariableIncrementType, htmlAttributes: new { @class = "mdb-main-label" })
-            @Html.DropDownListFor(model => model.VariableIncrementType, Model.VariableIncrementTypeDropdown, new { @class = "mdb-select", data_toggle = "tooltip", title = "How should the variable value be incremented at scheduled run time?" })
+            @Html.DropDownListFor(model => model.VariableIncrementType, Model.VariableIncrementTypeDropdown, new { @class = "mdb-select" })
             @Html.ValidationMessageFor(model => model.VariableIncrementType, "", new { @class = "text-danger" })
         </div>
 
-        <a class="icon-trash red-delete-icon" id="RemoveRequestVariable" data-toggle="tooltip" data-placement="top" title="Remove Variable"></a>
+        <a class="icon-trash red-delete-icon remove-request-variable"></a>
     </div>
 }

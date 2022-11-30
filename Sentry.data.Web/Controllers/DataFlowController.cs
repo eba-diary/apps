@@ -444,7 +444,7 @@ namespace Sentry.data.Web.Controllers
         {
             RequestVariableModel requestVariableModel = new RequestVariableModel
             {
-                VariableIncrementTypeDropdown = Utility.BuildSelectListFromEnum<RequestVariableIncrementType>(-1)
+                VariableIncrementTypeDropdown = Utility.BuildSelectListFromEnum<RequestVariableIncrementType>(0)
             };
 
             return PartialView("_RequestVariable", requestVariableModel);

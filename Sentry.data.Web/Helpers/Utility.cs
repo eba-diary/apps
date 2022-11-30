@@ -211,16 +211,6 @@ namespace Sentry.data.Web.Helpers
         {
             List<SelectListItem> options = new List<SelectListItem>();
 
-            if (selectedValue == -1)
-            {                
-                options.Add(new SelectListItem
-                 {
-                     Selected = true,
-                     Text = $"Select {GetEnumDisplayName<T>()}",
-                     Value = "-1"
-                 });
-            }
-
             foreach (T item in Enum.GetValues(typeof(T)))
             {
                 int value = (int)Convert.ChangeType(item, item.GetTypeCode());
@@ -751,18 +741,6 @@ namespace Sentry.data.Web.Helpers
         private static void AddPageEllipsis(this List<PageItemModel> pageItems)
         {
             pageItems.Add(new PageItemModel() { PageNumber = Pagination.ELLIPSIS });
-        }
-
-        private static string GetEnumDisplayName<T>() where T : Enum
-        {
-            try
-            {
-                return typeof(T).GetCustomAttribute<EnumDisplayName>().DisplayName;
-            }
-            catch (Exception)
-            {
-                return "Select an option";
-            }
         }
         #endregion
     }

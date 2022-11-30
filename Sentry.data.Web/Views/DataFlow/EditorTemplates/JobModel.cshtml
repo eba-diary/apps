@@ -93,36 +93,36 @@
                     @Html.DropDownListFor(model => model.PagingType, Model.PagingTypeDropdown, new { @class = "mdb-select", })
                     @Html.ValidationMessageFor(model => model.PagingType, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form paging-token-field" style="display:none;">
                     @Html.LabelFor(model => model.PageTokenField, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageTokenField, new { @class = "form-control", @placeholder = "Path to the token field on the response" })
                     @Html.ValidationMessageFor(model => model.PageTokenField, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form paging-request-parameter" style="display:none;">
                     @Html.LabelFor(model => model.PageParameterName, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageParameterName, new { @class = "form-control", @placeholder = "Parameter name to include on paging requests" })
                     @Html.ValidationMessageFor(model => model.PageParameterName, "", new { @class = "text-danger" })
                 </div>
 
-                <div>
-                    <div class="row">
-                        <div class="col align-self-end">
-                            <h6 class="pt-3">Request Variables</h6>
-                        </div>
-                        <div class="col">
-                            <button id="AddRequestVariable" class="btn btn-success waves-effect waves-light float-r"><em class="fas fa-plus mr-2"></em>Variable</button>
-                        </div>
-                    </div>
-                    <div id="RequestVariableContainer">
-                        @foreach (RequestVariableModel variable in Model.RequestVariables)
-                        {
-                            Html.RenderPartial("_RequestVariable", variable);
-                        }
-                    </div>
+
+                <h6 id="request-variable-header" class="pt-0">
+                    Request Variables
+                    <a class="icon-info-solid dsc-blue-text" data-toggle="popover" title="" data-placement="right" data-content="Use variables in the Relative URI by wrapping the variable name with << >> (Ex: Search/<<variablename>>/Data). On each scheduled run, the value will be incremented accordingly and substituted in for the matching variable name." href="javascript:void(0)"> </a>
+                </h6>
+
+                <div id="request-variable-container">
+                    @foreach (RequestVariableModel variable in Model.RequestVariables)
+                    {
+                        Html.RenderPartial("_RequestVariable", variable);
+                    }
                 </div>
+
+                <button id="add-request-variable" class="btn btn-sm btn-outline-primary waves-effect waves-light ml-0 mt-2"><em class="fas fa-plus"></em></button>
             </div>
 
-            <div class="text-muted font-italic">
+            <div class="text-muted font-italic mt-3">
                 Full URL: <span id="base-url"></span><span id="relative-url"></span><span id="parameter-url"></span>
             </div>
 

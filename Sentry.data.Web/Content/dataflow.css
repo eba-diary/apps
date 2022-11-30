@@ -275,3 +275,13 @@ a.create-link:focus {
 .schema-card-header:hover {
     background-color: #f7f5f5 !important;
 }
+
+.request-variable-row {
+    display: flex;
+    align-items: baseline;
+    max-height: 4.5rem;
+}
+
+.remove-request-variable {
+    font-size: 1.25rem;
+}

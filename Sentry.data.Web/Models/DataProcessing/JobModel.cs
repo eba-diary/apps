@@ -1,9 +1,11 @@
 ﻿using Azure.Storage.Sas;
+using Namotion.Reflection;
 using Sentry.Core;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq.Dynamic;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web
@@ -112,6 +114,16 @@ namespace Sentry.data.Web
                 if (string.IsNullOrWhiteSpace(PageTokenField))
                 {
                     results.Add("PageTokenField", "Page Token Field is required");
+                }
+            }
+
+            foreach (RequestVariableModel requestVariable in RequestVariables)
+            {
+                results.MergeInResults(requestVariable.Validate());
+
+                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName) && !RelativeUri.Contains(requestVariable.VariableName))
+                {
+                    results.Add($"RequestVariable[{requestVariable.Index}].VariableName", $"<<{requestVariable.VariableName}>> is not found in Relative URI");
                 }
             }
 
