@@ -11,7 +11,7 @@ namespace Sentry.data.Web
     {
         public DatasetModel() { }
 
-        public DatasetModel(DatasetDto dto) : base(dto)
+        public DatasetModel(DatasetSchemaDto dto) : base(dto)
         {
             OriginationID = dto.OriginationId;
             DatasetScopeTypeId = dto.DatasetScopeTypeId;

@@ -11,6 +11,7 @@ namespace Sentry.data.Core
     {
         public virtual int Id { get; set; }
         public virtual DataSource DataSourceId { get; set; }
+        public virtual int TokenId { get; set; }
         public virtual OAuthClaims Type { get; set; } 
         public virtual string Value { get; set; }
     }
