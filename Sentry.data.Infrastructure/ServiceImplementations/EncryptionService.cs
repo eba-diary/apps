@@ -103,14 +103,14 @@ namespace Sentry.data.Infrastructure
 
         public bool IsEncrypted(string input)
         {
-            return !string.IsNullOrEmpty(input) && input.StartsWith(Encryption.ENCRYPTIONINDICATOR) && input.EndsWith(Encryption.ENCRYPTIONINDICATOR);
+            return !string.IsNullOrEmpty(input) && input.StartsWith(Indicators.ENCRYPTIONINDICATOR) && input.EndsWith(Indicators.ENCRYPTIONINDICATOR);
         }
 
         public string PrepEncryptedForDisplay(string encryptedString)
         {
             if (!string.IsNullOrEmpty(encryptedString))
             {
-                return Encryption.ENCRYPTIONINDICATOR + encryptedString + Encryption.ENCRYPTIONINDICATOR;
+                return Indicators.ENCRYPTIONINDICATOR + encryptedString + Indicators.ENCRYPTIONINDICATOR;
             }
 
             return encryptedString;

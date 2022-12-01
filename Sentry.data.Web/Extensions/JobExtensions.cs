@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Nest;
+using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Web.Models.ApiModels.Job;
@@ -60,6 +62,5 @@ namespace Sentry.data.Web.Extensions
                 ClusterUrl = options.ClusterUrl
             };
         }
-        
     }
 }

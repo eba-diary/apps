@@ -1,12 +1,13 @@
-﻿using Azure.Storage.Sas;
-using Namotion.Reflection;
-using Sentry.Core;
+﻿using Sentry.Core;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Dynamic;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
 {
@@ -86,49 +87,94 @@ namespace Sentry.data.Web
         internal ValidationException Validate()
         {
             ValidationResults results = new ValidationResults();
+
             if (SelectedSourceType == null)
             {
                 results.Add("SelectedSourceType", "Source type is required");
             }
+
             if (string.IsNullOrWhiteSpace(SelectedDataSource) || SelectedDataSource == "0")
             {
                 results.Add("SelectedDataSource", "Data source is required");
             }
+
             if (string.IsNullOrWhiteSpace(SchedulePicker) || SchedulePicker == "0" || string.IsNullOrWhiteSpace(Schedule))
             {
                 results.Add("SchedulePicker", "Schedule is required");
             }
 
+            results.MergeInResults(ValidatePaging());
+            results.MergeInResults(ValidateRequestVariables());
+
+            return new ValidationException(results);
+        }
+
+        #region Private
+        private ValidationResults ValidatePaging()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            //parameter name required when paging type of page number
             if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
             {
-                results.Add("PageParameterName", "Page Parameter Name is required");
+                validationResults.Add("PageParameterName", "Page Parameter Name is required");
             }
 
             if (PagingType == PagingType.Token)
             {
+                //parameter name required when paging type of token
                 if (string.IsNullOrWhiteSpace(PageParameterName))
                 {
-                    results.Add("PageParameterName", "Page Parameter Name is required");
+                    validationResults.Add("PageParameterName", "Page Parameter Name is required");
                 }
 
+                //token field required when paging type of token
                 if (string.IsNullOrWhiteSpace(PageTokenField))
                 {
-                    results.Add("PageTokenField", "Page Token Field is required");
+                    validationResults.Add("PageTokenField", "Page Token Field is required");
+                }
+            }
+
+            return validationResults;
+        }
+
+        private ValidationResults ValidateRequestVariables()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            //check if relative uri contains any variables
+            MatchCollection matches = Regex.Matches(RelativeUri, string.Format(Indicators.REQUESTVARIABLEINDICATOR, "[A-Za-z0-9]+"));
+            List<string> checkedMatches = new List<string>();
+
+            foreach (Match match in matches)
+            { 
+                //match is not already checked 
+                if (!checkedMatches.Contains(match.Value))
+                {
+                    //relative uri variable does not have a matching request variable
+                    if (!RequestVariables.Any(x => string.Format(Indicators.REQUESTVARIABLEINDICATOR, x.VariableName) == match.Value))
+                    {
+                        validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable for {match.Value} is not defined");
+                    }
+
+                    checkedMatches.Add(match.Value);
                 }
             }
 
             foreach (RequestVariableModel requestVariable in RequestVariables)
             {
-                results.MergeInResults(requestVariable.Validate());
+                validationResults.MergeInResults(requestVariable.Validate());
 
-                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName) && !RelativeUri.Contains(requestVariable.VariableName))
+                //variable is not used in the relative uri
+                string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
+                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName) && !RelativeUri.Contains(variablePlaceholder))
                 {
-                    results.Add($"RequestVariable[{requestVariable.Index}].VariableName", $"<<{requestVariable.VariableName}>> is not found in Relative URI");
+                    validationResults.Add($"RequestVariable[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not found in Relative URI");
                 }
             }
 
-            return new ValidationException(results);
+            return validationResults;
         }
-       
+        #endregion
     }
 }

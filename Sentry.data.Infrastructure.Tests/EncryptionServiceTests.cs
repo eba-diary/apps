@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure.Tests
         {
             EncryptionService service = new EncryptionService();
 
-            bool result = service.IsEncrypted($"{Encryption.ENCRYPTIONINDICATOR}plaintext");
+            bool result = service.IsEncrypted($"{Indicators.ENCRYPTIONINDICATOR}plaintext");
 
             Assert.IsFalse(result);
         }
@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure.Tests
         {
             EncryptionService service = new EncryptionService();
 
-            bool result = service.IsEncrypted($"plaintext{Encryption.ENCRYPTIONINDICATOR}");
+            bool result = service.IsEncrypted($"plaintext{Indicators.ENCRYPTIONINDICATOR}");
 
             Assert.IsFalse(result);
         }
@@ -53,7 +53,7 @@ namespace Sentry.data.Infrastructure.Tests
         {
             EncryptionService service = new EncryptionService();
 
-            bool result = service.IsEncrypted($"{Encryption.ENCRYPTIONINDICATOR}text{Encryption.ENCRYPTIONINDICATOR}");
+            bool result = service.IsEncrypted($"{Indicators.ENCRYPTIONINDICATOR}text{Indicators.ENCRYPTIONINDICATOR}");
 
             Assert.IsTrue(result);
         }
@@ -75,7 +75,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string result = service.PrepEncryptedForDisplay("text");
 
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}text{Encryption.ENCRYPTIONINDICATOR}", result);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}text{Indicators.ENCRYPTIONINDICATOR}", result);
         }
     }
 }

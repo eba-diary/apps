@@ -700,7 +700,7 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
-                        ModelState.AddModelError(string.Empty, vr.Description);
+                        ModelState.AddModelError(vr.Id, vr.Description);
                         break;
                 }
             }
