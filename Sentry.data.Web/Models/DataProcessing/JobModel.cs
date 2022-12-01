@@ -140,36 +140,49 @@ namespace Sentry.data.Web
 
         private ValidationResults ValidateRequestVariables()
         {
-            ValidationResults validationResults = new ValidationResults();
-
-            //check if relative uri contains any variables
-            MatchCollection matches = Regex.Matches(RelativeUri, string.Format(Indicators.REQUESTVARIABLEINDICATOR, "[A-Za-z0-9]+"));
-            List<string> checkedMatches = new List<string>();
-
-            foreach (Match match in matches)
-            { 
-                //match is not already checked 
-                if (!checkedMatches.Contains(match.Value))
-                {
-                    //relative uri variable does not have a matching request variable
-                    if (!RequestVariables.Any(x => string.Format(Indicators.REQUESTVARIABLEINDICATOR, x.VariableName) == match.Value))
-                    {
-                        validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable for {match.Value} is not defined");
-                    }
-
-                    checkedMatches.Add(match.Value);
-                }
-            }
+            ValidationResults validationResults = ValidateRelativeUriVariables();
 
             foreach (RequestVariableModel requestVariable in RequestVariables)
             {
                 validationResults.MergeInResults(requestVariable.Validate());
 
-                //variable is not used in the relative uri
-                string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
-                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName) && !RelativeUri.Contains(variablePlaceholder))
+                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName))
                 {
-                    validationResults.Add($"RequestVariable[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not found in Relative URI");
+                    //variable is not used in the relative uri
+                    string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
+                    if (!string.IsNullOrEmpty(RelativeUri) && !RelativeUri.Contains(variablePlaceholder))
+                    {
+                        validationResults.Add($"RetrieverJob.RequestVariable[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not found in Relative URI");
+                    }
+                }
+            }
+
+            return validationResults;
+        }
+
+        private ValidationResults ValidateRelativeUriVariables()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            if (!string.IsNullOrEmpty(RelativeUri))
+            {
+                //check if relative uri contains any variables
+                MatchCollection matches = Regex.Matches(RelativeUri, string.Format(Indicators.REQUESTVARIABLEINDICATOR, "[A-Za-z0-9]+"));
+                List<string> checkedMatches = new List<string>();
+
+                foreach (Match match in matches)
+                {
+                    //match is not already checked 
+                    if (!checkedMatches.Contains(match.Value))
+                    {
+                        //relative uri variable does not have a matching request variable
+                        if (!RequestVariables.Any(x => string.Format(Indicators.REQUESTVARIABLEINDICATOR, x.VariableName) == match.Value))
+                        {
+                            validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable for {match.Value} is not defined");
+                        }
+
+                        checkedMatches.Add(match.Value);
+                    }
                 }
             }
 

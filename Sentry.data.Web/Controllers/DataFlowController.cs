@@ -510,6 +510,11 @@ namespace Sentry.data.Web.Controllers
                 pickerval = 0;
             }
             model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
+
+            foreach (RequestVariableModel requestVariable in model.RequestVariables)
+            {
+                requestVariable.VariableIncrementTypeDropdown = Utility.BuildSelectListFromEnum<RequestVariableIncrementType>((int)requestVariable.VariableIncrementType);
+            }
         }        
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)

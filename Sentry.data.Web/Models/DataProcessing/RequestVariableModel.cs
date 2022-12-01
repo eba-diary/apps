@@ -26,36 +26,38 @@ namespace Sentry.data.Web
         #endregion
 
         #region Methods
-        public ValidationResults Validate()
+        internal ValidationResults Validate()
         {
             ValidationResults results = new ValidationResults();
+
+            string idPrefix = $"RetrieverJob.RequestVariable[{Index}].";
 
             //variable name is required
             if (string.IsNullOrWhiteSpace(VariableName))
             {
-                results.Add($"RequestVariable[{Index}].VariableName", "Variable Name is required");
+                results.Add($"{idPrefix}VariableName", "Variable Name is required");
             }
             else if (!Regex.IsMatch(VariableName, "^[A-Za-z0-9]*$"))
             {
                 //variable name can only be alphanumeric with _
-                results.Add($"RequestVariable[{Index}].VariableName", "Variable Name must be alphanumeric");
+                results.Add($"{idPrefix}VariableName", "Variable Name must be alphanumeric");
             }
 
             //variable value is required
             if (string.IsNullOrWhiteSpace(VariableValue))
             {
-                results.Add($"RequestVariable[{Index}].VariableValue", "Variable Value is required");
+                results.Add($"{idPrefix}VariableValue", "Variable Value is required");
             }
             else if (VariableIncrementType == RequestVariableIncrementType.Daily && !DateTime.TryParseExact(VariableValue, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 //variable value must be in acceptable datetime format
-                results.Add($"RequestVariable[{Index}].VariableValue", $"Variable Value must be in yyyy-MM-dd format to use with '{VariableIncrementType.GetDescription()}'");
+                results.Add($"{idPrefix}VariableValue", $"Variable Value must be in yyyy-MM-dd format to use with '{VariableIncrementType.GetDescription()}'");
             }
 
             //increment type is required
             if (VariableIncrementType == RequestVariableIncrementType.None)
             {
-                results.Add($"RequestVariable[{Index}].VariableIncrementType", "Variable Increment Type is required");
+                results.Add($"{idPrefix}VariableIncrementType", "Variable Increment Type is required");
             }
 
             return results;

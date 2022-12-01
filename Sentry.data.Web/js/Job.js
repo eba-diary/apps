@@ -216,7 +216,7 @@
             data.Job.SetRelativeUriVariables();
         });
 
-        $('#add-request-variable').on('click', function () {
+        $('#add-request-variable').off('click').on('click', function () {
             $("#add-request-variable").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
             $.get("/DataFlow/RequestVariableEntryRow", function (template) {
                 $('#request-variable-container').append(template);
