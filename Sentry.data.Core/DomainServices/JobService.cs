@@ -916,6 +916,7 @@ namespace Sentry.data.Core
             job.ObjectStatus = dto.ObjectStatus;
             job.DeleteIssueDTM = dto.DeleteIssueDTM;
             job.DeleteIssuer = dto.DeleteIssuer;
+            job.RequestVariables = dto.RequestVariables?.Select(x => x.ToEntity()).ToList();
         }
 
         private void DeleteJobFromScheduler(RetrieverJob job)

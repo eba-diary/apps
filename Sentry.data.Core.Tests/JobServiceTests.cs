@@ -217,7 +217,16 @@ namespace Sentry.data.Core.Tests
                 Schedule = "* * * * *",
                 PagingType = PagingType.Token,
                 PageTokenField = "tokenField",
-                PageParameterName = "token_param"
+                PageParameterName = "token_param",
+                RequestVariables = new List<RequestVariableDto>
+                {
+                    new RequestVariableDto
+                    {
+                        VariableName = "var",
+                        VariableValue = "value",
+                        VariableIncrementType = RequestVariableIncrementType.Daily
+                    }
+                }
             };
 
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
@@ -246,6 +255,13 @@ namespace Sentry.data.Core.Tests
             Assert.IsNull(job.DeleteIssuer);
             Assert.AreEqual(DateTime.MaxValue, job.DeleteIssueDTM);
             Assert.IsFalse(job.ExecutionParameters.Any());
+            Assert.AreEqual(1, job.RequestVariables.Count);
+
+            RequestVariable requestVariable = job.RequestVariables.First();
+            Assert.AreEqual("var", requestVariable.VariableName);
+            Assert.AreEqual("value", requestVariable.VariableValue);
+            Assert.AreEqual(RequestVariableIncrementType.Daily, requestVariable.VariableIncrementType);
+
             Assert.IsNotNull(job.JobOptions);
 
             RetrieverJobOptions jobOptions = job.JobOptions;

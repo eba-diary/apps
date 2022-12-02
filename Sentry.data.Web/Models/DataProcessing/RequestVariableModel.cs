@@ -3,6 +3,7 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
@@ -30,7 +31,7 @@ namespace Sentry.data.Web
         {
             ValidationResults results = new ValidationResults();
 
-            string idPrefix = $"RetrieverJob.RequestVariable[{Index}].";
+            string idPrefix = $"RetrieverJob.RequestVariables[{Index}].";
 
             //variable name is required
             if (string.IsNullOrWhiteSpace(VariableName))

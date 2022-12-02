@@ -39,6 +39,14 @@ namespace Sentry.data.Core.Tests
                         PageTokenField = "PageToken",
                         PageParameterName = "PageParameter"
                     }
+                },
+                RequestVariables = new List<RequestVariable>
+                {
+                    new RequestVariable {
+                        VariableName = "VariableName",
+                        VariableValue = "VariableValue",
+                        VariableIncrementType = RequestVariableIncrementType.Daily
+                    }
                 }
             };
 
@@ -65,6 +73,13 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(PagingType.Token, result.PagingType);
             Assert.AreEqual("PageToken", result.PageTokenField);
             Assert.AreEqual("PageParameter", result.PageParameterName);
+            Assert.AreEqual(1, result.RequestVariables.Count);
+
+            RequestVariableDto dto = result.RequestVariables.First();
+            Assert.AreEqual("VariableName", dto.VariableName);
+            Assert.AreEqual("VariableValue", dto.VariableValue);
+            Assert.AreEqual(RequestVariableIncrementType.Daily, dto.VariableIncrementType);
+
         }
 
         [TestMethod]
@@ -106,6 +121,40 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(PagingType.None, result.PagingType);
             Assert.IsNull(result.PageTokenField);
             Assert.IsNull(result.PageParameterName);
+        }
+
+        [TestMethod]
+        public void ToEntity_RequestVariableDto_RequestVariable()
+        {
+            RequestVariableDto dto = new RequestVariableDto
+            {
+                VariableName = "VariableName",
+                VariableValue = "VariableValue",
+                VariableIncrementType = RequestVariableIncrementType.Daily
+            };
+
+            RequestVariable entity = dto.ToEntity();
+
+            Assert.AreEqual("VariableName", entity.VariableName);
+            Assert.AreEqual("VariableValue", entity.VariableValue);
+            Assert.AreEqual(RequestVariableIncrementType.Daily, entity.VariableIncrementType);
+        }
+
+        [TestMethod]
+        public void ToDto_RequestVariable_RequestVariableDto()
+        {
+            RequestVariable entity = new RequestVariable
+            {
+                VariableName = "VariableName",
+                VariableValue = "VariableValue",
+                VariableIncrementType = RequestVariableIncrementType.Daily
+            };
+
+            RequestVariableDto dto = entity.ToDto();
+
+            Assert.AreEqual("VariableName", dto.VariableName);
+            Assert.AreEqual("VariableValue", dto.VariableValue);
+            Assert.AreEqual(RequestVariableIncrementType.Daily, dto.VariableIncrementType);
         }
     }
 }

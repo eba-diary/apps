@@ -152,7 +152,7 @@ namespace Sentry.data.Web
                     string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
                     if (!string.IsNullOrEmpty(RelativeUri) && !RelativeUri.Contains(variablePlaceholder))
                     {
-                        validationResults.Add($"RetrieverJob.RequestVariable[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not found in Relative URI");
+                        validationResults.Add($"RetrieverJob.RequestVariables[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not used in Relative URI");
                     }
                 }
             }
@@ -167,22 +167,23 @@ namespace Sentry.data.Web
             if (!string.IsNullOrEmpty(RelativeUri))
             {
                 //check if relative uri contains any variables
-                MatchCollection matches = Regex.Matches(RelativeUri, string.Format(Indicators.REQUESTVARIABLEINDICATOR, "[A-Za-z0-9]+"));
-                List<string> checkedMatches = new List<string>();
+                string escapedIndicator = Indicators.REQUESTVARIABLEINDICATOR.Replace("[", @"\[").Replace("]", @"\]");
+                string variablePlaceholder = string.Format(escapedIndicator, "[A-Za-z0-9]+");
+                MatchCollection matches = Regex.Matches(RelativeUri, variablePlaceholder);
+                List<string> undefinedVariables = new List<string>();
 
                 foreach (Match match in matches)
                 {
-                    //match is not already checked 
-                    if (!checkedMatches.Contains(match.Value))
+                    //relative uri variable does not have a matching request variable
+                    if (!undefinedVariables.Contains(match.Value) && !RequestVariables.Any(x => string.Format(Indicators.REQUESTVARIABLEINDICATOR, x.VariableName) == match.Value))
                     {
-                        //relative uri variable does not have a matching request variable
-                        if (!RequestVariables.Any(x => string.Format(Indicators.REQUESTVARIABLEINDICATOR, x.VariableName) == match.Value))
-                        {
-                            validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable for {match.Value} is not defined");
-                        }
-
-                        checkedMatches.Add(match.Value);
+                        undefinedVariables.Add(match.Value);
                     }
+                }
+
+                if (undefinedVariables.Any())
+                {
+                    validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable(s) not defined for {string.Join(", ", undefinedVariables)}");
                 }
             }
 

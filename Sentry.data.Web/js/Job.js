@@ -71,6 +71,12 @@
                             data.Job.SetDataSourceSpecificPanels(datain.SourceType);
 
                             if (datain.SupportsPaging) {
+                                $('.request-variable-row').each(function () {
+                                    let generatedIndex = $(this).children('input:first').val();
+                                    $('#RetrieverJob_RequestVariables_' + generatedIndex + '__Index').val(generatedIndex);
+                                    $('#RetrieverJob_RequestVariables_' + generatedIndex + '__VariableIncrementType').materialSelect();
+                                });
+
                                 $('.httpPagingPanel').show();
                             }
                             else {
@@ -188,13 +194,9 @@
             $('.editDataSourceLink').hide();
         }
 
-        $("#relative-url")[0].textContent = $("#RetrieverJob_RelativeUri").val();
+        data.Job.SetRelativeUriVariables();
         data.Job.SetPagingForm();
         data.Job.targetFileNameDescUpdate();
-
-        $('[id$=_VariableIncrementType]').each(function () {
-            $(this).materialSelect();
-        });
 
         $('.includes-tooltip').each(function () {
             $(this).tooltip();
@@ -223,6 +225,9 @@
                 $('.request-variable-row:last .includes-tooltip').tooltip();
                 $('.request-variable-row:last [id$=_VariableIncrementType]').materialSelect();
                 $("#add-request-variable").html('<em class="fas fa-plus"></em>');
+
+                let generatedIndex = $('.request-variable-row:last input:first').val();
+                $('#RetrieverJob_RequestVariables_' + generatedIndex + '__Index').val(generatedIndex);
             });
         });
 
@@ -255,10 +260,11 @@
         let relativeUri = $("#RetrieverJob_RelativeUri").val();
 
         $('[id$=_VariableValue]').each(function () {
-            let variableName = $('#' + this.id.replace('Value', 'Name')).val();
-            relativeUri = relativeUri.replace("<<" + variableName + ">>", $(this).val());
+            let variableName = "~[" + $('#' + this.id.replace('Value', 'Name')).val() + "]~";
+            variableName = variableName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            let regex = new RegExp(variableName, 'g');
+            relativeUri = relativeUri.replace(regex, $(this).val());
         });
-
 
         $("#relative-url")[0].textContent = relativeUri;
     },

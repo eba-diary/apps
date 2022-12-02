@@ -129,7 +129,7 @@ namespace Sentry.data.Web
 
         public static DataFlowDto ToDto(this DataFlowModel model, string currentUser)
         {
-            DataFlowDto dto = new Core.DataFlowDto
+            DataFlowDto dto = new DataFlowDto
             {
                 Id = model.DataFlowId,
                 Name = model.Name,
@@ -235,7 +235,18 @@ namespace Sentry.data.Web
                 ExecutionParameters = model.ExecutionParameters,
                 PagingType = model.PagingType,
                 PageTokenField= model.PageTokenField,
-                PageParameterName= model.PageParameterName
+                PageParameterName= model.PageParameterName,
+                RequestVariables = model.RequestVariables?.Select(x => x.ToDto()).ToList()
+            };
+        }
+
+        public static RequestVariableDto ToDto(this RequestVariableModel model)
+        {
+            return new RequestVariableDto
+            {
+                VariableName = model.VariableName,
+                VariableValue = model.VariableValue,
+                VariableIncrementType = model.VariableIncrementType
             };
         }
 

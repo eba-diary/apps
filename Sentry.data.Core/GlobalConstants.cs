@@ -587,7 +587,7 @@ namespace Sentry.data.Core
         public static class Indicators
         {
             public const string ENCRYPTIONINDICATOR = "<--!-->";
-            public const string REQUESTVARIABLEINDICATOR = "<<{0}>>";
+            public const string REQUESTVARIABLEINDICATOR = "~[{0}]~";
         }
     }
 }
