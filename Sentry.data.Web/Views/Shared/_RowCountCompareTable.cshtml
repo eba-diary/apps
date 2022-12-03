@@ -19,7 +19,7 @@
     <tbody>
         @foreach (AuditDataFileModel file in Model.DatafileModels)
         {
-            <tr>
+            <tr class=@(file.HasCountDifference ? "text-danger" : "")>
                 <td>@file.DatasetFileName</td>
                 <td>@file.RawqueryRowCount</td>
                 <td>@file.ParquetRowCount</td>

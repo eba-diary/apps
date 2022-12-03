@@ -704,6 +704,9 @@ namespace Sentry.data.Web.Controllers
                     case DataFlow.ValidationErrors.topicNameIsBlank:
                         ModelState.AddModelError("TopicName", vr.Description);
                         break;
+                    case DataFlow.ValidationErrors.topicNameMustBeUnique:
+                        ModelState.AddModelError("TopicName", vr.Description);
+                        break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
                         ModelState.AddModelError(vr.Id, vr.Description);

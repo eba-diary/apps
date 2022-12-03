@@ -16,5 +16,6 @@ namespace Sentry.data.Web
         public string DatasetFileName { get; set; }
         public int RawqueryRowCount { get; set; }
         public int ParquetRowCount { get; set; }
+        public bool HasCountDifference { get; set; }
     }
 }

@@ -675,6 +675,14 @@ namespace Sentry.data.Core
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
 
+            //IF THIS IS A BRAND NEW DATAFLOW AND TOPIC INGESTION TYPE IS TOPIC THEN MAKE SURE TOPIC NAME DOESN'T ALREADY EXIST
+            if (    dfDto.Id == 0 
+                    && dfDto.IngestionType == (int) IngestionType.Topic 
+                    && _datasetContext.DataFlow.Any(w => w.TopicName == dfDto.TopicName))
+            {
+                results.Add(DataFlow.ValidationErrors.topicNameMustBeUnique, "Kafka Topic name is already used");
+            }
+
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dfDto.SaidKeyCode, dfDto.NamedEnvironment, dfDto.NamedEnvironmentType).ConfigureAwait(false));
 
