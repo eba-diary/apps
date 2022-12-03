@@ -27,6 +27,23 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
+        public void ToModel_RequestVariableDto_RequestVariableModel()
+        {
+            RequestVariableDto dto = new RequestVariableDto
+            {
+                VariableName = "foo",
+                VariableValue = "bar",
+                VariableIncrementType = RequestVariableIncrementType.Daily
+            };
+
+            RequestVariableModel model = dto.ToModel();
+
+            Assert.AreEqual("foo", model.VariableName);
+            Assert.AreEqual("bar", model.VariableValue);
+            Assert.AreEqual(RequestVariableIncrementType.Daily, model.VariableIncrementType);
+        }
+
+        [TestMethod]
         public void ToDto_JobModel_RetrieverJobDto()
         {
             JobModel model = new JobModel

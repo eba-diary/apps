@@ -401,7 +401,8 @@ namespace Sentry.data.Web.Controllers
                 SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule),
                 PagingType = dto.PagingType,
                 PageTokenField = dto.PageTokenField,
-                PageParameterName = dto.PageParameterName
+                PageParameterName = dto.PageParameterName,
+                RequestVariables = dto.RequestVariables?.Select(x => x.ToModel()).ToList()
             };
 
             model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => int.Parse(s.Value)).FirstOrDefault().ToString();
