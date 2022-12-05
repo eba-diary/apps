@@ -4,12 +4,13 @@ using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Migration;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Sentry.data.Core.DomainServices
+namespace Sentry.data.Core
 {
     /// <summary>
     /// The DataApplicationService is used to control transactional boundries for
@@ -27,12 +28,14 @@ namespace Sentry.data.Core.DomainServices
         private readonly Lazy<IDataFeatures> _dataFeatures;
         private readonly Lazy<ISecurityService> _securityService;
         private readonly Lazy<ISchemaService> _schemaService;
+        private readonly Lazy<IJobService> _jobService;
 
         public DataApplicationService(IDatasetContext datasetContext,
             Lazy<IDatasetService> datasetService, Lazy<IConfigService> configService,
             Lazy<IDataFlowService> dataFlowService, Lazy<IBackgroundJobClient> hangfireBackgroundJobClient,
             Lazy<IUserService> userService, Lazy<IDataFeatures> dataFeatures,
-            Lazy<ISecurityService> securityService, Lazy<ISchemaService> schemaService)
+            Lazy<ISecurityService> securityService, Lazy<ISchemaService> schemaService,
+            Lazy<IJobService> jobService)
         {
             _datasetContext = datasetContext;
             _datasetService = datasetService;
@@ -43,6 +46,7 @@ namespace Sentry.data.Core.DomainServices
             _dataFeatures = dataFeatures;
             _securityService = securityService;
             _schemaService = schemaService;
+            _jobService = jobService;
         }
 
         #region Private Properties
@@ -77,6 +81,10 @@ namespace Sentry.data.Core.DomainServices
         private ISchemaService SchemaService
         {
             get { return _schemaService.Value; }
+        }
+        private IJobService JobService
+        {
+            get { return _jobService.Value; }
         }
         #endregion
 
@@ -395,8 +403,20 @@ namespace Sentry.data.Core.DomainServices
                 //Create dataflow / dataflowstep entities
                 newDataFlow = DataFlowService.Create(dto);
 
-                //Create retriever job entities
-                DataFlowService.CreateDataFlowRetrieverJobMetadata(newDataFlow);
+                switch (dto.IngestionType)
+                {
+                    case (int)IngestionType.DFS_Drop:
+                    case (int)IngestionType.S3_Drop:
+                    case (int)IngestionType.Topic:
+                        CreateWithoutSave_DfsRetrieverJob(newDataFlow);
+                        break;
+                    case (int)IngestionType.DSC_Pull:
+                        newDataFlow.MapToRetrieverJobDto(dto.RetrieverJob);
+                        CreateWithoutSave_ExternalRetrieverJob(dto.RetrieverJob);
+                        break;
+                    default:
+                        break;
+                }
             }
             catch (Exception ex)
             {
@@ -428,6 +448,17 @@ namespace Sentry.data.Core.DomainServices
 
             Logger.Info($"{methodName} Method End");
             return newFileSchemaId;
+        }
+        private void CreateWithoutSave_DfsRetrieverJob(DataFlow dataFlow)
+        {
+            if (dataFlow.ShouldCreateDFSDropLocations(DataFeatures))
+            {
+                JobService.CreateDfsRetrieverJob(dataFlow);
+            }
+        }
+        private void CreateWithoutSave_ExternalRetrieverJob(RetrieverJobDto retrieverJobDto)
+        {
+            _ = JobService.CreateRetrieverJob(retrieverJobDto);
         }
 
 

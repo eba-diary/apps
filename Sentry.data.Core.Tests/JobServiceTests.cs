@@ -228,7 +228,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsNull(job.DatasetConfig);
             Assert.IsNotNull(job.DataSource);
@@ -315,7 +315,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -363,7 +363,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsTrue(job.ExecutionParameters.Any());
             Assert.IsTrue(job.ExecutionParameters.ContainsKey("Param1"));
@@ -415,7 +415,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -451,7 +451,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.AreEqual(4, job.Id);
             Assert.IsNull(job.DatasetConfig);
@@ -1218,9 +1218,14 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void InstantiateJobsForCreation_DfsNonProdSource()
+        public void CreateDfsRetrieverJob_DfsNonProdSource()
         {
-            JobService service = new JobService(null, null, null, null, null, null);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(context.Object, null, null, null, null, null);
 
             DataFlow dataFlow = new DataFlow()
             {
@@ -1231,16 +1236,22 @@ namespace Sentry.data.Core.Tests
 
             DataSource dataSource = new DfsNonProdSource();
 
-            RetrieverJob result = service.InstantiateJobsForCreation(dataFlow, dataSource);
+            RetrieverJob result = service.CreateDfsRetrieverJob(dataFlow, dataSource);
 
+            mr.VerifyAll();
             Assert.AreEqual("Instant", result.Schedule);
             Assert.AreEqual("SAID/DEV/000001", result.RelativeUri);
         }
 
         [TestMethod]
-        public void InstantiateJobsForCreation_DfsProdSource()
+        public void CreateDfsRetrieverJob_DfsProdSource()
         {
-            JobService service = new JobService(null, null, null, null, null, null);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(context.Object, null, null, null, null, null);
 
             DataFlow dataFlow = new DataFlow()
             {
@@ -1251,8 +1262,9 @@ namespace Sentry.data.Core.Tests
 
             DataSource dataSource = new DfsProdSource();
 
-            RetrieverJob result = service.InstantiateJobsForCreation(dataFlow, dataSource);
+            RetrieverJob result = service.CreateDfsRetrieverJob(dataFlow, dataSource);
 
+            mr.VerifyAll();
             Assert.AreEqual("Instant", result.Schedule);
             Assert.AreEqual("SAID/DEV/000001", result.RelativeUri);
         }

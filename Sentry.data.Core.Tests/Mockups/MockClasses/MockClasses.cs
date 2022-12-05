@@ -915,7 +915,8 @@ namespace Sentry.data.Core.Tests
                 NamedEnvironmentType = NamedEnvironmentType.NonProd,
                 ObjectStatus = ObjectStatusEnum.Active,
                 DeleteIssuer = null,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)IngestionType.DFS_Drop
             };
             return df;
         }
