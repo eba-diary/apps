@@ -20,26 +20,24 @@ namespace Sentry.data.Core
 {
     public class ConfigService : IConfigService
     {
-        public IDatasetContext _datasetContext;
-        public IUserService _userService;
-        public IEventService _eventService;
-        public IMessagePublisher _messagePublisher;
-        public IEncryptionService _encryptService;
-        public IJobService _jobService;
-        public readonly IDataFlowService _dataFlowService;
-        private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
+        private readonly IEventService _eventService;
+        private readonly IMessagePublisher _messagePublisher;
+        private readonly IEncryptionService _encryptService;
+        private readonly IJobService _jobService;
+        private readonly IDataFlowService _dataFlowService;
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
-        private string _bucket;
         private readonly ISAIDService _saidService;
         private readonly IDatasetFileService _datasetFileService;
 
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService, IDatasetFileService datasetFileService)
+            IJobService jobService, ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, 
+            ISAIDService saidService, IDatasetFileService datasetFileService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -47,37 +45,12 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _encryptService = encryptService;
             _securityService = securityService;
-            JobService = jobService;
-            _s3ServiceProvider = s3ServiceProvider;
+            _jobService = jobService;
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
             _dataFlowService = dataFlowService;
             _saidService = saidService;
             _datasetFileService = datasetFileService;
-        }
-
-        private IJobService JobService
-        {
-            get
-            {
-                return _jobService;
-            }
-            set
-            {
-                _jobService = value;
-            }
-        }
-
-        private string RootBucket
-        {
-            get
-            {
-                if (_bucket == null)
-                {
-                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
-                }
-                return _bucket;
-            }
         }
 
         public List<string> Validate(FileSchemaDto dto)
@@ -350,6 +323,28 @@ namespace Sentry.data.Core
 
                 return false;
             }
+        }
+
+        public int Create(DatasetFileConfigDto dto)
+        {
+            DatasetFileConfig datasetFileConfig;
+            try
+            {
+                datasetFileConfig = CreateDatasetFileConfig(dto);
+
+                Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+                List<DatasetFileConfig> datasetFileConfigList = (parentDataset.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parentDataset.DatasetFileConfigs.ToList();
+                datasetFileConfigList.Add(datasetFileConfig);
+                _datasetContext.Add(datasetFileConfig);
+                parentDataset.DatasetFileConfigs = datasetFileConfigList;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error creating Dataset File Config", ex);
+                throw;
+            }
+
+            return datasetFileConfig.ConfigId;
         }
 
         public bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)

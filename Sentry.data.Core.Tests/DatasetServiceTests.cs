@@ -1347,5 +1347,29 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Blue", dto.CategoryColor);
             Assert.AreEqual(1, dto.GroupAccessCount);
         }
+
+        [TestMethod]
+        public void Create_For_Dataset()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetDto dto = MockClasses.MockDatasetDto(new List<Dataset>() { MockClasses.MockDataset() }).First();
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<Dataset>()));
+            context.SetupGet(s => s.Assets).Returns(new List<Asset>() { new Asset() { AssetId = 1, SaidKeyCode = "ABCD" } }.AsQueryable());
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(s => s.GetCurrentUser().AssociateId).Returns("123456");
+
+            var datasetService = new DatasetService(context.Object, null, userService.Object, null, null, null, null, null, null);
+
+            //Act
+            _ = datasetService.Create(dto);
+
+            //Assert
+            mr.VerifyAll();
+            context.Verify(v => v.SaveChanges(It.IsAny<bool>()),Times.Never);
+        }
     }
 }

@@ -26,7 +26,20 @@ namespace Sentry.data.Core
         List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName);
 
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
+        /// <summary>
+        /// Creates a Dataflow Entity object and adds it to domain context.
+        /// <para>Domain context changes are not saved.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        DataFlow Create(DataFlowDto dto);
         int CreateDataFlow(DataFlowDto dto);
+        /// <summary>
+        /// Performs all necessary external dependency creation statements.
+        /// </summary>
+        /// <remarks>To be executed after creation of dataflow.</remarks>
+        /// <param name="dataFlowId"></param>
+        void CreateExternalDependencies(int dataFlowId);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);

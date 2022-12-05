@@ -21,7 +21,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             var user1 = new Mock<IApplicationUser>();
             user1.Setup(f => f.AssociateId).Returns("123456");
 
@@ -58,7 +58,7 @@ namespace Sentry.data.Core.Tests
         public void DatasetFileService_GetAllNonDeletedDatasetFileBySchema_PageParameters_Ordering_Is_Descending()
         {
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -112,7 +112,7 @@ namespace Sentry.data.Core.Tests
         public void DatasetFileService_GetAllNonDeletedDatasetFileBySchema_PageParameters_Ordering_Is_Ascending()
         {
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
 
             dfc.Schema = schema;
@@ -187,7 +187,7 @@ namespace Sentry.data.Core.Tests
 
             //setup Entity objects 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -234,7 +234,7 @@ namespace Sentry.data.Core.Tests
 
             //setup Entity objects
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -289,7 +289,7 @@ namespace Sentry.data.Core.Tests
 
             //setup Entity objects
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -344,7 +344,7 @@ namespace Sentry.data.Core.Tests
 
             //setup Entity objects
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -399,7 +399,7 @@ namespace Sentry.data.Core.Tests
 
             //setup Entity objects
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -452,7 +452,7 @@ namespace Sentry.data.Core.Tests
 
             //setup Entity objects
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             FileSchema schema = MockClasses.MockFileSchema();
             dfc.Schema = schema;
 
@@ -535,7 +535,7 @@ namespace Sentry.data.Core.Tests
 
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             var datasetFileDto = MockClasses.MockDatasetFileDto();
             datasetFileDto.Dataset = 93;
@@ -561,7 +561,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             var datasetFileDto = MockClasses.MockDatasetFileDto();
             datasetFileDto.Schema = 39;
@@ -587,7 +587,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             dataFile.Schema = null;
             
@@ -614,7 +614,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             dataFile.SchemaRevision = null;
 
@@ -644,7 +644,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             dataFile.SchemaRevision = null;
 
@@ -676,7 +676,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFile = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
 
             var datasetFileDto = MockClasses.MockDatasetFileDto();
@@ -742,7 +742,7 @@ namespace Sentry.data.Core.Tests
             datasetFileDto.ETag = "my-etag-string";
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             Mock<IApplicationUser> user1 = new Mock<IApplicationUser>();
             user1.Setup(f => f.AssociateId).Returns("123456");
 
@@ -796,7 +796,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFileA = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             DatasetFile dataFileB = MockClasses.MockDatasetFileB(ds, dfc, user1.Object);
             DatasetFile dataFileC = MockClasses.MockDatasetFileC(ds, dfc, user1.Object);
@@ -845,7 +845,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFileA = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             DatasetFile dataFileB = MockClasses.MockDatasetFileB(ds, dfc, user1.Object);
 
@@ -998,7 +998,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFileA = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
             DatasetFile dataFileB = MockClasses.MockDatasetFileB(ds, dfc, user1.Object);
             DatasetFile dataFileC = MockClasses.MockDatasetFileC(ds, dfc, user1.Object);
@@ -1047,7 +1047,7 @@ namespace Sentry.data.Core.Tests
             userService.Setup(u => u.GetCurrentUser()).Returns(user1.Object);
 
             Dataset ds = MockClasses.MockDataset();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(ds);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(ds);
             DatasetFile dataFileA = MockClasses.MockDatasetFile(ds, dfc, user1.Object);
 
 
@@ -1091,7 +1091,7 @@ namespace Sentry.data.Core.Tests
 
             FileSchema fileSchema = MockClasses.MockFileSchema();
 
-            DatasetFileConfig datasetFileConfig = MockClasses.MockDataFileConfig(schema: fileSchema);
+            DatasetFileConfig datasetFileConfig = MockClasses.MockDatasetFileConfig(schema: fileSchema);
 
             DatasetFile datasetFile = MockClasses.MockDatasetFile(dataset, datasetFileConfig, user.Object);
             datasetFile.FileKey = "rawquery/CRVS/PROD/8921001/2022/7/5/Structured_AgentEvent_20220705031726670_20220705201728000.json";
@@ -1168,7 +1168,7 @@ namespace Sentry.data.Core.Tests
 
             FileSchema fileSchema = MockClasses.MockFileSchema();
 
-            DatasetFileConfig datasetFileConfig = MockClasses.MockDataFileConfig(schema: fileSchema);
+            DatasetFileConfig datasetFileConfig = MockClasses.MockDatasetFileConfig(schema: fileSchema);
 
             // list of 101 datasetFileIds to test batch logic in schedule reprocessing
             List<int> datasetFileIds = new List<int>();
