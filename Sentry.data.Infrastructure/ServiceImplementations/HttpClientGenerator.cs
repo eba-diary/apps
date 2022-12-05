@@ -13,10 +13,14 @@ namespace Sentry.data.Infrastructure
             _dataFeatures = dataFeatures;
         }
 
-        public HttpClient GenerateHttpClient()
+        public HttpClient GenerateHttpClient(string url)
         {
             HttpClientHandler httpClientHandler = new HttpClientHandler();
-            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
+            if (url.ToLower().Contains(".sentry.com"))
+            {
+                httpClientHandler.UseDefaultCredentials = true;
+            }
+            else if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
                 httpClientHandler.Proxy = webProxy;
             };

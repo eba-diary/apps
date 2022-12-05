@@ -8,37 +8,32 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
-    public class AuthorizationProvider : IAuthorizationProvider
+    public sealed class AuthorizationProvider : IAuthorizationProvider
     {
         private readonly IEncryptionService _encryptionService;
         private readonly IDatasetContext _datasetContext;
-        private readonly IDataFeatures _dataFeatures;
+        private readonly IHttpClientGenerator _httpClientGenerator;
+        private HttpClient _httpClient;
 
-        public AuthorizationProvider(IEncryptionService encryptionService, IDatasetContext datasetContext, IDataFeatures dataFeatures)
+        public AuthorizationProvider(IEncryptionService encryptionService, IDatasetContext datasetContext, IHttpClientGenerator httpClientGenerator)
         {
             _encryptionService = encryptionService;
             _datasetContext = datasetContext;
-            _dataFeatures = dataFeatures;
+            _httpClientGenerator = httpClientGenerator;
         }
 
-        public string GetOAuthAccessTokenForToken(HTTPSSource source, DataSourceToken token)
+        public string GetOAuthAccessToken(HTTPSSource source, DataSourceToken token)
         {
             if (token.CurrentToken == null || token.CurrentTokenExp == null || token.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                 bool isRefreshToken = source.GrantType == Core.GlobalEnums.OAuthGrantType.RefreshToken;
-                HttpClientHandler httpHandler = new HttpClientHandler();
-                if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
-                {
-                    httpHandler.Proxy = webProxy;
-                }
 
-                HttpClient httpClient = new HttpClient(httpHandler);
+                HttpClient httpClient = GetHttpClient(token.TokenUrl);
 
                 HttpResponseMessage oAuthPostResult;
                 if (isRefreshToken)
@@ -82,9 +77,14 @@ namespace Sentry.data.Infrastructure
             return _encryptionService.DecryptString(token.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
         }
 
-        public string GetOAuthAccessToken(HTTPSSource source)
+        public string GetTokenAuthenticationToken(HTTPSSource source)
         {
-            return GetOAuthAccessTokenForToken(source, source.Tokens.FirstOrDefault());
+            return _encryptionService.DecryptString(source.AuthenticationTokenValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+        }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
 
         #region Private
@@ -214,6 +214,16 @@ namespace Sentry.data.Infrastructure
         {
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return origin.AddSeconds(timestamp);
+        }
+
+        private HttpClient GetHttpClient(string tokenUrl)
+        {
+            if (_httpClient == null)
+            {
+                _httpClient = _httpClientGenerator.GenerateHttpClient(tokenUrl);
+            }
+
+            return _httpClient;
         }
         #endregion
     }

@@ -37,79 +37,80 @@ namespace Sentry.data.Infrastructure
             GoogleBigQueryConfiguration config = GetConfig(job);
 
             Logger.Info($"Google BigQuery Retriever Job start - Job: {job.Id}");
-
-            //get Google token
-            string accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
-            Logger.Info($"Google BigQuery Retriever Job access token retrieved - Job: {job.Id}");
-
-            //get Google schema
-            HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
-            httpClient.BaseAddress = job.DataSource.BaseUri;
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-            httpClient.Timeout = new TimeSpan(0, 10, 0);
-
-            using (httpClient)
+            using (_authorizationProvider)
             {
-                try
+                //get Google token
+                HTTPSSource source = (HTTPSSource)job.DataSource;
+                string accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.Tokens.FirstOrDefault());
+                Logger.Info($"Google BigQuery Retriever Job access token retrieved - Job: {job.Id}");
+
+                using (HttpClient httpClient = _httpClientGenerator.GenerateHttpClient(job.DataSource.BaseUri.ToString()))
                 {
-                    //update DSC schema
-                    JArray bigQueryFields = GetBigQueryFields(httpClient, config);
-                    Logger.Info($"Google BigQuery Retriever Job fields retrieved - Job: {job.Id}");
-                    _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
-                    Logger.Info($"Google BigQuery Retriever Job fields saved - Job: {job.Id}");
+                    httpClient.BaseAddress = job.DataSource.BaseUri;
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+                    httpClient.Timeout = new TimeSpan(0, 10, 0);
 
-                    //get data flow step for drop location info
-                    DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop).FirstOrDefault();
-
-                    do
+                    try
                     {
-                        Logger.Info($"Google BigQuery Retriever Job start data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
-                        string requestKey = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                        //update DSC schema
+                        JArray bigQueryFields = GetBigQueryFields(httpClient, config);
+                        Logger.Info($"Google BigQuery Retriever Job fields retrieved - Job: {job.Id}");
+                        _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
+                        Logger.Info($"Google BigQuery Retriever Job fields saved - Job: {job.Id}");
 
-                        //make request
-                        MemoryStream stream = GetBigQueryDataStream(httpClient, config);
-                        Logger.Info($"Google BigQuery Retriever Job end data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                        //get data flow step for drop location info
+                        DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop).FirstOrDefault();
 
-                        //if rows to upload
-                        if (stream != null)
+                        do
                         {
-                            using (stream)
+                            Logger.Info($"Google BigQuery Retriever Job start data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                            string requestKey = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+
+                            //make request
+                            MemoryStream stream = GetBigQueryDataStream(httpClient, config);
+                            Logger.Info($"Google BigQuery Retriever Job end data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+
+                            //if rows to upload
+                            if (stream != null)
                             {
-                                //manufacture target key
-                                string targetKey = $"{step.TriggerKey}{job.JobOptions.TargetFileName}_{config.TableId}_{config.LastIndex}_{requestKey}.json";
+                                using (stream)
+                                {
+                                    //manufacture target key
+                                    string targetKey = $"{step.TriggerKey}{job.JobOptions.TargetFileName}_{config.TableId}_{config.LastIndex}_{requestKey}.json";
 
-                                //upload to S3
-                                Logger.Info($"Google BigQuery Retriever Job start S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
-                                _s3ServiceProvider.UploadDataFile(stream, step.TriggerBucket, targetKey);
-                                Logger.Info($"Google BigQuery Retriever Job end S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
+                                    //upload to S3
+                                    Logger.Info($"Google BigQuery Retriever Job start S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
+                                    _s3ServiceProvider.UploadDataFile(stream, step.TriggerBucket, targetKey);
+                                    Logger.Info($"Google BigQuery Retriever Job end S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
 
-                                //update execution parameters
-                                SaveProgress(config, job);
-                                Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                                    //update execution parameters
+                                    SaveProgress(config, job);
+                                    Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                                }
                             }
-                        }
 
-                        if (string.IsNullOrEmpty(config.PageToken))
-                        {
-                            IncrementTableId(config);
-                        }
+                            if (string.IsNullOrEmpty(config.PageToken))
+                            {
+                                IncrementTableId(config);
+                            }
 
-                        //refresh token if expired
-                        accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
-                        httpClient.DefaultRequestHeaders.Clear();
-                        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+                            //refresh token if expired
+                            accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.Tokens.FirstOrDefault());
+                            httpClient.DefaultRequestHeaders.Clear();
+                            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+                        }
+                        while (true); //only break loop on exception
                     }
-                    while (true); //only break loop on exception
-                }
-                catch (GoogleBigQueryNotFoundException)
-                {
-                    //no more tables to collect from
-                    DateTime expectedDate = DateTime.Today.AddDays(-1);
-                    DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
-                    if (stopDate < expectedDate)
+                    catch (GoogleBigQueryNotFoundException)
                     {
-                        //means there may be an unexpected gap
-                        Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                        //no more tables to collect from
+                        DateTime expectedDate = DateTime.Today.AddDays(-1);
+                        DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
+                        if (stopDate < expectedDate)
+                        {
+                            //means there may be an unexpected gap
+                            Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                        }
                     }
                 }
             }
@@ -207,22 +208,24 @@ namespace Sentry.data.Infrastructure
 
         private JObject GetBigQueryResponse(HttpClient httpClient, string uri)
         {
-            HttpResponseMessage response = httpClient.GetAsync(uri).Result;
-            string responseString = response.Content.ReadAsStringAsync().Result;
-
-            if (!response.IsSuccessStatusCode)
+            using (HttpResponseMessage response = httpClient.GetAsync(uri).Result)
             {
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                string responseString = response.Content.ReadAsStringAsync().Result;
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    Logger.Info($"Google BigQuery request to {uri} returned NotFound. {responseString}");
-                    throw new GoogleBigQueryNotFoundException();
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        Logger.Info($"Google BigQuery request to {uri} returned NotFound. {responseString}");
+                        throw new GoogleBigQueryNotFoundException();
+                    }
+
+                    Logger.Error($"Google BigQuery request to {uri} failed. {responseString}");
+                    throw new GoogleBigQueryJobProviderException(responseString);
                 }
 
-                Logger.Error($"Google BigQuery request to {uri} failed. {responseString}");
-                throw new GoogleBigQueryJobProviderException(responseString);
+                return JObject.Parse(responseString);
             }
-
-            return JObject.Parse(responseString);
         }
 
         private void SaveProgress(GoogleBigQueryConfiguration config, RetrieverJob job)

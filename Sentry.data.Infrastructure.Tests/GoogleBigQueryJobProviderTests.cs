@@ -24,10 +24,15 @@ namespace Sentry.data.Infrastructure.Tests
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource() 
+            { 
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
             HttpResponseMessage httpResponseMessageNotFound = GetResponseMessage(HttpStatusCode.NotFound, "NotFound");
@@ -38,10 +43,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri };
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             GoogleBigQueryJobProvider provider = new GoogleBigQueryJobProvider(null, null, authorizationProvider.Object, httpClientGenerator.Object, null);
 
@@ -68,10 +73,15 @@ namespace Sentry.data.Infrastructure.Tests
 
             DateTime today = DateTime.Today;
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource()
+            {
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
 
@@ -96,10 +106,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
@@ -154,10 +164,15 @@ namespace Sentry.data.Infrastructure.Tests
 
             DateTime today = DateTime.Today;
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource()
+            {
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
 
@@ -187,10 +202,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
@@ -270,10 +285,15 @@ namespace Sentry.data.Infrastructure.Tests
 
             DateTime today = DateTime.Today;
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource()
+            {
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
 
@@ -303,10 +323,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
@@ -386,10 +406,15 @@ namespace Sentry.data.Infrastructure.Tests
 
             DateTime today = DateTime.Today;
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource()
+            {
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
 
@@ -425,10 +450,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
@@ -517,10 +542,15 @@ namespace Sentry.data.Infrastructure.Tests
 
             DateTime today = DateTime.Today;
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource()
+            {
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
 
@@ -545,10 +575,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).Throws<Exception>();
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
@@ -608,10 +638,15 @@ namespace Sentry.data.Infrastructure.Tests
 
             DateTime today = DateTime.Today;
 
-            HTTPSSource httpsSource = new HTTPSSource() { BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/") };
+            HTTPSSource httpsSource = new HTTPSSource()
+            {
+                BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
+                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+            };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource)).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
 
@@ -636,10 +671,10 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object);
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
-            httpClientGenerator.Setup(x => x.GenerateHttpClient()).Returns(httpClient);
+            httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
