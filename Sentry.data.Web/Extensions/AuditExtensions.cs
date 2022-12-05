@@ -1,11 +1,7 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Exceptions;
-using Sentry.data.Web;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Sentry.data.Core
+namespace Sentry.data.Web
 {
     public static class AuditExtensions
     {

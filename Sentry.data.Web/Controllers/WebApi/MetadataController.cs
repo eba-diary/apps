@@ -157,6 +157,23 @@ namespace Sentry.data.Web.WebApi.Controllers
         //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
         //}
 
+        /* This code will be used within next two iterations*/
+        //[HttpPost]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        //[Route("dataset")]
+        //public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
+        //{
+        //    IHttpActionResult MigrateDatasetFunction()
+        //    {
+        //        SchemaMigrationRequest request = model.ToDto();
+        //        DataApplicationService.MigrateDataset(request);
+        //        return Ok();
+        //    }
+
+        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        //}
+
+
         /// <summary>
         /// List of all datasets
         /// </summary>

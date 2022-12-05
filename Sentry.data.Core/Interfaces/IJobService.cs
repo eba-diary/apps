@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,11 +24,13 @@ namespace Sentry.data.Core
         List<Submission> GetJobSubmissions(int jobId, int submissionId = 0);
         List<JobHistory> GetJobHistoryBySubmission(int SubmissionId);
         List<JobHistory> GetJobHistoryByJobAndSubmission(int JobId, int SubmissionId);
+        DataSource GetDfsDataSourceByDatasetNamedEnvironmentType(NamedEnvironmentType namedEnviornmentType);
         Submission SaveSubmission(RetrieverJob job, string options);
         void RecordJobState(Submission submission, RetrieverJob job, string state);
         RetrieverJob FindBasicJob(RetrieverJob job);
-        RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource);
-        RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto);
+        void CreateDfsRetrieverJob(DataFlow dataFlow);
+        RetrieverJob CreateDfsRetrieverJob(DataFlow df, DataSource dataSource);
+        RetrieverJob CreateRetrieverJob(RetrieverJobDto dto);
         void CreateDropLocation(RetrieverJob job);
         /// <summary>
         /// 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Migration;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true).Verifiable();
 
             var lazyService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyService, null, null, null, null, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -56,7 +56,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true).Verifiable();
 
             var lazyService = new Lazy<IConfigService>(() => configService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, null, lazyService, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, null, lazyService, null, null, null, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDatasetFileConfig(idList, user.Object);
@@ -82,7 +82,7 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true).Verifiable();
 
             var lazyService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, null, null, lazyService, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, null, null, lazyService, null, null, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataflow(idList, user.Object);
@@ -108,7 +108,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(idList[0], user.Object, true)).Returns(true);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -134,7 +134,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -162,7 +162,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(false);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null);
 
             // Act
             dataApplicationService.DeleteDataset(idList, user.Object);
@@ -189,7 +189,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(false);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null);
 
 
             // Act
@@ -241,26 +241,24 @@ namespace Sentry.data.Core.Tests
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
             var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
             var lazyUserService = new Lazy<IUserService>(() => userService.Object);
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, lazyDatasetService, null, null, null, lazyUserService, null, lazySecurityService, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, lazyDatasetService, null, null, null, lazyUserService, null, lazySecurityService, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1).Callback<DatasetDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
             dataApplicationService.Setup(s => s.MigrateSchemaWithoutSave_Internal(It.IsAny<List<SchemaMigrationRequest>>())).Returns(new List<int>()).Callback<List<SchemaMigrationRequest>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}", ++callOrder)));
-            dataApplicationService.Setup(s => s.CreateExternalDependenciesForSchema(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataFlowBySchemaId(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}", ++callOrder)));
 
 
             //Act
-            _ = dataApplicationService.Object.MigrateDataset(request);
+            dataApplicationService.Object.MigrateDataset(request);
 
             //Arrage
             mr.VerifyAll();
-            Assert.AreEqual(6, calls.Count);
+            Assert.AreEqual(5, calls.Count);
             Assert.AreEqual(1, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateWithoutSave)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateWithoutSave)} called out of order");
             Assert.AreEqual(2, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)} called out of order");
             Assert.AreEqual(3, calls.Where(w => w.Item1 == $"{nameof(IDatasetContext.SaveChanges)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
             Assert.AreEqual(4, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(IDatasetContext.SaveChanges)} called out of order");
-            Assert.AreEqual(5, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)} called out of order");
-            Assert.AreEqual(6, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
+            Assert.AreEqual(5, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
         }
 
         [TestMethod]
@@ -286,7 +284,7 @@ namespace Sentry.data.Core.Tests
 
             var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
             var lazyUserService = new Lazy<IUserService>(() => userService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, lazyUserService, null, lazySecurityService, null);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, lazyUserService, null, lazySecurityService, null, null);
 
             DatasetMigrationRequest request = new DatasetMigrationRequest()
             {
@@ -295,7 +293,7 @@ namespace Sentry.data.Core.Tests
             };
 
             //Act
-            _ = dataApplicationService.MigrateDataset(request);
+            dataApplicationService.MigrateDataset(request);
         }
 
         [TestMethod]
@@ -324,19 +322,19 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { datasetFileConfig }.AsQueryable());
-            context.Setup(s => s.DataFlow).Returns(new List<DataFlow>() { new DataFlow() { Id = 1, SchemaId = fileSchema.SchemaId } }.AsQueryable());
+            //context.Setup(s => s.DataFlow).Returns(new List<DataFlow>() { new DataFlow() { Id = 1, SchemaId = fileSchema.SchemaId } }.AsQueryable());
 
             Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
             schemaService.Setup(s => s.GetFileSchemaDto(It.IsAny<int>())).Returns(fileSchemaDto);
             Mock<IConfigService> configService = mr.Create<IConfigService>();
             configService.Setup(s => s.GetDatasetFileConfigDtoByDataset(It.IsAny<int>())).Returns(new List<DatasetFileConfigDto>() { datasetFileConfigDto });
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
-            dataFlowService.Setup(s => s.GetDataFlowDetailDto(It.IsAny<int>())).Returns(dataFlowDetailDto2);
+            dataFlowService.Setup(s => s.GetDataFlowDetailDtoBySchemaId(It.IsAny<int>())).Returns(new List<DataFlowDetailDto>() { dataFlowDetailDto2 });
 
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
             var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
             var lazyDataFlowService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, lazyConfigService, lazyDataFlowService, null, null, null, null, lazySchemaService);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, lazyConfigService, lazyDataFlowService, null, null, null, null, lazySchemaService, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(fileSchemaDto)).Returns(11).Callback<FileSchemaDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}_FileSchema", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateWithoutSave(datasetFileConfigDto)).Returns(22).Callback<DatasetFileConfigDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}_DatasetFileConfig", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateWithoutSave(dataFlowDetailDto2)).Returns(33).Callback<DataFlowDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}_DataFlow", ++callOrder)));
@@ -369,7 +367,7 @@ namespace Sentry.data.Core.Tests
             schemaService.Setup(s => s.GetFileSchemaDto(It.IsAny<int>())).Throws<InvalidOperationException>();
 
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, lazySchemaService);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, lazySchemaService, null);
 
             //Act
             dataApplicationService.MigrateSchemaWithoutSave_Internal(request);
@@ -387,7 +385,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(s => s.Create(datasetDto)).Returns(1);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, lazyDatasetService, null, null, null, null, null, null, null);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, lazyDatasetService, null, null, null, null, null, null, null, null);
 
             //Act
             int result = dataApplicationService.CreateWithoutSave(datasetDto);
@@ -411,7 +409,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(s => s.Create(datasetDto)).Throws<InvalidOperationException>();
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, lazyDatasetService, null, null, null, null, null, null, null);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, lazyDatasetService, null, null, null, null, null, null, null, null);
 
 
             //Act
@@ -431,7 +429,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Callback<bool>(s => calls.Add(new Tuple<string, int>($"{nameof(IDatasetContext.SaveChanges)}", ++callOrder)));
 
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(It.IsAny<DatasetDto>())).Returns(1).Callback<DatasetDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}", ++callOrder)));
 
@@ -461,7 +459,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(s => s.Create(dto)).Returns(1);
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object );
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null);
 
             //Act
             _ = dataApplicationService.Create(dto);
@@ -482,7 +480,7 @@ namespace Sentry.data.Core.Tests
             datasetService.Setup(s => s.CreateExternalDependencies(It.IsAny<int>())).Throws(new Exception());
 
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null);
+            var dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null);
 
             //Act
             int result = dataApplicationService.Create(dto);
@@ -506,7 +504,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(s => s.Create(datasetFileConfigDto)).Returns(1);
 
             var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, null, lazyConfigService, null, null, null, null, null, null);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, lazyConfigService, null, null, null, null, null, null, null);
 
             //Act
             int result = dataApplicationService.CreateWithoutSave(datasetFileConfigDto);
@@ -531,7 +529,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(s => s.Create(datasetFileConfigDto)).Throws<InvalidOperationException>();
 
             var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, null, lazyConfigService, null, null, null, null, null, null);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, lazyConfigService, null, null, null, null, null, null, null);
 
 
             //Act
@@ -555,7 +553,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Callback<bool>(s => calls.Add(new Tuple<string, int>($"{nameof(IDatasetContext.SaveChanges)}", ++callOrder)));
 
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(It.IsAny<DatasetFileConfigDto>())).Returns(1).Callback<DatasetFileConfigDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
 
             //Act
@@ -581,14 +579,14 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Throws<InvalidOperationException>();
             context.Setup(s => s.Clear());
 
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null);
 
             //Act
             _ = dataApplicationService.Object.Create(dto);
         }
 
         [TestMethod]
-        public void CreateWithoutSave_For_DataFlow()
+        public void CreateWithoutSave_For_DataFlow_DfsPull()
         {
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
@@ -596,14 +594,21 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             var schemaMapDto = new SchemaMapDto() { DatasetId = 1, SchemaId = schema.SchemaId, Id = 99 };
             DataFlowDto dto = MockClasses.MockDataFlowDto(MockClasses.MockDataFlow(), schemaMapDto);
+            dto.IngestionType = (int)IngestionType.DSC_Pull;
+            dto.RetrieverJob = new RetrieverJobDto() { JobId = 1 };
             DataFlow dataflow = MockClasses.MockDataFlow();
+
+            RetrieverJob retrieverJob = MockClasses.GetMockRetrieverJob();
 
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(s => s.Create(dto)).Returns(dataflow);
-            dataFlowService.Setup(s => s.CreateDataFlowRetrieverJobMetadata(dataflow));
+
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(s => s.CreateRetrieverJob(It.IsAny<RetrieverJobDto>())).Returns(retrieverJob);
 
             var lazyDataFlowService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, lazyDataFlowService, null, null, null, null, null);
+            var lazyJobService = new Lazy<IJobService>(() => jobService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, lazyDataFlowService, null, null, null, null, null, lazyJobService);
 
             //Act
             int result = dataApplicationService.CreateWithoutSave(dto);
@@ -630,7 +635,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Callback<bool>(s => calls.Add(new Tuple<string, int>($"{nameof(IDatasetContext.SaveChanges)}", ++callOrder)));
 
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(It.IsAny<DataFlowDto>())).Returns(1).Callback<DataFlowDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataFlow(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlow)}", ++callOrder)));
 
@@ -658,7 +663,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Throws<InvalidOperationException>();
             context.Setup(s => s.Clear());
 
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(It.IsAny<DataFlowDto>())).Returns(1);
 
             //Act
@@ -675,17 +680,25 @@ namespace Sentry.data.Core.Tests
             var schemaMapDto = new SchemaMapDto() { DatasetId = 1, SchemaId = schema.SchemaId, Id = 99 };
             DataFlowDto dto = MockClasses.MockDataFlowDto(MockClasses.MockDataFlow(), schemaMapDto);
             DataFlow dataFlow = MockClasses.MockDataFlow();
+            dataFlow.IngestionType = (int)IngestionType.DFS_Drop;
 
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(s => s.Create(dto)).Returns(dataFlow);
-            dataFlowService.Setup(s => s.CreateDataFlowRetrieverJobMetadata(It.IsAny<DataFlow>()));
             dataFlowService.Setup(s => s.CreateExternalDependencies(It.IsAny<int>())).Throws<InvalidOperationException>();
 
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(s => s.CreateDfsRetrieverJob(It.IsAny<DataFlow>()));
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+
             var lazyDataFlowService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, lazyDataFlowService, null, null, null, null, null);
+            var lazyJobService = new Lazy<IJobService>(() => jobService.Object);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, lazyDataFlowService, null, null, lazyDataFeatures, null, null, lazyJobService);
 
             //Act
             _ = dataApplicationService.Create(dto);
@@ -708,7 +721,7 @@ namespace Sentry.data.Core.Tests
             schemaService.Setup(s => s.Create(dto)).Returns(1);
 
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, lazySchemaService);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, lazySchemaService, null);
 
             //Act
             int result = dataApplicationService.CreateWithoutSave(dto);
@@ -733,7 +746,7 @@ namespace Sentry.data.Core.Tests
             schemaService.Setup(s => s.Create(dto)).Throws<InvalidOperationException>();
 
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, lazySchemaService);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, lazySchemaService, null);
 
             //Act
             _ = dataApplicationService.CreateWithoutSave(dto);
@@ -756,18 +769,16 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Callback<bool>(s => calls.Add(new Tuple<string, int>($"{nameof(IDatasetContext.SaveChanges)}", ++callOrder)));
 
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null);
             dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1).Callback<FileSchemaDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
-            dataApplicationService.Setup(s => s.CreateExternalDependenciesForSchema(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}", ++callOrder)));
 
             //Act
             _ = dataApplicationService.Object.Create(dto);
 
             mr.VerifyAll();
-            Assert.AreEqual(3, calls.Count);
+            Assert.AreEqual(2, calls.Count);
             Assert.AreEqual(1, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateWithoutSave)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateWithoutSave)} call out of order");
             Assert.AreEqual(2, calls.Where(w => w.Item1 == $"{nameof(IDatasetContext.SaveChanges)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(IDatasetContext.SaveChanges)} call out of order");
-            Assert.AreEqual(3, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForSchema)} call out of order");
 
         }
 
@@ -788,7 +799,7 @@ namespace Sentry.data.Core.Tests
             //context.Setup(s => s.Clear());
 
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
-            var dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, lazySchemaService);
+            var dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, lazySchemaService, null);
 
             //Act
             _ = dataApplicationService.Create(dto);

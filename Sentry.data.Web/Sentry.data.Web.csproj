@@ -565,6 +565,7 @@
     <Compile Include="Models\ApiModels\Job\JavaOptionsOverride.cs" />
     <Compile Include="Models\ApiModels\Migration\DatasetMigrationRequestModel.cs" />
     <Compile Include="Models\ApiModels\Migration\MigrationRequestModel.cs" />
+    <Compile Include="Models\ApiModels\Migration\SchemaMigrationRequestModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionTypeEnum.cs" />

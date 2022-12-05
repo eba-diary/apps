@@ -45,6 +45,106 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(result.ValidationResults.Contains(DataFlow.ValidationErrors.nameMustBeUnique));
         }
 
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_INSERT_DuplicateTopicName_IngestionTypeTopic()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana",TopicName="Montana",IngestionType = (int) IngestionType.Topic } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() { Name = "Montana2", TopicName = "Montana", IngestionType = (int)IngestionType.Topic };
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(1, result.ValidationResults.GetAll().Count);
+            Assert.IsTrue(result.ValidationResults.Contains(DataFlow.ValidationErrors.topicNameMustBeUnique));
+        }
+
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_INSERT_DuplicateTopicName_IngestionTypeTopic_Success()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() { Name = "Montana2", TopicName = "Montana2", IngestionType = (int)IngestionType.Topic };
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_UPDATE_IngestionTypeTopic_Success()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() {Id=60 ,Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic };
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
+        }
+
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_INSERT_NotIngestionTypeTopic()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana", IngestionType = (int)IngestionType.S3_Drop } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() { Name = "Montana2", IngestionType = (int)IngestionType.S3_Drop};
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
+        }
+
+
+
         /// <summary>
         /// Tests successful validation of the DataFlowDto
         /// </summary>

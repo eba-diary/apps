@@ -324,23 +324,6 @@ namespace Sentry.data.Core
             return newDataFlow;
         }
 
-        public void CreateDataFlowRetrieverJobMetadata(DataFlow dataFlow)
-        {
-            switch (dataFlow.IngestionType)
-            {
-                case (int)IngestionType.DFS_Drop:
-                case (int)IngestionType.S3_Drop:
-                case (int)IngestionType.Topic:
-                    CreateDataFlowDfsRetrieverJobMetadata(dataFlow);
-                    break;
-                case (int)IngestionType.DSC_Pull:
-                    CreateDataFlowExternalRetrieverJobMetadata(null, dataFlow);
-                    break;
-                default:
-                    break;
-            }
-        }
-
         /// <summary>
         /// Create all dataflow external dependiences.
         /// </summary>
@@ -741,6 +724,14 @@ namespace Sentry.data.Core
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
 
+            //IF THIS IS A BRAND NEW DATAFLOW AND TOPIC INGESTION TYPE IS TOPIC THEN MAKE SURE TOPIC NAME DOESN'T ALREADY EXIST
+            if (    dfDto.Id == 0 
+                    && dfDto.IngestionType == (int) IngestionType.Topic 
+                    && _datasetContext.DataFlow.Any(w => w.TopicName == dfDto.TopicName))
+            {
+                results.Add(DataFlow.ValidationErrors.topicNameMustBeUnique, "Kafka Topic name is already used");
+            }
+
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dfDto.SaidKeyCode, dfDto.NamedEnvironment, dfDto.NamedEnvironmentType).ConfigureAwait(false));
 
@@ -988,7 +979,7 @@ namespace Sentry.data.Core
 
         private void CreateDataFlowDfsRetrieverJobMetadata(DataFlow df)
         {
-            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlowRetrieverJobMetadata).ToLower()}";
+            string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlowDfsRetrieverJobMetadata).ToLower()}";
             Logger.Info($"{methodName} Method Start");
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
@@ -1015,9 +1006,7 @@ namespace Sentry.data.Core
                     dfsDataSource = _datasetContext.DataSources.FirstOrDefault(w => w is DfsDataFlowBasic);
                 }
 
-                RetrieverJob dfsRetrieverJob = _jobService.InstantiateJobsForCreation(df, dfsDataSource);
-
-                _datasetContext.Add(dfsRetrieverJob);
+                _ = _jobService.CreateDfsRetrieverJob(df, dfsDataSource);
             }
 
             Logger.Info($"{methodName} Method End");
@@ -1027,7 +1016,6 @@ namespace Sentry.data.Core
         {
             if (dataflow.ShouldCreateDFSDropLocations(_dataFeatures))
             {
-                //Get all jobs associated with dataflow
                 RetrieverJob job = _datasetContext.RetrieverJob.FirstOrDefault(w => w.DataFlow.Id == dataflow.Id && w.ObjectStatus == ObjectStatusEnum.Active && (w.DataSource is DfsNonProdSource || w.DataSource is DfsProdSource || w.DataSource is DfsDataFlowBasic));
 
                 if (job != null)
@@ -1043,7 +1031,7 @@ namespace Sentry.data.Core
 
             dto.RetrieverJob.DataFlow = df.Id;
             dto.RetrieverJob.FileSchema = df.SchemaId;
-            _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
+            _jobService.CreateRetrieverJob(dto.RetrieverJob);
 
             Logger.Info($"DataFlowService_MapDataFlowStepsForPull Method End");
         }
@@ -1545,8 +1533,7 @@ namespace Sentry.data.Core
             {
                 //Add default DFS drop location for data flow
                 List<DataSource> srcList = _datasetContext.DataSources.ToList();
-                RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, srcList.First(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
-                _datasetContext.Add(dfsDataFlowBasic);
+                _ = _jobService.CreateDfsRetrieverJob(df, srcList.First(w => w.SourceType == GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION));
             }
 
             //Generate ingestion steps (get file to raw location)

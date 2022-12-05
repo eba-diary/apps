@@ -49,12 +49,12 @@ namespace Sentry.data.Core
         /// <param name="migrationRequest"></param>
         /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user not authorized to migrate dataset.</exception>
         /// <returns></returns>
-        bool MigrateDataset(DatasetMigrationRequest migrationRequest);
+        void MigrateDataset(DatasetMigrationRequest migrationRequest);
         /// <summary>
         /// Performs the migration of a schema between named environemnts associated with parent dataset SAID asset code.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        bool MigrateSchema(SchemaMigrationRequest request);
+        void MigrateSchema(SchemaMigrationRequest request);
     }
 }

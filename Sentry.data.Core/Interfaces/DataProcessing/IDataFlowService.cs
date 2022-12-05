@@ -35,11 +35,6 @@ namespace Sentry.data.Core
         DataFlow Create(DataFlowDto dto);
         int CreateDataFlow(DataFlowDto dto);
         /// <summary>
-        /// Creates necessary retriever job metadata associated with dataflow.
-        /// </summary>
-        /// <param name="dataFlow"></param>
-        void CreateDataFlowRetrieverJobMetadata(DataFlow dataFlow);
-        /// <summary>
         /// Performs all necessary external dependency creation statements.
         /// </summary>
         /// <remarks>To be executed after creation of dataflow.</remarks>
