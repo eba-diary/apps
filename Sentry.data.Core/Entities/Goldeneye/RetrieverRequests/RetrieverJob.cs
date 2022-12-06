@@ -144,14 +144,20 @@ namespace Sentry.data.Core
             ExecutionParameters = parameters;
         }
 
-        public virtual void IncrementRequestVariables()
+        public virtual bool TryIncrementRequestVariables()
         {
             List<RequestVariable> variables = RequestVariables;
             foreach (RequestVariable variable in variables)
             {
-                variable.IncrementVariableValue();
+                //once 1 variable is unable to be incremented, none should be incremented
+                if (!variable.TryIncrementVariableValue())
+                {
+                    return false;
+                }
             }
+
             RequestVariables = variables;
+            return true;
         }
 
         public virtual Uri GetUri()
