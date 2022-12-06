@@ -475,9 +475,9 @@ data.Admin = {
         });
     },
 
-    AuditTableDiffFilter: function ()
+    TableDiffFilter: function (tableID)
     {
-        var table = $('#AuditTable').DataTable();
+        var table = $(tableID).DataTable();
 
         $.fn.dataTable.ext.search.pop();
 
@@ -491,9 +491,9 @@ data.Admin = {
         table.draw();
     },
 
-    AuditTableSameFilter: function ()
+    TableSameFilter: function (tableID)
     {
-        var table = $('#AuditTable').DataTable();
+        var table = $(tableID).DataTable();
 
         $.fn.dataTable.ext.search.pop();
 
@@ -507,9 +507,9 @@ data.Admin = {
         table.draw();
     },
 
-    AuditTableAllFilter: function ()
+    TableAllFilter: function (tableID)
     {
-        var table = $('#AuditTable').DataTable();
+        var table = $(tableID).DataTable();
 
         $.fn.dataTable.ext.search.pop();
         table.draw();
@@ -529,7 +529,7 @@ data.Admin = {
                     text: '<i class="fas fa-asterisk"></i> All',
                     action: function (e, dt, node, config)
                     {
-                        data.Admin.AuditTableAllFilter();
+                        data.Admin.TableAllFilter('#AuditTable');
                     },
                     className: 'btn-sm btn-outline-primary shadow-none',
                     init: function (api, node, config)
@@ -542,7 +542,7 @@ data.Admin = {
                     text: '<i class="text-warning fas fa-not-equal"></i> Diffs',
                     action: function(e, dt, node, config)
                     {
-                        data.Admin.AuditTableDiffFilter();
+                        data.Admin.TableDiffFilter('#AuditTable');
                     },
                     className: 'btn-sm btn-outline-primary shadow-none',
                     init: function (api, node, config)
@@ -554,7 +554,7 @@ data.Admin = {
                     text: '<i class="text-dark fas fa-equals"></i> Same',
                     action: function (e, dt, node, config)
                     {
-                        data.Admin.AuditTableSameFilter();
+                        data.Admin.TableSameFilter('#AuditTable');
                     },
                     className: 'btn-sm btn-outline-primary shadow-none',
                     init: function (api, node, config)
@@ -584,21 +584,6 @@ data.Admin = {
             $(this).removeClass("btn-outline-primary");
             $(this).removeClass("btn-primary");
             $(this).addClass("btn-primary");
-        });
-
-        // pops all search filters on table 
-        $("#resetFilters").click(function ()
-        {
-            // loops through all audit filtter buttons and reset them to default outline style
-            $(".dt-buttons .btn").each(function ()
-            {
-                $(this).removeClass("btn-primary");
-                $(this).removeClass("btn-outline-primary");
-                $(this).addClass("btn-outline-primary");
-            });
-
-            $.fn.dataTable.ext.search.pop();
-            table.search('').columns().search('').draw();
         });
     },
 
