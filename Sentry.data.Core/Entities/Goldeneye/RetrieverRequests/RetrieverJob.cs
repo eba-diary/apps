@@ -144,6 +144,16 @@ namespace Sentry.data.Core
             ExecutionParameters = parameters;
         }
 
+        public virtual void IncrementRequestVariables()
+        {
+            List<RequestVariable> variables = RequestVariables;
+            foreach (RequestVariable variable in variables)
+            {
+                variable.IncrementVariableValue();
+            }
+            RequestVariables = variables;
+        }
+
         public virtual Uri GetUri()
         {
             return DataSource.CalcRelativeUri(this);
