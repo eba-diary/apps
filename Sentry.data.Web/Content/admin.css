@@ -32,6 +32,10 @@ table#metricGroupsTable td.dt-control {
     cursor: pointer;
 }
 
+.metricsButton {
+    margin-bottom: 20px;
+}
+
 .audit-search-selection.hidden {
     display: none !important;
 }

@@ -536,7 +536,6 @@ data.Admin = {
                     {
                         $(node).removeClass('btn-secondary')
                     }
-
                 },
                 {
                     text: '<i class="text-warning fas fa-not-equal"></i> Diffs',
