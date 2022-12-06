@@ -6,8 +6,10 @@ using NHibernate.Dialect;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using StructureMap.Building;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,6 +18,7 @@ using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
@@ -73,10 +76,10 @@ namespace Sentry.data.Infrastructure
             //get data flow step for drop location info
             HTTPSSource source = (HTTPSSource)job.DataSource;
             DataFlowStep s3DropStep = _datasetContext.DataFlowStep.FirstOrDefault(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop);
-            string dataPath = job.FileSchema.SchemaRootPath;
+            string dataPath = job.FileSchema.SchemaRootPath ?? "";
 
             //build starting url
-            string relativeUri = BuildRelativeUri(job);
+            string nextRequestUri = BuildRelativeUri(job);
 
             //build filename
             int pageNumber = 1;
@@ -87,7 +90,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                using (FileStream fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
+                using (FileStream fileStream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
                     //loop until no more to retrieve
                     do
@@ -95,41 +98,31 @@ namespace Sentry.data.Infrastructure
                         SetAuthorizationHeader(source, dataSourceToken, httpClient);
 
                         //make request
-                        using (HttpResponseMessage response = await httpClient.GetAsync(relativeUri, HttpCompletionOption.ResponseHeadersRead))
+                        using (HttpResponseMessage response = await httpClient.GetAsync(nextRequestUri, HttpCompletionOption.ResponseHeadersRead))
                         {
                             if (response.IsSuccessStatusCode)
                             {
                                 using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-                                using (StreamReader streamReader = new StreamReader(contentStream))
-                                using (JsonReader jsonReader = new JsonTextReader(streamReader))
                                 {
-                                    JObject responseObj = JObject.Load(jsonReader);
-
-                                    //get the count of data from response object to determine to continue
-                                    if (responseObj.SelectToken(dataPath)?.Any() == true)
+                                    //combined size of file and response is over 2GB
+                                    if (fileStream.Length > 0 && contentStream.Length + fileStream.Length > Math.Pow(1024, 3) * 2)
                                     {
-                                        //combined size of file and response is over 2GB
-                                        if (contentStream.Length + fileStream.Length > Math.Pow(1024, 3) * 2)
-                                        {
-                                            //upload to S3 and save progress
-                                            UploadToS3(fileStream, s3DropStep, $"{filename}_{pageNumber}");
+                                        //upload to S3 and save progress
+                                        UploadToS3(fileStream, s3DropStep, filename, pageNumber);
 
-                                            //clear contents of filestream for continued use
-                                            fileStream.SetLength(0);
-                                            fileStream.Flush();
-                                        }
+                                        //clear contents of filestream for continued use
+                                        fileStream.SetLength(0);
+                                        fileStream.Flush();
+                                    }
 
-                                        //if this doesn't write in a single line, we'll write unformatted JObject
-                                        await contentStream.CopyToAsync(fileStream);
+                                    //Copy response to file
+                                    JObject responseObj = await ProcessResponseAsync(contentStream, fileStream, dataPath);
 
-                                        //set next page
-                                        switch (job.JobOptions.HttpOptions.PagingType)
-                                        {
-                                            case PagingType.PageNumber:
-                                                //add the next page number to uri
-
-                                                break;
-                                        }
+                                    //set next page
+                                    if (responseObj != null)
+                                    {
+                                        pageNumber++;
+                                        nextRequestUri = GetNextPageRequest(nextRequestUri, job.JobOptions.HttpOptions, pageNumber, responseObj);
                                     }
                                     else
                                     {
@@ -139,18 +132,19 @@ namespace Sentry.data.Infrastructure
                             }
                             else
                             {
-                                string errorMessage = $"HTTPS request to {relativeUri} failed. {response.Content.ReadAsStringAsync().Result}";
+                                string errorMessage = $"HTTPS request to {nextRequestUri} failed. {response.Content.ReadAsStringAsync().Result}";
                                 Logger.Error(errorMessage);
                                 throw new HttpsJobProviderException(errorMessage);
                             }
                         }
-
-                    } while (hasMore);
+                    } 
+                    while (hasMore);
 
                     //upload to S3 and save progress (last page retrieved had no results)
-                    UploadToS3(fileStream, s3DropStep, $"{filename}_{pageNumber - 1}");
+                    UploadToS3(fileStream, s3DropStep, filename, pageNumber);
 
                     //clear execution parameters
+
                 }
             }
             finally
@@ -159,6 +153,25 @@ namespace Sentry.data.Infrastructure
                 {
                     File.Delete(tempFile);
                 }
+            }
+        }
+
+        private async Task<JObject> ProcessResponseAsync(Stream contentStream, FileStream fileStream, string dataPath)
+        {
+            using (StreamReader streamReader = new StreamReader(contentStream))
+            using (JsonReader jsonReader = new JsonTextReader(streamReader))
+            {
+                JObject responseObj = JObject.Load(jsonReader);
+
+                //get the count of data from response object to determine to continue
+                if (responseObj.SelectToken(dataPath)?.Any() == true)
+                {
+                    //if this doesn't write in a single line, we'll write unformatted JObject
+                    await contentStream.CopyToAsync(fileStream);
+                    return responseObj;
+                }
+
+                return null;
             }
         }
 
@@ -223,22 +236,52 @@ namespace Sentry.data.Infrastructure
             return $@"{tempDirectory}\{filename}.json";
         }
 
-        private void UploadToS3(FileStream fileStream, DataFlowStep s3DropStep, string filename)
+        private void UploadToS3(Stream dataStream, DataFlowStep s3DropStep, string filename, int pageNumber)
         {
-            _s3ServiceProvider.UploadDataFile(fileStream, s3DropStep.TriggerBucket, $"{s3DropStep.TriggerKey}{filename}.json");
+            _s3ServiceProvider.UploadDataFile(dataStream, s3DropStep.TriggerBucket, $"{s3DropStep.TriggerKey}{filename}_{pageNumber}.json");
             
             //save progress
 
         }
 
-        private void SetNextPageRequest()
+        private string GetNextPageRequest(string relativeUri, RetrieverJobOptions.HttpsOptions httpsOptions, int pageNumber, JObject responseObj)
         {
+            switch (httpsOptions.PagingType)
+            {
+                case PagingType.PageNumber:
+                    //add the next page number to uri
+                    return AddUpdateUriParameter(relativeUri, httpsOptions.PageParameterName, pageNumber.ToString());
+                case PagingType.Token:
+                    //get token value and add to uri
+                    JToken tokenField = responseObj.SelectToken(httpsOptions.PageTokenField);
+                    if (tokenField != null)
+                    {
+                        return AddUpdateUriParameter(relativeUri, httpsOptions.PageParameterName, tokenField.ToString());
+                    }
 
+                    throw new HttpsJobProviderException($"The page token value could not be found using '{httpsOptions.PageTokenField}'");
+                default:
+                    return null;
+            }
         }
 
-        private void AddUriParameter(ref string uri, string parameterKey, string parameterValue)
+        private string AddUpdateUriParameter(string uri, string parameterKey, string parameterValue)
         {
-            uri += (uri.Contains("?") ? "&" : "?") + $"{parameterKey}={Uri.EscapeDataString(parameterValue)}";
+            NameValueCollection parameters;
+            List<string> uriParts = uri.Split('?').ToList();
+
+            if (uriParts.Count > 1)
+            {
+                parameters = HttpUtility.ParseQueryString(uriParts.Last());
+            }
+            else
+            {
+                parameters = new NameValueCollection();
+            }
+
+            parameters.Set(parameterKey, parameterValue);            
+
+            return $"{uriParts.First()}?{parameters.ToString()}";
         }
         #endregion
 
