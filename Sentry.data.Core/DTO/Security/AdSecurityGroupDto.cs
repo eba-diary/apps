@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,6 +47,11 @@ namespace Sentry.data.Core.DTO.Security
 
         public string GetGroupName()
         {
+            var env = Config.GetHostSetting("EnvironmentName");
+            if (string.Equals(env, "PROD"))
+            {
+                return $"DS_{env}_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
+            }
             return $"DS_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
         }
     }
