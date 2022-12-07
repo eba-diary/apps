@@ -38,6 +38,7 @@ namespace Sentry.data.Infrastructure
         #region IBaseJobProvider Implementation
         public void Execute(RetrieverJob job)
         {
+            Logger.Info($"Paging Https Retriever Job start - Job: {job.Id}");
             using (_authorizationProvider)
             {
                 HTTPSSource source = (HTTPSSource)job.DataSource;
@@ -49,6 +50,7 @@ namespace Sentry.data.Infrastructure
 
                     if (source.SourceAuthType.Is<OAuthAuthentication>())
                     {
+                        Logger.Info($"Paging Https Retriever Job using OAuth tokens - Job: {job.Id}");
                         foreach (DataSourceToken dataSourceToken in source.Tokens)
                         {
                             RetrieveDataAsync(job, httpClient, dataSourceToken).Wait();
@@ -60,6 +62,8 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
+
+            Logger.Info($"Paging Https Retriever Job end - Job: {job.Id}");
         }
         #endregion
 
@@ -73,23 +77,26 @@ namespace Sentry.data.Infrastructure
             {
                 using (FileStream fileStream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
+                    Logger.Info($"Paging Https Retriever Job {tempFile} created - Job: {job.Id}");
                     //loop until no more to retrieve
                     while (!string.IsNullOrEmpty(config.RequestUri))
                     {
                         SetAuthorizationHeader(config, httpClient);
 
                         //make request
+                        Logger.Info($"Paging Https Retriever Job making request to {config.RequestUri} - Job: {job.Id}");
                         using (HttpResponseMessage response = await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead))
                         {
                             if (response.IsSuccessStatusCode)
                             {
+                                Logger.Info($"Paging Https Retriever Job successful response from {config.RequestUri} - Job: {job.Id}");
                                 using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                                 {
                                     //combined size of file and response is over 2GB, upload file
                                     FlushAccumulatedProgress(fileStream, contentStream, config);
 
                                     //copy response to file
-                                    JObject responseObj = await ReadResponseAsync(contentStream, fileStream, config.DataPath);
+                                    JObject responseObj = await ReadResponseAsync(contentStream, fileStream, config);
 
                                     //get next request to make
                                     SetNextPageRequest(config, responseObj);
@@ -97,35 +104,40 @@ namespace Sentry.data.Infrastructure
                             }
                             else
                             {
-                                string errorMessage = $"HTTPS request to {config.RequestUri} failed. {response.Content.ReadAsStringAsync().Result}";
-                                Logger.Error(errorMessage);
-                                throw new HttpsJobProviderException(errorMessage);
+                                throw new HttpsJobProviderException($"HTTPS request to {config.RequestUri} failed. {response.Content.ReadAsStringAsync().Result}");
                             }
                         }
                     }
 
+                    Logger.Info($"Paging Https Retriever Job no further requests to make - Job: {config.Job.Id}");
+
                     //upload to S3 and save progress (last page retrieved had no results)
                     if (fileStream.Length > 0)
                     {
-                        _s3ServiceProvider.UploadDataFile(fileStream, config.S3DropStep.TriggerBucket, $"{config.S3DropStep.TriggerKey}{config.Filename}_{config.PageNumber}.json");
+                        string targetKey = $"{config.S3DropStep.TriggerKey}{config.Filename}_{config.PageNumber}.json";
+                        _s3ServiceProvider.UploadDataFile(fileStream, config.S3DropStep.TriggerBucket, targetKey);
+                        Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
                     }
 
                     //clear execution parameters because we have made it to the end successfully
                     job.ExecutionParameters = new Dictionary<string, string>();
                     //save cleared execution parameters and incremented variables
                     _datasetContext.SaveChanges();
+                    Logger.Info($"Paging Https Retriever Job progress saved - Job: {config.Job.Id}");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"Job Id {job.Id} failed attempting to retrieve data from {config.RequestUri}", ex);
+                Logger.Error($"Paging Https Retriever Job failed retrieving data from {config.RequestUri} - Job: {config.Job.Id}", ex);
                 throw;
             }
             finally
             {
+                //always clean up temp file because we only save progress after file has been uploaded to S3
                 if (File.Exists(tempFile))
                 {
                     File.Delete(tempFile);
+                    Logger.Info($"Paging Https Retriever Job {tempFile} deleted - Job: {job.Id}");
                 }
             }
         }
@@ -155,10 +167,12 @@ namespace Sentry.data.Infrastructure
                 SetNextRequestUri(config);
             }
 
+            Logger.Info($"Paging Https Retriever Job starting from {config.RequestUri} - Job: {job.Id}");
+
             return config;
         }
 
-        private async Task<JObject> ReadResponseAsync(Stream contentStream, FileStream fileStream, string dataPath)
+        private async Task<JObject> ReadResponseAsync(Stream contentStream, FileStream fileStream, PagingHttpsConfiguration config)
         {
             using (StreamReader streamReader = new StreamReader(contentStream))
             using (JsonReader jsonReader = new JsonTextReader(streamReader))
@@ -166,13 +180,15 @@ namespace Sentry.data.Infrastructure
                 JObject responseObj = JObject.Load(jsonReader);
 
                 //get the count of data from response object to determine to continue
-                if (responseObj.SelectToken(dataPath)?.Any() == true)
+                if (responseObj.SelectToken(config.DataPath)?.Any() == true)
                 {
                     //if this doesn't write in a single line, we'll write unformatted JObject
                     await contentStream.CopyToAsync(fileStream);
+                    Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
                     return responseObj;
                 }
 
+                Logger.Info($"Paging Https Retriever Job no data found at {config.DataPath} - Job: {config.Job.Id}");
                 return null;
             }
         }
@@ -212,6 +228,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
+                Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
                 config.RequestUri = "";
             }
         }
@@ -240,19 +257,25 @@ namespace Sentry.data.Infrastructure
             //combined size of file and response is over 2GB
             if (fileStream.Length > 0 && contentStream.Length + fileStream.Length > Math.Pow(1024, 3) * 2)
             {
+                Logger.Info($"Paging Https Retriever Job hit 2GB size threshold - Job: {config.Job.Id}");
                 //upload to S3 and save progress
-                _s3ServiceProvider.UploadDataFile(fileStream, config.S3DropStep.TriggerBucket, $"{config.S3DropStep.TriggerKey}{config.Filename}_{config.PageNumber}.json");
+                string targetKey = $"{config.S3DropStep.TriggerKey}{config.Filename}_{config.PageNumber}.json";
+                _s3ServiceProvider.UploadDataFile(fileStream, config.S3DropStep.TriggerBucket, targetKey);
+                Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
 
                 if (config.Options.PagingType == PagingType.PageNumber)
                 {
                     config.Job.AddOrUpdateExecutionParameter(config.Options.PageParameterName, config.PageNumber.ToString());
+                    Logger.Info($"Paging Https Retriever Job added execution parameter {config.Options.PageParameterName}: {config.PageNumber} - Job: {config.Job.Id}");
                 }
 
                 _datasetContext.SaveChanges();
+                Logger.Info($"Paging Https Retriever Job progress saved - Job: {config.Job.Id}");
 
                 //clear contents of filestream for continued use
                 fileStream.SetLength(0);
                 fileStream.Flush();
+                Logger.Info($"Paging Https Retriever Job temp file reset - Job: {config.Job.Id}");
             }            
         }
 
@@ -266,7 +289,9 @@ namespace Sentry.data.Infrastructure
             else
             {
                 SetNextRequestUri(config);
-            }            
+            }
+
+            Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
         }
 
         private void AddPageTypeParameter(PagingHttpsConfiguration config, JObject responseObj)

@@ -215,9 +215,8 @@ namespace Sentry.data.Core
             //if we have previous execution parameters from a data flow edit, only keep if RelativeUri did not change
             if (dto.ExecutionParameters?.Any() == true && dto.FileSchema > 0)
             {
-                //check that all jobs are currently deleted and get the most recent deleted job
                 RetrieverJob previousRetrieverJob = _datasetContext.RetrieverJob.OrderByDescending(x => x.Id).FirstOrDefault(w => w.DataFlow.SchemaId == dto.FileSchema);
-                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && previousRetrieverJob.RelativeUri == job.RelativeUri)
+                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && AreSameHttpsRequests(previousRetrieverJob, job))
                 {
                     job.ExecutionParameters = dto.ExecutionParameters;
                 }
@@ -546,6 +545,7 @@ namespace Sentry.data.Core
             return GetApacheLivyBatchStatusInternalAsync(hr);
         }
 
+        #region Private Methods
         private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
         {
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
@@ -607,7 +607,17 @@ namespace Sentry.data.Core
             return response;
         }
 
-#region Private Methods
+        private bool AreSameHttpsRequests(RetrieverJob previousJob, RetrieverJob newJob)
+        {
+            return previousJob.RelativeUri == newJob.RelativeUri &&
+                previousJob.JobOptions.HttpOptions.PagingType == newJob.JobOptions.HttpOptions.PagingType &&
+                previousJob.JobOptions.HttpOptions.PageParameterName == newJob.JobOptions.HttpOptions.PageParameterName &&
+                previousJob.JobOptions.HttpOptions.PageTokenField == newJob.JobOptions.HttpOptions.PageParameterName &&
+                previousJob.RequestVariables.All(previous =>
+                    newJob.RequestVariables.Any(newVar => newVar.VariableValue == previous.VariableValue &&
+                        newVar.VariableName == previous.VariableName &&
+                        newVar.VariableIncrementType == previous.VariableIncrementType));
+        }
 
         internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
         {
