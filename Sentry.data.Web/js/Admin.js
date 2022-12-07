@@ -29,10 +29,10 @@ data.Admin = {
 
     SideBarUtility: function ()
     {
-        currentHref = $(location).attr("href");
+        var currentHref = $(location).attr("href");
 
         // Gets title of current page
-        navID = /[^/]*$/.exec(currentHref)[0].toLowerCase();
+        var navID = /[^/]*$/.exec(currentHref)[0].toLowerCase();
 
         // Selects nav bar item that matches the current page title and sets the link to bold + blue font
         $("#sideNav").find(`[data-nav-id='${navID}']`).addClass("font-weight-bold text-primary");
