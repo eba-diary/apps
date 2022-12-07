@@ -36,5 +36,6 @@ namespace Sentry.data.Core
         public PagingType PagingType { get; set; }
         public string PageTokenField { get; set; }
         public string PageParameterName { get; set; }
+        public List<RequestVariableDto> RequestVariables { get; set; }
     }
 }

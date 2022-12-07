@@ -578,6 +578,7 @@
     <Compile Include="Models\Config\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
+    <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
@@ -1396,6 +1397,7 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
+    <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

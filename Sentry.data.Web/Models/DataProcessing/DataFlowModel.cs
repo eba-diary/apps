@@ -101,6 +101,7 @@ namespace Sentry.data.Web
         public ValidationException Validate()
         {
             ValidationResults results = new ValidationResults();
+
             if (string.IsNullOrWhiteSpace(Name))
             {
                 results.Add(DataFlow.ValidationErrors.nameIsBlank, "Must specify data flow name");
@@ -111,37 +112,8 @@ namespace Sentry.data.Web
                 results.Add(DataFlow.ValidationErrors.nameContainsReservedWords, "FileSchemaFlow is a reserved name, please choose new name");
             }
 
-            #region RetrieverJob validations
-            if (IngestionTypeSelection == (int)IngestionType.DSC_Pull)
-            {
-                if (RetrieverJob == null)
-                {
-                    results.Add(string.Empty, "Pull type data flows required retriever job configuration");
-                }
-                else
-                {
-                    foreach (ValidationResult result in RetrieverJob.Validate().ValidationResults.GetAll())
-                    {
-                        results.Add(result.Id, result.Description, result.Severity);
-                    }
-                }
-            }            
-            #endregion
-
-            if (SchemaMaps == null || !SchemaMaps.Any(w => !w.IsDeleted))
-            {
-                results.Add(DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap, "Must contain at least one schema mapping");
-            }
-            else
-            {
-                foreach(SchemaMapModel model in SchemaMaps)
-                {
-                    foreach(ValidationResult result in model.Validate().ValidationResults.GetAll())
-                    {
-                        results.Add($"SchemaMaps[{model.Index}].{result.Id}", result.Description, result.Severity);
-                    }
-                }
-            }
+            results.MergeInResults(ValidateRetrieverJob());
+            results.MergeInResults(ValidateSchemaMap());
 
             if (IsPreProcessingRequired && PreProcessingSelection == 0)
             {
@@ -162,5 +134,48 @@ namespace Sentry.data.Web
             ValidationException ex = new ValidationException(results);            
             return ex;
         }
+
+        #region Private
+        private ValidationResults ValidateRetrieverJob()
+        {
+            ValidationResults results = new ValidationResults();
+
+            if (IngestionTypeSelection == (int)IngestionType.DSC_Pull)
+            {
+                if (RetrieverJob == null)
+                {
+                    results.Add(string.Empty, "Pull type data flows required retriever job configuration");
+                }
+                else
+                {
+                    results.MergeInResults(RetrieverJob.Validate().ValidationResults);
+                }
+            }
+
+            return results;
+        }
+
+        private ValidationResults ValidateSchemaMap()
+        {
+            ValidationResults results = new ValidationResults();
+
+            if (SchemaMaps == null || !SchemaMaps.Any(w => !w.IsDeleted))
+            {
+                results.Add(DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap, "Must contain at least one schema mapping");
+            }
+            else
+            {
+                foreach (SchemaMapModel model in SchemaMaps)
+                {
+                    foreach (ValidationResult result in model.Validate().ValidationResults.GetAll())
+                    {
+                        results.Add($"SchemaMaps[{model.Index}].{result.Id}", result.Description, result.Severity);
+                    }
+                }
+            }
+
+            return results;
+        }
+        #endregion
     }
 }

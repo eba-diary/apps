@@ -128,6 +128,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Access(Accessor.Field);
                 m.Type(NHibernateUtil.StringClob);
             });
+
+            Property(x => x.RequestVariables, m =>
+            {
+                m.Column("RequestVariables");
+                m.Access(Accessor.Field);
+                m.Type(NHibernateUtil.StringClob);
+            });
         }
     }
 }

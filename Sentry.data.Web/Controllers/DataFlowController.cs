@@ -401,7 +401,8 @@ namespace Sentry.data.Web.Controllers
                 SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule),
                 PagingType = dto.PagingType,
                 PageTokenField = dto.PageTokenField,
-                PageParameterName = dto.PageParameterName
+                PageParameterName = dto.PageParameterName,
+                RequestVariables = dto.RequestVariables?.Select(x => x.ToModel()).ToList()
             };
 
             model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => int.Parse(s.Value)).FirstOrDefault().ToString();
@@ -438,6 +439,16 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
             return PartialView(model);
+        }
+
+        public ActionResult RequestVariableEntryRow()
+        {
+            RequestVariableModel requestVariableModel = new RequestVariableModel
+            {
+                VariableIncrementTypeDropdown = Utility.BuildSelectListFromEnum<RequestVariableIncrementType>(0)
+            };
+
+            return PartialView("_RequestVariable", requestVariableModel);
         }
 
         private void CreateDropDownSetup(JobModel model)
@@ -500,6 +511,11 @@ namespace Sentry.data.Web.Controllers
                 pickerval = 0;
             }
             model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
+
+            foreach (RequestVariableModel requestVariable in model.RequestVariables)
+            {
+                requestVariable.VariableIncrementTypeDropdown = Utility.BuildSelectListFromEnum<RequestVariableIncrementType>((int)requestVariable.VariableIncrementType);
+            }
         }        
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
@@ -693,7 +709,7 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
-                        ModelState.AddModelError(string.Empty, vr.Description);
+                        ModelState.AddModelError(vr.Id, vr.Description);
                         break;
                 }
             }
