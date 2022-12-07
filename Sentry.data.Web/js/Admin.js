@@ -586,7 +586,7 @@ data.Admin = {
         });
     },
 
-    NonParquetFilseTableInit: function ()
+    NonParquetFilesTableInit: function ()
     {
         $('#AuditTable').DataTable({
             columnDefs: [
