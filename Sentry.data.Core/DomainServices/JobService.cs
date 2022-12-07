@@ -609,14 +609,22 @@ namespace Sentry.data.Core
 
         private bool AreSameHttpsRequests(RetrieverJob previousJob, RetrieverJob newJob)
         {
-            return previousJob.RelativeUri == newJob.RelativeUri &&
+            bool areSame = previousJob.RelativeUri == newJob.RelativeUri &&
                 previousJob.JobOptions.HttpOptions.PagingType == newJob.JobOptions.HttpOptions.PagingType &&
                 previousJob.JobOptions.HttpOptions.PageParameterName == newJob.JobOptions.HttpOptions.PageParameterName &&
-                previousJob.JobOptions.HttpOptions.PageTokenField == newJob.JobOptions.HttpOptions.PageParameterName &&
-                previousJob.RequestVariables.All(previous =>
+                previousJob.JobOptions.HttpOptions.PageTokenField == newJob.JobOptions.HttpOptions.PageTokenField &&
+                previousJob.RequestVariables.Count == newJob.RequestVariables.Count;
+
+            if (areSame && previousJob.RequestVariables.Any())
+            {
+                //if request variables exist, make sure they are all the same (we already verified we have the same number of variables)
+                areSame = previousJob.RequestVariables.All(previous =>
                     newJob.RequestVariables.Any(newVar => newVar.VariableValue == previous.VariableValue &&
-                        newVar.VariableName == previous.VariableName &&
-                        newVar.VariableIncrementType == previous.VariableIncrementType));
+                    newVar.VariableName == previous.VariableName &&
+                    newVar.VariableIncrementType == previous.VariableIncrementType));
+            }
+
+            return areSame;
         }
 
         internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
