@@ -475,7 +475,7 @@ data.Admin = {
         });
     },
 
-    TableDiffFilter: function (tableID)
+    TableDifferenceFilter: function (tableID, showDifference)
     {
         var table = $(tableID).DataTable();
 
@@ -484,23 +484,7 @@ data.Admin = {
         $.fn.dataTable.ext.search.push(
             function (settings, data, dataIndex)
             {
-                return $(table.row(dataIndex).node()).data("record-difference") == "True";
-            }
-        );
-
-        table.draw();
-    },
-
-    TableSameFilter: function (tableID)
-    {
-        var table = $(tableID).DataTable();
-
-        $.fn.dataTable.ext.search.pop();
-
-        $.fn.dataTable.ext.search.push(
-            function (settings, data, dataIndex)
-            {
-                return $(table.row(dataIndex).node()).data("record-difference") == "False";
+                return $(table.row(dataIndex).node()).data("record-difference") == showDifference;
             }
         );
 
@@ -541,7 +525,7 @@ data.Admin = {
                     text: '<i class="text-warning fas fa-not-equal"></i> Diffs',
                     action: function(e, dt, node, config)
                     {
-                        data.Admin.TableDiffFilter('#AuditTable');
+                        data.Admin.TableDifferenceFilter('#AuditTable', "True");
                     },
                     className: 'btn-sm btn-outline-primary shadow-none',
                     init: function (api, node, config)
@@ -553,7 +537,7 @@ data.Admin = {
                     text: '<i class="text-dark fas fa-equals"></i> Same',
                     action: function (e, dt, node, config)
                     {
-                        data.Admin.TableSameFilter('#AuditTable');
+                        data.Admin.TableDifferenceFilter('#AuditTable', "False");
                     },
                     className: 'btn-sm btn-outline-primary shadow-none',
                     init: function (api, node, config)
