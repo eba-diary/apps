@@ -1,0 +1,8 @@
+{
+  "access_token": "416a201ba6b2db3d04c08467d37e08eb05a423438545952730205bcec1d42bf2",
+  "token_type": "Bearer",
+  "expires_in": 7200,
+  "refresh_token": "d57845641f875cba9cdf88cffcc20e48024b00266b8fdad9b43a10fdce263e3f",
+  "scope": "users.read vehicles.read inspection_reports.read fault_codes.read driver_performance_events.read hos_logs.hos_violation locations.vehicle_locations_list locations.vehicle_locations_single ifta_reports.trips ifta_reports.summary utilization.driver_utilization utilization.vehicle_utilization companies.read assets.read locations.asset_locations scorecard_summary.read collision_report.read",
+  "created_at": 1670350789
+}

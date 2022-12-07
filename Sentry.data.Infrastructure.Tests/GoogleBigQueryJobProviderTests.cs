@@ -671,7 +671,7 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(httpResponseMessageNotFound);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
-            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri }; ;
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object) { BaseAddress = httpsSource.BaseUri };
 
             Mock<IHttpClientGenerator> httpClientGenerator = repository.Create<IHttpClientGenerator>();
             httpClientGenerator.Setup(x => x.GenerateHttpClient(httpsSource.BaseUri.ToString())).Returns(httpClient);

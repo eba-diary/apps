@@ -187,6 +187,7 @@
     <Compile Include="ProdRetrieverJobProviderTests.cs" />
     <Compile Include="BaseRetrieverJobProviderTests.cs" />
     <Compile Include="EncryptionServiceTests.cs" />
+    <Compile Include="AuthorizationProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
