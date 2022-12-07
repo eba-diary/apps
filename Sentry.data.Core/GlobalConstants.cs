@@ -584,9 +584,10 @@ namespace Sentry.data.Core
             public const string PROD = "PROD";
         }
 
-        public static class Encryption
+        public static class Indicators
         {
             public const string ENCRYPTIONINDICATOR = "<--!-->";
+            public const string REQUESTVARIABLEINDICATOR = "~[{0}]~";
         }
     }
 }

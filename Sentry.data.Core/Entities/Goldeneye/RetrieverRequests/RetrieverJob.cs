@@ -13,6 +13,7 @@ namespace Sentry.data.Core
     {
         private string _jobOptions;
         private string _executionParameters;
+        private string _requestVariables;
 
         public RetrieverJob()
         {
@@ -106,7 +107,6 @@ namespace Sentry.data.Core
             }
         }
         public virtual IList<JobHistory> JobHistory { get; set; }
-
         public virtual IList<Submission> Submissions { get; set; }
         public virtual FileSchema FileSchema { get; set; }
         public virtual DataFlow DataFlow { get; set; }
@@ -122,6 +122,18 @@ namespace Sentry.data.Core
             set
             {
                 _executionParameters = JsonConvert.SerializeObject(value);
+            }
+        }
+        public virtual List<RequestVariable> RequestVariables
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_requestVariables) ? new List<RequestVariable>() : JsonConvert.DeserializeObject<List<RequestVariable>>(_requestVariables);
+
+            }
+            set
+            {
+                _requestVariables = JsonConvert.SerializeObject(value);
             }
         }
 

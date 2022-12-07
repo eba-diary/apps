@@ -1174,7 +1174,7 @@ namespace Sentry.data.Core
 
             if (_encryptService.IsEncrypted(input))
             {
-                return input.Replace(Encryption.ENCRYPTIONINDICATOR, "");
+                return input.Replace(Indicators.ENCRYPTIONINDICATOR, "");
             }
 
             return _encryptService.EncryptString(input, Config.GetHostSetting("EncryptionServiceKey"), ivKey).Item1;
