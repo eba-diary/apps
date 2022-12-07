@@ -714,6 +714,9 @@ namespace Sentry.data.Web.WebApi.Controllers
             string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(PublishMessage).ToLower()}";
             Logger.Info($"{methodName} Method Start");
 
+            Logger.AddContextVariable(new TextVariable("requestcontextguid", DateTime.UtcNow.ToString(GlobalConstants.System.REQUEST_CONTEXT_GUID_FORMAT)));
+            Logger.AddContextVariable(new TextVariable("requestcontextmethod", methodName));
+
             try
             {
                 if (message == null)
