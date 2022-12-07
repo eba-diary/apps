@@ -47,10 +47,9 @@ namespace Sentry.data.Core.DTO.Security
 
         public string GetGroupName()
         {
-            var env = Config.GetHostSetting("EnvironmentName");
-            if (!string.Equals(env, "PROD")) //if nonprod, return add env to ticket 
+            if (bool.Parse(Config.GetHostSetting("IncludeNamedEnvironmentInAdGroup"))) //if nonprod, return add env to ticket 
             {
-                return $"DS_{env}_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
+                return $"DS_{Config.GetDefaultEnvironmentName()}_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
             }
             return $"DS_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
         }
