@@ -142,7 +142,7 @@ left join DataFlow DFlow on
        TSD.Schema_ID = DFlow.SchemaId
 left join DataFlowStep DFlowStep on
        DFlowStep.DataFlow_Id = DFlow.Id and
-       DFlowStep.DataAction_Type_Id = 5 -- Convert to Parquet --
+       DFlowStep.DataAction_Type_Id = 2
 where TSD.RowNumber = 1 and EvMetadata.RowNumber = 1
 order by TSD.sub_Created
 
