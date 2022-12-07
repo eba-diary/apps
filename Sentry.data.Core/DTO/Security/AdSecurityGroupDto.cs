@@ -48,7 +48,7 @@ namespace Sentry.data.Core.DTO.Security
         public string GetGroupName()
         {
             var env = Config.GetHostSetting("EnvironmentName");
-            if (string.Equals(env, "PROD"))
+            if (!string.Equals(env, "PROD")) //if nonprod, return add env to ticket 
             {
                 return $"DS_{env}_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
             }
