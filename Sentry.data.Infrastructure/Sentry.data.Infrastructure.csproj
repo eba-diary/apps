@@ -381,6 +381,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\AuthorizationProvider.cs" />
+    <Compile Include="ServiceImplementations\AuthorizationSigner.cs" />
     <Compile Include="ServiceImplementations\ConfluentConnectorProvider.cs" />
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />

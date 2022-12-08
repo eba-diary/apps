@@ -1,15 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
@@ -18,13 +15,15 @@ namespace Sentry.data.Infrastructure
         private readonly IEncryptionService _encryptionService;
         private readonly IDatasetContext _datasetContext;
         private readonly IHttpClientGenerator _httpClientGenerator;
+        private readonly IAuthorizationSigner _authorizationSigner;
         private HttpClient _httpClient;
 
-        public AuthorizationProvider(IEncryptionService encryptionService, IDatasetContext datasetContext, IHttpClientGenerator httpClientGenerator)
+        public AuthorizationProvider(IEncryptionService encryptionService, IDatasetContext datasetContext, IHttpClientGenerator httpClientGenerator, IAuthorizationSigner authorizationSigner)
         {
             _encryptionService = encryptionService;
             _datasetContext = datasetContext;
             _httpClientGenerator = httpClientGenerator;
+            _authorizationSigner = authorizationSigner;
         }
 
         public string GetOAuthAccessToken(HTTPSSource source, DataSourceToken token)
@@ -45,32 +44,39 @@ namespace Sentry.data.Infrastructure
                     oAuthPostResult = GetOAuthResponseForJwt(source, token, httpClient);
                 }
 
-                string response = oAuthPostResult.Content.ReadAsStringAsync().Result;
-
-                if (oAuthPostResult.IsSuccessStatusCode)
+                using (oAuthPostResult)
                 {
-                    JObject responseAsJson = JObject.Parse(response);
-                    string accessToken = responseAsJson.Value<string>("access_token");
-                    string expires_in = responseAsJson.Value<string>("expires_in");
-                    string token_type = responseAsJson.Value<string>("token_type");
-
-                    Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
-
-                    DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
-                    if (isRefreshToken)
+                    if (oAuthPostResult.IsSuccessStatusCode)
                     {
-                        SaveOAuthToken(source, accessToken, newTokenExp, token, responseAsJson.Value<string>("refresh_token"), responseAsJson.Value<string>("scope"));
+                        using (Stream contentStream = oAuthPostResult.Content.ReadAsStreamAsync().Result)
+                        using (StreamReader streamReader = new StreamReader(contentStream))
+                        using (JsonReader jsonReader = new JsonTextReader(streamReader))
+                        {
+                            JObject responseAsJson = JObject.Load(jsonReader);
+                            string accessToken = responseAsJson.Value<string>("access_token");
+                            string expires_in = responseAsJson.Value<string>("expires_in");
+                            string token_type = responseAsJson.Value<string>("token_type");
+
+                            Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
+
+                            DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
+                            if (isRefreshToken)
+                            {
+                                SaveOAuthToken(source, accessToken, newTokenExp, token, responseAsJson.Value<string>("refresh_token"), responseAsJson.Value<string>("scope"));
+                            }
+                            else
+                            {
+                                SaveOAuthToken(source, accessToken, newTokenExp, token);
+                            }
+
+                            _datasetContext.SaveChanges();
+                            return accessToken;
+                        }
                     }
                     else
                     {
-                        SaveOAuthToken(source, accessToken, newTokenExp, token);
+                        throw new OAuthException($"Failed to retrieve OAuth Access Token from {token.TokenUrl}. Response: {oAuthPostResult.Content.ReadAsStringAsync().Result}");
                     }
-                    _datasetContext.SaveChanges();
-                    return accessToken;
-                }
-                else
-                {
-                    throw new OAuthException($"Failed to retrieve OAuth Access Token from {token.TokenUrl}. Response: {response}");
                 }
             }
 
@@ -90,7 +96,7 @@ namespace Sentry.data.Infrastructure
         #region Private
         private HttpResponseMessage GetOAuthResponseForJwt(HTTPSSource source, DataSourceToken token, HttpClient httpClient)
         {
-            FormUrlEncodedContent oAuthPostContent = GetOAuthContent(source);
+            FormUrlEncodedContent oAuthPostContent = GetOAuthContent(source, token);
             return httpClient.PostAsync(token.TokenUrl, oAuthPostContent).Result;
         }
 
@@ -103,36 +109,35 @@ namespace Sentry.data.Infrastructure
             return httpClient.PostAsync(tokenUrl, new StringContent("")).Result;
         }
 
-        private FormUrlEncodedContent GetOAuthContent(HTTPSSource source)
+        private FormUrlEncodedContent GetOAuthContent(HTTPSSource source, DataSourceToken token)
         {
             List<KeyValuePair<string, string>> content = new List<KeyValuePair<string, string>>()
             {
                 new KeyValuePair<string, string>("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer"),
-                new KeyValuePair<string, string>("assertion", GenerateJwt(source))
+                new KeyValuePair<string, string>("assertion", GenerateJwt(source, token))
             };
 
             return new FormUrlEncodedContent(content);
         }
 
-        private string GenerateJwt(HTTPSSource source)
+        private string GenerateJwt(HTTPSSource source, DataSourceToken token)
         {
-            string claimsJSON = GenerateClaims(source);
-            return SignOAuthToken(claimsJSON, source);
+            string claimsJSON = GenerateClaims(source, token);
+            return _authorizationSigner.SignOAuthToken(claimsJSON, _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
         }
 
-        private string GenerateClaims(HTTPSSource source)
+        private string GenerateClaims(HTTPSSource source, DataSourceToken token)
         {
             Dictionary<string, object> claims = new Dictionary<string, object>();
-            List<OAuthClaim> sourceClaims;
 
-            sourceClaims = _datasetContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
+            List<OAuthClaim> sourceClaims = _datasetContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
 
             foreach (OAuthClaim claim in sourceClaims)
             {
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.Tokens.FirstOrDefault().TokenExp)).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(token.TokenExp)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);
@@ -146,50 +151,8 @@ namespace Sentry.data.Infrastructure
             return JsonConvert.SerializeObject(claims);
         }
 
-        private string SignOAuthToken(string claims, HTTPSSource source)
-        {
-            List<string> segments = new List<string>();
-
-            byte[] header = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { alg = "RS256", typ = "JWT" }));
-            byte[] payload = Encoding.UTF8.GetBytes(claims);
-
-            segments.Add(Base64UrlEncode(header));
-            segments.Add(Base64UrlEncode(payload));
-
-            string stringToSign = string.Join(".", segments.ToArray());
-
-            byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
-
-            string privateKey = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
-
-            byte[] keyBytes = Convert.FromBase64String(privateKey);
-
-            var asymmetricKeyParameter = PrivateKeyFactory.CreateKey(keyBytes);
-            var rsaKeyParameter = (RsaKeyParameters)asymmetricKeyParameter;
-
-            ISigner sig = SignerUtilities.GetSigner("SHA256withRSA");
-
-            sig.Init(true, rsaKeyParameter);
-
-            sig.BlockUpdate(bytesToSign, 0, bytesToSign.Length);
-            byte[] signature = sig.GenerateSignature();
-
-            segments.Add(Base64UrlEncode(signature));
-            return string.Join(".", segments.ToArray());
-        }
-
-        private string Base64UrlEncode(byte[] input)
-        {
-            var output = Convert.ToBase64String(input);
-            output = output.Split('=')[0]; // Remove any trailing '='s
-            output = output.Replace('+', '-'); // 62nd char of encoding
-            output = output.Replace('/', '_'); // 63rd char of encoding
-            return output;
-        }
-
         private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token, string newRefreshToken, string newScope)
         {
-            //test if this is even needed, or will saving source as is will update
             SaveOAuthToken(source, newToken, tokenExpTime, token);
 
             token.RefreshToken = _encryptionService.EncryptString(newRefreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
@@ -204,10 +167,8 @@ namespace Sentry.data.Infrastructure
 
         private void SaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime, DataSourceToken token)
         {
-
             token.CurrentToken = _encryptionService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
             token.CurrentTokenExp = tokenExpTime;
-
         }
 
         private DateTime ConvertFromUnixTimestamp(double timestamp)
