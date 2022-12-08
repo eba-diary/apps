@@ -45,6 +45,106 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(result.ValidationResults.Contains(DataFlow.ValidationErrors.nameMustBeUnique));
         }
 
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_INSERT_DuplicateTopicName_IngestionTypeTopic()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana",TopicName="Montana",IngestionType = (int) IngestionType.Topic } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() { Name = "Montana2", TopicName = "Montana", IngestionType = (int)IngestionType.Topic };
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(1, result.ValidationResults.GetAll().Count);
+            Assert.IsTrue(result.ValidationResults.Contains(DataFlow.ValidationErrors.topicNameMustBeUnique));
+        }
+
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_INSERT_DuplicateTopicName_IngestionTypeTopic_Success()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() { Name = "Montana2", TopicName = "Montana2", IngestionType = (int)IngestionType.Topic };
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_UPDATE_IngestionTypeTopic_Success()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() {Id=60 ,Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic };
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
+        }
+
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public async Task DataFlowService_Validate_INSERT_NotIngestionTypeTopic()
+        {
+            // Arrange
+            var context = new Mock<IDatasetContext>();
+            var dataFlows = new[] { new DataFlow() { Name = "Montana", IngestionType = (int)IngestionType.S3_Drop } };
+            context.Setup(f => f.DataFlow).Returns(dataFlows.AsQueryable());
+
+            var quartermasterService = new Mock<IQuartermasterService>();
+            var validationResults = new ValidationResults();
+            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlow = new DataFlowDto() { Name = "Montana2", IngestionType = (int)IngestionType.S3_Drop};
+
+            // Act
+            var result = await dataFlowService.ValidateAsync(dataFlow);
+
+            // Assert
+            Assert.AreEqual(0, result.ValidationResults.GetAll().Count);
+        }
+
+
+
         /// <summary>
         /// Tests successful validation of the DataFlowDto
         /// </summary>
@@ -1193,6 +1293,57 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(0,testFlow.Count);
         }
 
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void EnableDataFlow()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Disabled;
+            df.DatasetId = 1;
+            df.Id = 77;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+           
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+
+            // Act
+            dataFlowService.EnableOrDisableDataFlow(77,ObjectStatusEnum.Active);
+
+            // Assert
+            Assert.AreEqual(ObjectStatusEnum.Active, df.ObjectStatus );
+        }
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void DisableDataFlow()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Active;
+            df.DatasetId = 1;
+            df.Id = 77;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
+
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+
+            // Act
+            dataFlowService.EnableOrDisableDataFlow(77, ObjectStatusEnum.Disabled);
+
+            // Assert
+            Assert.AreEqual(ObjectStatusEnum.Disabled, df.ObjectStatus);
+        }
+
+
+
         [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void Get_DataFlowDetailDto_Where_Status_is_Active()
@@ -1282,6 +1433,101 @@ namespace Sentry.data.Core.Tests
             // DataFlowDetailDto object mapped from the active object status DataFlow
             Assert.AreEqual(1, testFlow.Count);
         }
+
+
+
+        [TestCategory("Core DataFlowService")]
+        [TestMethod]
+        public void Get_DataFlowDetailDto_Where_Status_is_Disabled()
+        {
+            // Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Loose);
+
+            // Setup Dataflow steps for DataFlow objects
+            DataFlowStep step = new DataFlowStep()
+            {
+                Action = new ProducerS3DropAction(),
+                DataFlow = new DataFlow()
+                {
+                    Id = 1
+                }
+            };
+
+            DataFlowStep step2 = new DataFlowStep()
+            {
+                Action = new ProducerS3DropAction(),
+                DataFlow = new DataFlow()
+                {
+                    Id = 1
+                }
+            };
+
+            // Mock 2 DataFlow objects - both sharing a DatasetId, but with different object statuses
+            DataFlow df = MockClasses.MockDataFlow();
+            df.ObjectStatus = ObjectStatusEnum.Deleted;
+            df.DatasetId = 2;
+            df.SchemaId = 1;
+            df.Steps = new[] { step };
+
+            DataFlow df2 = MockClasses.MockDataFlow();
+            df2.ObjectStatus = ObjectStatusEnum.Disabled;
+            df2.DatasetId = 2;
+            df2.SchemaId = 2;
+            df2.Steps = new[] { step2 };
+
+            var dataflows = new[] { df, df2 };
+
+            // Create mock retrieve jobs
+            RetrieverJob job = MockClasses.GetMockRetrieverJob(
+                                        MockClasses.MockDataFileConfig(
+                                                MockClasses.MockDataset()), new FtpSource());
+
+            RetrieverJob job2 = MockClasses.GetMockRetrieverJob(
+                                        MockClasses.MockDataFileConfig(
+                                                MockClasses.MockDataset()), new FtpSource());
+            job.DataFlow = df;
+            job2.DataFlow = df2;
+            List<RetrieverJob> jobList = new List<RetrieverJob>() { job, job2 };
+
+            // Mock dataset context and setup return values
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.DataFlow).Returns(dataflows.AsQueryable);
+            context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
+
+
+            // Mock job service and setup return values
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+
+            // Mock data features and setup return values
+            Mock<IDataFeatures> _datafeatures = new Mock<IDataFeatures>();
+
+            // Mock user service and setup return values
+            Mock<IUserService> userService = new Mock<IUserService>();
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("displayName");
+            user.Setup(s => s.AssociateId).Returns("123456");
+            userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            // Mock security service and setup return values
+            Mock<ISecurityService> securityService = new Mock<ISecurityService>();
+            UserSecurity security = new UserSecurity();
+            securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
+
+            // Setup DataFlowService
+            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null);
+
+            // Act
+            List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(2);
+
+            // Assert
+            // Ensuring that the DataFlow with the deleted object status is filtered out and only returns the 
+            // DataFlowDetailDto object mapped from the active object status DataFlow
+            Assert.AreEqual(1, testFlow.Count);
+        }
+
+
+
 
         [TestMethod]
         public void GetDataFlowByTopicNameOnlyOneMatches()

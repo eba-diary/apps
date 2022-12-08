@@ -90,7 +90,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                if (String.IsNullOrEmpty(_jobOptions))
+                if (string.IsNullOrEmpty(_jobOptions))
                 {
                     return null;
                 }

@@ -5,7 +5,15 @@
 data.Dataset = {
 
     DatasetFilesTable: {},
-    IngestionType_TOPIC: "4",              //IngestionType_TOPIC matches public enum IngestionType, MY WAY OF CREATING A CONST INSTEAD OF HARDCODE
+
+    //DECLARE CONSTANTS INSTEAD OF HARDCODE
+    IngestionType_TOPIC: 4,       //IngestionType_TOPIC matches public enum IngestionType
+    ObjectStatus_Active: 1,         //ObjectStatus_Active matches ObjectStatusEnum Active
+    ObjectStatus_Disabled: 4,       //ObjectStatus_Active matches ObjectStatusEnum Disabled
+
+    //DECLARE PROPERTIES
+    DataFlowIdSelected: 0,          //Use for dataFlowOnOffSwitch to know which DataFlowId to turn on or off
+
 
     ViewModel: function () {
         var self = this;
@@ -544,14 +552,18 @@ data.Dataset = {
             });
             self.vm.OtherJobs.notifySubscribers();
 
-            //Populate associated DataFlows
+            //Populate self.vm.DataFlows() for knockout
             self.vm.DataFlows.removeAll();
             $.each(result.DataFlows, function (i, val) {
+                //GRAB ITEM
                 var item = new data.Dataset.DataFlow(val);
 
-                //only add if data flow is active
-                if (val.ObjectStatus === 1) self.vm.DataFlows().push(item);
+                //DETERMINE IF ITEM SHOULD BE ADDED TO DataFlows() array based on ObjectStatus
+                if (val.ObjectStatus === data.Dataset.ObjectStatus_Active || val.ObjectStatus === data.Dataset.ObjectStatus_Disabled) {
+                    self.vm.DataFlows().push(item);
+                }
             });
+
             self.vm.DataFlows.notifySubscribers();
             self.vm.SchemaId = result.SchemaId;
             //Determine last
@@ -568,6 +580,7 @@ data.Dataset = {
             data.Dataset.delroyReloadEverything(result.DatasetId, result.SchemaId, result.SnowflakeViews);
             data.Dataset.UpdateConsumptionLayers();
             data.Dataset.tryUpdateSchemaSearchTab();
+
         });
     },
 
@@ -778,7 +791,9 @@ data.Dataset = {
         self.IngestionType_TOPIC = ko.observable(data.Dataset.IngestionType_TOPIC);         //WAY OF CREATING A CONST INSTEAD OF HARDCODE FOR EVALUATION IN KNOCKOUT
         self.S3ConnectorName = ko.observable(dataInput.S3ConnectorName);
 
-       
+        //SET ObjectSTatus TO DIRECT dataFlowOnOffSwitch TO BE ON OR OFF
+        self.DataFlowObjectStatus = ko.observable(dataInput.ObjectStatus);
+
         $.each(dataInput.RetrieverJobs, function (i, val) {
             var item = new data.Dataset.DropLocation(val);
 
@@ -790,9 +805,17 @@ data.Dataset = {
         self.DataFlowEditRedirect = function () {
             data.DataFlow.EditUrlRedirect(this.Id());
         }
-        self.RenderJobs = ko.pureComputed(function () {
-            return ko.unwrap(self.Jobs) ? "RenderJobs" : "noRenderJobs";
+        self.RenderJobs = ko.pureComputed(function ()
+        {
+            var jobs = "noRenderJobs";
+            if (ko.unwrap(self.Jobs) || self.DataFlowObjectStatus == data.Dataset.ObjectStatus_Disabled) {
+                jobs = "RenderJobs";
+            }
+            return jobs;
         });
+
+        //SAVE OFF DataFlowId Selected
+        data.Dataset.DataFlowIdSelected = dataInput.Id
     },
 
 
@@ -1521,6 +1544,90 @@ data.Dataset = {
             tab = 'SchemaAbout';
         }
         $("#detailTab" + tab).trigger('click');
+
+
+
+        //************************************************************************************************************
+        //DataFlow ON OFF SWITCH CHANGE EVENT
+        //************************************************************************************************************
+        $('body').on('change', '#dataFlowOnOffSwitch', function () {
+
+            
+            var status = $('#dataFlowOnOffSwitchInput')[0].checked;     //GET NEW STATUS WHICH IS AFTER THEY CLICKED THE BUTTON
+            var actionTaken = "";
+            var btnName = "";
+            var btnStyle = "";
+            var confirmMessage = "";
+            var color = "";
+            var apiErrorMessage = "Something went wrong. Please try again or reach out to DSCSupport@sentry.com.";
+
+            //DEPENDING ON NEW STATUS SETUP OUR VARS WHICH DETERMINE LOOK OF CONFIRMATION MODAL
+            if (status)
+            {
+                //TURN ON
+                actionTaken = "TURN ON DATA FLOW";
+                btnName = "dataFlowBtnOn";
+                btnStyle = "btn-success";
+                color = "green";
+            }
+            else {
+
+                //TURN OFF
+                actionTaken = "TURN OFF DATA FLOW";
+                btnName = "dataFlowBtnOff";
+                btnStyle = "btn-danger";
+                color = "red";
+            }
+
+            confirmMessage = '<p>Are you sure?</p> <p> <h3><font color="' + color + '">THIS WILL ' + actionTaken + '. </font></h3> </p> ';
+            Sentry.ShowModalCustom(actionTaken, confirmMessage,
+                '<button type="button" id="' + btnName + '" data-dismiss="modal" class="btn ' + btnStyle + ' waves-effect waves-light">' + actionTaken + '</button>'
+                );
+
+           
+            //CLICK EVENT IF THEY CANCEL ON or OFF DECISION TO CHANGE SWITCH BACK TO ORIGINAL STATE
+            $(".modal-header .close").click(function () {   //pick the close class inside of the modal-header class just to be as safe as posssible when detecting click event
+
+                $('#dataFlowOnOffSwitchInput').prop('checked', !status);    //check opposite of original state
+
+            });
+
+            //CLICK EVENT IF THEY TURN DataFlow ON
+            $("#dataFlowBtnOn").click(function () {
+                $.ajax({
+                    url: "../../api/v20220609/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Enable",
+                    method: "POST",
+                    success: function (obj)
+                    {
+                        data.Dataset.makeToast("success", actionTaken);
+                    },
+                    failure: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    },
+                    error: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    }
+                });
+            });
+
+            //CLICK EVENT IF THEY TURN DataFlow OFF
+            $("#dataFlowBtnOff").click(function () {
+                $.ajax({
+                    url: "../../api/v20220609/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Disable",
+                    method: "POST",
+                    success: function (obj) {
+                        data.Dataset.makeToast("success", actionTaken);
+                    },
+                    failure: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    },
+                    error: function (obj) {
+                        data.Dataset.makeToast("error", apiErrorMessage);
+                    }
+                });
+            });
+            
+        });
     },
 
     toggleDeleteButton: function () {

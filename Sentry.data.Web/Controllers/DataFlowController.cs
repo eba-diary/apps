@@ -89,7 +89,6 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public async Task<ViewResult> Create()
         {
-
             UserSecurity us = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
             if (!us.CanCreateDataFlow)
@@ -104,8 +103,7 @@ namespace Sentry.data.Web.Controllers
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreProcessingSelection);
             model.IngestionTypeDropDown = Utility.BuildIngestionTypeDropdown(model.IngestionTypeSelection);
-
-            
+                        
             CreateDropDownSetup(model.RetrieverJob);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
@@ -121,8 +119,7 @@ namespace Sentry.data.Web.Controllers
             model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
             model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
 
-            return View("DataFlowForm", model);
-            
+            return View("DataFlowForm", model);            
         }
 
         /// <summary>
@@ -142,7 +139,9 @@ namespace Sentry.data.Web.Controllers
             }
 
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
-            if (dto.ObjectStatus != ObjectStatusEnum.Active)
+
+            //ONLY ALLOW EDIT OF ACTIVE or DISABLED
+            if (dto.ObjectStatus != ObjectStatusEnum.Active && dto.ObjectStatus != ObjectStatusEnum.Disabled)
             {
                 return View("NotFound");
             }
@@ -171,7 +170,7 @@ namespace Sentry.data.Web.Controllers
 
             AddCoreValidationExceptionsToModel(model.Validate());
 
-            DataFlowDto dfDto = ModelToDto(model);
+            DataFlowDto dfDto = model.ToDto(_userService.GetCurrentUser().AssociateId);
 
             AddCoreValidationExceptionsToModel(await _dataFlowService.ValidateAsync(dfDto));
 
@@ -230,13 +229,6 @@ namespace Sentry.data.Web.Controllers
                 results.Add(dsEx.Message);
                 AddCoreValidationExceptionsToModel(new ValidationException(results));
             }
-            //catch (DataFlowStepNotImplementedException stepEx)
-            //{
-            //    //User option selection not valid for dataflowstep mappings
-            //    ValidationResults results = new ValidationResults();
-            //    results.Add(stepEx.Message);
-            //    AddCoreValidationExceptionsToModel(new ValidationException(results));
-            //}
             catch (DataFlowUnauthorizedAccessException)
             {
                 //User should not get to this point via UI since navigating to Create page should give them Forbidden error
@@ -252,7 +244,6 @@ namespace Sentry.data.Web.Controllers
              *  At this point, something has failed 
              * 
              */
-
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
             model.IsBackFillRequiredDropdown = Utility.BuildBackFillRequiredDropdown(model.IsBackFillRequired);
             model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
@@ -262,13 +253,11 @@ namespace Sentry.data.Web.Controllers
             {
                 CreateDropDownSetup(model.RetrieverJob);
             }
-            if (model.SchemaMaps != null && model.SchemaMaps.Count > 0)
-            {
-                foreach (SchemaMapModel mapModel in model.SchemaMaps)
-                {
-                    SetSchemaModelLists(mapModel);
-                }
-            }
+
+            //No point loading the dropdowns here because we do it again from JS
+            //Instead make sure we are keeping the dataset and schema that were selected
+            model.SelectedDataset = model.SchemaMaps.First().SelectedDataset;
+            model.SelectedSchema = model.SchemaMaps.First().SelectedSchema;
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
@@ -405,14 +394,17 @@ namespace Sentry.data.Web.Controllers
                 CreateCurrentFile = dto.CreateCurrentFile,
                 SelectedDataSource = dto.DataSourceId.ToString(),
                 SelectedSourceType = dto.DataSourceType,
-                SelectedRequestMethod = dto.RequestMethod ?? Core.HttpMethods.none,
-                SelectedRequestDataFormat = dto.RequestDataFormat ?? Core.HttpDataFormat.none,
-                FtpPattern = dto.FtpPattern ?? Core.FtpPattern.NoPattern,
+                SelectedRequestMethod = dto.RequestMethod ?? HttpMethods.none,
+                SelectedRequestDataFormat = dto.RequestDataFormat ?? HttpDataFormat.none,
+                FtpPattern = dto.FtpPattern ?? FtpPattern.NoPattern,
                 ExecutionParameters = dto.ExecutionParameters,
-                SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule)
+                SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule),
+                PagingType = dto.PagingType,
+                PageTokenField = dto.PageTokenField,
+                PageParameterName = dto.PageParameterName
             };
 
-            model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault().ToString();
+            model.SchedulePicker = model.SchedulePickerDropdown.Where(w => w.Selected).Select(s => int.Parse(s.Value)).FirstOrDefault().ToString();
 
             return model;
         }
@@ -429,61 +421,7 @@ namespace Sentry.data.Web.Controllers
 
             return model;
         }
-
-        private void SetSchemaModelLists(SchemaMapModel model)
-        {
-            List<SelectListItem> dsList = new List<SelectListItem>();
-            List<SelectListItem> scmList = new List<SelectListItem>();
-            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
-
-            if (model.SelectedDataset == 0)
-            {
-                dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Selected = true });
-            }
-
-            foreach (var group in groupedDatasets)
-            {
-                SelectListGroup curGroup = new SelectListGroup()
-                {
-                    Name = group.Key.Name
-                };
-
-                dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
-                {
-                    Text = $"{m.DatasetName} ({m.Asset.SaidKeyCode} - {m.NamedEnvironment})",
-                    Value = m.DatasetId.ToString(),
-                    Group = curGroup,
-                    Selected = (m.DatasetId == model.SelectedDataset)
-                }
-                ));
-            }
-
-            model.AllDatasets = dsList;
-
-            if (model.SelectedDataset > 0 && model.SelectedSchema == 0)
-            {
-                scmList.Add(new SelectListItem() { Text = "Select Schema", Value = "0", Selected = true });
-            }
-
-            if (model.SelectedDataset > 0)
-            {
-                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset).Where(w => !w.DeleteInd).OrderBy(o => o.Name);
-
-                foreach (var scm in datasetSchemaList)
-                {
-                    scmList.Add(new SelectListItem()
-                    {
-                        Text = scm.Name,
-                        Value = scm.Schema.SchemaId.ToString(),
-                        Selected = (scm.Schema.SchemaId == model.SelectedSchema)
-                    });
-                }
-
-                model.AllSchemas = scmList;
-            }
-        }
-
-        
+                
         [HttpGet]
         [Route("DataFlow/NamedEnvironment")]
         public async Task<PartialViewResult> _NamedEnvironment(string assetKeyCode, string namedEnvironment)
@@ -533,22 +471,23 @@ namespace Sentry.data.Web.Controllers
             {
                 temp2 = DataSourcesByType(model.SelectedSourceType, model.SelectedDataSource);
             }
-
-            temp2.Add(new SelectListItem()
+            else
             {
-                Text = "Pick a Source Type Above",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                temp2.Add(new SelectListItem()
+                {
+                    Text = "Pick a Source Type Above",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
 
             model.SourcesForDropdown = temp2.OrderBy(x => x.Value);
 
             model.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(model.SelectedRequestMethod);
-
             model.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(model.SelectedRequestDataFormat);
-
             model.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(model.FtpPattern);
+            model.PagingTypeDropdown = Utility.BuildSelectListFromEnum<PagingType>((int)model.PagingType);
 
             int s;
             int pickerval;
@@ -561,9 +500,7 @@ namespace Sentry.data.Web.Controllers
                 pickerval = 0;
             }
             model.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(((RetrieverJobScheduleTypes)pickerval).GetDescription());
-        }
-
-        
+        }        
 
         private async Task<List<SelectListItem>> BuildSAIDAssetDropDown(string keyCode)
         {
@@ -721,6 +658,8 @@ namespace Sentry.data.Web.Controllers
                     case "SelectedDataSource":
                     case "SelectedSourceType":
                     case "SchedulePicker":
+                    case "PageParameterName":
+                    case "PageTokenField":
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsRequestBodyIsBlank:
@@ -749,63 +688,15 @@ namespace Sentry.data.Web.Controllers
                     case DataFlow.ValidationErrors.topicNameIsBlank:
                         ModelState.AddModelError("TopicName", vr.Description);
                         break;
+                    case DataFlow.ValidationErrors.topicNameMustBeUnique:
+                        ModelState.AddModelError("TopicName", vr.Description);
+                        break;
                     case DataFlow.ValidationErrors.stepsContainsAtLeastOneSchemaMap:
                     default:
                         ModelState.AddModelError(string.Empty, vr.Description);
                         break;
                 }
             }
-        }
-
-        internal DataFlowDto ModelToDto(DataFlowModel model)
-        {
-            Core.DataFlowDto dto = new Core.DataFlowDto
-            {
-                Id = model.DataFlowId,
-                Name = model.Name,
-                SaidKeyCode = model.SAIDAssetKeyCode,
-                CreatedBy = model.CreatedBy,
-                CreateDTM = model.CreatedDTM,
-                IngestionType = model.IngestionTypeSelection,
-                IsCompressed = model.IsCompressed,
-                IsBackFillRequired = model.IsBackFillRequired,
-                IsPreProcessingRequired = model.IsPreProcessingRequired,
-                PreProcessingOption = model.PreProcessingSelection,
-                ObjectStatus = model.ObjectStatus,
-                FlowStorageCode = model.StorageCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType,
-                // Propagate primary contact otherwise specify current user
-                PrimaryContactId = (model.PrimaryContactId) ?? _userService.GetCurrentUser().AssociateId,
-                IsSecured = true,
-                TopicName = model.TopicName,
-                S3ConnectorName = model.S3ConnectorName
-            };
-
-            if (model.SchemaMaps != null)
-            {
-                dto.SchemaMap = model.SchemaMaps.ToDto();
-            }
-
-            if (model.RetrieverJob != null)
-            {
-                dto.RetrieverJob = model.RetrieverJob.ToDto();
-            }
-
-            if (model.IsCompressed)
-            {
-                CompressionJobDto cDto = model.CompressionJob.First().ToDto();
-                dto.CompressionJob = cDto;
-                dto.CompressionType = (int)cDto.CompressionType;
-            }
-            else
-            {
-                dto.CompressionType = null;
-            }
-
-            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
-
-            return dto;
         }
     }
 

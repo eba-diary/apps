@@ -85,7 +85,7 @@ namespace Sentry.data.Core
             List<DataFlow> dfList = null;
 
             dfList = _datasetContext.DataFlow.Where(expression)
-                .Where(x => x.ObjectStatus == ObjectStatusEnum.Active)
+                .Where(x => x.ObjectStatus == ObjectStatusEnum.Active || x.ObjectStatus == ObjectStatusEnum.Disabled)
                 .OrderByDescending(x => x.Id).ToList();
 
             List<DataFlowDetailDto> dtoList = new List<DataFlowDetailDto>();
@@ -343,6 +343,29 @@ namespace Sentry.data.Core
 
             return newDataFlow.Id;
         }
+
+
+        public void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status)
+        {
+            if (status != ObjectStatusEnum.Active && status != ObjectStatusEnum.Disabled)
+            {
+                throw new ArgumentException("Active or Disabled Object Status only allowed",nameof(status));
+            }
+
+            try
+            {
+                //Find DataFlow
+                DataFlow flow = _datasetContext.GetById<DataFlow>(dataFlowId);
+                flow.ObjectStatus = status;
+                _datasetContext.SaveChanges();
+            }
+            catch(Exception ex) 
+            {
+                Logger.Error($"{nameof(DataFlowService)}.{nameof(EnableOrDisableDataFlow)} failed", ex);
+                throw;
+            }
+        }
+
 
         public void CreateDataFlowForSchema(FileSchema scm)
         {
@@ -652,6 +675,14 @@ namespace Sentry.data.Core
                 results.Add(DataFlow.ValidationErrors.nameMustBeUnique, "Dataflow name is already used");
             }
 
+            //IF THIS IS A BRAND NEW DATAFLOW AND TOPIC INGESTION TYPE IS TOPIC THEN MAKE SURE TOPIC NAME DOESN'T ALREADY EXIST
+            if (    dfDto.Id == 0 
+                    && dfDto.IngestionType == (int) IngestionType.Topic 
+                    && _datasetContext.DataFlow.Any(w => w.TopicName == dfDto.TopicName))
+            {
+                results.Add(DataFlow.ValidationErrors.topicNameMustBeUnique, "Kafka Topic name is already used");
+            }
+
             //Validate the Named Environment selection using the QuartermasterService
             results.MergeInResults(await _quartermasterService.VerifyNamedEnvironmentAsync(dfDto.SaidKeyCode, dfDto.NamedEnvironment, dfDto.NamedEnvironmentType).ConfigureAwait(false));
 
@@ -833,7 +864,7 @@ namespace Sentry.data.Core
                 Questionnaire = dto.DFQuestionnaire,
                 FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
                 SaidKeyCode = dto.SaidKeyCode,
-                ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active,
+                ObjectStatus = dto.ObjectStatus,    //in case they are changing an existing dataset that is disabled, keep status
                 DeleteIssuer = dto.DeleteIssuer,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IngestionType = dto.IngestionType,

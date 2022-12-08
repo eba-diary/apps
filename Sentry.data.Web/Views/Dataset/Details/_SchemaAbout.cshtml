@@ -67,7 +67,7 @@
                         <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
                             <tbody>
                                 <tr>
-                                    <td class="borderMeta_@color colOneMeta">
+                                    <td class="borderMeta_@color ">
                                         <div class="row pl-3">
                                             <a class="float-l" data-bind="attr: { href:DetailUrl, target: '_blank' }, click: DataFlowDetailRedirect, text: Name()"></a>
                                             @if (Model.DisplayDataflowEdit)
@@ -76,6 +76,55 @@
                                             }
                                         </div>
                                     </td>
+
+
+                                    @***********************************************************************************************************@
+                                    @*DATA FLOW ON OFF SWITCH*@
+                                    @***********************************************************************************************************@
+                                    @if (Model.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)
+                                    {
+                                       
+                                        <td>
+                                            <div class="switch pl-2" id="dataFlowOnOffSwitch" >
+                                                <label class="pb-0">
+                                                    Off
+
+                                                    <!-- ko if: DataFlowObjectStatus() == "1"-->
+                                                        @if (Model.Security.ShowAdminControls)
+                                                        {
+                                                            @*ObjectStatus=ACTIVE AND ADMIN*@
+                                                            <input type="checkbox" id="dataFlowOnOffSwitchInput" checked>
+                                                        }
+                                                        else
+                                                        {
+                                                            @*ObjectStatus=ACTIVE AND NOT ADMIN*@
+                                                            <input type="checkbox" id="dataFlowOnOffSwitchInput" checked disabled>
+                                                        }
+                                                    <!-- /ko -->
+                                                   
+                                                    <!-- ko if: DataFlowObjectStatus() != "1"-->
+                                                        @if (Model.Security.ShowAdminControls)
+                                                        {
+                                                            @*ObjectStatus=DISABLED AND ADMIN*@
+                                                            <input type="checkbox" id="dataFlowOnOffSwitchInput">
+                                                        }
+                                                        else
+                                                        {
+                                                            @*ObjectStatus=DISABLED AND NOT ADMIN*@
+                                                            <input type="checkbox" id="dataFlowOnOffSwitchInput" disabled>
+                                                        }
+                                                    <!-- /ko -->
+
+                                                    <span class="lever" id="dataFlowOnOffSwitchLever"></span>
+                                                    On
+                                                </label>
+                                            </div>
+                                        </td>
+                                       
+                                    }
+
+
+
                                     <!-- ko if: RenderJobs() == "noRenderJobs" -->
                                     <td style="padding:0px; border-top-width:0px">There are no retriever jobs associated with this dataflow</td>
                                     <!-- /ko -->
@@ -95,9 +144,6 @@
                                                     <td class="borderMeta_@color colOneMeta">S3 Connector Name: </td>
                                                     <td class="borderMeta_@color " data-bind="text: S3ConnectorName()"></td>
                                                 </tr>
-
-
-
                                                 <!-- /ko -->
                                                 <!-- ko foreach: Jobs -->
                                                 <tr>

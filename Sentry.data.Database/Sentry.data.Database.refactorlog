@@ -1092,4 +1092,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ParentDataSource_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="afa2c059-bff5-4a84-8787-9ccea543a812" ChangeDateTime="11/23/2022 14:53:24">
+    <Property Name="ElementName" Value="[dbo].[DataSource].[HasPaging]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SupportsPaging" />
+  </Operation>
 </Operations>
