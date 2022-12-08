@@ -11,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Sentry.data.Web;
+
 
 namespace Sentry.data.Web.Controllers
 {
@@ -208,7 +210,23 @@ namespace Sentry.data.Web.Controllers
         //below methods all return admin page views
         public ActionResult Index()
         {
-            return View();
+            // service method that returns the number of completed files
+            int totalCompletedFiles = 1051;
+
+            // service method that return the number of inflight files
+            int totalInFlightFiles = 306;
+
+            // service method that return the number of failed files
+            int totalFailedFiles = 2;
+
+            AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
+            {
+                CompletedFiles = totalCompletedFiles,
+                InFlightFiles = totalInFlightFiles,
+                FailedFiles = totalFailedFiles,
+            };
+
+            return View(adminElasticFileModel);
         }
         public ActionResult DataFileReprocessing()
         {

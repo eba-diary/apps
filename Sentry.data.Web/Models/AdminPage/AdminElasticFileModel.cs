@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Sentry.data.Web.Models.AdminPage
+namespace Sentry.data.Web
 {
-    public class ElasticSearchFileModel
+    public class AdminElasticFileModel
     {
         public int CompletedFiles { get; set; }
 
