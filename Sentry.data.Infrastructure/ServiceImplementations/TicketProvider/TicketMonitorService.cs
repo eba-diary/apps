@@ -20,7 +20,6 @@ namespace Sentry.data.Infrastructure
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
 
                 List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING && x.TicketId != null && !x.TicketId.Equals("DEFAULT_SECURITY") && !x.TicketId.Equals("DEFAULT_SECURITY_INHERITANCE")).ToList();
-                Sentry.Common.Logging.Logger.Info($"Checking ticket status for list {tickets.ToString()}");
 
                 foreach (SecurityTicket ticket in tickets)
                 {
