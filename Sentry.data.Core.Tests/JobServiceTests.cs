@@ -499,7 +499,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsTrue(job.ExecutionParameters.Any());
 
@@ -562,7 +562,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -625,7 +625,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -688,7 +688,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -757,7 +757,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -812,7 +812,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -867,7 +867,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -922,7 +922,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
 
@@ -977,7 +977,7 @@ namespace Sentry.data.Core.Tests
 
             JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
 
-            RetrieverJob job = service.CreateAndSaveRetrieverJob(dto);
+            RetrieverJob job = service.CreateRetrieverJob(dto);
 
             Assert.IsTrue(job.ExecutionParameters.Any());
 

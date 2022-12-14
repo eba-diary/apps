@@ -5,7 +5,6 @@ using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -15,13 +14,13 @@ using System.Threading.Tasks;
 namespace Sentry.data.Infrastructure.Tests
 {
     [TestClass]
-    public class AuthorizationProviderTests
+    public class AuthorizationProviderTests : BaseInfrastructureUnitTest
     {
         [TestMethod]
         public void GetOAuthAccessToken_NotExpired_Token()
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = new Mock<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
             encryptionService.Setup(x => x.DecryptString("CurrentToken", "ENCRYPT", "IVKey")).Returns("DecryptedToken");
 
             AuthorizationProvider authorizationProvider = new AuthorizationProvider(encryptionService.Object, null, null, null);
@@ -57,8 +56,7 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = new Mock<IEncryptionService>();
-            encryptionService.Setup(x => x.DecryptString("CurrentToken", "ENCRYPT", "IVKey")).Returns("DecryptedToken");
+            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
             encryptionService.Setup(x => x.DecryptString("EncryptedPrivateId", "ENCRYPT", "IVKey")).Returns("DecryptedPrivateId");
             encryptionService.Setup(x => x.DecryptString("EncryptedRefreshToken", "ENCRYPT", "IVKey")).Returns("DecryptedRefreshToken");
             encryptionService.Setup(x => x.EncryptString("fakeaccesstoken", "ENCRYPT", "IVKey")).Returns(new Tuple<string, string>("EncryptedAccessToken", null));
@@ -67,7 +65,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
             HttpResponseMessage responseMessage = new HttpResponseMessage
             {
-                Content = new StringContent(GetResponse("Motive_RefreshToken")),
+                Content = new StringContent(GetDataString("Motive_RefreshToken.json")),
                 StatusCode = HttpStatusCode.OK
             };
 
@@ -79,7 +77,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
 
-            Mock<IHttpClientGenerator> generator = new Mock<IHttpClientGenerator>();
+            Mock<IHttpClientGenerator> generator = repository.Create<IHttpClientGenerator>();
             generator.Setup(x => x.GenerateHttpClient(token.TokenUrl)).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
@@ -127,14 +125,14 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = new Mock<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
             encryptionService.Setup(x => x.DecryptString(source.ClientPrivateId, "ENCRYPT", "IVKey")).Returns("DecryptedPrivateKey");
             encryptionService.Setup(x => x.EncryptString("fakeaccesstoken", "ENCRYPT", "IVKey")).Returns(new Tuple<string, string>("EncryptedAccessToken", null));
             
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
             HttpResponseMessage responseMessage = new HttpResponseMessage
             {
-                Content = new StringContent(GetResponse("OAuth_JwtToken")),
+                Content = new StringContent(GetDataString("OAuth_JwtToken.json")),
                 StatusCode = HttpStatusCode.OK
             };
 
@@ -145,7 +143,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
 
-            Mock<IHttpClientGenerator> generator = new Mock<IHttpClientGenerator>();
+            Mock<IHttpClientGenerator> generator = repository.Create<IHttpClientGenerator>();
             generator.Setup(x => x.GenerateHttpClient(token.TokenUrl)).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
@@ -159,7 +157,7 @@ namespace Sentry.data.Infrastructure.Tests
             datasetContext.SetupGet(x => x.OAuthClaims).Returns(claims.AsQueryable());
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IAuthorizationSigner> signer = new Mock<IAuthorizationSigner>();
+            Mock<IAuthorizationSigner> signer = repository.Create<IAuthorizationSigner>();
             signer.Setup(x => x.SignOAuthToken(It.IsAny<string>(), "DecryptedPrivateKey")).Returns("SignedToken");
 
             AuthorizationProvider authorizationProvider = new AuthorizationProvider(encryptionService.Object, datasetContext.Object, generator.Object, signer.Object);
@@ -196,7 +194,7 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = new Mock<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
             encryptionService.Setup(x => x.DecryptString(source.ClientPrivateId, "ENCRYPT", "IVKey")).Returns("DecryptedPrivateKey");
             
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -212,7 +210,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
 
-            Mock<IHttpClientGenerator> generator = new Mock<IHttpClientGenerator>();
+            Mock<IHttpClientGenerator> generator = repository.Create<IHttpClientGenerator>();
             generator.Setup(x => x.GenerateHttpClient(token.TokenUrl)).Returns(httpClient);
 
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
@@ -225,7 +223,7 @@ namespace Sentry.data.Infrastructure.Tests
             };
             datasetContext.SetupGet(x => x.OAuthClaims).Returns(claims.AsQueryable());
 
-            Mock<IAuthorizationSigner> signer = new Mock<IAuthorizationSigner>();
+            Mock<IAuthorizationSigner> signer = repository.Create<IAuthorizationSigner>();
             signer.Setup(x => x.SignOAuthToken(It.IsAny<string>(), "DecryptedPrivateKey")).Returns("SignedToken");
 
             AuthorizationProvider authorizationProvider = new AuthorizationProvider(encryptionService.Object, datasetContext.Object, generator.Object, signer.Object);
@@ -244,7 +242,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetTokenAuthenticationToken_HTTPSSource_DecryptedAuthenticationTokenValue()
         {
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = new Mock<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
             encryptionService.Setup(x => x.DecryptString("EncryptedTokenValue", "ENCRYPT", "IVKey")).Returns("DecryptedToken");
 
             AuthorizationProvider authorizationProvider = new AuthorizationProvider(encryptionService.Object, null, null, null);
@@ -261,15 +259,5 @@ namespace Sentry.data.Infrastructure.Tests
 
             repository.VerifyAll();
         }
-
-        #region Helpers
-        private string GetResponse(string filename)
-        {
-            using (StreamReader rdr = new StreamReader($@"ExpectedJSON\{filename}.json"))
-            {
-                return rdr.ReadToEnd().Replace("\r\n", string.Empty);
-            }
-        }
-        #endregion
     }
 }
