@@ -10,6 +10,12 @@ namespace Sentry.data.Core
     {
         Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
         int Create(DatasetDto dto);
+        /// <summary>
+        /// Performs all necessary external dependency creation statements.
+        /// </summary>
+        /// <remarks>To be executed after creation of dataset</remarks>
+        /// <param name="datasetId"></param>
+        void CreateExternalDependencies(int datasetId);
         int CreateAndSaveNewDataset(DatasetSchemaDto dto);
         DatasetDto GetDatasetDto(int id);
 

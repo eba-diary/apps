@@ -263,22 +263,6 @@ namespace Sentry.data.Web
             return model;
         }
 
-        public static Models.ApiModels.Dataflow.DataFlowStepModel ToAPIModel(this Core.DataFlowStepDto dto)
-        {
-            Models.ApiModels.Dataflow.DataFlowStepModel model = new Models.ApiModels.Dataflow.DataFlowStepModel()
-            {
-                Id = dto.Id,
-                ActionId = dto.ActionId,
-                ActionName = dto.ActionName,
-                ActionDescription = dto.ActionDescription,
-                ExecutionOrder = dto.ExeuctionOrder,
-                TriggetKey = dto.TriggerKey,
-                TargetPrefix = dto.TargetPrefix,
-                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{dto.TriggerBucket}/"
-            };
-            return model;
-        }
-
         public static SchemaMapModel ToModel(this SchemaMapDto dto)
         {
             SchemaMapModel model = new SchemaMapModel();
@@ -289,22 +273,6 @@ namespace Sentry.data.Web
             model.SelectedSchema = dto.SchemaId;
 
             return model;
-        }
-
-        public static SchemaMapDetailModel ToDetailModel(this Core.SchemaMapDetailDto dto)
-        {
-            SchemaMapDetailModel model = new SchemaMapDetailModel(dto);
-            return model;
-        }
-        
-        public static List<SchemaMapDetailModel> ToDetailModelList(this List<Core.SchemaMapDetailDto> dtoList)
-        {
-            List<SchemaMapDetailModel> modelList = new List<SchemaMapDetailModel>();
-            foreach(Core.SchemaMapDetailDto dto in dtoList)
-            {
-                modelList.Add(ToDetailModel(dto));                
-            }
-            return modelList;
         }
 
         public static List<AssociatedDataFlowModel> ToModel(this List<Tuple<DataFlowDetailDto, List<RetrieverJob>>> jobList)
@@ -320,6 +288,38 @@ namespace Sentry.data.Web
         public static AssociatedDataFlowModel ToModel(this Tuple<DataFlowDetailDto, List<RetrieverJob>> job)
         {
             return new AssociatedDataFlowModel(job);
+        }
+
+        public static SchemaMapDetailModel ToDetailModel(this Core.SchemaMapDetailDto dto)
+        {
+            SchemaMapDetailModel model = new SchemaMapDetailModel(dto);
+            return model;
+        }
+
+        public static List<SchemaMapDetailModel> ToDetailModelList(this List<Core.SchemaMapDetailDto> dtoList)
+        {
+            List<SchemaMapDetailModel> modelList = new List<SchemaMapDetailModel>();
+            foreach (Core.SchemaMapDetailDto dto in dtoList)
+            {
+                modelList.Add(ToDetailModel(dto));
+            }
+            return modelList;
+        }
+
+        public static Models.ApiModels.Dataflow.DataFlowStepModel ToAPIModel(this Core.DataFlowStepDto dto)
+        {
+            Models.ApiModels.Dataflow.DataFlowStepModel model = new Models.ApiModels.Dataflow.DataFlowStepModel()
+            {
+                Id = dto.Id,
+                ActionId = dto.ActionId,
+                ActionName = dto.ActionName,
+                ActionDescription = dto.ActionDescription,
+                ExecutionOrder = dto.ExeuctionOrder,
+                TriggetKey = dto.TriggerKey,
+                TargetPrefix = dto.TargetPrefix,
+                RootAwsUrl = $"https://{AwsRegion.ToLower()}.amazonaws.com/{dto.TriggerBucket}/"
+            };
+            return model;
         }
     }
 }

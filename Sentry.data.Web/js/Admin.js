@@ -27,6 +27,18 @@ data.Admin = {
         });
     },
 
+    SideBarUtility: function ()
+    {
+        var currentHref = $(location).attr("href");
+
+        // Gets title of current page
+        var navID = /[^/]*$/.exec(currentHref)[0].toLowerCase();
+
+        // Selects nav bar item that matches the current page title and sets the link to bold + blue font
+        $("#sideNav").find(`[data-nav-id='${navID}']`).addClass("font-weight-bold text-primary");
+        
+    },
+
     // Reduce and group json fields by the specified key
     JsonReduce: function (jsonObject, groupKey, itemsKey) {    
         
@@ -311,15 +323,9 @@ data.Admin = {
 
     // activate or deactivate reprocess button based on input list of checked boxes
     ActivateDeactivateAuditSearchButton: function () {
-        console.log("calls")
-
         var searchStatus = false;
 
         $("select.admin-audit-dropdown.active").each(function () {
-
-            console.log($(this).attr("id"));
-            console.log($(this).find(":selected").val());
-
             // Checks if any acive dropdown items are not selected
             if ($(this).find(":selected").val() == null || $(this).find(":selected").val() == "" || $(this).find(":selected").val() == "-1") {
                 searchStatus = true;
@@ -327,8 +333,6 @@ data.Admin = {
                 // Break from each loop
                 return false;
             }
-
-            console.log(searchStatus);
         })
 
         $("#auditSearchButton").prop("disabled", searchStatus);

@@ -107,7 +107,6 @@ namespace Sentry.data.Web.Controllers
             return model;
         }
 
-        
         [Route("Admin/GetDeadJobs/{selectedDate?}")]
         [HttpGet]
         public ActionResult GetDeadJobs(string selectedDate)

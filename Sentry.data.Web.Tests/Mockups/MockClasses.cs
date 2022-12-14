@@ -33,7 +33,7 @@ namespace Sentry.data.Web.Tests
 
             if (addConfig)
             {
-                ds.DatasetFileConfigs.Add(MockDataFileConfig(ds));
+                ds.DatasetFileConfigs.Add(MockDatasetFileConfig(ds));
             }
 
             return ds;
@@ -55,7 +55,7 @@ namespace Sentry.data.Web.Tests
         }
 
 
-        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null)
+        public static DatasetFileConfig MockDatasetFileConfig(Dataset ds = null)
         {            
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
@@ -348,7 +348,7 @@ namespace Sentry.data.Web.Tests
 
                 DataSource = MockDataSource(dsrc, authType),
 
-                DatasetConfig = dfc != null ? dfc : MockDataFileConfig(null),
+                DatasetConfig = dfc != null ? dfc : MockDatasetFileConfig(null),
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
