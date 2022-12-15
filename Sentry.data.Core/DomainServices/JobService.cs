@@ -68,6 +68,33 @@ namespace Sentry.data.Core
             return histRecordList;
         }
 
+        /// <summary>
+        /// Returns the dfs datasource based on the NamedEnvironmentType
+        /// </summary>
+        /// <param name="namedEnviornmentType"></param>
+        /// <remarks>This is used by <see cref="DataApplicationService.CreateWithoutSave_DfsRetrieverJob"/>.</remarks>
+        /// <returns></returns>
+        public DataSource GetDfsDataSourceByDatasetNamedEnvironmentType(NamedEnvironmentType namedEnviornmentType)
+        {
+            DataSource dfsDataSource;
+            if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+            {
+                if (namedEnviornmentType == NamedEnvironmentType.NonProd)
+                {
+                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsNonProdSource);
+                }
+                else
+                {
+                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsProdSource);
+                }
+            }
+            else
+            {
+                dfsDataSource = _datasetContext.DataSources.FirstOrDefault(w => w is DfsDataFlowBasic);
+            }
+            return dfsDataSource;
+        }
+
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
         {
             JobHistory histRecord = null;
@@ -133,7 +160,15 @@ namespace Sentry.data.Core
             return basicJob;
         }
 
-        public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
+        public void CreateDfsRetrieverJob(DataFlow dataFlow)
+        {
+            NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == dataFlow.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
+            DataSource dfsDataSource = GetDfsDataSourceByDatasetNamedEnvironmentType(datasetEnvironmentType);
+
+            _ = CreateDfsRetrieverJob(dataFlow, dfsDataSource);
+        }
+
+        public RetrieverJob CreateDfsRetrieverJob(DataFlow df, DataSource dataSource)
         {
             Logger.Info($"InstantiateJobsForCreation Method Start");
 
@@ -185,12 +220,14 @@ namespace Sentry.data.Core
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
 
+            _datasetContext.Add(rj);
+
             Logger.Info($"InstantiateJobsForCreation Method End");
 
             return rj;
         }
 
-        public RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto)
+        public RetrieverJob CreateRetrieverJob(RetrieverJobDto dto)
         {
             Compression compress = new Compression();
             if (dto.IsCompressed)
@@ -223,8 +260,6 @@ namespace Sentry.data.Core
                 }
             }
             _datasetContext.Add(job);
-
-            CreateDropLocation(job);
 
             return job;
         }
@@ -546,6 +581,8 @@ namespace Sentry.data.Core
             return GetApacheLivyBatchStatusInternalAsync(hr);
         }
 
+        #region Private Methods
+
         private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
         {
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
@@ -601,13 +638,11 @@ namespace Sentry.data.Core
                 historyRecord.Active = false;
 
                 _datasetContext.SaveChanges();
-            }            
+            }
 
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
             return response;
         }
-
-#region Private Methods
 
         internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
         {
@@ -916,6 +951,7 @@ namespace Sentry.data.Core
             job.ObjectStatus = dto.ObjectStatus;
             job.DeleteIssueDTM = dto.DeleteIssueDTM;
             job.DeleteIssuer = dto.DeleteIssuer;
+            job.RequestVariables = dto.RequestVariables?.Select(x => x.ToEntity()).ToList();
         }
 
         private void DeleteJobFromScheduler(RetrieverJob job)

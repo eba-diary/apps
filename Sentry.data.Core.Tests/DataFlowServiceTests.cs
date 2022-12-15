@@ -966,7 +966,7 @@ namespace Sentry.data.Core.Tests
 
             DataFlow df = MockClasses.MockDataFlow();
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
@@ -1003,7 +1003,7 @@ namespace Sentry.data.Core.Tests
             df.DeleteIssuer = "654321";
 
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
@@ -1041,7 +1041,7 @@ namespace Sentry.data.Core.Tests
             df.DeleteIssuer = "654321";
 
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
@@ -1272,7 +1272,7 @@ namespace Sentry.data.Core.Tests
             df.DatasetId = 1;
 
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             List<RetrieverJob> jobList = new List<RetrieverJob>() { job };
@@ -1387,11 +1387,11 @@ namespace Sentry.data.Core.Tests
 
             // Create mock retrieve jobs
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
 
             RetrieverJob job2 = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             job2.DataFlow = df2;
@@ -1479,11 +1479,11 @@ namespace Sentry.data.Core.Tests
 
             // Create mock retrieve jobs
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
 
             RetrieverJob job2 = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             job2.DataFlow = df2;
@@ -1571,11 +1571,11 @@ namespace Sentry.data.Core.Tests
 
             // Create mock retrieve jobs
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
 
             RetrieverJob job2 = MockClasses.GetMockRetrieverJob(
-                                        MockClasses.MockDataFileConfig(
+                                        MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
             job.DataFlow = df;
             job2.DataFlow = df2;

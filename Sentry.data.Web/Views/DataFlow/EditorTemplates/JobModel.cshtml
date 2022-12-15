@@ -87,25 +87,42 @@
                 @Html.ValidationMessageFor(model => model.SelectedRequestMethod, "", new { @class = "text-danger" })
             </div>
 
-            <div class="httpParameterPanel" style="display:none;">
+            <div class="httpPagingPanel" style="display:none;">
                 <div class="md-form">
                     @Html.LabelFor(model => model.PagingType, htmlAttributes: new { @class = "mdb-main-label" })
                     @Html.DropDownListFor(model => model.PagingType, Model.PagingTypeDropdown, new { @class = "mdb-select", })
                     @Html.ValidationMessageFor(model => model.PagingType, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form paging-token-field" style="display:none;">
                     @Html.LabelFor(model => model.PageTokenField, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageTokenField, new { @class = "form-control", @placeholder = "Path to the token field on the response" })
                     @Html.ValidationMessageFor(model => model.PageTokenField, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form paging-request-parameter" style="display:none;">
                     @Html.LabelFor(model => model.PageParameterName, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageParameterName, new { @class = "form-control", @placeholder = "Parameter name to include on paging requests" })
                     @Html.ValidationMessageFor(model => model.PageParameterName, "", new { @class = "text-danger" })
                 </div>
+
+
+                <h6 id="request-variable-header" class="pt-0">
+                    Request Variables
+                    <a class="icon-info-solid dsc-blue-text" data-toggle="popover" title="" data-placement="right" data-content="Use variables in the Relative URI by wrapping the variable name with ~[ ]~ >> (Ex: Search/~[variablename]~/Data). On each scheduled run, the value will be incremented accordingly and substituted in for the matching variable name." href="javascript:void(0)"> </a>
+                </h6>
+
+                <div id="request-variable-container">
+                    @foreach (RequestVariableModel variable in Model.RequestVariables)
+                    {
+                        Html.RenderPartial("_RequestVariable", variable);
+                    }
+                </div>
+
+                <button id="add-request-variable" type="button" class="btn btn-sm btn-outline-primary waves-effect waves-light ml-0 mt-2"><em class="fas fa-plus"></em></button>
             </div>
 
-            <div class="text-muted font-italic">
+            <div class="text-muted font-italic mt-3">
                 Full URL: <span id="base-url"></span><span id="relative-url"></span><span id="parameter-url"></span>
             </div>
 

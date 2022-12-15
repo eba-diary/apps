@@ -1,11 +1,16 @@
 ﻿using Hangfire;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Migration;
+using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Sentry.data.Core.DomainServices
+namespace Sentry.data.Core
 {
     /// <summary>
     /// The DataApplicationService is used to control transactional boundries for
@@ -23,12 +28,14 @@ namespace Sentry.data.Core.DomainServices
         private readonly Lazy<IDataFeatures> _dataFeatures;
         private readonly Lazy<ISecurityService> _securityService;
         private readonly Lazy<ISchemaService> _schemaService;
+        private readonly Lazy<IJobService> _jobService;
 
         public DataApplicationService(IDatasetContext datasetContext,
             Lazy<IDatasetService> datasetService, Lazy<IConfigService> configService,
             Lazy<IDataFlowService> dataFlowService, Lazy<IBackgroundJobClient> hangfireBackgroundJobClient,
             Lazy<IUserService> userService, Lazy<IDataFeatures> dataFeatures,
-            Lazy<ISecurityService> securityService, Lazy<ISchemaService> schemaService)
+            Lazy<ISecurityService> securityService, Lazy<ISchemaService> schemaService,
+            Lazy<IJobService> jobService)
         {
             _datasetContext = datasetContext;
             _datasetService = datasetService;
@@ -39,6 +46,7 @@ namespace Sentry.data.Core.DomainServices
             _dataFeatures = dataFeatures;
             _securityService = securityService;
             _schemaService = schemaService;
+            _jobService = jobService;
         }
 
         #region Private Properties
@@ -73,6 +81,10 @@ namespace Sentry.data.Core.DomainServices
         private ISchemaService SchemaService
         {
             get { return _schemaService.Value; }
+        }
+        private IJobService JobService
+        {
+            get { return _jobService.Value; }
         }
         #endregion
 
@@ -145,31 +157,81 @@ namespace Sentry.data.Core.DomainServices
 
             Logger.Info($"{methodName} Method End");
             return successfullySubmitted;
-        }                
+        }
+
+
+        public void MigrateDataset(DatasetMigrationRequest migrationRequest)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateDataset).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            Logger.Info($"{methodName} {JsonConvert.SerializeObject(migrationRequest)}");
+            try
+            {
+                IApplicationUser user = UserService.GetCurrentUser();
+                UserSecurity userSecurity = SecurityService.GetUserSecurity(_datasetContext.GetById<Dataset>(migrationRequest.SourceDatasetId), user);
+                if (!userSecurity.CanEditDataset)
+                {
+                    throw new DatasetUnauthorizedAccessException();
+                }
+                
+                //TODO: CLA-4780 Add migration request validation
+
+                DatasetDto dto = DatasetService.GetDatasetDto(migrationRequest.SourceDatasetId);
+
+                dto.DatasetId = 0;
+                dto.NamedEnvironment = migrationRequest.TargetDatasetNamedEnvironment;
+
+                int newDsId = CreateWithoutSave(dto);
+
+                if (newDsId == 0)
+                {
+                    throw new DataApplicationServiceException("Failed to create dataset metadata");
+                }
+
+                List<int> newSchemaIdList = MigrateSchemaWithoutSave_Internal(migrationRequest.SchemaMigrationRequests);
+
+                //All entity objects have been created, therefore, save changes
+                _datasetContext.SaveChanges();
+
+                //Create dataset external dependencies
+                CreateExternalDependenciesForDataset(new List<int>() { newDsId });
+
+                //Create dataflow external dependencies
+                CreateExternalDependenciesForDataFlowBySchemaId(newSchemaIdList);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{methodName} Failed to perform migration", ex);
+                _datasetContext.Clear();
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+        }
+
+        public void MigrateSchema(SchemaMigrationRequest request)
+        {
+            MigrateSchema_Internal(request);
+        }
         #endregion
 
         #region Private methods        
         /// <summary>
-        /// Creates new dataset entity object, adds to context, and saves changes.
+        /// Creates new dataset entity object and saves domain context.
+        /// <para>Also calls <see cref="DatasetService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
         /// </summary>
         /// <param name="dto">DatasetDto</param>
-        /// <returns></returns>
+        /// <returns>Id of new dataset object.</returns>
         internal int Create(DatasetDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int newDatasetId = 0;
+            int newDatasetId;
             try
             {
-                newDatasetId = DatasetService.Create(dto);
-
+                newDatasetId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
-
-                if (DataFeatures.CLA3718_Authorization.GetValue())
-                {
-                    // Create a Hangfire job that will setup the default security groups for this new dataset
-                    SecurityService.EnqueueCreateDefaultSecurityForDataset(newDatasetId);
-                }
             }
             catch (Exception ex)
             {
@@ -178,21 +240,31 @@ namespace Sentry.data.Core.DomainServices
                 throw;
             }
 
+            try
+            {
+                CreateExternalDependenciesForDataset(new List<int>() { newDatasetId });
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to create external dependencies for dataflow", ex);
+            }
+
             Logger.Info($"{methodName} Method End");
             return newDatasetId;
         }
-
         /// <summary>
-        /// creates new datasetfileconfig entity object, adds to context, and saves changes
+        /// Creates new datasetfileconfig entity object and saves to domain context.
         /// </summary>
-        /// <param name="dto">DatasetFileConfigDto</param>
-        private void Create(DatasetFileConfigDto dto)
+        /// <param name="dto"></param>
+        /// <returns>Id of new datasetfileconfig object.</returns>
+        internal int Create(DatasetFileConfigDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
+            int newDatasetFileConfigId;
             try
             {
-                ConfigService.CreateAndSaveDatasetFileConfig(dto); 
+                newDatasetFileConfigId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -201,22 +273,59 @@ namespace Sentry.data.Core.DomainServices
                 _datasetContext.Clear();
                 throw;
             }
-            Logger.Info($"{methodName} Method End");
-        }
 
+            Logger.Info($"{methodName} Method End");
+            return newDatasetFileConfigId;
+        }
         /// <summary>
-        /// Creates new fileschema entity object, adds to context, and saves changes
+        /// Creates new dataflow entity object ans saves to domain context.  
+        /// <para>Also calls <see cref="DataFlowService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
         /// </summary>
-        /// <param name="dto">FileSchemaDto</param>
-        /// <returns></returns>
-        private int Create(FileSchemaDto dto)
+        /// <param name="dto">DataFlowDtoDto</param>
+        /// <returns>Id of new dataflow object.</returns>
+        internal int Create(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
             Logger.Info($"{methodName} Method Start");
-            int newFileSchemaId = 0;
+            int newDataFlowId;
             try
             {
-                newFileSchemaId = SchemaService.Create(dto);
+                newDataFlowId = CreateWithoutSave(dto);
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to save DataFlow", ex);
+                _datasetContext.Clear();
+                throw;
+            }
+
+            try
+            {
+                CreateExternalDependenciesForDataFlow(new List<int>() { newDataFlowId });
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to create external dependencies for dataflow", ex);
+            }
+
+
+            Logger.Info($"{methodName} Method End");
+            return newDataFlowId;
+        }
+        /// <summary>
+        /// Creates new fileschema entity object and saves to domain context.
+        /// </summary>
+        /// <param name="dto">FileSchemaDto</param>
+        /// <returns>Id of new fileschema object.</returns>
+        internal int Create(FileSchemaDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            int newFileSchemaId;
+            try
+            {
+                newFileSchemaId = CreateWithoutSave(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -229,6 +338,220 @@ namespace Sentry.data.Core.DomainServices
             Logger.Info($"{methodName} Method End");
             return newFileSchemaId;
         }
+
+        /// <summary>
+        ///  Creates new dataset entity object.    
+        /// <para>Caller is responsible for saving to domain context and calling <see cref="DatasetService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new dataset object.</returns>
+        internal virtual int CreateWithoutSave(DatasetDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            int newDatasetId;
+            try
+            {
+                newDatasetId = DatasetService.Create(dto);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to create Dataset", ex);
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newDatasetId;
+        }
+        /// <summary>
+        ///  Creates new datasetfileconfig entity object.    
+        /// <para>Caller is responsible for saving to domain context.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new datasetfileconfig object.</returns>
+        internal virtual int CreateWithoutSave(DatasetFileConfigDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            int newConfigId;
+            try
+            {
+                newConfigId = ConfigService.Create(dto);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to create DatasetFileConfig", ex);
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newConfigId;
+        }
+        /// <summary>
+        /// Creates new dataflow entity object and saves domain context.
+        /// <para>Also calls <see cref="DataFlowService.CreateExternalDependencies(int)"></see> to create any external dependencies.</para>
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new dataflow object.</returns>
+        internal virtual int CreateWithoutSave(DataFlowDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            DataFlow newDataFlow;
+            try
+            {
+                //Create dataflow / dataflowstep entities
+                newDataFlow = DataFlowService.Create(dto);
+
+                switch (dto.IngestionType)
+                {
+                    case (int)IngestionType.DFS_Drop:
+                    case (int)IngestionType.S3_Drop:
+                    case (int)IngestionType.Topic:
+                        CreateWithoutSave_DfsRetrieverJob(newDataFlow);
+                        break;
+                    case (int)IngestionType.DSC_Pull:
+                        newDataFlow.MapToRetrieverJobDto(dto.RetrieverJob);
+                        CreateWithoutSave_ExternalRetrieverJob(dto.RetrieverJob);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to create DataFlow", ex);
+                throw;
+            }
+            Logger.Info($"{methodName} Method End");
+            return newDataFlow.Id;
+        }
+        /// <summary>
+        /// Creates new fileschema entity object and saves to domain context.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Id of new fileschema object.</returns>
+        internal virtual int CreateWithoutSave(FileSchemaDto dto)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            int newFileSchemaId;
+            try
+            {
+                newFileSchemaId = SchemaService.Create(dto);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"{methodName} - Failed to create FileSchema", ex);
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newFileSchemaId;
+        }
+        private void CreateWithoutSave_DfsRetrieverJob(DataFlow dataFlow)
+        {
+            if (dataFlow.ShouldCreateDFSDropLocations(DataFeatures))
+            {
+                JobService.CreateDfsRetrieverJob(dataFlow);
+            }
+        }
+        private void CreateWithoutSave_ExternalRetrieverJob(RetrieverJobDto retrieverJobDto)
+        {
+            _ = JobService.CreateRetrieverJob(retrieverJobDto);
+        }
+
+
+        internal virtual List<int> MigrateSchemaWithoutSave_Internal(List<SchemaMigrationRequest> requestList)
+        {
+            List<int> newSchemaIdList = new List<int>();
+            foreach (SchemaMigrationRequest schemaMigration in requestList)
+            {
+                int newSchemaId = MigrateSchemaWithoutSave_Internal(schemaMigration);
+                if (newSchemaId == 0)
+                {
+                    throw new DataApplicationServiceException($"Schema migration failed");
+                }
+                newSchemaIdList.Add(newSchemaId);
+            }
+            return newSchemaIdList;
+        }
+        internal int MigrateSchemaWithoutSave_Internal(SchemaMigrationRequest request)
+        {
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateSchemaWithoutSave_Internal).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+            Logger.Info($"{methodName} Processing : {JsonConvert.SerializeObject(request)}");
+
+            int newSchemaId;
+            try
+            {
+                //Retrieve source dto objects
+                FileSchemaDto schemaDto = SchemaService.GetFileSchemaDto(request.SourceSchemaId);
+
+                int sourceDatasetId = _datasetContext.DatasetFileConfigs.FirstOrDefault(w => w.Schema.SchemaId == request.SourceSchemaId).ParentDataset.DatasetId;
+                DatasetFileConfigDto configDto = ConfigService.GetDatasetFileConfigDtoByDataset(sourceDatasetId).FirstOrDefault(x => x.Schema.SchemaId == request.SourceSchemaId);
+
+                DataFlowDetailDto dataflowDto = DataFlowService.GetDataFlowDetailDtoBySchemaId(request.SourceSchemaId).FirstOrDefault();
+
+                //Adjust schemaDto associations and create new entity
+                schemaDto.ParentDatasetId = request.TargetDatasetId;
+                newSchemaId = CreateWithoutSave(schemaDto);
+
+                //Adjust datasetFileConfigDto associations and create new entity
+                configDto.SchemaId = newSchemaId;
+                configDto.ParentDatasetId = request.TargetDatasetId;
+                _ = CreateWithoutSave(configDto);
+
+                //Adjust dataFlowDto associations and create new entity
+                dataflowDto.DatasetId = request.TargetDatasetId;
+                dataflowDto.SchemaId = newSchemaId;
+                dataflowDto.SchemaMap.First().SchemaId = newSchemaId;
+                dataflowDto.SchemaMap.First().DatasetId = request.TargetDatasetId;
+                dataflowDto.SchemaMap.First().StepId = 0;
+
+                _ = CreateWithoutSave(dataflowDto);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{methodName} - Failed to migrate schema.", ex);
+                throw;
+            }
+
+            Logger.Info($"{methodName} Method End");
+            return newSchemaId;
+        }
+        internal void MigrateSchema_Internal(SchemaMigrationRequest migrationRequest)
+        {
+            int newSchemaId = MigrateSchemaWithoutSave_Internal(migrationRequest);
+            _datasetContext.SaveChanges();
+
+            CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { newSchemaId });
+        }
+
+
+        internal virtual void CreateExternalDependenciesForDataset(List<int> datasetIdList)
+        {
+            foreach (int datasetId in datasetIdList)
+            {
+                DatasetService.CreateExternalDependencies(datasetId);
+            }
+        }
+        internal virtual void CreateExternalDependenciesForDataFlow(List<int> dataFlowIdList)
+        {
+            foreach (int dataFlowId in dataFlowIdList)
+            {
+                DataFlowService.CreateExternalDependencies(dataFlowId);
+            }
+        }
+        internal virtual void CreateExternalDependenciesForDataFlowBySchemaId(List<int> schemaIdList)
+        {
+            foreach (int schemaId in schemaIdList)
+            {
+                int dataFlowId = _datasetContext.DataFlow.FirstOrDefault(w => w.SchemaId == schemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Id;
+                DataFlowService.CreateExternalDependencies(dataFlowId);
+            }
+        }
+
 
         private bool Delete<T>(List<int> deleteIdList, IApplicationUser user, T instance, bool forceDelete = false) where T : IEntityService
         {

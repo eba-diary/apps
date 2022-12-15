@@ -37,7 +37,7 @@ namespace Sentry.data.Core.Tests
 
             if (addConfig)
             {
-                ds.DatasetFileConfigs.Add(MockDataFileConfig(ds));
+                ds.DatasetFileConfigs.Add(MockDatasetFileConfig(ds));
             }
 
             return ds;
@@ -51,7 +51,8 @@ namespace Sentry.data.Core.Tests
                 {
                     DatasetId = dsItem.DatasetId,
                     DatasetName = dsItem.DatasetName,
-                    DatasetDesc = dsItem.DatasetDesc
+                    DatasetDesc = dsItem.DatasetDesc,
+                    SAIDAssetKeyCode = "ABCD"
                 };
                 dsDtoList.Add(dsItemDto);
             }
@@ -89,7 +90,7 @@ namespace Sentry.data.Core.Tests
             return categories;
         }
 
-        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null, FileSchema schema = null)
+        public static DatasetFileConfig MockDatasetFileConfig(Dataset ds = null, FileSchema schema = null)
         {
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
@@ -119,7 +120,8 @@ namespace Sentry.data.Core.Tests
                 {
                     ConfigId = config.ConfigId,
                     Description = config.Description,
-                    Schema = MockFileSchemaDto(config.Schema)
+                    Schema = MockFileSchemaDto(config.Schema),
+                    ParentDatasetId = config.ParentDataset.DatasetId
                 };
 
                 dtoList.Add(dto);
@@ -450,7 +452,7 @@ namespace Sentry.data.Core.Tests
 
                 DataSource = MockDataSource(dsrc, authType),
 
-                DatasetConfig = dfc != null ? dfc : MockDataFileConfig(null),
+                DatasetConfig = dfc != null ? dfc : MockDatasetFileConfig(null),
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
@@ -913,7 +915,8 @@ namespace Sentry.data.Core.Tests
                 NamedEnvironmentType = NamedEnvironmentType.NonProd,
                 ObjectStatus = ObjectStatusEnum.Active,
                 DeleteIssuer = null,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)IngestionType.DFS_Drop
             };
             return df;
         }

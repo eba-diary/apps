@@ -75,10 +75,31 @@ namespace Sentry.data.Core
                 ExecutionParameters = job.ExecutionParameters,
                 PagingType = job.JobOptions?.HttpOptions?.PagingType ?? PagingType.None,
                 PageTokenField = job.JobOptions?.HttpOptions?.PageTokenField,
-                PageParameterName = job.JobOptions?.HttpOptions?.PageParameterName
+                PageParameterName = job.JobOptions?.HttpOptions?.PageParameterName,
+                RequestVariables = job.RequestVariables.Select(x => x.ToDto()).ToList()
             };
 
             return dto;
+        }
+
+        public static RequestVariable ToEntity(this RequestVariableDto dto)
+        {
+            return new RequestVariable
+            {
+                VariableName = dto.VariableName,
+                VariableValue = dto.VariableValue,
+                VariableIncrementType = dto.VariableIncrementType
+            };
+        }
+
+        public static RequestVariableDto ToDto(this RequestVariable entity)
+        {
+            return new RequestVariableDto
+            {
+                VariableName = entity.VariableName,
+                VariableValue = entity.VariableValue,
+                VariableIncrementType = entity.VariableIncrementType
+            };
         }
     }
 }

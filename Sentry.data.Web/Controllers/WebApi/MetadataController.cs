@@ -4,9 +4,11 @@ using NJsonSchema;
 using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.Migration;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Dataset;
+using Sentry.data.Web.Models.ApiModels.Migration;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -54,6 +56,11 @@ namespace Sentry.data.Web.WebApi.Controllers
         public IDatasetFileService DatasetFileService
         {
             get { return _datasetFileService.Value; }
+        }
+
+        public IDataApplicationService DataApplicationService
+        {
+            get { return _dataApplicationService.Value; }
         }
 
         #region Classes
@@ -133,6 +140,40 @@ namespace Sentry.data.Web.WebApi.Controllers
 
 
         #region Dataset_Endpoints
+
+        /* This code will be used within next two iterations*/
+        //[HttpPost]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        //[Route("dataset")]
+        //public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
+        //{
+        //    IHttpActionResult MigrateDatasetFunction()
+        //    {
+        //        DatasetMigrationRequest request = model.ToDto();
+        //        DataApplicationService.MigrateDataset(request);
+        //        return Ok();
+        //    }
+
+        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        //}
+
+        /* This code will be used within next two iterations*/
+        //[HttpPost]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        //[Route("dataset")]
+        //public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
+        //{
+        //    IHttpActionResult MigrateDatasetFunction()
+        //    {
+        //        SchemaMigrationRequest request = model.ToDto();
+        //        DataApplicationService.MigrateDataset(request);
+        //        return Ok();
+        //    }
+
+        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        //}
+
+
         /// <summary>
         /// List of all datasets
         /// </summary>

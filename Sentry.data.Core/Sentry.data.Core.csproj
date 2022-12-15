@@ -207,6 +207,7 @@
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
+    <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
@@ -287,6 +288,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Goldeneye\FileProcess.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\RequestVariable.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\Jira\JiraComponentResponse.cs" />
@@ -314,6 +316,9 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
+    <Compile Include="Entities\Migration\DatasetMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\MigrationRequest.cs" />
+    <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Schema\SchemaConsumption.cs" />
     <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
@@ -323,6 +328,7 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Exceptions\DataApplicationServiceException.cs" />
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
@@ -340,6 +346,7 @@
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="GlobalEnums\ConnectorState.cs" />
     <Compile Include="GlobalEnums\PagingType.cs" />
+    <Compile Include="GlobalEnums\RequestVariableIncrementType.cs" />
     <Compile Include="GlobalEnums\TileSearchSortByOption.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />

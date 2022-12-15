@@ -3,7 +3,11 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Linq.Dynamic;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web
 {
@@ -66,7 +70,7 @@ namespace Sentry.data.Web
         public string PageParameterName { get; set; }
         [DisplayName("Paging Type")]
         public PagingType PagingType { get; set; }
-
+        public List<RequestVariableModel> RequestVariables { get; set; } = new List<RequestVariableModel>();
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
@@ -83,39 +87,108 @@ namespace Sentry.data.Web
         internal ValidationException Validate()
         {
             ValidationResults results = new ValidationResults();
+
             if (SelectedSourceType == null)
             {
                 results.Add("SelectedSourceType", "Source type is required");
             }
+
             if (string.IsNullOrWhiteSpace(SelectedDataSource) || SelectedDataSource == "0")
             {
                 results.Add("SelectedDataSource", "Data source is required");
             }
+
             if (string.IsNullOrWhiteSpace(SchedulePicker) || SchedulePicker == "0" || string.IsNullOrWhiteSpace(Schedule))
             {
                 results.Add("SchedulePicker", "Schedule is required");
             }
 
+            results.MergeInResults(ValidatePaging());
+            results.MergeInResults(ValidateRequestVariables());
+
+            return new ValidationException(results);
+        }
+
+        #region Private
+        private ValidationResults ValidatePaging()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            //parameter name required when paging type of page number
             if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
             {
-                results.Add("PageParameterName", "Page Parameter Name is required");
+                validationResults.Add("PageParameterName", "Page Parameter Name is required");
             }
 
             if (PagingType == PagingType.Token)
             {
+                //parameter name required when paging type of token
                 if (string.IsNullOrWhiteSpace(PageParameterName))
                 {
-                    results.Add("PageParameterName", "Page Parameter Name is required");
+                    validationResults.Add("PageParameterName", "Page Parameter Name is required");
                 }
 
+                //token field required when paging type of token
                 if (string.IsNullOrWhiteSpace(PageTokenField))
                 {
-                    results.Add("PageTokenField", "Page Token Field is required");
+                    validationResults.Add("PageTokenField", "Page Token Field is required");
                 }
             }
 
-            return new ValidationException(results);
+            return validationResults;
         }
-       
+
+        private ValidationResults ValidateRequestVariables()
+        {
+            ValidationResults validationResults = ValidateRelativeUriVariables();
+
+            foreach (RequestVariableModel requestVariable in RequestVariables)
+            {
+                validationResults.MergeInResults(requestVariable.Validate());
+
+                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName))
+                {
+                    //variable is not used in the relative uri
+                    string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
+                    if (!string.IsNullOrEmpty(RelativeUri) && !RelativeUri.Contains(variablePlaceholder))
+                    {
+                        validationResults.Add($"RetrieverJob.RequestVariables[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not used in Relative URI");
+                    }
+                }
+            }
+
+            return validationResults;
+        }
+
+        private ValidationResults ValidateRelativeUriVariables()
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            if (!string.IsNullOrEmpty(RelativeUri))
+            {
+                //check if relative uri contains any variables
+                string escapedIndicator = Indicators.REQUESTVARIABLEINDICATOR.Replace("[", @"\[").Replace("]", @"\]");
+                string variablePlaceholder = string.Format(escapedIndicator, "[A-Za-z0-9]+");
+                MatchCollection matches = Regex.Matches(RelativeUri, variablePlaceholder);
+                List<string> undefinedVariables = new List<string>();
+
+                foreach (Match match in matches)
+                {
+                    //relative uri variable does not have a matching request variable
+                    if (!undefinedVariables.Contains(match.Value) && !RequestVariables.Any(x => string.Format(Indicators.REQUESTVARIABLEINDICATOR, x.VariableName) == match.Value))
+                    {
+                        undefinedVariables.Add(match.Value);
+                    }
+                }
+
+                if (undefinedVariables.Any())
+                {
+                    validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable(s) not defined for {string.Join(", ", undefinedVariables)}");
+                }
+            }
+
+            return validationResults;
+        }
+        #endregion
     }
 }

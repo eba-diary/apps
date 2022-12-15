@@ -191,6 +191,7 @@
     <Compile Include="Extensions\TileExtensionsTests.cs" />
     <Compile Include="Extensions\FilterSearchExtensionsTests.cs" />
     <Compile Include="Extensions\JobExtensionsTests.cs" />
+    <Compile Include="Extensions\DataFlowExtensionsTests.cs" />
     <Compile Include="LiveDatabaseUnitTests.cs" />
     <Compile Include="MetadataControllerTests.cs" />
     <Compile Include="MockBasedUnitTests.cs" />

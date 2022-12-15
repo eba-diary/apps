@@ -353,6 +353,15 @@ namespace Sentry.data.Core
             return ds.DatasetId;
         }
 
+        public void CreateExternalDependencies(int datasetId)
+        {
+            if (_featureFlags.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
+            }
+        }
+
         public int CreateAndSaveNewDataset(DatasetSchemaDto dto)
         {
             Dataset ds = CreateDataset(dto);
