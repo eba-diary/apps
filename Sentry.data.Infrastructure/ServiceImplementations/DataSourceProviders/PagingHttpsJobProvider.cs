@@ -89,7 +89,7 @@ namespace Sentry.data.Infrastructure
                                     JToken responseObj = await ReadResponseAsync(contentStream, fileStream, config);
 
                                     //get next request to make
-                                    SetNextPageRequest(config, responseObj);
+                                    SetNextRequest(config, responseObj);
                                 }
                             }
                             else
@@ -140,37 +140,28 @@ namespace Sentry.data.Infrastructure
                 Options = job.JobOptions.HttpOptions
             };
 
-            bool isBeginning = true;
+            config.OrderedDataSourceTokens = config.Source.Tokens?.OrderBy(x => x.Id).ToList();
 
-            if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
+            if (job.ExecutionParameters.Any()) //start from saved progress
             {
-                config.OrderedDataSourceTokens = config.Source.Tokens.OrderBy(x => x.Id).ToList();
+                ReplaceVariablePlaceholders(config);
 
-                //Use token left off at if available, otherwise start from beginning
-                if (job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID))
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID))
                 {
                     int tokenId = int.Parse(job.ExecutionParameters[ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID]);
                     config.CurrentDataSourceToken = config.Source.Tokens.First(x => x.Id == tokenId);
-                    isBeginning = false;
+                }
+
+                if (config.Options.PagingType == PagingType.PageNumber && job.ExecutionParameters.ContainsKey(config.Options.PageParameterName))
+                {
+                    config.PageNumber = int.Parse(job.ExecutionParameters[config.Options.PageParameterName]);
+                    AddUpdatePageParameter(config, config.PageNumber.ToString());
                 }
             }
-
-            if (config.Options.PagingType == PagingType.PageNumber && job.ExecutionParameters.ContainsKey(config.Options.PageParameterName))
+            else //start normally
             {
-                config.PageNumber = int.Parse(job.ExecutionParameters[config.Options.PageParameterName]);
-                AddUpdatePageParameter(config, config.PageNumber.ToString());
-                isBeginning = false;
-            }
-
-            if (isBeginning)
-            {
-                SetNextRequestUri(config);
-            }
-            else
-            {
-                //start from current variables if starting from incomplete previous run
-                ReplaceVariablePlaceholders(config);
-            }
+                SetNextRequestVariables(config);
+            }         
 
             Logger.Info($"Paging Https Retriever Job starting from {config.RequestUri} - Job: {job.Id}");
 
@@ -214,33 +205,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private void SetNextRequestUri(PagingHttpsConfiguration config)
-        {
-            if (config.CurrentDataSourceToken != null && config.CurrentDataSourceToken != config.OrderedDataSourceTokens.Last())
-            {
-                //using OAuth, move to the next token if there are more
-                int nextIndex = config.OrderedDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
-                config.CurrentDataSourceToken = config.OrderedDataSourceTokens[nextIndex];
-
-                Logger.Info($"Paging Https Retriever Job using data source token {nextIndex + 1} of {config.OrderedDataSourceTokens.Count} - Job: {config.Job.Id}");
-            }
-            else if (config.Job.TryIncrementRequestVariables()) //variables can be incremented
-            {                
-                ReplaceVariablePlaceholders(config);
-                
-                if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
-                {
-                    //start from first data source token if using OAuth
-                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
-                }
-            }
-            else
-            {
-                Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
-                config.RequestUri = "";
-            }
-        }
-
         private void ReplaceVariablePlaceholders(PagingHttpsConfiguration config)
         {
             config.RequestUri = config.Job.RelativeUri;
@@ -274,9 +238,8 @@ namespace Sentry.data.Infrastructure
 
                 if (config.Options.PagingType == PagingType.PageNumber)
                 {
-                    int completedPageNumber = config.PageNumber - 1;
-                    config.Job.AddOrUpdateExecutionParameter(config.Options.PageParameterName, completedPageNumber.ToString());
-                    Logger.Info($"Paging Https Retriever Job added execution parameter {config.Options.PageParameterName}: {completedPageNumber} - Job: {config.Job.Id}");
+                    config.Job.AddOrUpdateExecutionParameter(config.Options.PageParameterName, config.PageNumber.ToString());
+                    Logger.Info($"Paging Https Retriever Job added execution parameter {config.Options.PageParameterName}: {config.PageNumber} - Job: {config.Job.Id}");
                 }
 
                 if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
@@ -302,22 +265,56 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
         }
 
-        private void SetNextPageRequest(PagingHttpsConfiguration config, JToken responseObj)    
+        private void SetNextRequest(PagingHttpsConfiguration config, JToken responseObj)    
         {
             if (responseObj != null)
             {
+                //get next page if still getting results
                 config.PageNumber++;
-                AddPageTypeParameter(config, responseObj);
+                AddUpdatePageTypeParameter(config, responseObj);
             }
             else
             {
-                SetNextRequestUri(config);
+                config.PageNumber = 1;
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && config.CurrentDataSourceToken != config.OrderedDataSourceTokens.Last())
+                {
+                    //using OAuth, move to the next token if there are more
+                    int nextIndex = config.OrderedDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
+                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens[nextIndex];
+                    AddUpdatePageTypeParameter(config, responseObj);
+
+                    Logger.Info($"Paging Https Retriever Job using data source token {nextIndex + 1} of {config.OrderedDataSourceTokens.Count} - Job: {config.Job.Id}");
+                }
+                else
+                {
+                    SetNextRequestVariables(config);
+                }
             }
 
             Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
         }
 
-        private void AddPageTypeParameter(PagingHttpsConfiguration config, JToken responseObj)
+        private void SetNextRequestVariables(PagingHttpsConfiguration config)
+        {
+            if (config.Job.TryIncrementRequestVariables()) //variables can be incremented
+            {
+                //update request uri with incremented values
+                ReplaceVariablePlaceholders(config);
+
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
+                {
+                    //start from first data source token if using OAuth
+                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+                }
+            }
+            else
+            {
+                Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
+                config.RequestUri = "";
+            }
+        }
+
+        private void AddUpdatePageTypeParameter(PagingHttpsConfiguration config, JToken responseObj)
         {
             switch (config.Options.PagingType)
             {
