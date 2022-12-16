@@ -1,5 +1,7 @@
-﻿using Sentry.data.Core;
+﻿using NHibernate.Mapping;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using System.Collections.Generic;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Infrastructure
@@ -14,6 +16,7 @@ namespace Sentry.data.Infrastructure
         public string Filename { get; set; }
         public RetrieverJob Job { get; set; }
         public HttpsOptions Options { get; set; }
-        public DataSourceToken Token { get; set; }
+        public DataSourceToken CurrentDataSourceToken { get; set; }
+        public List<DataSourceToken> OrderedDataSourceTokens { get; set; }
     }
 }

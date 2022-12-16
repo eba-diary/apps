@@ -553,6 +553,11 @@ namespace Sentry.data.Core
                 public const string LASTINDEX = "LastIndex";
                 public const string TOTALROWS = "TotalRows";
             }
+
+            public static class PagingHttps
+            {
+                public const string CURRENTDATASOURCETOKENID = "CurrentDataSourceTokenId";
+            }
         }
 
         public static class HostSettings
