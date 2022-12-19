@@ -1,16 +1,18 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Sentry.Common.Logging;
-using System.Globalization;
-using System.IO;
-using static Sentry.data.Core.GlobalConstants;
 using System.Text;
-using Sentry.data.Core.Entities.DataProcessing;
+using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -169,7 +171,7 @@ namespace Sentry.data.Infrastructure
         {
             List<string> uriParts = config.RelativeUri.Split('/').ToList();
             string uri = string.Join("/", uriParts.GetRange(0, 6));
-            JObject response = GetBigQueryResponse(httpClient, uri);
+            JObject response = GetBigQueryResponseAsync(httpClient, uri).Result;
             return (JArray)response.SelectToken("schema.fields");
         }
 
@@ -186,7 +188,7 @@ namespace Sentry.data.Infrastructure
                 AddUriParameter(ref uri, "startIndex", config.LastIndex.ToString());
             }
 
-            JObject response = GetBigQueryResponse(httpClient, uri);
+            JObject response = GetBigQueryResponseAsync(httpClient, uri).Result;
 
             //when at the end, there is no rows or pageToken field
             config.TotalRows = response.Value<int>("totalRows");
@@ -206,14 +208,22 @@ namespace Sentry.data.Infrastructure
             uri += (uri.Contains("?") ? "&" : "?") + $"{parameterKey}={Uri.EscapeDataString(parameterValue)}";
         }
 
-        private JObject GetBigQueryResponse(HttpClient httpClient, string uri)
+        private async Task<JObject> GetBigQueryResponseAsync(HttpClient httpClient, string uri)
         {
-            using (HttpResponseMessage response = httpClient.GetAsync(uri).Result)
+            using (HttpResponseMessage response = await httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead))
             {
-                string responseString = response.Content.ReadAsStringAsync().Result;
-
-                if (!response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
+                    using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                    using (StreamReader streamReader = new StreamReader(contentStream))
+                    using (JsonReader jsonReader = new JsonTextReader(streamReader))
+                    {
+                        return JObject.Load(jsonReader);
+                    }
+                }
+                else
+                {
+                    string responseString = response.Content.ReadAsStringAsync().Result;
                     if (response.StatusCode == HttpStatusCode.NotFound)
                     {
                         Logger.Info($"Google BigQuery request to {uri} returned NotFound. {responseString}");
@@ -223,8 +233,6 @@ namespace Sentry.data.Infrastructure
                     Logger.Error($"Google BigQuery request to {uri} failed. {responseString}");
                     throw new GoogleBigQueryJobProviderException(responseString);
                 }
-
-                return JObject.Parse(responseString);
             }
         }
 
