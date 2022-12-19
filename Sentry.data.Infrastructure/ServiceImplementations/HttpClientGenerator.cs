@@ -15,12 +15,12 @@ namespace Sentry.data.Infrastructure
 
         public HttpClient GenerateHttpClient(string url)
         {
-            HttpClientHandler httpClientHandler = new HttpClientHandler();
-            if (url.ToLower().Contains(".sentry.com"))
+            HttpClientHandler httpClientHandler = new HttpClientHandler()
             {
-                httpClientHandler.UseDefaultCredentials = true;
-            }
-            else if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
+                UseDefaultCredentials = true
+            };
+            
+            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
                 httpClientHandler.Proxy = webProxy;
             };

@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using static Sentry.data.Core.GlobalConstants;
@@ -64,7 +65,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                using (Stream fileStream = _fileProvider.GetFileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                using (Stream fileStream = _fileProvider.GetFileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
                 {
                     Logger.Info($"Paging Https Retriever Job {tempFile} created - Job: {config.Job.Id}");
                     //loop until no more to retrieve
@@ -75,7 +76,7 @@ namespace Sentry.data.Infrastructure
 
                         //make request
                         Logger.Info($"Paging Https Retriever Job making request to {config.RequestUri} - Job: {config.Job.Id}");
-                        using (HttpResponseMessage response = await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead))
+                        using (HttpResponseMessage response = await httpClient.GetAsync(config.RequestUri))
                         {
                             if (response.IsSuccessStatusCode)
                             {
@@ -137,10 +138,16 @@ namespace Sentry.data.Infrastructure
                 S3DropStep = _datasetContext.DataFlowStep.FirstOrDefault(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop),
                 DataPath = job.FileSchema.SchemaRootPath ?? "",
                 Filename = job.JobOptions.TargetFileName,
-                Options = job.JobOptions.HttpOptions
+                Options = job.JobOptions.HttpOptions,
+                RequestUri = job.RelativeUri
             };
 
-            config.OrderedDataSourceTokens = config.Source.Tokens?.OrderBy(x => x.Id).ToList();
+            if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
+            {
+                //start from first data source token if using OAuth
+                config.OrderedDataSourceTokens = config.Source.Tokens?.OrderBy(x => x.Id).ToList();
+                config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+            }
 
             if (job.ExecutionParameters.Any()) //start from saved progress
             {
@@ -158,7 +165,7 @@ namespace Sentry.data.Infrastructure
                     AddUpdatePageParameter(config, config.PageNumber.ToString());
                 }
             }
-            else //start normally
+            else if (job.RequestVariables.Any()) //set request variables normally if any
             {
                 SetNextRequestVariables(config);
             }         
@@ -178,6 +185,7 @@ namespace Sentry.data.Infrastructure
                 //get the count of data from response object to determine to continue
                 if (response.SelectToken(config.DataPath)?.Any() == true)
                 {
+                    contentStream.Seek(0, SeekOrigin.Begin);
                     //if this doesn't write in a single line, we'll write unformatted JObject
                     await contentStream.CopyToAsync(fileStream);
                     Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
@@ -221,10 +229,7 @@ namespace Sentry.data.Infrastructure
             string tempDirectory = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", jobId.ToString());
             _fileProvider.CreateDirectory(tempDirectory);
 
-            string fullname = $@"{tempDirectory}\{filename}.json";
-            _fileProvider.DeleteFile(fullname);
-
-            return fullname;
+            return $@"{tempDirectory}\{filename}.json";
         }
 
         private void FlushAccumulatedProgress(Stream fileStream, Stream contentStream, PagingHttpsConfiguration config)
@@ -349,10 +354,10 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                parameters = new NameValueCollection();
+                parameters = HttpUtility.ParseQueryString("");
             }
 
-            parameters.Set(config.Options.PageParameterName, parameterValue);            
+            parameters.Set(config.Options.PageParameterName, parameterValue); 
 
             config.RequestUri = $"{uriParts.First()}?{parameters}";
         }
