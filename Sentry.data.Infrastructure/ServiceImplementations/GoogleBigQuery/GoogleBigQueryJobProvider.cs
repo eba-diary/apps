@@ -103,15 +103,22 @@ namespace Sentry.data.Infrastructure
                         }
                         while (true); //only break loop on exception
                     }
-                    catch (GoogleBigQueryNotFoundException)
+                    catch (AggregateException ae)
                     {
-                        //no more tables to collect from
-                        DateTime expectedDate = DateTime.Today.AddDays(-1);
-                        DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
-                        if (stopDate < expectedDate)
+                        if (ae.InnerException.GetType() == typeof(GoogleBigQueryNotFoundException))
                         {
-                            //means there may be an unexpected gap
-                            Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                            //no more tables to collect from
+                            DateTime expectedDate = DateTime.Today.AddDays(-1);
+                            DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
+                            if (stopDate < expectedDate)
+                            {
+                                //means there may be an unexpected gap
+                                Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                            }
+                        }
+                        else
+                        {
+                            throw;
                         }
                     }
                 }
