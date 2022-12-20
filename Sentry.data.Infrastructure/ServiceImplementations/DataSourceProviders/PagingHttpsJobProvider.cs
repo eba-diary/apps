@@ -65,7 +65,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                using (Stream fileStream = _fileProvider.GetFileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
+                using (Stream fileStream = _fileProvider.GetFileStream(tempFile, FileMode.CreateNew, FileAccess.ReadWrite))
                 {
                     Logger.Info($"Paging Https Retriever Job {tempFile} created - Job: {config.Job.Id}");
                     //loop until no more to retrieve
@@ -185,9 +185,14 @@ namespace Sentry.data.Infrastructure
                 //get the count of data from response object to determine to continue
                 if (response.SelectToken(config.DataPath)?.Any() == true)
                 {
-                    contentStream.Seek(0, SeekOrigin.Begin);
-                    //if this doesn't write in a single line, we'll write unformatted JObject
+                    //move back to beginning of content
+                    contentStream.Position = 0;
                     await contentStream.CopyToAsync(fileStream);
+
+                    //Add new line
+                    MemoryStream newLineStream = new MemoryStream(Encoding.UTF8.GetBytes("\r\n"));
+                    await newLineStream.CopyToAsync(fileStream);
+
                     Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
                     return response;
                 }
@@ -229,12 +234,15 @@ namespace Sentry.data.Infrastructure
             string tempDirectory = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", jobId.ToString());
             _fileProvider.CreateDirectory(tempDirectory);
 
-            return $@"{tempDirectory}\{filename}.json";
+            string fullFilename = $@"{tempDirectory}\{filename}.json";
+            _fileProvider.DeleteFile(fullFilename);
+
+            return fullFilename;
         }
 
         private void FlushAccumulatedProgress(Stream fileStream, Stream contentStream, PagingHttpsConfiguration config)
         {
-            //combined size of file and response is over 2GB
+            //combined size of file and response will be over 2GB
             if (fileStream.Length > 0 && contentStream.Length + fileStream.Length > Math.Pow(1024, 3) * 2)
             {
                 Logger.Info($"Paging Https Retriever Job hit 2GB size threshold - Job: {config.Job.Id}");

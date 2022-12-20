@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
@@ -57,7 +58,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -125,7 +126,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -214,7 +215,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -309,7 +310,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.Flush());
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -414,7 +415,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
             
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -511,7 +512,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -628,11 +629,12 @@ namespace Sentry.data.Infrastructure.Tests
             stream.SetupGet(x => x.CanRead).Returns(true);
             stream.SetupGet(x => x.CanWrite).Returns(true);
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length += (long)Math.Pow(1024, 3));
+            stream.Setup(x => x.WriteAsync(It.Is<byte[]>(b => b.SequenceEqual(Encoding.UTF8.GetBytes("\r\n"))), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
             stream.Setup(x => x.Flush());
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -735,9 +737,10 @@ namespace Sentry.data.Infrastructure.Tests
             stream.SetupGet(x => x.CanRead).Returns(true);
             stream.SetupGet(x => x.CanWrite).Returns(true);
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
+            stream.Setup(x => x.WriteAsync(It.Is<byte[]>(b => b.SequenceEqual(Encoding.UTF8.GetBytes("\r\n"))), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -847,11 +850,12 @@ namespace Sentry.data.Infrastructure.Tests
             stream.SetupGet(x => x.CanRead).Returns(true);
             stream.SetupGet(x => x.CanWrite).Returns(true);
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length += (long)((Math.Pow(1024, 3) * 2)/3));
+            stream.Setup(x => x.WriteAsync(It.Is<byte[]>(b => b.SequenceEqual(Encoding.UTF8.GetBytes("\r\n"))), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
             stream.Setup(x => x.Flush());
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -972,7 +976,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.SetupGet(x => x.Length).Returns(0);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -1035,7 +1039,7 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
@@ -1158,11 +1162,12 @@ namespace Sentry.data.Infrastructure.Tests
             stream.SetupGet(x => x.CanRead).Returns(true);
             stream.SetupGet(x => x.CanWrite).Returns(true);
             stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length += (long)Math.Pow(1024, 3));
+            stream.Setup(x => x.WriteAsync(It.Is<byte[]>(b => b.SequenceEqual(Encoding.UTF8.GetBytes("\r\n"))), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
             stream.Setup(x => x.Flush());
 
             string filename = expectedPath + @"\filename.json";
-            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
             fileProvider.Setup(x => x.DeleteFile(filename));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
