@@ -2694,6 +2694,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
             $("#RequestAccessConsumerTypeSection").addClass("d-none");
             $("#RequestAccessFormSection").removeClass("d-none");
+            data.Dataset.setupFormSnowflakeAccount();
         });
         $("#RequestAccessConsumeAwsBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("AWS IAM");
@@ -2781,6 +2782,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     setupFormAwsIam() {
         $("#AwsArnForm").removeClass("d-none");
         $("#RequestAccess_Type").val("1")
+        data.Dataset.requestAccessShowSaveChanges();
+    },
+
+    setupFormSnowflakeAccount() {
+        $("#SnowflakeAccountForm").removeClass("d-none");
+        $("#RequestAccess_Type").val("4")
         data.Dataset.requestAccessShowSaveChanges();
     },
 
