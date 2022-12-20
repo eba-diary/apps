@@ -3,10 +3,11 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        data.Admin.AuditTableInit();
-        data.Admin.AuditReprocessButton();
+        data.Admin.RowCountCompareTableInit();
     });
 </script>
+
+<br>
 
 <table id="AuditTable" aria-label="table of all audited files" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
     <thead>
@@ -19,7 +20,7 @@
     <tbody>
         @foreach (AuditDataFileModel file in Model.DatafileModels)
         {
-            <tr class=@(file.HasCountDifference ? "text-danger" : "")>
+            <tr data-record-difference=@file.HasCountDifference class=@(file.HasCountDifference ? "text-danger": "")>
                 <td>@file.DatasetFileName</td>
                 <td>@file.RawqueryRowCount</td>
                 <td>@file.ParquetRowCount</td>

@@ -10,7 +10,7 @@
 <!--Render DSC common header from layout controller-->
 @Html.Action("GetHeader", "Layout")
 <!--div containing side nav and current page-->
-<div class="row">
+<div class="d-flex">
     @RenderPage("~/Views/Shared/_AdminSideNav.cshtml")
    
     <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
