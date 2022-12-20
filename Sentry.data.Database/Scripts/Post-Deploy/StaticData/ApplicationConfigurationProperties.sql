@@ -261,8 +261,8 @@ BEGIN TRY
 		( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'eg.ld.proxy.address', 'app-proxy-nonprod.sentry.com' ),
 		( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'eg.ld.proxy.port', '8080' ),
 
-		( 'FSTTESTBATCHHANDLER', 'PROD', 'app.key2', 'value12' ),
 		( 'FSTPRODBATCHHANDLER', 'PROD', 'app.key1', 'value11' ),
+		( 'FSTTESTBATCHHANDLER', 'PROD', 'app.key2', 'value12' ),
 
 		( 'SNDPRODBATCHHANDLER', 'PROD', 'app.key1', 'value21' ),
 		( 'SNDPRODBATCHHANDLER', 'PROD', 'app.key2', 'value22' ),
