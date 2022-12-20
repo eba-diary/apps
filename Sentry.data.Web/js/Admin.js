@@ -199,7 +199,8 @@ data.Admin = {
 
                 var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
 
-                for (let schema of schemaApiResponse) {
+                for (let schema of schemaApiResponse)
+                {
                     scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
@@ -455,7 +456,6 @@ data.Admin = {
 
             // Show spinner + Reprocess button
             $("#tab-spinner").show();
-            $("#auditReprocessButton").show();
 
             if (postCheck) {
                 $.ajax({
@@ -489,7 +489,103 @@ data.Admin = {
         });
     },
 
-    AuditTableInit: function () {
+    TableDifferenceFilter: function (tableID, showDifference)
+    {
+        var table = $(tableID).DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex)
+            {
+                return $(table.row(dataIndex).node()).data("record-difference") == showDifference;
+            }
+        );
+
+        table.draw();
+    },
+
+    TableAllFilter: function (tableID)
+    {
+        var table = $(tableID).DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+        table.draw();
+    },
+
+    RowCountCompareTableInit: function () {
+        var table = $('#AuditTable').DataTable({
+            columnDefs: [
+                {
+                    targets: [0],
+                    orderable: true
+                }
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: '<i class="fas fa-asterisk"></i> All',
+                    action: function (e, dt, node, config)
+                    {
+                        data.Admin.TableAllFilter('#AuditTable');
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    text: '<i class="text-warning fas fa-not-equal"></i> Diffs',
+                    action: function(e, dt, node, config)
+                    {
+                        data.Admin.TableDifferenceFilter('#AuditTable', "True");
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    text: '<i class="text-dark fas fa-equals"></i> Same',
+                    action: function (e, dt, node, config)
+                    {
+                        data.Admin.TableDifferenceFilter('#AuditTable', "False");
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                }
+            ],
+            select: true
+        });
+
+        // ensures that table is reset of all filters that might have been applied
+        $.fn.dataTable.ext.search.pop();
+        table.draw();
+
+        // event for applying solid bg color for selected filter btns
+        $(".dt-buttons .btn").click(function ()
+        {
+            // loops through all audit filtter buttons and reset them to default outline style
+            $(".dt-buttons .btn").each(function ()
+            {
+                $(this).removeClass("btn-primary");
+                $(this).removeClass("btn-outline-primary");
+                $(this).addClass("btn-outline-primary");
+            });
+
+            $(this).removeClass("btn-outline-primary");
+            $(this).removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+        });
+    },
+
+    NonParquetFilesTableInit: function ()
+    {
         $('#AuditTable').DataTable({
             columnDefs: [
                 {
@@ -497,7 +593,8 @@ data.Admin = {
                     orderable: true
                 }
             ],
-            drawCallback: function () {
+            drawCallback: function ()
+            {
                 $('#data-file-select-all').prop('checked', false);
                 $('.select-all-target').prop('checked', false);
             }
