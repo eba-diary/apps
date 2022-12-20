@@ -56,6 +56,18 @@ namespace Sentry.data.Infrastructure
 
             Logger.Info($"Paging Https Retriever Job end - Job: {job.Id}");
         }
+
+        #region Not Implemented
+        public void Execute(RetrieverJob job, string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConfigureProvider(RetrieverJob job)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
         #endregion
 
         #region Private
@@ -368,18 +380,6 @@ namespace Sentry.data.Infrastructure
             parameters.Set(config.Options.PageParameterName, parameterValue); 
 
             config.RequestUri = $"{uriParts.First()}?{parameters}";
-        }
-        #endregion
-
-        #region Not Implemented
-        public void ConfigureProvider(RetrieverJob job)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Execute(RetrieverJob job, string filePath)
-        {
-            throw new NotImplementedException();
         }
         #endregion
     }
