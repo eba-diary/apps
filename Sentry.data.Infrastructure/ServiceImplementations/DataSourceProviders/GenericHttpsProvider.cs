@@ -49,7 +49,7 @@ namespace Sentry.data.Infrastructure
                 foreach(var token in ((HTTPSSource)job.DataSource).Tokens)
                 {
                     _httpClient.BaseAddress = job.DataSource.BaseUri;
-                    _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessTokenForToken((HTTPSSource)job.DataSource, token)}");
+                    _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource, token)}");
                     await ExecuteHttpClientCore(job);
                 }
             }

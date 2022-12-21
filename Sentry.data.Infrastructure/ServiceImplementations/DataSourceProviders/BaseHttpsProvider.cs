@@ -60,12 +60,6 @@ namespace Sentry.data.Infrastructure
             get { return _request; }
         }
 
-        //public virtual RetrieverJob Job
-        //{
-        //    get { return _job; }
-        //    set { _job = value; }
-        //}
-
         protected abstract void ConfigureClient();
         protected abstract void ConfigureRequest();
 

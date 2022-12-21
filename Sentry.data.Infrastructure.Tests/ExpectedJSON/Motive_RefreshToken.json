@@ -1,0 +1,8 @@
+{
+  "access_token": "fakeaccesstoken",
+  "token_type": "Bearer",
+  "expires_in": 7200,
+  "refresh_token": "fakerefreshtoken",
+  "scope": "users.read",
+  "created_at": 1670350789
+}
