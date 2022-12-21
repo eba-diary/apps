@@ -49,7 +49,7 @@ namespace Sentry.data.Web
             {
                 results.Add($"{idPrefix}VariableValue", "Variable Value is required");
             }
-            else if (VariableIncrementType == RequestVariableIncrementType.Daily && !DateTime.TryParseExact(VariableValue, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+            else if (VariableIncrementType == RequestVariableIncrementType.DailyExcludeToday && !DateTime.TryParseExact(VariableValue, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 //variable value must be in acceptable datetime format
                 results.Add($"{idPrefix}VariableValue", $"Variable Value must be in yyyy-MM-dd format to use with '{VariableIncrementType.GetDescription()}'");

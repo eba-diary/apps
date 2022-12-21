@@ -34,7 +34,6 @@ namespace Sentry.data.Core
         public DateTime DeleteIssueDTM { get; set; }
         public Dictionary<string, string> ExecutionParameters { get; set; }
         public PagingType PagingType { get; set; }
-        public string PageTokenField { get; set; }
         public string PageParameterName { get; set; }
         public List<RequestVariableDto> RequestVariables { get; set; }
     }

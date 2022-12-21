@@ -55,12 +55,12 @@ namespace Sentry.data.Core.Tests
                     new RequestVariable
                     {
                         VariableValue = "2021-01-01",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     },
                     new RequestVariable
                     {
                         VariableValue = "2021-01-02",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -85,12 +85,12 @@ namespace Sentry.data.Core.Tests
                     new RequestVariable
                     {
                         VariableValue = firstDate,
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     },
                     new RequestVariable
                     {
                         VariableValue = lastDate,
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -100,6 +100,90 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(result);
             Assert.AreEqual(firstDate, job.RequestVariables.First().VariableValue);
             Assert.AreEqual(lastDate, job.RequestVariables.Last().VariableValue);
+        }
+
+        [TestMethod]
+        public void HasValidRequestVariables_OneInvalidVariable_False()
+        {
+            string firstDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
+            string lastDate = DateTime.Today.ToString("yyyy-MM-dd");
+
+            RetrieverJob job = new RetrieverJob
+            {
+                RequestVariables = new List<RequestVariable>
+                {
+                    new RequestVariable
+                    {
+                        VariableValue = firstDate,
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    },
+                    new RequestVariable
+                    {
+                        VariableValue = lastDate,
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            bool result = job.HasValidRequestVariables();
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void HasValidRequestVariables_AllInvalidVariables_False()
+        {
+            string firstDate = DateTime.Today.ToString("yyyy-MM-dd");
+            string lastDate = DateTime.Today.ToString("yyyy-MM-dd");
+
+            RetrieverJob job = new RetrieverJob
+            {
+                RequestVariables = new List<RequestVariable>
+                {
+                    new RequestVariable
+                    {
+                        VariableValue = firstDate,
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    },
+                    new RequestVariable
+                    {
+                        VariableValue = lastDate,
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            bool result = job.HasValidRequestVariables();
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void HasValidRequestVariables_AllValidVariables_True()
+        {
+            string firstDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
+            string lastDate = DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd");
+
+            RetrieverJob job = new RetrieverJob
+            {
+                RequestVariables = new List<RequestVariable>
+                {
+                    new RequestVariable
+                    {
+                        VariableValue = firstDate,
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    },
+                    new RequestVariable
+                    {
+                        VariableValue = lastDate,
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            bool result = job.HasValidRequestVariables();
+
+            Assert.IsTrue(result);
         }
     }
 }

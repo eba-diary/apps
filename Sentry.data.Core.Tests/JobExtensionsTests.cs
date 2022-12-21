@@ -35,8 +35,7 @@ namespace Sentry.data.Core.Tests
                         Body = "Body",
                         RequestMethod = HttpMethods.get,
                         RequestDataFormat = HttpDataFormat.json,
-                        PagingType = PagingType.Token,
-                        PageTokenField = "PageToken",
+                        PagingType = PagingType.PageNumber,
                         PageParameterName = "PageParameter"
                     }
                 },
@@ -45,7 +44,7 @@ namespace Sentry.data.Core.Tests
                     new RequestVariable {
                         VariableName = "VariableName",
                         VariableValue = "VariableValue",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -70,15 +69,14 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, result.ExecutionParameters.Count);
             Assert.AreEqual("Param", result.ExecutionParameters.First().Key);
             Assert.AreEqual("Value", result.ExecutionParameters.First().Value);
-            Assert.AreEqual(PagingType.Token, result.PagingType);
-            Assert.AreEqual("PageToken", result.PageTokenField);
+            Assert.AreEqual(PagingType.PageNumber, result.PagingType);
             Assert.AreEqual("PageParameter", result.PageParameterName);
             Assert.AreEqual(1, result.RequestVariables.Count);
 
             RequestVariableDto dto = result.RequestVariables.First();
             Assert.AreEqual("VariableName", dto.VariableName);
             Assert.AreEqual("VariableValue", dto.VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, dto.VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, dto.VariableIncrementType);
 
         }
 
@@ -119,7 +117,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Param", result.ExecutionParameters.First().Key);
             Assert.AreEqual("Value", result.ExecutionParameters.First().Value);
             Assert.AreEqual(PagingType.None, result.PagingType);
-            Assert.IsNull(result.PageTokenField);
             Assert.IsNull(result.PageParameterName);
         }
 
@@ -130,14 +127,14 @@ namespace Sentry.data.Core.Tests
             {
                 VariableName = "VariableName",
                 VariableValue = "VariableValue",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             RequestVariable entity = dto.ToEntity();
 
             Assert.AreEqual("VariableName", entity.VariableName);
             Assert.AreEqual("VariableValue", entity.VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, entity.VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, entity.VariableIncrementType);
         }
 
         [TestMethod]
@@ -147,14 +144,14 @@ namespace Sentry.data.Core.Tests
             {
                 VariableName = "VariableName",
                 VariableValue = "VariableValue",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             RequestVariableDto dto = entity.ToDto();
 
             Assert.AreEqual("VariableName", dto.VariableName);
             Assert.AreEqual("VariableValue", dto.VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, dto.VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, dto.VariableIncrementType);
         }
     }
 }

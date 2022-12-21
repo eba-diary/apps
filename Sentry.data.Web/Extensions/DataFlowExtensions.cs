@@ -221,7 +221,6 @@ namespace Sentry.data.Web
                 TargetFileName = model.TargetFileName,
                 ExecutionParameters = model.ExecutionParameters,
                 PagingType = model.PagingType,
-                PageTokenField= model.PageTokenField,
                 PageParameterName= model.PageParameterName,
                 RequestVariables = model.RequestVariables?.Select(x => x.ToDto()).ToList()
             };

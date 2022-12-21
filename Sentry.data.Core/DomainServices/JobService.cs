@@ -647,7 +647,6 @@ namespace Sentry.data.Core
             bool areSame = previousJob.RelativeUri == newJob.RelativeUri &&
                 previousJob.JobOptions.HttpOptions.PagingType == newJob.JobOptions.HttpOptions.PagingType &&
                 previousJob.JobOptions.HttpOptions.PageParameterName == newJob.JobOptions.HttpOptions.PageParameterName &&
-                previousJob.JobOptions.HttpOptions.PageTokenField == newJob.JobOptions.HttpOptions.PageTokenField &&
                 previousJob.RequestVariables.Count == newJob.RequestVariables.Count;
 
             if (areSame && previousJob.RequestVariables.Any())
@@ -949,7 +948,6 @@ namespace Sentry.data.Core
             httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
             httpOptions.RequestDataFormat = dto.RequestDataFormat?? HttpDataFormat.none;
             httpOptions.PagingType = dto.PagingType;
-            httpOptions.PageTokenField = dto.PageTokenField;
             httpOptions.PageParameterName = dto.PageParameterName;
         }
 
