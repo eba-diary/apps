@@ -12,16 +12,27 @@ namespace Sentry.data.Core
 
         public bool TryIncrementVariableValue()
         {
-            if (VariableIncrementType == RequestVariableIncrementType.Daily)
+            if (VariableIncrementType == RequestVariableIncrementType.DailyExcludeToday)
             {
                 DateTime previousDate = DateTime.ParseExact(VariableValue, "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 DateTime nextDate = previousDate.AddDays(1);
 
-                if (nextDate <= DateTime.Today)
+                if (nextDate < DateTime.Today)
                 {
                     VariableValue = nextDate.ToString("yyyy-MM-dd");
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        public bool IsValidVariableValue()
+        {
+            if (VariableIncrementType == RequestVariableIncrementType.DailyExcludeToday)
+            {
+                DateTime currentValue = DateTime.ParseExact(VariableValue, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                return currentValue < DateTime.Today;
             }
 
             return false;

@@ -400,7 +400,6 @@ namespace Sentry.data.Web.Controllers
                 ExecutionParameters = dto.ExecutionParameters,
                 SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(dto.ReadableSchedule),
                 PagingType = dto.PagingType,
-                PageTokenField = dto.PageTokenField,
                 PageParameterName = dto.PageParameterName,
                 RequestVariables = dto.RequestVariables?.Select(x => x.ToModel()).ToList()
             };

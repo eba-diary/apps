@@ -16,14 +16,14 @@ namespace Sentry.data.Web.Tests
             {
                 VariableName = "foo",
                 VariableValue = "bar",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             RequestVariableDto dto = model.ToDto();
 
             Assert.AreEqual("foo", dto.VariableName);
             Assert.AreEqual("bar", dto.VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, dto.VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, dto.VariableIncrementType);
         }
 
         [TestMethod]
@@ -33,14 +33,14 @@ namespace Sentry.data.Web.Tests
             {
                 VariableName = "foo",
                 VariableValue = "bar",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             RequestVariableModel model = dto.ToModel();
 
             Assert.AreEqual("foo", model.VariableName);
             Assert.AreEqual("bar", model.VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, model.VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, model.VariableIncrementType);
         }
 
         [TestMethod]
@@ -63,16 +63,15 @@ namespace Sentry.data.Web.Tests
                 {
                     { "Key", "Value" }
                 },
-                PagingType = PagingType.Token,
+                PagingType = PagingType.PageNumber,
                 PageParameterName = "param",
-                PageTokenField = "TokenField",
                 RequestVariables = new List<RequestVariableModel>
                 {
                     new RequestVariableModel
                     {
                         VariableName = "foo",
                         VariableValue = "bar",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -98,13 +97,12 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, dto.ExecutionParameters.Count);
             Assert.IsTrue(dto.ExecutionParameters.ContainsKey("Key"));
             Assert.AreEqual("Value", dto.ExecutionParameters["Key"]);
-            Assert.AreEqual(PagingType.Token, dto.PagingType);
+            Assert.AreEqual(PagingType.PageNumber, dto.PagingType);
             Assert.AreEqual("param", dto.PageParameterName);
-            Assert.AreEqual("TokenField", dto.PageTokenField);
             Assert.AreEqual(1, dto.RequestVariables.Count);
             Assert.AreEqual("foo", dto.RequestVariables.First().VariableName);
             Assert.AreEqual("bar", dto.RequestVariables.First().VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, dto.RequestVariables.First().VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, dto.RequestVariables.First().VariableIncrementType);
         }
     }
 }

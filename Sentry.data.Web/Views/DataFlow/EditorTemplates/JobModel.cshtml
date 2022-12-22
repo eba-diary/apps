@@ -94,22 +94,15 @@
                     @Html.ValidationMessageFor(model => model.PagingType, "", new { @class = "text-danger" })
                 </div>
 
-                <div class="md-form paging-token-field" style="display:none;">
-                    @Html.LabelFor(model => model.PageTokenField, htmlAttributes: new { @class = "control-label" })
-                    @Html.TextBoxFor(model => model.PageTokenField, new { @class = "form-control", @placeholder = "Path to the token field on the response" })
-                    @Html.ValidationMessageFor(model => model.PageTokenField, "", new { @class = "text-danger" })
-                </div>
-
                 <div class="md-form paging-request-parameter" style="display:none;">
                     @Html.LabelFor(model => model.PageParameterName, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageParameterName, new { @class = "form-control", @placeholder = "Parameter name to include on paging requests" })
                     @Html.ValidationMessageFor(model => model.PageParameterName, "", new { @class = "text-danger" })
                 </div>
 
-
                 <h6 id="request-variable-header" class="pt-0">
                     Request Variables
-                    <a class="icon-info-solid dsc-blue-text" data-toggle="popover" title="" data-placement="right" data-content="Use variables in the Relative URI by wrapping the variable name with ~[ ]~ (Ex: Search/~[variablename]~/Data). On each scheduled run, the value will be incremented accordingly and substituted in for the matching variable name." href="javascript:void(0)"> </a>
+                    <a class="icon-info-solid dsc-blue-text" data-toggle="popover" title="" data-placement="right" data-content="Use variables in the Relative URI by wrapping the variable name with ~[ ]~ (Ex: Search/~[variablename]~/Data). On each scheduled run, the value will be substituted in for the matching variable name and incremented accordingly until end is reached." href="javascript:void(0)"> </a>
                 </h6>
 
                 <div id="request-variable-container">

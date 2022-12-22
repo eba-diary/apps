@@ -169,6 +169,20 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual bool HasValidRequestVariables()
+        {
+            foreach (RequestVariable variable in RequestVariables)
+            {
+                //if 1 request variable is invalid, treat as if all are invalid
+                if (!variable.IsValidVariableValue())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public virtual Uri GetUri()
         {
             return DataSource.CalcRelativeUri(this);
