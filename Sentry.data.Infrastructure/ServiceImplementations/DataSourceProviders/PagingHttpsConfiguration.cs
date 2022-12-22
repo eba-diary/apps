@@ -13,6 +13,7 @@ namespace Sentry.data.Infrastructure
         public string DataPath { get; set; }
         public string RequestUri { get; set; }
         public int PageNumber { get; set; }
+        public int Index { get; set; }
         public string Filename { get; set; }
         public RetrieverJob Job { get; set; }
         public HttpsOptions Options { get; set; }

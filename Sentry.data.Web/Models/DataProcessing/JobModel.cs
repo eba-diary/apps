@@ -114,7 +114,7 @@ namespace Sentry.data.Web
             ValidationResults validationResults = new ValidationResults();
 
             //parameter name required when paging type of page number
-            if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
+            if (PagingType != PagingType.None && string.IsNullOrWhiteSpace(PageParameterName))
             {
                 validationResults.Add("PageParameterName", "Page Parameter Name is required");
             }

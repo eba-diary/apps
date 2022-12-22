@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -82,7 +82,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             provider.Execute(job);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
         }
@@ -128,7 +128,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -168,7 +168,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetTokenAuthenticationToken(dataSource), Times.Exactly(1));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
@@ -218,7 +218,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -263,7 +263,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
@@ -313,7 +313,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -323,7 +323,7 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
 
-            HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_BasicResponse.json");
+            HttpResponseMessage responseMessage2 = new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError };
             httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "&pageNumber=2"),
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
@@ -339,7 +339,7 @@ namespace Sentry.data.Infrastructure.Tests
             s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
 
             Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
-            authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token").Throws<Exception>();
+            authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
@@ -364,8 +364,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
-            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
         }
@@ -419,7 +419,7 @@ namespace Sentry.data.Infrastructure.Tests
             
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -460,7 +460,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(2));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
@@ -517,7 +517,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -557,7 +557,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsFalse(job.ExecutionParameters.Any());
             Assert.IsFalse(job.RequestVariables.Any());
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(2));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
@@ -639,20 +639,16 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
             HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
-            string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
-
             HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_BasicResponse.json");
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "&pageNumber=1"),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+            string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
+            httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage).ReturnsAsync(responseMessage2);
 
             HttpResponseMessage responseMessage3 = GetResponseMessage("PagingHttps_BasicResponse.json");
             HttpResponseMessage responseMessage4 = GetResponseMessage("PagingHttps_BasicResponse.json");
@@ -692,7 +688,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(3));
             s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(2));
@@ -745,7 +741,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -808,7 +804,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetTokenAuthenticationToken(dataSource), Times.Exactly(1));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
@@ -854,26 +850,22 @@ namespace Sentry.data.Infrastructure.Tests
             stream.Setup(x => x.Length).Returns(() => length);
             stream.SetupGet(x => x.CanRead).Returns(true);
             stream.SetupGet(x => x.CanWrite).Returns(true);
-            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length += (long)((Math.Pow(1024, 3) * 2)/3));
+            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length += (long)Math.Round(Math.Pow(1024, 3) * 2/3));
             stream.Setup(x => x.WriteAsync(It.Is<byte[]>(b => b.SequenceEqual(Encoding.UTF8.GetBytes("\r\n"))), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
             stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
             HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
-            string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-3):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-2):yyyy-MM-dd}";
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
-
             HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_BasicResponse.json");
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "&pageNumber=1"),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+            string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-3):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-2):yyyy-MM-dd}";
+            httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage).ReturnsAsync(responseMessage2);
 
             HttpResponseMessage responseMessage3 = GetResponseMessage("PagingHttps_BasicResponse.json");
             HttpResponseMessage responseMessage4 = GetResponseMessage("PagingHttps_BasicResponse.json");
@@ -888,15 +880,11 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(emptyMessage).ReturnsAsync(emptyMessage2);
 
             HttpResponseMessage responseMessage5 = GetResponseMessage("PagingHttps_BasicResponse.json");
-            string requestUrl2 = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl2),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage5);
-
             HttpResponseMessage responseMessage6 = GetResponseMessage("PagingHttps_BasicResponse.json");
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl2 + "&pageNumber=1"),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage6);
+            string requestUrl2 = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
+            httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl2),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage5).ReturnsAsync(responseMessage6);
 
             HttpResponseMessage responseMessage7 = GetResponseMessage("PagingHttps_BasicResponse.json");
             HttpResponseMessage responseMessage8 = GetResponseMessage("PagingHttps_BasicResponse.json");
@@ -937,7 +925,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(6));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(6));
             s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(3));
@@ -1014,7 +1002,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -1058,7 +1046,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsFalse(job.ExecutionParameters.Any());
             Assert.IsFalse(job.RequestVariables.Any());
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
@@ -1142,20 +1130,16 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
             HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
-            string requestUrl = $@"{dataSource.BaseUri}Search";
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
-
             HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_BasicResponse.json");
-            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
-                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "?pageNumber=1"),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+            string requestUrl = $@"{dataSource.BaseUri}Search";
+            httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage).ReturnsAsync(responseMessage2);
 
             HttpResponseMessage responseMessage3 = GetResponseMessage("PagingHttps_BasicResponse.json");
             HttpResponseMessage responseMessage4 = GetResponseMessage("PagingHttps_BasicResponse.json");
@@ -1194,7 +1178,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsFalse(job.ExecutionParameters.Any());
             Assert.IsFalse(job.RequestVariables.Any());
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(3));
             s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(2));
@@ -1288,7 +1272,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             string filename = expectedPath + @"\filename.json";
             fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
-            fileProvider.Setup(x => x.DeleteFile(filename));
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
 
             Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
 
@@ -1333,12 +1317,12 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
-            fileProvider.Verify(x => x.DeleteFile(filename), Times.Exactly(2));
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(2));
             s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(4));
-            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(4));
-            stream.Verify(x => x.SetLength(0), Times.Exactly(3));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(5));
+            stream.Verify(x => x.SetLength(0), Times.Exactly(4));
             repo.VerifyAll();
         }
 

@@ -22,7 +22,7 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
-        public void DataFlowModel_Validate_TokenPagingHTTPS_Success()
+        public void DataFlowModel_Validate_IndexPagingHTTPS_Success()
         {
             DataFlowModel model = new DataFlowModel
             {
@@ -34,7 +34,7 @@ namespace Sentry.data.Web.Tests
                     SelectedDataSource = "3",
                     SchedulePicker = "4",
                     Schedule = "* * * * *",
-                    PagingType = PagingType.PageNumber,
+                    PagingType = PagingType.Index,
                     PageParameterName = "ParameterName"
                 },
                 SchemaMaps = new List<SchemaMapModel>
@@ -52,6 +52,44 @@ namespace Sentry.data.Web.Tests
             ValidationException result = model.Validate();
 
             Assert.IsTrue(result.ValidationResults.IsValid());
+        }
+
+        [TestMethod]
+        public void DataFlowModel_Validate_IndexPagingHTTPS_Fail()
+        {
+            DataFlowModel model = new DataFlowModel
+            {
+                Name = "DataFlowModel",
+                IngestionTypeSelection = 2,
+                RetrieverJob = new JobModel
+                {
+                    SelectedSourceType = DataSourceDiscriminator.HTTPS_SOURCE,
+                    SelectedDataSource = "3",
+                    SchedulePicker = "4",
+                    Schedule = "* * * * *",
+                    PagingType = PagingType.Index,
+                    PageParameterName = ""
+                },
+                SchemaMaps = new List<SchemaMapModel>
+                {
+                    new SchemaMapModel
+                    {
+                        SelectedDataset = 5,
+                        SelectedSchema = 6
+                    }
+                },
+                IsPreProcessingRequired = false,
+                SAIDAssetKeyCode = "SAID"
+            };
+
+            ValidationException result = model.Validate();
+
+            Assert.IsFalse(result.ValidationResults.IsValid());
+            Assert.AreEqual(1, result.ValidationResults.GetAll().Count);
+
+            ValidationResult validationResult = result.ValidationResults.GetAll()[0];
+            Assert.AreEqual("PageParameterName", validationResult.Id);
+            Assert.AreEqual("Page Parameter Name is required", validationResult.Description);
         }
 
         [TestMethod]

@@ -1,6 +1,8 @@
 ﻿using Amazon.Auth.AccessControlPolicy;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -25,6 +27,7 @@ namespace Sentry.data.Infrastructure
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IHttpClientGenerator _httpClientGenerator;
         private readonly IFileProvider _fileProvider;
+        private readonly Dictionary<DataFlowPreProcessingTypes, Func<Stream, Stream, JToken, PagingHttpsConfiguration, Task<JToken>>> _readResponseRegistry;
         #endregion
 
         #region Constructor
@@ -35,6 +38,11 @@ namespace Sentry.data.Infrastructure
             _authorizationProvider = authorizationProvider;
             _httpClientGenerator = httpClientGenerator;
             _fileProvider = fileProvider;
+
+            _readResponseRegistry = new Dictionary<DataFlowPreProcessingTypes, Func<Stream, Stream, JToken, PagingHttpsConfiguration, Task<JToken>>>
+            {
+                { DataFlowPreProcessingTypes.googlesearchconsoleapi, (content, file, resp, config) => GoogleSearchConsoleReadResponseAsync(content, file, resp, config) }
+            };
         }
         #endregion
 
@@ -86,7 +94,8 @@ namespace Sentry.data.Infrastructure
         #region Private
         private async Task RetrieveDataAsync(PagingHttpsConfiguration config, HttpClient httpClient)
         {
-            string tempFile = GetTempFile(config.Job.Id, config.Filename);
+            string tempDirectory = GetTempDirectory(config.Job.Id);
+            string tempFile = $@"{tempDirectory}\{config.Filename}.json";
 
             try
             {
@@ -101,22 +110,19 @@ namespace Sentry.data.Infrastructure
 
                         //make request
                         Logger.Info($"Paging Https Retriever Job making request to {config.RequestUri} - Job: {config.Job.Id}");
-                        using (HttpResponseMessage response = await httpClient.GetAsync(config.RequestUri))
+                        using (HttpResponseMessage response = await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead))
                         {
                             if (response.IsSuccessStatusCode)
                             {
                                 Logger.Info($"Paging Https Retriever Job successful response from {config.RequestUri} - Job: {config.Job.Id}");
-                                using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-                                {
-                                    //combined size of file and response is over 2GB, upload file
-                                    FlushAccumulatedProgress(fileStream, contentStream, config);
+                                //copy response to file
+                                JToken responseData = await ReadResponseAsync(response, fileStream, config);
 
-                                    //copy response to file
-                                    bool hasData = await ReadResponseAsync(contentStream, fileStream, config);
+                                //get next request to make
+                                SetNextRequest(config, responseData);
 
-                                    //get next request to make
-                                    SetNextRequest(config, hasData);
-                                }
+                                //upload file if over 2GB
+                                FlushAccumulatedProgress(fileStream, config);
                             }
                             else
                             {
@@ -147,9 +153,9 @@ namespace Sentry.data.Infrastructure
             }
             finally
             {
-                //always clean up temp file because we only save progress after file has been uploaded to S3
-                _fileProvider.DeleteFile(tempFile);
-                Logger.Info($"Paging Https Retriever Job {tempFile} deleted - Job: {config.Job.Id}");
+                //always clean up temp space because we only save progress after file has been uploaded to S3
+                _fileProvider.DeleteDirectory(tempDirectory);
+                Logger.Info($"Paging Https Retriever Job {tempDirectory} deleted - Job: {config.Job.Id}");
             }
         }
 
@@ -177,17 +183,13 @@ namespace Sentry.data.Infrastructure
 
             if (job.ExecutionParameters.Any()) //start from saved progress
             {
-                if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && job.ExecutionParameters.ContainsKey(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID))
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && job.ExecutionParameters.TryGetValue(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, out string value))
                 {
-                    int tokenId = int.Parse(job.ExecutionParameters[ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID]);
+                    int tokenId = int.Parse(value);
                     config.CurrentDataSourceToken = config.Source.Tokens.First(x => x.Id == tokenId);
                 }
 
-                if (config.Options.PagingType == PagingType.PageNumber && job.ExecutionParameters.ContainsKey(config.Options.PageParameterName))
-                {
-                    config.PageNumber = int.Parse(job.ExecutionParameters[config.Options.PageParameterName]);
-                    AddUpdatePageParameter(config, config.PageNumber.ToString());
-                }
+                CheckForPagingExecutionParameters(config);
             }       
 
             Logger.Info($"Paging Https Retriever Job starting from {config.RequestUri} - Job: {job.Id}");
@@ -195,30 +197,20 @@ namespace Sentry.data.Infrastructure
             return config;
         }
 
-        private async Task<bool> ReadResponseAsync(Stream contentStream, Stream fileStream, PagingHttpsConfiguration config)
+        private async Task<JToken> ReadResponseAsync(HttpResponseMessage response, Stream fileStream, PagingHttpsConfiguration config)
         {
+            using (Stream contentStream = await response.Content.ReadAsStreamAsync())
             using (StreamReader streamReader = new StreamReader(contentStream))
             using (JsonReader jsonReader = new JsonTextReader(streamReader))
             {
-                JToken response = JToken.Load(jsonReader);
+                JToken responseToken = JToken.Load(jsonReader);
 
-                //get the count of data from response object to determine to continue
-                if (response.SelectToken(config.DataPath)?.Any() == true)
+                if (config.Job.DataFlow.IsPreProcessingRequired && _readResponseRegistry.TryGetValue((DataFlowPreProcessingTypes)config.Job.DataFlow.PreProcessingOption, out var readResponse))
                 {
-                    //move back to beginning of content
-                    contentStream.Position = 0;
-                    await contentStream.CopyToAsync(fileStream);
-
-                    //Add new line
-                    MemoryStream newLineStream = new MemoryStream(Encoding.UTF8.GetBytes("\r\n"));
-                    await newLineStream.CopyToAsync(fileStream);
-
-                    Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
-                    return true;
+                    return await readResponse(contentStream, fileStream, responseToken, config);
                 }
 
-                Logger.Info($"Paging Https Retriever Job no data found at {config.DataPath} - Job: {config.Job.Id}");
-                return false;
+                return await GenericReadResponseAsync(contentStream, fileStream, responseToken, config);
             }
         }
 
@@ -249,31 +241,24 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private string GetTempFile(int jobId, string filename)
+        private string GetTempDirectory(int jobId)
         {
             string tempDirectory = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", jobId.ToString());
             _fileProvider.CreateDirectory(tempDirectory);
 
-            string fullFilename = $@"{tempDirectory}\{filename}.json";
-            _fileProvider.DeleteFile(fullFilename);
-
-            return fullFilename;
+            return tempDirectory;
         }
 
-        private void FlushAccumulatedProgress(Stream fileStream, Stream contentStream, PagingHttpsConfiguration config)
+        private void FlushAccumulatedProgress(Stream fileStream, PagingHttpsConfiguration config)
         {
             //combined size of file and response will be over 2GB
-            if (fileStream.Length > 0 && contentStream.Length + fileStream.Length > Math.Pow(1024, 3) * 2)
+            if (fileStream.Length >= Math.Pow(1024, 3) * 2)
             {
                 Logger.Info($"Paging Https Retriever Job hit 2GB size threshold - Job: {config.Job.Id}");
                 //upload to S3 and save progress
                 UploadStreamToS3(fileStream, config);
 
-                if (config.Options.PagingType == PagingType.PageNumber)
-                {
-                    config.Job.AddOrUpdateExecutionParameter(config.Options.PageParameterName, config.PageNumber.ToString());
-                    Logger.Info($"Paging Https Retriever Job added execution parameter {config.Options.PageParameterName}: {config.PageNumber} - Job: {config.Job.Id}");
-                }
+                AddUpdatePagingExecutionParameter(config);
 
                 if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
                 {
@@ -297,24 +282,25 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
         }
 
-        private void SetNextRequest(PagingHttpsConfiguration config, bool hasData)    
+        private void SetNextRequest(PagingHttpsConfiguration config, JToken response)    
         {
-            if (hasData && config.Options.PagingType != PagingType.None)
+            if (response != null && config.Options.PagingType != PagingType.None)
             {
                 //get next page if still getting results
-                config.PageNumber++;
-                AddUpdatePageTypeParameter(config);
+                AddUpdatePagingQueryParameter(config, response);
             }
             else
             {
+                //reset page parameters for new token or variable values
                 config.PageNumber = 1;
+                config.Index = 0;
 
                 if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && config.CurrentDataSourceToken != config.OrderedDataSourceTokens.Last())
                 {
                     //using OAuth, move to the next token if there are more
                     int nextIndex = config.OrderedDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
                     config.CurrentDataSourceToken = config.OrderedDataSourceTokens[nextIndex];
-                    AddUpdatePageTypeParameter(config);
+                    RemovePageParameter(config);
 
                     Logger.Info($"Paging Https Retriever Job using data source token {nextIndex + 1} of {config.OrderedDataSourceTokens.Count} - Job: {config.Job.Id}");
                 }
@@ -339,17 +325,6 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
         }
 
-        private void AddUpdatePageTypeParameter(PagingHttpsConfiguration config)
-        {
-            switch (config.Options.PagingType)
-            {
-                case PagingType.PageNumber:
-                    //add the next page number to uri
-                    AddUpdatePageParameter(config, config.PageNumber.ToString());
-                    break;
-            }
-        }
-
         private void AddUpdatePageParameter(PagingHttpsConfiguration config, string parameterValue)
         {
             NameValueCollection parameters;
@@ -364,10 +339,114 @@ namespace Sentry.data.Infrastructure
                 parameters = HttpUtility.ParseQueryString("");
             }
 
-            parameters.Set(config.Options.PageParameterName, parameterValue); 
+            parameters.Set(config.Options.PageParameterName, parameterValue);
 
             config.RequestUri = $"{uriParts.First()}?{parameters}";
         }
+
+        private void RemovePageParameter(PagingHttpsConfiguration config)
+        {
+            List<string> uriParts = config.RequestUri.Split('?').ToList();
+
+            if (uriParts.Count > 1)
+            {
+                NameValueCollection parameters = HttpUtility.ParseQueryString(uriParts.Last());
+                parameters.Remove(config.Options.PageParameterName);
+
+                config.RequestUri = uriParts.First();
+                if (parameters.HasKeys())
+                {
+                    config.RequestUri += $"?{parameters}";
+                }
+            }
+        }
+
+        #region PageType Methods
+        private void AddUpdatePagingQueryParameter(PagingHttpsConfiguration config, JToken response)
+        {
+            switch (config.Options.PagingType)
+            {
+                case PagingType.PageNumber:
+                    //add the next page number to uri
+                    config.PageNumber++;
+                    AddUpdatePageParameter(config, config.PageNumber.ToString());
+                    break;
+                case PagingType.Index:
+                    //add on data retrieved so far
+                    config.Index += response.Count();
+                    AddUpdatePageParameter(config, config.Index.ToString());
+                    break;
+            }
+        }
+
+        private void AddUpdatePagingExecutionParameter(PagingHttpsConfiguration config)
+        {
+            string parameterValue = null;
+
+            switch (config.Options.PagingType)
+            {
+                case PagingType.PageNumber:
+                    parameterValue = config.PageNumber.ToString();
+                    break;
+                case PagingType.Index:
+                    parameterValue = config.Index.ToString();
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(parameterValue))
+            {
+                config.Job.AddOrUpdateExecutionParameter(config.Options.PageParameterName, parameterValue);
+                Logger.Info($"Paging Https Retriever Job added execution parameter {config.Options.PageParameterName}: {parameterValue} - Job: {config.Job.Id}");
+            }
+        }
+
+        private void CheckForPagingExecutionParameters(PagingHttpsConfiguration config)
+        {
+            if (config.Job.ExecutionParameters.TryGetValue(config.Options.PageParameterName, out string parameterValue))
+            {
+                switch (config.Options.PagingType)
+                {
+                    case PagingType.PageNumber:
+                        config.PageNumber = int.Parse(parameterValue);
+                        break;
+                    case PagingType.Index:
+                        config.Index = int.Parse(parameterValue);
+                        break;
+                }
+
+                AddUpdatePageParameter(config, parameterValue);
+            }
+        }
+        #endregion
+
+        #region ReadResponse Methods
+        private async Task<JToken> GenericReadResponseAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
+        {
+            //verify there is data from response to write
+            JToken data = response.SelectToken(config.DataPath);
+            if (data?.Any() == true)
+            {
+                //move back to beginning of content
+                contentStream.Position = 0;
+                await contentStream.CopyToAsync(fileStream);
+
+                //Add new line
+                MemoryStream newLineStream = new MemoryStream(Encoding.UTF8.GetBytes("\r\n"));
+                await newLineStream.CopyToAsync(fileStream);
+
+                Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
+                return data;
+            }
+
+            Logger.Info($"Paging Https Retriever Job no data found at {config.DataPath} - Job: {config.Job.Id}");
+            return null;
+        }
+
+        private async Task<JToken> GoogleSearchConsoleReadResponseAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
+        {
+            return null;
+        }
+        #endregion
         #endregion
     }
 }

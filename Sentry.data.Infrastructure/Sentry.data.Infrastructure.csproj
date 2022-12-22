@@ -295,6 +295,7 @@
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleSearchConsoleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleBigQueryApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\JsonFlatteningActionMapping.cs" />

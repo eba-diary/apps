@@ -776,7 +776,7 @@ namespace Sentry.data.Core.Tests
                     { "Param2", "Value2" }
                 },
                 RequestVariables = new List<RequestVariableDto>(),
-                PagingType = PagingType.None,
+                PagingType = PagingType.Index,
                 PageParameterName = "Name"
             };
 
