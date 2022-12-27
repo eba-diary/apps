@@ -1326,6 +1326,297 @@ namespace Sentry.data.Infrastructure.Tests
             repo.VerifyAll();
         }
 
+        [TestMethod]
+        public void Execute_PagingTypeIndex_OAuth_MultiplePages()
+        {
+            DataSourceToken token = new DataSourceToken();
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                Tokens = new List<DataSourceToken> { token },
+                RequestHeaders = new List<RequestHeader>()
+            };
+
+            HttpsOptions options = new HttpsOptions
+            {
+                PagingType = PagingType.Index,
+                PageParameterName = "start"
+            };
+
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+            job.RelativeUri = "Search";
+            job.RequestVariables = new List<RequestVariable>();
+
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+
+            List<DataFlowStep> steps = GetDataFlowSteps(job.DataFlow);
+
+            Mock<IDatasetContext> datasetContext = repo.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(steps.AsQueryable());
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IFileProvider> fileProvider = repo.Create<IFileProvider>();
+            string expectedPath = @"C:\tmp\GoldenEye\work\Jobs\1";
+            fileProvider.Setup(x => x.CreateDirectory(expectedPath));
+
+            int length = 0;
+            Mock<Stream> stream = repo.Create<Stream>();
+            stream.Setup(x => x.Close());
+            stream.Setup(x => x.Length).Returns(() => length);
+
+            stream.SetupGet(x => x.CanRead).Returns(true);
+            stream.SetupGet(x => x.CanWrite).Returns(true);
+            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
+
+            string filename = expectedPath + @"\filename.json";
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
+
+            Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
+
+            HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
+            string requestUrl = $@"{dataSource.BaseUri}Search";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_BasicResponse.json");
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "?start=2"),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+
+            HttpResponseMessage emptyMessage = CreateResponseMessage("[]");
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "?start=4"),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(emptyMessage);
+            httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
+
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
+
+            Mock<IHttpClientGenerator> generator = repo.Create<IHttpClientGenerator>();
+            generator.Setup(x => x.GenerateHttpClient(dataSource.BaseUri.ToString())).Returns(httpClient);
+
+            Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
+            s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
+
+            Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+
+            provider.Execute(job);
+
+            Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
+            Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
+            Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
+            repo.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Execute_PagingTypeIndex_OAuth_MultiplePages_FailInProgress()
+        {
+            DataSourceToken token = new DataSourceToken { Id = 3 };
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                Tokens = new List<DataSourceToken> { token },
+                RequestHeaders = new List<RequestHeader>()
+            };
+
+            HttpsOptions options = new HttpsOptions
+            {
+                PagingType = PagingType.Index,
+                PageParameterName = "start"
+            };
+
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+            job.RelativeUri = "Search";
+            job.RequestVariables = new List<RequestVariable>();
+
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+
+            List<DataFlowStep> steps = GetDataFlowSteps(job.DataFlow);
+
+            Mock<IDatasetContext> datasetContext = repo.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(steps.AsQueryable());
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IFileProvider> fileProvider = repo.Create<IFileProvider>();
+            string expectedPath = @"C:\tmp\GoldenEye\work\Jobs\1";
+            fileProvider.Setup(x => x.CreateDirectory(expectedPath));
+
+            long length = 0;
+            Mock<Stream> stream = repo.Create<Stream>();
+            stream.Setup(x => x.Close());
+            stream.Setup(x => x.Length).Returns(() => length);
+            stream.SetupGet(x => x.CanRead).Returns(true);
+            stream.SetupGet(x => x.CanWrite).Returns(true);
+            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length = (long)Math.Pow(1024, 3) * 2);
+            stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
+
+            string filename = expectedPath + @"\filename.json";
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
+
+            Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
+
+            HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
+            string requestUrl = $@"{dataSource.BaseUri}Search";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            HttpResponseMessage responseMessage2 = new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError };
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "?start=2"),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+
+            httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
+
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
+
+            Mock<IHttpClientGenerator> generator = repo.Create<IHttpClientGenerator>();
+            generator.Setup(x => x.GenerateHttpClient(dataSource.BaseUri.ToString())).Returns(httpClient);
+
+            Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
+            s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
+
+            Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+
+            Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
+
+            Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
+            Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
+            Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsTrue(job.ExecutionParameters.Any());
+            Assert.AreEqual(2, job.ExecutionParameters.Count());
+
+            KeyValuePair<string, string> parameter = job.ExecutionParameters.First();
+            Assert.AreEqual("start", parameter.Key);
+            Assert.AreEqual("2", parameter.Value);
+
+            parameter = job.ExecutionParameters.Last();
+            Assert.AreEqual(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, parameter.Key);
+            Assert.AreEqual("3", parameter.Value);
+
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
+            repo.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Execute_PagingTypeIndex_OAuth_StartFromSavedProgress()
+        {
+            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                Tokens = new List<DataSourceToken> { token, token2 },
+                RequestHeaders = new List<RequestHeader>()
+            };
+
+            HttpsOptions options = new HttpsOptions
+            {
+                PagingType = PagingType.Index,
+                PageParameterName = "start"
+            };
+
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+            job.RelativeUri = "Search";
+            job.RequestVariables = new List<RequestVariable>();
+            job.ExecutionParameters = new Dictionary<string, string>
+            {
+                { options.PageParameterName, "2" },
+                { ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, "4" }
+            };
+
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+
+            List<DataFlowStep> steps = GetDataFlowSteps(job.DataFlow);
+
+            Mock<IDatasetContext> datasetContext = repo.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(steps.AsQueryable());
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IFileProvider> fileProvider = repo.Create<IFileProvider>();
+            string expectedPath = @"C:\tmp\GoldenEye\work\Jobs\1";
+            fileProvider.Setup(x => x.CreateDirectory(expectedPath));
+
+            long length = 0;
+            Mock<Stream> stream = repo.Create<Stream>();
+            stream.Setup(x => x.Close());
+            stream.Setup(x => x.Length).Returns(() => length);
+            stream.SetupGet(x => x.CanRead).Returns(true);
+            stream.SetupGet(x => x.CanWrite).Returns(true);
+            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length++);
+
+            string filename = expectedPath + @"\filename.json";
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
+
+            Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
+
+            HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
+            string requestUrl = $@"{dataSource.BaseUri}Search";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "?start=2"),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            HttpResponseMessage emptyMessage = CreateResponseMessage("[]");
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "?start=4"),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(emptyMessage);
+
+            httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
+
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
+
+            Mock<IHttpClientGenerator> generator = repo.Create<IHttpClientGenerator>();
+            generator.Setup(x => x.GenerateHttpClient(dataSource.BaseUri.ToString())).Returns(httpClient);
+
+            Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
+            s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
+
+            Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
+            authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
+            authorizationProvider.Setup(x => x.Dispose());
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+
+            provider.Execute(job);
+
+            Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
+            Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
+            Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(2));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
+            repo.VerifyAll();
+        }
+
         #region Helpers
         private HttpResponseMessage GetResponseMessage(string filename)
         {

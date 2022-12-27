@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
@@ -32,7 +33,8 @@ namespace Sentry.data.Core
 
             ValidHttpMethods = new List<HttpMethods>
             {
-                HttpMethods.get
+                HttpMethods.get,
+                HttpMethods.post
             };
 
             ValidHttpDataFormats = new List<HttpDataFormat>
@@ -148,6 +150,29 @@ namespace Sentry.data.Core
             if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.none)
             {
                 validationResults.Add(ValidationErrors.httpsRequestMethodNotSelected, "Request method is required");
+            }
+            else if (job.JobOptions.HttpOptions.RequestMethod == HttpMethods.post)
+            {
+                if (job.JobOptions.HttpOptions.RequestDataFormat == HttpDataFormat.none)
+                {
+                    validationResults.Add(ValidationErrors.httpsRequestDataFormatNotSelected, "Request Body Format is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(job.JobOptions.HttpOptions.Body))
+                {
+                    validationResults.Add(ValidationErrors.httpsRequestBodyIsBlank, "Request body is required");
+                }
+                else
+                {
+                    try
+                    {
+                        JToken.Parse(job.JobOptions.HttpOptions.Body);
+                    }
+                    catch (JsonReaderException)
+                    {
+                        validationResults.Add(ValidationErrors.httpsRequestBodyIsInvalidJson, "Request body is invalid JSON");
+                    }
+                }
             }
         }
         #endregion

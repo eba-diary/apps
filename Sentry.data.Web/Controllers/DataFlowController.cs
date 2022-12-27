@@ -678,6 +678,7 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsRequestBodyIsBlank:
+                    case DataSource.ValidationErrors.httpsRequestBodyIsInvalidJson:
                         ModelState.AddModelError("RetrieverJob.HttpRequestBody", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsRequestDataFormatNotSelected:
