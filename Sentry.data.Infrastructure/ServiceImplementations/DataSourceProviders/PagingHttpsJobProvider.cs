@@ -1,9 +1,5 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Amazon.Runtime;
-using Nest;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.Pkcs;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -16,7 +12,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.UI.WebControls;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
@@ -29,7 +24,6 @@ namespace Sentry.data.Infrastructure
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IHttpClientGenerator _httpClientGenerator;
         private readonly IFileProvider _fileProvider;
-        private readonly Dictionary<DataFlowPreProcessingTypes, Func<Stream, Stream, JToken, PagingHttpsConfiguration, Task<JToken>>> _readResponseRegistry;
         #endregion
 
         #region Constructor
@@ -40,11 +34,6 @@ namespace Sentry.data.Infrastructure
             _authorizationProvider = authorizationProvider;
             _httpClientGenerator = httpClientGenerator;
             _fileProvider = fileProvider;
-
-            _readResponseRegistry = new Dictionary<DataFlowPreProcessingTypes, Func<Stream, Stream, JToken, PagingHttpsConfiguration, Task<JToken>>>
-            {
-                { DataFlowPreProcessingTypes.googlesearchconsoleapi, (content, file, resp, config) => GoogleSearchConsoleReadResponseAsync(content, file, resp, config) }
-            };
         }
         #endregion
 
@@ -91,6 +80,29 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
         #endregion
+        #endregion
+
+        #region Overridable
+        protected virtual string GetDataPath(RetrieverJob job)
+        {
+            return job.FileSchema.SchemaRootPath ?? "";
+        }
+
+        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
+        {
+            //move back to beginning of content
+            contentStream.Position = 0;
+            await contentStream.CopyToAsync(fileStream);
+
+            //Add new line
+            MemoryStream newLineStream = new MemoryStream(Encoding.UTF8.GetBytes("\r\n"));
+            await newLineStream.CopyToAsync(fileStream);
+        }
+
+        protected virtual void EndFile(Stream fileStream)
+        {
+            //do nothing
+        }
         #endregion
 
         #region Private
@@ -182,7 +194,7 @@ namespace Sentry.data.Infrastructure
                 PageNumber = 1,
                 Source = (HTTPSSource)job.DataSource,
                 S3DropStep = _datasetContext.DataFlowStep.FirstOrDefault(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop),
-                DataPath = job.FileSchema.SchemaRootPath ?? "",
+                DataPath = GetDataPath(job),
                 Filename = job.JobOptions.TargetFileName,
                 Options = job.JobOptions.HttpOptions
             };
@@ -220,12 +232,16 @@ namespace Sentry.data.Infrastructure
             {
                 JToken responseToken = JToken.Load(jsonReader);
 
-                if (config.Job.DataFlow.IsPreProcessingRequired && _readResponseRegistry.TryGetValue((DataFlowPreProcessingTypes)config.Job.DataFlow.PreProcessingOption, out var readResponse))
+                JToken data = responseToken.SelectToken(config.DataPath);
+                if (data?.Any() == true)
                 {
-                    return await readResponse(contentStream, fileStream, responseToken, config);
+                    await WriteToFileAsync(contentStream, fileStream, responseToken, config);
+                    Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
+                    return data;
                 }
 
-                return await GenericReadResponseAsync(contentStream, fileStream, responseToken, config);
+                Logger.Info($"Google Search Console Retriever Job no rows found - Job: {config.Job.Id}");
+                return null;
             }
         }
 
@@ -303,6 +319,8 @@ namespace Sentry.data.Infrastructure
 
         private void UploadStreamToS3(Stream fileStream, PagingHttpsConfiguration config)
         {
+            EndFile(fileStream);
+
             string targetKey = $"{config.S3DropStep.TriggerKey}{config.Filename}_{DateTime.Now:yyyyMMddHHmmssfff}.json";
             _s3ServiceProvider.UploadDataFile(fileStream, config.S3DropStep.TriggerBucket, targetKey);
             Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
@@ -457,35 +475,6 @@ namespace Sentry.data.Infrastructure
 
                 AddUpdatePageParameter(config, intValue);
             }
-        }
-        #endregion
-
-        #region ReadResponse Methods
-        private async Task<JToken> GenericReadResponseAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
-        {
-            //verify there is data from response to write
-            JToken data = response.SelectToken(config.DataPath);
-            if (data?.Any() == true)
-            {
-                //move back to beginning of content
-                contentStream.Position = 0;
-                await contentStream.CopyToAsync(fileStream);
-
-                //Add new line
-                MemoryStream newLineStream = new MemoryStream(Encoding.UTF8.GetBytes("\r\n"));
-                await newLineStream.CopyToAsync(fileStream);
-
-                Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
-                return data;
-            }
-
-            Logger.Info($"Paging Https Retriever Job no data found at {config.DataPath} - Job: {config.Job.Id}");
-            return null;
-        }
-
-        private async Task<JToken> GoogleSearchConsoleReadResponseAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
-        {
-            return null;
         }
         #endregion
         #endregion
