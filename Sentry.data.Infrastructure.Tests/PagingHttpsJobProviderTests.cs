@@ -26,8 +26,7 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
-                SourceAuthType = new AnonymousAuthentication(),
-                RequestHeaders = new List<RequestHeader>()
+                SourceAuthType = new AnonymousAuthentication()
             };
 
             HttpsOptions options = new HttpsOptions
@@ -94,8 +93,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new TokenAuthentication(),
-                AuthenticationHeaderName = "AuthHeader",
-                RequestHeaders = new List<RequestHeader>()
+                AuthenticationHeaderName = "AuthHeader"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -183,8 +181,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -278,8 +275,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -380,8 +376,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -476,8 +471,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -573,8 +567,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -704,8 +697,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new TokenAuthentication(),
-                AuthenticationHeaderName = "AuthHeader",
-                RequestHeaders = new List<RequestHeader>()
+                AuthenticationHeaderName = "AuthHeader"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -820,8 +812,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -940,8 +931,7 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
-                SourceAuthType = new AnonymousAuthentication(),
-                RequestHeaders = new List<RequestHeader>()
+                SourceAuthType = new AnonymousAuthentication()
             };
 
             HttpsOptions options = new HttpsOptions
@@ -965,8 +955,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1062,8 +1051,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1197,8 +1185,7 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                Tokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
