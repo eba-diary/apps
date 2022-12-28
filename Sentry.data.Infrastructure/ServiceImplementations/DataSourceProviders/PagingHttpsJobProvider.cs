@@ -1,4 +1,5 @@
 ﻿using Amazon.Auth.AccessControlPolicy;
+using Amazon.Runtime;
 using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,6 +16,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.UI.WebControls;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
@@ -110,7 +112,7 @@ namespace Sentry.data.Infrastructure
 
                         //make request
                         Logger.Info($"Paging Https Retriever Job making request to {config.RequestUri} - Job: {config.Job.Id}");
-                        using (HttpResponseMessage response = await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead))
+                        using (HttpResponseMessage response = await GetResponseMessageAsync(config, httpClient))
                         {
                             if (response.IsSuccessStatusCode)
                             {
@@ -156,6 +158,19 @@ namespace Sentry.data.Infrastructure
                 //always clean up temp space because we only save progress after file has been uploaded to S3
                 _fileProvider.DeleteDirectory(tempDirectory);
                 Logger.Info($"Paging Https Retriever Job {tempDirectory} deleted - Job: {config.Job.Id}");
+            }
+        }
+
+        private async Task<HttpResponseMessage> GetResponseMessageAsync(PagingHttpsConfiguration config, HttpClient httpClient)
+        {
+            if (config.Options.RequestMethod == HttpMethods.post)
+            {
+                StringContent content = new StringContent(config.RequestBody.ToString(), Encoding.UTF8, "application/json");
+                return await httpClient.PostAsync(config.RequestUri, content);
+            }
+            else
+            {
+                return await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead);
             }
         }
 
@@ -233,11 +248,22 @@ namespace Sentry.data.Infrastructure
         private void ReplaceVariablePlaceholders(PagingHttpsConfiguration config)
         {
             config.RequestUri = config.Job.RelativeUri;
+            string body = config.Options.Body;
 
             foreach (RequestVariable variable in config.Job.RequestVariables)
             {
                 string placeholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, variable.VariableName);
                 config.RequestUri = config.RequestUri.Replace(placeholder, variable.VariableValue);
+
+                if (config.Options.RequestMethod == HttpMethods.post)
+                {
+                    body = body.Replace(placeholder, variable.VariableValue);
+                }
+            }
+
+            if (config.Options.RequestMethod == HttpMethods.post)
+            {
+                config.RequestBody = JObject.Parse(body);
             }
         }
 
@@ -327,36 +353,50 @@ namespace Sentry.data.Infrastructure
 
         private void AddUpdatePageParameter(PagingHttpsConfiguration config, string parameterValue)
         {
-            NameValueCollection parameters;
-            List<string> uriParts = config.RequestUri.Split('?').ToList();
-
-            if (uriParts.Count > 1)
+            if (config.Options.RequestMethod == HttpMethods.post)
             {
-                parameters = HttpUtility.ParseQueryString(uriParts.Last());
+                config.RequestBody[config.Options.PageParameterName] = parameterValue;
             }
             else
             {
-                parameters = HttpUtility.ParseQueryString("");
+                NameValueCollection parameters;
+                List<string> uriParts = config.RequestUri.Split('?').ToList();
+
+                if (uriParts.Count > 1)
+                {
+                    parameters = HttpUtility.ParseQueryString(uriParts.Last());
+                }
+                else
+                {
+                    parameters = HttpUtility.ParseQueryString("");
+                }
+
+                parameters.Set(config.Options.PageParameterName, parameterValue);
+
+                config.RequestUri = $"{uriParts.First()}?{parameters}";
             }
-
-            parameters.Set(config.Options.PageParameterName, parameterValue);
-
-            config.RequestUri = $"{uriParts.First()}?{parameters}";
         }
 
         private void RemovePageParameter(PagingHttpsConfiguration config)
         {
-            List<string> uriParts = config.RequestUri.Split('?').ToList();
-
-            if (uriParts.Count > 1)
+            if (config.Options.RequestMethod == HttpMethods.post)
             {
-                NameValueCollection parameters = HttpUtility.ParseQueryString(uriParts.Last());
-                parameters.Remove(config.Options.PageParameterName);
+                config.RequestBody.Remove(config.Options.PageParameterName);
+            }
+            else
+            {
+                List<string> uriParts = config.RequestUri.Split('?').ToList();
 
-                config.RequestUri = uriParts.First();
-                if (parameters.HasKeys())
+                if (uriParts.Count > 1)
                 {
-                    config.RequestUri += $"?{parameters}";
+                    NameValueCollection parameters = HttpUtility.ParseQueryString(uriParts.Last());
+                    parameters.Remove(config.Options.PageParameterName);
+
+                    config.RequestUri = uriParts.First();
+                    if (parameters.HasKeys())
+                    {
+                        config.RequestUri += $"?{parameters}";
+                    }
                 }
             }
         }

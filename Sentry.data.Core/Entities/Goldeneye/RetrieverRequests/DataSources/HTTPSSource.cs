@@ -166,7 +166,7 @@ namespace Sentry.data.Core
                 {
                     try
                     {
-                        JToken.Parse(job.JobOptions.HttpOptions.Body);
+                        JObject.Parse(job.JobOptions.HttpOptions.Body);
                     }
                     catch (JsonReaderException)
                     {
