@@ -9,6 +9,10 @@
     {
       "Name": "NameValue2",
       "Description": "DescriptionValue2"
+    },
+    {
+      "Name": "NameValue3",
+      "Description": "DescriptionValue3"
     }
   ]
 }

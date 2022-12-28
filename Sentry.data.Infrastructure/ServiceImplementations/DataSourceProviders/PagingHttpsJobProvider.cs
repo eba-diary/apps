@@ -351,7 +351,7 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
         }
 
-        private void AddUpdatePageParameter(PagingHttpsConfiguration config, string parameterValue)
+        private void AddUpdatePageParameter(PagingHttpsConfiguration config, int parameterValue)
         {
             if (config.Options.RequestMethod == HttpMethods.post)
             {
@@ -371,7 +371,7 @@ namespace Sentry.data.Infrastructure
                     parameters = HttpUtility.ParseQueryString("");
                 }
 
-                parameters.Set(config.Options.PageParameterName, parameterValue);
+                parameters.Set(config.Options.PageParameterName, parameterValue.ToString());
 
                 config.RequestUri = $"{uriParts.First()}?{parameters}";
             }
@@ -409,12 +409,12 @@ namespace Sentry.data.Infrastructure
                 case PagingType.PageNumber:
                     //add the next page number to uri
                     config.PageNumber++;
-                    AddUpdatePageParameter(config, config.PageNumber.ToString());
+                    AddUpdatePageParameter(config, config.PageNumber);
                     break;
                 case PagingType.Index:
                     //add on data retrieved so far
                     config.Index += response.Count();
-                    AddUpdatePageParameter(config, config.Index.ToString());
+                    AddUpdatePageParameter(config, config.Index);
                     break;
             }
         }
@@ -444,17 +444,18 @@ namespace Sentry.data.Infrastructure
         {
             if (config.Job.ExecutionParameters.TryGetValue(config.Options.PageParameterName, out string parameterValue))
             {
+                int intValue = int.Parse(parameterValue);
                 switch (config.Options.PagingType)
                 {
                     case PagingType.PageNumber:
-                        config.PageNumber = int.Parse(parameterValue);
+                        config.PageNumber = intValue;
                         break;
                     case PagingType.Index:
-                        config.Index = int.Parse(parameterValue);
+                        config.Index = intValue;
                         break;
                 }
 
-                AddUpdatePageParameter(config, parameterValue);
+                AddUpdatePageParameter(config, intValue);
             }
         }
         #endregion
