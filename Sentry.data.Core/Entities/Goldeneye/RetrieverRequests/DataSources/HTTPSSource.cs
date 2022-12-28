@@ -97,15 +97,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                if (string.IsNullOrEmpty(_requestHeaders))
-                {
-                    return null;
-                }
-                else
-                {
-                    List<RequestHeader> a = JsonConvert.DeserializeObject<List<RequestHeader>>(_requestHeaders);
-                    return a;
-                }
+                return string.IsNullOrEmpty(_requestHeaders) ? new List<RequestHeader>() : JsonConvert.DeserializeObject<List<RequestHeader>>(_requestHeaders);
             }
             set
             {
