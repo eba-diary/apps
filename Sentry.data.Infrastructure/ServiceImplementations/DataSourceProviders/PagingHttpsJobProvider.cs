@@ -401,9 +401,9 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private bool RequestVariablesAreEqual(List<RequestVariable> collected, List<RequestVariable> mostRecent)
+        private bool RequestVariablesAreEqual(List<RequestVariable> collected, List<RequestVariable> current)
         {
-            return collected.Count == mostRecent.Count && collected.All(x => mostRecent.Any(a => x.EqualTo(a)));
+            return collected.Count == current.Count && collected.All(x => current.Any(a => x.EqualTo(a)));
         }
 
         private void AddUpdatePageParameter(PagingHttpsConfiguration config, int parameterValue)
