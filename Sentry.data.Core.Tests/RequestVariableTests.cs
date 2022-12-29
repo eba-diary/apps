@@ -7,34 +7,21 @@ namespace Sentry.data.Core.Tests
     public class RequestVariableTests
     {
         [TestMethod]
-        public void TryIncrementVariableValue_TypeNone_False()
+        public void IncrementVariableValue_TypeNone_False()
         {
             RequestVariable variable = new RequestVariable
             {
-                VariableIncrementType = RequestVariableIncrementType.None
+                VariableIncrementType = RequestVariableIncrementType.None,
+                VariableValue = "1"
             };
 
-            bool result = variable.TryIncrementVariableValue();
+            variable.IncrementVariableValue();
 
-            Assert.IsFalse(result);
+            Assert.AreEqual("1", variable.VariableValue);
         }
 
         [TestMethod]
-        public void TryIncrementVariableValue_TypeDailyExcludeToday_False()
-        {
-            RequestVariable variable = new RequestVariable
-            {
-                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
-                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
-            };
-
-            bool result = variable.TryIncrementVariableValue();
-
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void TryIncrementVariableValue_TypeDailyExcludeToday_True()
+        public void IncrementVariableValue_TypeDailyExcludeToday()
         {
             RequestVariable variable = new RequestVariable
             {
@@ -42,9 +29,9 @@ namespace Sentry.data.Core.Tests
                 VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
-            bool result = variable.TryIncrementVariableValue();
+            variable.IncrementVariableValue();
 
-            Assert.IsTrue(result);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), variable.VariableValue);
         }
 
         [TestMethod]

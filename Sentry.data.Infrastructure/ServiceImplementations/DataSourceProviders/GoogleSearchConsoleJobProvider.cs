@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -19,21 +20,21 @@ namespace Sentry.data.Infrastructure
             return "rows";
         }
 
-        protected override Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
+        protected override Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken data, PagingHttpsConfiguration config)
         {
-            using (StreamWriter writer = new StreamWriter(fileStream))
+            using (StreamWriter writer = new StreamWriter(fileStream, Encoding.UTF8, 1024, true))
             {
                 if (fileStream.Length == 0)
                 {
                     JObject rawBody = JObject.Parse(config.Options.Body);
                     writer.WriteLine("{");
-                    writer.WriteLine("\t\"request\": " + rawBody.ToString(Formatting.None));
+                    writer.WriteLine($"\t\"request\": {rawBody.ToString(Formatting.None)},");
                     writer.WriteLine("\t\"data\": [");
                 }
 
-                foreach (JToken row in response)
+                foreach (JToken row in data)
                 {
-                    writer.WriteLine(row.ToString(Formatting.None) + ",");
+                    writer.WriteLine("\t\t" + row.ToString(Formatting.None) + ",");
                 }
             }
 
@@ -42,7 +43,7 @@ namespace Sentry.data.Infrastructure
 
         protected override void EndFile(Stream fileStream)
         {
-            using (StreamWriter writer = new StreamWriter(fileStream))
+            using (StreamWriter writer = new StreamWriter(fileStream, Encoding.UTF8, 1024, true))
             {
                 writer.WriteLine("\t]");
                 writer.WriteLine("}");

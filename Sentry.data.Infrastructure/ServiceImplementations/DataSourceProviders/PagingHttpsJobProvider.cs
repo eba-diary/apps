@@ -88,7 +88,7 @@ namespace Sentry.data.Infrastructure
             return job.FileSchema.SchemaRootPath ?? "";
         }
 
-        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken response, PagingHttpsConfiguration config)
+        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken data, PagingHttpsConfiguration config)
         {
             //move back to beginning of content
             contentStream.Position = 0;
@@ -235,7 +235,7 @@ namespace Sentry.data.Infrastructure
                 JToken data = responseToken.SelectToken(config.DataPath);
                 if (data?.Any() == true)
                 {
-                    await WriteToFileAsync(contentStream, fileStream, responseToken, config);
+                    await WriteToFileAsync(contentStream, fileStream, data, config);
                     Logger.Info($"Paging Https Retriever Job response content copied to temp file - Job: {config.Job.Id}");
                     return data;
                 }
@@ -348,25 +348,35 @@ namespace Sentry.data.Infrastructure
 
                     Logger.Info($"Paging Https Retriever Job using data source token {nextIndex + 1} of {config.OrderedDataSourceTokens.Count} - Job: {config.Job.Id}");
                 }
-                else if(config.Job.TryIncrementRequestVariables())
-                {
-                    //variables able to be incremented, update request uri with incremented values
-                    ReplaceVariablePlaceholders(config);
-
-                    if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
-                    {
-                        //start from first data source token if using OAuth
-                        config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
-                    }
-                }
                 else
                 {
-                    Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
-                    config.RequestUri = "";
+                    SetNextRequestVariables(config);
                 }
             }
 
             Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
+        }
+
+        private void SetNextRequestVariables(PagingHttpsConfiguration config)
+        {
+            config.Job.IncrementRequestVariables();
+
+            if (config.Job.RequestVariables.Any() && config.Job.HasValidRequestVariables())
+            {
+                //variables able to be incremented, update request uri with incremented values
+                ReplaceVariablePlaceholders(config);
+
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
+                {
+                    //start from first data source token if using OAuth
+                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+                }
+            }
+            else
+            {
+                Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
+                config.RequestUri = "";
+            }
         }
 
         private void AddUpdatePageParameter(PagingHttpsConfiguration config, int parameterValue)

@@ -164,8 +164,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("token", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetTokenAuthenticationToken(dataSource), Times.Exactly(1));
@@ -258,8 +258,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
@@ -453,8 +453,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(2));
@@ -679,8 +679,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
@@ -794,8 +794,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("token", httpClient.DefaultRequestHeaders.First().Value.First());
             Assert.AreEqual(4, length);
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetTokenAuthenticationToken(dataSource), Times.Exactly(1));
@@ -914,8 +914,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(6));
@@ -1302,8 +1302,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
@@ -1738,8 +1738,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(6));
@@ -1854,8 +1854,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
@@ -1967,8 +1967,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(2));
@@ -2081,8 +2081,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
@@ -2092,20 +2092,6 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         #region Helpers
-        private HttpResponseMessage GetResponseMessage(string filename)
-        {
-            return CreateResponseMessage(GetDataString(filename));
-        }
-
-        private HttpResponseMessage CreateResponseMessage(string data)
-        {
-            return new HttpResponseMessage
-            {
-                Content = new StringContent(data),
-                StatusCode = HttpStatusCode.OK
-            };
-        }
-
         private List<DataFlowStep> GetDataFlowSteps(DataFlow dataFlow)
         {
             return new List<DataFlowStep>
