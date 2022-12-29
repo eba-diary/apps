@@ -1,6 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using System;
 using System.Globalization;
-using System;
 
 namespace Sentry.data.Core
 {
@@ -28,6 +27,13 @@ namespace Sentry.data.Core
             }
 
             return false;
+        }
+
+        public bool EqualTo(RequestVariable other)
+        {
+            return other.VariableValue == VariableValue &&
+                other.VariableName == VariableName &&
+                other.VariableIncrementType == VariableIncrementType;
         }
     }
 }

@@ -20,5 +20,6 @@ namespace Sentry.data.Infrastructure
         public HttpsOptions Options { get; set; }
         public DataSourceToken CurrentDataSourceToken { get; set; }
         public List<DataSourceToken> OrderedDataSourceTokens { get; set; }
+        public List<RequestVariable> RequestVariablesWithCollectedData { get; set; }
     }
 }

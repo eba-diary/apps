@@ -74,5 +74,93 @@ namespace Sentry.data.Core.Tests
 
             Assert.IsFalse(result);
         }
+
+        [TestMethod]
+        public void EqualTo_VariableValues_False()
+        {
+            RequestVariable variable1 = new RequestVariable
+            {
+                VariableName = "Name",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            RequestVariable variable2 = new RequestVariable
+            {
+                VariableName = "Name",
+                VariableValue = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            bool result = variable1.EqualTo(variable2);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void EqualTo_True()
+        {
+            RequestVariable variable1 = new RequestVariable
+            {
+                VariableName = "Name",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            RequestVariable variable2 = new RequestVariable
+            {
+                VariableName = "Name",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            bool result = variable1.EqualTo(variable2);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void EqualTo_VariableNames_False()
+        {
+            RequestVariable variable1 = new RequestVariable
+            {
+                VariableName = "Name1",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            RequestVariable variable2 = new RequestVariable
+            {
+                VariableName = "Name2",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            bool result = variable1.EqualTo(variable2);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void EqualTo_VariableIncrementTypes_False()
+        {
+            RequestVariable variable1 = new RequestVariable
+            {
+                VariableName = "Name",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+            };
+
+            RequestVariable variable2 = new RequestVariable
+            {
+                VariableName = "Name",
+                VariableValue = DateTime.Today.ToString("yyyy-MM-dd"),
+                VariableIncrementType = RequestVariableIncrementType.None
+            };
+
+            bool result = variable1.EqualTo(variable2);
+
+            Assert.IsFalse(result);
+        }
     }
 }
