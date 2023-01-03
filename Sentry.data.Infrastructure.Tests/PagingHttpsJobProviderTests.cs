@@ -1869,7 +1869,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_SingleTokens_NoVariableIncrement()
+        public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement()
         {
             DataSourceToken token = new DataSourceToken { Id = 3 };
 
@@ -2205,6 +2205,95 @@ namespace Sentry.data.Infrastructure.Tests
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
             s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(1));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
+            repo.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Execute_PagingTypeIndex_OAuth_PostMethod_SingleToken_NoResultsOnFirstRequest()
+        {
+            DataSourceToken token = new DataSourceToken { Id = 3 };
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                Tokens = new List<DataSourceToken> { token }
+            };
+
+            HttpsOptions options = new HttpsOptions
+            {
+                RequestMethod = HttpMethods.post,
+                Body = @"{ ""field"": ""~[var2]~"", ""field2"": ""~[var1]~"" }",
+                PagingType = PagingType.Index,
+                PageParameterName = "start"
+            };
+
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+            job.RelativeUri = "Search";
+            job.FileSchema = new FileSchema { SchemaRootPath = "Items" };
+
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+
+            List<DataFlowStep> steps = GetDataFlowSteps(job.DataFlow);
+
+            Mock<IDatasetContext> datasetContext = repo.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(steps.AsQueryable());
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IFileProvider> fileProvider = repo.Create<IFileProvider>();
+            string expectedPath = @"C:\tmp\GoldenEye\work\Jobs\1";
+            fileProvider.Setup(x => x.CreateDirectory(expectedPath));
+
+            Mock<Stream> stream = repo.Create<Stream>();
+            stream.Setup(x => x.Close());
+            stream.Setup(x => x.Length).Returns(0);
+
+            string filename = expectedPath + @"\filename.json";
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
+
+            Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
+
+            JObject requestObj = new JObject
+            {
+                { "field", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") },
+                { "field2", DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") }
+            };
+
+            string requestUrl = $@"{dataSource.BaseUri}Search";
+            string requestContent = requestObj.ToString();
+            HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_EmptyNestedResponse.json");
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl &&
+                                                                                x.Content.ReadAsStringAsync().Result == requestContent),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
+
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
+
+            Mock<IHttpClientGenerator> generator = repo.Create<IHttpClientGenerator>();
+            generator.Setup(x => x.GenerateHttpClient(dataSource.BaseUri.ToString())).Returns(httpClient);
+
+            Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, null, authorizationProvider.Object, generator.Object, fileProvider.Object);
+
+            provider.Execute(job);
+
+            Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
+            Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
+            Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(1));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
         }

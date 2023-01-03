@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
@@ -355,55 +356,67 @@ namespace Sentry.data.Infrastructure
                 }
                 else
                 {
-                    SetNextRequestVariables(config);
+                    bool dataRetrievedForCurrentVariables = IsDataRetrievedForCurrentVariables(config);
+                    SetNextRequestVariables(config, dataRetrievedForCurrentVariables);
                 }
             }
 
             Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
         }
 
-        private void SetNextRequestVariables(PagingHttpsConfiguration config)
+        private bool IsDataRetrievedForCurrentVariables(PagingHttpsConfiguration config)
         {
             //check if data was found for the current request variables before incrementing
-            bool dataFoundForCurrentVariables = RequestVariablesAreEqual(config.RequestVariablesWithCollectedData, config.Job.RequestVariables);
+            bool dataFoundForCurrentVariables = config.RequestVariablesWithCollectedData != null &&
+                config.RequestVariablesWithCollectedData.Count == config.Job.RequestVariables.Count && 
+                config.RequestVariablesWithCollectedData.All(x => config.Job.RequestVariables.Any(a => x.EqualTo(a)));
+            
             if (!dataFoundForCurrentVariables)
             {
                 string additionalInfo = config.Options.RequestMethod == HttpMethods.post ? " " + config.RequestBody.ToString(Formatting.None) : "";
                 Logger.Warn($"Paging Https Retriever Job no data retrieved from {config.RequestUri}{additionalInfo} - Job: {config.Job.Id}");
             }
 
-            config.Job.IncrementRequestVariables();
+            return dataFoundForCurrentVariables;
+        }
 
-            if (config.Job.RequestVariables.Any() && config.Job.HasValidRequestVariables())
+        private void SetNextRequestVariables(PagingHttpsConfiguration config, bool dataRetrievedForCurrentVariables)
+        {
+            //RequestVariablesWithCollectedData is null when no data is retrieved on the very first request
+            if (config.RequestVariablesWithCollectedData != null)
             {
-                //variables able to be incremented, update request uri with incremented values
-                ReplaceVariablePlaceholders(config);
+                config.Job.IncrementRequestVariables();
 
-                if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
+                if (config.Job.RequestVariables.Any() && config.Job.HasValidRequestVariables())
                 {
-                    //start from first data source token if using OAuth
-                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+                    //variables able to be incremented, update request uri with incremented values
+                    ReplaceVariablePlaceholders(config);
+
+                    if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
+                    {
+                        //start from first data source token if using OAuth
+                        config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+                    }
+                }
+                else
+                {
+                    Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
+
+                    if (!dataRetrievedForCurrentVariables)
+                    {
+                        //keep track of what point data was last retrieved for
+                        Logger.Info($"Paging Https Retriever Job variables set after most recently collected variables - Job: {config.Job.Id}");
+                        config.Job.RequestVariables = config.RequestVariablesWithCollectedData;
+                        config.Job.IncrementRequestVariables();
+                    }
+
+                    config.RequestUri = "";
                 }
             }
             else
             {
-                Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
-
-                if (!dataFoundForCurrentVariables)
-                {
-                    //keep track of what point data was last retrieved for
-                    Logger.Info($"Paging Https Retriever Job variables set after most recently collected variables - Job: {config.Job.Id}");
-                    config.Job.RequestVariables = config.RequestVariablesWithCollectedData;
-                    config.Job.IncrementRequestVariables();
-                }
-
                 config.RequestUri = "";
             }
-        }
-
-        private bool RequestVariablesAreEqual(List<RequestVariable> collected, List<RequestVariable> current)
-        {
-            return collected.Count == current.Count && collected.All(x => current.Any(a => x.EqualTo(a)));
         }
 
         private void AddUpdatePageParameter(PagingHttpsConfiguration config, int parameterValue)
