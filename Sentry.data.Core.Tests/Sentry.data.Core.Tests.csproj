@@ -224,12 +224,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\Google.Protobuf.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CFG.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
@@ -242,6 +236,12 @@
       <Project>{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}</Project>
       <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\Google.Protobuf.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CFG.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

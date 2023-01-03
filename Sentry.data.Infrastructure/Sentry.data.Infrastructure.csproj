@@ -523,10 +523,10 @@
     <Analyzer Include="..\packages\AWSSDK.Lambda.3.7.14.26\analyzers\dotnet\cs\AWSSDK.Lambda.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.S3.3.7.9.66\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.7.1.212\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\Google.Protobuf.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CFG.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\Google.Protobuf.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CFG.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
