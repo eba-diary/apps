@@ -159,8 +159,8 @@ namespace Sentry.data.Web.Tests.Extensions
             Assert.AreEqual(flowModel.PreProcessingSelection, dto.PreProcessingOption, "PreProcessingOption");
             Assert.AreEqual(flowModel.ObjectStatus, dto.ObjectStatus, "ObjectStatu");
             Assert.AreEqual(flowModel.StorageCode, dto.FlowStorageCode, "FlowStorageCode");
-            Assert.AreEqual(flowModel.NamedEnvironment, dto.NamedEnvironment, "NamedEnvironment");
-            Assert.AreEqual(flowModel.NamedEnvironmentType, dto.NamedEnvironmentType, "NamedEnvironmentType");
+            Assert.AreEqual(flowModel.DataFlowNamedEnvironment, dto.NamedEnvironment, "NamedEnvironment");
+            Assert.AreEqual(flowModel.DataFlowNamedEnvironmentType, dto.NamedEnvironmentType, "NamedEnvironmentType");
             Assert.AreEqual(flowModel.PrimaryContactId, dto.PrimaryContactId, "PrimaryContactId");
             Assert.IsNotNull(dto.RetrieverJob, "RetrieverJob");
             Assert.AreEqual(JsonConvert.SerializeObject(toBeSearilalized), dto.DFQuestionnaire, "DFQuestionnaire");
