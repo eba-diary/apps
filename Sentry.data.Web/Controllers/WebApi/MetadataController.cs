@@ -438,9 +438,9 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("GenerateSchemaFromSampleData")]
         public async Task<IHttpActionResult> GenerateSchema([FromBody] JObject data)
         {
-            var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
-            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
-            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
+            JsonSchema schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(schema);
+            return Ok(schema);
         }
 
         /// <summary>
