@@ -16,7 +16,8 @@
 		  (12,	'Producer S3 Drop'),
 		  (13,	'XML'),
 		  (14,	'JSONFlattening'),
-		  (15,	'Google BigQuery API')
+		  (15,	'Google BigQuery API'),
+		  (16,	'Google Search Console API')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

@@ -58,6 +58,7 @@ namespace Sentry.data.Core
             public const string httpsRequestMethodNotSelected = "httpsRequestMethodNotSelected";
             public const string httpsRequestDataFormatNotSelected = "httpsRequestDataFormateNotSelected";
             public const string httpsRequestBodyIsBlank = "httpsRequestBodyIsBlank";
+            public const string httpsRequestBodyIsInvalidJson = "httpsRequestBodyIsInvalidJson";
             public const string httpsTargetFileNameIsBlank = "httpsTargetFileNameIsBlank";
             public const string httpsTargetFileNameContainsSpace = "httpsTargetFileNameContainsSpace";
             public const string ftpPatternNotSelected = "ftpPatternNotSelected";

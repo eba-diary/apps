@@ -10,11 +10,11 @@ namespace Sentry.data.Infrastructure
             Directory.CreateDirectory(path);
         }
 
-        public void DeleteFile(string path)
+        public void DeleteDirectory(string path)
         {
-            if (File.Exists(path))
+            if (Directory.Exists(path))
             {
-                File.Delete(path);
+                Directory.Delete(path, true);
             }
         }
 

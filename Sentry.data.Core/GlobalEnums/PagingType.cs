@@ -7,6 +7,8 @@ namespace Sentry.data.Core
         [Description("None")]
         None = 0,
         [Description("Page Number")]
-        PageNumber = 1
+        PageNumber = 1,
+        [Description("Index")]
+        Index = 2
     }
 }
