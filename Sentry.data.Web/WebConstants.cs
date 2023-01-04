@@ -16,6 +16,7 @@
             public const string VERSION_TAG = VERSION + "/tags";
             public const string VERSION_DATAFILE = VERSION + "/datafile";
             public const string VERSION_AUTH = VERSION + "/auth";
+            public const string VERSION_DATASOURCE = VERSION + "/datasource";
         }
     }
 }

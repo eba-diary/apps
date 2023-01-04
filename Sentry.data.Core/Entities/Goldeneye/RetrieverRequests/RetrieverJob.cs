@@ -5,6 +5,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
@@ -142,6 +143,44 @@ namespace Sentry.data.Core
             Dictionary<string, string> parameters = ExecutionParameters;
             parameters[key] = value;
             ExecutionParameters = parameters;
+        }
+
+        public virtual bool TryIncrementRequestVariables()
+        {
+            List<RequestVariable> variables = RequestVariables;
+
+            if (variables.Any())
+            {
+                foreach (RequestVariable variable in variables)
+                {
+                    //once 1 variable is unable to be incremented, none should be incremented
+                    if (!variable.TryIncrementVariableValue())
+                    {
+                        return false;
+                    }
+                }
+
+                RequestVariables = variables;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public virtual bool HasValidRequestVariables()
+        {
+            foreach (RequestVariable variable in RequestVariables)
+            {
+                //if 1 request variable is invalid, treat as if all are invalid
+                if (!variable.IsValidVariableValue())
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public virtual Uri GetUri()

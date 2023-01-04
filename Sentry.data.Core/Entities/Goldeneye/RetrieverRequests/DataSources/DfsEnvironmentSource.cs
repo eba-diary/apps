@@ -18,7 +18,7 @@ namespace Sentry.data.Core
 
         public override void Validate(RetrieverJob job, ValidationResults validationResults)
         {
-            throw new NotImplementedException();
+            //Nothing to validate
         }
     }
 }

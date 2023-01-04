@@ -215,16 +215,15 @@ namespace Sentry.data.Core.Tests
                 DataFlow = 3,
                 RelativeUri = "RelativeUri",
                 Schedule = "* * * * *",
-                PagingType = PagingType.Token,
-                PageTokenField = "tokenField",
-                PageParameterName = "token_param",
+                PagingType = PagingType.PageNumber,
+                PageParameterName = "param",
                 RequestVariables = new List<RequestVariableDto>
                 {
                     new RequestVariableDto
                     {
                         VariableName = "var",
                         VariableValue = "value",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -260,7 +259,7 @@ namespace Sentry.data.Core.Tests
             RequestVariable requestVariable = job.RequestVariables.First();
             Assert.AreEqual("var", requestVariable.VariableName);
             Assert.AreEqual("value", requestVariable.VariableValue);
-            Assert.AreEqual(RequestVariableIncrementType.Daily, requestVariable.VariableIncrementType);
+            Assert.AreEqual(RequestVariableIncrementType.DailyExcludeToday, requestVariable.VariableIncrementType);
 
             Assert.IsNotNull(job.JobOptions);
 
@@ -286,9 +285,8 @@ namespace Sentry.data.Core.Tests
             Assert.IsNull(httpsOptions.Body);
             Assert.AreEqual(HttpMethods.get, httpsOptions.RequestMethod);
             Assert.AreEqual(HttpDataFormat.none, httpsOptions.RequestDataFormat);
-            Assert.AreEqual(PagingType.Token, httpsOptions.PagingType);
-            Assert.AreEqual("tokenField", httpsOptions.PageTokenField);
-            Assert.AreEqual("token_param", httpsOptions.PageParameterName);
+            Assert.AreEqual(PagingType.PageNumber, httpsOptions.PagingType);
+            Assert.AreEqual("param", httpsOptions.PageParameterName);
 
             datasetContext.VerifyAll();
         }
@@ -350,7 +348,8 @@ namespace Sentry.data.Core.Tests
                 {
                     { "Param1", "Value1" },
                     { "Param2", "Value2" }
-                }
+                },
+                RequestVariables = new List<RequestVariableDto>()
             };
 
             List<RetrieverJob> jobs = new List<RetrieverJob>()
@@ -367,7 +366,11 @@ namespace Sentry.data.Core.Tests
                     Id = 2,
                     ObjectStatus = ObjectStatusEnum.Deleted,
                     DataFlow = new DataFlow() { SchemaId = 2 },
-                    RelativeUri = "RelativeUri"
+                    RelativeUri = "RelativeUri",
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions()
+                    }
                 }
             };
 
@@ -439,6 +442,486 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_RequestVariablesMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>
+                {
+                    new RequestVariableDto
+                    {
+                        VariableName = "Name",
+                        VariableValue = "Value",
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>
+                    {
+                        new RequestVariable
+                        {
+                            VariableName = "Name",
+                            VariableValue = "Value",
+                            VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                        }
+                    },
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions()
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsTrue(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_RequestVariablesValueNoMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>
+                {
+                    new RequestVariableDto
+                    {
+                        VariableName = "Name",
+                        VariableValue = "Value1",
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>
+                    {
+                        new RequestVariable
+                        {
+                            VariableName = "Name",
+                            VariableValue = "Value2",
+                            VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                        }
+                    },
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions()
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_RequestVariablesNameNoMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>
+                {
+                    new RequestVariableDto
+                    {
+                        VariableName = "Name1",
+                        VariableValue = "Value",
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>
+                    {
+                        new RequestVariable
+                        {
+                            VariableName = "Name2",
+                            VariableValue = "Value",
+                            VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                        }
+                    },
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions()
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_RequestVariablesIncrementTypeNoMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>
+                {
+                    new RequestVariableDto
+                    {
+                        VariableName = "Name",
+                        VariableValue = "Value",
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>
+                    {
+                        new RequestVariable
+                        {
+                            VariableName = "Name",
+                            VariableValue = "Value",
+                            VariableIncrementType = RequestVariableIncrementType.None
+                        }
+                    },
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions()
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_RequestVariablesCountNoMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>
+                {
+                    new RequestVariableDto
+                    {
+                        VariableName = "Name",
+                        VariableValue = "Value",
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                    }
+                }
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>
+                    {
+                        new RequestVariable
+                        {
+                            VariableName = "Name",
+                            VariableValue = "Value",
+                            VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                        },
+                        new RequestVariable
+                        {
+                            VariableName = "Name2",
+                            VariableValue = "Value2",
+                            VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                        }
+                    },
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions()
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_PagingTypeNoMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>(),
+                PagingType = PagingType.None,
+                PageParameterName = "Name"
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>(),
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions
+                        {
+                            PagingType = PagingType.PageNumber,
+                            PageParameterName = "Name"
+                        }
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_PagingParameterNameNoMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>(),
+                PagingType = PagingType.PageNumber,
+                PageParameterName = "Name"
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>(),
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions
+                        {
+                            PagingType = PagingType.PageNumber,
+                            PageParameterName = "Name2"
+                        }
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateAndSaveRetrieverJob_WithExecutionParameters_PagingMatch()
+        {
+            RetrieverJobDto dto = new RetrieverJobDto()
+            {
+                DataSourceId = 1,
+                FileSchema = 2,
+                RelativeUri = "RelativeUri",
+                ExecutionParameters = new Dictionary<string, string>()
+                {
+                    { "Param1", "Value1" },
+                    { "Param2", "Value2" }
+                },
+                RequestVariables = new List<RequestVariableDto>(),
+                PagingType = PagingType.PageNumber,
+                PageParameterName = "Name"
+            };
+
+            List<RetrieverJob> jobs = new List<RetrieverJob>()
+            {
+                new RetrieverJob()
+                {
+                    Id = 2,
+                    ObjectStatus = ObjectStatusEnum.Deleted,
+                    DataFlow = new DataFlow() { SchemaId = 2 },
+                    RelativeUri = "RelativeUri",
+                    RequestVariables = new List<RequestVariable>(),
+                    JobOptions = new RetrieverJobOptions
+                    {
+                        HttpOptions = new HttpsOptions
+                        {
+                            PagingType = PagingType.PageNumber,
+                            PageParameterName = "Name"
+                        }
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>(MockBehavior.Strict);
+            datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(new HTTPSSource() { Id = 11 });
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(new FileSchema() { SchemaId = 21 });
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
+            datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
+
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+
+            RetrieverJob job = service.CreateRetrieverJob(dto);
+
+            Assert.IsTrue(job.ExecutionParameters.Any());
+
+            datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
         public void CreateAndSaveRetrieverJob_PagingHTTPS_RetrieverJob()
         {
             RetrieverJobDto dto = new RetrieverJobDto()
@@ -450,9 +933,8 @@ namespace Sentry.data.Core.Tests
                 Schedule = "* * * * *",
                 RequestMethod = HttpMethods.get,
                 RequestDataFormat = HttpDataFormat.json,
-                PagingType = PagingType.Token,
-                PageTokenField = "tokenField",
-                PageParameterName = "token",
+                PagingType = PagingType.PageNumber,
+                PageParameterName = "pageNumber",
                 TargetFileName = "FileName"
             };
 
@@ -499,9 +981,8 @@ namespace Sentry.data.Core.Tests
             Assert.IsNull(httpsOptions.Body);
             Assert.AreEqual(HttpMethods.get, httpsOptions.RequestMethod);
             Assert.AreEqual(HttpDataFormat.json, httpsOptions.RequestDataFormat);
-            Assert.AreEqual(PagingType.Token, httpsOptions.PagingType);
-            Assert.AreEqual("tokenField", httpsOptions.PageTokenField);
-            Assert.AreEqual("token", httpsOptions.PageParameterName);
+            Assert.AreEqual(PagingType.PageNumber, httpsOptions.PagingType);
+            Assert.AreEqual("pageNumber", httpsOptions.PageParameterName);
 
             datasetContext.VerifyAll();
         }

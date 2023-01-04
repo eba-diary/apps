@@ -1,4 +1,7 @@
-﻿namespace Sentry.data.Infrastructure
+﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
+
+namespace Sentry.data.Infrastructure
 {
     public class GoogleBigQueryConfiguration
     {
@@ -9,5 +12,7 @@
         public string PageToken { get; set; }
         public int LastIndex { get; set; }
         public int TotalRows { get; set; }
+        public RetrieverJob Job { get; set; }
+        public DataFlowStep S3DropStep { get; set; }
     }
 }
