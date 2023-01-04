@@ -544,7 +544,6 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DeleteFilesExtension.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
-    <Compile Include="Extensions\MigrationExtensions.cs" />
     <Compile Include="Extensions\TileExtensions.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
@@ -564,8 +563,10 @@
     <Compile Include="Models\ApiModels\DatasetFile\DeleteFilesParamModel.cs" />
     <Compile Include="Models\ApiModels\Job\JavaOptionsOverride.cs" />
     <Compile Include="Models\ApiModels\Migration\DatasetMigrationRequestModel.cs" />
+    <Compile Include="Models\ApiModels\Migration\DatasetMigrationResponseModel.cs" />
     <Compile Include="Models\ApiModels\Migration\MigrationRequestModel.cs" />
     <Compile Include="Models\ApiModels\Migration\SchemaMigrationRequestModel.cs" />
+    <Compile Include="Models\ApiModels\Migration\SchemaMigrationResponseModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
     <Compile Include="Models\ApiModels\PagedResponse.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionTypeEnum.cs" />
