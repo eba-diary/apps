@@ -109,13 +109,11 @@
                 </div>
 
                 @* search box *@
-                <div class="input-group md-form has-feedback has-feedback-left">
+                <div class="input-group md-form">
                     <span class="input-group-prepend sentry-blue white-text icon-search" id="SearchBoxAddon"></span>
                     <input class="form-control text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
                     <input class="form-control text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
                 </div>
-
-
 
                 @* filters/tiles (hidden by default until content loads *@
                 <div id="dataColumn" style="display:none;">
