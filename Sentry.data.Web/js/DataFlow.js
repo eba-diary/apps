@@ -85,8 +85,6 @@
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
-
-        data.Job.FormInit();
     },
 
     DataFlowDetailInit: function (dataflowId) {
@@ -168,6 +166,7 @@
             if (ingestionSelection === "2") {
                 $('#retrieverPanelSpinner').css('float', 'left');
                 Sentry.InjectSpinner($("#retrieverPanelSpinner"));
+                data.Job.FormInit();
                 $('.retrieverPanel').show();
             }
             //if changing to Push
