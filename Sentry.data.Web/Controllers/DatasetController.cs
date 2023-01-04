@@ -118,10 +118,7 @@ namespace Sentry.data.Web.Controllers
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(cdm.SAIDAssetKeyCode, cdm.DatasetNamedEnvironment);
-            cdm.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            cdm.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            cdm.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(cdm);
 
             _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
 
@@ -144,10 +141,7 @@ namespace Sentry.data.Web.Controllers
                 Utility.SetupLists(_datasetContext, model);
                 model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
-                var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.DatasetNamedEnvironment);
-                model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-                model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-                model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+                await SetNamedEnvironmentProperties(model);
 
                 _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Edit Page", id);
                 
@@ -199,10 +193,7 @@ namespace Sentry.data.Web.Controllers
             Utility.SetupLists(_datasetContext, cdm);
             cdm.SAIDAssetDropDown = await BuildSAIDAssetDropDown(cdm.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(cdm.SAIDAssetKeyCode, cdm.DatasetNamedEnvironment);
-            cdm.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            cdm.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            cdm.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(cdm);
 
             _ = _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, "Viewed Dataset Creation Page", cdm.DatasetId);
             ViewData["Title"] = "Create Dataset";
@@ -220,10 +211,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetNamedEnvironment = namedEnvironment
             };
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(assetKeyCode, namedEnvironment);
-            model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(model);
 
             return PartialView(model);
         }
@@ -301,10 +289,8 @@ namespace Sentry.data.Web.Controllers
                 model.CategoryNames = model.AllCategories.Where(cat => model.DatasetCategoryIds.Contains(int.Parse(cat.Value))).Select(cat => cat.Text).ToList();
             }
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.DatasetNamedEnvironment);
-            model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
+            await SetNamedEnvironmentProperties(model);
             
             model.CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue();         //REMOVE WHEN TURNED ON LATER
 
@@ -1300,5 +1286,12 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        private async Task SetNamedEnvironmentProperties(DatasetModel model)
+        {
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.DatasetNamedEnvironment);
+            model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+            model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+        }
     }
 }
