@@ -232,11 +232,15 @@ namespace Sentry.data.Core.Tests
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(new ValidationResults()));
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
             var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
             var lazyUserService = new Lazy<IUserService>(() => userService.Object);
             var lazyQuartermasterService = new Lazy<IQuartermasterService>(() => quartermasterService.Object);
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, lazyDatasetService, null, null, null, lazyUserService, null, lazySecurityService, null, null, lazyQuartermasterService);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, lazyDatasetService, null, null, null, lazyUserService, lazyDataFeatures, lazySecurityService, null, null, lazyQuartermasterService);
             dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1).Callback<DatasetDto>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateWithoutSave)}", ++callOrder)));
             dataApplicationService.Setup(s => s.MigrateSchemaWithoutSave_Internal(It.IsAny<List<SchemaMigrationRequest>>())).Returns(new List<SchemaMigrationRequestResponse>()).Callback<List<SchemaMigrationRequest>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}", ++callOrder)));
@@ -276,6 +280,9 @@ namespace Sentry.data.Core.Tests
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(new ValidationResults()));
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
             Dataset dataset = MockClasses.MockDataset(user: user.Object);
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(dataset);
@@ -286,7 +293,8 @@ namespace Sentry.data.Core.Tests
             var lazyUserService = new Lazy<IUserService>(() => userService.Object);
             var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
             var lazyQuartermasterService = new Lazy<IQuartermasterService>(() => quartermasterService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, lazyUserService, null, lazySecurityService, null, null, lazyQuartermasterService);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, lazyUserService, lazyDataFeatures, lazySecurityService, null, null, lazyQuartermasterService);
 
             DatasetMigrationRequest request = new DatasetMigrationRequest()
             {
@@ -333,10 +341,14 @@ namespace Sentry.data.Core.Tests
             Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
             schemaService.Setup(s => s.SchemaExistsInTargetDataset(It.IsAny<int>(), It.IsAny<string>())).Returns((0,false));
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
             var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
             var lazyUserService = new Lazy<IUserService>(() => userService.Object);
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
-            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, lazyUserService, null, lazySecurityService, lazySchemaService, null, null);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, lazyUserService, lazyDataFeatures, lazySecurityService, lazySchemaService, null, null);
 
             //Assert
             Assert.ThrowsException<SchemaUnauthorizedAccessException>(() => dataApplicationService.MigrateSchema(request));
@@ -384,10 +396,14 @@ namespace Sentry.data.Core.Tests
             schemaService.Setup(s => s.SchemaExistsInTargetDataset(It.IsAny<int>(), It.IsAny<string>())).Returns((targetSchema.SchemaId, true));
             schemaService.Setup(s => s.GetLatestSchemaRevisionFieldStructureBySchemaId(It.IsAny<int>(), It.IsAny<int>())).Returns(schemaRevisionDto);
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
             var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
             var lazyUserService = new Lazy<IUserService>(() => userService.Object);
             var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
-            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, lazyUserService, null, lazySecurityService, lazySchemaService, null, null);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, lazyUserService, lazyDataFeatures, lazySecurityService, lazySchemaService, null, null);
             dataApplicationService.Setup(s => s.CheckPermissionToMigrateSchema(targetSchema.SchemaId));
             dataApplicationService.Setup(s => s.CreateWithoutSave(It.IsAny<SchemaRevisionFieldStructureDto>())).Returns(777);
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForSchemaRevision(It.IsAny<List<(int, int)>>()));
