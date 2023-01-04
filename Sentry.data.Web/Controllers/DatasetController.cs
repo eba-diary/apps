@@ -84,22 +84,6 @@ namespace Sentry.data.Web.Controllers
             get { return _dataApplicationService.Value; }
         }
 
-        public ActionResult Index()
-        {
-            HomeModel hm = new HomeModel
-            {
-                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).Count(),
-                Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
-                DirectToSearchPages = _featureFlags.CLA3756_UpdateSearchPages.GetValue()
-            };
-
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, "Viewed Dataset Home Page", 0);
-            return View(hm);
-        }
-
-
         #region Dataset Modification
 
         [HttpGet]

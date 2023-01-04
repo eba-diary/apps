@@ -818,57 +818,6 @@ data.Dataset = {
         data.Dataset.DataFlowIdSelected = dataInput.Id
     },
 
-
-
-
-
-    IndexInit: function () {
-        /// Initialize the Index page for data assets (with the categories)
-
-        $(".sentry-app-version").hide();
-
-        $("[id^='CreateDataset']").click(function (e) {
-            e.preventDefault();
-            window.location = "/Dataset/Create";
-        });
-
-        $("[id^='CreateDataflow']").click(function (e) {
-            e.preventDefault();
-            window.location = "/Dataflow/Create";
-        });
-
-        $("[id^='UploadDatafile']").click(function (e) {
-            e.preventDefault();
-            data.Dataset.LoadUploadFileModal(0);
-        });
-
-        $('.tile').click(function (e) {
-            var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-            if (storedNames !== null) {
-                for (i = 0; i < storedNames.length; i++) {
-                    $('#' + storedNames[i]).prop('checked', false);
-                }
-                localStorage.removeItem("filteredIds");
-            }
-
-            localStorage.removeItem("searchText");
-        });
-
-        $('#DatasetSearch').submit(function (e) {
-            localStorage.removeItem("filteredIds");
-
-            localStorage.removeItem("searchText");
-
-            localStorage.setItem("searchText", $('#SearchText')[0].value);
-        });
-
-        $('.input-group-prepend').click(function (e) {
-            $('#DatasetSearch').submit();
-        });
-
-    },
-
     FormSubmitInit: function () {
         $("#DatasetFormContent #IsSecured").removeAttr("disabled");
         $.ajax({

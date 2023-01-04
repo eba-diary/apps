@@ -73,55 +73,6 @@ namespace Sentry.data.Web.Tests
 
         [TestMethod]
         [TestCategory("Dataset Controller")]
-        public void Dataset_Controller_Index_Model_Check_Index_URL()
-        {
-            var user = MockUsers.App_DataMgmt_Upld();
-            var ds = MockClasses.MockDataset();
-            var dac = MockControllers.MockDatasetController(ds, user);
-
-            var result = dac.Index() as ViewResult;
-
-            //We don't want to see Index in the URL
-            Assert.AreEqual("", result.ViewName);
-        }
-
-        [TestMethod]
-        [TestCategory("Dataset Controller")]
-        public void Dataset_Controller_Index_Model_Check_Default_User()
-        {
-            var user = MockUsers.App_DataMgmt_Upld();
-            var ds = MockClasses.MockDataset();
-            var dac = MockControllers.MockDatasetController(ds, user);
-
-            var result = dac.Index() as ViewResult;
-
-            Assert.IsTrue(result.Model.GetType() == typeof(HomeModel));
-
-            var model = (result.Model as HomeModel);
-
-            Assert.IsFalse(model.CanEditDataset);
-        }
-
-        [TestMethod]
-        [TestCategory("Dataset Controller")]
-        public void Dataset_Controller_Index_Model_Check_Manage_Dataset_User()
-        {
-            var user = MockUsers.App_DataMgmt_MngDS();
-            var ds = MockClasses.MockDataset();
-            var dac = MockControllers.MockDatasetController(ds, user);
-
-            var result = dac.Index() as ViewResult;
-
-            Assert.IsTrue(result.Model.GetType() == typeof(HomeModel));
-
-            var model = (result.Model as HomeModel);
-
-            Assert.IsTrue(model.CanEditDataset);
-        }
-
-
-        [TestMethod]
-        [TestCategory("Dataset Controller")]
         [TestCategory("Dataset Subscriptions")]
         public void Dataset_Controller_Subscribe_Check_Current_Subscriptions_With_Subs()
         {
