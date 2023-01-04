@@ -135,6 +135,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception datasetfile - {errorMetadata}", ex);
                 return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Data File");
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception - {errorMetadata}", ex);
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access");
+            }
             catch (Exception ex)
             {
                 Logger.Error($"{controllerName.ToLower()}_{methodName.ToLower()}_internalservererror - {errorMetadata}", ex);

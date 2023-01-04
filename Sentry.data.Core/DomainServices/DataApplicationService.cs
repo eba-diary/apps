@@ -171,6 +171,11 @@ namespace Sentry.data.Core
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateDataset).ToLower()}";
             Logger.Info($"{methodName} Method Start");
             Logger.Info($"{methodName} {JsonConvert.SerializeObject(migrationRequest)}");
+
+            if (!DataFeatures.CLA1797_DatasetSchemaMigration.GetValue())
+            {
+                throw new UnauthorizedAccessException("Not authorized to use this functionality");
+            }
             
             //Perform validations on incoming request object
             List<string> errors = await ValidateMigrationRequest(migrationRequest);
@@ -263,6 +268,11 @@ namespace Sentry.data.Core
 
         public SchemaMigrationRequestResponse MigrateSchema(SchemaMigrationRequest request)
         {
+            if (!DataFeatures.CLA1797_DatasetSchemaMigration.GetValue())
+            {
+                throw new UnauthorizedAccessException("Not authorized to use this functionality");
+            }
+
             return MigrateSchema_Internal(request);
         }
         #endregion
