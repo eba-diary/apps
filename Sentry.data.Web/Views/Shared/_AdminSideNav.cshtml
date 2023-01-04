@@ -1,13 +1,26 @@
 ﻿<!--Partial View containing links to admin pages-->
-<div class="card form-wrapper col-lg-2 side-nav-wrapper" id="sideNav">
+<div class="col-lg-2 side-nav-wrapper" id="sideNav">
     <div class="card-body">
         <h2 class="card-title">Admin Actions</h2>
-        <a href="@Url.Action("Index", "Admin")"><h4>Admin Home</h4></a>
-        <a href="@Url.Action("DataFileReprocessing", "Admin")"><h4>Reprocess Data Files</h4></a>
-        <a href="@Url.Action("DataFlowMetrics", "Admin")"><h4>Data Flow Metrics</h4></a>
-        <a href="@Url.Action("ConnectorStatus","Admin")"><h4>Connector Status</h4></a>
-        <a href="@Url.Action("ReprocessDeadSparkJobs", "Admin")"><h4>Reprocess Dead Jobs</h4></a>
-        <a href="@Url.Action("SupportLinks", "Admin")"><h4>Link Farm</h4></a>
-        <a href="@Url.Action("RawqueryParquetAudit", "Admin")"><h4>General Rawquery/Parquet Audit</h4></a>
+        <hr />
+        <a data-nav-id="admin" class="side-nav-links" href="@Url.Action("Index", "Admin")">Admin Home</a>
+        <h5>Reprocessing</h5>
+        <ul>
+            <li><a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("DataFileReprocessing", "Admin")">Data Files</a></li>
+            <li><a data-nav-id="reprocessdeadsparkjobs" class="side-nav-links" href="@Url.Action("ReprocessDeadSparkJobs", "Admin")">Dead Jobs</a></li>
+        </ul>
+        <h5>Audit</h5>
+        <ul>
+            <li><a data-nav-id="rawqueryparquetaudit" class="side-nav-links" href="@Url.Action("RawqueryParquetAudit", "Admin")">General Rawquery/Parquet Audit</a></li>
+        </ul>
+        <h5>Status</h5>
+        <ul>
+            <li><a data-nav-id="dataflowmetrics" class="side-nav-links" href="@Url.Action("DataFlowMetrics", "Admin")">Data Flow Metrics</a></li>
+            <li><a data-nav-id="connectorstatus" class="side-nav-links" href="@Url.Action("ConnectorStatus","Admin")">Connector Status</a></li>
+        </ul>
+        <h5>Misc</h5>
+        <ul>
+            <li><a data-nav-id="supportlinks" class="side-nav-links" href="@Url.Action("SupportLinks", "Admin")">Link Farm</a></li>
+        </ul>
     </div>
 </div>

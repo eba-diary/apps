@@ -233,11 +233,11 @@ a.create-link:focus {
     display: flex;
 }
 
-.schema-delete-icon {
+.red-delete-icon {
     color: #B3140B !important;
 }
 
-    .schema-delete-icon:hover {
+    .red-delete-icon:hover {
         color: #f54940 !important;
     }
 
@@ -274,4 +274,13 @@ a.create-link:focus {
 
 .schema-card-header:hover {
     background-color: #f7f5f5 !important;
+}
+
+.request-variable-row {
+    display: flex;
+    align-items: baseline;
+}
+
+.remove-request-variable {
+    font-size: 1.25rem;
 }

@@ -1174,7 +1174,7 @@ namespace Sentry.data.Core
 
             if (_encryptService.IsEncrypted(input))
             {
-                return input.Replace(Encryption.ENCRYPTIONINDICATOR, "");
+                return input.Replace(Indicators.ENCRYPTIONINDICATOR, "");
             }
 
             return _encryptService.EncryptString(input, Config.GetHostSetting("EncryptionServiceKey"), ivKey).Item1;
@@ -1311,6 +1311,12 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(source);
 
+            if (auth.Is<OAuthAuthentication>())
+            {
+                ((HTTPSSource)source).Tokens = new List<DataSourceToken>();
+                MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
+            }
+
             if (source.IsSecured)
             {
                 source.Security = new Security(SecurableEntityName.DATASOURCE)
@@ -1366,8 +1372,6 @@ namespace Sentry.data.Core
                         ((HTTPSSource)source).ClientId = dto.ClientId;
                         ((HTTPSSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1;
                         ((HTTPSSource)source).GrantType = dto.GrantType;
-                        ((HTTPSSource)source).Tokens = new List<DataSourceToken>();
-                        MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
                     }
                     break;
                 case DataSourceDiscriminator.GOOGLE_API_SOURCE:
@@ -1392,8 +1396,6 @@ namespace Sentry.data.Core
                     {
                         ((GoogleApiSource)source).ClientId = dto.ClientId;
                         ((GoogleApiSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1;
-                        ((GoogleApiSource)source).Tokens = new List<DataSourceToken>();
-                        MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
                     }
                     break;
                 case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
@@ -1401,10 +1403,8 @@ namespace Sentry.data.Core
                     {
                         IVKey = ivKey,
                         ClientId = dto.ClientId,
-                        ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1,
-                        Tokens = new List<DataSourceToken>()
+                        ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1
                     };
-                    MapDtoTokensToDataSourceTokens(dto, (GoogleBigQueryApiSource)source);
 
                     break;
                 default:

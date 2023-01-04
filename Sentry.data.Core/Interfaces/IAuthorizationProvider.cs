@@ -1,8 +1,10 @@
-﻿namespace Sentry.data.Core
+﻿using System;
+
+namespace Sentry.data.Core
 {
-    public interface IAuthorizationProvider
+    public interface IAuthorizationProvider : IDisposable
     {
-        string GetOAuthAccessToken(HTTPSSource source);
-        string GetOAuthAccessTokenForToken(HTTPSSource source, DataSourceToken token);
+        string GetOAuthAccessToken(HTTPSSource source, DataSourceToken token);
+        string GetTokenAuthenticationToken(HTTPSSource source);
     }
 }

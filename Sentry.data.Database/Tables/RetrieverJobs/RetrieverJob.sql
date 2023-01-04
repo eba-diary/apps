@@ -18,6 +18,7 @@
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NULL, 
     [ExecutionParameters] NVARCHAR(MAX) NULL, 
+    [RequestVariables] NVARCHAR(MAX) NULL, 
     PRIMARY KEY CLUSTERED ([Job_ID] ASC),
     CONSTRAINT [FK_RetrieverJob_DatasetFileConfigs] FOREIGN KEY ([Config_ID]) REFERENCES [dbo].[DatasetFileConfigs] ([Config_ID]),
     CONSTRAINT [FK_RetrieverJob_DataSource] FOREIGN KEY ([DataSource_ID]) REFERENCES [dbo].[DataSource] ([DataSource_Id])

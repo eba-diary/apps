@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,6 +47,10 @@ namespace Sentry.data.Core.DTO.Security
 
         public string GetGroupName()
         {
+            if (bool.Parse(Config.GetHostSetting("IncludeNamedEnvironmentInAdGroup"))) //if nonprod, return add env to ticket 
+            {
+                return $"DS_{Config.GetDefaultEnvironmentName()}_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
+            }
             return $"DS_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
         }
     }

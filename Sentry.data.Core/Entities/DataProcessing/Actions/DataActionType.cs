@@ -34,6 +34,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("JSONFlattening")]
         JsonFlattening = 14,
         [Description("Google BigQuery API")]
-        GoogleBigQueryApi = 15
+        GoogleBigQueryApi = 15,
+        [Description("Google Search Console API")]
+        GoogleSearchConsoleApi = 16
     }
 }

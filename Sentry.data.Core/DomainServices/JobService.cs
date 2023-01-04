@@ -252,9 +252,8 @@ namespace Sentry.data.Core
             //if we have previous execution parameters from a data flow edit, only keep if RelativeUri did not change
             if (dto.ExecutionParameters?.Any() == true && dto.FileSchema > 0)
             {
-                //check that all jobs are currently deleted and get the most recent deleted job
                 RetrieverJob previousRetrieverJob = _datasetContext.RetrieverJob.OrderByDescending(x => x.Id).FirstOrDefault(w => w.DataFlow.SchemaId == dto.FileSchema);
-                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && previousRetrieverJob.RelativeUri == job.RelativeUri)
+                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && AreSameHttpsRequests(previousRetrieverJob, job))
                 {
                     job.ExecutionParameters = dto.ExecutionParameters;
                 }
@@ -582,7 +581,6 @@ namespace Sentry.data.Core
         }
 
         #region Private Methods
-
         private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
         {
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
@@ -642,6 +640,25 @@ namespace Sentry.data.Core
 
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
             return response;
+        }
+
+        private bool AreSameHttpsRequests(RetrieverJob previousJob, RetrieverJob newJob)
+        {
+            bool areSame = previousJob.RelativeUri == newJob.RelativeUri &&
+                previousJob.JobOptions.HttpOptions.PagingType == newJob.JobOptions.HttpOptions.PagingType &&
+                previousJob.JobOptions.HttpOptions.PageParameterName == newJob.JobOptions.HttpOptions.PageParameterName &&
+                previousJob.RequestVariables.Count == newJob.RequestVariables.Count;
+
+            if (areSame && previousJob.RequestVariables.Any())
+            {
+                //if request variables exist, make sure they are all the same (we already verified we have the same number of variables)
+                areSame = previousJob.RequestVariables.All(previous =>
+                    newJob.RequestVariables.Any(newVar => newVar.VariableValue == previous.VariableValue &&
+                    newVar.VariableName == previous.VariableName &&
+                    newVar.VariableIncrementType == previous.VariableIncrementType));
+            }
+
+            return areSame;
         }
 
         internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
@@ -931,7 +948,6 @@ namespace Sentry.data.Core
             httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
             httpOptions.RequestDataFormat = dto.RequestDataFormat?? HttpDataFormat.none;
             httpOptions.PagingType = dto.PagingType;
-            httpOptions.PageTokenField = dto.PageTokenField;
             httpOptions.PageParameterName = dto.PageParameterName;
         }
 
@@ -951,6 +967,7 @@ namespace Sentry.data.Core
             job.ObjectStatus = dto.ObjectStatus;
             job.DeleteIssueDTM = dto.DeleteIssueDTM;
             job.DeleteIssuer = dto.DeleteIssuer;
+            job.RequestVariables = dto.RequestVariables?.Select(x => x.ToEntity()).ToList();
         }
 
         private void DeleteJobFromScheduler(RetrieverJob job)

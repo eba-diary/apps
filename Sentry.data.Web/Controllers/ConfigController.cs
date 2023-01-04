@@ -1325,7 +1325,7 @@ namespace Sentry.data.Web.Controllers
             {
                 output.Add(new SelectListItem()
                 {
-                    Text = "Pick a Request Data Format type",
+                    Text = "Pick a Data Format",
                     Value = "0",
                     Selected = true,
                     Disabled = true

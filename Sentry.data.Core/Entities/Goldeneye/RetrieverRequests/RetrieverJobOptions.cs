@@ -90,7 +90,6 @@ namespace Sentry.data.Core
             public HttpMethods RequestMethod { get; set; }
             public HttpDataFormat RequestDataFormat { get; set; }
             public PagingType PagingType { get; set; }
-            public string PageTokenField { get; set; }
             public string PageParameterName { get; set; }
         }
     }

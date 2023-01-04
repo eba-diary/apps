@@ -660,7 +660,7 @@ namespace Sentry.data.Infrastructure
                 poReq.BucketName = targetBucket;
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                poReq.AutoCloseStream = true;
+                poReq.AutoCloseStream = false;
                 poReq.CannedACL = GetCannedAcl();
 
                 if (UploadTagKeyValuePairs != null)

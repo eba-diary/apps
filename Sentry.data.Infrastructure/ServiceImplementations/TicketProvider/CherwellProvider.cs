@@ -63,7 +63,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error("cherwell_retrieveTicket_failed", ex);
+                Logger.Error($"cherwell_retrieveTicket_failed {ticketId}", ex);
                 return null;
             }            
         }

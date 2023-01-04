@@ -523,9 +523,9 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("GenerateSchemaFromSampleData")]
         public async Task<IHttpActionResult> GenerateSchema([FromBody] JObject data)
         {
-            var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
-            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
-            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
+            JsonSchema schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(schema);
+            return Ok(schema);
         }
 
         /// <summary>
@@ -837,31 +837,40 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("PublishMessage")]
         public IHttpActionResult PublishMessage([FromBody] KafkaMessage message)
         {
+            string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(PublishMessage).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+
+            Logger.AddContextVariable(new TextVariable("requestcontextguid", DateTime.UtcNow.ToString(GlobalConstants.System.REQUEST_CONTEXT_GUID_FORMAT)));
+            Logger.AddContextVariable(new TextVariable("requestcontextmethod", methodName));
+
             try
             {
                 if (message == null)
                 {
-                    Logger.Error($"jobcontroller-publishmessage null message");
+                    Logger.Error($"{methodName} null message");
                     throw new ArgumentException("message parameter is null");
                 }
                 else
                 {
-                    Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
+                    Logger.Info($"{methodName} message:{ JsonConvert.SerializeObject(message) }");
                 }
 
-                _messagePublisher.PublishDSCEvent(message.Key, message.Message, message.Topic);
-                return Ok();
+                _messagePublisher.PublishDSCEvent(message.Key, message.Message, message.Topic);                
             }
             catch (KafkaProducerException ex)
             {
-                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                Logger.Error($"{methodName} failure", ex);
                 return Content(System.Net.HttpStatusCode.BadGateway, "Unable to produce messages to kafka");
             }
             catch (Exception ex)
             {
-                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                Logger.Error($"{methodName} failure", ex);
                 return InternalServerError();
             }
+
+            Logger.Info($"{methodName} Method End");
+            return Ok();
+
         }
         
         /// <summary>
