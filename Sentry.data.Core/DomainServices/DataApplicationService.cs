@@ -510,6 +510,11 @@ namespace Sentry.data.Core
             Logger.Info($"{methodName} Method End");
             return newFileSchemaId;
         }
+        internal virtual int CreateWithoutSave(SchemaRevisionFieldStructureDto dto)
+        {
+            int newRevisionId = SchemaService.CreateSchemaRevision(dto);
+            return newRevisionId;
+        }
         private void CreateWithoutSave_DfsRetrieverJob(DataFlow dataFlow)
         {
             if (dataFlow.ShouldCreateDFSDropLocations(DataFeatures))
@@ -522,11 +527,6 @@ namespace Sentry.data.Core
             _ = JobService.CreateRetrieverJob(retrieverJobDto);
         }
 
-        internal virtual int CreateWithoutSave(SchemaRevisionFieldStructureDto dto)
-        {
-            int newRevisionId = SchemaService.CreateSchemaRevision(dto);
-            return newRevisionId;
-        }
 
 
         /// <summary>
