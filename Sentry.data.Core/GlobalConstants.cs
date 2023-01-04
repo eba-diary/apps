@@ -239,6 +239,7 @@ namespace Sentry.data.Core
         {
             public const string AD = "AD";
             public const string AWS_IAM = "AWS_IAM";
+            public const string SNOWFLAKE = "SNOWFLAKE";
         }
 
         public static class ConvertedFileStoragePrefix

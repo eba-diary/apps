@@ -28,6 +28,7 @@ namespace Sentry.data.Core
         public virtual bool IsSecuredAtUserLevel { get; set; }
         public virtual string GrantPermissionToUserId { get; set; }
         public virtual string AwsArn { get; set; }
+        public virtual string SnowflakeAccount { get; set; }
         public virtual Security ParentSecurity { get; set; }
 
         public virtual IList<SecurityPermission> AddedPermissions { get; set; }
@@ -56,6 +57,10 @@ namespace Sentry.data.Core
                 {
                     return AwsArn;
                 }
+                else if (SnowflakeAccount != null)
+                {
+                    return SnowflakeAccount;
+                }
                 else
                 {
                     return null;
@@ -78,6 +83,10 @@ namespace Sentry.data.Core
                 else if (AwsArn != null)
                 {
                     return GlobalConstants.IdentityType.AWS_IAM;
+                }
+                else if (SnowflakeAccount != null)
+                {
+                    return GlobalConstants.IdentityType.SNOWFLAKE;
                 }
                 else
                 {

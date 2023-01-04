@@ -37,6 +37,17 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("arn:aws:iam::376585054624:role/CA-DataEngineering", ticket.Identity);
             Assert.AreEqual(GlobalConstants.IdentityType.AWS_IAM, ticket.IdentityType);
         }
+        
+        /// <summary>
+        /// Tests that a Security Ticket with an AWS Arn defined returns the correct Identity/IdentityType
+        /// </summary>
+        [TestMethod]
+        public void SecurityTicket_Identity_Snowflake()
+        {
+            var ticket = new SecurityTicket() { SnowflakeAccount = "SampleSnowflakeAccount" };
+            Assert.AreEqual("SampleSnowflakeAccount", ticket.Identity);
+            Assert.AreEqual(GlobalConstants.IdentityType.SNOWFLAKE, ticket.IdentityType);
+        }
 
         /// <summary>
         /// Tests that a Security Ticket with no identity defined returns a null Identity/IdentityType

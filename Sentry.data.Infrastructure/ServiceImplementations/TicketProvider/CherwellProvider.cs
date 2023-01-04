@@ -527,6 +527,24 @@ namespace Sentry.data.Infrastructure
                     sb.Append($"</ul>");
                     sb.Append($"<br>");
                     break;
+                case AccessRequestType.SnowflakeAcoount:
+                    if (model.IsAddingPermission)
+                    {
+                        sb.Append($"Please grant the Snowflake Account {model.SnowflakeAccount} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)}{(model.Scope != AccessScope.Asset ? $" ({model.SecurableObjectNamedEnvironment})" : String.Empty)} data. <br>");
+                    }
+                    else
+                    {
+                        sb.Append($"Please remove the following permissions for the Snowflake Account {model.SnowflakeAccount} from {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)}{(model.Scope != AccessScope.Asset ? $" ({model.SecurableObjectNamedEnvironment})" : String.Empty)} data. <br>");
+                    }
+
+                    foreach (Permission item in model.Permissions)
+                    {
+                        sb.Append($"<li>{item.PermissionName} - {item.PermissionDescription} </li>");
+                    }
+
+                    sb.Append($"</ul>");
+                    sb.Append($"<br>");
+                    break;
                 case AccessRequestType.Inheritance:
                     sb.Append($"Please {(model.IsAddingPermission ? "enable" : "disable")} inheritance for dataset {model.SecurableObjectName} from Data.Sentry.com. {(model.IsAddingPermission ? "Enabling" : "Disabling")} inheritance will {(model.IsAddingPermission ? "allow" : "prevent")} the dataset {(model.IsAddingPermission ? "to" : "from")} {(model.IsAddingPermission ? "inherit" : "inheriting")} permissions from its parent asset {model.SaidKeyCode}.");
                     sb.Append($" When approved, users with access to {model.SaidKeyCode} in Data.Sentry.com {(model.IsAddingPermission ? "will" : "will not")} have access to {model.SecurableObjectName} data.");
@@ -583,6 +601,8 @@ namespace Sentry.data.Infrastructure
             {
                 case AccessRequestType.AwsArn:
                     return $"Access {(model.IsAddingPermission ? "" : "Removal")} Request for AWS ARN {model.AwsArn}";
+                case AccessRequestType.SnowflakeAcoount:
+                    return $"Access {(model.IsAddingPermission ? "" : "Removal")} Request for Snowflake Account {model.SnowflakeAccount}";
                 case AccessRequestType.Inheritance:
                     return $"Inheritance {(model.IsAddingPermission ? "enable" : "disable")} request for {model.SecurableObjectName}";
                 default:

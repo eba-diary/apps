@@ -11,6 +11,7 @@ namespace Sentry.data.Core
         RemovePermission,
         [Description("Inheritance")]
         Inheritance,
+        [Description("Snowflake Account")]
         SnowflakeAcoount = 4
     }
 }
