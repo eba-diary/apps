@@ -455,7 +455,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
+    <Compile Include="Interfaces\IAuthorizationSigner.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
+    <Compile Include="Interfaces\IFileProvider.cs" />
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
     <Compile Include="Interfaces\IHttpClientGenerator.cs" />

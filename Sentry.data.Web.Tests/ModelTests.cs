@@ -34,9 +34,8 @@ namespace Sentry.data.Web.Tests
                     SelectedDataSource = "3",
                     SchedulePicker = "4",
                     Schedule = "* * * * *",
-                    PagingType = PagingType.Token,
-                    PageParameterName = "ParameterName",
-                    PageTokenField = "PageToken"
+                    PagingType = PagingType.PageNumber,
+                    PageParameterName = "ParameterName"
                 },
                 SchemaMaps = new List<SchemaMapModel>
                 {
@@ -53,47 +52,6 @@ namespace Sentry.data.Web.Tests
             ValidationException result = model.Validate();
 
             Assert.IsTrue(result.ValidationResults.IsValid());
-        }
-
-        [TestMethod]
-        public void DataFlowModel_Validate_TokenPagingHTTPS_Fail()
-        {
-            DataFlowModel model = new DataFlowModel
-            {
-                Name = "DataFlowModel",
-                IngestionTypeSelection = 2,
-                RetrieverJob = new JobModel
-                {
-                    SelectedSourceType = DataSourceDiscriminator.HTTPS_SOURCE,
-                    SelectedDataSource = "3",
-                    SchedulePicker = "4",
-                    Schedule = "* * * * *",
-                    PagingType = Core.PagingType.Token
-                },
-                SchemaMaps = new List<SchemaMapModel>
-                {
-                    new SchemaMapModel
-                    {
-                        SelectedDataset = 5,
-                        SelectedSchema = 6
-                    }
-                },
-                IsPreProcessingRequired = false,
-                SAIDAssetKeyCode = "SAID"
-            };
-
-            ValidationException result = model.Validate();
-
-            Assert.IsFalse(result.ValidationResults.IsValid());
-            Assert.AreEqual(2, result.ValidationResults.GetAll().Count);
-
-            ValidationResult validationResult = result.ValidationResults.GetAll()[0];
-            Assert.AreEqual("PageParameterName", validationResult.Id);
-            Assert.AreEqual("Page Parameter Name is required", validationResult.Description);
-
-            validationResult = result.ValidationResults.GetAll()[1];
-            Assert.AreEqual("PageTokenField", validationResult.Id);
-            Assert.AreEqual("Page Token Field is required", validationResult.Description);
         }
 
         [TestMethod]
@@ -226,14 +184,14 @@ namespace Sentry.data.Web.Tests
                         Index = "1",
                         VariableName = "Var1",
                         VariableValue = "2022-12-01",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     },
                     new RequestVariableModel
                     {
                         Index = "2",
                         VariableName = "Var2",
                         VariableValue = "2022-12-02",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -272,14 +230,14 @@ namespace Sentry.data.Web.Tests
                         Index = "1",
                         VariableName = "Var1",
                         VariableValue = "2022-12-01",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     },
                     new RequestVariableModel
                     {
                         Index = "3",
                         VariableName = "Var3",
                         VariableValue = "2022-12-03",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -318,14 +276,14 @@ namespace Sentry.data.Web.Tests
                         Index = "1",
                         VariableName = "Var1",
                         VariableValue = "2022-12-01",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     },
                     new RequestVariableModel
                     {
                         Index = "2",
                         VariableName = "Var2",
                         VariableValue = "2022-12-02",
-                        VariableIncrementType = RequestVariableIncrementType.Daily
+                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
                     }
                 }
             };
@@ -372,7 +330,7 @@ namespace Sentry.data.Web.Tests
                 Index = "1",
                 VariableName = "v@r$123",
                 VariableValue = "2022-12-01",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             ValidationResults results = model.Validate();
@@ -393,7 +351,7 @@ namespace Sentry.data.Web.Tests
                 Index = "1",
                 VariableName = "var1",
                 VariableValue = "20221201",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             ValidationResults results = model.Validate();
@@ -403,7 +361,7 @@ namespace Sentry.data.Web.Tests
 
             ValidationResult validationResult = results.GetAll()[0];
             Assert.AreEqual("RetrieverJob.RequestVariables[1].VariableValue", validationResult.Id);
-            Assert.AreEqual($"Variable Value must be in yyyy-MM-dd format to use with '{RequestVariableIncrementType.Daily.GetDescription()}'", validationResult.Description);
+            Assert.AreEqual($"Variable Value must be in yyyy-MM-dd format to use with '{RequestVariableIncrementType.DailyExcludeToday.GetDescription()}'", validationResult.Description);
         }
 
         [TestMethod]
@@ -414,7 +372,7 @@ namespace Sentry.data.Web.Tests
                 Index = "1",
                 VariableName = "var1",
                 VariableValue = "2022-12-01",
-                VariableIncrementType = RequestVariableIncrementType.Daily
+                VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
             };
 
             ValidationResults results = model.Validate();

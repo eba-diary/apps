@@ -7,9 +7,14 @@ namespace Sentry.data.Infrastructure.Tests
     {
         protected JObject GetData(string fileName)
         {
+            return JObject.Parse(GetDataString(fileName));
+        }
+
+        protected string GetDataString(string fileName)
+        {
             using (StreamReader rdr = new StreamReader($@"ExpectedJSON\{fileName}"))
             {
-                return JObject.Parse(rdr.ReadToEnd().Replace("\r\n", string.Empty));
+                return rdr.ReadToEnd().Replace("\r\n", string.Empty);
             }
         }
     }

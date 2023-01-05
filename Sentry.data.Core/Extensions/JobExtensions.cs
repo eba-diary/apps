@@ -74,7 +74,6 @@ namespace Sentry.data.Core
                 FtpPattern = job.JobOptions?.FtpPattern ?? null,
                 ExecutionParameters = job.ExecutionParameters,
                 PagingType = job.JobOptions?.HttpOptions?.PagingType ?? PagingType.None,
-                PageTokenField = job.JobOptions?.HttpOptions?.PageTokenField,
                 PageParameterName = job.JobOptions?.HttpOptions?.PageParameterName,
                 RequestVariables = job.RequestVariables.Select(x => x.ToDto()).ToList()
             };

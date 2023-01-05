@@ -7,8 +7,6 @@ namespace Sentry.data.Core
         [Description("None")]
         None = 0,
         [Description("Page Number")]
-        PageNumber = 1,
-        [Description("Token")]
-        Token = 2
+        PageNumber = 1
     }
 }

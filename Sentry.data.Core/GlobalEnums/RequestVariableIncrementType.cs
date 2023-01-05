@@ -4,9 +4,9 @@ namespace Sentry.data.Core
 {
     public enum RequestVariableIncrementType
     {
-        [Description("Select a Variable Increment Type")]
+        [Description("Select How To Increment Variable")]
         None = 0,
-        [Description("Increment By 1 Day")]
-        Daily = 1
+        [Description("By 1 Day - Exclude Today")]
+        DailyExcludeToday = 1
     }
 }

@@ -268,6 +268,7 @@
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
+    <Compile Include="Exceptions\HttpsJobProviderException.cs" />
     <Compile Include="Exceptions\InfrastructureEventingException.cs" />
     <Compile Include="Exceptions\JiraServiceException.cs" />
     <Compile Include="Exceptions\OAuthException.cs" />
@@ -380,12 +381,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\AuthorizationProvider.cs" />
+    <Compile Include="ServiceImplementations\AuthorizationSigner.cs" />
     <Compile Include="ServiceImplementations\ConfluentConnectorProvider.cs" />
     <Compile Include="ServiceImplementations\ApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
+    <Compile Include="ServiceImplementations\FileProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />
@@ -436,7 +440,7 @@
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />
-    <Compile Include="ServiceImplementations\PagingHttpsJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsJobProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />

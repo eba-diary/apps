@@ -63,11 +63,10 @@ namespace Sentry.data.Web
         [DisplayName("FTP Pattern")]
         public FtpPattern FtpPattern { get; set; }
 
-        [DisplayName("Page Token Field")]
-        public string PageTokenField { get; set; }
         [DisplayName("Page Parameter Name")]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[a-zA-Z0-9_\-\~\.]*$", ErrorMessage = "GET parameter names can only be alphanumeric with -._~")]
         public string PageParameterName { get; set; }
+
         [DisplayName("Paging Type")]
         public PagingType PagingType { get; set; }
         public List<RequestVariableModel> RequestVariables { get; set; } = new List<RequestVariableModel>();
@@ -118,21 +117,6 @@ namespace Sentry.data.Web
             if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
             {
                 validationResults.Add("PageParameterName", "Page Parameter Name is required");
-            }
-
-            if (PagingType == PagingType.Token)
-            {
-                //parameter name required when paging type of token
-                if (string.IsNullOrWhiteSpace(PageParameterName))
-                {
-                    validationResults.Add("PageParameterName", "Page Parameter Name is required");
-                }
-
-                //token field required when paging type of token
-                if (string.IsNullOrWhiteSpace(PageTokenField))
-                {
-                    validationResults.Add("PageTokenField", "Page Token Field is required");
-                }
             }
 
             return validationResults;

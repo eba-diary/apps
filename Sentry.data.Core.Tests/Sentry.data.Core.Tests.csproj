@@ -150,7 +150,6 @@
     <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RetrieverJobEntityTests.cs" />
     <Compile Include="SchemaConsumptionDtoTransformerTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessAreaServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessIntelligenceServiceTests.cs" />
@@ -178,6 +177,8 @@
     <Compile Include="DataSourceExtensionsTests.cs" />
     <Compile Include="DataSourceServiceTests.cs" />
     <Compile Include="JobExtensionsTests.cs" />
+    <Compile Include="RequestVariableTests.cs" />
+    <Compile Include="RetrieverJobTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

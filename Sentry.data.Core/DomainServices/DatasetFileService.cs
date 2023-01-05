@@ -177,7 +177,10 @@ namespace Sentry.data.Core
                 DataFlowStep dropStep = dataFlow?.Steps.FirstOrDefault(x => x.DataAction_Type_Id == DataActionType.ProducerS3Drop);
                 if (dropStep != null)
                 {
-                    _s3ServiceProvider.UploadDataFile(uploadDatasetFileDto.FileInputStream, dropStep.TriggerBucket, dropStep.TriggerKey + uploadDatasetFileDto.FileName);
+                    using (uploadDatasetFileDto.FileInputStream)
+                    {
+                        _s3ServiceProvider.UploadDataFile(uploadDatasetFileDto.FileInputStream, dropStep.TriggerBucket, dropStep.TriggerKey + uploadDatasetFileDto.FileName);
+                    }
                 }
                 else
                 {

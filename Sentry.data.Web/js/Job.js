@@ -222,7 +222,6 @@
             $("#add-request-variable").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
             $.get("/DataFlow/RequestVariableEntryRow", function (template) {
                 $('#request-variable-container').append(template);
-                $('.request-variable-row:last .includes-tooltip').tooltip();
                 $('.request-variable-row:last [id$=_VariableIncrementType]').materialSelect();
                 $("#add-request-variable").html('<em class="fas fa-plus"></em>');
 
@@ -238,18 +237,10 @@
     SetPagingForm: function () {
         switch ($("#RetrieverJob_PagingType :selected").val()) {
             case '1':
-                $('.paging-token-field').hide();
-                $('.paging-request-parameter').show();
-                $("#RetrieverJob_PageTokenField").val('');
-                break;
-            case '2':
-                $('.paging-token-field').show();
                 $('.paging-request-parameter').show();
                 break;
             default:
-                $('.paging-token-field').hide();
                 $('.paging-request-parameter').hide();
-                $("#RetrieverJob_PageTokenField").val('');
                 $("#RetrieverJob_PageParameterName").val('');
         }
 

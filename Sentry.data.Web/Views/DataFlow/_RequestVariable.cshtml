@@ -17,7 +17,7 @@
             @Html.ValidationMessageFor(model => model.VariableValue, "", new { @class = "text-danger" })
         </div>
 
-        <div class="md-form w-75 mr-3 mb-0 includes-tooltip" data-toggle="tooltip" data-placement="left" title="Variable value will be incremented as selected each scheduled run time">
+        <div class="md-form w-75 mr-3 mb-0">
             @Html.LabelFor(model => model.VariableIncrementType, htmlAttributes: new { @class = "mdb-main-label" })
             @Html.DropDownListFor(model => model.VariableIncrementType, Model.VariableIncrementTypeDropdown, new { @class = "mdb-select" })
             @Html.ValidationMessageFor(model => model.VariableIncrementType, "", new { @class = "text-danger" })
