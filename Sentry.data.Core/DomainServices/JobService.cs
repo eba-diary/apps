@@ -647,6 +647,8 @@ namespace Sentry.data.Core
             bool areSame = previousJob.RelativeUri == newJob.RelativeUri &&
                 previousJob.JobOptions.HttpOptions.PagingType == newJob.JobOptions.HttpOptions.PagingType &&
                 previousJob.JobOptions.HttpOptions.PageParameterName == newJob.JobOptions.HttpOptions.PageParameterName &&
+                previousJob.JobOptions.HttpOptions.Body == newJob.JobOptions.HttpOptions.Body &&
+                previousJob.JobOptions.HttpOptions.RequestMethod == newJob.JobOptions.HttpOptions.RequestMethod &&
                 previousJob.RequestVariables.Count == newJob.RequestVariables.Count;
 
             if (areSame && previousJob.RequestVariables.Any())
