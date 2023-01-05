@@ -1,15 +1,15 @@
 {
-	"request": {"startDate":"~[dateVariable]~","endDate":"~[dateVariable]~","dimensions":["DATE","PAGE","QUERY","COUNTRY","DEVICE"]},
-	"data": [
-		{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":997,"impressions":2780,"ctr":0.35863309352517986,"position":1.0017985611510791},
-		{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":646,"impressions":1313,"ctr":0.492003046458492,"position":1},
-		{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":371,"impressions":739,"ctr":0.50202976995940463,"position":1},
-		{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland","usa","MOBILE"],"clicks":195,"impressions":545,"ctr":0.3577981651376147,"position":1.1577981651376148},
-		{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":104,"impressions":240,"ctr":0.43333333333333335,"position":1},
-		{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":997,"impressions":2780,"ctr":0.35863309352517986,"position":1.0017985611510791},
-		{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":646,"impressions":1313,"ctr":0.492003046458492,"position":1},
-		{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":371,"impressions":739,"ctr":0.50202976995940463,"position":1},
-		{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland","usa","MOBILE"],"clicks":195,"impressions":545,"ctr":0.3577981651376147,"position":1.1577981651376148},
-		{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":104,"impressions":240,"ctr":0.43333333333333335,"position":1},
-	]
+"request": {"startDate":"~[dateVariable]~","endDate":"~[dateVariable]~","dimensions":["DATE","PAGE","QUERY","COUNTRY","DEVICE"]},
+"data": [
+{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":997,"impressions":2780,"ctr":0.35863309352517986,"position":1.0017985611510791},
+{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":646,"impressions":1313,"ctr":0.492003046458492,"position":1},
+{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":371,"impressions":739,"ctr":0.50202976995940463,"position":1},
+{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland","usa","MOBILE"],"clicks":195,"impressions":545,"ctr":0.3577981651376147,"position":1.1577981651376148},
+{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":104,"impressions":240,"ctr":0.43333333333333335,"position":1},
+{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":997,"impressions":2780,"ctr":0.35863309352517986,"position":1.0017985611510791},
+{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","MOBILE"],"clicks":646,"impressions":1313,"ctr":0.492003046458492,"position":1},
+{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":371,"impressions":739,"ctr":0.50202976995940463,"position":1},
+{"keys":["2022-10-31","https://www.dairylandinsurance.com/","dairyland","usa","MOBILE"],"clicks":195,"impressions":545,"ctr":0.3577981651376147,"position":1.1577981651376148},
+{"keys":["2022-10-30","https://www.dairylandinsurance.com/","dairyland insurance","usa","DESKTOP"],"clicks":104,"impressions":240,"ctr":0.43333333333333335,"position":1},
+]
 }
