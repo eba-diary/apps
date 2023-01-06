@@ -283,7 +283,7 @@
                         </div>
 
                         @*CLASSIFICATION*@
-                        <div class="col margin-left-inherit margin-right-inhert padding-left-zero padding-right-one">
+                        <div class="col margin-left-inherit margin-right-inherit padding-left-zero padding-right-one">
                             <h5 class="@textColor pt-1">Classification</h5>
                             <p>@Model.DataClassificationDescription</p>
                         </div>
@@ -296,15 +296,15 @@
                             @if (Model.DatasetRelatives != null && Model.DatasetRelatives.Count() > 1)
                             {
                                 <select class="form-control" onchange="location = this.value;">
-                                    @foreach (DatasetRelativeModel myModel in Model.DatasetRelatives)
+                                    @foreach (DatasetRelativeModel datasetRelativeModel in Model.DatasetRelatives)
                                     {
-                                        if (myModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)
+                                        if (datasetRelativeModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)
                                         {
-                                            <option value=@myModel.Url selected> @myModel.DatasetNamedEnvironment</option>
+                                            <option value=@datasetRelativeModel.Url selected> @datasetRelativeModel.DatasetNamedEnvironment</option>
                                         }
                                         else
                                         {
-                                            <option value=@myModel.Url> @myModel.DatasetNamedEnvironment</option>
+                                            <option value=@datasetRelativeModel.Url> @datasetRelativeModel.DatasetNamedEnvironment</option>
                                         }
                                     }
                                 </select>
