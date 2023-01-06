@@ -298,13 +298,13 @@
                                 <select class="form-control" onchange="location = this.value;">
                                     @foreach (DatasetRelativeModel myModel in Model.DatasetRelatives)
                                     {
-                                        if (myModel.NamedEnvironment == Model.NamedEnvironment)
+                                        if (myModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)
                                         {
-                                            <option value=@myModel.Url selected> @myModel.NamedEnvironment</option>
+                                            <option value=@myModel.Url selected> @myModel.DatasetNamedEnvironment</option>
                                         }
                                         else
                                         {
-                                            <option value=@myModel.Url> @myModel.NamedEnvironment</option>
+                                            <option value=@myModel.Url> @myModel.DatasetNamedEnvironment</option>
                                         }
                                     }
                                 </select>
@@ -312,7 +312,7 @@
                             else
                             {
                                 //DISPLAY JUST LABEL SINCE ONLY 1 NAMED ENV
-                                <p>@Model.NamedEnvironment</p>
+                                <p>@Model.DatasetNamedEnvironment</p>
                             }
                         </div>
 

@@ -91,7 +91,7 @@ namespace Sentry.data.Web
             return new DatasetRelativeModel()
             {
                 DatasetId = dto.DatasetId,
-                NamedEnvironment = dto.NamedEnvironment,
+                DatasetNamedEnvironment = dto.NamedEnvironment,
                 Url = dto.Url
             };
         }
