@@ -1348,6 +1348,295 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, dto.GroupAccessCount);
         }
 
+
+
+
+        [TestMethod]
+        public void Ensure_DatasetRelatives_Matches_Same_Dataset_Name()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Category category = new Category()
+            {
+                Id = 6,
+                Color = "Blue",
+                Name = "CategoryName"
+            };
+
+            DatasetFileConfig datasetFileConfig = new DatasetFileConfig()
+            {
+                ConfigId = 2,
+                Name = "FileConfigName",
+                Description = "FileConfigDescription",
+                Schema = new FileSchema()
+                {
+                    SchemaId = 3,
+                    Delimiter = ","
+                },
+                FileExtension = new FileExtension()
+                {
+                    Id = 4
+                },
+                DatasetScopeType = new DatasetScopeType()
+                {
+                    ScopeTypeId = 5,
+                    Name = "ScopeTypeName",
+                    Description = "ScopeTypeDescription"
+                },
+                DeleteInd = false
+            };
+
+            Favorite favorite = new Favorite() { UserId = "000002" };
+
+            Dataset dataset = new Dataset()
+            {
+                PrimaryContactId = "000000",
+                IsSecured = true,
+                DatasetId = 1,
+                DatasetCategories = new List<Category>() { category },
+                DatasetName = "Jeb",
+                ShortName = "ShortName",
+                DatasetDesc = "Description",
+                DatasetInformation = "Information",
+                DatasetType = "Type",
+                DataClassification = DataClassificationType.Public,
+                ObjectStatus = ObjectStatusEnum.Active,
+                CreationUserName = "000000",
+                UploadUserName = "000001",
+                DatasetDtm = new DateTime(2022, 6, 21, 8, 0, 0),
+                ChangedDtm = new DateTime(2022, 6, 21, 9, 0, 0),
+                CanDisplay = true,
+                OriginationCode = "Internal",
+                DatasetFileConfigs = new List<DatasetFileConfig>() { datasetFileConfig },
+                Asset = new Asset() { SaidKeyCode = "CODE" },
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                Favorities = new List<Favorite>() { favorite },
+                DatasetFiles = new List<DatasetFile>()
+            };
+
+            Dataset dataset2 = new Dataset()
+            {
+                PrimaryContactId = "000000",
+                IsSecured = true,
+                DatasetId = 2,
+                DatasetCategories = new List<Category>() { category },
+                DatasetName = "Jeb",
+                ShortName = "ShortName",
+                DatasetDesc = "Description",
+                DatasetInformation = "Information",
+                DatasetType = "Type",
+                DataClassification = DataClassificationType.Public,
+                ObjectStatus = ObjectStatusEnum.Active,
+                CreationUserName = "000000",
+                UploadUserName = "000001",
+                DatasetDtm = new DateTime(2022, 6, 21, 8, 0, 0),
+                ChangedDtm = new DateTime(2022, 6, 21, 9, 0, 0),
+                CanDisplay = true,
+                OriginationCode = "Internal",
+                DatasetFileConfigs = new List<DatasetFileConfig>() { datasetFileConfig },
+                Asset = new Asset() { SaidKeyCode = "CODE" },
+                NamedEnvironment = "QUAL",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                Favorities = new List<Favorite>() { favorite },
+                DatasetFiles = new List<DatasetFile>()
+            };
+
+
+
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
+            datasetContext.SetupGet(x => x.Security).Returns(new List<Security>().AsQueryable());
+            datasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>().AsQueryable());
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset,dataset2 }.AsQueryable());
+            datasetContext.SetupGet(x => x.Events).Returns(new List<Event>().AsQueryable());
+            datasetContext.Setup(x => x.IsUserSubscribedToDataset("000002", 1)).Returns(false);
+            datasetContext.Setup(x => x.GetAllUserSubscriptionsForDataset("000002", 1)).Returns(new List<DatasetSubscription>());
+
+            Mock<IExtendedUserInfo> extendedUserInfo = mockRepository.Create<IExtendedUserInfo>();
+            extendedUserInfo.SetupGet(x => x.FamiliarName).Returns("");
+            extendedUserInfo.SetupGet(x => x.FirstName).Returns("Foo");
+            extendedUserInfo.SetupGet(x => x.LastName).Returns("Bar");
+            extendedUserInfo.SetupGet(x => x.EmailAddress).Returns("foobar@gmail.com");
+            ApplicationUser applicationUser = new ApplicationUser(null, extendedUserInfo.Object);
+
+            Mock<IExtendedUserInfo> extendedUserInfo2 = mockRepository.Create<IExtendedUserInfo>();
+            extendedUserInfo2.SetupGet(x => x.FamiliarName).Returns("Lorem");
+            extendedUserInfo2.SetupGet(x => x.LastName).Returns("Ipsum");
+            ApplicationUser applicationUser2 = new ApplicationUser(null, extendedUserInfo2.Object);
+
+            Mock<IExtendedUserInfo> extendedUserInfo3 = mockRepository.Create<IExtendedUserInfo>();
+            extendedUserInfo3.SetupGet(x => x.UserId).Returns("000002");
+            ApplicationUser applicationUser3 = new ApplicationUser(null, extendedUserInfo3.Object);
+
+            Mock<IExtendedUserInfo> extendedUserInfo4 = mockRepository.Create<IExtendedUserInfo>();
+            ApplicationUser applicationUser4 = new ApplicationUser(null, extendedUserInfo4.Object);
+
+            Mock<IUserService> userService = mockRepository.Create<IUserService>();
+            userService.Setup(x => x.GetByAssociateId("000000")).Returns(applicationUser);
+            userService.Setup(x => x.GetByAssociateId("000001")).Returns(applicationUser2);
+            userService.SetupSequence(x => x.GetCurrentUser()).Returns(applicationUser4).Returns(applicationUser3);
+
+            Mock<ISecurityService> securityService = mockRepository.Create<ISecurityService>();
+            UserSecurity userSecurity = new UserSecurity();
+            securityService.Setup(x => x.GetGroupAccessCount(dataset)).Returns(1);
+            securityService.Setup(x => x.GetUserSecurity(dataset, applicationUser4)).Returns(userSecurity);
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null);
+
+            DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
+
+            mockRepository.VerifyAll();
+
+            //should be exactly 2 total relatives that match 
+            Assert.AreEqual(2, dto.DatasetRelatives.Count);
+        }
+
+
+        [TestMethod]
+        public void Ensure_Dataset_Has_Zero_Relatives_Found()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Category category = new Category()
+            {
+                Id = 6,
+                Color = "Blue",
+                Name = "CategoryName"
+            };
+
+            DatasetFileConfig datasetFileConfig = new DatasetFileConfig()
+            {
+                ConfigId = 2,
+                Name = "FileConfigName",
+                Description = "FileConfigDescription",
+                Schema = new FileSchema()
+                {
+                    SchemaId = 3,
+                    Delimiter = ","
+                },
+                FileExtension = new FileExtension()
+                {
+                    Id = 4
+                },
+                DatasetScopeType = new DatasetScopeType()
+                {
+                    ScopeTypeId = 5,
+                    Name = "ScopeTypeName",
+                    Description = "ScopeTypeDescription"
+                },
+                DeleteInd = false
+            };
+
+            Favorite favorite = new Favorite() { UserId = "000002" };
+
+            Dataset dataset = new Dataset()
+            {
+                PrimaryContactId = "000000",
+                IsSecured = true,
+                DatasetId = 1,
+                DatasetCategories = new List<Category>() { category },
+                DatasetName = "Jeb",
+                ShortName = "ShortName",
+                DatasetDesc = "Description",
+                DatasetInformation = "Information",
+                DatasetType = "Type",
+                DataClassification = DataClassificationType.Public,
+                ObjectStatus = ObjectStatusEnum.Active,
+                CreationUserName = "000000",
+                UploadUserName = "000001",
+                DatasetDtm = new DateTime(2022, 6, 21, 8, 0, 0),
+                ChangedDtm = new DateTime(2022, 6, 21, 9, 0, 0),
+                CanDisplay = true,
+                OriginationCode = "Internal",
+                DatasetFileConfigs = new List<DatasetFileConfig>() { datasetFileConfig },
+                Asset = new Asset() { SaidKeyCode = "CODE" },
+                NamedEnvironment = "TEST",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                Favorities = new List<Favorite>() { favorite },
+                DatasetFiles = new List<DatasetFile>()
+            };
+
+            Dataset dataset2 = new Dataset()
+            {
+                PrimaryContactId = "000000",
+                IsSecured = true,
+                DatasetId = 2,
+                DatasetCategories = new List<Category>() { category },
+                DatasetName = "Jeb1",
+                ShortName = "ShortName",
+                DatasetDesc = "Description",
+                DatasetInformation = "Information",
+                DatasetType = "Type",
+                DataClassification = DataClassificationType.Public,
+                ObjectStatus = ObjectStatusEnum.Active,
+                CreationUserName = "000000",
+                UploadUserName = "000001",
+                DatasetDtm = new DateTime(2022, 6, 21, 8, 0, 0),
+                ChangedDtm = new DateTime(2022, 6, 21, 9, 0, 0),
+                CanDisplay = true,
+                OriginationCode = "Internal",
+                DatasetFileConfigs = new List<DatasetFileConfig>() { datasetFileConfig },
+                Asset = new Asset() { SaidKeyCode = "CODE" },
+                NamedEnvironment = "QUAL",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                Favorities = new List<Favorite>() { favorite },
+                DatasetFiles = new List<DatasetFile>()
+            };
+
+
+
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>().AsQueryable());
+            datasetContext.SetupGet(x => x.Security).Returns(new List<Security>().AsQueryable());
+            datasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>().AsQueryable());
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset, dataset2 }.AsQueryable());
+            datasetContext.SetupGet(x => x.Events).Returns(new List<Event>().AsQueryable());
+            datasetContext.Setup(x => x.IsUserSubscribedToDataset("000002", 1)).Returns(false);
+            datasetContext.Setup(x => x.GetAllUserSubscriptionsForDataset("000002", 1)).Returns(new List<DatasetSubscription>());
+
+            Mock<IExtendedUserInfo> extendedUserInfo = mockRepository.Create<IExtendedUserInfo>();
+            extendedUserInfo.SetupGet(x => x.FamiliarName).Returns("");
+            extendedUserInfo.SetupGet(x => x.FirstName).Returns("Foo");
+            extendedUserInfo.SetupGet(x => x.LastName).Returns("Bar");
+            extendedUserInfo.SetupGet(x => x.EmailAddress).Returns("foobar@gmail.com");
+            ApplicationUser applicationUser = new ApplicationUser(null, extendedUserInfo.Object);
+
+            Mock<IExtendedUserInfo> extendedUserInfo2 = mockRepository.Create<IExtendedUserInfo>();
+            extendedUserInfo2.SetupGet(x => x.FamiliarName).Returns("Lorem");
+            extendedUserInfo2.SetupGet(x => x.LastName).Returns("Ipsum");
+            ApplicationUser applicationUser2 = new ApplicationUser(null, extendedUserInfo2.Object);
+
+            Mock<IExtendedUserInfo> extendedUserInfo3 = mockRepository.Create<IExtendedUserInfo>();
+            extendedUserInfo3.SetupGet(x => x.UserId).Returns("000002");
+            ApplicationUser applicationUser3 = new ApplicationUser(null, extendedUserInfo3.Object);
+
+            Mock<IExtendedUserInfo> extendedUserInfo4 = mockRepository.Create<IExtendedUserInfo>();
+            ApplicationUser applicationUser4 = new ApplicationUser(null, extendedUserInfo4.Object);
+
+            Mock<IUserService> userService = mockRepository.Create<IUserService>();
+            userService.Setup(x => x.GetByAssociateId("000000")).Returns(applicationUser);
+            userService.Setup(x => x.GetByAssociateId("000001")).Returns(applicationUser2);
+            userService.SetupSequence(x => x.GetCurrentUser()).Returns(applicationUser4).Returns(applicationUser3);
+
+            Mock<ISecurityService> securityService = mockRepository.Create<ISecurityService>();
+            UserSecurity userSecurity = new UserSecurity();
+            securityService.Setup(x => x.GetGroupAccessCount(dataset)).Returns(1);
+            securityService.Setup(x => x.GetUserSecurity(dataset, applicationUser4)).Returns(userSecurity);
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null);
+
+            DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
+
+            mockRepository.VerifyAll();
+
+            //should be exactly 1 total relatives since this guy has no relatives, just himself
+            Assert.AreEqual(1, dto.DatasetRelatives.Count);
+        }
+
+
         [TestMethod]
         public void Create_For_Dataset()
         {

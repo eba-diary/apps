@@ -85,5 +85,15 @@ namespace Sentry.data.Web
                 SchemaName = dto.SchemaName
             };
         }
+
+        public static DatasetRelativeModel ToModel(this DatasetRelativeDto dto)
+        {
+            return new DatasetRelativeModel()
+            {
+                DatasetId = dto.DatasetId,
+                NamedEnvironment = dto.NamedEnvironment,
+                Url = dto.Url
+            };
+        }
     }
 }
