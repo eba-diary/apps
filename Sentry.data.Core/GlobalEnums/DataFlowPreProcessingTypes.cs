@@ -13,6 +13,8 @@ namespace Sentry.data.Core
         [Description("Claim IQ")]
         claimiq = 2,
         [Description("Google BigQuery API")]
-        googlebigqueryapi = 3
+        googlebigqueryapi = 3,
+        [Description("Google Search Console API")]
+        googlesearchconsoleapi = 4
     }
 }

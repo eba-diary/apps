@@ -2,50 +2,48 @@
 <div class="md-form">
     <label class="active" for="">Named Environment</label> <!-- Not using helper for this because it causes duplicate labels and MDB select snatches it from text box -->
     <div class="dropdown-container">
-        <span id="namedEnvironmentSpinner"></span>
+        <span id="DatasetNamedEnvironmentSpinner"></span>
         @if (Model.DatasetId == 0)
         {
-            if (Model.NamedEnvironmentDropDown.Any())
+            if (Model.DatasetNamedEnvironmentDropDown.Any())
             {
-                @Html.DropDownListFor(x =>
-                          x.NamedEnvironment,
-                          Model.NamedEnvironmentDropDown,
-                          new { @class = "mdb-select" })
+                @Html.DropDownListFor(x => x.DatasetNamedEnvironment, Model.DatasetNamedEnvironmentDropDown, new { @class = "mdb-select" })
             }
             else
             {
-                @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control" })
+                @Html.TextBoxFor(x => x.DatasetNamedEnvironment, new { @class = "form-control" })
             }
-            @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
+
+            @Html.ValidationMessageFor(model => Model.DatasetNamedEnvironment, "", new { @class = "text-danger" })
         }
         else
         {
-            <input id="NamedEnvironmentReadonly" placeholder="@Model.NamedEnvironment" disabled class="disabled form-control" />
-            @Html.HiddenFor(model => model.NamedEnvironment)
+            <input id="DatasetNamedEnvironmentReadonly" placeholder="@Model.DatasetNamedEnvironment" disabled class="disabled form-control" />
+            @Html.HiddenFor(model => model.DatasetNamedEnvironment)
         }
     </div>
 </div>
 <div class="md-form">
-    @Html.LabelFor((model) => model.NamedEnvironmentType, new { @class = "active" })
+    @Html.LabelFor((model) => model.DatasetNamedEnvironmentType, new { @class = "active" })
     <div class="dropdown-container">
-        <span id="namedEnvironmentTypeSpinner"></span>
+        <span id="DatasetNamedEnvironmentTypeSpinner"></span>
         @if (Model.DatasetId == 0)
         {
-            if (Model.NamedEnvironmentDropDown.Any())
+            if (Model.DatasetNamedEnvironmentDropDown.Any())
             {
-                @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
-                @Html.HiddenFor(x => x.NamedEnvironmentType)
+                @Html.DropDownListFor(x => x.DatasetNamedEnvironmentType, Model.DatasetNamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
+                @Html.HiddenFor(x => x.DatasetNamedEnvironmentType)
             }
             else
             {
-                @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
+                @Html.DropDownListFor(x => x.DatasetNamedEnvironmentType, Model.DatasetNamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
             }
-            @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
+            @Html.ValidationMessageFor(model => Model.DatasetNamedEnvironmentType, "", new { @class = "text-danger" })
         }
         else
         {
-            <input id="NamedEnvironmentTypeReadonly" placeholder="@Model.NamedEnvironmentType" disabled class="disabled form-control" />
-            @Html.HiddenFor(model => model.NamedEnvironmentType)
+            <input id="DatasetNamedEnvironmentTypeReadonly" placeholder="@Model.DatasetNamedEnvironmentType" disabled class="disabled form-control" />
+            @Html.HiddenFor(model => model.DatasetNamedEnvironmentType)
         }
     </div>
 </div>

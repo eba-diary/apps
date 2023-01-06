@@ -149,6 +149,10 @@ namespace Sentry.data.Core
             {
                 actionId = 33;
             }
+            else if (query is IQueryable<GoogleSearchConsoleApiAction>)
+            {
+                actionId = 34;
+            }
             else
             {
                 actionId = 0;

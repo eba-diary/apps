@@ -23,8 +23,8 @@ namespace Sentry.data.Web
             DatasetInformation = dto.DatasetInformation;
             DataClassification = dto.DataClassification;
             SAIDAssetKeyCode = dto.SAIDAssetKeyCode;
-            NamedEnvironment = dto.NamedEnvironment;
-            NamedEnvironmentType = dto.NamedEnvironmentType;
+            DatasetNamedEnvironment = dto.NamedEnvironment;
+            DatasetNamedEnvironmentType = dto.NamedEnvironmentType;
             ShortName = dto.ShortName;
         }
 
@@ -85,16 +85,16 @@ namespace Sentry.data.Web
         [DisplayName("Named Environment")]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression("^[A-Z0-9]{1,10}$", ErrorMessage = "Named environment must be alphanumeric, all caps, and less than 10 characters")]
-        public string NamedEnvironment { get; set; }
+        public string DatasetNamedEnvironment { get; set; }
 
 
         [DisplayName("Named Environment Type")]
         [System.ComponentModel.DataAnnotations.Required]
-        public NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public NamedEnvironmentType DatasetNamedEnvironmentType { get; set; }
 
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
-        public IEnumerable<SelectListItem> NamedEnvironmentDropDown { get; set; }
-        public IEnumerable<SelectListItem> NamedEnvironmentTypeDropDown { get; set; }
+        public IEnumerable<SelectListItem> DatasetNamedEnvironmentDropDown { get; set; }
+        public IEnumerable<SelectListItem> DatasetNamedEnvironmentTypeDropDown { get; set; }
     }
 
 
