@@ -1,5 +1,4 @@
-﻿using Nest;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
@@ -124,12 +123,12 @@ namespace Sentry.data.Infrastructure
                         SetAuthorizationHeader(config, httpClient);
 
                         //make request
-                        Logger.Info($"Paging Https Retriever Job making request to {config.RequestUri} - Job: {config.Job.Id}");
+                        Logger.Info($"Paging Https Retriever Job making request to {RequestLog(config)} - Job: {config.Job.Id}");
                         using (HttpResponseMessage response = await GetResponseMessageAsync(config, httpClient))
                         {
                             if (response.IsSuccessStatusCode)
                             {
-                                Logger.Info($"Paging Https Retriever Job successful response from {config.RequestUri} - Job: {config.Job.Id}");
+                                Logger.Info($"Paging Https Retriever Job successful response from {RequestLog(config)} - Job: {config.Job.Id}");
                                 //copy response to file
                                 JToken responseData = await ReadResponseAsync(response, fileStream, config);
 
@@ -141,7 +140,7 @@ namespace Sentry.data.Infrastructure
                             }
                             else
                             {
-                                throw new HttpsJobProviderException($"HTTPS request to {config.RequestUri} failed. {response.Content.ReadAsStringAsync().Result}");
+                                throw new HttpsJobProviderException($"HTTPS request to {RequestLog(config)} failed. {response.Content.ReadAsStringAsync().Result}");
                             }
                         }
                     }
@@ -163,7 +162,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Paging Https Retriever Job failed retrieving data from {config.RequestUri} - Job: {config.Job.Id}", ex);
+                Logger.Error($"Paging Https Retriever Job failed retrieving data from {RequestLog(config)} - Job: {config.Job.Id}", ex);
                 throw;
             }
             finally
@@ -220,7 +219,7 @@ namespace Sentry.data.Infrastructure
                 CheckForPagingExecutionParameters(config);
             }       
 
-            Logger.Info($"Paging Https Retriever Job starting from {config.RequestUri} - Job: {job.Id}");
+            Logger.Info($"Paging Https Retriever Job starting from {RequestLog(config)} - Job: {job.Id}");
 
             return config;
         }
@@ -360,8 +359,6 @@ namespace Sentry.data.Infrastructure
                     SetNextRequestVariables(config, dataRetrievedForCurrentVariables);
                 }
             }
-
-            Logger.Info($"Paging Https Retriever Job next request {config.RequestUri} - Job: {config.Job.Id}");
         }
 
         private bool IsDataRetrievedForCurrentVariables(PagingHttpsConfiguration config)
@@ -373,8 +370,7 @@ namespace Sentry.data.Infrastructure
             
             if (!dataFoundForCurrentVariables)
             {
-                string additionalInfo = config.Options.RequestMethod == HttpMethods.post ? " " + config.RequestBody.ToString(Formatting.None) : "";
-                Logger.Warn($"Paging Https Retriever Job no data retrieved from {config.RequestUri}{additionalInfo} - Job: {config.Job.Id}");
+                Logger.Warn($"Paging Https Retriever Job no data retrieved from {RequestLog(config)} - Job: {config.Job.Id}");
             }
 
             return dataFoundForCurrentVariables;
@@ -467,6 +463,18 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
+        }
+
+        private string RequestLog(PagingHttpsConfiguration config)
+        {
+            string log = config.RequestUri;
+
+            if (config.Options.RequestMethod == HttpMethods.post)
+            {
+                log += " " + config.RequestBody.ToString(Formatting.None);
+            }
+
+            return log;
         }
 
         #region PageType Methods
