@@ -516,7 +516,7 @@ namespace Sentry.data.Core.Tests
             };
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.DatasetFileConfigs).Throws<InvalidOperationException>();
+            context.Setup(s => s.FileSchema).Throws<InvalidOperationException>();
 
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
 
@@ -1077,8 +1077,8 @@ namespace Sentry.data.Core.Tests
             validationResults.Add("failed a validation");
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync("QUAL", "ABCD", It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(new ValidationResults()));
-            quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync("PROD", "ABCD", It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(validationResults));
+            quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync("ABCD", "QUAL", It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(new ValidationResults()));
+            quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync("ABCD", "PROD", It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(validationResults));
 
             var lazyQuartermasterService = new Lazy<IQuartermasterService>(() => quartermasterService.Object);
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, lazyQuartermasterService);
@@ -1090,6 +1090,63 @@ namespace Sentry.data.Core.Tests
             //Assert
             Assert.IsTrue(relatedRequest);
             Assert.IsFalse(notRelatedRequest);
+        }
+
+        [TestMethod]
+        public async Task ValidateMigrationRequest_DatasetMigrationRequest_Request_with_all_defaults()
+        {
+            //Arrange
+            DatasetMigrationRequest request = new DatasetMigrationRequest();
+
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            List<string> errors = await dataApplicationService.ValidateMigrationRequest(request);
+
+            //Assert
+            Assert.IsNotNull(errors);
+            Assert.IsTrue(errors.Contains("SourceDatasetId is required"));
+            Assert.IsTrue(errors.Contains("TargetDatasetNamedEnvironment is required"));
+        }
+
+        [TestMethod]
+        public async Task ValidationMigraqtionRequest_Negative_Values()
+        {
+            //Arrange
+            DatasetMigrationRequest request = new DatasetMigrationRequest() { SourceDatasetId = -1, TargetDatasetId = -1};
+
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            List<string> errors = await dataApplicationService.ValidateMigrationRequest(request);
+
+            //Assert
+            Assert.IsNotNull(errors);
+            Assert.IsTrue(errors.Contains("SourceDatasetId cannot be a negative number"));
+            Assert.IsTrue(errors.Contains("TargetDatasetId cannot be a negative number"));
+        }
+
+        [TestMethod]
+        public void ValidateMigrationRequest_Null_Request()
+        {
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
+            Assert.ThrowsExceptionAsync<ArgumentNullException>(() => dataApplicationService.ValidateMigrationRequest(null));
+        }
+
+        [TestMethod]
+        public async Task ValidationMigraqtionRequest_Invalid_NamedEnvironment()
+        {
+            //Arrange
+            DatasetMigrationRequest request = new DatasetMigrationRequest() { TargetDatasetNamedEnvironment = "string"};
+
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            List<string> errors = await dataApplicationService.ValidateMigrationRequest(request);
+
+            //Assert
+            Assert.IsTrue(errors.Any());
+            Assert.IsTrue(errors.Contains("Named environment must be alphanumeric, all caps, and less than 10 characters"));
         }
     }
 }

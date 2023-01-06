@@ -143,7 +143,8 @@ namespace Sentry.data.Web.WebApi.Controllers
         /* This code will be used within next two iterations*/
         [HttpPost]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK,null, typeof(DatasetMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(DatasetMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
         [Route("MigrateDataset")]
         public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
         {
@@ -190,6 +191,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                     throw;
                 }
 
+                if (errors.Count > 0)
+                {
+                    return BadRequest(JsonConvert.SerializeObject(errors));
+                }
+
                 return Ok(responseModel);
             }
 
@@ -200,6 +206,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [HttpPost]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
         [Route("MigrateSchema")]
         public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
         {
@@ -938,13 +945,14 @@ namespace Sentry.data.Web.WebApi.Controllers
             };
         }
 
-        private DatasetMigrationResponseModel ToDatasetMigrationResponseModel(DatasetMigrationRequestResponse response)
+        internal DatasetMigrationResponseModel ToDatasetMigrationResponseModel(DatasetMigrationRequestResponse response)
         {
             DatasetMigrationResponseModel model = new DatasetMigrationResponseModel()
             {
                 IsDatasetMigrated = response.IsDatasetMigrated,
                 DatasetMigrationReason = response.DatasetMigrationReason,
-                DatasetId = response.DatasetId
+                DatasetId = response.DatasetId,
+                SchemaMigrationResponse = new List<SchemaMigrationResponseModel>()
             };
 
             foreach (SchemaMigrationRequestResponse schemaResponse in response.SchemaMigrationResponses)
@@ -968,13 +976,14 @@ namespace Sentry.data.Web.WebApi.Controllers
             };
         }
 
-        private DatasetMigrationRequest ToDto(DatasetMigrationRequestModel model)
+        internal DatasetMigrationRequest ToDto(DatasetMigrationRequestModel model)
         {
             DatasetMigrationRequest request = new DatasetMigrationRequest()
             {
                 SourceDatasetId = model.SourceDatasetId,
                 TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment,
-                TargetDatasetId = model.TargetDatasetId
+                TargetDatasetId = model.TargetDatasetId,
+                SchemaMigrationRequests = new List<SchemaMigrationRequest>()
             };
 
             foreach (SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)

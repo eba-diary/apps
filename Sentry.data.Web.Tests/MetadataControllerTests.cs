@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Rhino.Mocks;
 using Sentry.data.Core;
-using System;
+using Sentry.data.Web.Models.ApiModels.Migration;
+using Sentry.data.Web.WebApi.Controllers;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Tests
 {
@@ -25,45 +25,108 @@ namespace Sentry.data.Web.Tests
             TestCleanup();
         }
 
-        //[TestCategory("Security_API")]
-        //[TestMethod]
-        //public async Task SchemaApiTest()
-        //{
+        [TestMethod]
+        public void MigrationRequest_ToDto()
+        { 
+            DatasetMigrationRequestModel model = new DatasetMigrationRequestModel()
+            {
+                SourceDatasetId = 99,
+                TargetDatasetNamedEnvironment = "TEST",
+                TargetDatasetId = 22,
+                SchemaMigrationRequests = new List<SchemaMigrationRequestModel>()
+                {
+                    new SchemaMigrationRequestModel()
+                    {
+                        SourceSchemaId = 44,
+                        TargetDatasetNamedEnvironment = "TEST",
+                        TargetDataFlowNamedEnviornment = "TEST2",
+                        TargetDatasetId = 33
+                    },
+                    new SchemaMigrationRequestModel()
+                    {
+                        SourceSchemaId = 66,
+                        TargetDatasetNamedEnvironment = "TEST",
+                        TargetDataFlowNamedEnviornment = "TEST2",
+                        TargetDatasetId = 33
+                    },
+                    new SchemaMigrationRequestModel()
+                    {
+                        SourceSchemaId = 88,
+                        TargetDatasetNamedEnvironment = "TEST",
+                        TargetDataFlowNamedEnviornment = "TEST2",
+                        TargetDatasetId = 33
+                    }
+                }
+            };
 
-        //    Dataset ds1 = MockClasses.MockDataset();
-        //    DatasetFileConfig dfc1 = MockClasses.MockDataFileConfig(ds1);
-        //    var user1 = MockUsers.App_DataMgmt_Admin_User();
+            MetadataController controller = new MetadataController(_container.GetInstance<IDatasetContext>(), null, null, null, null, null, null, null, null);
+            var datasetRequest = controller.ToDto(model);
+            var schemaRequest = datasetRequest.SchemaMigrationRequests.FirstOrDefault(w => w.SourceSchemaId == 44);
+            var schemaRequest_DeletedDataFlow = datasetRequest.SchemaMigrationRequests.FirstOrDefault(w => w.SourceSchemaId == 66);
+            var schemaRequest_DisabledDataFlow = datasetRequest.SchemaMigrationRequests.FirstOrDefault(w => w.SourceSchemaId == 88);
 
-        //    var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
-        //    mockDatasetContext.Stub(x => x.GetById(ds1.DatasetId)).Return(ds1).Repeat.Any();
-        //    mockDatasetContext.Stub(x => x.GetById<Dataset>(ds1.DatasetId)).Return(ds1).Repeat.Any();
-        //    mockDatasetContext.Stub(x => x.GetById<DatasetFileConfig>(dfc1.ConfigId)).Return(dfc1);
+            //Assert
+            Assert.AreEqual(99, datasetRequest.SourceDatasetId);
+            Assert.AreEqual("TEST", datasetRequest.TargetDatasetNamedEnvironment);
+            Assert.AreEqual(22, datasetRequest.TargetDatasetId);
+            Assert.IsNotNull(schemaRequest);
+            Assert.AreEqual(44, schemaRequest.SourceSchemaId);
+            Assert.AreEqual("TEST", schemaRequest.TargetDatasetNamedEnvironment);
+            Assert.AreEqual("TEST2", schemaRequest.TargetDataFlowNamedEnvironment);
+            Assert.AreEqual(33, schemaRequest.TargetDatasetId);
+            Assert.IsTrue(schemaRequest.SourceSchemaHasDataFlow);
+            Assert.IsNotNull(schemaRequest_DeletedDataFlow);
+            Assert.IsFalse(schemaRequest_DeletedDataFlow.SourceSchemaHasDataFlow);
+            Assert.IsNotNull(schemaRequest_DisabledDataFlow);
+            Assert.IsTrue(schemaRequest_DisabledDataFlow.SourceSchemaHasDataFlow);
 
-        //    _container.Inject(mockDatasetContext);
+        }
 
-        //    //UserSecurity us = new UserSecurity();
-        //    //ISecurityService mockSecurityService = _container.GetInstance<ISecurityService>();
-        //    //mockSecurityService.Stub(x => x.GetUserSecurity(ds1, user1)).Return(MockClasses.GetMockUserSecurity_Public_Admin());
+        [TestMethod]
+        public void ToDatasetMigrationResponseModel()
+        {
+            SchemaMigrationRequestResponse schemaRequestResponse = new SchemaMigrationRequestResponse()
+            {
+                TargetSchemaId = 22,
+                MigratedSchema = true,
+                SchemaMigrationReason = "Schema Migrated",
+                TargetSchemaRevisionId = 33,
+                MigratedSchemaRevision = true,
+                SchemaRevisionMigrationReason = "Schema Revision Migrated",
+                TargetDataFlowId = 44,
+                MigratedDataFlow = true,
+                DataFlowMigrationReason = "DataFlow Migrated"
+            };
 
-        //    //ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-        //    //securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-        //    //securable.Stub(x => x.PrimaryOwnerId).Return(ds1.PrimaryOwnerId).Repeat.Any();
+            DatasetMigrationRequestResponse datasetRequestResponse = new DatasetMigrationRequestResponse()
+            {
+                DatasetId = 11,
+                IsDatasetMigrated = true,
+                DatasetMigrationReason = "It Migrated",
+                SchemaMigrationResponses = new List<SchemaMigrationRequestResponse>() { schemaRequestResponse }
+            };
 
+            MetadataController controller = new MetadataController(null, null, null, null, null, null, null, null, null);
 
-        //    var mc = MockControllers.MockMetadataController(ds1, dfc1, null, user1);
-
-
-
-        //    try
-        //    {
-        //        var job = await mc.GetSchemaRevisionBySchema(ds1.DatasetId, 9999);
-        //        Assert.Fail();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Assert.IsTrue(ex is HttpNotFoundResult);
-        //    }
-
-        //}
+            //Act
+            DatasetMigrationResponseModel datasetResponseModel = controller.ToDatasetMigrationResponseModel(datasetRequestResponse);
+            SchemaMigrationResponseModel schemaResponseModel = datasetResponseModel.SchemaMigrationResponse.FirstOrDefault();
+            //Assert
+            Assert.IsNotNull(datasetResponseModel);
+            Assert.AreEqual(datasetRequestResponse.DatasetId, datasetResponseModel.DatasetId);
+            Assert.AreEqual(datasetRequestResponse.IsDatasetMigrated, datasetResponseModel.IsDatasetMigrated);
+            Assert.AreEqual(datasetRequestResponse.DatasetMigrationReason, datasetResponseModel.DatasetMigrationReason);
+            Assert.AreEqual(1, datasetRequestResponse.SchemaMigrationResponses.Count);
+            Assert.IsNotNull(schemaResponseModel);
+            Assert.AreEqual(schemaRequestResponse.TargetSchemaId, schemaResponseModel.SchemaId);
+            Assert.AreEqual(schemaRequestResponse.MigratedSchema, schemaResponseModel.IsSchemaMigrated);
+            Assert.AreEqual(schemaRequestResponse.SchemaMigrationReason, schemaResponseModel.SchemaMigrationMessage);
+            Assert.AreEqual(schemaRequestResponse.TargetSchemaRevisionId, schemaResponseModel.SchemaRevisionId);
+            Assert.AreEqual(schemaRequestResponse.MigratedSchemaRevision, schemaResponseModel.IsSchemaRevisionMigrated);
+            Assert.AreEqual(schemaRequestResponse.SchemaRevisionMigrationReason, schemaResponseModel.SchemaRevisionMigrationMessage);
+            Assert.AreEqual(schemaRequestResponse.TargetDataFlowId, schemaResponseModel.DataFlowId);
+            Assert.AreEqual(schemaRequestResponse.MigratedDataFlow, schemaResponseModel.IsDataFlowMigrated);
+            Assert.AreEqual(schemaRequestResponse.DataFlowMigrationReason, schemaResponseModel.DataFlowMigrationMessage);
+        }
     }
 }

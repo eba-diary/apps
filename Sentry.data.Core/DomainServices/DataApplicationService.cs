@@ -8,6 +8,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -250,8 +251,8 @@ namespace Sentry.data.Core
                 var migratedSchemaRevisions = schemaMigrationResponses.Where(w => w.MigratedSchemaRevision).Select(s => (s.TargetSchemaId, s.TargetSchemaRevisionId)).ToList();
                 CreateExternalDependenciesForSchemaRevision(migratedSchemaRevisions);
 
-                response.IsDatasetMigrated = true;
-                response.DatasetMigrationReason = "Success";
+                response.IsDatasetMigrated = !datasetExistsInTarget;
+                response.DatasetMigrationReason = datasetExistsInTarget? "Dataset already exists in target named environment" : "Success";
                 response.DatasetId = newDatasetId;
                 response.SchemaMigrationResponses = schemaMigrationResponses;
             }
@@ -562,7 +563,16 @@ namespace Sentry.data.Core
 
             SchemaMigrationRequestResponse migrationResponse =  new SchemaMigrationRequestResponse();
 
-            ValidateMigrationRequest(request);
+            List<string> errors = ValidateMigrationRequest(request);
+            if (errors.Any())
+            {
+                List<ArgumentException> exceptions = new List<ArgumentException>();
+                foreach (string error in errors)
+                {
+                    exceptions.Add(new ArgumentException(error));
+                }
+                throw new AggregateException(exceptions);
+            }
 
             int newSchemaId;
             int newSchemaRevisionId;
@@ -763,7 +773,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="request"></param>
         /// <exception cref="AggregateException">Aggregation of all validation errors</exception>
-        private void ValidateMigrationRequest(SchemaMigrationRequest request)
+        private List<string> ValidateMigrationRequest(SchemaMigrationRequest request)
         {
             if (request == null)
             {
@@ -771,38 +781,40 @@ namespace Sentry.data.Core
             }
 
             List<string> errors = new List<string>();
-            int sourceDatasetId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == request.SourceSchemaId).Select(w => w.ParentDataset.DatasetId).FirstOrDefault();
-            bool sourceSchemaHasDataflow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
             
             if (request.SourceSchemaId == 0)
             {
                 errors.Add("SourceSchemaId is required");
             }
 
-            if (sourceSchemaHasDataflow && string.IsNullOrWhiteSpace(request.TargetDataFlowNamedEnvironment))
+            if (request.SourceSchemaId < 0)
             {
-                errors.Add("TargetDataFlowNamedEnvironment is required");
-            } 
+                errors.Add("SourceSchemaId cannot be a negative number");
+            }            
 
-            if (!AreDatasetsRelated(sourceDatasetId, request.TargetDatasetId))
+            if (request.SourceSchemaId > 0 && request.TargetDatasetId > 0)
             {
-                errors.Add("Source and target datasets are not related");
+
+                int sourceDatasetId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == request.SourceSchemaId).Select(w => w.ParentDataset.DatasetId).FirstOrDefault();
+                bool sourceSchemaHasDataflow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
+
+                if (sourceSchemaHasDataflow && string.IsNullOrWhiteSpace(request.TargetDataFlowNamedEnvironment))
+                {
+                    errors.Add("TargetDataFlowNamedEnvironment is required");
+                }
+
+                if (!AreDatasetsRelated(sourceDatasetId, request.TargetDatasetId))
+                {
+                    errors.Add("Source and target datasets are not related");
+                }
             }
 
             ValidateMigrationRequest((MigrationRequest)request).ForEach(i => errors.Add(i));
 
-            if (errors.Any())
-            {
-                List<ArgumentException> exceptions = new List<ArgumentException>();
-                foreach (string error in errors)
-                {
-                    exceptions.Add(new ArgumentException(error));
-                }
-                throw new AggregateException(exceptions);
-            }
+            return errors;            
         }
 
-        private Task<List<string>> ValidateMigrationRequest(DatasetMigrationRequest request)
+        internal Task<List<string>> ValidateMigrationRequest(DatasetMigrationRequest request)
         {
             List<string> errors = new List<string>();
             if (request == null)
@@ -815,12 +827,23 @@ namespace Sentry.data.Core
                 errors.Add("SourceDatasetId is required");
             }
 
-            if (request.TargetDatasetId != 0 && !AreDatasetsRelated(request.SourceDatasetId, request.TargetDatasetId))
+            if (request.SourceDatasetId < 0)
             {
-                errors.Add("Source and target datasets are not related");
+                errors.Add("SourceDatasetId cannot be a negative number");
+            }
+
+            if (request.TargetDatasetId > 0 && !AreDatasetsRelated(request.SourceDatasetId, request.TargetDatasetId))
+            {
+                errors.Add("Source and target datasets are not related");                
             }
 
             ValidateMigrationRequest((MigrationRequest)request).ForEach(i => errors.Add(i));
+
+            //Do not proceed on as next validation requires values, so return with error list
+            if (errors.Any())
+            {
+                return Task.FromResult(errors);
+            }
 
             // This "wrapping" of the async portion of this method is required so that the error checking above runs immediately.
             // See https://sonarqube.sentry.com/coding_rules?open=csharpsquid%3AS4457&rule_key=csharpsquid%3AS4457
@@ -849,9 +872,22 @@ namespace Sentry.data.Core
                 errors.Add("TargetDatasetId cannot be a negative number");
             }
 
-            if (String.IsNullOrWhiteSpace(request.TargetDatasetNamedEnvironment))
+            if (request.TargetDatasetId == 0)
             {
-                errors.Add("TargetDatasetNamedEnvironment is required");
+                if (String.IsNullOrWhiteSpace(request.TargetDatasetNamedEnvironment))
+                {
+                    errors.Add("TargetDatasetNamedEnvironment is required");
+                }
+                else
+                {
+                    //Named Environment naming conventions from https://confluence.sentry.com/x/eQNvAQ
+                    Regex namedEnvironmentRegex = new Regex("^[A-Z0-9]{1,10}$");
+                    Match matchedNamedEnvironment = namedEnvironmentRegex.Match(request.TargetDatasetNamedEnvironment);
+                    if (!matchedNamedEnvironment.Success)
+                    {
+                        errors.Add("Named environment must be alphanumeric, all caps, and less than 10 characters");
+                    }
+                }                
             }
 
             return errors;
@@ -863,7 +899,7 @@ namespace Sentry.data.Core
 
             (string datasetSaidAssetKeyCode, NamedEnvironmentType datasetNamedEnvironmentType) = _datasetContext.Datasets.Where(w => w.DatasetId == datasetId).Select(s => new Tuple<string, NamedEnvironmentType>(s.Asset.SaidKeyCode, s.NamedEnvironmentType)).FirstOrDefault();
             
-            var results = await QuartermasterService.VerifyNamedEnvironmentAsync(namedEnvironment, datasetSaidAssetKeyCode, datasetNamedEnvironmentType);
+            var results = await QuartermasterService.VerifyNamedEnvironmentAsync(datasetSaidAssetKeyCode, namedEnvironment, datasetNamedEnvironmentType);
 
             if (results != null && !results.IsValid())
             {
