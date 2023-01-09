@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Nest;
+using Newtonsoft.Json;
 using Sentry.Configuration;
 using Sentry.data.Core;
 using System;
@@ -27,21 +28,7 @@ namespace Sentry.data.Web
                 return _aws_v2;
             }
         }
-        private static string RootBucket
-        {
-            get
-            {
-#pragma warning disable S3240 // The simplest possible condition syntax should be used
-                if (_bucket == null)
-#pragma warning restore S3240 // The simplest possible condition syntax should be used
-                {
-                    _bucket = AWSv2Configuration
-                        ? Config.GetHostSetting("AWS2_0RootBucket")
-                        : Config.GetHostSetting("AWSRootBucket");
-                }
-                return _bucket;
-            }
-        }
+
         private static string AwsRegion
         {
             get
@@ -129,7 +116,7 @@ namespace Sentry.data.Web
 
         public static DataFlowDto ToDto(this DataFlowModel model, string currentUser)
         {
-            DataFlowDto dto = new Core.DataFlowDto
+            DataFlowDto dto = new DataFlowDto
             {
                 Id = model.DataFlowId,
                 Name = model.Name,
@@ -143,8 +130,8 @@ namespace Sentry.data.Web
                 PreProcessingOption = model.PreProcessingSelection,
                 ObjectStatus = model.ObjectStatus,
                 FlowStorageCode = model.StorageCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType,
+                NamedEnvironment = model.DataFlowNamedEnvironment,
+                NamedEnvironmentType = model.DataFlowNamedEnvironmentType,
                 PrimaryContactId = (model.PrimaryContactId) ?? currentUser,
                 IsSecured = true,
                 TopicName = model.TopicName,
@@ -234,8 +221,28 @@ namespace Sentry.data.Web
                 TargetFileName = model.TargetFileName,
                 ExecutionParameters = model.ExecutionParameters,
                 PagingType = model.PagingType,
-                PageTokenField= model.PageTokenField,
-                PageParameterName= model.PageParameterName
+                PageParameterName= model.PageParameterName,
+                RequestVariables = model.RequestVariables?.Select(x => x.ToDto()).ToList()
+            };
+        }
+
+        public static RequestVariableDto ToDto(this RequestVariableModel model)
+        {
+            return new RequestVariableDto
+            {
+                VariableName = model.VariableName,
+                VariableValue = model.VariableValue,
+                VariableIncrementType = model.VariableIncrementType
+            };
+        }
+
+        public static RequestVariableModel ToModel(this RequestVariableDto dto)
+        {
+            return new RequestVariableModel
+            {
+                VariableName = dto.VariableName,
+                VariableValue = dto.VariableValue,
+                VariableIncrementType = dto.VariableIncrementType
             };
         }
 

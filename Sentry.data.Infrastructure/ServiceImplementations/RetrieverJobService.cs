@@ -95,9 +95,21 @@ namespace Sentry.data.Infrastructure
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
                                 break;
                             case GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE:
-                                _jobProvider = ((HTTPSSource)_job.DataSource).SupportsPaging
-                                    ? Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.PAGING_HTTPS_SOURCE)
-                                    : Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                                if (((HTTPSSource)_job.DataSource).SupportsPaging)
+                                {
+                                    if (_job.DataFlow.IsPreProcessingRequired && _job.DataFlow.PreProcessingOption == (int)DataFlowPreProcessingTypes.googlesearchconsoleapi)
+                                    {
+                                        _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_SEARCH_CONSOLE_API_SOURCE);
+                                    }
+                                    else
+                                    {
+                                        _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.PAGING_HTTPS_SOURCE);
+                                    }
+                                }
+                                else
+                                {
+                                    _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                                }                                    
                                 break;
                             case GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
                                 _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);

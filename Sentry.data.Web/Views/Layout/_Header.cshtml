@@ -242,6 +242,7 @@
                     <ul class="dropdown-menu z-depth-1">
                         <li class="dropdown-item"><a href="mailto:DSCSupport@sentry.com?Subject=Feedback">Provide Feedback</a></li>
                         <li class="dropdown-item"><a href="mailto:DSCSupport@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
+                        <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Data+Lake+Query+Share">Query Share</a></li>
                         <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Frequently+Asked+Questions">FAQ</a></li>
 
                         <li class="dropdown-submenu">
@@ -251,19 +252,16 @@
                                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Data Assets</a>
                                     <ul class="dropdown-menu z-depth-1">
                                         <li class="dropdown-item">
-                                            <a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataLineageUserGuide.docx?Web=1">Data Lineage</a>
+                                            <a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Data+Lineage">Data Lineage</a>
                                         </li>
                                         <li class="dropdown-item">
-                                            <a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataAssetAlertNotificationUserGuide.docx?Web=1">Alert Notifications</a>
+                                            <a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Data+Asset+Alert+Notification">Alert Notifications</a>
                                         </li>
                                     </ul>
                                 </li>
-                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">Access Guide</a></li>
-                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DSCRolesResponsibilities.docx?Web=1">Roles and Responsiblities</a></li>
-                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/ChromeBrowserFileTypeOpen.docx?Web=1">Open Files with Chrome</a></li>
-                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/RetrievalJobUserGuide.docx?Web=1">Retriever Jobs</a></li>
-                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/QueryToolUserGuide.docx?Web=1">Query Tool</a></li>
-                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Data+Lake+Consumption+Layer+-+Transitioning+from+Hive+to+Snowflake">Snowflake</a></li>
+                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Access+Guide">Access Guide</a></li>
+                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Open+Files+with+Chrome">Open Files with Chrome</a></li>
+                                <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/display/CLA/Getting+Started+With+Snowflake">Snowflake</a></li>
                                 <li class="dropdown-item"><a rel="noopener" target="_blank" href="https://confluence.sentry.com/pages/viewpage.action?spaceKey=CLA&title=Send+Data+to+DSC">Sending Data to DSC</a></li>
                             </ul>
                         </li>
@@ -282,8 +280,17 @@
                         <a class=" nav-link waves-effect waves-light " href="~/hangfire">Hangfire</a>
                     </li>
                     <!-- Admin -->
-                    <li class="nav-item">
-                        <a class="nav-link waves-effect waves-light" href="~/Admin">Admin</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownDatasetLink">
+                            <a class="dropdown-item" href="~/Admin">Admin Home</a>
+                            <a class="dropdown-item" href="~/Admin/DataFileReprocessing">Reprocess Data Files</a>
+                            <a class="dropdown-item" href="~/Admin/ReprocessDeadSparkJobs">Reprocess Dead Jobs</a>
+                            <a class="dropdown-item" href="~/Admin/RawqueryParquetAudit">Rawquery/Parquet Audit</a>
+                            <a class="dropdown-item" href="~/Admin/DataFlowMetrics">Data Flow Metrics</a>
+                            <a class="dropdown-item" href="~/Admin/ConnectorStatus">Connector Status</a>
+                            <a class="dropdown-item" href="~/Admin/SupportLinks">Link Farm</a>
+                        </div>
                     </li>
                 }
 

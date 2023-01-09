@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -7,5 +11,6 @@ namespace Sentry.data.Core
         List<DataSourceTypeDto> GetDataSourceTypeDtosForDropdown();
         List<AuthenticationTypeDto> GetValidAuthenticationTypeDtosByType(string sourceType);
         List<AuthenticationTypeDto> GetAuthenticationTypeDtos();
+        void ExchangeAuthToken(DataSource dataSource, string authToken);
     }
 }

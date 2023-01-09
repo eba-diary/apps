@@ -42,7 +42,8 @@
         data.Job.RequestMethodDropdownPopulate(true);
 
         $("#RetrieverJob_SelectedRequestMethod").change(function () {
-            data.Job.DisplayHttpPostPanel();
+            data.Job.DisplayHttpPostPanel(false);
+            data.Job.SetParameterUrl();
         });
         
         $("#RetrieverJob_SelectedDataSource").change(function () {
@@ -69,13 +70,21 @@
                             }
 
                             data.Job.SetDataSourceSpecificPanels(datain.SourceType);
+                            data.Job.DisplayHttpPostPanel(true);
 
                             if (datain.SupportsPaging) {
-                                $('.httpParameterPanel').show();
+                                $('.request-variable-row').each(function () {
+                                    let generatedIndex = $(this).children('input:first').val();
+                                    $('#RetrieverJob_RequestVariables_' + generatedIndex + '__Index').val(generatedIndex);
+                                    $('#RetrieverJob_RequestVariables_' + generatedIndex + '__VariableIncrementType').materialSelect();
+                                });
+
+                                $('.httpPagingPanel').show();
                             }
                             else {
+                                $('.httpPagingPanel').hide();
                                 $("[id$='PagingType']").val('0').change();
-                                $('.httpParameterPanel').hide();
+                                $("#request-variable-container")[0].textContent = '';
                             }
                         }
                         else {
@@ -97,17 +106,6 @@
                     }
                 });
             }            
-        });
-
-        $('#jsonPreview').on('click', function () {
-            try {
-                var data = JSON.parse($("[id$='HttpRequestBody']").val());
-                $("[id$='json-viewer']").jsonViewer(data);
-                $('.jsonValidateResultsPanel').show();
-            }
-            catch (error) {
-                alert("invalid json");
-            }
         });
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
@@ -151,7 +149,7 @@
                     }
 
                     data.Job.SetDataSourceSpecificPanels(datain.SourceType);
-                    data.Job.DisplayHttpPostPanel();
+                    data.Job.DisplayHttpPostPanel(false);
                     data.Job.targetFileNameDescUpdate();
                     
                     if ($("#RetrieverJob_SelectedSourceType").val().toLowerCase() === "ftp") {
@@ -187,9 +185,13 @@
             $('.editDataSourceLink').hide();
         }
 
-        $("#relative-url")[0].textContent = $("#RetrieverJob_RelativeUri").val();
+        data.Job.SetRelativeUriVariables();
         data.Job.SetPagingForm();
         data.Job.targetFileNameDescUpdate();
+
+        $('.includes-tooltip').each(function () {
+            $(this).tooltip();
+        });
 
         $("#RetrieverJob_PagingType").on('change', function () {
             data.Job.SetPagingForm();
@@ -200,36 +202,70 @@
             data.Job.SetParameterUrl();
         })
 
-        $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl)
+        $("#RetrieverJob_PageParameterName").on('keyup', data.Job.SetParameterUrl);
+
+        $(document).on('click', '.remove-request-variable', function () {
+            $(this).parent().remove();
+            data.Job.SetRelativeUriVariables();
+        });
+
+        $('#add-request-variable').off('click').on('click', function () {
+            $("#add-request-variable").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
+            $.get("/DataFlow/RequestVariableEntryRow", function (template) {
+                $('#request-variable-container').append(template);
+                $('.request-variable-row:last [id$=_VariableIncrementType]').materialSelect();
+                $("#add-request-variable").html('<em class="fas fa-plus"></em>');
+
+                let generatedIndex = $('.request-variable-row:last input:first').val();
+                $('#RetrieverJob_RequestVariables_' + generatedIndex + '__Index').val(generatedIndex);
+            });
+        });
+
+        $(document).on('keyup', '[id$=_VariableValue]', data.Job.SetRelativeUriVariables);
+        $(document).on('keyup', '[id$=_VariableName]', data.Job.SetRelativeUriVariables);
+
+        $(document).on('input click', '#RetrieverJob_HttpRequestBody', function () {
+            if ($('#RetrieverJob_HttpRequestBody').val() == '' || this.scrollHeight == 0) {
+                this.style.height = 'auto';
+            }
+            else {
+                this.style.height = (this.scrollHeight) + "px";
+            }
+        });
     },
 
     SetPagingForm: function () {
-        switch ($("#RetrieverJob_PagingType :selected").val()) {
-            case '1':
-                $('.paging-token-field').hide();
-                $('.paging-request-parameter').show();
-                $("#RetrieverJob_PageTokenField").val('');
-                break;
-            case '2':
-                $('.paging-token-field').show();
-                $('.paging-request-parameter').show();
-                break;
-            default:
-                $('.paging-token-field').hide();
-                $('.paging-request-parameter').hide();
-                $("#RetrieverJob_PageTokenField").val('');
-                $("#RetrieverJob_PageParameterName").val('');
+        if ($("#RetrieverJob_PagingType :selected").val() == "0") {
+            $('.paging-request-parameter').hide();
+            $("#RetrieverJob_PageParameterName").val('');
+        }
+        else {
+            $('.paging-request-parameter').show();
         }
 
         data.Job.SetParameterUrl();
+    },
+
+    SetRelativeUriVariables: function () {
+        let relativeUri = $("#RetrieverJob_RelativeUri").val();
+
+        $('[id$=_VariableValue]').each(function () {
+            let variableName = "~[" + $('#' + this.id.replace('Value', 'Name')).val() + "]~";
+            variableName = variableName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            let regex = new RegExp(variableName, 'g');
+            relativeUri = relativeUri.replace(regex, $(this).val());
+        });
+
+        $("#relative-url")[0].textContent = relativeUri;
     },
 
     SetParameterUrl: function () {
         let parameter = '';
         let selectedType = $("#RetrieverJob_PagingType :selected").val();
         let parameterName = $("#RetrieverJob_PageParameterName").val();
+        let selectedMethod = $("#RetrieverJob_SelectedRequestMethod :selected").text();
         
-        if (parameterName && selectedType != '0') {
+        if (parameterName && selectedType != '0' && selectedMethod.toUpperCase() === 'GET') {
             if ($("#RetrieverJob_RelativeUri").val().includes('?')) {
                 parameter += "&";
             }
@@ -243,7 +279,7 @@
                 parameter += "1";
             }
             else {
-                parameter += "tokenValue";
+                parameter += "0";
             }
         }
 
@@ -437,34 +473,41 @@
             $("#RetrieverJob_SelectedRequestMethod").materialSelect();
         });
 
-        data.Job.DisplayHttpPostPanel();
+        data.Job.DisplayHttpPostPanel(setPreviousSelected);
     },
 
-    DisplayHttpPostPanel: function () {
+    DisplayHttpPostPanel: function (setPreviousSelected) {
         
         var val = $("#RetrieverJob_SelectedRequestMethod :selected").text();
         if (val.toUpperCase() === 'POST') {
-            //data.Job.RequestDataFormatDropdownPopulate();
+            data.Job.RequestDataFormatDropdownPopulate(setPreviousSelected);
             $('.httpPostPanel').show();
         }
         else {
             $('.httpPostPanel').hide();
+            $("#RetrieverJob_HttpRequestBody").val('');
+            $("[id$='SelectedRequestDataFormat']").val('0')
         }
     },
 
-    RequestDataFormatDropdownPopulate: function () {
+    RequestDataFormatDropdownPopulate: function (setPreviousSelected) {
         if ($("#JobID").val() === undefined || $("#JobID").val() === "0") {
             
             var val = $("#RetrieverJob_SelectedSourceType :selected").val();
+            let previousSelected = $("#RetrieverJob_SelectedRequestDataFormat :selected").val();
 
             $.getJSON(encodeURI("/Config/RequestDataFormatByType/" + val), function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {
-                    subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                    let selected = "";
+                    if (setPreviousSelected && item.Value == previousSelected) {
+                        selected = "selected='true'";
+                    }
+                    subItems += "<option value='" + item.Value + "' " + selected + ">" + item.Text + "</option>";
                 });
 
                 $("#RetrieverJob_SelectedRequestDataFormat").materialSelect({ destroy: true });
-                $("[id$ ='SelectedRequestDataFormat']").html(subItems);
+                $("#RetrieverJob_SelectedRequestDataFormat").html(subItems);
                 $("#RetrieverJob_SelectedRequestDataFormat").materialSelect();
             });
         }        

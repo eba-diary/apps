@@ -862,7 +862,7 @@ namespace Sentry.data.Core
             dto.TagIds = new List<string>();
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.CategoryName = ds.DatasetCategories.First().Name;
-            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
+            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + GetUrl(ds.DatasetId);
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
             dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;
@@ -908,6 +908,14 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
+            dto.DatasetRelatives = _datasetContext.Datasets.Where(w => w.DatasetName.Trim() == ds.DatasetName.Trim())
+                                    .Select(s => new DatasetRelativeDto(s.DatasetId, s.NamedEnvironment, GetUrl(s.DatasetId)))
+                                    .ToList();
+        }
+
+        private string GetUrl(int datasetId)
+        {
+            return $"{Configuration.Config.GetHostSetting("SentryDataBaseUrl")}/Dataset/Detail/{datasetId}";
         }
         #endregion
 

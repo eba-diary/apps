@@ -728,9 +728,9 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataSource>(), appUser2.Object)).Returns(userSecurity);
 
             Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
-            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedClientPrivateId")).Returns<string>(x => Encryption.ENCRYPTIONINDICATOR + x + Encryption.ENCRYPTIONINDICATOR);
-            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedCurrentToken")).Returns<string>(x => Encryption.ENCRYPTIONINDICATOR + x + Encryption.ENCRYPTIONINDICATOR);
-            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedRefreshToken")).Returns<string>(x => Encryption.ENCRYPTIONINDICATOR + x + Encryption.ENCRYPTIONINDICATOR);
+            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedClientPrivateId")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
+            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedCurrentToken")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
+            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedRefreshToken")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
 
             ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, null, null, encryptionService.Object, securityService.Object, null, null, null, null, null, null);
 
@@ -752,7 +752,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(userSecurity, dataSource.Security);
             Assert.AreEqual($"mailto:username@sentry.com?Subject=Data%20Source%20Inquiry%20-%20DataSourceName", dataSource.MailToLink);
             Assert.AreEqual("ClientId", dataSource.ClientId);
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedClientPrivateId{Encryption.ENCRYPTIONINDICATOR}", dataSource.ClientPrivateId);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}EncryptedClientPrivateId{Indicators.ENCRYPTIONINDICATOR}", dataSource.ClientPrivateId);
             Assert.IsTrue(dataSource.SupportsPaging);
             Assert.AreEqual("AuthHeaderName", dataSource.TokenAuthHeader);
             Assert.AreEqual(OAuthGrantType.JwtBearer, dataSource.GrantType);
@@ -767,8 +767,8 @@ namespace Sentry.data.Core.Tests
 
             DataSourceTokenDto dataSourceToken = dataSource.Tokens.First();
             Assert.AreEqual(3, dataSourceToken.Id);
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedCurrentToken{Encryption.ENCRYPTIONINDICATOR}", dataSourceToken.CurrentToken);
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedRefreshToken{Encryption.ENCRYPTIONINDICATOR}", dataSourceToken.RefreshToken);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}EncryptedCurrentToken{Indicators.ENCRYPTIONINDICATOR}", dataSourceToken.CurrentToken);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}EncryptedRefreshToken{Indicators.ENCRYPTIONINDICATOR}", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 21, 8, 0, 0), dataSourceToken.CurrentTokenExp);
             Assert.AreEqual(100, dataSourceToken.TokenExp);
             Assert.AreEqual("TokenName", dataSourceToken.TokenName);

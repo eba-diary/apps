@@ -1,32 +1,29 @@
 ﻿@model Sentry.data.Web.DataFlowModel
 <div class="md-form">
     <h4>What Named Environment will be sending data?</h4>
-        <span id="namedEnvironmentSpinner"></span>
-        @if (Model.NamedEnvironmentDropDown.Any())
-        {
-            @Html.DropDownListFor(x =>
-                    x.NamedEnvironment,
-                    Model.NamedEnvironmentDropDown,
-                    new { @class = "mdb-select" })
-        }
-        else
-        {
-            @Html.TextBoxFor(x => x.NamedEnvironment, new { @class = "form-control" })
-        }
-        @Html.ValidationMessageFor(model => Model.NamedEnvironment, "", new { @class = "text-danger" })
-</div>
-<div class="md-form">
-    <h4>What type of environment is this?</h4>
-    <span id="namedEnvironmentTypeSpinner"></span>
-    @if (Model.NamedEnvironmentDropDown.Any())
+    <span id="DataFlowNamedEnvironmentSpinner"></span>
+    @if (Model.DataFlowNamedEnvironmentDropDown.Any())
     {
-        @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
-        @Html.HiddenFor(x => x.NamedEnvironmentType)
+        @Html.DropDownListFor(x => x.DataFlowNamedEnvironment, Model.DataFlowNamedEnvironmentDropDown, new { @class = "mdb-select" })
     }
     else
     {
-        @Html.DropDownListFor(x => x.NamedEnvironmentType, Model.NamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
+        @Html.TextBoxFor(x => x.DataFlowNamedEnvironment, new { @class = "form-control" })
     }
-    @Html.ValidationMessageFor(model => Model.NamedEnvironmentType, "", new { @class = "text-danger" })
+
+    @Html.ValidationMessageFor(model => Model.DataFlowNamedEnvironment, "", new { @class = "text-danger" })
 </div>
+<div class="md-form">
+    <h4>What type of environment is this?</h4>
+    <span id="DataFlowNamedEnvironmentSpinner"></span>
+    @if (Model.DataFlowNamedEnvironmentDropDown.Any())
+    {
+        @Html.DropDownListFor(x => x.DataFlowNamedEnvironmentType, Model.DataFlowNamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
+        @Html.HiddenFor(x => x.DataFlowNamedEnvironmentType)
+    }
+    else
+    {
+        @Html.DropDownListFor(x => x.DataFlowNamedEnvironmentType, Model.DataFlowNamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
+    }
+    @Html.HiddenFor(x => x.DataFlowNamedEnvironmentType)</div>
 

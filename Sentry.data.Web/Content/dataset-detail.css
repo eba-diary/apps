@@ -192,3 +192,19 @@ div.dataTables_wrapper div.dataTables_filter input {
 #upload-invalid-message {
     font-size: 1rem;
 }
+
+.margin-left-inherit {
+    margin-left: inherit;
+}
+
+.margin-right-inherit {
+    margin-right: inherit;
+}
+
+.padding-left-zero {
+    padding-left:0px;
+}
+
+.padding-right-one {
+    padding-right: 1px;
+}

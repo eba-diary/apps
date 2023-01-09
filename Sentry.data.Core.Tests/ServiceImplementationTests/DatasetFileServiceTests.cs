@@ -908,6 +908,7 @@ namespace Sentry.data.Core.Tests
             };
 
             Mock<Stream> stream = mockRepository.Create<Stream>();
+            stream.Setup(x => x.Close());
 
             Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>(MockBehavior.Strict);
             datasetContext.Setup(x => x.GetById<DatasetFileConfig>(1)).Returns(datasetFileConfig);
