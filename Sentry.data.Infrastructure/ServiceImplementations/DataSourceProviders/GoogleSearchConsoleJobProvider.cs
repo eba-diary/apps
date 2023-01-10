@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace Sentry.data.Infrastructure
             return "rows";
         }
 
-        protected override Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken data, PagingHttpsConfiguration config)
+        protected override Task WriteToFileAsync(Stream contentStream, Stream fileStream, IEnumerable<JToken> data, PagingHttpsConfiguration config)
         {
             using (StreamWriter writer = new StreamWriter(fileStream, GetEncoding(), 1024, true))
             {

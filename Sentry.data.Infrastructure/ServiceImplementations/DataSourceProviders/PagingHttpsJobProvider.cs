@@ -85,10 +85,28 @@ namespace Sentry.data.Infrastructure
         #region Overridable
         protected virtual string GetDataPath(RetrieverJob job)
         {
-            return job.FileSchema.SchemaRootPath ?? "";
+            if (string.IsNullOrEmpty(job.FileSchema.SchemaRootPath))
+            {
+                return "";
+            }
+            else
+            {
+                string tempPath = job.FileSchema.SchemaRootPath.Replace(",", ".");
+                int lastIndex = tempPath.LastIndexOf(".");
+
+                if (lastIndex == -1)
+                {
+                    return $"..{tempPath}";
+                }
+
+                string beginString = tempPath.Substring(0, lastIndex);
+                string endString = tempPath.Substring(lastIndex + 1);
+
+                return $"{beginString}..{endString}";
+            }
         }
 
-        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken data, PagingHttpsConfiguration config)
+        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, IEnumerable<JToken> data, PagingHttpsConfiguration config)
         {
             //move back to beginning of content
             contentStream.Position = 0;
@@ -130,7 +148,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 Logger.Info($"Paging Https Retriever Job successful response from {RequestLog(config)} - Job: {config.Job.Id}");
                                 //copy response to file
-                                JToken responseData = await ReadResponseAsync(response, fileStream, config);
+                                IEnumerable<JToken> responseData = await ReadResponseAsync(response, fileStream, config);
 
                                 //get next request to make
                                 SetNextRequest(config, responseData);
@@ -224,7 +242,7 @@ namespace Sentry.data.Infrastructure
             return config;
         }
 
-        private async Task<JToken> ReadResponseAsync(HttpResponseMessage response, Stream fileStream, PagingHttpsConfiguration config)
+        private async Task<IEnumerable<JToken>> ReadResponseAsync(HttpResponseMessage response, Stream fileStream, PagingHttpsConfiguration config)
         {
             using (Stream contentStream = await response.Content.ReadAsStreamAsync())
             using (StreamReader streamReader = new StreamReader(contentStream))
@@ -232,7 +250,16 @@ namespace Sentry.data.Infrastructure
             {
                 JToken responseToken = JToken.Load(jsonReader);
 
-                JToken data = responseToken.SelectToken(config.DataPath);
+                IEnumerable<JToken> data;
+                try
+                {
+                    data = responseToken.SelectToken(config.DataPath);
+                }
+                catch (JsonException)
+                {
+                    data = responseToken.SelectTokens(config.DataPath);
+                }
+
                 if (data?.Any() == true)
                 {
                     await WriteToFileAsync(contentStream, fileStream, data, config);
@@ -326,7 +353,7 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
         }
 
-        private void SetNextRequest(PagingHttpsConfiguration config, JToken response)    
+        private void SetNextRequest(PagingHttpsConfiguration config, IEnumerable<JToken> response)    
         {            
             if (response != null)
             {
@@ -478,7 +505,7 @@ namespace Sentry.data.Infrastructure
         }
 
         #region PageType Methods
-        private void AddUpdatePagingQueryParameter(PagingHttpsConfiguration config, JToken response)
+        private void AddUpdatePagingQueryParameter(PagingHttpsConfiguration config, IEnumerable<JToken> response)
         {
             switch (config.Options.PagingType)
             {
