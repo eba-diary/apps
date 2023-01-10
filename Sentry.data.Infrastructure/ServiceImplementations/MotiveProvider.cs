@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
@@ -31,22 +32,24 @@ namespace Sentry.data.Infrastructure
             _authorizationProvider = authorizationProvider;
         }
 
-        public async void MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken newToken, DataFlow dataflow)
+        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken newToken, DataFlow dataflow)
         {
-            HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessTokenForToken((HTTPSSource)motiveSource, newToken)}");
+            var motiveCompaniesUrl = Config.GetHostSetting("MotiveCompaniesUrl");
+            HttpClient httpClient = _httpClientGenerator.GenerateHttpClient(motiveCompaniesUrl);
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, newToken)}");
 
-            using (HttpResponseMessage response = await httpClient.GetAsync("uri_placeholder", HttpCompletionOption.ResponseHeadersRead))
+            using (HttpResponseMessage response = await httpClient.GetAsync(motiveCompaniesUrl, HttpCompletionOption.ResponseHeadersRead))
             {
                 using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                 using (StreamReader streamReader = new StreamReader(contentStream))
                 using (JsonReader jsonReader = new JsonTextReader(streamReader))
                 {
                     JObject responseObject = JObject.Load(jsonReader);
-                    newToken.TokenName = responseObject.Value<string>("companyname_placeholder");
+                    newToken.TokenName = responseObject.Value<string>("companies.company");
                     var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(dataflow.Id, DataActionType.S3Drop);
                     _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
                 }
+                _datasetContext.SaveChanges();
             }
         }
     }
