@@ -211,7 +211,7 @@ namespace Sentry.data.Core
                 {
                     errors.Add("OAuth requires a Token URL.");
                 }
-                if (dto.Tokens.Count(t => !t.ToDelete) < 1)
+                if (dto.Tokens.Any(t => !t.ToDelete))
                 {
                     errors.Add("OAuth requires at least one token.");
                 }
@@ -1138,7 +1138,7 @@ namespace Sentry.data.Core
                 if (dtoToken.ToDelete)
                 {
                     _datasetContext.RemoveById<DataSourceToken>(dtoToken.Id);
-                    var toRemove = httpsSource.Tokens.Where(t => t.Id == dtoToken.Id).First();
+                    var toRemove = httpsSource.Tokens.First(t => t.Id == dtoToken.Id);
                     httpsSource.Tokens.Remove(toRemove);
                 }
                 else
