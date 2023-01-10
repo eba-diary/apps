@@ -215,7 +215,7 @@ namespace Sentry.data.Core
                 {
                     errors.Add("OAuth requires at least one token.");
                 }
-                var tokensToValidate = dto.Tokens.Where(t => !t.ToDelete).ToList(); //skip validation on tokens we plan on removing 
+                List<DataSourceTokenDto> tokensToValidate = dto.Tokens.Where(t => !t.ToDelete).ToList(); //skip validation on tokens we plan on removing 
                 foreach (var token in tokensToValidate)
                 {
                     if (string.IsNullOrWhiteSpace(token.TokenName))
