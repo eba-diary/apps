@@ -908,7 +908,7 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
-            dto.DatasetRelatives = _datasetContext.Datasets.Where(w => w.DatasetName.Trim() == ds.DatasetName.Trim())
+            dto.DatasetRelatives = _datasetContext.Datasets.Where(w => w.DatasetName.Trim() == ds.DatasetName.Trim() && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active)
                                     .Select(s => new DatasetRelativeDto(s.DatasetId, s.NamedEnvironment, GetUrl(s.DatasetId)))
                                     .ToList();
         }
