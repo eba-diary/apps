@@ -1251,8 +1251,12 @@ namespace Sentry.data.Core
             {
                 ((HTTPSSource)dsrc).ClientId = dto.ClientId;
                 ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
-                ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders.Any() ? dto.RequestHeaders : null;
                 ((HTTPSSource)dsrc).SupportsPaging = dto.SupportsPaging;
+
+                if (dto.RequestHeaders.Any())
+                {
+                    ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders;
+                }
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
