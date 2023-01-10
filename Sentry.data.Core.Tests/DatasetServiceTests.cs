@@ -1775,7 +1775,7 @@ namespace Sentry.data.Core.Tests
 
             mockRepository.VerifyAll();
 
-            //should be exactly 2 total relatives that match 
+            //should be exactly 1 total relatives that match 
             Assert.AreEqual(1, dto.DatasetRelatives.Count);
         }
 
