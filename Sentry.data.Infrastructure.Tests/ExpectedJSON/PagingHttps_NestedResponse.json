@@ -3,16 +3,22 @@
   "ParentDescription": "ParentDescriptionValue",
   "Items": [
     {
-      "Name": "NameValue",
-      "Description": "DescriptionValue"
+      "Item": {
+        "Name": "NameValue",
+        "Description": "DescriptionValue"
+      }
     },
     {
-      "Name": "NameValue2",
-      "Description": "DescriptionValue2"
+      "Item": {
+        "Name": "NameValue2",
+        "Description": "DescriptionValue2"
+      }
     },
     {
-      "Name": "NameValue3",
-      "Description": "DescriptionValue3"
+      "Item": {
+        "Name": "NameValue3",
+        "Description": "DescriptionValue3"
+      }
     }
   ]
 }

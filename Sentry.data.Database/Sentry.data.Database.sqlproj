@@ -329,6 +329,9 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_07\CLA-4660-HistoryFixUpperCaseS3ConnectorName.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4668-RemoveQueryPermissionFromDefaultSecurity.sql" />
     <Build Include="Tables\RetrieverJobs\DataSourceTokens.sql" />
+    <Build Include="Tables\DatasetFileDrop.sql" />
+    <Build Include="Tables\DatasetFileQuery.sql" />
+    <Build Include="Tables\DatasetFileRaw.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

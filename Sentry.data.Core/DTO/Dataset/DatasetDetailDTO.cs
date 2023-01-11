@@ -14,5 +14,7 @@ namespace Sentry.data.Core
         public string DataClassificationDescription { get; set; }
         public int GroupAccessCount { get; set; }
         public List<Tuple<string, List<Tuple<DataFlowDetailDto, List<RetrieverJob>>>>> DataFlows { get; set; }
+        public List<DatasetRelativeDto> DatasetRelatives { get; set; }
+
     }
 }

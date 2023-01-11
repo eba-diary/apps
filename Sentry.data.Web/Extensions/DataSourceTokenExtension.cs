@@ -20,7 +20,8 @@ namespace Sentry.data.Web.Extensions
                 TokenName = dataSourceTokenModel.TokenName,
                 TokenUrl = dataSourceTokenModel.TokenUrl,
                 Scope = dataSourceTokenModel.Scope,
-                TokenExp = dataSourceTokenModel.TokenExp
+                TokenExp = dataSourceTokenModel.TokenExp,
+                ToDelete = dataSourceTokenModel.ToDelete
             };
         }
         public static DataSourceTokenModel ToModel(this DataSourceTokenDto dataSourceTokenDto)
