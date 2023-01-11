@@ -32,7 +32,7 @@
     <SccProvider>SAK</SccProvider>
     <Use64BitIISExpress />
     <CodeAnalysisRuleSet>..\.sonarlint\data_data.sentry.comcsharp.ruleset</CodeAnalysisRuleSet>
-    <TypeScriptToolsVersion>4.0</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -1243,6 +1243,8 @@
     <Content Include="Scripts\esm\popper.js.map" />
     <Content Include="Scripts\esm\popper-utils.min.js.map" />
     <Content Include="Scripts\esm\popper-utils.js.map" />
+    <Content Include="package.json" />
+    <Content Include="package-lock.json" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -1400,6 +1402,7 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
+    <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -2184,6 +2187,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+    <TypeScriptCompile Include="webpack.config.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
