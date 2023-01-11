@@ -56,6 +56,10 @@ namespace Sentry.data.Core
 
         protected internal virtual void AddRevision(SchemaRevision revision)
         {
+            if (Revisions == null)
+            {
+                Revisions = new List<SchemaRevision>();
+            }
             revision.Revision_NBR = (Revisions.Any()) ? Revisions.Count + 1 : 1;
             revision.ParentSchema = this as FileSchema;
             Revisions.Add(revision);

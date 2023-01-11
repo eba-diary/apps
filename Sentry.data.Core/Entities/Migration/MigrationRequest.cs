@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sentry.data.Core.Entities.Migration
+namespace Sentry.data.Core
 {
     public class MigrationRequest
     {

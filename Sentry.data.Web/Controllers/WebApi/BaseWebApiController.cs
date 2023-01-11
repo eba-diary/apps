@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Sentry.Common.Logging;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -86,8 +87,65 @@ namespace Sentry.data.Web.WebApi.Controllers
                 //Logger.Error($"metadataapi_getschemabydataset_internalservererror", ex);
                 return InternalServerError(ex);
             }
-
         }
 
+        protected async Task<IHttpActionResult> ApiTryCatchAsync(string controllerName, string methodName, string errorMetadata, Func<Task<IHttpActionResult>> myMethod1)
+        {
+            try
+            {
+                return await myMethod1();
+            }
+            catch (DatasetNotFoundException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound dataset - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
+            }
+            catch (SchemaNotFoundException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schema - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
+            }
+            catch (SchemaRevisionNotFoundException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound schemaRevision - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Schema Revision not found");
+            }
+            catch (DataFileNotFoundException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_notfound datafile - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.NotFound, "DataFile not found");
+            }
+            catch (DatasetUnauthorizedAccessException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedaccess dataset - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Dataset");
+            }
+            catch (SchemaUnauthorizedAccessException)
+            {
+                Logger.Debug($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception schema - {errorMetadata}");
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Schema");
+            }
+            catch (SchemaConversionException ex)
+            {
+                Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_schemaconversionexception - {errorMetadata}", ex);
+                return Content(System.Net.HttpStatusCode.BadRequest, ex.Message);
+            }
+            catch (DataFileUnauthorizedException ex)
+            {
+                Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception datasetfile - {errorMetadata}", ex);
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Data File");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception - {errorMetadata}", ex);
+                return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{controllerName.ToLower()}_{methodName.ToLower()}_internalservererror - {errorMetadata}", ex);
+                //Logger.Error($"metadataapi_getschemabydataset_internalservererror", ex);
+                return InternalServerError(ex);
+            }
+        }
     }
 }

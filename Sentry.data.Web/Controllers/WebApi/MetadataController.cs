@@ -4,7 +4,6 @@ using NJsonSchema;
 using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Migration;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Dataset;
@@ -193,20 +192,67 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
 
         /* This code will be used within next two iterations*/
-        //[HttpPost]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
-        //[Route("dataset")]
-        //public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
-        //{
-        //    IHttpActionResult MigrateDatasetFunction()
-        //    {
-        //        SchemaMigrationRequest request = model.ToDto();
-        //        DataApplicationService.MigrateDataset(request);
-        //        return Ok();
-        //    }
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
+        [Route("MigrateSchema")]
+        public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
+        {
+            IHttpActionResult MigrateDatasetFunction()
+            {
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
 
-        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
-        //}
+                List<string> errors = new List<string>();
+                if (model == null)
+                {
+                    Logger.Debug($"{methodName} - Null {nameof(SchemaMigrationRequestModel)}");
+                    return BadRequest($"{nameof(SchemaMigrationRequestModel)} is required");
+                }
+
+                Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
+
+                SchemaMigrationRequest request = ToDto(model);
+
+                SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse();
+                SchemaMigrationResponseModel responseModel = new SchemaMigrationResponseModel();
+                try
+                {
+                    response = DataApplicationService.MigrateSchema(request);
+                    responseModel = ToSchemaMigrationRequestModel(response);
+                }
+                catch (AggregateException ex)
+                {
+                    Logger.Info($"{methodName} - AggreateException thrown from {nameof(DataApplicationService)}.{nameof(MigrateSchema)}");
+                    foreach (var innerEx in ex.InnerExceptions)
+                    {
+                        if (innerEx is ArgumentException)
+                        {
+                            errors.Add(innerEx.Message);
+                        }
+                    }
+                }
+                catch (ArgumentException ex)
+                {
+                    Logger.Debug($"{methodName} - {ex.Message}");
+                    errors.Add(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn($"{methodName} - Unhandled exception : {ex.Message}");
+                    throw;
+                }
+
+                if (errors.Any())
+                {
+                    return BadRequest(JsonConvert.SerializeObject(errors));
+                }
+
+                return Ok(responseModel);
+            }
+
+            return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        }
 
 
         /// <summary>
