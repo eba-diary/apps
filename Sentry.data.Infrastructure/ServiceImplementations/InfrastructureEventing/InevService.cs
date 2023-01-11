@@ -53,7 +53,10 @@ namespace Sentry.data.Infrastructure
         public async Task PublishDatasetPermissionsUpdated(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> datasetPermissions, IList<SecurablePermission> parentPermissions)
         {
             var details = BuildDatasetPermissionsUpdatedDto(dataset, ticket, datasetPermissions, parentPermissions);
-            await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, details.ToDictionary(), dataset.DatasetId.ToString());
+            var datasetId = dataset.DatasetId.ToString();
+            var payload = details.ToDictionary();
+            await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, payload, datasetId);
+            Common.Logging.Logger.Info($"Sent dataset {datasetId} permission updated event with payload: {payload} ");
         }
 
         /// <summary>
