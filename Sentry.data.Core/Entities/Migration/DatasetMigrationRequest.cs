@@ -10,5 +10,9 @@ namespace Sentry.data.Core.Entities.Migration
     {
         public int SourceDatasetId { get; set; }
         public List<SchemaMigrationRequest> SchemaMigrationRequests { get; set; } = new List<SchemaMigrationRequest>();
+
+
+
+        public List<string> AllNamedEnvironments { get; set; } = new List<string>();
     }
 }

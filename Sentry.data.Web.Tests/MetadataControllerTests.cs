@@ -25,10 +25,39 @@ namespace Sentry.data.Web.Tests
             TestCleanup();
         }
 
-        //[TestCategory("Security_API")]
-        //[TestMethod]
-        //public async Task SchemaApiTest()
-        //{
+        [TestMethod]
+        public void MigrationRequest_ToDto()
+        {
+            Models.ApiModels.Migration.DatasetMigrationRequestModel model = new Models.ApiModels.Migration.DatasetMigrationRequestModel()
+            {
+                SourceDatasetId = 99,
+                TargetDatasetNamedEnvironment = "TEST",
+                TargetDatasetId = 22,
+                SchemaMigrationRequests = new List<Models.ApiModels.Migration.SchemaMigrationRequestModel>()
+                {
+                    new SchemaMigrationRequestModel()
+                    {
+                        SourceSchemaId = 44,
+                        TargetDatasetNamedEnvironment = "TEST",
+                        TargetDataFlowNamedEnviornment = "TEST2",
+                        TargetDatasetId = 33
+                    },
+                    new SchemaMigrationRequestModel()
+                    {
+                        SourceSchemaId = 66,
+                        TargetDatasetNamedEnvironment = "TEST",
+                        TargetDataFlowNamedEnviornment = "TEST2",
+                        TargetDatasetId = 33
+                    },
+                    new SchemaMigrationRequestModel()
+                    {
+                        SourceSchemaId = 88,
+                        TargetDatasetNamedEnvironment = "TEST",
+                        TargetDataFlowNamedEnviornment = "TEST2",
+                        TargetDatasetId = 33
+                    }
+                }
+            };
 
         //    Dataset ds1 = MockClasses.MockDataset();
         //    DatasetFileConfig dfc1 = MockClasses.MockDataFileConfig(ds1);

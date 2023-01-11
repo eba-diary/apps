@@ -581,6 +581,10 @@
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\Migration\DatasetMigrationRequestModel.cs" />
+    <Compile Include="Models\Migration\DatasetMigrationResponseModel.cs" />
+    <Compile Include="Models\Migration\MigrationResponseModel.cs" />
+    <Compile Include="Models\Migration\SchemaMigrationResponseModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -974,6 +978,7 @@
     <Content Include="Content\MDB\mdb.css" />
     <Content Include="Content\MDB\mdb.min.css" />
     <Content Include="Content\MDB\README.txt" />
+    <Content Include="Content\migration.css" />
     <Content Include="Content\regular.css" />
     <Content Include="Content\regular.min.css" />
     <Content Include="Content\sentry-icons.css" />
@@ -1014,6 +1019,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\MigrationRequest.js" />
     <Content Include="js\Shared\Utils.js" />
     <Content Include="js\Subscription.js" />
     <Content Include="Scripts\bloodhound.js" />
@@ -1399,6 +1405,8 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
+    <Content Include="Views\Dataset\Migration\_DatasetMigrationRequest.cshtml" />
+    <Content Include="Views\Dataset\Migration\_DatasetMigrationResponse.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

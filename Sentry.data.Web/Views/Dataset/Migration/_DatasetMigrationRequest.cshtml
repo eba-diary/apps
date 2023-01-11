@@ -1,0 +1,93 @@
+﻿@model Sentry.data.Web.DatasetMigrationRequestModel
+<div id="RequestAccessLoading" class="d-none text-center">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="RequestMigrationBody">
+    <div id="RequestMigrationFormSection">
+        @Html.HiddenFor(x => x.DatasetId)
+        <div class="md-form">
+            <label class="active" for="">Named Environment</label>
+            <div class="dropdown-container">
+
+                @if (Model.DatasetNamedEnvironmentDropDown.Any())
+                {
+                    @Html.DropDownListFor(x => x.TargetNamedEnvironment, Model.DatasetNamedEnvironmentDropDown, new { @class = "mdb-select" })
+                }
+                else
+                {
+                    @Html.TextBoxFor(x => x.TargetNamedEnvironment, new { @class = "form-control" })
+                }
+
+                @Html.ValidationMessageFor(model => Model.TargetNamedEnvironment, "", new { @class = "text-danger" })
+            </div>
+
+            @Html.DropDownListFor(x => x.SelectedSchema, Model.SchemaList, new { @class = "mdb-select" })
+        </div>
+    </div>
+    <div class="d-none" id="MigrationResponseBody">
+        <div class="ResponseContainer">
+            <div class="row">
+                <table class="table dsc-blud-table table-boardered table-hover" id="migrationResponseTable">
+                    <thead>
+                        <tr class="table-header">
+                            <th scope="col">Parent Name</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Status</th>
+                            @*<th scope="col">Details</th>*@
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="d-none" id="migration-response-modal-container">
+        <div class="modal fade" id="migrationResponseModal">
+            <div class="modal-dialog migration-response-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Dataset Migration Response</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body migration-response-modal-body">
+                        <div class="row">
+                            <table class="table dsc-blud-table table-boardered table-hover" id="migrationResponseTable_V2">
+                                <thead>
+                                    <tr class="table-header">
+                                        <th scope="col">Parent Name</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Status</th>
+                                        @*<th scope="col">Details</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary waves-effect display-none filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary float-right" id="MigrationRequestSubmitButton">Submit Migration</button>
+</div>
+
+
