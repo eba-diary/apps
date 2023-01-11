@@ -200,7 +200,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                return await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead);
+                return await httpClient.GetAsync(config.RequestUri);
             }
         }
 
