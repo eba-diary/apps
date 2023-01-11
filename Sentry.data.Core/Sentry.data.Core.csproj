@@ -318,6 +318,7 @@
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Migration\DatasetMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\DatasetMigrationRequestResponse.cs" />
     <Compile Include="Entities\Migration\MigrationRequest.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />

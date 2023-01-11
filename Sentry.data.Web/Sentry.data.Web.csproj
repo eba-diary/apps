@@ -2141,6 +2141,7 @@
     <Folder Include="Images\Home\" />
     <Folder Include="Models\ApiModels\Admin\" />
     <Folder Include="Models\Dataset\ApiModels\" />
+    <Folder Include="Models\Migration\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\AccessRequest\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
@@ -2150,6 +2151,7 @@
     <Folder Include="Views\BaseSearchable\" />
     <Folder Include="Views\BusinessIntelligenceSearch\" />
     <Folder Include="Views\DatasetSearch\" />
+    <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
