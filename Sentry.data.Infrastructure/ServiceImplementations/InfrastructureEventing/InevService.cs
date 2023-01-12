@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure
             if (dataset.DatasetFileConfigs.Any())
             {
                 snowflake.AddRange(
-                    dataset.DatasetFileConfigs.First().Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
+                    dataset.DatasetFileConfigs.First(dsfc => !dsfc.DeleteInd).Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
                         new DatasetPermissionsUpdatedDto.SnowflakeDto()
                         {
                             Warehouse = s.SnowflakeWarehouse,
