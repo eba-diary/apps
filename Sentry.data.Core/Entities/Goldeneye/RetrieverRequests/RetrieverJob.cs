@@ -145,7 +145,7 @@ namespace Sentry.data.Core
             ExecutionParameters = parameters;
         }
 
-        public virtual bool TryIncrementRequestVariables()
+        public virtual void IncrementRequestVariables()
         {
             List<RequestVariable> variables = RequestVariables;
 
@@ -153,19 +153,10 @@ namespace Sentry.data.Core
             {
                 foreach (RequestVariable variable in variables)
                 {
-                    //once 1 variable is unable to be incremented, none should be incremented
-                    if (!variable.TryIncrementVariableValue())
-                    {
-                        return false;
-                    }
+                    variable.IncrementVariableValue();
                 }
 
                 RequestVariables = variables;
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
 

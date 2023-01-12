@@ -61,9 +61,11 @@
                 @Html.DropDownListFor(x => x.SAIDAssetKeyCode, Model.SAIDAssetDropDown, new { @class = "mdb-select", searchable = "Search SAID Assets..." })
                 @Html.ValidationMessageFor(model => Model.SAIDAssetKeyCode, "", new { @class = "text-danger" })
             </div>
-            <div id="NamedEnvironmentPartial">
+
+            <div id="DataFlowNamedEnvironmentPartial">
                 @Html.Partial("_NamedEnvironment", Model)
             </div>
+
             <div class="md-form">
                 <h4>What would you like to name this Data Flow?</h4>
                 @Html.TextBoxFor((m) => m.Name, Model.Name, new { @class = "form-control" })

@@ -121,7 +121,8 @@
 									(30, 'B9EACD9B-B2B8-4956-8ED7-60D9AE27608E', 'XML', 'xmlpreprocessing/', @Bucketv2, 'XML', 0, 'Converts xml file into data processing friendly format within DLST bucket'),
 									(31, 'AFFA0462-749E-4130-AFFF-D16747B73F26', 'JSON Flattening', 'jsonflattening/', @Bucketv2, 'JsonFlattening', 0, 'Flattens incoming JSON based on specified Schema Root Path property on schema within DLST bucket'),
 									(32, '3DE8781B-5E16-4946-A4D9-642B8B0F05FB', 'Schema Load', 'schemaload/', @Bucketv2, 'SchemaLoad', 0, 'Maps schema related metadata to file for processing within DLST bucket'),
-									(33, '1FCB782B-5135-4723-BED9-16CD8468CDA8', 'Google BigQuery API', 'googlebigqueryapipreprocessing/', @Bucketv2, 'GoogleBigQueryApi', 0, 'Converts Google BigQuery API JSON output to data processing friendly format within DLST bucket')
+									(33, '1FCB782B-5135-4723-BED9-16CD8468CDA8', 'Google BigQuery API', 'googlebigqueryapipreprocessing/', @Bucketv2, 'GoogleBigQueryApi', 0, 'Converts Google BigQuery API JSON output to data processing friendly format within DLST bucket'),
+									(34, '5FE4ADC8-30A4-485C-BF56-29C10C1F6E3A', 'Google Search Console API', 'googlesearchconsoleapipreprocessing/', @Bucketv2, 'GoogleSearchConsoleApi', 0, 'Converts Google Search Console API JSON output to data processing friendly format within DLST bucket')
 								)
 								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description]) 
 

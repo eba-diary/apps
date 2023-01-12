@@ -565,8 +565,7 @@ namespace Sentry.data.Web.Helpers
                 {
                     Text = "Pick a Data Format",
                     Value = "0",
-                    Selected = true,
-                    Disabled = true
+                    Selected = true
                 });
             }
 

@@ -46,7 +46,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void TryIncrementRequestVariables_AllIncrement_True()
+        public void IncrementRequestVariables_DailyExcludeToday()
         {
             RetrieverJob job = new RetrieverJob
             {
@@ -65,41 +65,10 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            bool result = job.TryIncrementRequestVariables();
+            job.IncrementRequestVariables();
 
-            Assert.IsTrue(result);
             Assert.AreEqual("2021-01-02", job.RequestVariables.First().VariableValue);
             Assert.AreEqual("2021-01-03", job.RequestVariables.Last().VariableValue);
-        }
-
-        [TestMethod]
-        public void TryIncrementRequestVariables_OneFalseIncrement_False()
-        {
-            string firstDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
-            string lastDate = DateTime.Today.ToString("yyyy-MM-dd");
-
-            RetrieverJob job = new RetrieverJob
-            {
-                RequestVariables = new List<RequestVariable>
-                {
-                    new RequestVariable
-                    {
-                        VariableValue = firstDate,
-                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
-                    },
-                    new RequestVariable
-                    {
-                        VariableValue = lastDate,
-                        VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
-                    }
-                }
-            };
-
-            bool result = job.TryIncrementRequestVariables();
-
-            Assert.IsFalse(result);
-            Assert.AreEqual(firstDate, job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(lastDate, job.RequestVariables.Last().VariableValue);
         }
 
         [TestMethod]

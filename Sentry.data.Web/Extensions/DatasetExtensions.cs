@@ -41,8 +41,8 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CreateCurrentView,
                 ObjectStatus = model.ObjectStatus,
                 SAIDAssetKeyCode = model.SAIDAssetKeyCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType
+                NamedEnvironment = model.DatasetNamedEnvironment,
+                NamedEnvironmentType = model.DatasetNamedEnvironmentType
             };
         }
 

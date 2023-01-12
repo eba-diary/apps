@@ -70,6 +70,7 @@ namespace Sentry.data.Core
         IQueryable<SchemaMapAction> SchemaMapAction { get; }
         IQueryable<GoogleApiAction> GoogleApiAction { get; }
         IQueryable<GoogleBigQueryApiAction> GoogleBigQueryApiAction { get; }
+        IQueryable<GoogleSearchConsoleApiAction> GoogleSearchConsoleApiAction { get; }
         IQueryable<FixedWidthAction> FixedWidthAction { get; }
         IQueryable<XMLAction> XMLAction { get; }
         IQueryable<JsonFlatteningAction> JsonFlatteningAction { get; }

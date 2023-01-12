@@ -27,7 +27,7 @@ namespace Sentry.data.Web
         [DisplayName("Relative URI")]
         public string RelativeUri { get; set; }
 
-        [DisplayName("Https Body")]
+        [DisplayName("HTTPS Request Body")]
         public string HttpRequestBody { get; set; }
 
         [DisplayName("Search Criteria")]
@@ -114,7 +114,7 @@ namespace Sentry.data.Web
             ValidationResults validationResults = new ValidationResults();
 
             //parameter name required when paging type of page number
-            if (PagingType == PagingType.PageNumber && string.IsNullOrWhiteSpace(PageParameterName))
+            if (PagingType != PagingType.None && string.IsNullOrWhiteSpace(PageParameterName))
             {
                 validationResults.Add("PageParameterName", "Page Parameter Name is required");
             }
@@ -124,17 +124,43 @@ namespace Sentry.data.Web
 
         private ValidationResults ValidateRequestVariables()
         {
-            ValidationResults validationResults = ValidateRelativeUriVariables();
+            //variables that are in the RelativeUri, but not in the RequestVariables list
+            ValidationResults validationResults = ValidateUndefinedVariablesFor(RelativeUri, "RelativeUri");
+
+            if (SelectedRequestMethod == HttpMethods.post)
+            {
+                //variables that are in the body, but not in the RequestVariables list
+                validationResults.MergeInResults(ValidateUndefinedVariablesFor(HttpRequestBody, "HttpRequestBody"));
+            }
 
             foreach (RequestVariableModel requestVariable in RequestVariables)
             {
                 validationResults.MergeInResults(requestVariable.Validate());
+                validationResults.MergeInResults(ValidateRequestVariableIsUsed(requestVariable));                
+            }
 
-                if (!string.IsNullOrWhiteSpace(requestVariable.VariableName))
+            return validationResults;
+        }
+
+        private ValidationResults ValidateRequestVariableIsUsed(RequestVariableModel requestVariable)
+        {
+            ValidationResults validationResults = new ValidationResults();
+
+            if (!string.IsNullOrWhiteSpace(requestVariable.VariableName))
+            {
+                string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
+                if (string.IsNullOrEmpty(RelativeUri) || !RelativeUri.Contains(variablePlaceholder))
                 {
                     //variable is not used in the relative uri
-                    string variablePlaceholder = string.Format(Indicators.REQUESTVARIABLEINDICATOR, requestVariable.VariableName);
-                    if (!string.IsNullOrEmpty(RelativeUri) && !RelativeUri.Contains(variablePlaceholder))
+                    if (SelectedRequestMethod == HttpMethods.post)
+                    {
+                        if (string.IsNullOrEmpty(HttpRequestBody) || !HttpRequestBody.Contains(variablePlaceholder))
+                        {
+                            //and variable is not used in the body
+                            validationResults.Add($"RetrieverJob.RequestVariables[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not used in Relative URI or HTTPS Request Body");
+                        }
+                    }
+                    else
                     {
                         validationResults.Add($"RetrieverJob.RequestVariables[{requestVariable.Index}].VariableName", $"{variablePlaceholder} is not used in Relative URI");
                     }
@@ -144,16 +170,16 @@ namespace Sentry.data.Web
             return validationResults;
         }
 
-        private ValidationResults ValidateRelativeUriVariables()
+        private ValidationResults ValidateUndefinedVariablesFor(string source, string property)
         {
             ValidationResults validationResults = new ValidationResults();
 
-            if (!string.IsNullOrEmpty(RelativeUri))
+            if (!string.IsNullOrEmpty(source))
             {
                 //check if relative uri contains any variables
                 string escapedIndicator = Indicators.REQUESTVARIABLEINDICATOR.Replace("[", @"\[").Replace("]", @"\]");
                 string variablePlaceholder = string.Format(escapedIndicator, "[A-Za-z0-9]+");
-                MatchCollection matches = Regex.Matches(RelativeUri, variablePlaceholder);
+                MatchCollection matches = Regex.Matches(source, variablePlaceholder);
                 List<string> undefinedVariables = new List<string>();
 
                 foreach (Match match in matches)
@@ -167,7 +193,7 @@ namespace Sentry.data.Web
 
                 if (undefinedVariables.Any())
                 {
-                    validationResults.Add("RetrieverJob.RelativeUri", $"Request Variable(s) not defined for {string.Join(", ", undefinedVariables)}");
+                    validationResults.Add($"RetrieverJob.{property}", $"Request Variable(s) not defined for {string.Join(", ", undefinedVariables)}");
                 }
             }
 

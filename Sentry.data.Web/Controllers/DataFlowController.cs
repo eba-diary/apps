@@ -6,6 +6,7 @@ using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
@@ -114,10 +115,7 @@ namespace Sentry.data.Web.Controllers
             
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
-            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(model);
 
             return View("DataFlowForm", model);            
         }
@@ -155,10 +153,7 @@ namespace Sentry.data.Web.Controllers
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
             CreateDropDownSetup(model.RetrieverJob);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
-            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType),namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(model);
 
             return View("DataFlowForm", model);
         }
@@ -260,10 +255,7 @@ namespace Sentry.data.Web.Controllers
             model.SelectedSchema = model.SchemaMaps.First().SelectedSchema;
             model.SAIDAssetDropDown = await BuildSAIDAssetDropDown(model.SAIDAssetKeyCode);
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.NamedEnvironment);
-            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList; 
-            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(model);
 
             return View("DataFlowForm", model);
         }
@@ -345,8 +337,8 @@ namespace Sentry.data.Web.Controllers
                 StorageCode = dto.FlowStorageCode,
                 SelectedDataset = dto.DatasetId,
                 SelectedSchema = dto.SchemaId,
-                NamedEnvironment = dto.NamedEnvironment,
-                NamedEnvironmentType = dto.NamedEnvironmentType,
+                DataFlowNamedEnvironment = dto.NamedEnvironment,
+                DataFlowNamedEnvironmentType = dto.NamedEnvironmentType,
                 PrimaryContactId = dto.PrimaryContactId,
                 IsSecured = dto.IsSecured,
                 TopicName = dto.TopicName,
@@ -429,13 +421,10 @@ namespace Sentry.data.Web.Controllers
             DataFlowModel model = new DataFlowModel()
             {
                 SAIDAssetKeyCode = assetKeyCode,
-                NamedEnvironment = namedEnvironment
+                DataFlowNamedEnvironment = namedEnvironment
             };
 
-            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(assetKeyCode, namedEnvironment);
-            model.NamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
-            model.NamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            model.NamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            await SetNamedEnvironmentProperties(model);
 
             return PartialView(model);
         }
@@ -657,10 +646,10 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError(nameof(DataFlowModel.SAIDAssetKeyCode), vr.Description);
                         break;
                     case GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID:
-                        ModelState.AddModelError(nameof(DataFlowModel.NamedEnvironment), vr.Description);
+                        ModelState.AddModelError(nameof(DataFlowModel.DataFlowNamedEnvironment), vr.Description);
                         break;
                     case GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
-                        ModelState.AddModelError(nameof(DataFlowModel.NamedEnvironmentType), vr.Description);
+                        ModelState.AddModelError(nameof(DataFlowModel.DataFlowNamedEnvironmentType), vr.Description);
                         break;
                     case "PreprocessingOptions":
                     case SchemaMap.ValidationErrors.schemamapMustContainDataset:
@@ -678,6 +667,7 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError($"RetrieverJob.{vr.Id}", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsRequestBodyIsBlank:
+                    case DataSource.ValidationErrors.httpsRequestBodyIsInvalidJson:
                         ModelState.AddModelError("RetrieverJob.HttpRequestBody", vr.Description);
                         break;
                     case DataSource.ValidationErrors.httpsRequestDataFormatNotSelected:
@@ -712,6 +702,14 @@ namespace Sentry.data.Web.Controllers
                         break;
                 }
             }
+        }
+
+        private async Task SetNamedEnvironmentProperties(DataFlowModel model)
+        {
+            var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.DataFlowNamedEnvironment);
+            model.DataFlowNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList;
+            model.DataFlowNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+            model.DataFlowNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
         }
     }
 

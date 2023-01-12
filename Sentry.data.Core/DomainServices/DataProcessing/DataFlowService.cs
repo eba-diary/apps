@@ -1071,6 +1071,9 @@ namespace Sentry.data.Core
                     case (int)DataFlowPreProcessingTypes.googlebigqueryapi:
                         AddDataFlowStep(dto, df, DataActionType.GoogleBigQueryApi);
                         break;
+                    case (int)DataFlowPreProcessingTypes.googlesearchconsoleapi:
+                        AddDataFlowStep(dto, df, DataActionType.GoogleSearchConsoleApi);
+                        break;
                     default:
                         break;
                 }
@@ -1317,6 +1320,9 @@ namespace Sentry.data.Core
                     break;
                 case DataActionType.GoogleBigQueryApi:
                     action = _datasetContext.GoogleBigQueryApiAction.GetAction(_dataFeatures, isHumanResources);
+                    break;
+                case DataActionType.GoogleSearchConsoleApi:
+                    action = _datasetContext.GoogleSearchConsoleApiAction.GetAction(_dataFeatures, isHumanResources);
                     break;
                 case DataActionType.ClaimIq:
                     action = _datasetContext.ClaimIQAction.GetAction(_dataFeatures, isHumanResources);

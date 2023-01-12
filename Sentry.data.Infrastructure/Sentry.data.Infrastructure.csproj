@@ -295,6 +295,7 @@
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleSearchConsoleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleBigQueryApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\JsonFlatteningActionMapping.cs" />
@@ -388,6 +389,7 @@
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricProvider.cs" />
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\GoogleSearchConsoleJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
     <Compile Include="ServiceImplementations\FileProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
@@ -523,10 +525,10 @@
     <Analyzer Include="..\packages\AWSSDK.Lambda.3.7.14.26\analyzers\dotnet\cs\AWSSDK.Lambda.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.S3.3.7.9.66\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.7.1.212\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\Google.Protobuf.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CFG.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\Google.Protobuf.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CFG.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
