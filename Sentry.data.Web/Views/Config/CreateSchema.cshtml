@@ -1,7 +1,7 @@
 ﻿@model Sentry.data.Web.Models.CreateSchemaModel
+
 @{
     ViewBag.Title = "Create Schema Revision";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @using (Html.BeginForm("CreateSchema", "Config", FormMethod.Post))
@@ -72,7 +72,6 @@
 </div>
 
 @section Scripts {
-    @*@Scripts.Render("~/bundles/jqueryval")*@
     <script>
         $(function () {
             //data.Dataset.EditInit();

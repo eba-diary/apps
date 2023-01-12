@@ -7,30 +7,29 @@ namespace Sentry.data.Web
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            string dataTablesScriptsDirectory = "~/Scripts/DataTables";
-
             //This bundle contains basic jquery stuff and some common plugins
             bundles.Add(new ScriptBundle("~/bundles/jquery").
                         Include("~/Scripts/jquery-{version}.js").
                         Include("~/Scripts/jquery-ui.js").
                         Include("~/Scripts/jquery.unobtrusive-ajax.js").
                         Include("~/Scripts/jquery.placeholder.js").
-                        Include("~/Scripts/select2.js").
                         Include("~/Scripts/jquery.ba-throttle-debounce.js").
-                        Include("~/Scripts/bootbox.js").
-                        Include("~/Scripts/spin.js").
-                        Include("~/Scripts/ladda.js").
-                        Include("~/Scripts/knockout-3.4.2.js").
-                        Include("~/Scripts/knockout-sortable.min.js").
-                        Include("~/Scripts/knockout-paging.js").
-                        Include("~/Scripts/jQuery.extendext.min.js").
                         Include("~/Scripts/jquery.validate.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
                         Include("~/Scripts/jquery.json-viewer.js").
+                        Include("~/Scripts/jQuery.extendext.min.js").
+                        Include("~/Scripts/select2.js").
+                        Include("~/Scripts/bootbox.js").
+                        Include("~/Scripts/spin.js").
+                        Include("~/Scripts/ladda.js").
                         Include("~/Scripts/toastr.min.js").
                         Include("~/Scripts/thenBy.min.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/knockout").
+                        Include("~/Scripts/knockout-3.4.2.js").
+                        Include("~/Scripts/knockout-sortable.min.js").
+                        Include("~/Scripts/knockout-paging.js"));
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new Bundle("~/bundles/bootstrap").
@@ -47,6 +46,7 @@ namespace Sentry.data.Web
                         Include("~/js/_Shared.js").
                         IncludeDirectory("~/js", "*.js", true));
 
+            string dataTablesScriptsDirectory = "~/Scripts/DataTables";
             //This bundle contains scripts needed for DataTables and related plugins
             bundles.Add(new ScriptBundle("~/bundles/dataTables").
                         Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").
@@ -71,13 +71,9 @@ namespace Sentry.data.Web
                         Include("~/Scripts/later.js").
                         Include("~/Scripts/prettycron.js"));
 
-
-
             //This bundle contains quill
             bundles.Add(new ScriptBundle("~/bundles/quill").
-                        Include("~/Scripts/quill/quill.js")
-                        );
-
+                        Include("~/Scripts/quill/quill.js"));
 
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
@@ -88,8 +84,6 @@ namespace Sentry.data.Web
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
 
-
-
             //This bundle contains styles specific to DataTables and related plugins
             string dataTablesStylesDirectory = "~/Content/DataTables/css";
             bundles.Add(new StyleBundle("~/bundles/css/dataTables").
@@ -97,8 +91,6 @@ namespace Sentry.data.Web
                     Include(dataTablesStylesDirectory + "/dataTables.responsive.css").
                     Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
                     Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
-
-
 
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
@@ -124,7 +116,6 @@ namespace Sentry.data.Web
                 Include("~/Content/jquery.json-viewer.css").
                 Include("~/scripts/quill/quill.snow.css").
                 Include("~/Content/admin.css")
-
             );
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
@@ -133,8 +124,6 @@ namespace Sentry.data.Web
             https://stackoverflow.com/questions/21270834/asp-net-mvc-bundle-not-rendering-script-files-on-staging-server-it-works-on-dev
             BundleTable.EnableOptimizations = false;
             */
-
-
         }
     }
 }

@@ -690,7 +690,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AnonymousTypeUtils.cs" />
-    <Compile Include="Helpers\EditorForMany.cs" />
+    <Compile Include="Helpers\HtmlHelperExtensions.cs" />
     <Compile Include="Helpers\LoggerHelper.cs" />
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
@@ -2006,7 +2006,6 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Error\Forbidden.cshtml" />
-    <Content Include="Views\Error\Index.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
     <Content Include="Views\Error\ServerError.cshtml" />
     <Content Include="Views\Error\Unauthorized.cshtml" />
@@ -2014,7 +2013,6 @@
     <Content Include="Views\Layout\_Header.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\ModelStateDictionary.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Currency.cshtml" />
-    <Content Include="Views\Shared\_GenericLayout.cshtml" />
     <Content Include="Views\User\Switch.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\_AssetCarousel.cshtml" />
@@ -2060,7 +2058,6 @@
     <Content Include="Views\Config\EditDataSource.cshtml" />
     <Content Include="Views\DataAsset\Test.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
-    <Content Include="Views\Shared\_HomePageLayout.cshtml" />
     <Content Include="Views\Config\_Headers.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Collection.cshtml" />
     <Content Include="Views\Config\Fields.cshtml" />
