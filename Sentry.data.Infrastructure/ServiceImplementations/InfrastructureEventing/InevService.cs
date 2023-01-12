@@ -56,7 +56,6 @@ namespace Sentry.data.Infrastructure
             var datasetId = dataset.DatasetId.ToString();
             var payload = details.ToDictionary();
             await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, payload, datasetId);
-            Common.Logging.Logger.Info($"Sent dataset {datasetId} permission updated event with payload: {payload} ");
         }
 
         /// <summary>
@@ -112,7 +111,7 @@ namespace Sentry.data.Infrastructure
             if (dataset.DatasetFileConfigs.Any())
             {
                 snowflake.AddRange(
-                    dataset.DatasetFileConfigs.First(dsfc => !dsfc.DeleteInd).Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
+                    dataset.DatasetFileConfigs.First(dsfc => dsfc.ObjectStatus == ObjectStatusEnum.Active).Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
                         new DatasetPermissionsUpdatedDto.SnowflakeDto()
                         {
                             Warehouse = s.SnowflakeWarehouse,
