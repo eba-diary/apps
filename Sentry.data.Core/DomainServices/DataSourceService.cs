@@ -24,7 +24,6 @@ namespace Sentry.data.Core
         #region Constructor
         public DataSourceService(IDatasetContext datasetContext,
                             IEncryptionService encryptionService,
-                            IHttpClientProvider httpClient, 
                             IHttpClientGenerator httpClientGenerator)
         {
             _datasetContext = datasetContext;
