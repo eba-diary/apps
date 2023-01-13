@@ -18,17 +18,18 @@ namespace Sentry.data.Core
         #region Fields
         private readonly IDatasetContext _datasetContext;
         private readonly IEncryptionService _encryptionService;
-        private readonly IHttpClientProvider _httpClient;
+        private readonly IHttpClientGenerator _httpClientGenerator;
         #endregion
 
         #region Constructor
         public DataSourceService(IDatasetContext datasetContext,
                             IEncryptionService encryptionService,
-                            IHttpClientProvider httpClient)
+                            IHttpClientProvider httpClient, 
+                            IHttpClientGenerator httpClientGenerator)
         {
             _datasetContext = datasetContext;
             _encryptionService = encryptionService;
-            _httpClient = httpClient;
+            _httpClientGenerator = httpClientGenerator;
         }
         #endregion
 
@@ -96,12 +97,14 @@ namespace Sentry.data.Core
             {
               {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "https://telematicsnonprod.sentry.com/Motive/MotiveSuccess"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
             };
-            Sentry.Common.Logging.Logger.Info($"Attempting to add token {authToken} to datasource {dataSource.ToString()}");
             var jsonContent = JsonConvert.SerializeObject(content);
             var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var stringContent = jsonContent.ToString();
+            Sentry.Common.Logging.Logger.Info($"Attempting to add token {authToken} to datasource {dataSource.Name} with payload: {stringContent}");
             try
             {
-                var response = await _httpClient.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent);
+                var client = _httpClientGenerator.GenerateHttpClient("https://api.gomotive.com/oauth/token");
+                var response = await client.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent);
                 Sentry.Common.Logging.Logger.Info($"Response {response.StatusCode}: {response.Content.ReadAsStringAsync()}");
                 JObject responseAsJson = JObject.Parse(await response.Content.ReadAsStringAsync());
                 string accessToken = responseAsJson.Value<string>("access_token");

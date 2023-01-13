@@ -211,7 +211,7 @@ namespace Sentry.data.Core
                 {
                     errors.Add("OAuth requires a Token URL.");
                 }
-                if (dto.Tokens.Any(t => !t.ToDelete))
+                if (!dto.Tokens.Any(t => !t.ToDelete))
                 {
                     errors.Add("OAuth requires at least one token.");
                 }
