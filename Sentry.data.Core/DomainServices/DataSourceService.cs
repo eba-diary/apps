@@ -104,7 +104,8 @@ namespace Sentry.data.Core
             {
                 var client = _httpClientGenerator.GenerateHttpClient("https://api.gomotive.com/oauth/token");
                 var response = await client.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent);
-                Sentry.Common.Logging.Logger.Info($"Response {response.StatusCode}: {response.Content.ReadAsStringAsync()}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Sentry.Common.Logging.Logger.Info($"Response {response.StatusCode}: {responseContent}");
                 JObject responseAsJson = JObject.Parse(await response.Content.ReadAsStringAsync());
                 string accessToken = responseAsJson.Value<string>("access_token");
                 string refreshToken = responseAsJson.Value<string>("refresh_token");
