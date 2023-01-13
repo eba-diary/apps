@@ -8,6 +8,7 @@ function config(env, argv): webpack.Configuration {
     return {
         entry: {
             // one entry per "bundle" goes in here
+            'common': './src/common.ts',
         },
         output: {
             clean: true,

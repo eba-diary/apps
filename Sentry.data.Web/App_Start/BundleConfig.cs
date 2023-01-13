@@ -26,11 +26,6 @@ namespace Sentry.data.Web
                         Include("~/Scripts/toastr.min.js").
                         Include("~/Scripts/thenBy.min.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/knockout").
-                        Include("~/Scripts/knockout-3.4.2.js").
-                        Include("~/Scripts/knockout-sortable.min.js").
-                        Include("~/Scripts/knockout-paging.js"));
-
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new Bundle("~/bundles/bootstrap").
                         Include("~/Scripts/bootstrap.bundle.js").
@@ -39,6 +34,11 @@ namespace Sentry.data.Web
                         Include("~/Scripts/typeahead.bundle.js").
                         Include("~/Scripts/sentry.associates.js").
                         Include("~/Scripts/sentry.common.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/knockout").
+                        Include("~/Scripts/knockout-3.4.2.js").
+                        Include("~/Scripts/knockout-sortable.min.js").
+                        Include("~/Scripts/knockout-paging.js"));
 
             //This bundle contains all of the custom javascript for your application -
             //it automatically picks up everything in the "js" folder

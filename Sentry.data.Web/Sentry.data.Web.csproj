@@ -2184,6 +2184,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+    <TypeScriptCompile Include="src\common.ts" />
     <TypeScriptCompile Include="webpack.config.ts" />
   </ItemGroup>
   <PropertyGroup>
