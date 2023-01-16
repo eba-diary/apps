@@ -513,8 +513,7 @@ namespace Sentry.data.Core
         }
         internal virtual int CreateWithoutSave(SchemaRevisionFieldStructureDto dto)
         {
-            int newRevisionId = SchemaService.CreateSchemaRevision(dto);
-            return newRevisionId;
+            return SchemaService.CreateSchemaRevision(dto);
         }
         private void CreateWithoutSave_DfsRetrieverJob(DataFlow dataFlow)
         {
