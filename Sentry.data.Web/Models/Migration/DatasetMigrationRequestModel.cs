@@ -13,6 +13,7 @@ namespace Sentry.data.Web
         public string TargetNamedEnvironment { get; set; }
         public List<string> AllAssetNamedEnvironments { get; set; } = new List<string>();
         public List<int> SelectedSchema { get; set; } = new List<int>();
+        public bool QuartermasterManagedNamedEnvironments { get; set; }
 
         public string SAIDAssetKeyCode { get; set; }
         public IEnumerable<SelectListItem> DatasetNamedEnvironmentDropDown { get; set; }

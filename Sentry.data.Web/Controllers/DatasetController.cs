@@ -1319,6 +1319,7 @@ namespace Sentry.data.Web.Controllers
                 List<NamedEnvironmentDto> datasetNamedEnvironmentDtoList = _datasetContext.Datasets.Where(w => w.Asset.SaidKeyCode == model.SAIDAssetKeyCode && w.DatasetName == datasetName).Select(s => new NamedEnvironmentDto() { NamedEnvironment = s.NamedEnvironment, NamedEnvironmentType = s.NamedEnvironmentType }).ToList();
                 model.DatasetNamedEnvironmentDropDown = NamedEnvironmentBuilder.BuildNamedEnvironmentDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList);
                 model.DatasetNamedEnvironmentTypeDropDown = _namedEnvironmentBuilder.BuildNamedEnvironmentTypeDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList);
+                model.QuartermasterManagedNamedEnvironments = false;
             }
             else
             {
@@ -1326,6 +1327,7 @@ namespace Sentry.data.Web.Controllers
                 model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList.Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
                 model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
                 model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+                model.QuartermasterManagedNamedEnvironments = true;
             }
 
             

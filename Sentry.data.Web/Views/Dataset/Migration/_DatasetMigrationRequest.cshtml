@@ -26,14 +26,18 @@
             <label class="active" for="">Target Named Environment</label>
             <div class="dropdown-container">
 
-                @if (Model.DatasetNamedEnvironmentDropDown.Any())
+                @if (Model.QuartermasterManagedNamedEnvironments)
                 {
-                    @Html.DropDownListFor(x => x.TargetNamedEnvironment, Model.DatasetNamedEnvironmentDropDown, new { @class = "mdb-select" })
+                    @Html.DropDownListFor(x => x.TargetNamedEnvironment, Model.DatasetNamedEnvironmentDropDown, new { @class = "mdb-select", searchable = "Search or add here...", editable = "true" })
+                }
+                else if (Model.DatasetNamedEnvironmentDropDown.Any())
+                {
+                    @Html.DropDownListFor(x => x.TargetNamedEnvironment, Model.DatasetNamedEnvironmentDropDown, new { @class = "mdb-select", searchable = "Search or add here...", editable = "true" })
                 }
                 else
                 {
                     @Html.TextBoxFor(x => x.TargetNamedEnvironment, new { @class = "form-control" })
-                }
+                }                
 
                 @Html.ValidationMessageFor(model => Model.TargetNamedEnvironment, "", new { @class = "text-danger" })
             </div>

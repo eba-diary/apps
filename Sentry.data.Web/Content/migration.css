@@ -24,3 +24,11 @@
 #RequestMigrationFormSection #ValidationMessages li {
     color: red;
 }
+
+#RequestMigrationFormSection .select-wrapper{
+    padding-top: 10px;
+}
+
+#RequestMigrationFormSection .form-check-input[type="checkbox"] + label {
+    top: -11px !important; /* previously 0px; */
+}

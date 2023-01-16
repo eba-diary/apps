@@ -985,7 +985,12 @@ namespace Sentry.data.Web.WebApi.Controllers
             DatasetMigrationRequest request = new DatasetMigrationRequest()
             {
                 SourceDatasetId = model.SourceDatasetId,
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment,
+                /*
+                 * Adding ToUpper() due to MDB editable dropdown adds new items as lower regardless of user input
+                 * https://mdbootstrap.com/docs/b4/jquery/forms/select/#new-options
+                 * We are following Quartermaster named environment requirements which one is named environment is to be all upper case.
+                 */
+                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment.ToUpper(),
                 TargetDatasetId = model.TargetDatasetId,
                 SchemaMigrationRequests = new List<SchemaMigrationRequest>()
             };
