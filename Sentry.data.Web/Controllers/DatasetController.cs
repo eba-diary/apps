@@ -773,34 +773,6 @@ namespace Sentry.data.Web.Controllers
         }
         #endregion
 
-        #region Migration
-        [HttpGet]
-        public async Task<ActionResult> MigrationRequest(int datasetId)
-        {
-            if (!_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
-            {
-                return Json(new { Success = false, Message = "Unauthorized access" });
-            }
-            DatasetMigrationRequestModel model = new DatasetMigrationRequestModel
-            {
-                DatasetId = datasetId,
-                SAIDAssetKeyCode = _datasetContext.Datasets.Where(w => w.DatasetId == datasetId).Select(s => s.Asset.SaidKeyCode).FirstOrDefault()
-            };
-
-            await SetNamedEnvironmentProperties(model);
-
-            model.SchemaList = Utility.BuildSchemaDropDown(_datasetContext, datasetId, 0);
-
-            return PartialView("Migration/_DatasetMigrationRequest", model);
-        }
-
-        [HttpGet]
-        public PartialViewResult DatasetMigrationResponse()
-        {
-            return PartialView("~/Views/Dataset/Migration/_DatasetMigrationResponse.cshtml");
-        }
-        #endregion
-
         #region Helpers
 
         [HttpGet()]

@@ -4,7 +4,7 @@
         var migrationRequestModal = Sentry.ShowModalWithSpinner("Dataset Migration Request");
         $(migrationRequestModal).attr("id", "MigrationRequestModal");
 
-        getDatasetMigrationRequestUrl = "/Dataset/MigrationRequest?datasetId=" + encodeURI(datasetId);
+        getDatasetMigrationRequestUrl = "/Migration/DatasetMigrationRequest?datasetId=" + encodeURI(datasetId);
 
         $.get(getDatasetMigrationRequestUrl, function (e) {
             migrationRequestModal.ReplaceModalBody(e);
@@ -93,7 +93,7 @@
     },
 
     initMigrationResponseModal: function (response) {
-        $('.migration-modal-container').load("/Dataset/DatasetMigrationResponse", function () {
+        $('.migration-modal-container').load("/Migration/DatasetMigrationResponse", function () {
             data.MigrationRequest.initMigrationResponseDataTable(response);
             $('#migrationResponseModal').modal('show');
         });

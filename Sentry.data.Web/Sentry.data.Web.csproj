@@ -531,6 +531,7 @@
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
@@ -1407,8 +1408,8 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
-    <Content Include="Views\Dataset\Migration\_DatasetMigrationRequest.cshtml" />
-    <Content Include="Views\Dataset\Migration\_DatasetMigrationResponse.cshtml" />
+    <Content Include="Views\Migration\Dataset\_DatasetMigrationRequest.cshtml" />
+    <Content Include="Views\Migration\Dataset\_DatasetMigrationResponse.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -2143,7 +2144,6 @@
     <Folder Include="Images\Home\" />
     <Folder Include="Models\ApiModels\Admin\" />
     <Folder Include="Models\Dataset\ApiModels\" />
-    <Folder Include="Models\Migration\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\AccessRequest\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
