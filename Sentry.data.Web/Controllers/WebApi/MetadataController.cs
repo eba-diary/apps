@@ -153,7 +153,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
 
-                List<string> errors = new List<string>();
                 if (model == null)
                 {
                     Logger.Debug($"{methodName} - Null {nameof(DatasetMigrationRequestModel)}");
@@ -185,7 +184,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
 
-                List<string> errors = new List<string>();
                 if (model == null)
                 {
                     Logger.Debug($"{methodName} - Null {nameof(SchemaMigrationRequestModel)}");
