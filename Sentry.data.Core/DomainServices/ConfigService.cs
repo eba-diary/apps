@@ -207,16 +207,16 @@ namespace Sentry.data.Core
                 {
                     errors.Add("OAuth requires a Client Private ID.");
                 }
-
-                if (string.IsNullOrWhiteSpace(dto.Tokens.FirstOrDefault().TokenUrl))
+                if(!dto.Tokens.Any(t => !String.IsNullOrEmpty(t.TokenUrl) && !t.ToDelete))
                 {
                     errors.Add("OAuth requires a Token URL.");
                 }
-                if (dto.Tokens.Count < 1)
+                if (dto.Tokens.Any(t => !t.ToDelete))
                 {
                     errors.Add("OAuth requires at least one token.");
                 }
-                foreach (var token in dto.Tokens)
+                List<DataSourceTokenDto> tokensToValidate = dto.Tokens.Where(t => !t.ToDelete).ToList(); //skip validation on tokens we plan on removing 
+                foreach (var token in tokensToValidate)
                 {
                     if (string.IsNullOrWhiteSpace(token.TokenName))
                     {
@@ -1135,32 +1135,41 @@ namespace Sentry.data.Core
         {
             foreach(DataSourceTokenDto dtoToken in dataSourceDto.Tokens)
             {
-                bool update = false;
-                DataSourceToken token = new DataSourceToken();
-
-                if (dtoToken.Id != 0 && httpsSource.Tokens.Any(dsToken => dsToken.Id == dtoToken.Id))
+                if (dtoToken.ToDelete)
                 {
-                    token = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
-                    update = true;
-                }
-
-                token.ParentDataSource = httpsSource;
-                token.TokenName = dtoToken.TokenName;
-                token.RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey);
-                token.CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey);
-                token.CurrentTokenExp = dtoToken.CurrentTokenExp;
-                token.TokenExp = dtoToken.TokenExp;
-                token.TokenUrl = dtoToken.TokenUrl;
-                token.Scope = dtoToken.Scope;
-
-                if (update)
-                {
-                    UpdateClaimsForToken(token, dataSourceDto);
+                    _datasetContext.RemoveById<DataSourceToken>(dtoToken.Id);
+                    var toRemove = httpsSource.Tokens.First(t => t.Id == dtoToken.Id);
+                    httpsSource.Tokens.Remove(toRemove);
                 }
                 else
                 {
-                    CreateClaimsForToken(token, dataSourceDto, httpsSource);
-                    httpsSource.Tokens.Add(token);
+                    bool update = false;
+                    DataSourceToken token = new DataSourceToken();
+
+                    if (dtoToken.Id != 0 && httpsSource.Tokens.Any(dsToken => dsToken.Id == dtoToken.Id))
+                    {
+                        token = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
+                        update = true;
+                    }
+
+                    token.ParentDataSource = httpsSource;
+                    token.TokenName = dtoToken.TokenName;
+                    token.RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey);
+                    token.CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey);
+                    token.CurrentTokenExp = dtoToken.CurrentTokenExp;
+                    token.TokenExp = dtoToken.TokenExp;
+                    token.TokenUrl = dtoToken.TokenUrl;
+                    token.Scope = dtoToken.Scope;
+
+                    if (update)
+                    {
+                        UpdateClaimsForToken(token, dataSourceDto);
+                    }
+                    else
+                    {
+                        CreateClaimsForToken(token, dataSourceDto, httpsSource);
+                        httpsSource.Tokens.Add(token);
+                    }
                 }
             }
         }
@@ -1251,8 +1260,12 @@ namespace Sentry.data.Core
             {
                 ((HTTPSSource)dsrc).ClientId = dto.ClientId;
                 ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
-                ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders.Any() ? dto.RequestHeaders : null;
                 ((HTTPSSource)dsrc).SupportsPaging = dto.SupportsPaging;
+
+                if (dto.RequestHeaders.Any())
+                {
+                    ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders;
+                }
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {

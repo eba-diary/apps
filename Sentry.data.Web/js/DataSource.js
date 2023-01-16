@@ -33,7 +33,37 @@
         });
 
         $('body').on('click', '.removeToken', function () {
-            $(this).parent().parent().remove();
+            let tokenCard = $(this).parent().parent();
+            if (tokenCard.find("input.tokenId").val()) {
+                let tokenCardChildren = tokenCard.children();
+                tokenCard.find("input.toDeleteMarker").val(true);
+                tokenCardChildren.find("button.cancelDelete").removeClass("d-none");
+                tokenCardChildren.find("button.removeToken").addClass("d-none");
+            }
+            else {
+                tokenCard.remove();
+            }
+            data.DataSource.UpdateShowAddTokenButton();
+        });
+
+        $('body').on('click', '.cancelDelete', function () {
+            let tokenCard = $(this).parent().parent();
+            let tokenCardChildren = tokenCard.children();
+            tokenCard.find("input.toDeleteMarker").val(false);
+            tokenCardChildren.find("button.cancelDelete").addClass("d-none");
+            tokenCardChildren.find("button.removeToken").removeClass("d-none");
+            data.DataSource.UpdateShowAddTokenButton();
+        });
+
+        $('body').on('click', '.removeToken', function () {
+            let tokenCard = $(this).parent().parent();
+            if (tokenCard.children(".tokenId").val()) {
+                tokenCard.children(".toDeleteMarker").val(true);
+
+            }
+            else {
+                tokenCard.remove();
+            }
             data.DataSource.UpdateShowAddTokenButton();
         });
 

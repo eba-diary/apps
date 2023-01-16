@@ -53,7 +53,9 @@ namespace Sentry.data.Infrastructure
         public async Task PublishDatasetPermissionsUpdated(Dataset dataset, SecurityTicket ticket, IList<SecurablePermission> datasetPermissions, IList<SecurablePermission> parentPermissions)
         {
             var details = BuildDatasetPermissionsUpdatedDto(dataset, ticket, datasetPermissions, parentPermissions);
-            await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, details.ToDictionary(), dataset.DatasetId.ToString());
+            var datasetId = dataset.DatasetId.ToString();
+            var payload = details.ToDictionary();
+            await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, payload, datasetId);
         }
 
         /// <summary>
@@ -109,7 +111,7 @@ namespace Sentry.data.Infrastructure
             if (dataset.DatasetFileConfigs.Any())
             {
                 snowflake.AddRange(
-                    dataset.DatasetFileConfigs.First().Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
+                    dataset.DatasetFileConfigs.First(dsfc => dsfc.ObjectStatus == ObjectStatusEnum.Active).Schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().Select(s =>
                         new DatasetPermissionsUpdatedDto.SnowflakeDto()
                         {
                             Warehouse = s.SnowflakeWarehouse,

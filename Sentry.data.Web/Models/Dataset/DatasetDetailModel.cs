@@ -19,6 +19,7 @@ namespace Sentry.data.Web
             GroupAccessCount = dto.GroupAccessCount;
             HasDataAccess = dto.Security.CanViewData;
             HasSchema = dto.DatasetFileConfigSchemas.Any();
+            DatasetRelatives = dto.DatasetRelatives?.Select(s => s.ToModel()).ToList();
         }
 
         public DatasetDetailModel() { }
@@ -30,7 +31,10 @@ namespace Sentry.data.Web
         public List<DatasetFileConfigSchemaModel> DatasetFileConfigSchemas { get; set; }
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public string DataClassificationDescription { get; set; }
-        
+        public List<DatasetRelativeModel> DatasetRelatives { get; set; }
+
+
+
         //NOTE: USED BY KNOCKOUT AS MODEL TO DISPLAY ELEMENTS
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }

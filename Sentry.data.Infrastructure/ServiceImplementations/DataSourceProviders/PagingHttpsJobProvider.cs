@@ -85,10 +85,28 @@ namespace Sentry.data.Infrastructure
         #region Overridable
         protected virtual string GetDataPath(RetrieverJob job)
         {
-            return job.FileSchema.SchemaRootPath ?? "";
+            if (string.IsNullOrEmpty(job.FileSchema.SchemaRootPath))
+            {
+                return "";
+            }
+            else
+            {
+                string tempPath = job.FileSchema.SchemaRootPath.Replace(",", ".");
+                int lastIndex = tempPath.LastIndexOf(".");
+
+                if (lastIndex == -1)
+                {
+                    return $"..{tempPath}";
+                }
+
+                string beginString = tempPath.Substring(0, lastIndex);
+                string endString = tempPath.Substring(lastIndex + 1);
+
+                return $"{beginString}..{endString}";
+            }
         }
 
-        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, JToken data, PagingHttpsConfiguration config)
+        protected virtual async Task WriteToFileAsync(Stream contentStream, Stream fileStream, IEnumerable<JToken> data, PagingHttpsConfiguration config)
         {
             //move back to beginning of content
             contentStream.Position = 0;
@@ -130,7 +148,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 Logger.Info($"Paging Https Retriever Job successful response from {RequestLog(config)} - Job: {config.Job.Id}");
                                 //copy response to file
-                                JToken responseData = await ReadResponseAsync(response, fileStream, config);
+                                IEnumerable<JToken> responseData = await ReadResponseAsync(response, fileStream, config);
 
                                 //get next request to make
                                 SetNextRequest(config, responseData);
@@ -182,7 +200,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                return await httpClient.GetAsync(config.RequestUri, HttpCompletionOption.ResponseHeadersRead);
+                return await httpClient.GetAsync(config.RequestUri);
             }
         }
 
@@ -196,7 +214,8 @@ namespace Sentry.data.Infrastructure
                 S3DropStep = _datasetContext.DataFlowStep.FirstOrDefault(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop),
                 DataPath = GetDataPath(job),
                 Filename = job.JobOptions.TargetFileName,
-                Options = job.JobOptions.HttpOptions
+                Options = job.JobOptions.HttpOptions,
+                InitialRequestVariables = job.RequestVariables
             };
 
             if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
@@ -224,7 +243,7 @@ namespace Sentry.data.Infrastructure
             return config;
         }
 
-        private async Task<JToken> ReadResponseAsync(HttpResponseMessage response, Stream fileStream, PagingHttpsConfiguration config)
+        private async Task<IEnumerable<JToken>> ReadResponseAsync(HttpResponseMessage response, Stream fileStream, PagingHttpsConfiguration config)
         {
             using (Stream contentStream = await response.Content.ReadAsStreamAsync())
             using (StreamReader streamReader = new StreamReader(contentStream))
@@ -232,7 +251,16 @@ namespace Sentry.data.Infrastructure
             {
                 JToken responseToken = JToken.Load(jsonReader);
 
-                JToken data = responseToken.SelectToken(config.DataPath);
+                IEnumerable<JToken> data;
+                try
+                {
+                    data = responseToken.SelectToken(config.DataPath);
+                }
+                catch (JsonException)
+                {
+                    data = responseToken.SelectTokens(config.DataPath);
+                }
+
                 if (data?.Any() == true)
                 {
                     await WriteToFileAsync(contentStream, fileStream, data, config);
@@ -326,11 +354,11 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Paging Https Retriever Job complete S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
         }
 
-        private void SetNextRequest(PagingHttpsConfiguration config, JToken response)    
+        private void SetNextRequest(PagingHttpsConfiguration config, IEnumerable<JToken> response)    
         {            
             if (response != null)
             {
-                config.RequestVariablesWithCollectedData = config.Job.RequestVariables;
+                config.MostRecentVariablesWithCollectedData = config.Job.RequestVariables;
             }
             
             if (response != null && config.Options.PagingType != PagingType.None)
@@ -364,9 +392,9 @@ namespace Sentry.data.Infrastructure
         private bool IsDataRetrievedForCurrentVariables(PagingHttpsConfiguration config)
         {
             //check if data was found for the current request variables before incrementing
-            bool dataFoundForCurrentVariables = config.RequestVariablesWithCollectedData != null &&
-                config.RequestVariablesWithCollectedData.Count == config.Job.RequestVariables.Count && 
-                config.RequestVariablesWithCollectedData.All(x => config.Job.RequestVariables.Any(a => x.EqualTo(a)));
+            bool dataFoundForCurrentVariables = config.MostRecentVariablesWithCollectedData != null &&
+                config.MostRecentVariablesWithCollectedData.Count == config.Job.RequestVariables.Count && 
+                config.MostRecentVariablesWithCollectedData.All(x => config.Job.RequestVariables.Any(a => x.EqualTo(a)));
             
             if (!dataFoundForCurrentVariables)
             {
@@ -378,39 +406,41 @@ namespace Sentry.data.Infrastructure
 
         private void SetNextRequestVariables(PagingHttpsConfiguration config, bool dataRetrievedForCurrentVariables)
         {
-            //RequestVariablesWithCollectedData is null when no data is retrieved on the very first request
-            if (config.RequestVariablesWithCollectedData != null)
+            config.Job.IncrementRequestVariables();
+
+            if (config.Job.RequestVariables.Any() && config.Job.HasValidRequestVariables())
             {
-                config.Job.IncrementRequestVariables();
+                //variables able to be incremented, update request uri with incremented values
+                ReplaceVariablePlaceholders(config);
 
-                if (config.Job.RequestVariables.Any() && config.Job.HasValidRequestVariables())
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
                 {
-                    //variables able to be incremented, update request uri with incremented values
-                    ReplaceVariablePlaceholders(config);
-
-                    if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
-                    {
-                        //start from first data source token if using OAuth
-                        config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
-                    }
-                }
-                else
-                {
-                    Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
-
-                    if (!dataRetrievedForCurrentVariables)
-                    {
-                        //keep track of what point data was last retrieved for
-                        Logger.Info($"Paging Https Retriever Job variables set after most recently collected variables - Job: {config.Job.Id}");
-                        config.Job.RequestVariables = config.RequestVariablesWithCollectedData;
-                        config.Job.IncrementRequestVariables();
-                    }
-
-                    config.RequestUri = "";
+                    //start from first data source token if using OAuth
+                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
                 }
             }
             else
             {
+                Logger.Info($"Paging Https Retriever Job variables could not be incremented further - Job: {config.Job.Id}");
+
+                if (!dataRetrievedForCurrentVariables)
+                {
+                    //is null when nothing was collected 
+                    if (config.MostRecentVariablesWithCollectedData == null)
+                    {
+                        //set back to starting variable values since nothing was collected
+                        Logger.Info($"Paging Https Retriever Job variables set back to initial variables - Job: {config.Job.Id}");
+                        config.Job.RequestVariables = config.InitialRequestVariables;
+                    }
+                    else
+                    {
+                        //keep track of what point data was last retrieved for
+                        Logger.Info($"Paging Https Retriever Job variables set after most recently collected variables - Job: {config.Job.Id}");
+                        config.Job.RequestVariables = config.MostRecentVariablesWithCollectedData;
+                        config.Job.IncrementRequestVariables();
+                    }
+                }
+
                 config.RequestUri = "";
             }
         }
@@ -478,7 +508,7 @@ namespace Sentry.data.Infrastructure
         }
 
         #region PageType Methods
-        private void AddUpdatePagingQueryParameter(PagingHttpsConfiguration config, JToken response)
+        private void AddUpdatePagingQueryParameter(PagingHttpsConfiguration config, IEnumerable<JToken> response)
         {
             switch (config.Options.PagingType)
             {
