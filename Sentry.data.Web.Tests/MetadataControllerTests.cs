@@ -98,10 +98,8 @@ namespace Sentry.data.Web.Tests
                 SchemaMigrationResponses = new List<SchemaMigrationRequestResponse>() { schemaRequestResponse }
             };
 
-            MetadataController controller = new MetadataController(null, null, null, null, null, null, null, null, null);
-
             //Act
-            DatasetMigrationResponseModel datasetResponseModel = controller.ToDatasetMigrationResponseModel(datasetRequestResponse);
+            DatasetMigrationResponseModel datasetResponseModel = datasetRequestResponse.ToDatasetMigrationResponseModel();
             SchemaMigrationResponseModel schemaResponseModel = datasetResponseModel.SchemaMigrationResponse.FirstOrDefault();
             //Assert
             Assert.IsNotNull(datasetResponseModel);
