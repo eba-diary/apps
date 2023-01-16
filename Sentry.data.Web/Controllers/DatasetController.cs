@@ -791,38 +791,13 @@ namespace Sentry.data.Web.Controllers
 
             model.SchemaList = Utility.BuildSchemaDropDown(_datasetContext, datasetId, 0);
 
-            
-            
-
             return PartialView("Migration/_DatasetMigrationRequest", model);
-
-            //if (_featureFlags.CLA3718_Authorization.GetValue())
-            //{
-            //    model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-            //    model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            //    return PartialView("Permission/RequestAccessCLA3723", model);
-            //}
-            //model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-            //model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            //return PartialView("DatasetAccessRequest", model);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> MigrateDataset(DatasetMigrationRequestModel model)
+        [HttpGet]
+        public PartialViewResult DatasetMigrationResponse()
         {
-            
-            if (!_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
-            {
-                return Json(new { Success = false, Message = "Unauthorized access" });
-            }
-
-            DatasetMigrationRequest request = model.ToDo();
-
-            DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
-
-            DatasetMigrationResponseModel responseModel = response.ToModel(_datasetContext);
-
-            return PartialView("DatasetMigrationResponse", responseModel);
+            return PartialView("~/Views/Dataset/Migration/_DatasetMigrationResponse.cshtml");
         }
         #endregion
 
@@ -1336,9 +1311,24 @@ namespace Sentry.data.Web.Controllers
         {
             var sourceNamedEnvironment = _datasetContext.Datasets.Where(w => w.DatasetId == model.DatasetId).Select(s => s.NamedEnvironment).FirstOrDefault();
             var namedEnvironments = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, sourceNamedEnvironment);
-            model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList.OrderBy(o => o.Text);
-            model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
-            model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+
+                       
+            if (namedEnvironments.namedEnvironmentList == null || !namedEnvironments.namedEnvironmentList.Any())
+            {
+                var datasetName = _datasetContext.Datasets.Where(w => w.DatasetId == model.DatasetId).Select(s => s.DatasetName).FirstOrDefault();
+                List<NamedEnvironmentDto> datasetNamedEnvironmentDtoList = _datasetContext.Datasets.Where(w => w.Asset.SaidKeyCode == model.SAIDAssetKeyCode && w.DatasetName == datasetName).Select(s => new NamedEnvironmentDto() { NamedEnvironment = s.NamedEnvironment, NamedEnvironmentType = s.NamedEnvironmentType }).ToList();
+                model.DatasetNamedEnvironmentDropDown = NamedEnvironmentBuilder.BuildNamedEnvironmentDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList);
+                model.DatasetNamedEnvironmentTypeDropDown = _namedEnvironmentBuilder.BuildNamedEnvironmentTypeDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList);
+            }
+            else
+            {
+                //Filter out the source dataset named environment from list and order
+                model.DatasetNamedEnvironmentDropDown = namedEnvironments.namedEnvironmentList.Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
+                model.DatasetNamedEnvironmentTypeDropDown = namedEnvironments.namedEnvironmentTypeList;
+                model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironments.namedEnvironmentTypeList.First(l => l.Selected).Value);
+            }
+
+            
         }
     }
 }

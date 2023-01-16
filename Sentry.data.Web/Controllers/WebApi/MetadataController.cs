@@ -150,7 +150,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             async Task<IHttpActionResult> MigrateDatasetFunction()
             {
-                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateDataset).ToLower()}";
 
                 List<string> errors = new List<string>();
                 if (model == null)
@@ -190,6 +190,17 @@ namespace Sentry.data.Web.WebApi.Controllers
                     Logger.Warn($"{methodName} - Unhandled exception : {ex.Message}");
                     throw;
                 }
+
+                if (errors.Any())
+                {
+                    return BadRequest(JsonConvert.SerializeObject(errors));
+                }
+
+                return Ok(responseModel);
+            }
+
+            return await ApiTryCatchAsync(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        }
 
         /* This code will be used within next two iterations*/
         [HttpPost]
@@ -924,12 +935,15 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 IsSchemaMigrated = response.MigratedSchema,
                 SchemaId = response.TargetSchemaId,
+                SchemaName = response.SchemaName,
                 SchemaMigrationMessage = response.SchemaMigrationReason,
                 IsSchemaRevisionMigrated = response.MigratedSchemaRevision,
                 SchemaRevisionId = response.TargetSchemaRevisionId,
+                SchemaRevisionName = response.SchemaRevisionName,
                 SchemaRevisionMigrationMessage = response.SchemaRevisionMigrationReason,
                 IsDataFlowMigrated = response.MigratedDataFlow,
                 DataFlowId = response.TargetDataFlowId,
+                DataFlowName = response.DataFlowName,
                 DataFlowMigrationMessage = response.DataFlowMigrationReason
             };
         }
@@ -941,6 +955,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 IsDatasetMigrated = response.IsDatasetMigrated,
                 DatasetMigrationReason = response.DatasetMigrationReason,
                 DatasetId = response.DatasetId,
+                DatasetName = response.DatasetName,
                 SchemaMigrationResponse = new List<SchemaMigrationResponseModel>()
             };
 

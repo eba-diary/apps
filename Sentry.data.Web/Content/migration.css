@@ -1,3 +1,26 @@
-﻿#migrationResponseTable tr .group {
+﻿#migrationResponseTable_V2 tr.group {
     background-color: #ddd;
+}
+
+#migrationResponseTable_V2 tr.group td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#migrationResponseTable_V2 tr.odd td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#migrationResponseTable_V2 tr.even td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#migrationResponseTable_V2 tr.even td .fa-check-circle, #migrationResponseTable_V2 tr.odd td .fa-check-circle {
+    color: green;
+}
+
+#RequestMigrationFormSection #ValidationMessages li {
+    color: red;
 }

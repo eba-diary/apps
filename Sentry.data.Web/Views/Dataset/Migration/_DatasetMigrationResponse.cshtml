@@ -1,19 +1,35 @@
-﻿@model Sentry.data.Web.Models.Migration.DatasetMigrationResponseModel
-
-<div class="ResponseContainer">
-    <div class="row">
-        <table class="table dsc-blud-table table-boardered table-hover nowrap" id="migrationResponseTable">
-            <thead>
-                <tr class="table-header">
-                    <th scope="col">Type</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Details</th>
-                </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
+﻿<div class="modal fade" id="migrationResponseModal">
+    <div class="modal-dialog migration-response-modal modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Dataset Migration Response</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body migration-response-modal-body">
+                <div class="row">
+                    <table class="table dsc-blud-table table-boardered table-hover" id="migrationResponseTable_V2">
+                        <thead>
+                            <!--<tr class="table-header">
+                                <th scope="col">Parent Name</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Status</th>-->
+                                @*<th scope="col">Details</th>*@
+                            <!--</tr>-->
+                            <tr class="table-header">
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary waves-effect display-none filter-search-start filter-search-apply"><em class="icon-search filter-search-apply-icon"></em>Apply</button>
+            </div>
+        </div>
     </div>
 </div>

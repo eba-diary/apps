@@ -123,7 +123,8 @@ namespace Sentry.data.Web
                 Include("~/Content/data-inventory.css").
                 Include("~/Content/jquery.json-viewer.css").
                 Include("~/scripts/quill/quill.snow.css").
-                Include("~/Content/admin.css")
+                Include("~/Content/admin.css").
+                Include("~/Content/migration.css")
 
             );
 

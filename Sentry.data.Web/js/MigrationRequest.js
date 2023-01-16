@@ -1,39 +1,79 @@
 ﻿data.MigrationRequest = {
     InitForDataset : function(datasetId) {
         $("#MigrationRequestModal").remove();
-        var modal = Sentry.ShowModalWithSpinner("Dataset Migration Request");
-        $(modal).attr("id", "MigrationRequestModal");
+        var migrationRequestModal = Sentry.ShowModalWithSpinner("Dataset Migration Request");
+        $(migrationRequestModal).attr("id", "MigrationRequestModal");
 
         getDatasetMigrationRequestUrl = "/Dataset/MigrationRequest?datasetId=" + encodeURI(datasetId);
 
         $.get(getDatasetMigrationRequestUrl, function (e) {
-            modal.ReplaceModalBody(e);
+            migrationRequestModal.ReplaceModalBody(e);
             $('#MigrationRequestModal #SelectedSchema').attr('multiple', true);
             $("#MigrationRequestModal select").materialSelect();
 
             $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
-                //alert('DatasetId' + $('#DatasetId').val())
-                //alert('SchemaId' + $("#SelectedSchema").val())
-                var request = data.MigrationRequest.CreateDatasetMigrationObject($('#DatasetId').val(), $('#TargetNamedEnvironment').val(), $('#SelectedSchema').val())
-                alert(JSON.stringify(request));
+                $('#MigrationRequestSubmitButton').prop('disabled', true);
+                $('#ValidationMessages').addClass('d-none');
+                $('#RequestMigrationFormSection').addClass('d-none');
+                $('#RequestMigrationSubmissionBody').removeClass('d-none');
+                $('#MigrationModalSpinner').removeClass('d-none');
+
+                var request = data.MigrationRequest.MapToDatasetMigrationRequestModel($('#DatasetId').val(), $('#TargetNamedEnvironment').val(), $('#SelectedSchema').val())
+                console.log(JSON.stringify(request));
 
                 var postDatasetMigrationUrl = "/api/v20220609/metadata/MigrateDataset"
 
-                //$.post(postDatasetMigrationUrl, request, function (migrationResultsModel) {
-                //    console.log(JSON.stringify(migrationResultsModel));
-                //    responseData = JSON.parse(migrationResultsModel);
-                //    console.log(responseData)
-                //})
+                /*Send migration request to API*/
+                $.post(postDatasetMigrationUrl, request, function (migrationResultsModel) {
+                    console.log(migrationResultsModel);
+                    migrationRequestModal.HideModal();
+                    data.MigrationRequest.initMigrationResponseModal(migrationResultsModel);
+                })
+                    .fail(function (errorResponse) {
+                        
+                        console.log(errorResponse);
+                        var statusCode = errorResponse.status;
+                        var errorMessage = errorResponse.responseJSON.Message;
 
-                data.MigrationRequest.initResponseDataTableV2();
-                $('#RequestMigrationFormSection').addClass('d-none');
-                //$('#MigrationResponseBody').removeClass('d-none');
-                $('#migration-response-modal-container').removeClass('d-none');
+                        if (statusCode === 400) {                            
+                            var messageArray = JSON.parse(errorMessage);
+
+                            data.MigrationRequest.InitRequestValidationMessages(messageArray);                            
+                            
+                            $('#RequestMigrationSubmissionBody').addClass('d-none');
+                            $('#RequestMigrationFormSection').removeClass('d-none');
+                            $('#MigrationModalSpinner').addClass('d-none');
+                            $('#MigrationRequestSubmitButton').prop('disabled', false);
+                        }
+                        else {
+                            data.Dataset.makeToast("error", "Error Occurred, please contact DSC team if problem persists.");
+                            $('#MigrationModalSpinner').addClass('d-none');
+                            $('#RequestMigrationSubmissionBody').addClass('d-none');
+                            $('#RequestMigrationFormSection').removeClass('d-none');
+                            $('#MigrationRequestSubmitButton').prop('disabled', false);
+                        }
+                    })
             })
         })
-    }, 
+    },
 
-    CreateDatasetMigrationObject: function (datasetId, targetNamedEnvironment, schemaIdList) {
+    InitRequestValidationMessages: function (errorArray) {
+        //Clear existing validation errors
+        $('#RequestMigrationFormSection #ValidationMessages ul').empty();
+        errorArray.forEach(data.MigrationRequest.AddErrorToValidationMessages);
+        $('#ValidationMessages').removeClass('d-none');
+    },
+
+    AddErrorToValidationMessages: function (error) {
+        var errorList = $('#RequestMigrationFormSection #ValidationMessages ul');
+        errorList.append('<li>' + error + '</li>');
+    },
+
+    CreateErrorToastrMessage(message) {
+        data.Dataset.makeToast("error", message);
+    },
+
+    MapToDatasetMigrationRequestModel: function (datasetId, targetNamedEnvironment, schemaIdList) {
         var requestObject = new Object();
         requestObject.SourceDatasetId = datasetId;
         requestObject.TargetDatasetNamedEnvironment = targetNamedEnvironment;
@@ -52,89 +92,36 @@
         return requestObject;
     },
 
-    initResponseDataTable: function () {
-        var groupColumn = 0;
-        var responseTable = $('#migrationResponseTable').DataTable({
-            ordering: false,
-            searching: false,
-            paging: true,
-            columnDefs: [{ visible: false, targets: groupColumn }],
-            drawCallback: function (settings) {
-                var api = this.api();
-                var rows = api.rows({ page: 'current' }).nodes();
-                var last = null;
-
-                api
-                    .column(groupColumn, { page: 'current' })
-                    .data()
-                    .each(function (group, i) {
-                        if (last !== group) {
-                            $(rows)
-                                .eq(i)
-                                .before('<tr class="group"><td colspan="4">' + group + '</td></tr>');
-
-                            last = group;
-                        }
-                    });
-            }
+    initMigrationResponseModal: function (response) {
+        $('.migration-modal-container').load("/Dataset/DatasetMigrationResponse", function () {
+            data.MigrationRequest.initMigrationResponseDataTable(response);
+            $('#migrationResponseModal').modal('show');
         });
-
-        responseTable.row.add(['ZZZ Test Data', 'Dataset Information', 'My Dataset', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 02', 'Schema Information', 'CSV Data 02', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 02', 'Column Metadata', 'CSV Data 02', 'Success']).draw(false);
-        responseTable.row.add(['CSV Data 02', 'Producer DataFlow', 'ZZZTestData_CS', 'Not Migrated']).draw(false);
-        responseTable.row.add(['JSON Data 02', 'Schema Information', 'JSON Data 02', 'Not Migrated']).draw(false);
-        responseTable.row.add(['JSON Data 02', 'Column Metadata', 'JSON Data 02', 'Success']).draw(false);
-        responseTable.row.add(['JSON Data 02', 'Producer DataFlow', 'ZZZTestData_JS', 'Not Migrated']).draw(false);
-        responseTable.row.add(['XML Data 02', 'Schema Information', 'XML Data 01', 'Not Migrated']).draw(false);
-        responseTable.row.add(['XML Data 02', 'Column Metadata', 'XML Data 01', 'Success']).draw(false);
-        responseTable.row.add(['XML Data 02', 'Producer DataFlow', 'ZZZTestData_X', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 03', 'Schema Information', 'CSV Data 03', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 03', 'Column Metadata', 'CSV Data 03', 'Success']).draw(false);
-        responseTable.row.add(['CSV Data 03', 'Producer DataFlow', 'ZZZTestData_', 'Not Migrated']).draw(false);
-
     },
 
-    initResponseDataTableV2: function () {
-        var groupColumn = 0;
+    initMigrationResponseDataTable: function (response) {
         var responseTable = $('#migrationResponseTable_V2').DataTable({
             ordering: false,
             searching: false,
-            paging: true,
-            columnDefs: [{ visible: false, targets: groupColumn }],
-            drawCallback: function (settings) {
-                var api = this.api();
-                var rows = api.rows({ page: 'current' }).nodes();
-                var last = null;
-
-                api
-                    .column(groupColumn, { page: 'current' })
-                    .data()
-                    .each(function (group, i) {
-                        if (last !== group) {
-                            $(rows)
-                                .eq(i)
-                                .before('<tr class="group"><td colspan="4">' + group + '</td></tr>');
-
-                            last = group;
-                        }
-                    });
-            }
+            paging: false
         });
 
-        responseTable.row.add(['ZZZ Test Data', 'Dataset Information', 'My Dataset', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 02', 'Schema Information', 'CSV Data 02', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 02', 'Column Metadata', 'CSV Data 02', 'Success']).draw(false);
-        responseTable.row.add(['CSV Data 02', 'Producer DataFlow', 'ZZZTestData_CS', 'Not Migrated']).draw(false);
-        responseTable.row.add(['JSON Data 02', 'Schema Information', 'JSON Data 02', 'Not Migrated']).draw(false);
-        responseTable.row.add(['JSON Data 02', 'Column Metadata', 'JSON Data 02', 'Success']).draw(false);
-        responseTable.row.add(['JSON Data 02', 'Producer DataFlow', 'ZZZTestData_JS', 'Not Migrated']).draw(false);
-        responseTable.row.add(['XML Data 02', 'Schema Information', 'XML Data 01', 'Not Migrated']).draw(false);
-        responseTable.row.add(['XML Data 02', 'Column Metadata', 'XML Data 01', 'Success']).draw(false);
-        responseTable.row.add(['XML Data 02', 'Producer DataFlow', 'ZZZTestData_X', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 03', 'Schema Information', 'CSV Data 03', 'Not Migrated']).draw(false);
-        responseTable.row.add(['CSV Data 03', 'Column Metadata', 'CSV Data 03', 'Success']).draw(false);
-        responseTable.row.add(['CSV Data 03', 'Producer DataFlow', 'ZZZTestData_', 'Not Migrated']).draw(false);
+        if (response.hasOwnProperty('DatasetId')) {
+            data.MigrationRequest.AddDatasetRowToMigrationResponseTable(responseTable, response);
+        }
 
+        if (response.hasOwnProperty('SchemaMigrationResponse')) {
+            response.SchemaMigrationResponse.forEach(function (item, index) {
+                data.MigrationRequest.AddSchemaRowToMigrationResponseTable(responseTable, item);
+            });
+        }
+    },
+
+    AddDatasetRowToMigrationResponseTable: function (responseTable, item) {
+        responseTable.row.add(['Dataset', item.DatasetName, '<i class="fas fa-check-circle fa-2x" />']).draw(false);
+    },
+
+    AddSchemaRowToMigrationResponseTable: function (responseTable, item) {
+        responseTable.row.add(['Schema', item.SchemaName, '<i class="fas fa-check-circle fa-2x" />']).draw(false);
     }
 }
