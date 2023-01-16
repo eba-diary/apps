@@ -443,6 +443,7 @@ namespace Sentry.data.Core.Tests
             FileSchema sourceFileSchema = MockClasses.MockFileSchema();
             FileSchemaDto fileSchemaDto = MockClasses.MockFileSchemaDto(sourceFileSchema);
             DataFlow dataFlow = MockClasses.MockDataFlow();
+            dataFlow.SchemaId = sourceFileSchema.SchemaId;
 
             Dataset targetDataset = MockClasses.MockDataset();
             targetDataset.NamedEnvironment = "QUAL";
@@ -459,8 +460,7 @@ namespace Sentry.data.Core.Tests
                 SourceSchemaId = sourceFileSchema.SchemaId,
                 TargetDatasetId = 1000,
                 TargetDatasetNamedEnvironment = "QUAL",
-                TargetDataFlowNamedEnvironment = "QUALV2",
-                SourceSchemaHasDataFlow = true
+                TargetDataFlowNamedEnvironment = "QUALV2"
             };
 
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
@@ -516,6 +516,7 @@ namespace Sentry.data.Core.Tests
             };
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(x => x.DataFlow).Returns(new List<DataFlow>() { new DataFlow() }.AsQueryable());
             context.Setup(s => s.FileSchema).Throws<InvalidOperationException>();
 
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);

@@ -2,6 +2,7 @@
 using Moq;
 using Rhino.Mocks;
 using Sentry.data.Core;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Migration;
 using Sentry.data.Web.WebApi.Controllers;
 using System.Collections.Generic;
@@ -58,12 +59,8 @@ namespace Sentry.data.Web.Tests
                     }
                 }
             };
-
-            MetadataController controller = new MetadataController(_container.GetInstance<IDatasetContext>(), null, null, null, null, null, null, null, null);
-            var datasetRequest = controller.ToDto(model);
+            var datasetRequest = model.ToDto();
             var schemaRequest = datasetRequest.SchemaMigrationRequests.FirstOrDefault(w => w.SourceSchemaId == 44);
-            var schemaRequest_DeletedDataFlow = datasetRequest.SchemaMigrationRequests.FirstOrDefault(w => w.SourceSchemaId == 66);
-            var schemaRequest_DisabledDataFlow = datasetRequest.SchemaMigrationRequests.FirstOrDefault(w => w.SourceSchemaId == 88);
 
             //Assert
             Assert.AreEqual(99, datasetRequest.SourceDatasetId);
@@ -74,11 +71,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("TEST", schemaRequest.TargetDatasetNamedEnvironment);
             Assert.AreEqual("TEST2", schemaRequest.TargetDataFlowNamedEnvironment);
             Assert.AreEqual(33, schemaRequest.TargetDatasetId);
-            Assert.IsTrue(schemaRequest.SourceSchemaHasDataFlow);
-            Assert.IsNotNull(schemaRequest_DeletedDataFlow);
-            Assert.IsFalse(schemaRequest_DeletedDataFlow.SourceSchemaHasDataFlow);
-            Assert.IsNotNull(schemaRequest_DisabledDataFlow);
-            Assert.IsTrue(schemaRequest_DisabledDataFlow.SourceSchemaHasDataFlow);
 
         }
 

@@ -563,7 +563,9 @@ namespace Sentry.data.Core
 
             SchemaMigrationRequestResponse migrationResponse =  new SchemaMigrationRequestResponse();
 
-            List<string> errors = ValidateMigrationRequest(request);
+            bool sourceHasDataFlow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
+
+            List<string> errors = ValidateMigrationRequest(request, sourceHasDataFlow);
             if (errors.Any())
             {
                 List<ArgumentException> exceptions = new List<ArgumentException>();
@@ -629,7 +631,7 @@ namespace Sentry.data.Core
                     migrationResponse.SchemaRevisionMigrationReason = "No column metadata on source schema";
                 }
 
-                (int newDataFlowId, bool wasDataFlowMigrated) = MigrateDataFlowWihtoutSave_Internal(newSchemaId, request.SourceSchemaId, request.SourceSchemaHasDataFlow, sourceDatasetId);
+                (int newDataFlowId, bool wasDataFlowMigrated) = MigrateDataFlowWihtoutSave_Internal(newSchemaId, request.SourceSchemaId, sourceHasDataFlow, sourceDatasetId);
                 
                 if (wasDataFlowMigrated)
                 {
@@ -639,7 +641,7 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    string message = (request.SourceSchemaHasDataFlow) ? "Target dataflow metadata already exists" : "Source schema is not associated with dataflow";
+                    string message = (sourceHasDataFlow) ? "Target dataflow metadata already exists" : "Source schema is not associated with dataflow";
                     migrationResponse.DataFlowMigrationReason = message;
                     migrationResponse.TargetDataFlowId = newDataFlowId;
                 }
@@ -773,7 +775,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="request"></param>
         /// <exception cref="AggregateException">Aggregation of all validation errors</exception>
-        private List<string> ValidateMigrationRequest(SchemaMigrationRequest request)
+        private List<string> ValidateMigrationRequest(SchemaMigrationRequest request, bool sourceSchemaHasDataflow)
         {
             if (request == null)
             {
@@ -796,7 +798,6 @@ namespace Sentry.data.Core
             {
 
                 int sourceDatasetId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == request.SourceSchemaId).Select(w => w.ParentDataset.DatasetId).FirstOrDefault();
-                bool sourceSchemaHasDataflow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
 
                 if (sourceSchemaHasDataflow && string.IsNullOrWhiteSpace(request.TargetDataFlowNamedEnvironment))
                 {

@@ -6,6 +6,7 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Migration;
 using Sentry.data.Web.Models.ApiModels.Schema;
@@ -161,7 +162,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
 
-                DatasetMigrationRequest request = ToDto(model);
+                DatasetMigrationRequest request = model.ToDto();
 
                 DatasetMigrationResponseModel responseModel = new DatasetMigrationResponseModel();
                 try
@@ -223,7 +224,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
 
-                SchemaMigrationRequest request = ToDto(model);
+                SchemaMigrationRequest request = model.ToDto();
 
                 SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse();
                 SchemaMigrationResponseModel responseModel = new SchemaMigrationResponseModel();
@@ -961,37 +962,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             }
 
             return model;
-        }
-
-
-        private SchemaMigrationRequest ToDto(SchemaMigrationRequestModel model)
-        {
-            return new SchemaMigrationRequest()
-            {
-                SourceSchemaId = model.SourceSchemaId,
-                SourceSchemaHasDataFlow = _dsContext.DataFlow.Any(w => w.SchemaId == model.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Active || w.ObjectStatus == ObjectStatusEnum.Disabled)),
-                TargetDataFlowNamedEnvironment = model.TargetDataFlowNamedEnviornment,
-                TargetDatasetId = model.TargetDatasetId,
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
-            };
-        }
-
-        internal DatasetMigrationRequest ToDto(DatasetMigrationRequestModel model)
-        {
-            DatasetMigrationRequest request = new DatasetMigrationRequest()
-            {
-                SourceDatasetId = model.SourceDatasetId,
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment,
-                TargetDatasetId = model.TargetDatasetId,
-                SchemaMigrationRequests = new List<SchemaMigrationRequest>()
-            };
-
-            foreach (SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
-            {
-                request.SchemaMigrationRequests.Add(ToDto(schemaMigrationRequestModel));
-            }
-
-            return request;
         }
 
         private async Task<IHttpActionResult> GetColumnSchema(DatasetFileConfig config, int SchemaID)
