@@ -175,7 +175,7 @@ namespace Sentry.data.Core
 
             if (!DataFeatures.CLA1797_DatasetSchemaMigration.GetValue())
             {
-                throw new UnauthorizedAccessException("Not authorized to use this functionality");
+                throw new FeatureNotEnabledException("Migration feature is not enabled.");
             }
             
             //Perform validations on incoming request object
