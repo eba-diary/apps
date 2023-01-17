@@ -357,7 +357,8 @@ namespace Sentry.data.Web.Tests
                 CreatedBy = "000000",
                 CreatedDTM = DateTime.Parse("2021-12-15 15:15:00"),
                 LastUpdatedDTM = DateTime.Parse("2021-12-15 15:15:00"),
-                JsonSchemaObject = "Object"
+                JsonSchemaObject = "Object",
+                ParentSchema = new FileSchema() { SchemaId = 1 }
             };
 
             SchemaRevisionDto dto = revision.ToDto();

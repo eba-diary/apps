@@ -1802,5 +1802,64 @@ namespace Sentry.data.Core.Tests
             mr.VerifyAll();
             context.Verify(v => v.SaveChanges(It.IsAny<bool>()),Times.Never);
         }
+
+        [TestMethod]
+        public void DatasetExistsInTargetNamedEnvironment_ArgumentNullException()
+        {
+            DatasetService datasetService = new DatasetService(null, null, null, null, null, null, null, null, null);
+
+            Assert.ThrowsException<ArgumentNullException>(() => datasetService.DatasetExistsInTargetNamedEnvironment(null, "ABCD", "TEST"), "DatasetName null value check failed");
+            Assert.ThrowsException<ArgumentNullException>(() => datasetService.DatasetExistsInTargetNamedEnvironment("MyDataset", null, "TEST"), "SAID asset key non value check failed");
+            Assert.ThrowsException<ArgumentNullException>(() => datasetService.DatasetExistsInTargetNamedEnvironment("MyDataset", "ABCD", null), "Target Named Enviornment non value check failed");
+           
+        }
+
+        [TestMethod]
+        public void DatasetExistsInTargetNamedEnvironment()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            List<Dataset> datasetList = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    DatasetId = 1,
+                    DatasetName = "MyDataset",
+                    Asset = new Asset() { SaidKeyCode = "ABCD" },
+                    NamedEnvironment = "TEST",
+                    ObjectStatus = ObjectStatusEnum.Active
+                },
+                new Dataset()
+                {
+                    DatasetId = 2,
+                    DatasetName = "DeletedDataset",
+                    Asset = new Asset() { SaidKeyCode = "ABCD" },
+                    NamedEnvironment = "TEST",
+                    ObjectStatus = ObjectStatusEnum.Deleted
+                }
+            };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(datasetList.AsQueryable());
+
+            DatasetService datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null);
+
+            (int targetDatasetId, bool datasetExistsInTarget) resultTrue = datasetService.DatasetExistsInTargetNamedEnvironment("MyDataset", "ABCD", "TEST");
+            (int targetDatasetId, bool datasetExistsInTarget) resultFalse = datasetService.DatasetExistsInTargetNamedEnvironment("DeletedDataset", "ABCD", "TEST");
+            (int targetDatasetId, bool datasetExistsInTarget) resultFalseDatasetName = datasetService.DatasetExistsInTargetNamedEnvironment("YourDataset", "ABCD", "TEST");
+            (int targetDatasetId, bool datasetExistsInTarget) resultFalseSaidAssetKey = datasetService.DatasetExistsInTargetNamedEnvironment("MyDataset", "WXYZ", "TEST");
+            (int targetDatasetId, bool datasetExistsInTarget) resultFalseTargetNamedEnvironment = datasetService.DatasetExistsInTargetNamedEnvironment("MyDataset", "ABCD", "QUAL");
+
+
+            Assert.IsTrue(resultTrue.datasetExistsInTarget);
+            Assert.IsFalse(resultFalse.datasetExistsInTarget);
+            Assert.AreEqual(1, resultTrue.targetDatasetId);
+            Assert.IsFalse(resultFalseDatasetName.datasetExistsInTarget);
+            Assert.AreEqual(0, resultFalseDatasetName.targetDatasetId);
+            Assert.IsFalse(resultFalseSaidAssetKey.datasetExistsInTarget);
+            Assert.AreEqual(0, resultFalseSaidAssetKey.targetDatasetId);
+            Assert.IsFalse(resultFalseTargetNamedEnvironment.datasetExistsInTarget);
+            Assert.AreEqual(0, resultFalseTargetNamedEnvironment.targetDatasetId);
+        }        
     }
 }

@@ -1,6 +1,7 @@
-﻿using Sentry.data.Core.Entities.Migration;
-using Sentry.data.Core.Exceptions;
+﻿using Sentry.data.Core.Exceptions;
 using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -49,12 +50,13 @@ namespace Sentry.data.Core
         /// <param name="migrationRequest"></param>
         /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user not authorized to migrate dataset.</exception>
         /// <returns></returns>
-        void MigrateDataset(DatasetMigrationRequest migrationRequest);
+        Task<DatasetMigrationRequestResponse> MigrateDataset(DatasetMigrationRequest migrationRequest);
         /// <summary>
         /// Performs the migration of a schema between named environemnts associated with parent dataset SAID asset code.
         /// </summary>
         /// <param name="request"></param>
+        /// <exception cref="ArgumentException"></exception>
         /// <returns></returns>
-        void MigrateSchema(SchemaMigrationRequest request);
+        SchemaMigrationRequestResponse MigrateSchema(SchemaMigrationRequest request);
     }
 }
