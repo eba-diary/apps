@@ -630,7 +630,7 @@ namespace Sentry.data.Core
                     migrationResponse.SchemaRevisionMigrationReason = "No column metadata on source schema";
                 }
 
-                (int newDataFlowId, bool wasDataFlowMigrated) = MigrateDataFlowWihtoutSave_Internal(newSchemaId, request.SourceSchemaId, sourceHasDataFlow, sourceDatasetId);
+                (int newDataFlowId, bool wasDataFlowMigrated) = MigrateDataFlowWihtoutSave_Internal(newSchemaId, request.SourceSchemaId, sourceHasDataFlow, request.TargetDatasetId);
                 
                 if (wasDataFlowMigrated)
                 {
@@ -678,8 +678,12 @@ namespace Sentry.data.Core
                 //Determeine if source schema has dataflow, if so perform dataflow migration as well                
                 DataFlowDetailDto dataflowDto = DataFlowService.GetDataFlowDetailDtoBySchemaId(sourceSchemaId).FirstOrDefault();
 
+                (string targetDatasetNamedEnvironment, NamedEnvironmentType targetDatasetNamedEnvironmentType) = _datasetContext.Datasets.Where(w => w.DatasetId == targetDatasetId).Select(s => new Tuple<string, NamedEnvironmentType>(s.NamedEnvironment, s.NamedEnvironmentType)).FirstOrDefault();
+
                 //Adjust dataFlowDto associations and create new entity
                 dataflowDto.DatasetId = targetDatasetId;
+                dataflowDto.NamedEnvironment = targetDatasetNamedEnvironment;
+                dataflowDto.NamedEnvironmentType = targetDatasetNamedEnvironmentType;
                 dataflowDto.SchemaId = newSchemaId;
                 dataflowDto.SchemaMap.First().SchemaId = newSchemaId;
                 dataflowDto.SchemaMap.First().DatasetId = targetDatasetId;
