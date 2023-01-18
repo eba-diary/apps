@@ -106,7 +106,7 @@ namespace Sentry.data.Core
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     Sentry.Common.Logging.Logger.Info($"Response {response.StatusCode}: {responseContent}");
-                    JObject responseAsJson = JObject.Parse(await response.Content.ReadAsStringAsync());
+                    JObject responseAsJson = JObject.Parse(responseContent);
                     string accessToken = responseAsJson.Value<string>("access_token");
                     string refreshToken = responseAsJson.Value<string>("refresh_token");
                     ((HTTPSSource)dataSource).Tokens.Add(new DataSourceToken()
