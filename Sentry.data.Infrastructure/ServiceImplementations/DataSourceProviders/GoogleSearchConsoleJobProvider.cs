@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
 using Sentry.data.Core;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,12 +15,12 @@ namespace Sentry.data.Infrastructure
         {
         }
 
-        protected override string GetDataPath(RetrieverJob job)
+        protected override string GetDataPathRegexPattern(RetrieverJob job)
         {
             return "rows";
         }
 
-        protected override Task WriteToFileAsync(Stream contentStream, Stream fileStream, IEnumerable<JToken> data, PagingHttpsConfiguration config)
+        protected override Task WriteToFileAsync(Stream contentStream, Stream fileStream, PagingHttpsConfiguration config)
         {
             using (StreamWriter writer = new StreamWriter(fileStream, GetEncoding(), 1024, true))
             {
@@ -35,9 +32,17 @@ namespace Sentry.data.Infrastructure
                     writer.WriteLine("\"data\": [");
                 }
 
-                foreach (JToken row in data)
+                contentStream.Seek(0, SeekOrigin.Begin);
+                using (StreamReader streamReader = GetStreamReader(contentStream))
+                using (JsonReader jsonReader = new JsonTextReader(streamReader))
                 {
-                    writer.WriteLine(row.ToString(Formatting.None) + ",");
+                    while (jsonReader.Read())
+                    {
+                        if (jsonReader.TokenType == JsonToken.StartObject && config.DataPathRegex.IsMatch(jsonReader.Path))
+                        {
+                            writer.WriteLine(JToken.Load(jsonReader).ToString(Formatting.None) + ",");
+                        }
+                    }
                 }
             }
 
@@ -55,6 +60,7 @@ namespace Sentry.data.Infrastructure
 
         private UTF8Encoding GetEncoding()
         {
+            //required to prevent byte order marks from being included on the file which causes issues on the processing platform side
             if (UTF8NoBOM == null)
             {
                 UTF8NoBOM = new UTF8Encoding(false);
