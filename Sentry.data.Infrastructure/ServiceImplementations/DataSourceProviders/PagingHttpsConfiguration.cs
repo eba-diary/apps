@@ -2,6 +2,7 @@
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Infrastructure
@@ -10,7 +11,7 @@ namespace Sentry.data.Infrastructure
     {
         public HTTPSSource Source { get; set; }
         public DataFlowStep S3DropStep { get; set; }
-        public string DataPath { get; set; }
+        public Regex DataPathRegex { get; set; }
         public string RequestUri { get; set; }
         public int PageNumber { get; set; }
         public int Index { get; set; }
