@@ -1,20 +1,29 @@
-﻿using Sentry.data.Core.Entities.Migration;
-using Sentry.data.Web.Models.ApiModels.Migration;
-using System;
+﻿using Sentry.data.Web.Models.ApiModels.Migration;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace Sentry.data.Web
+namespace Sentry.data.Web.Extensions
 {
     public static class MigrationExtensions
     {
-        public static DatasetMigrationRequest ToDto(this DatasetMigrationRequestModel model)
+        public static Core.SchemaMigrationRequest ToDto(this SchemaMigrationRequestModel model)
         {
-            DatasetMigrationRequest request = new DatasetMigrationRequest()
+            return new Core.SchemaMigrationRequest()
+            {
+                SourceSchemaId = model.SourceSchemaId,
+                TargetDataFlowNamedEnvironment = model.TargetDataFlowNamedEnviornment,
+                TargetDatasetId = model.TargetDatasetId,
+                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
+            };
+        }
+
+        public static Core.DatasetMigrationRequest ToDto(this DatasetMigrationRequestModel model)
+        {
+            Core.DatasetMigrationRequest request = new Core.DatasetMigrationRequest()
             {
                 SourceDatasetId = model.SourceDatasetId,
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
+                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment,
+                TargetDatasetId = model.TargetDatasetId,
+                SchemaMigrationRequests = new List<Core.SchemaMigrationRequest>()
             };
 
             foreach (SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
@@ -25,14 +34,37 @@ namespace Sentry.data.Web
             return request;
         }
 
-        public static SchemaMigrationRequest ToDto(this SchemaMigrationRequestModel model)
+        public static DatasetMigrationResponseModel ToDatasetMigrationResponseModel(this Core.DatasetMigrationRequestResponse response)
         {
-            return new SchemaMigrationRequest()
+            DatasetMigrationResponseModel model = new DatasetMigrationResponseModel()
             {
-                SourceSchemaId = model.SourceSchemaId,
-                TargetDataFlowNamedEnvironment = model.TargetDataFlowNamedEnviornment,
-                TargetDatasetId = model.TargetDatasetId,
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
+                IsDatasetMigrated = response.IsDatasetMigrated,
+                DatasetMigrationReason = response.DatasetMigrationReason,
+                DatasetId = response.DatasetId,
+                SchemaMigrationResponse = new List<SchemaMigrationResponseModel>()
+            };
+
+            foreach (Core.SchemaMigrationRequestResponse schemaResponse in response.SchemaMigrationResponses)
+            {
+                model.SchemaMigrationResponse.Add(schemaResponse.ToSchemaMigrationRequestModel());
+            }
+
+            return model;
+        }
+
+        public static SchemaMigrationResponseModel ToSchemaMigrationRequestModel(this Core.SchemaMigrationRequestResponse response)
+        {
+            return new SchemaMigrationResponseModel()
+            {
+                IsSchemaMigrated = response.MigratedSchema,
+                SchemaId = response.TargetSchemaId,
+                SchemaMigrationMessage = response.SchemaMigrationReason,
+                IsSchemaRevisionMigrated = response.MigratedSchemaRevision,
+                SchemaRevisionId = response.TargetSchemaRevisionId,
+                SchemaRevisionMigrationMessage = response.SchemaRevisionMigrationReason,
+                IsDataFlowMigrated = response.MigratedDataFlow,
+                DataFlowId = response.TargetDataFlowId,
+                DataFlowMigrationMessage = response.DataFlowMigrationReason
             };
         }
     }

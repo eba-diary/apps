@@ -98,6 +98,8 @@ namespace Sentry.data.Core
             _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
         }
 
+        
+        [Obsolete("Use " + nameof(CreateSchemaRevision) + "method excepting " + nameof(SchemaRevisionFieldStructureDto),false)]
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
         {
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
@@ -165,7 +167,7 @@ namespace Sentry.data.Core
 
                     DeleteElasticIndexForSchema(schemaId);
                     IndexElasticFieldsForSchema(schemaId, ds.DatasetId, revision.Fields);
-                    GenerateConsumptionLayerCreateEvent(schema, JObject.Parse("{\"revision\":\"added\"}"));
+                    GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
                                         
                     return revision.SchemaRevision_Id;
                 }
@@ -184,6 +186,106 @@ namespace Sentry.data.Core
             }
 
             return 0;
+        }
+
+        public int CreateSchemaRevision(SchemaRevisionFieldStructureDto schemaRevisionFieldsStructureDto)
+        {
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaRevisionFieldsStructureDto.Revision.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            if (ds == null)
+            {
+                throw new DatasetNotFoundException();
+            }
+
+            try
+            {
+                UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                if (!us.CanManageSchema)
+                {
+                    try
+                    {
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Logger.Info($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access", ex);
+                    }
+                    throw new SchemaUnauthorizedAccessException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object", ex);
+                throw new SchemaUnauthorizedAccessException();
+            }
+
+            FileSchema schema = _datasetContext.GetById<FileSchema>(schemaRevisionFieldsStructureDto.Revision.SchemaId);
+            SchemaRevision revision;
+            SchemaRevision latestRevision = null;
+
+            try
+            {
+                if (schema != null)
+                {
+                    latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+
+                    revision = new SchemaRevision()
+                    {
+                        SchemaRevision_Name = schemaRevisionFieldsStructureDto.Revision.SchemaRevisionName,
+                        CreatedBy = _userService.GetCurrentUser().AssociateId,
+                        JsonSchemaObject = null
+                    };
+
+                    schema.AddRevision(revision);
+
+                    _datasetContext.Add(revision);
+
+                    //filter out fields marked for deletion
+                    foreach (var row in schemaRevisionFieldsStructureDto.FieldStructure.Where(w => !w.DeleteInd))
+                    {
+                        revision.Fields.Add(AddRevisionField(row, revision, previousRevision: latestRevision));
+                    }
+
+                    //Add posible checksum validation here
+
+                    SetHierarchyProperties(revision.Fields);
+
+                    return revision.SchemaRevision_Id;
+                }
+            }
+            catch (AggregateException agEx)
+            {
+                var flatArgExs = agEx.Flatten().InnerExceptions;
+                foreach (var ex in flatArgExs)
+                {
+                    Logger.Error("Failed generating consumption layer event", ex);
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to add revision", ex);
+                throw;
+            }
+
+            return 0;
+        }
+
+        public void CreateSchemaRevisionExternalDependencies(int schemaId, int schemaRevisionId)
+        {
+            FileSchema fileSchema = _datasetContext.GetById<FileSchema>(schemaId);
+            SchemaRevision schemaRevision = fileSchema.Revisions.FirstOrDefault(w => w.SchemaRevision_Id == schemaRevisionId);
+            int parentDatasetId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
+
+            CreateSchemaRevisionExternalDependencies_Internal(schemaRevision, parentDatasetId);
+        }
+
+        private void CreateSchemaRevisionExternalDependencies_Internal(SchemaRevision revision, int datasetId)
+        {
+            DeleteElasticIndexForSchema(revision.ParentSchema.SchemaId);
+            IndexElasticFieldsForSchema(revision.ParentSchema.SchemaId, datasetId, revision.Fields);
+            GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
         }
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
@@ -285,6 +387,22 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
         }
 
+        public (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName)
+        {
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                throw new ArgumentNullException(nameof(schemaName));
+            }
+            if (targetDatasetId == 0)
+            {
+                throw new ArgumentNullException(nameof(targetDatasetId));
+            }
+
+            int schemaId = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == targetDatasetId && w.Schema.Name == schemaName && w.Schema.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Schema.SchemaId).FirstOrDefault();
+
+            return (schemaId, (schemaId != 0));
+        }
+
         private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
             /*Generate *-CREATE-TABLE-REQUESTED event when:
@@ -292,32 +410,29 @@ namespace Sentry.data.Core
             */
             if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
-                GenerateConsumptionLayerCreateEvent(schema, propertyDeltaList);
+                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).Take(1).FirstOrDefault();
+                GenerateConsumptionLayerCreateEvent(latestRevision, propertyDeltaList);
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="schema"></param>
+        /// <param name="schemaRevision"></param>
         /// <param name="propertyDeltaList"></param>
         /// <exception cref="AggregateException">Thows exception when event could not be published</exception>
-        private void GenerateConsumptionLayerCreateEvent(FileSchema schema, JObject propertyDeltaList)
+        private void GenerateConsumptionLayerCreateEvent(SchemaRevision schemaRevision, JObject propertyDeltaList)
         {
-            var latestRevision = _datasetContext.SchemaRevision
-                .Where(w => w.ParentSchema.SchemaId == schema.SchemaId)
-                .Select(s => new {s.ParentSchema.SchemaId, s.SchemaRevision_Id, s.Revision_NBR })
-                .OrderByDescending(o => o.Revision_NBR)
-                .Take(1).FirstOrDefault();
+            string methodName = $"{nameof(SchemaService).ToLower()}_{nameof(GenerateConsumptionLayerCreateEvent).ToLower()}";
 
             //Do nothing if there is no revision associated with schema
-            if (latestRevision == null)
+            if (schemaRevision == null)
             {
-                Logger.Debug($"<generateconsumptionlayercreateevent> - consumption layer event not generated - no schema revision");
+                Logger.Debug($"<{methodName}> - consumption layer event not generated - no schema revision");
                 return;
             }
                         
-            int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
+            int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaRevision.ParentSchema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
 
             bool generateEvent = false;
             /* schema column updates trigger, this will trigger for initial schema column add along with any updates there after */
@@ -337,8 +452,8 @@ namespace Sentry.data.Core
                 var exceptionList = new List<Exception>();
                 HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
                 {
-                    SchemaID = latestRevision.SchemaId,
-                    RevisionID = latestRevision.SchemaRevision_Id,
+                    SchemaID = schemaRevision.ParentSchema.SchemaId,
+                    RevisionID = schemaRevision.SchemaRevision_Id,
                     DatasetID = dsId,
                     HiveStatus = null,
                     InitiatorID = _userService.GetCurrentUser().AssociateId,
@@ -347,23 +462,23 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sending {hiveCreate.EventType.ToLower()} event...");
+                    Logger.Debug($"<{methodName}> sending {hiveCreate.EventType.ToLower()} event...");
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
                         topicName = GetDSCEventTopic(dsId);
-                        _messagePublisher.Publish(topicName, schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
+                        _messagePublisher.Publish(topicName, schemaRevision.ParentSchema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
                     }
                     else
                     {
-                        _messagePublisher.PublishDSCEvent(schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate), topicName);
+                        _messagePublisher.PublishDSCEvent(schemaRevision.ParentSchema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate), topicName);
                     }
 
-                    Logger.Debug($"<generateconsumptionlayercreateevent> sent {hiveCreate.EventType.ToLower()} event");
+                    Logger.Debug($"<{methodName}> sent {hiveCreate.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<generateconsumptionlayercreateevent> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
+                    Logger.Error($"<{methodName}> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
                     exceptionList.Add(ex);
                 }
 
@@ -371,15 +486,15 @@ namespace Sentry.data.Core
                 SnowTableCreateModel snowModel = new SnowTableCreateModel()
                 {
                     DatasetID = dsId,
-                    SchemaID = schema.SchemaId,
-                    RevisionID = latestRevision.SchemaRevision_Id,
+                    SchemaID = schemaRevision.ParentSchema.SchemaId,
+                    RevisionID = schemaRevision.SchemaRevision_Id,
                     InitiatorID = _userService.GetCurrentUser().AssociateId,
                     ChangeIND = propertyDeltaList.ToString(Formatting.None)
                 };
 
                 try
                 {
-                    Logger.Info($"<generateconsumptionlayercreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    Logger.Info($"<{methodName}> sending {snowModel.EventType.ToLower()} event...");
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
@@ -390,11 +505,11 @@ namespace Sentry.data.Core
                     {
                         _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
                     }
-                    Logger.Info($"<generateconsumptionlayercreateevent> sent {snowModel.EventType.ToLower()} event");
+                    Logger.Info($"<{methodName}> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<generateconsumptionlayercreateevent> failed sending event: {snowModel}");
+                    Logger.Error($"<{methodName}> failed sending event: {snowModel}");
                     exceptionList.Add(ex);
                 }
 
@@ -641,6 +756,21 @@ namespace Sentry.data.Core
             {
                 Revision = revision?.ToDto(),
                 JsonStructure = revision?.ToJsonStructure()
+            };
+        }
+
+        public SchemaRevisionFieldStructureDto GetLatestSchemaRevisionFieldStructureBySchemaId(int datasetId, int schemaId)
+        {
+            //check schema exists
+            DatasetFileConfig fileConfig = GetDatasetFileConfig(datasetId, schemaId, x => x.CanPreviewDataset || x.CanViewFullDataset || x.CanUploadToDataset || x.CanEditDataset || x.CanManageSchema);
+
+            //get latest revision
+            SchemaRevision revision = fileConfig.GetLatestSchemaRevision();
+
+            return new SchemaRevisionFieldStructureDto()
+            {
+                Revision = revision?.ToDto(),
+                FieldStructure = revision?.ToFieldStructure()
             };
         }
 
@@ -1254,7 +1384,7 @@ namespace Sentry.data.Core
             return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
         }
 
-        private BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
+        internal BaseField AddRevisionField(BaseFieldDto row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
         {
             BaseField newField = null;
             //Should we perform comparison to previous based on is incoming field new
@@ -1266,15 +1396,15 @@ namespace Sentry.data.Core
             bool changed = false;
             newField = row.ToEntity(parentRow, CurrentRevision);
 
-            if (!compare)
-            {
-                newField.CreateDTM = CurrentRevision.CreatedDTM;
-                newField.LastUpdateDTM = CurrentRevision.CreatedDTM;
-            }
-            else
+            if (compare && previousFieldDtoVersion != null)
             {
                 changed = previousFieldDtoVersion.CompareToEntity(newField);
                 newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldDtoVersion.LastUpdatedDtm;
+            }
+            else
+            {
+                newField.CreateDTM = CurrentRevision.CreatedDTM;
+                newField.LastUpdateDTM = CurrentRevision.CreatedDTM;
             }
 
             _datasetContext.Add(newField);
