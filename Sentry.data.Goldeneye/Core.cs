@@ -210,7 +210,7 @@ namespace Sentry.data.Goldeneye
 
         private void RunSecondlyProcessing()
         {
-            //Console.WriteLine("There are currently " + currentTasks.Count + " processes running. " + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
+            Console.WriteLine("There are currently " + currentTasks.Count + " processes running. " + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
             foreach (RunningTask rt in currentTasks)
             {
                 if (rt.Task.IsFaulted)
