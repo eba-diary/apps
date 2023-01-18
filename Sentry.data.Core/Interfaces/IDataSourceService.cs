@@ -11,6 +11,6 @@ namespace Sentry.data.Core
         List<DataSourceTypeDto> GetDataSourceTypeDtosForDropdown();
         List<AuthenticationTypeDto> GetValidAuthenticationTypeDtosByType(string sourceType);
         List<AuthenticationTypeDto> GetAuthenticationTypeDtos();
-        void ExchangeAuthToken(DataSource dataSource, string authToken);
+        Task<bool> ExchangeAuthToken(DataSource dataSource, string authToken);
     }
 }

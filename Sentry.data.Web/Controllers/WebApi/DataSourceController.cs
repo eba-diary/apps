@@ -2,6 +2,7 @@
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace Sentry.data.Web.WebApi.Controllers
@@ -30,7 +31,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
-        public IHttpActionResult AddAccessTokenFromAuthToken(int dataSourceId, string authToken)
+        public async Task<IHttpActionResult> AddAccessTokenFromAuthToken(int dataSourceId, string authToken)
         {
             //validate
             if (authToken == null)
@@ -43,8 +44,14 @@ namespace Sentry.data.Web.WebApi.Controllers
                 return BadRequest($"Datasource with ID \"{dataSourceId}\" could not be found.");
             }
             //act
-            _dataSourceService.ExchangeAuthToken(dataSource, authToken);
-            return Ok();
+            var result = await _dataSourceService.ExchangeAuthToken(dataSource, authToken);
+
+            if (!result)
+            {
+                return BadRequest("Token exchange failed.");
+            }
+
+            return Ok("Token Added.");
         }
     }
 }
