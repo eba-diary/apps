@@ -3,10 +3,10 @@
 
     InitForMigration: function (datasetId) {
         $("#MigrationRequestModal").remove();
-        migrationRequestModal = Sentry.ShowModalWithSpinner("Migration Request");
+        data.MigrationRequest.migrationRequestModal = Sentry.ShowModalWithSpinner("Migration Request");
         $(migrationRequestModal).attr("id", "MigrationRequestModal");
 
-        getMigrationRequestUrl = "/Migration/MigrationRequest?datasetId=" + encodeURI(datasetId);
+        var getMigrationRequestUrl = "/Migration/MigrationRequest?datasetId=" + encodeURI(datasetId);
 
         $.get(getMigrationRequestUrl, function (e) {
             migrationRequestModal.ReplaceModalBody(e);
@@ -21,7 +21,6 @@
             $('#MigrationRequestModal #TargetNamedEnvironment').attr('searchable', 'Search or add here...');
             $('#MigrationRequestModal #TargetNamedEnvironment').attr('editable', true);
         }
-        //$('#MigrationRequestModal #SelectedSchema').attr('multiple', true);
         $("#MigrationFormSection select").materialSelect();
 
         $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
