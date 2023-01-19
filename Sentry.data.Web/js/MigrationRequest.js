@@ -1,65 +1,133 @@
 ﻿data.MigrationRequest = {
-    InitForDataset : function(datasetId) {
+    migrationRequestModal: {},
+
+    InitForMigration: function (datasetId) {
         $("#MigrationRequestModal").remove();
-        var migrationRequestModal = Sentry.ShowModalWithSpinner("Dataset Migration Request");
+        migrationRequestModal = Sentry.ShowModalWithSpinner("Migration Request");
         $(migrationRequestModal).attr("id", "MigrationRequestModal");
 
-        getDatasetMigrationRequestUrl = "/Migration/DatasetMigrationRequest?datasetId=" + encodeURI(datasetId);
+        getMigrationRequestUrl = "/Migration/MigrationRequest?datasetId=" + encodeURI(datasetId);
 
-        $.get(getDatasetMigrationRequestUrl, function (e) {
+        $.get(getMigrationRequestUrl, function (e) {
             migrationRequestModal.ReplaceModalBody(e);
-            $('#MigrationRequestModal #SelectedSchema').attr('multiple', true);
-            $("#MigrationRequestModal select").materialSelect();
 
-            $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
-                $('#MigrationRequestSubmitButton').prop('disabled', true);
-                $('#ValidationMessages').addClass('d-none');
-                $('#RequestMigrationFormSection').addClass('d-none');
-                $('#RequestMigrationSubmissionBody').removeClass('d-none');
-                $('#MigrationModalSpinner').removeClass('d-none');
+            data.MigrationRequest.InitForDataset($(this).data("id"));
+        });
+    },
 
-                var request = data.MigrationRequest.MapToDatasetMigrationRequestModel($('#DatasetId').val(), $('#TargetNamedEnvironment').val(), $('#SelectedSchema').val())
-                console.log(JSON.stringify(request));
+    InitForDataset: function (datasetid) {
+        data.MigrationRequest.InitMigrationRequestForm();
+        if ($('#QuartermasterManagedNamedEnvironments').val() === 'False') {
+            $('#MigrationRequestModal #TargetNamedEnvironment').attr('searchable', 'Search or add here...');
+            $('#MigrationRequestModal #TargetNamedEnvironment').attr('editable', true);
+        }
+        //$('#MigrationRequestModal #SelectedSchema').attr('multiple', true);
+        $("#MigrationFormSection select").materialSelect();
 
-                var postDatasetMigrationUrl = "/api/v20220609/metadata/MigrateDataset"
+        $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
 
-                /*Send migration request to API*/
-                $.post(postDatasetMigrationUrl, request, function (migrationResultsModel) {
-                    console.log(migrationResultsModel);
-                    migrationRequestModal.HideModal();
-                    data.MigrationRequest.initMigrationResponseModal(migrationResultsModel);
-                })
-                    .fail(function (errorResponse) {
-                        
-                        console.log(errorResponse);
-                        var statusCode = errorResponse.status;
-                        var errorMessage = errorResponse.responseJSON.Message;
+            var request = data.MigrationRequest.MapToDatasetMigrationRequestModel($('#DatasetId').val(), $('#TargetNamedEnvironment').val(), $('#SelectedSchema').val())
+            var postDatasetMigrationUrl = "/api/v20220609/metadata/MigrateDataset";
 
-                        if (statusCode === 400) {                            
-                            var messageArray = JSON.parse(errorMessage);
+            data.MigrationRequest.InitMigrationRequestSubmission(postDatasetMigrationUrl, request);
+        });
+    },
 
-                            data.MigrationRequest.InitRequestValidationMessages(messageArray);                            
-                            
-                            $('#RequestMigrationSubmissionBody').addClass('d-none');
-                            $('#RequestMigrationFormSection').removeClass('d-none');
-                            $('#MigrationModalSpinner').addClass('d-none');
-                            $('#MigrationRequestSubmitButton').prop('disabled', false);
-                        }
-                        else {
-                            data.Dataset.makeToast("error", "Error Occurred, please contact DSC team if problem persists.");
-                            $('#MigrationModalSpinner').addClass('d-none');
-                            $('#RequestMigrationSubmissionBody').addClass('d-none');
-                            $('#RequestMigrationFormSection').removeClass('d-none');
-                            $('#MigrationRequestSubmitButton').prop('disabled', false);
-                        }
-                    })
-            })
+    InitForSchema: function (datasetId) {
+        data.MigrationRequest.InitMigrationRequestForm();
+        $('#MigrationRequestModal #TargetNamedEnvironment').attr('searchable', 'Search here...');
+        $('#MigrationRequestModal #TargetNamedEnvironment').attr('editable', false);
+        $('#MigrationRequestModal #SelectedSchema').attr('multiple', false);
+        $("#MigrationFormSection select").materialSelect();
+        $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
+
+            var request = data.MigrationRequest.MapToSchemaMigrationRequestModel($('#DatasetId').val(), $('#TargetNamedEnvironment').val(), $('#SelectedSchema').val())
+            var postDatasetMigrationUrl = "/api/v20220609/metadata/MigrateSchema";
+
+            data.MigrationRequest.InitMigrationRequestSubmission(postDatasetMigrationUrl, request);
+        });
+    },
+
+    InitMigrationRequestForm: function () {
+        $('#MigrationRequestForSection').addClass('d-none');
+        $('#RequestMigrationFormSection').removeClass('d-none');
+        $('#MigrationFormSection').removeClass('d-none');
+        $('#MigrationRequestSubmitButton').removeClass('d-none');
+    },
+
+    InitMigrationRequestSubmission: function (submissionApiUrl, request) {
+        $('#MigrationRequestSubmitButton').prop('disabled', true);
+        $('#ValidationMessages').addClass('d-none');
+        $('#RequestMigrationFormSection').addClass('d-none');
+        $('#RequestMigrationSubmissionBody').removeClass('d-none');
+        $('#MigrationModalSpinner').removeClass('d-none');
+
+        $.post(submissionApiUrl, request, function (migrationResultsModel) {
+            console.log(migrationResultsModel);
+            migrationRequestModal.HideModal();
+            data.MigrationRequest.initMigrationResponseModal(migrationResultsModel);
         })
+            .fail(function (errorResponse) {
+
+                console.log(errorResponse);
+                var statusCode = errorResponse.status;
+                var errorMessage = errorResponse.responseJSON.Message;
+
+                if (statusCode === 400) {
+                    var messageArray = JSON.parse(errorMessage);
+
+                    data.MigrationRequest.InitRequestValidationMessages(messageArray);
+
+                    $('#RequestMigrationSubmissionBody').addClass('d-none');
+                    $('#RequestMigrationFormSection').removeClass('d-none');
+                    $('#MigrationModalSpinner').addClass('d-none');
+                    $('#MigrationRequestSubmitButton').prop('disabled', false);
+                }
+                else {
+                    data.Dataset.makeToast("error", "Error Occurred, please contact DSC team if problem persists.");
+                    $('#MigrationModalSpinner').addClass('d-none');
+                    $('#RequestMigrationSubmissionBody').addClass('d-none');
+                    $('#RequestMigrationFormSection').removeClass('d-none');
+                    $('#MigrationRequestSubmitButton').prop('disabled', false);
+                }
+            })
+    },
+
+    initMigrationResponseModal: function (response) {
+        $('.migration-modal-container').load("/Migration/MigrationResponse", function () {
+            data.MigrationRequest.initMigrationResponseDataTable(response);
+            $('#migrationResponseModal').modal('show');
+        });
+    },
+
+    initMigrationResponseDataTable: function (response) {
+        var responseTable = $('#migrationResponseTable_V2').DataTable({
+            ordering: false,
+            searching: false,
+            paging: false
+        });
+
+        var hasDatasetMetadata = false;
+        if (response.hasOwnProperty('DatasetId')) {
+            hasDatasetMetadata = true;
+            data.MigrationRequest.AddDatasetRowToMigrationResponseTable(responseTable, response);
+        }
+
+        if (response.hasOwnProperty('SchemaMigrationResponse')) {
+            response.SchemaMigrationResponse.forEach(function (item, index) {
+                data.MigrationRequest.AddSchemaRowToMigrationResponseTable(responseTable, item);
+            });
+        }
+
+        if (hasDatasetMetadata === false) {
+            data.MigrationRequest.AddSchemaRowToMigrationResponseTable(responseTable, response);
+        }
     },
 
     InitRequestValidationMessages: function (errorArray) {
-        //Clear existing validation errors
+        /*Clear any potentail existing errors*/
         $('#RequestMigrationFormSection #ValidationMessages ul').empty();
+
         errorArray.forEach(data.MigrationRequest.AddErrorToValidationMessages);
         $('#ValidationMessages').removeClass('d-none');
     },
@@ -74,47 +142,31 @@
     },
 
     MapToDatasetMigrationRequestModel: function (datasetId, targetNamedEnvironment, schemaIdList) {
+        /* Create json object for submission to MigrateDataset API endpoint */
         var requestObject = new Object();
         requestObject.SourceDatasetId = datasetId;
         requestObject.TargetDatasetNamedEnvironment = targetNamedEnvironment;
         var sourceSchemaRequests = [];
         if (schemaIdList != undefined) {
             for (schemaId of schemaIdList) {
-                var schemaRequestObject = new Object();
-                schemaRequestObject.SourceSchemaId = schemaId;
-                schemaRequestObject.TargetDatasetNamedEnvironment = targetNamedEnvironment;
-                schemaRequestObject.TargetDataFlowNamedEnviornment = targetNamedEnvironment;
+                var schemaRequestObject = data.MigrationRequest.MapToSchemaMigrationRequestModel(datasetId, targetNamedEnvironment, schemaId);
                 sourceSchemaRequests.push(schemaRequestObject);
-
             }
             requestObject.SchemaMigrationRequests = sourceSchemaRequests;
         }
         return requestObject;
     },
 
-    initMigrationResponseModal: function (response) {
-        $('.migration-modal-container').load("/Migration/DatasetMigrationResponse", function () {
-            data.MigrationRequest.initMigrationResponseDataTable(response);
-            $('#migrationResponseModal').modal('show');
-        });
-    },
+    MapToSchemaMigrationRequestModel: function (datasetId, targetNamedEnvironment, schemaId) {
+        /* Create json object for submission to MigrateSchema API endpoint 
+             or SchemaMigrationRequests property submitted to MigrateDataset endpoint.*/
+        var schemaRequestObject = new Object();
+        schemaRequestObject.SourceSchemaId = schemaId;
+        schemaRequestObject.TargetDatasetId = datasetId;
+        schemaRequestObject.TargetDatasetNamedEnvironment = targetNamedEnvironment;
+        schemaRequestObject.TargetDataFlowNamedEnviornment = targetNamedEnvironment;
 
-    initMigrationResponseDataTable: function (response) {
-        var responseTable = $('#migrationResponseTable_V2').DataTable({
-            ordering: false,
-            searching: false,
-            paging: false
-        });
-
-        if (response.hasOwnProperty('DatasetId')) {
-            data.MigrationRequest.AddDatasetRowToMigrationResponseTable(responseTable, response);
-        }
-
-        if (response.hasOwnProperty('SchemaMigrationResponse')) {
-            response.SchemaMigrationResponse.forEach(function (item, index) {
-                data.MigrationRequest.AddSchemaRowToMigrationResponseTable(responseTable, item);
-            });
-        }
+        return schemaRequestObject
     },
 
     AddDatasetRowToMigrationResponseTable: function (responseTable, item) {

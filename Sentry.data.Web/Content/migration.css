@@ -1,4 +1,10 @@
-﻿#migrationResponseTable_V2 tr.group {
+﻿.requestMigrationButton {
+    margin-bottom: 0.5rem !important;
+    font-size: 15px;
+}
+
+
+#migrationResponseTable_V2 tr.group {
     background-color: #ddd;
 }
 
@@ -26,9 +32,17 @@
 }
 
 #RequestMigrationFormSection .select-wrapper{
-    padding-top: 10px;
+    padding-top: 8px;
 }
 
 #RequestMigrationFormSection .form-check-input[type="checkbox"] + label {
-    top: -11px !important; /* previously 0px; */
+    top: -11px !important;  /*previously 0px;*/ 
+}
+
+#RequestMigrationFormSection .search-wrap{
+    padding-top: 5px;  /* search-wrap default is 1rem */
+}
+
+#RequestMigrationFormSection .search-wrap .select-add-option {
+    margin-top: -12px; /* default was not set */
 }

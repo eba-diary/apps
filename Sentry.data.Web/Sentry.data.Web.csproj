@@ -584,10 +584,8 @@
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
-    <Compile Include="Models\Migration\DatasetMigrationRequestModel.cs" />
-    <Compile Include="Models\Migration\DatasetMigrationResponseModel.cs" />
+    <Compile Include="Models\Migration\MigrationRequestModel.cs" />
     <Compile Include="Models\Migration\MigrationResponseModel.cs" />
-    <Compile Include="Models\Migration\SchemaMigrationResponseModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -1408,8 +1406,8 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
-    <Content Include="Views\Migration\Dataset\_DatasetMigrationRequest.cshtml" />
-    <Content Include="Views\Migration\Dataset\_DatasetMigrationResponse.cshtml" />
+    <Content Include="Views\Migration\_MigrationResponse.cshtml" />
+    <Content Include="Views\Migration\_MigrationRequest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

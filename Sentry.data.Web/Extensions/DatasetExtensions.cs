@@ -47,30 +47,6 @@ namespace Sentry.data.Web
             };
         }
 
-        public static DatasetMigrationRequest ToDo(this DatasetMigrationRequestModel model)
-        {
-            DatasetMigrationRequest datasetMigrationRequest = new DatasetMigrationRequest()
-            {
-                SourceDatasetId = model.DatasetId,
-                TargetDatasetNamedEnvironment = model.TargetNamedEnvironment
-            };
-
-            if (model.SelectedSchema.Any())
-            {
-                foreach(int schemaId in model.SelectedSchema)
-                {
-                    datasetMigrationRequest.SchemaMigrationRequests.Add(new SchemaMigrationRequest()
-                    {
-                        SourceSchemaId = schemaId,
-                        TargetDatasetNamedEnvironment = model.TargetNamedEnvironment,
-                        TargetDataFlowNamedEnvironment = model.TargetNamedEnvironment
-                    });
-                }
-            }
-
-            return datasetMigrationRequest;
-        }
-
         public static List<DatasetInfoModel> ToApiModel(this List<DatasetSchemaDto> dtoList)
         {
             List<DatasetInfoModel> modelList = new List<DatasetInfoModel>();
@@ -119,54 +95,6 @@ namespace Sentry.data.Web
                 DatasetNamedEnvironment = dto.NamedEnvironment,
                 Url = dto.Url
             };
-        }
-
-        public static DatasetMigrationResponseModel ToModel(this Core.DatasetMigrationRequestResponse response, IDatasetContext context)
-        {
-            DatasetMigrationResponseModel model = new DatasetMigrationResponseModel()
-            {
-                DatasetResponse = new MigrationResponseModel()
-                {
-                    Id = response.DatasetId,
-                    WasMigrated = response.IsDatasetMigrated,
-                    MigrationNotes = response.DatasetMigrationReason,
-                    Name = context.Datasets.Where(w => w.DatasetId == response.DatasetId).Select(s => s.DatasetName).FirstOrDefault()
-                }
-            };
-
-            if (response.SchemaMigrationResponses.Any())
-            {
-                foreach(var schemaResponse in response.SchemaMigrationResponses)
-                {
-                    _ = model.SchemaResponses.Append(new SchemaMigrationResponseModel()
-                    {
-                        SchemaResponse = new MigrationResponseModel()
-                        {
-                            Id = schemaResponse.TargetSchemaId,
-                            Name = context.Schema.Where(w => w.SchemaId == schemaResponse.TargetSchemaId).Select(s => s.Name).FirstOrDefault(),
-                            WasMigrated = schemaResponse.MigratedSchema,
-                            MigrationNotes = schemaResponse.SchemaMigrationReason
-                        },
-                        SchemaRevisionResponse = new MigrationResponseModel()
-                        {
-                            Id = schemaResponse.TargetSchemaRevisionId,
-                            Name = context.SchemaRevision.Where(w => w.SchemaRevision_Id == schemaResponse.TargetSchemaRevisionId).Select(s => s.SchemaRevision_Name).FirstOrDefault(),
-                            WasMigrated = schemaResponse.MigratedSchemaRevision,
-                            MigrationNotes = schemaResponse.SchemaRevisionMigrationReason
-                        },
-                        DataFlowResponse = new MigrationResponseModel()
-                        {
-                            Id = schemaResponse.TargetDataFlowId,
-                            Name = context.DataFlow.Where(w => w.Id == schemaResponse.TargetDataFlowId).Select(s => s.Name).FirstOrDefault(),
-                            WasMigrated = schemaResponse.MigratedDataFlow,
-                            MigrationNotes = schemaResponse.DataFlowMigrationReason
-                        }
-
-                    });
-                }
-            }
-
-            return model;
         }
     }
 }

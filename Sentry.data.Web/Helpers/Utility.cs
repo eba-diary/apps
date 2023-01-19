@@ -209,9 +209,14 @@ namespace Sentry.data.Web.Helpers
 
         public static IEnumerable<SelectListItem> BuildSchemaDropDown(IDatasetContext context, int datasetId, int selectedSchemaId)
         {
-            IEnumerable<SelectListItem> itemList;
-            itemList = context.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId)
-                .Select(s => new SelectListItem { Text = s.Schema.Name, Value = s.Schema.SchemaId.ToString(), Selected = s.Schema.SchemaId == selectedSchemaId });
+            List<SelectListItem> itemList = new List<SelectListItem>();
+            if (selectedSchemaId == 0)
+            {
+                itemList.Add(new SelectListItem { Text = "Select Schema", Value = selectedSchemaId.ToString(), Selected = true, Disabled = true });
+            }
+
+            itemList.AddRange(context.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId)
+                .Select(s => new SelectListItem { Text = s.Schema.Name, Value = s.Schema.SchemaId.ToString() } ));
 
             return itemList;
         }

@@ -1022,9 +1022,9 @@ data.Dataset = {
             data.AccessRequest.InitForDataset($(this).data("id"));
         });
 
-        $("[id^='btnMigrateDataset']").off('click').on('click', function (e) {
+        $("[id^='btnMigrationRqeuest']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.MigrationRequest.InitForDataset($(this).data("id"));
+            data.MigrationRequest.InitForMigration($(this).data("id"));
         });
 
         $("[id^='DownloadLatest']").off('click').on('click', function (e) {

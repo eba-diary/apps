@@ -1,17 +1,20 @@
 ﻿using Sentry.data.Core.GlobalEnums;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
-    public class DatasetMigrationRequestModel
+    public class MigrationRequestModel
     {
         public int DatasetId { get; set; }
+        [DisplayName("Dataset Name")]
+        public string DatasetName { get; set; }
+        [DisplayName("Target Named Environment")]
         public string TargetNamedEnvironment { get; set; }
         public List<string> AllAssetNamedEnvironments { get; set; } = new List<string>();
+        [DisplayName("Schema ")]
         public List<int> SelectedSchema { get; set; } = new List<int>();
         public bool QuartermasterManagedNamedEnvironments { get; set; }
 

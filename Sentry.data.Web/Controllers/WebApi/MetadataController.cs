@@ -208,7 +208,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaMigrationResponseModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
         [Route("MigrateSchema")]
-        public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
+        public async Task<IHttpActionResult> MigrateSchema([FromBody] Models.ApiModels.Migration.SchemaMigrationRequestModel model)
         {
             IHttpActionResult MigrateDatasetFunction()
             {
@@ -968,7 +968,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
 
 
-        private SchemaMigrationRequest ToDto(SchemaMigrationRequestModel model)
+        private SchemaMigrationRequest ToDto(Models.ApiModels.Migration.SchemaMigrationRequestModel model)
         {
             return new SchemaMigrationRequest()
             {
@@ -980,7 +980,7 @@ namespace Sentry.data.Web.WebApi.Controllers
             };
         }
 
-        internal DatasetMigrationRequest ToDto(Sentry.data.Web.Models.ApiModels.Migration.DatasetMigrationRequestModel model)
+        internal DatasetMigrationRequest ToDto(Models.ApiModels.Migration.DatasetMigrationRequestModel model)
         {
             DatasetMigrationRequest request = new DatasetMigrationRequest()
             {
@@ -995,7 +995,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 SchemaMigrationRequests = new List<SchemaMigrationRequest>()
             };
 
-            foreach (SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
+            foreach (Models.ApiModels.Migration.SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
             {
                 request.SchemaMigrationRequests.Add(ToDto(schemaMigrationRequestModel));
             }
