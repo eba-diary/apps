@@ -94,7 +94,7 @@ namespace Sentry.data.Core
         {
             var content = new Dictionary<string, string>
             {
-              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", "https://telematicsnonprod.sentry.com/Motive/MotiveSuccess"}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
+              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", Configuration.Config.GetHostSetting("MotiveRedirectURI")}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
             };
             var jsonContent = JsonConvert.SerializeObject(content);
             var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
