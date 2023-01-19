@@ -150,6 +150,7 @@ namespace Sentry.data.Core
             public const string GENERIC_HTTPS_DATAFLOW_SOURCE = "GENERICHTTPSDATAFLOW";
             public const string GOOGLE_BIG_QUERY_API_SOURCE = "GoogleBigQueryApi";
             public const string PAGING_HTTPS_SOURCE = "PagingHttps";
+            public const string GOOGLE_SEARCH_CONSOLE_API_SOURCE = "GoogleSearchConsoleApi";
         }
 
         public static class DataFeedType

@@ -580,6 +580,7 @@
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
+    <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
@@ -2026,7 +2027,6 @@
     <Content Include="Views\Home\_NewsFeed.cshtml" />
     <Content Include="Views\Shared\_AssetList.cshtml" />
     <Content Include="Views\Dataset\DatasetForm.cshtml" />
-    <Content Include="Views\Dataset\Index.cshtml" />
     <Content Include="Views\Home\_AssetOverview - Copy.cshtml" />
     <Content Include="Views\Dataset\_hoverPopup.cshtml" />
     <Content Include="Views\Dataset\_ListItem.cshtml" />
@@ -2039,7 +2039,6 @@
     <Content Include="Views\Home\_GridFull.cshtml" />
     <Content Include="Views\Home\_GridTwo.cshtml" />
     <Content Include="Views\Home\_Feed.cshtml" />
-    <Content Include="Views\Dataset\_HomeDataset.cshtml" />
     <Content Include="Views\Dataset\Details\_UploadDatasetFileForm.cshtml" />
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />

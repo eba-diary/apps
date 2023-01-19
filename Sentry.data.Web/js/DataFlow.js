@@ -65,7 +65,7 @@
 
         //When the SAID asset changes, reload the named environments dropdown
         $("div#DataFlowFormContainer #SAIDAssetKeyCode").on('change', function () {
-            Sentry.InjectSpinner($("div#DataFlowFormContainer #namedEnvironmentSpinner"), 30);
+            Sentry.InjectSpinner($("#DataFlowNamedEnvironmentSpinner"), 30);
             data.DataFlow.populateNamedEnvironments();
         });
 
@@ -78,14 +78,13 @@
             $("#IsBackFillRequired").materialSelect();
             $("#IsPreProcessingRequired").materialSelect();
             $("#PreProcessingSelection").materialSelect();
-            $("#NamedEnvironmentPartial select").materialSelect();
+            $("#DataFlowNamedEnvironment.mdb-select").materialSelect();
+            $("#DataFlowNamedEnvironmentType.mdb-select").materialSelect();
             $("#retrieverJobPanel select").materialSelect();
             $("#compressionJobQuestion select").materialSelect();
         });
         
         data.DataFlow.InitSchemaMaps(datasetId, schemaId);
-
-        data.Job.FormInit();
     },
 
     DataFlowDetailInit: function (dataflowId) {
@@ -167,6 +166,7 @@
             if (ingestionSelection === "2") {
                 $('#retrieverPanelSpinner').css('float', 'left');
                 Sentry.InjectSpinner($("#retrieverPanelSpinner"));
+                data.Job.FormInit();
                 $('.retrieverPanel').show();
             }
             //if changing to Push
@@ -476,19 +476,24 @@
 
     initNamedEnvironmentEvents() {
         //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
-        $("div#DataFlowFormContainer select#NamedEnvironment").change(function () {
-            Sentry.InjectSpinner($("div#DataFlowFormContainer #namedEnvironmentTypeSpinner"), 30);
+        $("#DataFlowNamedEnvironment.mdb-select").change(function () {
+            Sentry.InjectSpinner($("#DataFlowNamedEnvironmentTypeSpinner"), 30);
             data.DataFlow.populateNamedEnvironments();
         });
     },
 
     populateNamedEnvironments() {
         var assetKeyCode = $("div#DataFlowFormContainer #SAIDAssetKeyCode").val();
-        var selectedEnvironment = $("div#DataFlowFormContainer #NamedEnvironment").val();
+        var selectedEnvironment = $("#DataFlowNamedEnvironment").val();
         $.get("/DataFlow/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
-            $('div#DataFlowFormContainer #NamedEnvironmentPartial').html(result);
+            $("#DataFlowNamedEnvironment.mdb-select").materialSelect({ destroy: true });
+            $("#DataFlowNamedEnvironmentType.mdb-select").materialSelect({ destroy: true });
+
+            $('#DataFlowNamedEnvironmentPartial').html(result);
             data.DataFlow.initNamedEnvironmentEvents();
-            $("#NamedEnvironmentPartial select").materialSelect();
+
+            $("#DataFlowNamedEnvironment.mdb-select").materialSelect();
+            $("#DataFlowNamedEnvironmentType.mdb-select").materialSelect();
         });
     },
 

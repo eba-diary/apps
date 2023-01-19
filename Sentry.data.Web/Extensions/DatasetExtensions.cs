@@ -41,8 +41,8 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CreateCurrentView,
                 ObjectStatus = model.ObjectStatus,
                 SAIDAssetKeyCode = model.SAIDAssetKeyCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType
+                NamedEnvironment = model.DatasetNamedEnvironment,
+                NamedEnvironmentType = model.DatasetNamedEnvironmentType
             };
         }
 
@@ -83,6 +83,16 @@ namespace Sentry.data.Web
                 ConfigId = dto.ConfigId,
                 SchemaId = dto.SchemaId,
                 SchemaName = dto.SchemaName
+            };
+        }
+
+        public static DatasetRelativeModel ToModel(this DatasetRelativeDto dto)
+        {
+            return new DatasetRelativeModel()
+            {
+                DatasetId = dto.DatasetId,
+                DatasetNamedEnvironment = dto.NamedEnvironment,
+                Url = dto.Url
             };
         }
     }

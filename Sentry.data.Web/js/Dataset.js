@@ -818,57 +818,6 @@ data.Dataset = {
         data.Dataset.DataFlowIdSelected = dataInput.Id
     },
 
-
-
-
-
-    IndexInit: function () {
-        /// Initialize the Index page for data assets (with the categories)
-
-        $(".sentry-app-version").hide();
-
-        $("[id^='CreateDataset']").click(function (e) {
-            e.preventDefault();
-            window.location = "/Dataset/Create";
-        });
-
-        $("[id^='CreateDataflow']").click(function (e) {
-            e.preventDefault();
-            window.location = "/Dataflow/Create";
-        });
-
-        $("[id^='UploadDatafile']").click(function (e) {
-            e.preventDefault();
-            data.Dataset.LoadUploadFileModal(0);
-        });
-
-        $('.tile').click(function (e) {
-            var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-            if (storedNames !== null) {
-                for (i = 0; i < storedNames.length; i++) {
-                    $('#' + storedNames[i]).prop('checked', false);
-                }
-                localStorage.removeItem("filteredIds");
-            }
-
-            localStorage.removeItem("searchText");
-        });
-
-        $('#DatasetSearch').submit(function (e) {
-            localStorage.removeItem("filteredIds");
-
-            localStorage.removeItem("searchText");
-
-            localStorage.setItem("searchText", $('#SearchText')[0].value);
-        });
-
-        $('.input-group-prepend').click(function (e) {
-            $('#DatasetSearch').submit();
-        });
-
-    },
-
     FormSubmitInit: function () {
         $("#DatasetFormContent #IsSecured").removeAttr("disabled");
         $.ajax({
@@ -921,7 +870,8 @@ data.Dataset = {
             $("#saidAsset").materialSelect();
             $("#OriginationID").materialSelect();
             $("#DataClassification").materialSelect();
-            $("#NamedEnvironmentPartial select").materialSelect();
+            $("#DatasetNamedEnvironment.mdb-select").materialSelect();
+            $("#DatasetNamedEnvironmentType.mdb-select").materialSelect();
             $("#DatasetScopeTypeId").materialSelect();
             $("#FileExtensionId").materialSelect();
         });
@@ -935,7 +885,7 @@ data.Dataset = {
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
             //Load the named environments for the selected asset
-            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
+            Sentry.InjectSpinner($("#DatasetNamedEnvironmentSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
         });
 
@@ -2432,19 +2382,24 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     initNamedEnvironmentEvents() {
         //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
-        $("div#DatasetFormContent select#NamedEnvironment").change(function () {
-            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentTypeSpinner"), 30);
+        $("#DatasetNamedEnvironment.mdb-select").change(function () {
+            Sentry.InjectSpinner($("#DatasetNamedEnvironmentTypeSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
         });
     },
 
     populateNamedEnvironments() {
         var assetKeyCode = $("div#DatasetFormContent #saidAsset").val();
-        var selectedEnvironment = $("div#DatasetFormContent #NamedEnvironment").val();
+        var selectedEnvironment = $("#DatasetNamedEnvironment").val();
         $.get("/Dataset/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
-            $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
+            $("#DatasetNamedEnvironment.mdb-select").materialSelect({ destroy: true });
+            $("#DatasetNamedEnvironmentType.mdb-select").materialSelect({ destroy: true });
+
+            $('#DatasetNamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
-            $("#NamedEnvironmentPartial select").materialSelect();
+
+            $("#DatasetNamedEnvironment.mdb-select").materialSelect();
+            $("#DatasetNamedEnvironmentType.mdb-select").materialSelect();
         });
     },
 

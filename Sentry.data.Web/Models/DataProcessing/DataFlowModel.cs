@@ -76,12 +76,12 @@ namespace Sentry.data.Web
         [DisplayName("Named Environment")]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression("^[A-Z0-9]{1,10}$", ErrorMessage = "Named environment must be alphanumeric, all caps, and less than 10 characters")]
-        public string NamedEnvironment { get; set; }
+        public string DataFlowNamedEnvironment { get; set; }
 
 
         [DisplayName("Named Environment Type")]
         [System.ComponentModel.DataAnnotations.Required]
-        public NamedEnvironmentType NamedEnvironmentType { get; set; }
+        public NamedEnvironmentType DataFlowNamedEnvironmentType { get; set; }
         //[Range(1, int.MaxValue, ErrorMessage = "Please Select a Dataset")]
         public int SelectedDataset { get; set; }
         //[Range(1, int.MaxValue, ErrorMessage = "Please Select a Schema")]
@@ -93,8 +93,8 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
         public IEnumerable<SelectListItem> SAIDAssetDropDown { get; set; }
         public IEnumerable<SelectListItem> IngestionTypeDropDown { get; set; }
-        public IEnumerable<SelectListItem> NamedEnvironmentDropDown { get; set; }
-        public IEnumerable<SelectListItem> NamedEnvironmentTypeDropDown { get; set; }
+        public IEnumerable<SelectListItem> DataFlowNamedEnvironmentDropDown { get; set; }
+        public IEnumerable<SelectListItem> DataFlowNamedEnvironmentTypeDropDown { get; set; }
         [DisplayName("Pre Processing Options")]
         public List<int> PreprocessingOptions { get; set; }
 

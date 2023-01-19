@@ -33,6 +33,6 @@ namespace Sentry.data.Web.Models.Config
         [DisplayName("Scope")]
         public virtual string Scope { get; set; }
 
-
+        public bool ToDelete { get; set; }
     }
 }

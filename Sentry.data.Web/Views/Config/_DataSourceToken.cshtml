@@ -1,11 +1,12 @@
 ﻿@model Sentry.data.Web.Models.Config.DataSourceTokenModel
 @using (Html.BeginCollectionItem("Tokens"))
 {
-    if (Model != null)
-    {
-        @Html.HiddenFor(model => model.Id)
-    }
     <div class="card mb-3">
+        @if (Model != null)
+        {
+            @Html.HiddenFor(model => model.Id, new { @class="tokenId"})
+            @Html.HiddenFor(model => model.ToDelete, new { @class = "toDeleteMarker"})
+        }
         <div class="card-body">
             <div class="row">
                 <div class="col">
@@ -50,7 +51,8 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer @(Model != null ? "d-none" : "" ) ">
+        <div class="card-footer">
+            <button type="button" class="btn d-none btn-warning waves-effect waves-light float-r cancelDelete">Cancel Delete</button>
             <button type="button" class="btn btn-danger waves-effect waves-light float-r removeToken">Remove</button>
         </div>
     </div>
