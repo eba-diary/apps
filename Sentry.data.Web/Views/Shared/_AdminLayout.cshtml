@@ -12,11 +12,10 @@
 <!--div containing side nav and current page-->
 <div class="d-flex">
     @RenderPage("~/Views/Shared/_AdminSideNav.cshtml")
-   
+
     <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
     <!--Render bundles necessary for admin pages before layout is applied to page-->
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    <script src="@Html.GetContent("common.*.js")"></script>
     @Scripts.Render("~/bundles/js")
     @Scripts.Render("~/bundles/dataTables")
     @Styles.Render("~/bundles/css/dataTables")

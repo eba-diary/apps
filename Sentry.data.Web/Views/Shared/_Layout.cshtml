@@ -40,9 +40,8 @@
 
     @Html.Action("GetFooter", "Layout")
 
-    @Scripts.Render("~/bundles/jquery")
+    <script src="@Html.GetContent("common.*.js")"></script>
     @Scripts.Render("~/bundles/knockout")
-    @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/js")
 
     <script>

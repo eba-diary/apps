@@ -152,12 +152,8 @@
 @section Scripts {
     <script>
         $(function () {
-
             data.Home.CLA2838_DSC_ANOUNCEMENTS = @Model.CLA2838_DSC_ANOUNCEMENTS.ToString().ToLower();      //SET FEATURE FLAG SO JS CAN USE LATER.  DELETE THIS WHEN THIS FEATURE GOES LIVE
             data.Home.Init();
-            data.Dataset.IndexInit();
-
-
 
             $('#DatasetSearch').click(function (e) {
                 localStorage.removeItem("filteredIds");
@@ -170,9 +166,7 @@
             $('.input-group-addon').click(function (e) {
                 $('#DatasetSearch').submit();
             });
-
         });
-
 
         function GetFile(location, datasetId) {
             var link = $(this);

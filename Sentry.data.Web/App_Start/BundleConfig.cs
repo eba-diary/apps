@@ -8,32 +8,32 @@ namespace Sentry.data.Web
         public static void RegisterBundles(BundleCollection bundles)
         {
             //This bundle contains basic jquery stuff and some common plugins
-            bundles.Add(new ScriptBundle("~/bundles/jquery").
-                        Include("~/Scripts/jquery-{version}.js").
-                        Include("~/Scripts/jquery-ui.js").
-                        Include("~/Scripts/jquery.unobtrusive-ajax.js").
-                        Include("~/Scripts/jquery.placeholder.js").
-                        Include("~/Scripts/jquery.ba-throttle-debounce.js").
-                        Include("~/Scripts/jquery.validate.js").
-                        Include("~/Scripts/jquery.validate.unobtrusive.js").
-                        Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
-                        Include("~/Scripts/jquery.json-viewer.js").
-                        Include("~/Scripts/jQuery.extendext.min.js").
-                        Include("~/Scripts/select2.js").
-                        Include("~/Scripts/bootbox.js").
-                        Include("~/Scripts/spin.js").
-                        Include("~/Scripts/ladda.js").
-                        Include("~/Scripts/toastr.min.js").
-                        Include("~/Scripts/thenBy.min.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/jquery").
+            //            Include("~/Scripts/jquery-{version}.js").
+            //            Include("~/Scripts/jquery-ui.js").
+            //            Include("~/Scripts/jquery.unobtrusive-ajax.js").
+            //            Include("~/Scripts/jquery.placeholder.js").
+            //            Include("~/Scripts/jquery.ba-throttle-debounce.js").
+            //            Include("~/Scripts/jquery.validate.js").
+            //            Include("~/Scripts/jquery.validate.unobtrusive.js").
+            //            Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
+            //            Include("~/Scripts/jquery.json-viewer.js").
+            //            Include("~/Scripts/jQuery.extendext.min.js").
+            //            Include("~/Scripts/select2.js").
+            //            Include("~/Scripts/bootbox.js").
+            //            Include("~/Scripts/spin.js").
+            //            Include("~/Scripts/ladda.js").
+            //            Include("~/Scripts/toastr.min.js").
+            //            Include("~/Scripts/thenBy.min.js"));
 
-            //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
-            bundles.Add(new Bundle("~/bundles/bootstrap").
-                        Include("~/Scripts/bootstrap.bundle.js").
-                        Include("~/Scripts/MDB/mdb.js").
-                        Include("~/Scripts/respond.js").
-                        Include("~/Scripts/typeahead.bundle.js").
-                        Include("~/Scripts/sentry.associates.js").
-                        Include("~/Scripts/sentry.common.js"));
+            ////This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
+            //bundles.Add(new Bundle("~/bundles/bootstrap").
+            //            Include("~/Scripts/bootstrap.bundle.js").
+            //            Include("~/Scripts/MDB/mdb.js").
+            //            Include("~/Scripts/respond.js").
+            //            Include("~/Scripts/typeahead.bundle.js").
+            //            Include("~/Scripts/sentry.associates.js").
+            //            Include("~/Scripts/sentry.common.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/knockout").
                         Include("~/Scripts/knockout-3.4.2.js").

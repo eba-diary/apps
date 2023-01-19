@@ -33,7 +33,7 @@
     "bootbox": "^6.0.0",
     "jquery-ajax-unobtrusive": "^3.2.6",
     "jquery-throttle-debounce": "^1.0.0",
-    "jquery-ui": "^1.13.2",
+    "jquery-ui-dist": "^1.13.2",
     "jquery-validation": "^1.19.5",
     "jquery-validation-unobtrusive": "^4.0.0",
     "select2": "^4.1.0-rc.0",
