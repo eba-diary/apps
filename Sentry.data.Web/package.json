@@ -41,6 +41,7 @@
     "jquery-validation": "^1.19.5",
     "jquery-validation-unobtrusive": "^4.0.0",
     "knockout": "^3.4.2",
+    "prettycron": "^0.10.0",
     "select2": "^4.1.0-rc.0",
     "thenby": "^1.3.4",
     "toastr": "^2.1.4",

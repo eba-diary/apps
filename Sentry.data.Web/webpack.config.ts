@@ -12,6 +12,7 @@ function config(env, argv): webpack.Configuration {
             'knockout': './src/knockout.ts',
             'site': { import: '!import-glob!./src/site.ts', dependOn: 'common' },
             'datatables': { import: '/src/datatables.ts', dependOn: 'common' },
+            'prettycron': './src/prettycron.ts'
         },
         output: {
             clean: true,
@@ -23,6 +24,10 @@ function config(env, argv): webpack.Configuration {
             new MiniCssExtractPlugin({
                 filename: (IS_PROD ? '[name].[contenthash].css' : '[name].local.css')
             }),
+            //solution for npm build failing for prettycron due to issue with later.js found here: https://github.com/bunkat/later/issues/155
+            new webpack.EnvironmentPlugin({
+                LATER_COV: false
+            })
         ],
         optimization: {
             minimizer: [

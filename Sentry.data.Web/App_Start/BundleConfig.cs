@@ -64,11 +64,11 @@ namespace Sentry.data.Web
             //            Include(dataTablesScriptsDirectory + "/moment.js").
             //            Include("~/Scripts/jquery.dataTables.yadcf.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/prettyCron").
-                        Include(dataTablesScriptsDirectory + "/moment.js").
-                        Include(dataTablesScriptsDirectory + "/moment.min.js").
-                        Include("~/Scripts/later.js").
-                        Include("~/Scripts/prettycron.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/prettyCron").
+            //            Include(dataTablesScriptsDirectory + "/moment.js").
+            //            Include(dataTablesScriptsDirectory + "/moment.min.js").
+            //            Include("~/Scripts/later.js").
+            //            Include("~/Scripts/prettycron.js"));
 
             //This bundle contains quill
             bundles.Add(new ScriptBundle("~/bundles/quill").

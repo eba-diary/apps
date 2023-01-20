@@ -7,6 +7,11 @@
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
+@section styles
+{
+    @Styles.Render("~/bundles/css/dataTables")
+}
+
 @if (@Model.HasSchema && @Model.DatasetFileCount == 0)
 {
     <div>
@@ -455,13 +460,10 @@ else
         </div>
     </div>
 }
-</div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/prettyCron")
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
     <script src="@Html.GetContent("datatables.*.js")"></script>
-    @Styles.Render("~/bundles/css/dataTables")
-
     <script>
 
         $(function () {

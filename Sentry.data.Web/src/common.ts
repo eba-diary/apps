@@ -11,7 +11,7 @@ import 'expose-loader?exposes=Sentry!@sentry-insurance/InternalFrontendTemplate/
 import 'select2';
 import 'bootbox';
 import 'expose-loader?exposes=toastr!toastr';
-import 'thenby';
+import 'expose-loader?exposes=firstBy!thenby';
 import 'typeahead.js';
 
 //Full list of MDB components: https://bitbucket.sentry.com/projects/COMDN/repos/dotnettemplate/browse/Sentry._MyApp_/Sentry._MyApp_.Web/src/js/mdb.ts

@@ -258,9 +258,7 @@
 
 
 @section Scripts {
-
-    @Scripts.Render("~/bundles/prettyCron")
-
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
     <script>
         $(function () {
             data.Config.IndexInit();

@@ -153,9 +153,9 @@
                     </div>
 
                     @if (item.Schema != null)
-                        {
-                            bool hasRevisions = item.Schema.Revisions.Count() > 0;
-                            <div class="card-body-header mt-3">
+                    {
+                        bool hasRevisions = item.Schema.Revisions.Count() > 0;
+                        <div class="card-body-header mt-3">
                             <h4 class="@color pt-0">Columns (name, datatype, is array, etc.)</h4>
 
                             <div class="schema-modify-icons">
@@ -195,11 +195,11 @@
                                 {
                                     if (ext == null)
                                     {
-                                    <a class="fas fa-plus schema-add-icon" href="/DataFlow/Create" data-toggle="tooltip" data-placement="top" title="Add DataFlow"></a>
+                                        <a class="fas fa-plus schema-add-icon" href="/DataFlow/Create" data-toggle="tooltip" data-placement="top" title="Add DataFlow"></a>
                                     }
                                     else if (Model.DisplayDataflowEdit)
                                     {
-                                    <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" data-toggle="tooltip" data-placement="top" title="Edit DataFlow"></a>
+                                        <a class="far fa-edit" href="/DataFlow/Edit/@ext.Id" data-toggle="tooltip" data-placement="top" title="Edit DataFlow"></a>
                                     }
                                 }
                             </div>
@@ -245,9 +245,7 @@
 @BackLink()
 
 @section Scripts {
-
-    @Scripts.Render("~/bundles/prettyCron")
-
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
     <script>
         $(function () {
             data.Config.IndexInit();
