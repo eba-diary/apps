@@ -19,7 +19,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                This is some content!
+                <h2>There are a total of @Model.CompletedFiles completed files. </h2>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
@@ -41,7 +41,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                This is some content! 2
+                <h2>There are a total of @Model.InFlightFiles in-flight files. </h2>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
@@ -63,7 +63,7 @@
             </div>
             <div class="modal-body">
                 
-                <h2>There are a total of <strong>@Model.FailedFiles</strong> failed files. </h2>
+                <h2>There are a total of @Model.FailedFiles failed files. </h2>
             
             </div>
             <div class="modal-footer">
