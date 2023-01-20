@@ -2942,3 +2942,9 @@ table.dsc-blue-table th {
 span.twitter-typeahead {
     width: 100%;
 }
+
+/* fix for pagination page number being transparent after click */
+.pagination .page-item .page-link:focus {
+    box-shadow: none;
+    background-color: #00A3E0;
+}

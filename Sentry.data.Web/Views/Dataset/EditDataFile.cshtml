@@ -18,7 +18,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.S3Key, htmlAttributes: new { @class = "control-label col-sm-3" })
             <div class="col-sm-9">
-                @Html.TextAreaFor(model => model.S3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row", @style="width: 100%" })
+                @Html.TextAreaFor(model => model.S3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row", @style = "width: 100%" })
                 @*@Html.ValidationMessageFor(model => model.S3Key, "", new { @class = "text-danger" })*@
             </div>
         </div>
@@ -28,7 +28,7 @@
             <div class="col-sm-9">
                 <p class="form-control-static">@Html.DisplayFor(model => model.Name)</p>
                 @*@Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-            @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })*@
+                    @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })*@
             </div>
         </div>
 
@@ -43,17 +43,17 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Information, htmlAttributes: new { @class = "control-label col-sm-3" })
             <div class="col-sm-9">
-                @Html.EditorFor(model => model.Information, new { htmlAttributes = new { @placeholder = "Information about this Data File: ",@class = "form-control edit-dataset-row" } })
+                @Html.EditorFor(model => model.Information, new { htmlAttributes = new { @placeholder = "Information about this Data File: ", @class = "form-control edit-dataset-row" } })
                 @Html.ValidationMessageFor(model => model.Information, "", new { @class = "text-danger" })
             </div>
         </div>
 
         @*<div class="form-group">
-            @Html.LabelFor(model => model.IsUsable, htmlAttributes: new { @class = "control-label col-sm-3" })
-            <div class="col-sm-9">
-                @Html.CheckBox("IsUsable", new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-            </div>
-        </div>*@
+                @Html.LabelFor(model => model.IsUsable, htmlAttributes: new { @class = "control-label col-sm-3" })
+                <div class="col-sm-9">
+                    @Html.CheckBox("IsUsable", new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                </div>
+            </div>*@
 
         <div class="form-group">
             @Html.LabelFor(model => model.CreateDtm, htmlAttributes: new { @class = "control-label col-sm-3" })
@@ -69,7 +69,7 @@
             <div class="col-sm-9">
                 <p class="form-control-static">@Html.DisplayFor((model) => model.ModifiedDtm)</p>
                 @*@Html.EditorFor(model => model.ModifiedDTM, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-            @Html.ValidationMessageFor(model => model.ModifiedDTM, "", new { @class = "text-danger" })*@
+                    @Html.ValidationMessageFor(model => model.ModifiedDTM, "", new { @class = "text-danger" })*@
             </div>
         </div>
 
@@ -88,14 +88,12 @@
 
 
 
-@section Scripts{
-
-    @Scripts.Render("~/bundles/dataTables")
-
+@section Scripts {
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    @Styles.Render("~/bundles/css/dataTables")
     <script>
-    $(function () {
-        data.ManageConfigs.Init();
-    });
+        $(function () {
+            data.ManageConfigs.Init();
+        });
     </script>
-
 }

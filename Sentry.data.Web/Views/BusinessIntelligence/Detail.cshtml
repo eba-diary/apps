@@ -221,7 +221,8 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
-    @Scripts.Render("~/bundles/dataTables")
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    @Styles.Render("~/bundles/css/dataTables")
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />
     <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
     <script src="~/Scripts/jquery.fancybox.min.js"></script>

@@ -614,18 +614,8 @@
 
 
 @section Scripts {
-    <script src="~/Scripts/dot.js"></script>
-    <script src="~/Scripts/jQuery.extendext.min.js"></script>
-    <script src="~/Scripts/query-builder.js"></script>
-    @Scripts.Render("~/bundles/dataTables")
-
-    <script src="~/js/QueryTool/QueryToolModel.js"></script>
-    <script src="~/js/QueryTool/Startup.js"></script>
-    <script src="~/js/QueryTool/SaveTo.js"></script>
-    <script src="~/js/QueryTool/BannerControls.js"></script>
-    <script src="~/js/QueryTool/RenderTable.js"></script>
-    <script src="~/js/QueryTool/AddRule.js"></script>
-
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    @Styles.Render("~/bundles/css/dataTables")
     <script>
         data.QueryTool.Init();
 

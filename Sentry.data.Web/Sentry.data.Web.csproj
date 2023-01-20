@@ -2187,6 +2187,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
     <TypeScriptCompile Include="src\common.ts" />
+    <TypeScriptCompile Include="src\datatables.ts" />
     <TypeScriptCompile Include="src\knockout.ts" />
     <TypeScriptCompile Include="src\site.ts" />
     <TypeScriptCompile Include="webpack.config.ts" />

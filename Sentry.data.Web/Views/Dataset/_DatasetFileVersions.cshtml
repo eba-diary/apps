@@ -44,9 +44,8 @@
 </div>
 
 @section Scripts {
-
-    @Scripts.Render("~/bundles/dataTables")
-
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    @Styles.Render("~/bundles/css/dataTables")
     <script>
         var Id = @Model.DatasetFileId;
         $(function () {

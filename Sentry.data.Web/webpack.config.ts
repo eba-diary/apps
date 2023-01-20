@@ -10,7 +10,8 @@ function config(env, argv): webpack.Configuration {
             // one entry per "bundle" goes in here
             'common': './src/common.ts',
             'knockout': './src/knockout.ts',
-            'site': '!import-glob!./src/site.ts'
+            'site': { import: '!import-glob!./src/site.ts', dependOn: 'common' },
+            'datatables': { import: '/src/datatables.ts', dependOn: 'common' },
         },
         output: {
             clean: true,

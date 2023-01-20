@@ -48,22 +48,21 @@ namespace Sentry.data.Web
 
             string dataTablesScriptsDirectory = "~/Scripts/DataTables";
             //This bundle contains scripts needed for DataTables and related plugins
-            bundles.Add(new ScriptBundle("~/bundles/dataTables").
-                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.bootstrap4.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
-                        Include(dataTablesScriptsDirectory + "/jquery.dataTables.odata.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.buttons.js").
-                        Include(dataTablesScriptsDirectory + "/buttons.colVis.js").
-                        Include(dataTablesScriptsDirectory + "/buttons.bootstrap4.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
-                        Include(dataTablesScriptsDirectory + "/buttons.print.min.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.rowGroup.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.fixedHeader.js").
-                        Include(dataTablesScriptsDirectory + "/dataTables.select.js").
-                        Include(dataTablesScriptsDirectory + "/moment.js").
-                        Include("~/Scripts/jquery.dataTables.yadcf.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/dataTables").
+            //            Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.bootstrap4.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
+            //            Include(dataTablesScriptsDirectory + "/jquery.dataTables.odata.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.buttons.js").
+            //            Include(dataTablesScriptsDirectory + "/buttons.colVis.js").
+            //            Include(dataTablesScriptsDirectory + "/buttons.bootstrap4.js").
+            //            Include(dataTablesScriptsDirectory + "/buttons.print.min.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.rowGroup.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.fixedHeader.js").
+            //            Include(dataTablesScriptsDirectory + "/dataTables.select.js").
+            //            Include(dataTablesScriptsDirectory + "/moment.js").
+            //            Include("~/Scripts/jquery.dataTables.yadcf.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/prettyCron").
                         Include(dataTablesScriptsDirectory + "/moment.js").

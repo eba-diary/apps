@@ -3,7 +3,6 @@
     ViewBag.Title = "Manage Data File Configs";
 }
 
-
 <div>
     <div id="detailSectionHeader_DataFileConfigs">
         <em class="fas fa-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_DataFileConfigs"></em>
@@ -31,13 +30,11 @@
 </div>
 
 @section Scripts{
-
-@Scripts.Render("~/bundles/dataTables")
-
-<script>
-    $(function () {
-        data.ManageConfigs.Init();
-    });
-</script>
-    
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    @Styles.Render("~/bundles/css/dataTables")
+    <script>
+        $(function () {
+            data.ManageConfigs.Init();
+        });
+    </script>
 }

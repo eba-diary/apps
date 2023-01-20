@@ -7,6 +7,11 @@
     string jsControllerName = "data." + Model.SearchType + "Search";
 }
 
+@section styles 
+{
+    @Styles.Render("~/bundles/css/dataTables")
+}
+
 <div class="pt-4">
     <div class="text-center">
         <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
@@ -86,7 +91,7 @@
                 <h4 class="modal-title">Save Search</h4>
                 <button type="button" id="filter-search-save-close" class="close" data-dismiss="modal">&times;</button>
             </div>
-            
+
             <form class="needs-validation" id="save-search">
                 <div class="modal-body ml-3 mr-3">
                     <input id="save-search-type" type="hidden" value="@Model.SearchType" />
@@ -121,13 +126,11 @@
 
 @section Scripts
 {
-@Scripts.Render("~/bundles/dataTables")
-<script type="text/javascript">
-
-    $(function () {
-        data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter, @(jsControllerName).retrieveResultConfig);
-        @(jsControllerName).init();
-    });
-
-</script>
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    <script type="text/javascript">
+        $(function () {
+            data.FilterSearch.init(@(jsControllerName).executeSearch, @(jsControllerName).buildFilter, @(jsControllerName).retrieveResultConfig);
+            @(jsControllerName).init();
+        });
+    </script>
 }
