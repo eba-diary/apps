@@ -12,5 +12,6 @@ namespace Sentry.data.Web
         public int InFlightFiles { get; set; }
 
         public int FailedFiles { get; set; }
+
     }
 }

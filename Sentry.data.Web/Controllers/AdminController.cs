@@ -219,6 +219,7 @@ namespace Sentry.data.Web.Controllers
             // service method that return the number of failed files
             int totalFailedFiles = 2;
 
+
             AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
             {
                 CompletedFiles = totalCompletedFiles,

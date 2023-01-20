@@ -7,6 +7,72 @@
 
 <!DOCTYPE html>
 
+
+<!-- Modal for total files today-->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Details for Completed Files Today</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="142">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                This is some content!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal for files in flight-->
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Details for In-Flight Files</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="142">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                This is some content! 2
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for failed files-->
+<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Details for Failed Files</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="142">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <h2>There are a total of <strong>@Model.FailedFiles</strong> failed files. </h2>
+            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <html>
 <body>
     <div>
@@ -21,22 +87,21 @@
                 <div class="column">
                     <div class="container">
                         <h5>Total Files Today</h5>
-                        <a href="https://www.nytimes.com/games/wordle/index.html"><strong class="num_style">@Model.CompletedFiles</strong></a>
+                        <a data-toggle="modal" data-target="#exampleModal"><strong class="num_style">@Model.CompletedFiles</strong></a>
                     </div>
 
                 </div>
                 <div class="column">
                     <div class="container">
                         <h5>Files In-Flight</h5>
-                        <a href="https://www.nytimes.com/games/wordle/index.html"><strong class="num_style">@Model.InFlightFiles</strong></a>
-
+                        <a data-toggle="modal" data-target="#exampleModal2"><strong class="num_style">@Model.InFlightFiles</strong></a>
                     </div>
 
                 </div>
                 <div class="column">
                     <div class="container">
                         <h5>File Failures</h5>
-                        <a href="https://www.nytimes.com/games/wordle/index.html"><strong class="failure_style">@Model.FailedFiles</strong></a>
+                        <a data-toggle="modal" data-target="#exampleModal3"><strong class="failure_style">@Model.FailedFiles</strong></a>
                     </div>
 
                 </div>
@@ -49,7 +114,7 @@
 
 <style>
     .column {
-        text-align: center; 
+        text-align: center;
         width: 20%;
         /*border: 5px double lightgray;*/
     }
