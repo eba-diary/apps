@@ -2,7 +2,7 @@
 
 namespace Sentry.data.Web
 {
-    public class BundleConfig
+    public static class BundleConfig
     {
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
@@ -35,16 +35,16 @@ namespace Sentry.data.Web
             //            Include("~/Scripts/sentry.associates.js").
             //            Include("~/Scripts/sentry.common.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/knockout").
-                        Include("~/Scripts/knockout-3.4.2.js").
-                        Include("~/Scripts/knockout-sortable.min.js").
-                        Include("~/Scripts/knockout-paging.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/knockout").
+            //            Include("~/Scripts/knockout-3.4.2.js").
+            //            Include("~/Scripts/knockout-sortable.min.js").
+            //            Include("~/Scripts/knockout-paging.js"));
 
             //This bundle contains all of the custom javascript for your application -
             //it automatically picks up everything in the "js" folder
-            bundles.Add(new ScriptBundle("~/bundles/js").
-                        Include("~/js/_Shared.js").
-                        IncludeDirectory("~/js", "*.js", true));
+            //bundles.Add(new ScriptBundle("~/bundles/js").
+            //            Include("~/js/_Shared.js").
+            //            IncludeDirectory("~/js", "*.js", true));
 
             string dataTablesScriptsDirectory = "~/Scripts/DataTables";
             //This bundle contains scripts needed for DataTables and related plugins

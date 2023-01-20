@@ -41,8 +41,8 @@
     @Html.Action("GetFooter", "Layout")
 
     <script src="@Html.GetContent("common.*.js")"></script>
-    @Scripts.Render("~/bundles/knockout")
-    @Scripts.Render("~/bundles/js")
+    <script src="@Html.GetContent("knockout.*.js")"></script>
+    <script src="@Html.GetContent("site.*.js")"></script>
 
     <script>
         $(document).ready(function () {

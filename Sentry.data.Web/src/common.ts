@@ -1,34 +1,19 @@
-﻿//Include("~/Scripts/jquery-{version}.js").
-import 'expose-loader?exposes=$,jQuery!jquery'
-
-//Include("~/Scripts/jquery-ui.js").
+﻿import 'expose-loader?exposes=$,jQuery!jquery'
 import 'jquery-ui-dist/jquery-ui';
-
-//Include("~/Scripts/jquery.unobtrusive-ajax.js").
 import 'jquery-ajax-unobtrusive';
-
-//Include("~/Scripts/jquery.ba-throttle-debounce.js").
 import 'imports-loader?wrapper=window!jquery-throttle-debounce';
-
-//Include("~/Scripts/jquery.validate.js").
 import 'jquery-validation';
-
-//Include("~/Scripts/jquery.validate.unobtrusive.js").
 import 'jquery-validation-unobtrusive';
-
-//Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
 import '@sentry-insurance/InternalFrontendTemplate/dist/jquery.validate.unobtrusive.sentry.js';
-
-//Include("~/Scripts/bootstrap.bundle.js").
 import 'bootstrap';
-
-//Include("~/Scripts/sentry.associates.js").
 import '@sentry-insurance/InternalFrontendTemplate/dist/Sentry.Associates.js';
-
-//Include("~/Scripts/sentry.common.js"));
 import 'expose-loader?exposes=Sentry!@sentry-insurance/InternalFrontendTemplate/dist/Sentry.Common.js';
+import 'select2';
+import 'bootbox';
+import 'expose-loader?exposes=toastr!toastr';
+import 'thenby';
+import 'typeahead.js';
 
-//Include("~/Scripts/MDB/mdb.js").
 //Full list of MDB components: https://bitbucket.sentry.com/projects/COMDN/repos/dotnettemplate/browse/Sentry._MyApp_/Sentry._MyApp_.Web/src/js/mdb.ts
 
 // Selectively enable only the pieces you need to keep your bundle small
@@ -77,24 +62,9 @@ import '@sentry-insurance/mdbootstrap/src/js/vendor/free/waves.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/lightbox.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/ofi.js';
 ////Using commonJS with imports loader as to not interfere with MDB's half-supported module implementaion in picker-date
-//import 'imports-loader?type=commonjs&imports=single|jquery|$!@sentry-insurance/mdbootstrap/src/js/vendor/pro/picker-date.js';
+import 'imports-loader?type=commonjs&imports=single|jquery|$!@sentry-insurance/mdbootstrap/src/js/vendor/pro/picker-date.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/picker-date-time.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/scrollbar.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/toastr.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/vector-map.js';
 //import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/vector-map-world-mill.js';
-
-//Include("~/Scripts/select2.js").
-import 'select2';
-
-//Include("~/Scripts/bootbox.js").
-import 'bootbox';
-
-//Include("~/Scripts/toastr.min.js").
-import 'expose-loader?exposes=toastr!toastr';
-
-//Include("~/Scripts/thenBy.min.js"));
-import 'thenby';
-
-//Include("~/Scripts/typeahead.bundle.js").
-import 'typeahead.js';

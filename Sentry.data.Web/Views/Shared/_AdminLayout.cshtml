@@ -16,7 +16,7 @@
     <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
     <!--Render bundles necessary for admin pages before layout is applied to page-->
     <script src="@Html.GetContent("common.*.js")"></script>
-    @Scripts.Render("~/bundles/js")
+    <script src="@Html.GetContent("site.*.js")"></script>
     @Scripts.Render("~/bundles/dataTables")
     @Styles.Render("~/bundles/css/dataTables")
 

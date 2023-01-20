@@ -9,6 +9,8 @@ function config(env, argv): webpack.Configuration {
         entry: {
             // one entry per "bundle" goes in here
             'common': './src/common.ts',
+            'knockout': './src/knockout.ts',
+            'site': '!import-glob!./src/site.ts'
         },
         output: {
             clean: true,
