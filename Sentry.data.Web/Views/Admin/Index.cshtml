@@ -21,14 +21,14 @@
                 <div class="column">
                     <div class="container">
                         <h5>Total Files Today</h5>
-                        <strong class="num_style">@Model.CompletedFiles</strong>
+                        <a href="https://www.nytimes.com/games/wordle/index.html"><strong class="num_style">@Model.CompletedFiles</strong></a>
                     </div>
 
                 </div>
                 <div class="column">
                     <div class="container">
                         <h5>Files In-Flight</h5>
-                        <strong class="num_style">@Model.InFlightFiles</strong>
+                        <a href="https://www.nytimes.com/games/wordle/index.html"><strong class="num_style">@Model.InFlightFiles</strong></a>
 
                     </div>
 
@@ -36,7 +36,7 @@
                 <div class="column">
                     <div class="container">
                         <h5>File Failures</h5>
-                        <strong class="failure_style">@Model.FailedFiles</strong>
+                        <a href="https://www.nytimes.com/games/wordle/index.html"><strong class="failure_style">@Model.FailedFiles</strong></a>
                     </div>
 
                 </div>
@@ -51,7 +51,7 @@
     .column {
         text-align: center; 
         width: 20%;
-        border: 5px double lightgray;
+        /*border: 5px double lightgray;*/
     }
 
     .row:after {
