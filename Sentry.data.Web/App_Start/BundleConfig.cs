@@ -33,7 +33,7 @@ namespace Sentry.data.Web
             //            Include("~/Scripts/respond.js").
             //            Include("~/Scripts/typeahead.bundle.js").
             //            Include("~/Scripts/sentry.associates.js").
-            //            Include("~/Scripts/sentry.common.js"));
+            //            Include("~/Scripts/sentry.common.js"));asdf
 
             //bundles.Add(new ScriptBundle("~/bundles/knockout").
             //            Include("~/Scripts/knockout-3.4.2.js").
@@ -46,7 +46,7 @@ namespace Sentry.data.Web
             //            Include("~/js/_Shared.js").
             //            IncludeDirectory("~/js", "*.js", true));
 
-            string dataTablesScriptsDirectory = "~/Scripts/DataTables";
+            //string dataTablesScriptsDirectory = "~/Scripts/DataTables";
             //This bundle contains scripts needed for DataTables and related plugins
             //bundles.Add(new ScriptBundle("~/bundles/dataTables").
             //            Include(dataTablesScriptsDirectory + "/jquery.dataTables.js").
