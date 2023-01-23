@@ -14,7 +14,7 @@ function config(env, argv): webpack.Configuration {
             'site': { import: '!import-glob!./src/site.ts', dependOn: 'main' },
             'datatables': { import: '/src/datatables.ts', dependOn: 'main' },
             'prettycron': './src/prettycron.ts',
-            'quill': './src/quill.ts'
+            'quill': './src/quill.ts',
         },
         output: {
             clean: true,
