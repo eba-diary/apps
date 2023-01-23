@@ -2,6 +2,8 @@
  * Javascript methods for the Manage Asset Alert Page
  ******************************************************************************************/
 
+import Quill from 'quill'
+
 data.Notification = {
 
     QuillEditorTitle: null,                 //declare as property for use later

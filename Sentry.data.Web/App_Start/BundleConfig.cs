@@ -71,8 +71,8 @@ namespace Sentry.data.Web
             //            Include("~/Scripts/prettycron.js"));
 
             //This bundle contains quill
-            bundles.Add(new ScriptBundle("~/bundles/quill").
-                        Include("~/Scripts/quill/quill.js"));
+            //bundles.Add(new ScriptBundle("~/bundles/quill").
+            //            Include("~/Scripts/quill/quill.js"));
 
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
