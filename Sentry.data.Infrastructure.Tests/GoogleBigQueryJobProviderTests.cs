@@ -632,7 +632,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             GoogleBigQueryJobProvider provider = new GoogleBigQueryJobProvider(datasetContext.Object, s3ServiceProvider.Object, authorizationProvider.Object, httpClientGenerator.Object, bigQueryService.Object);
 
-            Assert.ThrowsException<Exception>(() => provider.Execute(job));
+            Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
 
             Assert.AreEqual(1, saveCount);
             Assert.AreEqual(1, s3Count);

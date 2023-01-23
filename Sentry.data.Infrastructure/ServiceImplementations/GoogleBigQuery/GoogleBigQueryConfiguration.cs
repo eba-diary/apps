@@ -12,6 +12,7 @@ namespace Sentry.data.Infrastructure
         public string PageToken { get; set; }
         public int LastIndex { get; set; }
         public int TotalRows { get; set; }
+        public string ExecutionKey { get; set; }
         public RetrieverJob Job { get; set; }
         public DataFlowStep S3DropStep { get; set; }
     }
