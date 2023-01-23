@@ -104,8 +104,8 @@ else
 
 }
 @section Scripts {
+    <script src="@Html.GetContent("quill.*.js")"></script>
     <script type="text/javascript">
-
         $(function () {
 
             $('#ObjectId').materialSelect();
@@ -119,6 +119,5 @@ else
             data.Notification.initAssetListener();
             data.Notification.initNotificationCategoryListener();
         });
-
     </script>
 }

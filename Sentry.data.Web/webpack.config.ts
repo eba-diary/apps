@@ -9,11 +9,12 @@ function config(env, argv): webpack.Configuration {
         entry: {
             // one entry per "bundle" goes in here
             'main': './src/main.ts',
+            'main_css': './src/main.scss',
             'knockout': './src/knockout.ts',
             'site': { import: '!import-glob!./src/site.ts', dependOn: 'main' },
             'datatables': { import: '/src/datatables.ts', dependOn: 'main' },
             'prettycron': './src/prettycron.ts',
-            'main_css': './src/main.scss'
+            'quill': './src/quill.ts'
         },
         output: {
             clean: true,
