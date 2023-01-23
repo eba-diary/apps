@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
 @RenderSection("styles", false)
 @Styles.Render("~/bundles/css/fontawesome")
-@Styles.Render("~/bundles/css/dataTables")
+<link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
 @Styles.Render("~/bundles/css/site")
 
 <!--Render DSC common header from layout controller-->

@@ -8,7 +8,7 @@
 
 @section styles
 {
-    @Styles.Render("~/bundles/css/dataTables")
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
     <link rel="stylesheet" href="@Html.GetContent("fancybox_css.*.css")" />
 }
 

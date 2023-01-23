@@ -84,12 +84,12 @@ namespace Sentry.data.Web
             //            Include("~/Content/ladda-themeless.css"));
 
             //This bundle contains styles specific to DataTables and related plugins
-            string dataTablesStylesDirectory = "~/Content/DataTables/css";
-            bundles.Add(new StyleBundle("~/bundles/css/dataTables").
-                    Include(dataTablesStylesDirectory + "/dataTables.bootstrap4.css").
-                    Include(dataTablesStylesDirectory + "/dataTables.responsive.css").
-                    Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
-                    Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
+            //string dataTablesStylesDirectory = "~/Content/DataTables/css";
+            //bundles.Add(new StyleBundle("~/bundles/css/dataTables").
+            //        Include(dataTablesStylesDirectory + "/dataTables.bootstrap4.css").
+            //        Include(dataTablesStylesDirectory + "/dataTables.responsive.css").
+            //        Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
+            //        Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
 
             bundles.Add(new StyleBundle("~/bundles/css/fontawesome").
                         Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
