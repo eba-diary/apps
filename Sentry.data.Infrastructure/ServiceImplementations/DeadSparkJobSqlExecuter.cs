@@ -21,6 +21,7 @@ namespace Sentry.data.Infrastructure
                 connection.Open();
 
                 SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @JobID, @TimeCreated", connection);
+                command.CommandTimeout = 300;
 
                 //add parameter for current enviroment (@JobId)
                 command.Parameters.AddWithValue("@JobID", System.Data.SqlDbType.Int);

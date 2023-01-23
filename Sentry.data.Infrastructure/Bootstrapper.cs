@@ -173,6 +173,14 @@ namespace Sentry.data.Infrastructure
                     break;
             }
 
+            WebHelper.TryGetWebProxy(true, out WebProxy webProxy);
+
+            var dataSourceClient = new HttpClient(new HttpClientHandler()
+            {
+                Proxy = webProxy
+            });
+            registry.For<IDataSourceService>().Use<DataSourceService>().Ctor<HttpClient>().Is(dataSourceClient);
+
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             registry.For<HttpClient>().Use(client);

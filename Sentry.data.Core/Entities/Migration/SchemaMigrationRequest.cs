@@ -9,7 +9,6 @@ namespace Sentry.data.Core
     public class SchemaMigrationRequest : MigrationRequest
     {
         public int SourceSchemaId { get; set; }
-        public bool SourceSchemaHasDataFlow { get; set; }
         public string TargetDataFlowNamedEnvironment { get; set; }
 
         public static class ValidationErrors

@@ -6,6 +6,7 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Migration;
 using Sentry.data.Web.Models.ApiModels.Schema;
@@ -152,7 +153,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateDataset).ToLower()}";
 
-                List<string> errors = new List<string>();
                 if (model == null)
                 {
                     Logger.Debug($"{methodName} - Null {nameof(Models.ApiModels.Migration.DatasetMigrationRequestModel)}");
@@ -161,40 +161,12 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
 
-                DatasetMigrationRequest request = ToDto(model);
+                DatasetMigrationRequest request = model.ToDto();
 
                 DatasetMigrationResponseModel responseModel = new DatasetMigrationResponseModel();
-                try
-                {
-                    DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
-                    responseModel = ToDatasetMigrationResponseModel(response);
-                }
-                catch (AggregateException ex)
-                {
-                    Logger.Info($"{methodName} - AggreateException thrown from {nameof(DataApplicationService)}.{nameof(MigrateDataset)}");
-                    foreach (var innerEx in ex.InnerExceptions)
-                    {
-                        if (innerEx is ArgumentException)
-                        {
-                            errors.Add(innerEx.Message);
-                        }
-                    }
-                }
-                catch (ArgumentException ex)
-                {
-                    Logger.Debug($"{methodName} - {ex.Message}");
-                    errors.Add(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn($"{methodName} - Unhandled exception : {ex.Message}");
-                    throw;
-                }
-
-                if (errors.Any())
-                {
-                    return BadRequest(JsonConvert.SerializeObject(errors));
-                }
+                
+                DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
+                responseModel = response.ToDatasetMigrationResponseModel();
 
                 return Ok(responseModel);
             }
@@ -214,7 +186,6 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
 
-                List<string> errors = new List<string>();
                 if (model == null)
                 {
                     Logger.Debug($"{methodName} - Null {nameof(SchemaMigrationRequestModel)}");
@@ -223,41 +194,10 @@ namespace Sentry.data.Web.WebApi.Controllers
 
                 Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
 
-                SchemaMigrationRequest request = ToDto(model);
+                SchemaMigrationRequest request = model.ToDto();
 
-                SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse();
-                SchemaMigrationResponseModel responseModel = new SchemaMigrationResponseModel();
-                try
-                {
-                    response = DataApplicationService.MigrateSchema(request);
-                    responseModel = ToSchemaMigrationRequestModel(response);
-                }
-                catch (AggregateException ex)
-                {
-                    Logger.Info($"{methodName} - AggreateException thrown from {nameof(DataApplicationService)}.{nameof(MigrateSchema)}");
-                    foreach (var innerEx in ex.InnerExceptions)
-                    {
-                        if (innerEx is ArgumentException)
-                        {
-                            errors.Add(innerEx.Message);
-                        }
-                    }
-                }
-                catch (ArgumentException ex)
-                {
-                    Logger.Debug($"{methodName} - {ex.Message}");
-                    errors.Add(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn($"{methodName} - Unhandled exception : {ex.Message}");
-                    throw;
-                }
-
-                if (errors.Any())
-                {
-                    return BadRequest(JsonConvert.SerializeObject(errors));
-                }
+                SchemaMigrationRequestResponse response = DataApplicationService.MigrateSchema(request);
+                SchemaMigrationResponseModel responseModel = response.ToSchemaMigrationRequestModel();
 
                 return Ok(responseModel);
             }
@@ -929,80 +869,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         #endregion
 
         #region Private Methods
-        private SchemaMigrationResponseModel ToSchemaMigrationRequestModel(SchemaMigrationRequestResponse response)
-        {
-            return new SchemaMigrationResponseModel()
-            {
-                IsSchemaMigrated = response.MigratedSchema,
-                SchemaId = response.TargetSchemaId,
-                SchemaName = response.SchemaName,
-                SchemaMigrationMessage = response.SchemaMigrationReason,
-                IsSchemaRevisionMigrated = response.MigratedSchemaRevision,
-                SchemaRevisionId = response.TargetSchemaRevisionId,
-                SchemaRevisionName = response.SchemaRevisionName,
-                SchemaRevisionMigrationMessage = response.SchemaRevisionMigrationReason,
-                IsDataFlowMigrated = response.MigratedDataFlow,
-                DataFlowId = response.TargetDataFlowId,
-                DataFlowName = response.DataFlowName,
-                DataFlowMigrationMessage = response.DataFlowMigrationReason
-            };
-        }
-
-        internal DatasetMigrationResponseModel ToDatasetMigrationResponseModel(DatasetMigrationRequestResponse response)
-        {
-            DatasetMigrationResponseModel model = new DatasetMigrationResponseModel()
-            {
-                IsDatasetMigrated = response.IsDatasetMigrated,
-                DatasetMigrationReason = response.DatasetMigrationReason,
-                DatasetId = response.DatasetId,
-                DatasetName = response.DatasetName,
-                SchemaMigrationResponse = new List<SchemaMigrationResponseModel>()
-            };
-
-            foreach (SchemaMigrationRequestResponse schemaResponse in response.SchemaMigrationResponses)
-            {
-                model.SchemaMigrationResponse.Add(ToSchemaMigrationRequestModel(schemaResponse));
-            }
-
-            return model;
-        }
-
-
-        private SchemaMigrationRequest ToDto(Models.ApiModels.Migration.SchemaMigrationRequestModel model)
-        {
-            return new SchemaMigrationRequest()
-            {
-                SourceSchemaId = model.SourceSchemaId,
-                SourceSchemaHasDataFlow = _dsContext.DataFlow.Any(w => w.SchemaId == model.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Active || w.ObjectStatus == ObjectStatusEnum.Disabled)),
-                TargetDataFlowNamedEnvironment = model.TargetDataFlowNamedEnviornment,
-                TargetDatasetId = model.TargetDatasetId,
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment
-            };
-        }
-
-        internal DatasetMigrationRequest ToDto(Models.ApiModels.Migration.DatasetMigrationRequestModel model)
-        {
-            DatasetMigrationRequest request = new DatasetMigrationRequest()
-            {
-                SourceDatasetId = model.SourceDatasetId,
-                /*
-                 * Adding ToUpper() due to MDB editable dropdown adds new items as lower regardless of user input
-                 * https://mdbootstrap.com/docs/b4/jquery/forms/select/#new-options
-                 * We are following Quartermaster named environment requirements which one is named environment is to be all upper case.
-                 */
-                TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment.ToUpper(),
-                TargetDatasetId = model.TargetDatasetId,
-                SchemaMigrationRequests = new List<SchemaMigrationRequest>()
-            };
-
-            foreach (Models.ApiModels.Migration.SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
-            {
-                request.SchemaMigrationRequests.Add(ToDto(schemaMigrationRequestModel));
-            }
-
-            return request;
-        }
-
         private async Task<IHttpActionResult> GetColumnSchema(DatasetFileConfig config, int SchemaID)
         {
             if (config.Schema != null)

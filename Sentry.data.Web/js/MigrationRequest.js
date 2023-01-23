@@ -4,12 +4,12 @@
     InitForMigration: function (datasetId) {
         $("#MigrationRequestModal").remove();
         data.MigrationRequest.migrationRequestModal = Sentry.ShowModalWithSpinner("Migration Request");
-        $(migrationRequestModal).attr("id", "MigrationRequestModal");
+        $(data.MigrationRequest.migrationRequestModal).attr("id", "MigrationRequestModal");
 
         var getMigrationRequestUrl = "/Migration/MigrationRequest?datasetId=" + encodeURI(datasetId);
 
         $.get(getMigrationRequestUrl, function (e) {
-            migrationRequestModal.ReplaceModalBody(e);
+            data.MigrationRequest.migrationRequestModal.ReplaceModalBody(e);
 
             data.MigrationRequest.InitForDataset($(this).data("id"));
         });
@@ -63,7 +63,7 @@
 
         $.post(submissionApiUrl, request, function (migrationResultsModel) {
             console.log(migrationResultsModel);
-            migrationRequestModal.HideModal();
+            data.MigrationRequest.migrationRequestModal.HideModal();
             data.MigrationRequest.initMigrationResponseModal(migrationResultsModel);
         })
             .fail(function (errorResponse) {

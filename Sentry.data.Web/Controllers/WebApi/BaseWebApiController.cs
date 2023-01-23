@@ -5,6 +5,9 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Sentry.Common.Logging;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -81,6 +84,25 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception datasetfile - {errorMetadata}", ex);
                 return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access to Data File");
             }
+            catch (AggregateException ex)
+            {
+                Logger.Info($"{controllerName.ToLower()}_{methodName.ToLower()}_aggreateexception thrown");
+                List<string> errors = new List<string>();
+                foreach (var innerEx in ex.InnerExceptions)
+                {
+                    if (innerEx is ArgumentException)
+                    {
+                        errors.Add(innerEx.Message);
+                    }
+                }
+                
+                return BadRequest(JsonConvert.SerializeObject(errors));
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.Debug($"{methodName}_arguementexception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 Logger.Error($"{controllerName.ToLower()}_{methodName.ToLower()}_internalservererror - {errorMetadata}", ex);
@@ -139,6 +161,25 @@ namespace Sentry.data.Web.WebApi.Controllers
             {
                 Logger.Warn($"{controllerName.ToLower()}_{methodName.ToLower()}_unauthorizedexception - {errorMetadata}", ex);
                 return Content(System.Net.HttpStatusCode.Forbidden, "Unauthorized Access");
+            }
+            catch (AggregateException ex)
+            {
+                Logger.Info($"{controllerName.ToLower()}_{methodName.ToLower()}_aggreateexception thrown");
+                List<string> errors = new List<string>();
+                foreach (var innerEx in ex.InnerExceptions)
+                {
+                    if (innerEx is ArgumentException)
+                    {
+                        errors.Add(innerEx.Message);
+                    }
+                }
+
+                return BadRequest(JsonConvert.SerializeObject(errors));
+            }
+            catch (ArgumentException ex)
+            {
+                Logger.Debug($"{methodName}_arguementexception {ex.Message}");
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

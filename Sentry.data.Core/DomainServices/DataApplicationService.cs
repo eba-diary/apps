@@ -175,7 +175,7 @@ namespace Sentry.data.Core
 
             if (!DataFeatures.CLA1797_DatasetSchemaMigration.GetValue())
             {
-                throw new UnauthorizedAccessException("Not authorized to use this functionality");
+                throw new FeatureNotEnabledException("Migration feature is not enabled.");
             }
             
             //Perform validations on incoming request object
@@ -514,8 +514,7 @@ namespace Sentry.data.Core
         }
         internal virtual int CreateWithoutSave(SchemaRevisionFieldStructureDto dto)
         {
-            int newRevisionId = SchemaService.CreateSchemaRevision(dto);
-            return newRevisionId;
+            return SchemaService.CreateSchemaRevision(dto);
         }
         private void CreateWithoutSave_DfsRetrieverJob(DataFlow dataFlow)
         {
@@ -564,7 +563,9 @@ namespace Sentry.data.Core
 
             SchemaMigrationRequestResponse migrationResponse =  new SchemaMigrationRequestResponse();
 
-            List<string> errors = ValidateMigrationRequest(request);
+            bool sourceHasDataFlow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
+
+            List<string> errors = ValidateMigrationRequest(request, sourceHasDataFlow);
             if (errors.Any())
             {
                 List<ArgumentException> exceptions = new List<ArgumentException>();
@@ -633,7 +634,7 @@ namespace Sentry.data.Core
                     migrationResponse.SchemaRevisionMigrationReason = "No column metadata on source schema";
                 }
 
-                (int newDataFlowId, bool wasDataFlowMigrated) = MigrateDataFlowWihtoutSave_Internal(newSchemaId, request.SourceSchemaId, request.SourceSchemaHasDataFlow, sourceDatasetId);
+                (int newDataFlowId, bool wasDataFlowMigrated) = MigrateDataFlowWihtoutSave_Internal(newSchemaId, request.SourceSchemaId, sourceHasDataFlow, request.TargetDatasetId);
                 
                 if (wasDataFlowMigrated)
                 {
@@ -644,9 +645,9 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    string message = (request.SourceSchemaHasDataFlow) ? "Target dataflow metadata already exists" : "Source schema is not associated with dataflow";
+                    string message = (sourceHasDataFlow) ? "Target dataflow metadata already exists" : "Source schema is not associated with dataflow";
                     migrationResponse.DataFlowMigrationReason = message;
-                    migrationResponse.DataFlowName = (!request.SourceSchemaHasDataFlow) ? null : _datasetContext.DataFlow.Where(w => w.Id == newDataFlowId).Select(s => s.Name).FirstOrDefault();
+                    migrationResponse.DataFlowName = (!sourceHasDataFlow) ? null : _datasetContext.DataFlow.Where(w => w.Id == newDataFlowId).Select(s => s.Name).FirstOrDefault();
                     migrationResponse.TargetDataFlowId = newDataFlowId;
                 }
             }
@@ -683,8 +684,12 @@ namespace Sentry.data.Core
                 //Determeine if source schema has dataflow, if so perform dataflow migration as well                
                 DataFlowDetailDto dataflowDto = DataFlowService.GetDataFlowDetailDtoBySchemaId(sourceSchemaId).FirstOrDefault();
 
+                (string targetDatasetNamedEnvironment, NamedEnvironmentType targetDatasetNamedEnvironmentType) = _datasetContext.Datasets.Where(w => w.DatasetId == targetDatasetId).Select(s => new Tuple<string, NamedEnvironmentType>(s.NamedEnvironment, s.NamedEnvironmentType)).FirstOrDefault();
+
                 //Adjust dataFlowDto associations and create new entity
                 dataflowDto.DatasetId = targetDatasetId;
+                dataflowDto.NamedEnvironment = targetDatasetNamedEnvironment;
+                dataflowDto.NamedEnvironmentType = targetDatasetNamedEnvironmentType;
                 dataflowDto.SchemaId = newSchemaId;
                 dataflowDto.SchemaMap.First().SchemaId = newSchemaId;
                 dataflowDto.SchemaMap.First().DatasetId = targetDatasetId;
@@ -779,7 +784,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="request"></param>
         /// <exception cref="AggregateException">Aggregation of all validation errors</exception>
-        private List<string> ValidateMigrationRequest(SchemaMigrationRequest request)
+        private List<string> ValidateMigrationRequest(SchemaMigrationRequest request, bool sourceSchemaHasDataflow)
         {
             if (request == null)
             {
@@ -802,7 +807,6 @@ namespace Sentry.data.Core
             {
 
                 int sourceDatasetId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == request.SourceSchemaId).Select(w => w.ParentDataset.DatasetId).FirstOrDefault();
-                bool sourceSchemaHasDataflow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
 
                 if (sourceSchemaHasDataflow && string.IsNullOrWhiteSpace(request.TargetDataFlowNamedEnvironment))
                 {

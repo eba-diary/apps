@@ -2343,7 +2343,7 @@ namespace Sentry.data.Infrastructure.Tests
                 PageParameterName = "start"
             };
 
-            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 3, 2);
             job.RelativeUri = "Search";
             job.FileSchema = new FileSchema { SchemaRootPath = "Items,Item" };
 
@@ -2371,8 +2371,8 @@ namespace Sentry.data.Infrastructure.Tests
 
             JObject requestObj = new JObject
             {
-                { "field", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") },
-                { "field2", DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") }
+                { "field", DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") },
+                { "field2", DateTime.Today.AddDays(-3).ToString("yyyy-MM-dd") }
             };
 
             string requestUrl = $@"{dataSource.BaseUri}Search";
@@ -2382,6 +2382,19 @@ namespace Sentry.data.Infrastructure.Tests
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl &&
                                                                                 x.Content.ReadAsStringAsync().Result == requestContent),
                                                                             ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            JObject requestObj2 = new JObject
+            {
+                { "field", DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd") },
+                { "field2", DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd") }
+            };
+
+            string requestContent2 = requestObj2.ToString();
+            HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_EmptyNestedResponse.json");
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl &&
+                                                                                x.Content.ReadAsStringAsync().Result == requestContent2),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
 
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
@@ -2403,11 +2416,11 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
-            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
-            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-3).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
 
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
-            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
             datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
             repo.VerifyAll();
         }
