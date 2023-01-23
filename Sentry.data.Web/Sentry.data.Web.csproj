@@ -1405,6 +1405,7 @@
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
     <Content Include="tsconfig.json" />
+    <Content Include="src\main.scss" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

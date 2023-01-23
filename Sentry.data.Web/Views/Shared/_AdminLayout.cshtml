@@ -4,11 +4,14 @@
     ViewBag.Fluid = true;
 }
 <!--Styles to make it look decent-->
-@Styles.Render("~/bundles/css/main")
+<link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
 @RenderSection("styles", false)
 @Styles.Render("~/bundles/css/site")
+@Styles.Render("~/bundles/css/fontawesome")
+
 <!--Render DSC common header from layout controller-->
 @Html.Action("GetHeader", "Layout")
+
 <!--div containing side nav and current page-->
 <div class="d-flex">
     @RenderPage("~/Views/Shared/_AdminSideNav.cshtml")
@@ -28,6 +31,7 @@
         </div>
     </div>
 </div>
+
 <!--Render DSC common footer from layout controller-->
 @Html.Action("GetFooter", "Layout")
 

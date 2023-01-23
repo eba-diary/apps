@@ -13,9 +13,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    @Styles.Render("~/bundles/css/main")
+
+    <link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
     @RenderSection("styles", false)
     @Styles.Render("~/bundles/css/site")
+    @Styles.Render("~/bundles/css/fontawesome")
 
 </head>
 <body class="prevent-animation">

@@ -75,13 +75,13 @@ namespace Sentry.data.Web
             //            Include("~/Scripts/quill/quill.js"));
 
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
-            bundles.Add(new StyleBundle("~/bundles/css/main").
-                        Include("~/Content/bootstrap.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-styles.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-icons.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/ladda-themeless.css"));
+            //bundles.Add(new StyleBundle("~/bundles/css/main").
+            //            Include("~/Content/bootstrap.css", new CssRewriteUrlTransform()).
+            //            Include("~/Content/sentry-styles.css", new CssRewriteUrlTransform()).
+            //            Include("~/Content/sentry-icons.css", new CssRewriteUrlTransform()).
+            //            Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
+            //            Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
+            //            Include("~/Content/ladda-themeless.css"));
 
             //This bundle contains styles specific to DataTables and related plugins
             string dataTablesStylesDirectory = "~/Content/DataTables/css";
@@ -91,10 +91,13 @@ namespace Sentry.data.Web
                     Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
                     Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
 
+            bundles.Add(new StyleBundle("~/bundles/css/fontawesome").
+                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/all.min.css", new CssRewriteUrlTransform()));
+
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
                 Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
-                Include("~/Content/all.min.css", new CssRewriteUrlTransform()).
                 Include("~/Content/toastr.min.css").
                 Include("~/Content/query-builder.default.min.css").
                 Include("~/Content/query-tool.css").
