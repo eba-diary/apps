@@ -15,6 +15,8 @@ function config(env, argv): webpack.Configuration {
             'datatables': { import: '/src/datatables.ts', dependOn: 'main' },
             'prettycron': './src/prettycron.ts',
             'quill': './src/quill.ts',
+            'fancybox': './src/fancybox.ts',
+            'fancybox_css': './src/fancybox.scss',
         },
         output: {
             clean: true,

@@ -1,5 +1,9 @@
 ﻿@model Sentry.data.Web.DatasetFileVersionsModel
 
+@section styles
+{
+    @Styles.Render("~/bundles/css/dataTables")
+}
 
 <div>
     @*<h2 class="detailSection @color">Data Files</h2>*@
@@ -45,7 +49,6 @@
 
 @section Scripts {
     <script src="@Html.GetContent("datatables.*.js")"></script>
-    @Styles.Render("~/bundles/css/dataTables")
     <script>
         var Id = @Model.DatasetFileId;
         $(function () {

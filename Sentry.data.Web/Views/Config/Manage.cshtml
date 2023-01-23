@@ -1,6 +1,12 @@
 ﻿@model Sentry.data.Web.DatasetFileConfigsModel
+
 @{
     ViewBag.Title = "Manage Data File Configs";
+}
+
+@section styles
+{
+    @Styles.Render("~/bundles/css/dataTables")
 }
 
 <div>
@@ -31,7 +37,6 @@
 
 @section Scripts{
     <script src="@Html.GetContent("datatables.*.js")"></script>
-    @Styles.Render("~/bundles/css/dataTables")
     <script>
         $(function () {
             data.ManageConfigs.Init();

@@ -2,6 +2,11 @@
     String livyURL = ViewBag.LivyURL + "/ui/session/";
 }
 
+@section styles
+{
+    @Styles.Render("~/bundles/css/dataTables")
+}
+
 <div id="bannerRow" class="row" style="position: fixed; z-index: 999">
     <div class="col-lg-12">
         <div id="bannerContainer" class="bs-component" onclick="HideBanner();">
@@ -615,7 +620,6 @@
 
 @section Scripts {
     <script src="@Html.GetContent("datatables.*.js")"></script>
-    @Styles.Render("~/bundles/css/dataTables")
     <script>
         data.QueryTool.Init();
 

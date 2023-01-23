@@ -29,6 +29,7 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
+    "@fancyapps/fancybox": "^3.5.7",
     "@sentry-insurance/InternalFrontendTemplate": "^6.1.1",
     "bootbox": "^6.0.0",
     "datatables.net": "^1.13.1",

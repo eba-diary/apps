@@ -6,8 +6,9 @@
 <!--Styles to make it look decent-->
 <link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
 @RenderSection("styles", false)
-@Styles.Render("~/bundles/css/site")
 @Styles.Render("~/bundles/css/fontawesome")
+@Styles.Render("~/bundles/css/dataTables")
+@Styles.Render("~/bundles/css/site")
 
 <!--Render DSC common header from layout controller-->
 @Html.Action("GetHeader", "Layout")
@@ -21,7 +22,6 @@
     <script src="@Html.GetContent("main.*.js")"></script>
     <script src="@Html.GetContent("site.*.js")"></script>
     <script src="@Html.GetContent("datatables.*.js")"></script>
-    @Styles.Render("~/bundles/css/dataTables")
 
     @RenderSection("Scripts", false)
     <!--div containing in-line styling and current page-->

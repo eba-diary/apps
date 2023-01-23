@@ -16,10 +16,10 @@
 
     <link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
     @RenderSection("styles", false)
-    @Styles.Render("~/bundles/css/site")
     @Styles.Render("~/bundles/css/fontawesome")
-
+    @Styles.Render("~/bundles/css/site")
 </head>
+
 <body class="prevent-animation">
     <!-- BEGIN SENTRY COMMON HEADER -->
     @Html.Action("GetHeader", "Layout"@*, new { hasMenu = isSubPage }*@)

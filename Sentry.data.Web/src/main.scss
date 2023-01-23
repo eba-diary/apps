@@ -1,10 +1,3 @@
-﻿/*bundles.Add(new StyleBundle("~/bundles/css/main").
-                        Include("~/Content/bootstrap.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-styles.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/sentry-icons.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/ladda-themeless.css"));*/
-@import '@sentry-insurance/InternalFrontendTemplate/Content/sentry-styles.css';
+﻿@import '@sentry-insurance/InternalFrontendTemplate/Content/sentry-styles.css';
 @import '@sentry-insurance/InternalFrontendTemplate/Content/sentry-icons.css';
 @import 'select2/dist/css/select2.css';

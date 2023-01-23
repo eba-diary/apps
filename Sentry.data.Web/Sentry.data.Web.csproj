@@ -1406,6 +1406,8 @@
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
     <Content Include="tsconfig.json" />
     <Content Include="src\main.scss" />
+    <Content Include="src\datatables.scss" />
+    <Content Include="src\fancybox.scss" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -2187,6 +2189,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />
+    <TypeScriptCompile Include="src\fancybox.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="src\datatables.ts" />
     <TypeScriptCompile Include="src\knockout.ts" />
