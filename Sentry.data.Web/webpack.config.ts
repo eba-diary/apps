@@ -8,10 +8,10 @@ function config(env, argv): webpack.Configuration {
     return {
         entry: {
             // one entry per "bundle" goes in here
-            'common': './src/common.ts',
+            'main': './src/main.ts',
             'knockout': './src/knockout.ts',
-            'site': { import: '!import-glob!./src/site.ts', dependOn: 'common' },
-            'datatables': { import: '/src/datatables.ts', dependOn: 'common' },
+            'site': { import: '!import-glob!./src/site.ts', dependOn: 'main' },
+            'datatables': { import: '/src/datatables.ts', dependOn: 'main' },
             'prettycron': './src/prettycron.ts'
         },
         output: {
