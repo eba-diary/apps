@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
         }
         
         /// <summary>
-        /// Tests that a Security Ticket with an AWS Arn defined returns the correct Identity/IdentityType
+        /// Tests that a Security Ticket with a Snowflake Account defined returns the correct Identity/IdentityType
         /// </summary>
         [TestMethod]
         public void SecurityTicket_Identity_Snowflake()
