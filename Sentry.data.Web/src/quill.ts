@@ -1,0 +1,1 @@
+﻿import 'expose-loader?exposes=Quill!quill'
