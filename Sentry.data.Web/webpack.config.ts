@@ -63,6 +63,14 @@ function config(env, argv): webpack.Configuration {
         },
         resolve: {
             extensions: ['.ts', '.js'],  // this allows us to use "import 'abc'" syntax, and either abc.ts or abc.js is found
+            alias: {
+                // this maps paths found in sentry-styles.css to the correct locations
+                // Without these, you'll get errors such as
+                //    Module not found: Error: Can't resolve '../img/overlays/01.png'
+                //    Module not found: Error: Can't resolve '/fonts/SourceCodePro/SourceSerifPro-Regular.woff' 
+                '../img': '@sentry-insurance/mdbootstrap/img',
+                '/fonts': '../fonts',
+            }
         }
     }
 
