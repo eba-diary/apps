@@ -177,32 +177,47 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetProducerS3DropAction_HRDropLocation()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.ProducerS3DropAction).Returns(MockClasses.MockProducerS3DropActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Act
-            var result = context.Object.ProducerS3DropAction.GetAction(new MockDataFeatures(), true);
+            var result = context.Object.ProducerS3DropAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_prod = context.Object.ProducerS3DropAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true);
+            var result_nonprod = context.Object.ProducerS3DropAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true);
 
             // Assert
             Assert.AreEqual(20, result.Id);
+            Assert.AreEqual(20, result_prod.Id);
+            Assert.AreEqual(40, result_nonprod.Id);
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetProducerS3DropAction_DLSTDropLocation()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.ProducerS3DropAction).Returns(MockClasses.MockProducerS3DropActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.ProducerS3DropAction.GetAction(dataFeatures, false);
+            var result = context.Object.ProducerS3DropAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_prod = context.Object.ProducerS3DropAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_nonprod = context.Object.ProducerS3DropAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
             Assert.AreEqual(15, result.Id);
+            Assert.AreEqual(15, result_prod.Id);
+            Assert.AreEqual(35, result_nonprod.Id);
         }
 
         #endregion
@@ -212,63 +227,103 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetRawStorageAction_HRRawStorage()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.RawStorageAction).Returns(MockClasses.MockRawStorageActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Act
-            var result = context.Object.RawStorageAction.GetAction(new MockDataFeatures(), true);
+            var result_Prod_Orig = context.Object.RawStorageAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_NonProd_Orig = context.Object.RawStorageAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.RawStorageAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.RawStorageAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(16, result.Id);
+            Assert.AreEqual(16, result_Prod_Orig.Id);
+            Assert.AreEqual(16, result_NonProd_Orig.Id);
+            Assert.AreEqual(16, result_Prod.Id);
+            Assert.AreEqual(36, result_NonProd.Id);
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetRawStorageAction_DlstRawStorage()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.RawStorageAction).Returns(MockClasses.MockRawStorageActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.RawStorageAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.RawStorageAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.RawStorageAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.RawStorageAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.RawStorageAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(22, result.Id);
+            Assert.AreEqual(22, result_Prod_Orig.Id);
+            Assert.AreEqual(22, result_NonProd_Orig.Id);
+            Assert.AreEqual(22, result_Prod.Id);
+            Assert.AreEqual(42, result_NonProd.Id);
         }
         #endregion
 
         #region QueryStorage Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetQueryStorageAction_HRQueryStorage()
-        {            
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.QueryStorageAction).Returns(MockClasses.MockQueryStorageActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Act
-            var result = context.Object.QueryStorageAction.GetAction(new MockDataFeatures(), true);
+            var result_Prod_Orig = context.Object.QueryStorageAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.QueryStorageAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.QueryStorageAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.QueryStorageAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(17, result.Id);
+            Assert.AreEqual(17, result_Prod_Orig.Id);
+            Assert.AreEqual(17, result_NonProd_Orig.Id);
+            Assert.AreEqual(17, result_Prod.Id);
+            Assert.AreEqual(37, result_NonProd.Id);
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetQueryStorageAction_DlstQueryStorage()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.QueryStorageAction).Returns(MockClasses.MockQueryStorageActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.QueryStorageAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.QueryStorageAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.QueryStorageAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.QueryStorageAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.QueryStorageAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(23, result.Id);
+            Assert.AreEqual(23, result_Prod_Orig.Id);
+            Assert.AreEqual(23, result_NonProd_Orig.Id);
+            Assert.AreEqual(23, result_Prod.Id);
+            Assert.AreEqual(43, result_NonProd.Id);
         }
         #endregion
 
@@ -276,31 +331,51 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetConvertToParquetAction_HRConvertToParquet()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.ConvertToParquetAction).Returns(MockClasses.MockConvertToParquetActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Act
-            var result = context.Object.ConvertToParquetAction.GetAction(new MockDataFeatures(), true);
+            var result_Prod_Orig = context.Object.ConvertToParquetAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.ConvertToParquetAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.ConvertToParquetAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.ConvertToParquetAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(19, result.Id);
+            Assert.AreEqual(19, result_Prod_Orig.Id);
+            Assert.AreEqual(19, result_NonProd_Orig.Id);
+            Assert.AreEqual(19, result_Prod.Id);
+            Assert.AreEqual(39, result_NonProd.Id);
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetConvertToParquetAction_DlstConvertToParquet()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.ConvertToParquetAction).Returns(MockClasses.MockConvertToParquetActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.ConvertToParquetAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.ConvertToParquetAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.ConvertToParquetAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.ConvertToParquetAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.ConvertToParquetAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(24, result.Id);
+            Assert.AreEqual(24, result_Prod_Orig.Id);
+            Assert.AreEqual(24, result_NonProd_Orig.Id);
+            Assert.AreEqual(24, result_Prod.Id);
+            Assert.AreEqual(44, result_NonProd.Id);
         }
         #endregion
 
@@ -308,60 +383,89 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetUncompressZipAction_HRUncompressZip()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.UncompressZipAction).Returns(MockClasses.MockUncompressZipActions().AsQueryable());
 
-            // Act
-            //var result = context.Object.UncompressZipAction.GetAction(new MockDataFeatures(), true);
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressZipAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressZipAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressZipAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressZipAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressZipAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetUncompressZipAction_DlstUncompressZip()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.UncompressZipAction).Returns(MockClasses.MockUncompressZipActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.UncompressZipAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.UncompressZipAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.UncompressZipAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.UncompressZipAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.UncompressZipAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(25, result.Id);
+            Assert.AreEqual(25, result_Prod_Orig.Id);
+            Assert.AreEqual(25, result_NonProd_Orig.Id);
+            Assert.AreEqual(25, result_Prod.Id);
+            Assert.AreEqual(45, result_NonProd.Id);
         }
         #endregion
 
         #region GoogleApi Tests
         [TestMethod]
-        public void DataActionQueryExtensions_GetGoogleApiAction_HRUncompressZip()
+        public void DataActionQueryExtensions_GetGoogleApiAction_HRGoogleApiAction()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.GoogleApiAction).Returns(MockClasses.MockGoogleApiActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.GoogleApiAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.GoogleApiAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.GoogleApiAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
-        public void DataActionQueryExtensions_GetGoogleApiAction_DlstUncompressZip()
+        public void DataActionQueryExtensions_GetGoogleApiAction_DlstGoogleApiAction()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.GoogleApiAction).Returns(MockClasses.MockGoogleApiActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.GoogleApiAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.GoogleApiAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.GoogleApiAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.GoogleApiAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.GoogleApiAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(26, result.Id);
+            Assert.AreEqual(26, result_Prod_Orig.Id);
+            Assert.AreEqual(26, result_NonProd_Orig.Id);
+            Assert.AreEqual(26, result_Prod.Id);
+            Assert.AreEqual(46, result_NonProd.Id);
         }
         #endregion
 
@@ -369,28 +473,43 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetClaimIQAction_HRClaimIQ()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.ClaimIQAction).Returns(MockClasses.MockClaimIQActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.ClaimIQAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.ClaimIQAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.ClaimIQAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetClaimIQAction_DlstClaimIQ()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.ClaimIQAction).Returns(MockClasses.MockClaimIQActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.ClaimIQAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.ClaimIQAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.ClaimIQAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.ClaimIQAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.ClaimIQAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(27, result.Id);
+            Assert.AreEqual(27, result_Prod_Orig.Id);
+            Assert.AreEqual(27, result_NonProd_Orig.Id);
+            Assert.AreEqual(27, result_Prod.Id);
+            Assert.AreEqual(47, result_NonProd.Id);
         }
         #endregion
 
@@ -398,28 +517,43 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetUncompressGzipAction_HRUncompressGzip()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.UncompressGzipAction).Returns(MockClasses.MockUncompressGzipActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressGzipAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressGzipAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.UncompressGzipAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetUncompressGzipAction_DlstUncompressGzip()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.UncompressGzipAction).Returns(MockClasses.MockUncompressGzipActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.UncompressGzipAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.UncompressGzipAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.UncompressGzipAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.UncompressGzipAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.UncompressGzipAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(28, result.Id);
+            Assert.AreEqual(28, result_Prod_Orig.Id);
+            Assert.AreEqual(28, result_NonProd_Orig.Id);
+            Assert.AreEqual(28, result_Prod.Id);
+            Assert.AreEqual(48, result_NonProd.Id);
         }
         #endregion
 
@@ -427,28 +561,43 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetFixedWidthAction_HRFixedWidth()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.FixedWidthAction).Returns(MockClasses.MockFixedWidthActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.FixedWidthAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.FixedWidthAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.FixedWidthAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetFixedWidthAction_DlstFixedWidth()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.FixedWidthAction).Returns(MockClasses.MockFixedWidthActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.FixedWidthAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.FixedWidthAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.FixedWidthAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.FixedWidthAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.FixedWidthAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(29, result.Id);
+            Assert.AreEqual(29, result_Prod_Orig.Id);
+            Assert.AreEqual(29, result_NonProd_Orig.Id);
+            Assert.AreEqual(29, result_Prod.Id);
+            Assert.AreEqual(49, result_NonProd.Id);
         }
         #endregion
 
@@ -456,31 +605,51 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetXmlAction_HRXml()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.XMLAction).Returns(MockClasses.MockXmlActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Act
-            var result = context.Object.XMLAction.GetAction(new MockDataFeatures(), true);
+            var result_Prod_Orig = context.Object.XMLAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.XMLAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.XMLAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.XMLAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(21, result.Id);
+            Assert.AreEqual(21, result_Prod_Orig.Id);
+            Assert.AreEqual(21, result_NonProd_Orig.Id);
+            Assert.AreEqual(21, result_Prod.Id);
+            Assert.AreEqual(41, result_NonProd.Id);
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetXmlAction_DlstXml()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.XMLAction).Returns(MockClasses.MockXmlActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.XMLAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.XMLAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.XMLAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.XMLAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.XMLAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(30, result.Id);
+            Assert.AreEqual(30, result_Prod_Orig.Id);
+            Assert.AreEqual(30, result_NonProd_Orig.Id);
+            Assert.AreEqual(30, result_Prod.Id);
+            Assert.AreEqual(50, result_NonProd.Id);
         }
 
         #endregion
@@ -489,28 +658,43 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetJsonFlatteningAction_HRJsonFlattening()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.JsonFlatteningAction).Returns(MockClasses.MockJsonFlatteningActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.JsonFlatteningAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.JsonFlatteningAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.JsonFlatteningAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetJsonFlatteningAction_DlstJsonFlattening()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.JsonFlatteningAction).Returns(MockClasses.MockJsonFlatteningActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.JsonFlatteningAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.JsonFlatteningAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.JsonFlatteningAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.JsonFlatteningAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.JsonFlatteningAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(31, result.Id);
+            Assert.AreEqual(31, result_Prod_Orig.Id);
+            Assert.AreEqual(31, result_NonProd_Orig.Id);
+            Assert.AreEqual(31, result_Prod.Id);
+            Assert.AreEqual(51, result_NonProd.Id);
         }
 
         #endregion
@@ -519,23 +703,35 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetSchemaMapAction_HRSchemaMap()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.SchemaMapAction).Returns(MockClasses.MockSchemaMapActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetSchemaMapAction_DlstSchemaMap()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.SchemaMapAction).Returns(MockClasses.MockSchemaMapActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.SchemaMapAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true));
         }
 
         #endregion
@@ -544,23 +740,35 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetS3DropAction_HRS3Drop()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.S3DropAction).Returns(MockClasses.MockS3DropActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true));
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetS3DropAction_DlstS3Drop()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.S3DropAction).Returns(MockClasses.MockS3DropActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Assert
-            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(new MockDataFeatures(), true));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false));
+            Assert.ThrowsException<DataFlowStepNotImplementedException>(() => context.Object.S3DropAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true));
         }
 
         #endregion
@@ -569,31 +777,51 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DataActionQueryExtensions_GetSchemaLoadAction_HRSchemaLoading()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.SchemaLoadAction).Returns(MockClasses.MockSchemaLoadActions().AsQueryable());
 
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
             // Act
-            var result = context.Object.SchemaLoadAction.GetAction(new MockDataFeatures(), true);
+            var result_Prod_Orig = context.Object.SchemaLoadAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.SchemaLoadAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.SchemaLoadAction.GetAction(features.Object, true, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.SchemaLoadAction.GetAction(features.Object, true, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(18, result.Id);
+            Assert.AreEqual(18, result_Prod_Orig.Id);
+            Assert.AreEqual(18, result_NonProd_Orig.Id);
+            Assert.AreEqual(18, result_Prod.Id);
+            Assert.AreEqual(38, result_NonProd.Id);
         }
 
         [TestMethod]
         public void DataActionQueryExtensions_GetSchemaLoadAction_DlstSchemaLoading()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             // Arrange
-            var context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(f => f.SchemaLoadAction).Returns(MockClasses.MockSchemaLoadActions().AsQueryable());
 
-            var dataFeatures = new MockDataFeatures();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             // Act
-            var result = context.Object.SchemaLoadAction.GetAction(dataFeatures, false);
+            var result_Prod_Orig = context.Object.SchemaLoadAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, false);
+            var result_NonProd_Orig = context.Object.SchemaLoadAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, false);
+            var result_Prod = context.Object.SchemaLoadAction.GetAction(features.Object, false, NamedEnvironmentType.Prod, true);
+            var result_NonProd = context.Object.SchemaLoadAction.GetAction(features.Object, false, NamedEnvironmentType.NonProd, true);
 
             // Assert
-            Assert.AreEqual(32, result.Id);
+            Assert.AreEqual(32, result_Prod_Orig.Id);
+            Assert.AreEqual(32, result_NonProd_Orig.Id);
+            Assert.AreEqual(32, result_Prod.Id);
+            Assert.AreEqual(52, result_NonProd.Id);
         }
 
         #endregion
