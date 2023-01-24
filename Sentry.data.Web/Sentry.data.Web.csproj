@@ -1408,6 +1408,7 @@
     <Content Include="src\main.scss" />
     <Content Include="src\datatables.scss" />
     <Content Include="src\fancybox.scss" />
+    <Content Include="src\quill.scss" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />

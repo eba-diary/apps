@@ -16,6 +16,7 @@ function config(env, argv): webpack.Configuration {
             'datatables_css': './src/datatables.scss',
             'prettycron': './src/prettycron.ts',
             'quill': './src/quill.ts',
+            'quill_css': './src/quill.scss',
             'fancybox': './src/fancybox.ts',
             'fancybox_css': './src/fancybox.scss',
         },

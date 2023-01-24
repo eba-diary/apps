@@ -91,15 +91,15 @@ namespace Sentry.data.Web
             //        Include(dataTablesStylesDirectory + "/buttons.bootstrap4.css").
             //        Include(dataTablesStylesDirectory + "/buttons.dataTables.css"));
 
-            bundles.Add(new StyleBundle("~/bundles/css/fontawesome").
-                        Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
-                        Include("~/Content/all.min.css", new CssRewriteUrlTransform()));
+            //bundles.Add(new StyleBundle("~/bundles/css/fontawesome").
+            //            Include("~/Content/font-awesome.css", new CssRewriteUrlTransform()).
+            //            Include("~/Content/all.min.css", new CssRewriteUrlTransform()));
 
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
-                Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
-                Include("~/Content/toastr.min.css").
-                Include("~/Content/query-builder.default.min.css").
+                //Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
+                //Include("~/Content/toastr.min.css").
+                //Include("~/Content/query-builder.default.min.css").
                 Include("~/Content/query-tool.css").
                 Include("~/Content/datasets.css").
                 Include("~/Content/dataset-detail.css").
@@ -115,8 +115,8 @@ namespace Sentry.data.Web
                 Include("~/Content/site.css").
                 Include("~/Content/filter-search.css").
                 Include("~/Content/data-inventory.css").
-                Include("~/Content/jquery.json-viewer.css").
-                Include("~/scripts/quill/quill.snow.css").
+                //Include("~/Content/jquery.json-viewer.css").
+                //Include("~/scripts/quill/quill.snow.css").
                 Include("~/Content/admin.css")
             );
 

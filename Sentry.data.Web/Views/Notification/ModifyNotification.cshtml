@@ -3,6 +3,11 @@
     ViewBag.Title = "Create Notification";
 }
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("quill_css.*.css")" />
+}
+
 <div class="topBanner">
     <div>
         <a class="backToList" href="/Notification/ManageNotification"><em class="fas fa-chevron-left pr-3"></em>Back to Previous Page</a>
