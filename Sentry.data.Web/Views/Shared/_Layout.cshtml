@@ -16,7 +16,7 @@
 
     <link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
     @RenderSection("styles", false)
-    @Styles.Render("~/bundles/css/site")
+    <link rel="stylesheet" href="@Html.GetContent("site_css.*.css")" />
 </head>
 
 <body class="prevent-animation">

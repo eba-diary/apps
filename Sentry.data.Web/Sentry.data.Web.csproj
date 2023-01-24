@@ -606,9 +606,7 @@
     <Compile Include="WebProxy\Win32Api.cs" />
     <Content Include="Content\admin.css" />
     <Content Include="Content\business-intelligence.css" />
-    <Content Include="Content\checkbox.css" />
     <Content Include="Content\business-area.css" />
-    <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AccessRequestController.cs" />
     <Compile Include="Controllers\BusinessAreaController.cs" />
     <Compile Include="Controllers\DataFlowController.cs" />
@@ -778,7 +776,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Smarts_Resources\CustomSmartsResources.cs" />
     <Compile Include="WebConstants.cs" />
-    <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\data-inventory.css" />
     <Content Include="Content\filter-search.css" />
     <Content Include="Content\dataflow.css" />
@@ -787,9 +784,6 @@
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fields.css" />
     <Content Include="Content\home.css" />
-    <Content Include="Content\jquery.json-viewer.css" />
-    <Content Include="Content\sentry-icons.css" />
-    <Content Include="fonts\icomoon.svg" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
     <Content Include="Images\Category\hr.png" />
     <Content Include="Images\Category\hr.svg" />
@@ -813,9 +807,6 @@
     <Content Include="js\Shared\Tags.js" />
     <Content Include="js\Shared\Utils.js" />
     <Content Include="js\Subscription.js" />
-    <Content Include="Scripts\jquery.json-viewer.js" />
-    <Content Include="Content\query-builder.default.css" />
-    <Content Include="Content\query-builder.default.min.css" />
     <Content Include="Content\query-tool.css" />
     <Content Include="Content\search.css" />
     <Content Include="Content\system-notifications.css" />
@@ -862,39 +853,8 @@
     <Content Include="LegacyJS\QueryTool\Startup.js" />
     <Content Include="js\Report.js" />
     <Content Include="readme.txt" />
-    <Content Include="Scripts\DataTables\moment-with-locales.js" />
-    <Content Include="Scripts\DataTables\moment-with-locales.min.js" />
-    <Content Include="Scripts\DataTables\moment.js" />
-    <Content Include="Scripts\DataTables\moment.min.js" />
-    <Content Include="Scripts\doT.js" />
-    <Content Include="Scripts\doT.min.js" />
-    <Content Include="Scripts\jquery-ui.js" />
-    <Content Include="Scripts\jQuery.extendext.min.js" />
-    <Content Include="fonts\icomoon.eot" />
-    <Content Include="fonts\icomoon.ttf" />
-    <Content Include="fonts\icomoon.woff" />
-    <Content Include="fonts\icomoon.woff2" />
-    <Content Include="fonts\SourceCodePro\SourceCodePro-Regular.woff" />
     <Content Include="package.json" />
     <Content Include="package-lock.json" />
-    <Content Include="Scripts\knockout-3.4.2.js" />
-    <Content Include="Scripts\knockout-paging.js" />
-    <Content Include="Scripts\knockout-sortable.min.js" />
-    <Content Include="Scripts\later.js" />
-    <Content Include="Scripts\prettycron.js" />
-    <Content Include="Scripts\query-builder.js" />
-    <Content Include="Scripts\query-builder.min.js" />
-    <Content Include="Scripts\quill\quill.bubble.css" />
-    <Content Include="Scripts\quill\quill.bubble.min.css" />
-    <Content Include="Scripts\quill\quill.core.css" />
-    <Content Include="Scripts\quill\quill.core.js" />
-    <Content Include="Scripts\quill\quill.core.min.css" />
-    <Content Include="Scripts\quill\quill.core.min.js" />
-    <Content Include="Scripts\quill\quill.js" />
-    <Content Include="Scripts\quill\quill.min.js" />
-    <Content Include="Scripts\quill\quill.snow.css" />
-    <Content Include="Scripts\quill\quill.snow.min.css" />
-    <Content Include="Scripts\thenBy.min.js" />
     <Content Include="Views\Dataset\Permission\ManagePermissions.cshtml" />
     <Content Include="Views\Search\SavedSearches.cshtml" />
     <Content Include="Views\Search\FilterSearch.cshtml" />
@@ -929,7 +889,6 @@
     <Content Include="src\site.scss" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\sentry-internal.css" />
     <Content Include="favicon.ico" />
     <Content Include="..\AWSSettings.config">
       <Link>AWSSettings.config</Link>
@@ -1054,7 +1013,6 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1170,11 +1128,6 @@
     <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
     <Content Include="Views\DataFlow\_AjaxMakeSchemaMap.cshtml" />
     <Content Include="Views\RetrieverJob\_RetrieverJob.cshtml" />
-    <Content Include="Scripts\quill\quill.bubble.min.css.map" />
-    <Content Include="Scripts\quill\quill.core.min.css.map" />
-    <Content Include="Scripts\quill\quill.core.min.js.map" />
-    <Content Include="Scripts\quill\quill.min.js.map" />
-    <Content Include="Scripts\quill\quill.snow.min.css.map" />
     <Content Include="Views\Shared\Unauthorized.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMapDetail.cshtml" />
     <Content Include="Views\DataFlow\_NamedEnvironment.cshtml" />

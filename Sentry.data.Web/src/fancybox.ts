@@ -1,1 +1,1 @@
-﻿import '@fancyapps/fancybox'
+﻿import '@fancyapps/fancybox';

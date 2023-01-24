@@ -1,4 +1,4 @@
-﻿import 'expose-loader?exposes=$,jQuery!jquery'
+﻿import 'expose-loader?exposes=$,jQuery!jquery';
 import 'jquery-ui-dist/jquery-ui';
 import 'jquery-ajax-unobtrusive';
 import 'imports-loader?wrapper=window!jquery-throttle-debounce';

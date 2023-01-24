@@ -2,6 +2,7 @@
 import * as webpack from 'webpack';
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import * as CopyWebpackPlugin from 'copy-webpack-plugin';
 
 function config(env, argv): webpack.Configuration {
     let IS_PROD = argv.mode == 'production';
@@ -12,7 +13,7 @@ function config(env, argv): webpack.Configuration {
             'main_css': './src/main.scss',
             'knockout': './src/knockout.ts',
             'site': { import: '!import-glob!./src/site.ts', dependOn: 'main' },
-            'site_css': '!import-glob!./src/site.scss',
+            'site_css': './src/site.scss',
             'datatables': { import: '/src/datatables.ts', dependOn: 'main' },
             'datatables_css': './src/datatables.scss',
             'prettycron': './src/prettycron.ts',
@@ -31,9 +32,15 @@ function config(env, argv): webpack.Configuration {
             new MiniCssExtractPlugin({
                 filename: (IS_PROD ? '[name].[contenthash].css' : '[name].local.css')
             }),
-            //solution for npm build failing for prettycron due to issue with later.js found here: https://github.com/bunkat/later/issues/155
+            // solution for npm build failing for prettycron due to issue with later.js found here: https://github.com/bunkat/later/issues/155
             new webpack.EnvironmentPlugin({
                 LATER_COV: false
+            }),
+            // The CopyWebpackPlugin lets you copy any files from sources to the dist folder.
+            new CopyWebpackPlugin({
+                patterns: [
+                    { from: 'node_modules/@sentry-insurance/InternalFrontendTemplate/Images', to: 'images' }
+                ]
             })
         ],
         optimization: {

@@ -101,7 +101,7 @@
             ],
             aLengthMenu: [10, 20, 50, 100, 500],
             dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
-            buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventorySearch.saveUpdates }],
+            buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save btn-primary', action: data.DataInventorySearch.saveUpdates }],
             initComplete: (settings, json) => data.DataInventorySearch.completeDataInventorySearch(json),
             "autoWidth": false
         });
@@ -154,7 +154,10 @@
     },
 
     completeDataInventorySearch: function (json) {
-        
+        $(".dataTables_length_select").select2({
+            minimumResultsForSearch: -1
+        });
+
         var table = $("#di-result-table").DataTable();
         var tableInfo = table.page.info();
         

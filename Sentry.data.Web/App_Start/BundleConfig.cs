@@ -96,29 +96,29 @@ namespace Sentry.data.Web
             //            Include("~/Content/all.min.css", new CssRewriteUrlTransform()));
 
             //This bundle contains styles that override everything else, and must come after all other css includes
-            bundles.Add(new StyleBundle("~/bundles/css/site").
-                //Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
-                //Include("~/Content/toastr.min.css").
-                //Include("~/Content/query-builder.default.min.css").
-                Include("~/Content/query-tool.css").
-                Include("~/Content/datasets.css").
-                Include("~/Content/dataset-detail.css").
-                Include("~/Content/favorites.css").
-                Include("~/Content/fields.css").
-                Include("~/Content/home.css").
-                Include("~/Content/search.css").
-                Include("~/Content/business-area.css").
-                Include("~/Content/system-notifications.css").
-                Include("~/Content/checkbox.css").
-                Include("~/Content/business-intelligence.css").
-                Include("~/Content/dataflow.css").
-                Include("~/Content/site.css").
-                Include("~/Content/filter-search.css").
-                Include("~/Content/data-inventory.css").
-                //Include("~/Content/jquery.json-viewer.css").
-                //Include("~/scripts/quill/quill.snow.css").
-                Include("~/Content/admin.css")
-            );
+            //bundles.Add(new StyleBundle("~/bundles/css/site").
+            //    //Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
+            //    //Include("~/Content/toastr.min.css").
+            //    //Include("~/Content/query-builder.default.min.css").
+            //    Include("~/Content/query-tool.css").
+            //    Include("~/Content/datasets.css").
+            //    Include("~/Content/dataset-detail.css").
+            //    Include("~/Content/favorites.css").
+            //    Include("~/Content/fields.css").
+            //    Include("~/Content/home.css").
+            //    Include("~/Content/search.css").
+            //    Include("~/Content/business-area.css").
+            //    Include("~/Content/system-notifications.css").
+            //    Include("~/Content/checkbox.css").
+            //    Include("~/Content/business-intelligence.css").
+            //    Include("~/Content/dataflow.css").
+            //    Include("~/Content/site.css").
+            //    Include("~/Content/filter-search.css").
+            //    Include("~/Content/data-inventory.css").
+            //    //Include("~/Content/jquery.json-viewer.css").
+            //    //Include("~/scripts/quill/quill.snow.css").
+            //    Include("~/Content/admin.css")
+            //);
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
                line below.  Otherwise, bundling/optimization will be driven by the compilation debug property.

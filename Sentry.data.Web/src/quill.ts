@@ -1,1 +1,1 @@
-﻿import 'expose-loader?exposes=Quill!quill'
+﻿import 'expose-loader?exposes=Quill!quill';

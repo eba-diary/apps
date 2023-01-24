@@ -1,2 +1,2 @@
-﻿import 'expose-loader?exposes=ko!knockout'
-import 'knockout-paging'
+﻿import 'expose-loader?exposes=ko!knockout';
+import 'knockout-paging';
