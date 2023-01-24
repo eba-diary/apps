@@ -12,6 +12,7 @@ function config(env, argv): webpack.Configuration {
             'main_css': './src/main.scss',
             'knockout': './src/knockout.ts',
             'site': { import: '!import-glob!./src/site.ts', dependOn: 'main' },
+            'site_css': '!import-glob!./src/site.scss',
             'datatables': { import: '/src/datatables.ts', dependOn: 'main' },
             'datatables_css': './src/datatables.scss',
             'prettycron': './src/prettycron.ts',
