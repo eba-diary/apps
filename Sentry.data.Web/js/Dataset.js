@@ -1776,7 +1776,6 @@ data.Dataset = {
                 { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
             ],
             language: {
-                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>',
                 emptyTable: 'No Data Files Available'
             },
             order: [5, 'desc'],

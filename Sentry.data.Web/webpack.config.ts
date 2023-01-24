@@ -62,6 +62,15 @@ function config(env, argv): webpack.Configuration {
                     use: ['ts-loader'],
                     exclude: /node_modules/,
                 },
+                {
+                    // expose dateSelect function in yadcf
+                    test: /jquery.dataTables.yadcf\.js$/,
+                    loader: 'string-replace-loader',
+                    options: {
+                        search: 'dateSelectSingle: dateSelectSingle,',
+                        replace: 'dateSelectSingle: dateSelectSingle, dateSelect: dateSelect,',
+                    }
+                }
             ]
         },
         resolve: {
