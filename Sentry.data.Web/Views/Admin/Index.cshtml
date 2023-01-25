@@ -50,6 +50,14 @@
             <div class="modal-body">
                 <h3>There are a total of @Model.InFlightFiles in-flight files.</h3>
                 <!-- Display more details about the number of in-flight files-->
+                @if(Model.InFlightFiles > 300)
+                {
+                    <h3>Everything is Working</h3>
+                }
+                else
+                {
+                    <h3>Error occured</h3>
+                }
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
@@ -73,6 +81,14 @@
                 
                 <h3>There are a total of @Model.FailedFiles failed files.</h3>
                 <!-- Display more details about the failed files-->
+                @if(Model.FailedFiles > 5)
+                {
+                    <h2>That is a lot of errors today</h2>
+                }
+                else
+                {
+                    <h2>Not many errors today</h2>
+                }
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
