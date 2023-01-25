@@ -1,10 +1,7 @@
-﻿using Owin;
-using Sentry.data;
-using Hangfire;
-using Sentry.Configuration;
+﻿using Hangfire;
 using Hangfire.SqlServer;
-using Hangfire.StructureMap;
-using Sentry.data.Infrastructure;
+using Owin;
+using Sentry.Configuration;
 
 namespace Sentry.data.Web
 {
@@ -12,8 +9,6 @@ namespace Sentry.data.Web
     {
         public void Configuration(IAppBuilder app)
         {
-            app.MapSignalR();
-
             var options = new SqlServerStorageOptions
             {
                 //Turn off automatic creation of HangFire database schema
