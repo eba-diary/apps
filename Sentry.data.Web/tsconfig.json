@@ -5,7 +5,8 @@
     "removeComments": false,
     "sourceMap": true,
     "target": "ES6",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "skipLibCheck": true //only type check source code
   },
   "exclude": [
     "node_modules"
