@@ -1,5 +1,5 @@
 ﻿import 'expose-loader?exposes=$,jQuery!jquery';
-import 'jquery-ui-dist/jquery-ui';
+import 'jquery-ui/dist/jquery-ui.js';
 import 'jquery-ajax-unobtrusive';
 import 'imports-loader?wrapper=window!jquery-throttle-debounce';
 import 'jquery-validation';
@@ -15,7 +15,6 @@ import 'expose-loader?exposes=firstBy!thenby';
 import 'typeahead.js';
 
 //Full list of MDB components: https://bitbucket.sentry.com/projects/COMDN/repos/dotnettemplate/browse/Sentry._MyApp_/Sentry._MyApp_.Web/src/js/mdb.ts
-
 // Selectively enable only the pieces you need to keep your bundle small
 import '@sentry-insurance/mdbootstrap/src/js/free/forms-free.js';
 //import '@sentry-insurance/mdbootstrap/src/js/free/scrolling-navbar.js';
