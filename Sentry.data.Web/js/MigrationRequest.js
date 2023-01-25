@@ -100,7 +100,7 @@
     },
 
     initMigrationResponseDataTable: function (response) {
-        var responseTable = $('#migrationResponseTable_V2').DataTable({
+        var responseTable = $('#MigrationResponseTable').DataTable({
             ordering: false,
             searching: false,
             paging: false
@@ -147,7 +147,7 @@
         requestObject.TargetDatasetNamedEnvironment = targetNamedEnvironment;
         var sourceSchemaRequests = [];
         if (schemaIdList != undefined) {
-            for (schemaId of schemaIdList) {
+            for (var schemaId of schemaIdList) {
                 var schemaRequestObject = data.MigrationRequest.MapToSchemaMigrationRequestModel(datasetId, targetNamedEnvironment, schemaId);
                 sourceSchemaRequests.push(schemaRequestObject);
             }

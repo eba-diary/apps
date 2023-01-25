@@ -1,8 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -300,6 +305,130 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("20", item.PageNumber);
             Assert.IsFalse(item.IsActive);
             Assert.IsFalse(item.IsDisabled);
+        }
+
+        [TestMethod]
+        public void BuildSchemaDropDown()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig();
+            config.Schema = new FileSchema() { SchemaId = 11, Name = "My Schema" };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { config }.AsQueryable());
+
+            var ListWithNoSelection = Utility.BuildSchemaDropDown(context.Object, 1000, 0);
+            var ListWithSelection = Utility.BuildSchemaDropDown(context.Object, 1000, 11);
+
+            Assert.AreEqual(2, ListWithNoSelection.Count());
+            Assert.IsTrue(ListWithNoSelection.Any(x => x.Text == "Select Schema" && x.Selected));
+            Assert.IsTrue(ListWithSelection.Any(x => x.Text == "My Schema" && !x.Selected));
+
+            Assert.AreEqual(1, ListWithSelection.Count());
+            
+        }
+
+        [TestMethod]
+        public async Task SetNamedEnvironmentProperties_NonQuartermasterManagedAsset()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            MigrationRequestModel model = new MigrationRequestModel()
+            {
+                DatasetId = 1000,
+                TargetNamedEnvironment = "QUAL",
+                SAIDAssetKeyCode = "ABCD"
+            };
+
+            Dataset dataset_Test = MockClasses.MockDataset(null, true);
+            dataset_Test.Asset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            dataset_Test.ObjectStatus = ObjectStatusEnum.Active;
+            dataset_Test.NamedEnvironment = "TEST";
+            dataset_Test.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            Dataset dataset_Qual = MockClasses.MockDataset(null, true);
+            dataset_Qual.Asset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            dataset_Qual.DatasetId = 99;
+            dataset_Qual.ObjectStatus = ObjectStatusEnum.Active;
+            dataset_Qual.NamedEnvironment = "QUAL";
+            dataset_Qual.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            Dataset dataset_Prod = MockClasses.MockDataset(null, true);
+            dataset_Prod.Asset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            dataset_Prod.DatasetId = 88;
+            dataset_Prod.ObjectStatus = ObjectStatusEnum.Active;
+            dataset_Prod.NamedEnvironment = "PROD";
+            dataset_Prod.NamedEnvironmentType = NamedEnvironmentType.Prod;
+
+            List<NamedEnvironmentDto> namedEnvironmentDtos = new List<NamedEnvironmentDto>();
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { dataset_Test, dataset_Qual, dataset_Prod }.AsQueryable());
+
+            Mock<IQuartermasterService> qmService = mr.Create<IQuartermasterService>();
+            qmService.Setup(s => s.GetNamedEnvironmentsAsync("ABCD")).Returns(Task.FromResult(namedEnvironmentDtos));
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            await model.SetNamedEnvironmentProperties(context.Object, new NamedEnvironmentBuilder(qmService.Object, dataFeatures.Object));
+
+            Assert.IsFalse(model.QuartermasterManagedNamedEnvironments);
+
+            Assert.AreEqual(2, model.DatasetNamedEnvironmentDropDown.Count(), "Named Environment Dropdown Count");
+            Assert.IsTrue(model.DatasetNamedEnvironmentDropDown.Any(x => x.Text == "QUAL"));
+            Assert.IsTrue(model.DatasetNamedEnvironmentDropDown.Any(x => x.Text == "PROD"));
+
+            Assert.AreEqual(2, model.DatasetNamedEnvironmentTypeDropDown.Count(), "Named Environment Type Dropdown Count");
+            Assert.AreEqual("NonProd", model.DatasetNamedEnvironmentTypeDropDown.Where(w => w.Selected).Select(s => s.Text).First(), "Named Environment Type Dropdown Count");
+            Assert.AreEqual(NamedEnvironmentType.NonProd, model.DatasetNamedEnvironmentType);
+        }
+
+        [TestMethod]
+        public async Task SetNamedEnvironmentProperties_QuartermasterManagedAsset()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            MigrationRequestModel model = new MigrationRequestModel()
+            {
+                DatasetId = 1000,
+                TargetNamedEnvironment = "QUAL",
+                SAIDAssetKeyCode = "ABCD"
+            };
+
+            Dataset dataset_Test = MockClasses.MockDataset(null, true);
+            dataset_Test.Asset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            dataset_Test.ObjectStatus = ObjectStatusEnum.Active;
+            dataset_Test.NamedEnvironment = "TEST";
+            dataset_Test.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            List<NamedEnvironmentDto> namedEnvironmentDtos = new List<NamedEnvironmentDto>(){
+                new NamedEnvironmentDto(){ NamedEnvironment = "TEST", NamedEnvironmentType=NamedEnvironmentType.NonProd } ,
+                new NamedEnvironmentDto(){ NamedEnvironment = "QUAL", NamedEnvironmentType=NamedEnvironmentType.NonProd } ,
+                new NamedEnvironmentDto(){ NamedEnvironment = "PROD", NamedEnvironmentType = NamedEnvironmentType.Prod }
+            };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { dataset_Test }.AsQueryable());
+
+            Mock<IQuartermasterService> qmService = mr.Create<IQuartermasterService>();
+            qmService.Setup(s => s.GetNamedEnvironmentsAsync("ABCD")).Returns(Task.FromResult(namedEnvironmentDtos));
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            await model.SetNamedEnvironmentProperties(context.Object, new NamedEnvironmentBuilder(qmService.Object, dataFeatures.Object));
+
+            Assert.IsTrue(model.QuartermasterManagedNamedEnvironments);
+
+            Assert.AreEqual(2, model.DatasetNamedEnvironmentDropDown.Count(), "Named Environment Dropdown Count");
+            Assert.IsTrue(model.DatasetNamedEnvironmentDropDown.Any(x => x.Text == "QUAL"), "QUAL in Named Environment Dropdown");
+            Assert.IsTrue(model.DatasetNamedEnvironmentDropDown.Any(x => x.Text == "PROD"), "QUAL in Named Environment Dropdown");
+
+            Assert.AreEqual(2, model.DatasetNamedEnvironmentTypeDropDown.Count(), "Named Environment Type Dropdown Count");
+            Assert.AreEqual("NonProd", model.DatasetNamedEnvironmentTypeDropDown.Where(w => w.Selected).Select(s => s.Text).First(), "Named Environment Type Dropdown Count");
+            Assert.AreEqual(NamedEnvironmentType.NonProd, model.DatasetNamedEnvironmentType);
         }
     }
 }

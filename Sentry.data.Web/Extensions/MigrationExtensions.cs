@@ -1,5 +1,11 @@
-﻿using Sentry.data.Web.Models.ApiModels.Migration;
+﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Helpers;
+using Sentry.data.Web.Models.ApiModels.Migration;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Extensions
 {
@@ -66,6 +72,40 @@ namespace Sentry.data.Web.Extensions
                 DataFlowId = response.TargetDataFlowId,
                 DataFlowMigrationMessage = response.DataFlowMigrationReason
             };
+        }
+
+        public static async Task SetNamedEnvironmentProperties(this MigrationRequestModel model, IDatasetContext context, NamedEnvironmentBuilder namedEnvironmentBuilder)
+        {
+            var sourceNamedEnvironment = context.Datasets
+                .Where(w => w.DatasetId == model.DatasetId && w.ObjectStatus == ObjectStatusEnum.Active)
+                .Select(s => s.NamedEnvironment)
+                .FirstOrDefault();
+            var (namedEnvironmentList, namedEnvironmentTypeList) = await namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, sourceNamedEnvironment);
+
+            if (namedEnvironmentList == null || !namedEnvironmentList.Any())
+            {
+                //Build out model properties based on SAID asset named environments defined in DSC for the given dataset name
+                var datasetName = context.Datasets.Where(w => w.DatasetId == model.DatasetId).Select(s => s.DatasetName).FirstOrDefault();
+
+                List<NamedEnvironmentDto> datasetNamedEnvironmentDtoList = context.Datasets
+                    .Where(w => w.Asset.SaidKeyCode == model.SAIDAssetKeyCode && w.DatasetName == datasetName && w.ObjectStatus == ObjectStatusEnum.Active)
+                    .Select(s => new NamedEnvironmentDto() { NamedEnvironment = s.NamedEnvironment, NamedEnvironmentType = s.NamedEnvironmentType })
+                    .ToList();
+
+                model.DatasetNamedEnvironmentDropDown = NamedEnvironmentBuilder.BuildNamedEnvironmentDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList)
+                                                                                    .Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
+                model.DatasetNamedEnvironmentTypeDropDown = namedEnvironmentBuilder.BuildNamedEnvironmentTypeDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList);
+                model.QuartermasterManagedNamedEnvironments = false;
+            }
+            else
+            {
+                //Build out model properties based on SAID asset named environments defined within Quartermaster
+                //Filter out the source dataset named environment from list and order
+                model.DatasetNamedEnvironmentDropDown = namedEnvironmentList.Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
+                model.DatasetNamedEnvironmentTypeDropDown = namedEnvironmentTypeList;
+                model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironmentTypeList.First(l => l.Selected).Value);
+                model.QuartermasterManagedNamedEnvironments = true;
+            }
         }
     }
 }

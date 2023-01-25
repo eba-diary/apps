@@ -162,11 +162,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                 Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
 
                 DatasetMigrationRequest request = model.ToDto();
-
-                DatasetMigrationResponseModel responseModel = new DatasetMigrationResponseModel();
                 
                 DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
-                responseModel = response.ToDatasetMigrationResponseModel();
+                DatasetMigrationResponseModel responseModel = response.ToDatasetMigrationResponseModel();
 
                 return Ok(responseModel);
             }
