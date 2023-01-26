@@ -382,6 +382,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, targetDataset }.AsQueryable());
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { sourceDatasetFileConfig, targetDatasetFileConfig }.AsQueryable());
             context.Setup(s => s.DataFlow).Returns(new List<DataFlow>().AsQueryable());
+            context.Setup(s => s.SchemaRevision).Returns(new List<SchemaRevision>() { new SchemaRevision() { SchemaRevision_Name = "My_New_Revision", SchemaRevision_Id = 1 } }.AsQueryable());
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
@@ -470,6 +471,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.DataFlow).Returns(new List<DataFlow>() { dataFlow }.AsQueryable());
             context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, targetDataset }.AsQueryable());
             context.Setup(s => s.FileSchema).Returns(new List<FileSchema>() { sourceFileSchema }.AsQueryable());
+            context.Setup(s => s.SchemaRevision).Returns(new List<SchemaRevision>() { new SchemaRevision() { SchemaRevision_Id = 1, SchemaRevision_Name = "My New Revision" } }.AsQueryable());
 
             Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
             schemaService.Setup(s => s.GetFileSchemaDto(It.IsAny<int>())).Returns(fileSchemaDto);

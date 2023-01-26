@@ -531,6 +531,7 @@
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
@@ -584,6 +585,8 @@
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\Migration\MigrationRequestModel.cs" />
+    <Compile Include="Models\Migration\MigrationResponseModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -977,6 +980,7 @@
     <Content Include="Content\MDB\mdb.css" />
     <Content Include="Content\MDB\mdb.min.css" />
     <Content Include="Content\MDB\README.txt" />
+    <Content Include="Content\migration.css" />
     <Content Include="Content\regular.css" />
     <Content Include="Content\regular.min.css" />
     <Content Include="Content\sentry-icons.css" />
@@ -1017,6 +1021,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\MigrationRequest.js" />
     <Content Include="js\Shared\Utils.js" />
     <Content Include="js\Subscription.js" />
     <Content Include="Scripts\bloodhound.js" />
@@ -1402,6 +1407,8 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
+    <Content Include="Views\Migration\_MigrationResponse.cshtml" />
+    <Content Include="Views\Migration\_MigrationRequest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
@@ -2145,6 +2152,7 @@
     <Folder Include="Views\BaseSearchable\" />
     <Folder Include="Views\BusinessIntelligenceSearch\" />
     <Folder Include="Views\DatasetSearch\" />
+    <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Security\" />
