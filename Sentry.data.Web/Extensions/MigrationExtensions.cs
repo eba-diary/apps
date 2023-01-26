@@ -47,6 +47,7 @@ namespace Sentry.data.Web.Extensions
                 IsDatasetMigrated = response.IsDatasetMigrated,
                 DatasetMigrationReason = response.DatasetMigrationReason,
                 DatasetId = response.DatasetId,
+                DatasetName = response.DatasetName,
                 SchemaMigrationResponse = new List<SchemaMigrationResponseModel>()
             };
 
@@ -64,12 +65,15 @@ namespace Sentry.data.Web.Extensions
             {
                 IsSchemaMigrated = response.MigratedSchema,
                 SchemaId = response.TargetSchemaId,
+                SchemaName = response.SchemaName,
                 SchemaMigrationMessage = response.SchemaMigrationReason,
                 IsSchemaRevisionMigrated = response.MigratedSchemaRevision,
                 SchemaRevisionId = response.TargetSchemaRevisionId,
+                SchemaRevisionName = response.SchemaRevisionName,
                 SchemaRevisionMigrationMessage = response.SchemaRevisionMigrationReason,
                 IsDataFlowMigrated = response.MigratedDataFlow,
                 DataFlowId = response.TargetDataFlowId,
+                DataFlowName = response.DataFlowName,
                 DataFlowMigrationMessage = response.DataFlowMigrationReason
             };
         }
