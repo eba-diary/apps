@@ -54,7 +54,7 @@ pipeline {
                 dir('Sentry.data.Web') {
                    nodejs("Node 16") {
                       bat 'npm run build-prod'                     
-                      copyFiles (source: 'dist', destination: '..\build\Sentry.data.Web\_PublishedWebsites\Sentry.data.Web')
+                      copyFiles (source: 'dist', destination: '..//build//Sentry.data.Web//_PublishedWebsites//Sentry.data.Web')
                    }
                 }
             }
