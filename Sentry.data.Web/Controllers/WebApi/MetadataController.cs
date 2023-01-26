@@ -4,9 +4,9 @@ using NJsonSchema;
 using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Migration;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Migration;
 using Sentry.data.Web.Models.ApiModels.Schema;
@@ -142,36 +142,66 @@ namespace Sentry.data.Web.WebApi.Controllers
         #region Dataset_Endpoints
 
         /* This code will be used within next two iterations*/
-        //[HttpPost]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
-        //[Route("dataset")]
-        //public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
-        //{
-        //    IHttpActionResult MigrateDatasetFunction()
-        //    {
-        //        DatasetMigrationRequest request = model.ToDto();
-        //        DataApplicationService.MigrateDataset(request);
-        //        return Ok();
-        //    }
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(DatasetMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
+        [Route("MigrateDataset")]
+        public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
+        {
+            async Task<IHttpActionResult> MigrateDatasetFunction()
+            {
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
 
-        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
-        //}
+                if (model == null)
+                {
+                    Logger.Debug($"{methodName} - Null {nameof(DatasetMigrationRequestModel)}");
+                    return BadRequest($"{nameof(DatasetMigrationRequestModel)} is required");
+                }
+
+                Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
+
+                DatasetMigrationRequest request = model.ToDto();
+
+                DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
+                DatasetMigrationResponseModel responseModel = response.ToDatasetMigrationResponseModel();
+
+                return Ok(responseModel);
+            }
+
+            return await ApiTryCatchAsync(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        }
 
         /* This code will be used within next two iterations*/
-        //[HttpPost]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
-        //[Route("dataset")]
-        //public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
-        //{
-        //    IHttpActionResult MigrateDatasetFunction()
-        //    {
-        //        SchemaMigrationRequest request = model.ToDto();
-        //        DataApplicationService.MigrateDataset(request);
-        //        return Ok();
-        //    }
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
+        [Route("MigrateSchema")]
+        public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
+        {
+            IHttpActionResult MigrateDatasetFunction()
+            {
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
 
-        //    return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
-        //}
+                if (model == null)
+                {
+                    Logger.Debug($"{methodName} - Null {nameof(SchemaMigrationRequestModel)}");
+                    return BadRequest($"{nameof(SchemaMigrationRequestModel)} is required");
+                }
+
+                Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
+
+                SchemaMigrationRequest request = model.ToDto();
+
+                SchemaMigrationRequestResponse response = DataApplicationService.MigrateSchema(request);
+                SchemaMigrationResponseModel responseModel = response.ToSchemaMigrationRequestModel();
+
+                return Ok(responseModel);
+            }
+
+            return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        }
 
 
         /// <summary>

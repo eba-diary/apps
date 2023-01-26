@@ -52,5 +52,14 @@ namespace Sentry.data.Core
         Task<string> RequestAccessRemoval(AccessRequest request);
 
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
+
+        /// <summary>
+        /// Does the dataset exist in the target environment
+        /// </summary>
+        /// <param name="datasetName"></param>
+        /// <param name="saidAssetKey"></param>
+        /// <param name="targetNamedEnvironment"></param>
+        /// <returns></returns>
+        (int targetDatasetId, bool datasetExistsInTarget) DatasetExistsInTargetNamedEnvironment(string datasetName, string saidAssetKey, string targetNamedEnvironment);
     }
 }

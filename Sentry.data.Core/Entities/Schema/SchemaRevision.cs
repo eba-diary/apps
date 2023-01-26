@@ -37,5 +37,17 @@ namespace Sentry.data.Core
 
             return structure;
         }
+
+        public virtual List<BaseFieldDto> ToFieldStructure()
+        {
+            List<BaseFieldDto> fieldDtoList = new List<BaseFieldDto>();
+
+            foreach (var field in Fields)
+            {
+                fieldDtoList.Add(field.ToDto());
+            }
+
+            return fieldDtoList;
+        }
     }
 }
