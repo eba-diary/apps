@@ -886,7 +886,6 @@ data.Dataset = {
                 $('#DatasetFormContent #PrimaryContactId').val(associate.Id);
             },
             filterPermission: permissionFilter,
-            minLength: 0,
             maxResults: 10
         });
 
