@@ -1,7 +1,7 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY
 		DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
-		DECLARE	@Bucket VARCHAR(255), @ProducerS3DropBucket VARCHAR(255), @Bucketv2 VARCHAR(255), @ProducerS3DropBucketv2 VARCHAR(255)
+		DECLARE	@Bucket VARCHAR(255), @Bucketv2 VARCHAR(255), @ProducerS3DropBucket VARCHAR(255), @ProducerS3DropBucketv2 VARCHAR(255)
 		DECLARE	@HRBucket VARCHAR(255), @HRProducerS3DropBucket VARCHAR(255)
 		DECLARE @Bucketv2_NP VARCHAR(255), @ProducerS3DropBucketv2_NP VARCHAR(255),@HRBucket_NP VARCHAR(255), @HRProducerS3DropBucket_NP VARCHAR(255)
 		
