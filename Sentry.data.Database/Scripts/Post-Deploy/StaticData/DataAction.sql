@@ -60,7 +60,7 @@
 
 			--HR
 			SET @HRBucket = 'sentry-dlst-qual-hrdataset-ae2'
-			SET @HRBucket = 'sentry-dlst-qualnp-hrdataset-ae2'
+			SET @HRBucket_NP = 'sentry-dlst-qualnp-hrdataset-ae2'
 			SET @HRProducerS3DropBucket = 'sentry-dlst-qual-hrdroplocation-ae2'
 			SET @HRProducerS3DropBucket_NP = 'sentry-dlst-qualnp-hrdroplocation-ae2'
 		END
