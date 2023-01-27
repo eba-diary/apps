@@ -1,2 +1,2 @@
 ﻿import 'expose-loader?exposes=later!later';
-import 'prettycron';
+import 'expose-loader?exposes=prettyCron!prettycron';
