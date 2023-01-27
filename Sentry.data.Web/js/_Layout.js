@@ -25,6 +25,11 @@ data._Layout = {
             document.querySelector('.select2-search__field').focus();
         });
 
+        /* fix for pagination buttons holding onto focus style after click */
+        $(document).on('mouseup', '.pagination .page-item .page-link', () => {
+            document.activeElement.blur();
+        })
+
         $("body").removeClass("prevent-animation");
     }
     , restoreUser: function () {

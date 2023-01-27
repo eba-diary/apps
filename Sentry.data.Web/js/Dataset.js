@@ -159,7 +159,7 @@ data.Dataset = {
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
     delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
 
-        $('#delroySpinner').show();
+        $('#delroyTable_processing').show();
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
@@ -173,11 +173,11 @@ data.Dataset = {
             data.Dataset.delroyAddFieldArray(result.Fields);
             data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
             data.Dataset.delroyGridRefresh();
-            $('#delroySpinner').hide();
+            $('#delroyTable_processing').hide();
 
         }).fail(function (result) {
             if (result.status === 404) {
-                $('#delroySpinner').hide();
+                $('#delroyTable_processing').hide();
                 data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
                 data.Dataset.makeToast("success", "No columns Exist.");
             }
@@ -202,28 +202,19 @@ data.Dataset = {
         //init DataTable,
         var delroyTable = $("#delroyTable").DataTable({
             orderCellsTop: true,
-
+            processing: true,
             //client side setup
             pageLength: 100,
-
-            //Code if i wanted the grid to reload and make AJAX call, but i reload manually without AJAX call in delroyGridRefresh
-            //ajax: {
-            //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
-            //    type: "GET",
-            //    dataSrc: "Fields"       //this is a trick too specify a property within the obj coming back from URL call, in this scenario i need to sepcify WHERE array of columns exists to load
-            //},
-
             columns: [
                 { data: "OrdinalPosition", className: "OrdinalPosition" },
                 {
                     data: "Name", className: "Name",
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
-                        var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
-                        var parent = "<em class='far fa-folder-open " + color + "' > " + innerLink + "</em>";
+                        var link = "<a href='javascript:void(0)' class='clickable'><em class='far fa-folder-open " + color + "'></em> " + d + "</a>";
 
                         if (row.Fields != null) {
-                            return parent;
+                            return link;
                         }
                         else {
                             return d;
@@ -237,18 +228,12 @@ data.Dataset = {
                 { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } },
                 { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } }
             ],
-
             aLengthMenu: [
                 [20, 100, 500],
                 [20, 100, 500]
             ],
-
             order: [0, 'asc'],
-
-            //style for columnVisibility and paging to show
-            //dom: 'B',
-
-            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>t<"d-inline-block"i><"float-right d-inline-block"p>',
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<"d-inline-block"i><"float-right d-inline-block"p>',
             buttons: {
                 dom: {
                     container: {
@@ -258,10 +243,8 @@ data.Dataset = {
                         className: 'btn btn-primary p-2'
                     },
                     collection: {
-                        //tag: 'div',
                         className: 'dt-button-collection dropdown-menu',
                         button: {
-                            //tag: 'a',
                             className: 'dropdown-item'
                         }
                     }
@@ -269,7 +252,6 @@ data.Dataset = {
                 buttons: [
                     {
                         extend: 'colvis',
-                        //text: "<i class='icon-onecol_twocol'></i>"
                     },
                     {
                         text: 'Snowflake Query',
@@ -296,6 +278,8 @@ data.Dataset = {
                 }
             );
         }
+
+        $('#delroyTable_processing').show();
     },
 
 
@@ -304,7 +288,7 @@ data.Dataset = {
     delroySetupClickAttack: function () {
 
         //DELROY GRID CLICK
-        $('#delroyTable tbody').on('click', 'tr', function () {                         //anything clicked in delroyTable tbody, filter down to capture 'tr' class clicks only
+        $('#delroyTable tbody').on('click', 'tr', function (e) {                         //anything clicked in delroyTable tbody, filter down to capture 'tr' class clicks only
 
             var table = $('#delroyTable').DataTable();
             var field = table.row(this).data();
@@ -461,14 +445,11 @@ data.Dataset = {
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
     delroyQueryGenerator: function () {
 
-        $('#delroySpinner').show();
-
         var field = data.Dataset.delroyGetLatestField();
 
         //if field is null, means no columns to generate a query so hide spinner and create a toastr
         if (field == null) {
             data.Dataset.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
-            $('#delroySpinner').hide();
         }
         else {
             //pass the current field array and necessary info to controller and get back the snowflake query
@@ -481,15 +462,12 @@ data.Dataset = {
                 success: function (r) {
                     var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
                     modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
-                    $('#delroySpinner').hide();
                 },
                 failure: function () {
                     data.Dataset.makeToast("error", "Error creating Snowflake Query.");
-                    $('#delroySpinner').hide();
                 },
                 error: function () {
                     data.Dataset.makeToast("error", "Error creating Snowflake Query.");
-                    $('#delroySpinner').hide();
                 }
             });
         }
@@ -1297,7 +1275,6 @@ data.Dataset = {
                         $('#tabSchemaColumns').html(view);
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
-                        $('#delroySpinner').hide();
                         $("#tab-spinner").hide();
                     }
                 });
@@ -2417,9 +2394,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 }
             },
             "processing": true,
-            "language": {
-                "processing": "Searching..."
-            },
             "sort": false,
             "columns": [
                 { "data": "Name" },
