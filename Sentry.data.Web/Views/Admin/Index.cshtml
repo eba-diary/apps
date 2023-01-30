@@ -99,7 +99,7 @@
 
 <html>
 <body>
-    <div>
+    <div id="dashboard">
 
         <div>
             <h1>Welcome to the Admin Page</h1>
@@ -133,6 +133,15 @@
         </div>
     </div>
 
+    <div id="failedFiles">
+        @Html.Partial("_FailedFilesDetails")
+    </div>
+    <div id="completedFiles">
+        @Html.Partial("_CompletedFilesDetails")
+    </div>
+    <div id="inFlightFiles">
+        @Html.Partial("_InFlightFilesDetails")
+    </div>
 </body>
 </html>
 
@@ -168,4 +177,6 @@
         right: auto;
         padding-right: 25px;
     }
+
+    
 </style>

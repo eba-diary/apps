@@ -270,5 +270,29 @@ namespace Sentry.data.Web.Controllers
             AuditSelectionModel model = GetAuditSelectionModel();
             return View(model);
         }
+
+        /*
+         * Partial View to present more data on FailedFiles 
+         */
+        public ActionResult FailedFilesDetails()
+        {
+            return PartialView();
+        }
+
+        /*
+         * Partial View to present more data on Completed Files
+         */
+        public ActionResult CompletedFilesDetails()
+        {
+            return PartialView();
+        }
+
+        /*
+         * Partial View to present more data on In-Flight Files 
+         */
+        public ActionResult InFlightFilesDetails()
+        {
+            return PartialView();
+        }
     }
 }
