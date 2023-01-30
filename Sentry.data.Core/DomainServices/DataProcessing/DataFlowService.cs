@@ -1304,55 +1304,59 @@ namespace Sentry.data.Core
                 isHumanResources = true;
             }
 
+            NamedEnvironmentType datasetNamedEnviornmentType = ds.NamedEnvironmentType;
+
+            bool checkNamedEnviornmentType = bool.Parse(Configuration.Config.GetHostSetting("DataFlowStepBasedOnNamedEnvironmentType"));
+
             //Look at ActionType and return correct BaseAction
             BaseAction action;
             switch (actionType)
             {
                 case DataActionType.S3Drop:
-                    action = _datasetContext.S3DropAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.S3DropAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.ProducerS3Drop:
-                    action = _datasetContext.ProducerS3DropAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.ProducerS3DropAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.RawStorage:
-                    action = _datasetContext.RawStorageAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.RawStorageAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.QueryStorage:
-                    action = _datasetContext.QueryStorageAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.QueryStorageAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.ConvertParquet:
-                    action = _datasetContext.ConvertToParquetAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.ConvertToParquetAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.UncompressZip:
-                    action = _datasetContext.UncompressZipAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.UncompressZipAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.GoogleApi:
-                    action = _datasetContext.GoogleApiAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.GoogleApiAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.GoogleBigQueryApi:
-                    action = _datasetContext.GoogleBigQueryApiAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.GoogleBigQueryApiAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.GoogleSearchConsoleApi:
-                    action = _datasetContext.GoogleSearchConsoleApiAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.GoogleSearchConsoleApiAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.ClaimIq:
-                    action = _datasetContext.ClaimIQAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.ClaimIQAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.UncompressGzip:
-                    action = _datasetContext.UncompressGzipAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.UncompressGzipAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.FixedWidth:
-                    action = _datasetContext.FixedWidthAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.FixedWidthAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.XML:
-                    action = _datasetContext.XMLAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.XMLAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.JsonFlattening:
-                    action = _datasetContext.JsonFlatteningAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.JsonFlatteningAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.SchemaLoad:
 
-                    action = _datasetContext.SchemaLoadAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.SchemaLoadAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
@@ -1366,7 +1370,7 @@ namespace Sentry.data.Core
 
                 //TODO: REMOVE THIS ENTIRELY.  NOT CALLED ANYNORE SINCE SCHEMA MAP IS V2 and NO LONGER EVEN CALLED, BONUS AFTER TOPIC NAME IS WORKING
                 case DataActionType.SchemaMap:
-                    action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources);
+                    action = _datasetContext.SchemaMapAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
                     foreach (SchemaMapDto mapDto in dto.SchemaMap.Where(w => !w.IsDeleted))
                     {

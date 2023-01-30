@@ -11,6 +11,7 @@ namespace Sentry.data.Core
         public bool IsDatasetMigrated { get; set; }
         public string DatasetMigrationReason { get; set; }
         public int DatasetId { get; set; }
-        public List<SchemaMigrationRequestResponse> SchemaMigrationResponses { get; set; }
+        public string DatasetName { get; set; }
+        public List<SchemaMigrationRequestResponse> SchemaMigrationResponses { get; set; } = new List<SchemaMigrationRequestResponse>();
     }
 }

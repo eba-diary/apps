@@ -3,6 +3,7 @@
 		DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
 		DECLARE	@Bucket VARCHAR(255), @Bucketv2 VARCHAR(255), @ProducerS3DropBucket VARCHAR(255), @ProducerS3DropBucketv2 VARCHAR(255)
 		DECLARE	@HRBucket VARCHAR(255), @HRProducerS3DropBucket VARCHAR(255)
+		DECLARE @Bucketv2_NP VARCHAR(255), @ProducerS3DropBucketv2_NP VARCHAR(255),@HRBucket_NP VARCHAR(255), @HRProducerS3DropBucket_NP VARCHAR(255)
 		
 		IF @ENV = 'DEV'
 		BEGIN
@@ -52,23 +53,31 @@
 		BEGIN
 			SET @Bucket = 'sentry-data-qual-dataset-ae2'
 			SET @Bucketv2 = 'sentry-dlst-qual-dataset-ae2'
+			SET @Bucketv2_NP = 'sentry-dlst-qualnp-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-qual-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-qual-droplocation-ae2'
+			SET @ProducerS3DropBucketv2_NP = 'sentry-dlst-qualnp-droplocation-ae2'
 
 			--HR
 			SET @HRBucket = 'sentry-dlst-qual-hrdataset-ae2'
+			SET @HRBucket_NP = 'sentry-dlst-qualnp-hrdataset-ae2'
 			SET @HRProducerS3DropBucket = 'sentry-dlst-qual-hrdroplocation-ae2'
+			SET @HRProducerS3DropBucket_NP = 'sentry-dlst-qualnp-hrdroplocation-ae2'
 		END
 		ELSE IF @ENV = 'PROD'
 		BEGIN
 			SET @Bucket = 'sentry-data-prod-dataset-ae2'
 			SET @Bucketv2 = 'sentry-dlst-prod-dataset-ae2'
+			SET @Bucketv2_NP = 'sentry-dlst-prodnp-dataset-ae2'
 			SET @ProducerS3DropBucket = 'sentry-data-prod-droplocation-ae2'
 			SET @ProducerS3DropBucketv2 = 'sentry-dlst-prod-droplocation-ae2'
+			SET @ProducerS3DropBucketv2_NP = 'sentry-dlst-prodnp-droplocation-ae2'
 
 			--HR
 			SET @HRBucket = 'sentry-dlst-prod-hrdataset-ae2'
+			SET @HRBucket_NP = 'sentry-dlst-prodnp-hrdataset-ae2'
 			SET @HRProducerS3DropBucket = 'sentry-dlst-prod-hrdroplocation-ae2'
+			SET @HRProducerS3DropBucket_NP = 'sentry-dlst-prodnp-hrdroplocation-ae2'
 		END
 		ELSE
 		BEGIN
@@ -146,6 +155,56 @@
 			-- delete rows that are in the target but not the source 
 			DELETE;
 
+	IF (@ENV = 'QUAL' or @ENV = 'PROD')
+	BEGIN
+	MERGE INTO DataAction AS Target 
+		USING (VALUES 
+									(35, 'B657536B-E156-4D20-AE72-E2B29C430F61', 'Producer S3 Drop', 'producers3drop/', @ProducerS3DropBucketv2_NP, 'ProducerS3Drop', 0, 'DLST S3 drop location exposed to data producers for sending data to DSC data processing platform'),
+									
+									--HR DataAction 
+									(36, 'B396FCE9-742A-432C-B0AB-9388F729C149', 'HR Raw Storage', 'raw/', @HRBucket_NP, 'RawStorage', 0, 'HR Sends copy of unaltered incoming file to long term storage location'),
+									(37, 'F8D2EEBC-C6C1-4DEE-83CE-372E85B07129', 'HR Query Storage', 'rawquery/', @HRBucket_NP, 'QueryStorage', 1, 'HR Sends copy of raw file to long term storage accessed via Query Tool'),
+									(38, '31C906A6-BBB3-4931-9BDC-8E5F5AB06F69', 'HR Schema Load', 'schemaload/', @HRBucket_NP, 'SchemaLoad', 0, 'HR Maps schema related metadata to file for processing'),
+									(39, 'F1A0A818-07FA-4CD6-A11B-71B33BF42B09', 'HR ConvertToParquet', 'parquet/', @HRBucket_NP, 'ConvertParquet', 1, 'HR Converts raw file to parquet format and stores in long term storage accessed via Hive'),
+									(40, '6D32BF31-F1F4-4CE8-A9AA-4061A41A9DF5', 'HR Producer S3 Drop', 'producers3drop/', @HRProducerS3DropBucket_NP, 'ProducerS3Drop', 0, 'HR S3 drop location exposed to data producers for sending data to DSC data processing platform'),
+									(41, 'E9ECDA50-8D1E-42D8-BC15-0FE008C4B10D', 'HR XML', 'xmlpreprocessing/', @HRBucket_NP, 'XML', 0, 'HR Converts xml file into data processing friendly format'),
+									
+									(42, 'EF2AC2F7-3B05-4A62-9F5E-02E1FA987C05', 'Raw Storage', 'raw/', @Bucketv2_NP, 'RawStorage', 0, 'Sends copy of unaltered incoming file to long term storage location within DLST bucket'),
+									(43, '0A51137B-4DC7-40B8-A8EE-81A7047F3F5D', 'Query Storage', 'rawquery/', @Bucketv2_NP, 'QueryStorage', 1, 'Sends copy of raw file to long term storage within DLST bucket'),
+									(44, '4A2AB6BF-E555-4AAA-A716-BF664AACD20F', 'ConvertToParquet', 'parquet/', @Bucketv2_NP, 'ConvertParquet', 1, 'Converts raw file to parquet format and stores in long term storage within DLST bucket'),
+									(45, 'E6006873-3AA5-462E-A988-EC882C8C4607', 'Uncompress Zip', 'uncompresszip/', @Bucketv2_NP, 'UncompressZip', 0, 'Uncompresses incoming zip file within DLST bucket'),
+									(46, 'B7D973CB-217E-40DB-987E-4E28BE4A00D8', 'Google Api', 'googleapipreprocessing/', @Bucketv2_NP, 'GoogleApi', 0, 'Converts Google API JSON output to data processing friendly format within DLST bucket'),
+									(47, 'A9B037EA-9C96-44A7-9D05-C3AFF2C21FEB', 'ClaimIQ', 'claimiqpreprocessing/', @Bucketv2_NP, 'ClaimIq', 0, 'Encodes and converts ClaimIQ file to data processing friendly format within DLST bucket'),
+									(48, '07C5822E-94C5-409B-AC4B-3530867024D0', 'Uncompress Gzip', 'uncompressgzip/', @Bucketv2_NP, 'UncompressGzip', 0, 'Decompresses incoming gzip file within DLST bucket'),
+									(49, '8F6E5651-3E0C-4ECA-8285-DED6A43B14EC', 'Fixed Width', 'fixedwidthpreprocessing/', @Bucketv2_NP, 'FixedWidth', 0, 'Converts fixed width file into data processing friendly format within DLST bucket'),
+									(50, 'F892323D-F23C-430A-8285-D663800D0846', 'XML', 'xmlpreprocessing/', @Bucketv2_NP, 'XML', 0, 'Converts xml file into data processing friendly format within DLST bucket'),
+									(51, 'C7FC3A73-D0B0-4DA6-AE47-9C40210C6628', 'JSON Flattening', 'jsonflattening/', @Bucketv2_NP, 'JsonFlattening', 0, 'Flattens incoming JSON based on specified Schema Root Path property on schema within DLST bucket'),
+									(52, '7847700A-2E68-4803-860F-CD2ABC9236C9', 'Schema Load', 'schemaload/', @Bucketv2_NP, 'SchemaLoad', 0, 'Maps schema related metadata to file for processing within DLST bucket'),
+									(53, '7C381CE0-C5AF-45F5-94BD-9478BD136A30', 'Google BigQuery API', 'googlebigqueryapipreprocessing/', @Bucketv2_NP, 'GoogleBigQueryApi', 0, 'Converts Google BigQuery API JSON output to data processing friendly format within DLST bucket'),
+									(54, '6C92A3FB-3E80-457C-811B-12942AD11DC4', 'Google Search Console API', 'googlesearchconsoleapipreprocessing/', @Bucketv2_NP, 'GoogleSearchConsoleApi', 0, 'Converts Google Search Console API JSON output to data processing friendly format within DLST bucket')
+								)
+								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description]) 
+
+		ON Target.[Id] = Source.[Id]
+		WHEN MATCHED THEN 
+			UPDATE SET
+				[Id] = Source.[Id],
+				[ActionGuid] = Source.[ActionGuid],
+				[Name] = Source.[Name],
+				[TargetStoragePrefix] = Source.[TargetStoragePrefix],
+				[TargetStorageBucket] = Source.[TargetStorageBucket],
+				[ActionType] = Source.[ActionType],
+				[TargetStorageSchemaAware] = Source.[TargetStorageSchemaAware],
+				[Description] = Source.[Description]
+		WHEN NOT MATCHED BY TARGET THEN 
+			-- insert new rows 
+			INSERT ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description]) 
+			VALUES ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware], [Description])  
+					  
+		WHEN NOT MATCHED BY SOURCE THEN 
+			-- delete rows that are in the target but not the source 
+			DELETE;
+	END
 
 	END TRY 
 	BEGIN CATCH 

@@ -1022,6 +1022,11 @@ data.Dataset = {
             data.AccessRequest.InitForDataset($(this).data("id"));
         });
 
+        $("[id^='btnMigrationRqeuest']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.MigrationRequest.InitForMigration($(this).data("id"));
+        });
+
         $("[id^='DownloadLatest']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.DownloadLatestDatasetFile($(this).data("id"));
