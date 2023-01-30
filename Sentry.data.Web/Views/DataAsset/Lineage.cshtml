@@ -919,7 +919,7 @@
                     var url5 = "/api/v1/lineage/lineage" + baseUrlParameters + elementFromURL;
 
                     $.getJSON(encodeURI(url5), function (allData) {
-                        var items = $.map(allData, function (item) { return new Lineage(item) });
+                        var items = $.map(allData, function (item) { return new Lineage(item, self) });
                         self.lineage(items);
                         $('.layer0').show();
 
