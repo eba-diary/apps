@@ -527,7 +527,7 @@ namespace Sentry.data.Infrastructure
                     sb.Append($"</ul>");
                     sb.Append($"<br>");
                     break;
-                case AccessRequestType.SnowflakeAcoount:
+                case AccessRequestType.SnowflakeAcount:
                     if (model.IsAddingPermission)
                     {
                         sb.Append($"Please grant the Snowflake Account {model.SnowflakeAccount} the following permissions to {(model.Scope == AccessScope.Asset ? model.SaidKeyCode : model.SecurableObjectName)}{(model.Scope != AccessScope.Asset ? $" ({model.SecurableObjectNamedEnvironment})" : String.Empty)} data. <br>");
@@ -601,7 +601,7 @@ namespace Sentry.data.Infrastructure
             {
                 case AccessRequestType.AwsArn:
                     return $"Access {(model.IsAddingPermission ? "" : "Removal")} Request for AWS ARN {model.AwsArn}";
-                case AccessRequestType.SnowflakeAcoount:
+                case AccessRequestType.SnowflakeAcount:
                     return $"Access {(model.IsAddingPermission ? "" : "Removal")} Request for Snowflake Account {model.SnowflakeAccount}";
                 case AccessRequestType.Inheritance:
                     return $"Inheritance {(model.IsAddingPermission ? "enable" : "disable")} request for {model.SecurableObjectName}";

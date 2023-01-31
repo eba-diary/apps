@@ -63,6 +63,9 @@
             <div class="alert alert-danger d-none" id="AccessRequestAwsArnValidationMessage" role="alert">
                 AWS ARN must be properly formatted.
             </div>
+            <div class="alert alert-danger d-none" id="AccessRequestSnowflakeValidationMessage" role="alert">
+                Snowflake Account name is required and must be less than 255 characters.
+            </div>
             @Html.HiddenFor(m => m.Type)
             @Html.HiddenFor(m => m.Scope)
             @Html.HiddenFor(m => m.SecurableObjectId)

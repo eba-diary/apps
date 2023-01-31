@@ -337,7 +337,7 @@ namespace Sentry.data.Core
                 case AccessRequestType.AwsArn:
                     request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == PermissionCodes.S3_ACCESS).First());
                     break;
-                case AccessRequestType.SnowflakeAcoount:
+                case AccessRequestType.SnowflakeAcount:
                     request.Permissions.Add(_datasetContext.Permission.Where(x => x.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS).First());
                     break;
                 case AccessRequestType.RemovePermission:

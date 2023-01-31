@@ -2688,10 +2688,13 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateRequestAccessModal() {
-        var valid;
-        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val != ''
+        let valid;
+        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val() != ''
         if ($("#RequestAccess_Type").val() == "1") {
             valid = valid && data.Dataset.requestAccessValidateAwsArnIam();
+        }
+        if ($("#RequestAccess_Type").val() == "4") {
+            valid = valid && data.Dataset.requestAccessValidateSnowflakeAccount();
         }
         return valid;
     },
@@ -2763,6 +2766,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
         else {
             $("#AccessRequestAwsArnValidationMessage").removeClass("d-none");
+            return false;
+        }
+    },
+
+    requestAccessValidateSnowflakeAccount() {
+        let valid = $("#RequestAccess_SnowflakeAccount").val() != '';
+        valid = valid && $("#RequestAccess_SnowflakeAccount").val().length < 255;
+        if (valid) {
+            $("#AccessRequestSnowflakeValidationMessage").addClass("d-none");
+            return true;
+        }
+        else {
+            $("#AccessRequestSnowflakeValidationMessage").removeClass("d-none");
             return false;
         }
     },

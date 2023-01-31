@@ -47,7 +47,7 @@ namespace Sentry.data.Web
                 }
                 else if (Code == GlobalConstants.PermissionCodes.SNOWFLAKE_ACCESS)
                 {
-                    return AccessRequestType.SnowflakeAcoount;
+                    return AccessRequestType.SnowflakeAcount;
                 }
                 return AccessRequestType.RemovePermission;
             }
