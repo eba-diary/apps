@@ -19,16 +19,19 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly IEncryptionService _encryptionService;
         private readonly IHttpClientProvider _httpClient;
+        private readonly IMotiveProvider _motiveProvider;
         #endregion
 
         #region Constructor
         public DataSourceService(IDatasetContext datasetContext,
                             IEncryptionService encryptionService,
-                            IHttpClientProvider httpClient)
+                            IHttpClientProvider httpClient,
+                            IMotiveProvider motiveProvider)
         {
             _datasetContext = datasetContext;
             _encryptionService = encryptionService;
             _httpClient = httpClient;
+            _motiveProvider = motiveProvider;
         }
         #endregion
 
@@ -104,14 +107,15 @@ namespace Sentry.data.Core
                 JObject responseAsJson = JObject.Parse(await response.Content.ReadAsStringAsync());
                 string accessToken = responseAsJson.Value<string>("access_token");
                 string refreshToken = responseAsJson.Value<string>("refresh_token");
-                ((HTTPSSource)dataSource).Tokens.Add(new DataSourceToken()
+                DataSourceToken token = new DataSourceToken()
                 {
                     CurrentToken = accessToken,
                     RefreshToken = refreshToken,
                     TokenExp = 7200,
                     TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret"
-                    //company name as token name once we start dropping comapny file.
-                });
+                };
+                ((HTTPSSource)dataSource).Tokens.Add(token);
+                await _motiveProvider.MotiveOnboardingAsync(dataSource, token, 0);
                 _datasetContext.SaveChanges();
             }
             catch (Exception e)

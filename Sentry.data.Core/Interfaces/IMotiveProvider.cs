@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class IMotiveProvider
+    public interface IMotiveProvider
     {
-
+        Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId);
     }
 }

@@ -22,6 +22,7 @@ namespace Sentry.data.Infrastructure
         private IEncryptionService _encryptionService;
         private IAuthorizationProvider _authorizationProvider;
 
+
         public MotiveProvider(IHttpClientGenerator httpClientGenerator, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IEncryptionService encryptionService, IAuthorizationProvider authorizationProvider)
         {
             _httpClientGenerator = httpClientGenerator;
@@ -32,11 +33,11 @@ namespace Sentry.data.Infrastructure
             _authorizationProvider = authorizationProvider;
         }
 
-        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken newToken, DataFlow dataflow)
+        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
         {
             var motiveCompaniesUrl = Config.GetHostSetting("MotiveCompaniesUrl");
             HttpClient httpClient = _httpClientGenerator.GenerateHttpClient(motiveCompaniesUrl);
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, newToken)}");
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, token)}");
 
             using (HttpResponseMessage response = await httpClient.GetAsync(motiveCompaniesUrl, HttpCompletionOption.ResponseHeadersRead))
             {
@@ -45,8 +46,8 @@ namespace Sentry.data.Infrastructure
                 using (JsonReader jsonReader = new JsonTextReader(streamReader))
                 {
                     JObject responseObject = JObject.Load(jsonReader);
-                    newToken.TokenName = responseObject.Value<string>("companies.company");
-                    var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(dataflow.Id, DataActionType.S3Drop);
+                    token.TokenName = responseObject.Value<string>("companies[0].company");
+                    var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
                     _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
                 }
                 _datasetContext.SaveChanges();
