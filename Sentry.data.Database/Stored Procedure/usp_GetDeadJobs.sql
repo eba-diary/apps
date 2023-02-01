@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[usp_GetDeadJobs] @JobID INT, @TimeCreated datetime
+﻿CREATE PROCEDURE [dbo].[usp_GetDeadJobs] @TimeCreated datetime
 
 AS
 
@@ -13,16 +13,45 @@ IF OBJECT_ID('tempdb..#IdentifiedDeadJobs') IS NOT NULL DROP TABLE #IdentifiedDe
 IF OBJECT_ID('tempdb..#EventMetadata') IS NOT NULL DROP TABLE #EventMetadata
 
 /************************
-Job IDs
-prod = 465
-QUAL = 529
-TEST = 262
+This stored procedure is used to produce results to UI
+
+Do not change output format unless UI is tested. 
+
+Job IDs:
+PRDO     = 465
+QUAL OG  = 529
+QUAL NEW = 4638
+QUALNP   = 4637
+TEST     = 262
 ************************/
+
+
+/* Determine current named environment */
+DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
+
+DECLARE @EnvironmentJobIDs table (ID int)
+DELETE FROM @EnvironmentJobIDs
+
+
+/* Select Job IDs associated with current Environment */
+IF (@ENV = 'DEV' OR @ENV = 'NRDEV' OR @ENV = 'TEST' OR @ENV = 'NRTEST')
+BEGIN 
+    INSERT @EnvironmentJobIDs(ID) values(262);
+END
+ELSE IF @ENV = 'QUAL'
+BEGIN 
+    INSERT @EnvironmentJobIDs(ID) values(529),(4638),(4367);
+END
+ELSE IF @ENV = 'PROD'
+BEGIN 
+    INSERT @EnvironmentJobIDs(ID) values(465);
+END
+
 
 select distinct Submission,History_Id
 into #Submissions
 from JobHistory
-where State = 'Dead' and Job_ID = @JobID and Created > @TimeCreated
+where State = 'Dead' and Job_ID in (SELECT ID FROM @EnvironmentJobIDs) and Created > @TimeCreated
 order by History_Id DESC
 
 /* SELECT * FROM #Submissions */
