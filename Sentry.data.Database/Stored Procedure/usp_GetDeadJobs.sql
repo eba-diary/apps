@@ -25,13 +25,11 @@ QUALNP   = 4637
 TEST     = 262
 ************************/
 
-
 /* Determine current named environment */
 DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
 
 DECLARE @EnvironmentJobIDs table (ID int)
 DELETE FROM @EnvironmentJobIDs
-
 
 /* Select Job IDs associated with current Environment */
 IF (@ENV = 'DEV' OR @ENV = 'NRDEV' OR @ENV = 'TEST' OR @ENV = 'NRTEST')
