@@ -48,7 +48,7 @@ namespace Sentry.data.Web
             IsSecured = dto.IsSecured;
             Security = dto.Security.ToModel();
             MailToLink = dto.MailToLink;
-
+            GrantType = dto.GrantType;
             //We do not populate TokenAuthValue and ClientPrivateID.  On Post
             // if a value exists, then a new value is encrypted.  Otherwise, old value is unchanged.
             TokenAuthValue = null;

@@ -16,5 +16,6 @@ namespace Sentry.data.Core
         public DateTime CreatedDTM { get; set; }
         public DateTime LastUpdatedDTM { get; set; }
         public string JsonSchemaObject { get; set; }
+        public int SchemaId { get; set; }
     }
 }

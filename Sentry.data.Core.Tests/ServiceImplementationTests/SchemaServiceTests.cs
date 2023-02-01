@@ -2204,18 +2204,18 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
+            //datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
-            SchemaRevision revision = new SchemaRevision() 
-            { 
-                ParentSchema = fileConfig.Schema,
-                SchemaRevision_Id = 3 
-            };
-            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
-            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
+            //SchemaRevision revision = new SchemaRevision() 
+            //{ 
+            //    ParentSchema = fileConfig.Schema,
+            //    SchemaRevision_Id = 3 
+            //};
+            //List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
+            //datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
 
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
@@ -2233,37 +2233,37 @@ namespace Sentry.data.Core.Tests
             feature.Setup(x => x.GetValue()).Returns(true);
             Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
             features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            //features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
-            Mock<Helpers.DscEventTopicHelper> topicHelper = mr.Create<Helpers.DscEventTopicHelper>();
-            topicHelper.Setup(s => s.GetDSCNamedEnvironment()).Returns("DEV");
-            topicHelper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("topicName");
+            //Mock<Helpers.DscEventTopicHelper> topicHelper = mr.Create<Helpers.DscEventTopicHelper>();
+            //topicHelper.Setup(s => s.GetDSCNamedEnvironment()).Returns("DEV");
+            //topicHelper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("topicName");
 
-            //mock publisher
-            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
-            {
-                SchemaID = 1,
-                RevisionID = 3,
-                DatasetID = 2,
-                HiveStatus = null,
-                InitiatorID = "000000",
-                ChangeIND = "{\"createcurrentview\":\"true\"}"
-            };
+            ////mock publisher
+            //HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            //{
+            //    SchemaID = 1,
+            //    RevisionID = 3,
+            //    DatasetID = 2,
+            //    HiveStatus = null,
+            //    InitiatorID = "000000",
+            //    ChangeIND = "{\"createcurrentview\":\"true\"}"
+            //};
 
-            SnowTableCreateModel snowCreate = new SnowTableCreateModel()
-            {
-                SchemaID = 1,
-                RevisionID = 3,
-                DatasetID = 2,
-                InitiatorID = "000000",
-                ChangeIND = "{\"createcurrentview\":\"true\"}"
-            };
+            //SnowTableCreateModel snowCreate = new SnowTableCreateModel()
+            //{
+            //    SchemaID = 1,
+            //    RevisionID = 3,
+            //    DatasetID = 2,
+            //    InitiatorID = "000000",
+            //    ChangeIND = "{\"createcurrentview\":\"true\"}"
+            //};
 
-            Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
-            publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
-            publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+            //Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
+            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
+            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null, null, null, null, topicHelper.Object);
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
 
             FileSchemaDto dto = new FileSchemaDto() 
             { 
@@ -2320,18 +2320,9 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
-
-            SchemaRevision revision = new SchemaRevision()
-            {
-                ParentSchema = fileConfig.Schema,
-                SchemaRevision_Id = 3
-            };
-            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
-            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
 
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
@@ -2402,18 +2393,9 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
-
-            SchemaRevision revision = new SchemaRevision()
-            {
-                ParentSchema = fileConfig.Schema,
-                SchemaRevision_Id = 3
-            };
-            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
-            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
 
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
@@ -2482,17 +2464,17 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
-            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
+            //datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
-            SchemaRevision revision = new SchemaRevision()
-            {
-                ParentSchema = fileConfig.Schema,
-                SchemaRevision_Id = 3
-            };
-            List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
-            datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
+            //SchemaRevision revision = new SchemaRevision()
+            //{
+            //    ParentSchema = fileConfig.Schema,
+            //    SchemaRevision_Id = 3
+            //};
+            //List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
+            //datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
 
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
@@ -2510,37 +2492,37 @@ namespace Sentry.data.Core.Tests
             feature.Setup(x => x.GetValue()).Returns(true);
             Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
             features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
-            features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            //features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
-            Mock<Helpers.DscEventTopicHelper> topicHelper = mr.Create<Helpers.DscEventTopicHelper>();
-            topicHelper.Setup(s => s.GetDSCNamedEnvironment()).Returns("DEV");
-            topicHelper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("topicName");
+            //Mock<Helpers.DscEventTopicHelper> topicHelper = mr.Create<Helpers.DscEventTopicHelper>();
+            //topicHelper.Setup(s => s.GetDSCNamedEnvironment()).Returns("DEV");
+            //topicHelper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("topicName");
 
-            //mock publisher
-            HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
-            {
-                SchemaID = 1,
-                RevisionID = 3,
-                DatasetID = 2,
-                HiveStatus = null,
-                InitiatorID = "000000",
-                ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
-            };
+            ////mock publisher
+            //HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
+            //{
+            //    SchemaID = 1,
+            //    RevisionID = 3,
+            //    DatasetID = 2,
+            //    HiveStatus = null,
+            //    InitiatorID = "000000",
+            //    ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
+            //};
 
-            SnowTableCreateModel snowCreate = new SnowTableCreateModel()
-            {
-                SchemaID = 1,
-                RevisionID = 3,
-                DatasetID = 2,
-                InitiatorID = "000000",
-                ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
-            };
+            //SnowTableCreateModel snowCreate = new SnowTableCreateModel()
+            //{
+            //    SchemaID = 1,
+            //    RevisionID = 3,
+            //    DatasetID = 2,
+            //    InitiatorID = "000000",
+            //    ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
+            //};
 
-            Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
-            publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
-            publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
+            //Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
+            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
+            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, publisher.Object, null, null, null, null, topicHelper.Object);
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
 
             FileSchemaDto dto = new FileSchemaDto()
             {
@@ -2727,7 +2709,8 @@ namespace Sentry.data.Core.Tests
                     {
                         SchemaRevision_Name = "StructureTest",
                         Revision_NBR = 1,
-                        Fields = new List<BaseField>() { new IntegerField() { Name = "fieldname", Description = "Field Description" } }
+                        Fields = new List<BaseField>() { new IntegerField() { Name = "fieldname", Description = "Field Description" } },
+                        ParentSchema = new FileSchema() { SchemaId = 1}
                     } }
                 },
                 ParentDataset = ds
@@ -3030,6 +3013,175 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(3, exception.ValidationResults.GetAll().Count);
 
             datasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void AddRevisionField_Migrated_New_Field()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<BaseField>()));
+
+            DateTime fieldCreateDTM = DateTime.Parse("2022-12-01 01:01:01");
+            DateTime currentRevisionCreatedDTM = DateTime.Parse("2022-12-01 01:01:56");
+            DateTime currentRevisionLastUpdateDTM = DateTime.Parse("2022-12-05 05:05:05");
+
+            DateTime previousRevisionCreateDTM = currentRevisionCreatedDTM.AddDays(-10);
+            DateTime previousRevisionLastUpdateDTM = currentRevisionLastUpdateDTM.AddDays(-6);
+            DateTime previousRevisionFieldCreateDTM = currentRevisionLastUpdateDTM.AddDays(-8);
+            DateTime previousRevisionFieldLastUpdatedDTM = currentRevisionLastUpdateDTM.AddDays(-7);
+            Guid existingFieldGuid = Guid.NewGuid();
+
+            BaseFieldDto newFieldDto = new VarcharFieldDto()
+            {
+                Name = "COL_333",
+                Length = 1000,
+                ChildFields = new List<BaseFieldDto>(),
+                FieldGuid = Guid.NewGuid(),
+                CreateDtm = fieldCreateDTM
+            };
+
+            SchemaRevision currentSchemaRevision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                CreatedDTM = currentRevisionCreatedDTM,
+                LastUpdatedDTM = currentRevisionLastUpdateDTM
+            };
+
+            SchemaRevision previousSchemaRevision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                CreatedDTM = previousRevisionCreateDTM,
+                LastUpdatedDTM = previousRevisionLastUpdateDTM,
+                Fields = new List<BaseField>()
+                {
+                    new VarcharField()
+                    {
+                        Name = "COL_1",
+                        FieldLength = 888,
+                        FieldGuid = existingFieldGuid,
+                        CreateDTM = previousRevisionFieldCreateDTM,
+                        LastUpdateDTM = previousRevisionFieldLastUpdatedDTM
+                    }
+                }
+            };
+
+            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+
+            BaseField newField = schemaService.AddRevisionField(newFieldDto, currentSchemaRevision, null, previousSchemaRevision);
+
+            Assert.AreEqual(currentRevisionCreatedDTM, newField.CreateDTM, "CreatedDTM validation failed");
+            Assert.AreEqual(currentRevisionCreatedDTM, newField.LastUpdateDTM, "LastUpdatedDTM validation failed");
+        }
+
+        [TestMethod]
+        public void AddRevisionField_New_Field()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<BaseField>()));
+
+            DateTime CreatedDTM = DateTime.Parse("2022-12-01 01:01:01");
+            DateTime LastUpdateDTM = DateTime.Parse("2022-12-05 05:05:05");
+
+            BaseFieldDto newFieldDto = new VarcharFieldDto()
+            {
+                Name = "COL_333",
+                Length = 1000,
+                ChildFields = new List<BaseFieldDto>(),
+                FieldGuid = Guid.Empty
+            };
+
+            SchemaRevision currentSchemaRevision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                CreatedDTM = CreatedDTM,
+                LastUpdatedDTM = LastUpdateDTM
+            };
+
+            SchemaRevision previousSchemaRevision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                CreatedDTM = CreatedDTM.AddDays(-1),
+                LastUpdatedDTM = LastUpdateDTM.AddDays(-1),
+                Fields = new List<BaseField>()
+                {
+                    new VarcharField()
+                    {
+                        Name = "COL_1",
+                        FieldGuid = Guid.NewGuid()
+                    }
+                }
+            };
+
+            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+
+            BaseField newField = schemaService.AddRevisionField(newFieldDto, currentSchemaRevision, null, previousSchemaRevision);
+
+            Assert.AreEqual(CreatedDTM, newField.CreateDTM, "CreatedDTM validation failed");
+            Assert.AreEqual(CreatedDTM, newField.LastUpdateDTM, "LastUpdatedDTM validation failed");
+        }
+
+        [TestMethod]
+        public void AddRevisionField_ExistingField_Changed()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<BaseField>()));
+
+            DateTime fieldCreateDTM = DateTime.Parse("2022-12-01 01:01:01");
+            DateTime currentRevisionCreatedDTM = DateTime.Parse("2022-12-01 01:01:56");
+            DateTime currentRevisionLastUpdateDTM = DateTime.Parse("2022-12-05 05:05:05");
+
+            DateTime previousRevisionCreateDTM = currentRevisionCreatedDTM.AddDays(-10);
+            DateTime previousRevisionLastUpdateDTM = currentRevisionLastUpdateDTM.AddDays(-6);
+            DateTime previousRevisionFieldCreateDTM = currentRevisionLastUpdateDTM.AddDays(-8);
+            DateTime previousRevisionFieldLastUpdatedDTM = currentRevisionLastUpdateDTM.AddDays(-7);
+            Guid existingFieldGuid = Guid.NewGuid();
+
+            BaseFieldDto newFieldDto = new VarcharFieldDto()
+            {
+                Name = "COL_333",
+                Length = 1000,
+                ChildFields = new List<BaseFieldDto>(),
+                FieldGuid = existingFieldGuid,
+                CreateDtm = fieldCreateDTM
+            };
+
+            SchemaRevision currentSchemaRevision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                CreatedDTM = currentRevisionCreatedDTM,
+                LastUpdatedDTM = currentRevisionLastUpdateDTM
+            };
+
+            SchemaRevision previousSchemaRevision = new SchemaRevision()
+            {
+                SchemaRevision_Id = 1,
+                CreatedDTM = previousRevisionCreateDTM,
+                LastUpdatedDTM = previousRevisionLastUpdateDTM,
+                Fields = new List<BaseField>()
+                {
+                    new VarcharField()
+                    {
+                        Name = "COL_333",
+                        FieldLength = 888,
+                        FieldGuid = existingFieldGuid,
+                        CreateDTM = previousRevisionFieldCreateDTM,
+                        LastUpdateDTM = previousRevisionFieldLastUpdatedDTM
+                    }
+                }
+            };
+
+            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+
+            BaseField newField = schemaService.AddRevisionField(newFieldDto, currentSchemaRevision, null, previousSchemaRevision);
+
+            Assert.AreEqual(fieldCreateDTM, newField.CreateDTM, "CreatedDTM validation failed");
+            Assert.AreEqual(previousRevisionFieldLastUpdatedDTM, newField.LastUpdateDTM, "LastUpdatedDTM validation failed");
         }
 
         #region Private Methods

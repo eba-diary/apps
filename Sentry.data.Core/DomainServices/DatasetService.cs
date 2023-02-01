@@ -653,6 +653,26 @@ namespace Sentry.data.Core
                                                                       !x.IsBundled);
         }
 
+        public (int targetDatasetId, bool datasetExistsInTarget) DatasetExistsInTargetNamedEnvironment(string datasetName, string saidAssetKey, string targetNamedEnvironment)
+        {
+            if (string.IsNullOrWhiteSpace(datasetName))
+            {
+                throw new ArgumentNullException(nameof(datasetName));
+            }
+            if (string.IsNullOrWhiteSpace(saidAssetKey))
+            {
+                throw new ArgumentNullException(nameof(saidAssetKey));
+            }
+            if (string.IsNullOrWhiteSpace(targetNamedEnvironment))
+            {
+                throw new ArgumentNullException(nameof(targetNamedEnvironment));
+            }
+
+            int datasetId = _datasetContext.Datasets.Where(w => w.DatasetName == datasetName && w.Asset.SaidKeyCode == saidAssetKey && w.NamedEnvironment == targetNamedEnvironment && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.DatasetId).FirstOrDefault();
+            
+            return (datasetId, (datasetId != 0));
+        }
+
         #region "private functions"
         private static void ValidateDatasetCategories(DatasetSchemaDto dto, ValidationResults results)
         {
@@ -876,11 +896,15 @@ namespace Sentry.data.Core
             MapToDto(ds, (DatasetDto)dto);
 
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
-            dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
-            dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
-            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.Delimiter;
-            dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
-            dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
+            //Only populate if dataset is associated with schema
+            if (ds.DatasetFileConfigs != null && ds.DatasetFileConfigs.Any())
+            {
+                dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
+                dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
+                dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.Delimiter;
+                dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
+                dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
+            }            
         }
 
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
@@ -908,7 +932,7 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
-            dto.DatasetRelatives = _datasetContext.Datasets.Where(w => w.DatasetName.Trim() == ds.DatasetName.Trim())
+            dto.DatasetRelatives = _datasetContext.Datasets.Where(w => w.DatasetName.Trim() == ds.DatasetName.Trim() && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active)
                                     .Select(s => new DatasetRelativeDto(s.DatasetId, s.NamedEnvironment, GetUrl(s.DatasetId)))
                                     .ToList();
         }

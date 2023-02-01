@@ -227,6 +227,7 @@
     <Compile Include="DTO\Schema\SchemaConsumptionSnowflakeDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
+    <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
@@ -319,8 +320,10 @@
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
     <Compile Include="Entities\Migration\DatasetMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\DatasetMigrationRequestResponse.cs" />
     <Compile Include="Entities\Migration\MigrationRequest.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\SchemaMigrationRequestResponse.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Schema\SchemaConsumption.cs" />
     <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
@@ -332,6 +335,7 @@
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
     <Compile Include="Exceptions\DataApplicationServiceException.cs" />
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
+    <Compile Include="Exceptions\FeatureNotEnabledException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />

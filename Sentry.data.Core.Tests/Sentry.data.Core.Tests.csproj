@@ -151,6 +151,7 @@
     <Compile Include="PaginateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaConsumptionDtoTransformerTests.cs" />
+    <Compile Include="SchemaTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessAreaServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessIntelligenceServiceTests.cs" />
     <Compile Include="ServiceImplementationTests\ConfigServiceTests.cs" />
@@ -181,6 +182,10 @@
     <Compile Include="RetrieverJobTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\DefaultSettings\defaultSettings.config">
+      <Link>defaultSettings.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config" />
     <Content Include="ExpectedJSON\BasicSchema_String.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
