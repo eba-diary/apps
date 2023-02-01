@@ -15,7 +15,7 @@ namespace Sentry.data.Infrastructure
 {
     public class MotiveProvider : IMotiveProvider
     {
-        private IHttpClientGenerator _httpClientGenerator;
+        private readonly HttpClient client;
         private IS3ServiceProvider _s3ServiceProvider;
         private IDatasetContext _datasetContext;
         private IDataFlowService _dataFlowService;
@@ -23,9 +23,9 @@ namespace Sentry.data.Infrastructure
         private IAuthorizationProvider _authorizationProvider;
 
 
-        public MotiveProvider(IHttpClientGenerator httpClientGenerator, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IEncryptionService encryptionService, IAuthorizationProvider authorizationProvider)
+        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IEncryptionService encryptionService, IAuthorizationProvider authorizationProvider)
         {
-            _httpClientGenerator = httpClientGenerator;
+            client = httpClient;
             _s3ServiceProvider = s3ServiceProvider;
             _datasetContext = datasetContext;
             _dataFlowService = dataFlowService;
@@ -36,19 +36,25 @@ namespace Sentry.data.Infrastructure
         public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
         {
             var motiveCompaniesUrl = Config.GetHostSetting("MotiveCompaniesUrl");
-            HttpClient httpClient = _httpClientGenerator.GenerateHttpClient(motiveCompaniesUrl);
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, token)}");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, token)}");
 
-            using (HttpResponseMessage response = await httpClient.GetAsync(motiveCompaniesUrl, HttpCompletionOption.ResponseHeadersRead))
+            using (HttpResponseMessage response = await client.GetAsync(motiveCompaniesUrl, HttpCompletionOption.ResponseHeadersRead))
             {
                 using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                 using (StreamReader streamReader = new StreamReader(contentStream))
                 using (JsonReader jsonReader = new JsonTextReader(streamReader))
                 {
                     JObject responseObject = JObject.Load(jsonReader);
-                    token.TokenName = responseObject.Value<string>("companies[0].company");
-                    var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
-                    _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                    var temp = responseObject.Value<string>("error");
+                    if (string.IsNullOrEmpty(responseObject.Value<string>("error")))
+                    {
+                        JArray companies = (JArray)responseObject["companies"];
+                        JObject firstCompany = (JObject)companies[0];
+                        token.TokenName = firstCompany.GetValue("company").Value<string>("name");
+
+                        var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
+                        _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                    }
                 }
                 _datasetContext.SaveChanges();
             }

@@ -265,9 +265,10 @@
     <Content Include="ExpectedJSON\PagingHttps_SimpleNestedResponse.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="ExpectedJSON\Motive_Companies.json">
+    <Content Include="ExpectedJSON\Motive_Companies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ExpectedJSON\Motive_Companies_Unexpected.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

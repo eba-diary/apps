@@ -117,16 +117,19 @@ namespace Sentry.data.Core
                         Sentry.Common.Logging.Logger.Error($"Unable to parse response tokens from JSON: {responseContent}");
                         return false;
                     }
-                    ((HTTPSSource)dataSource).Tokens.Add(new DataSourceToken()
+
+                    var newToken = new DataSourceToken()
                     {
                         CurrentToken = _encryptionService.EncryptString(accessToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey).Item1,
                         RefreshToken = _encryptionService.EncryptString(refreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey).Item1,
                         ParentDataSource = ((HTTPSSource)dataSource),
                         TokenExp = 7200,
                         TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret"
-                        //company name as token name once we start dropping comapny file.
-                    });
+                    };
+
+                    ((HTTPSSource)dataSource).Tokens.Add(newToken);
                     _datasetContext.SaveChanges();
+                    _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
                 }
             }
             catch (Exception e)
