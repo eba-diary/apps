@@ -12,6 +12,6 @@ namespace Sentry.data.Core
         [Description("Inheritance")]
         Inheritance,
         [Description("Snowflake Account")]
-        SnowflakeAcount = 4
+        SnowflakeAccount = 4
     }
 }
