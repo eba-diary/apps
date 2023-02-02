@@ -41,6 +41,8 @@ namespace Sentry.data.Web
         public AccessRequestType Type { get; set; }
         [DisplayName("AWS IAM Role ARN")]
         public string AwsArn { get; set; }
+        [DisplayName("Snowflake Account")]
+        public string SnowflakeAccount { get; set; }
         public AccessScope Scope { get; set; }
         public string TicketId { get; set; }
     }
