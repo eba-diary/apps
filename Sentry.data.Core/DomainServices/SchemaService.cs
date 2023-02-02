@@ -853,7 +853,7 @@ namespace Sentry.data.Core
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
-            var snowConsumption = schemaDto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault();
+            var snowConsumption = schemaDto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault(consumptionType => consumptionType.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet);
             if (snowConsumption != null)
             {
 
