@@ -182,6 +182,10 @@
     <Compile Include="RetrieverJobTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\DefaultSettings\defaultSettings.config">
+      <Link>defaultSettings.config</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config" />
     <Content Include="ExpectedJSON\BasicSchema_String.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
