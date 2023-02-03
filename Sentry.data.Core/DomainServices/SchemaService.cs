@@ -1265,16 +1265,10 @@ namespace Sentry.data.Core
 
             if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                 && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && dscNamedEnvironment == "QUAL")
+                && (dscNamedEnvironment == "QUAL" || dscNamedEnvironment == "PROD"))
             {
                 dbName += dscNamedEnvironment;
                 dbName += "NP";
-            }
-            else if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
-                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && dscNamedEnvironment == "PROD")
-            {
-                dbName += "NONPROD";
             }
             else
             {

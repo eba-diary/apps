@@ -1863,19 +1863,47 @@ namespace Sentry.data.Core.Tests
 
 
         [TestMethod]
-        public void SchemaService_GenerateSnowflakeDatabaseName_Include_Prefix()
+        [DataRow(" ")]
+        [DataRow("ABC")]
+        public void SchemaService_GenerateSnowflakeDatabaseName_Include_Prefix(string allowableEnvironments)
         {
             //Arrange
             Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
-            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("All");
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(allowableEnvironments);
 
             var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null);
 
             //Act
             string dbName_TESTNP = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_QUALNP = schemaService.GenerateSnowflakeDatabaseName(false, "QUAL", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_QUALPROD = schemaService.GenerateSnowflakeDatabaseName(false, "QUAL", NamedEnvironmentType.Prod.ToString(), "RAWQUERY_");
+            string dbName_PRODNP = schemaService.GenerateSnowflakeDatabaseName(false, "PROD", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_PRODPROD = schemaService.GenerateSnowflakeDatabaseName(false, "PROD", NamedEnvironmentType.Prod.ToString(), "RAWQUERY_");
+            string dbName_PRODNP_HR = schemaService.GenerateSnowflakeDatabaseName(true, "PROD", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_PRODPROD_HR = schemaService.GenerateSnowflakeDatabaseName(true, "PROD", NamedEnvironmentType.Prod.ToString(), "RAWQUERY_");
 
             //Assert
-            Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+            if (allowableEnvironments == " ")
+            {
+                Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUALNP", dbName_QUALNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUAL", dbName_QUALPROD);
+                Assert.AreEqual("DATA_RAWQUERY_PRODNP", dbName_PRODNP);
+                Assert.AreEqual("DATA_RAWQUERY_PROD", dbName_PRODPROD);
+                Assert.AreEqual("WDAY_RAWQUERY_PRODNP", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_RAWQUERY_PROD", dbName_PRODPROD_HR);
+            }
+            else
+            {
+                Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUAL", dbName_QUALNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUAL", dbName_QUALPROD);
+                Assert.AreEqual("DATA_RAWQUERY_PROD", dbName_PRODNP);
+                Assert.AreEqual("DATA_RAWQUERY_PROD", dbName_PRODPROD);
+                Assert.AreEqual("WDAY_RAWQUERY_PROD", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_RAWQUERY_PROD", dbName_PRODPROD_HR);
+            }
+
         }
 
         [TestMethod]
@@ -1914,12 +1942,12 @@ namespace Sentry.data.Core.Tests
 
                 Assert.AreEqual("DATA_QUALNP", dbName_QUALNP);
                 Assert.AreEqual("DATA_QUAL", dbName_QUALPROD);
-                Assert.AreEqual("DATA_NONPROD", dbName_PRODNP);
+                Assert.AreEqual("DATA_PRODNP", dbName_PRODNP);
                 Assert.AreEqual("DATA_PROD", dbName_PRODPROD);
 
                 Assert.AreEqual("WDAY_QUALNP", dbName_QUALNP_HR);
                 Assert.AreEqual("WDAY_QUAL", dbName_QUALPROD_HR);
-                Assert.AreEqual("WDAY_NONPROD", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_PRODNP", dbName_PRODNP_HR);
                 Assert.AreEqual("WDAY_PROD", dbName_PRODPROD_HR);
             }
             else
