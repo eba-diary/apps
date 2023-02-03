@@ -4,98 +4,9 @@
     Layout = Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewBag.Fluid = true;
 }
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 <!DOCTYPE html>
-
-
-<!-- Modal for total files today-->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Details for Completed Files Today</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="142">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h3>There are a total of @Model.CompletedFiles completed files.</h3>
-                @if (Model.CompletedFiles > 6000)
-            {
-                <h4>An error has occured</h4>
-            } else
-            {
-                <h4>The number of completed files seems correct</h4>
-            }
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<!-- Modal for files in flight-->
-<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Details for In-Flight Files</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="142">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h3>There are a total of @Model.InFlightFiles in-flight files.</h3>
-                <!-- Display more details about the number of in-flight files-->
-                @if(Model.InFlightFiles > 300)
-                {
-                    <h3>Everything is Working</h3>
-                }
-                else
-                {
-                    <h3>Error occured</h3>
-                }
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal for failed files-->
-<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Details for Failed Files</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="142">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                
-                <h3>There are a total of @Model.FailedFiles failed files.</h3>
-                <!-- Display more details about the failed files-->
-                @if(Model.FailedFiles > 5)
-                {
-                    <h2>That is a lot of errors today</h2>
-                }
-                else
-                {
-                    <h2>Not many errors today</h2>
-                }
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal" tabindex="143">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <html>
 <body>
@@ -111,36 +22,37 @@
                 <div class="column">
                     <div class="container">
                         <h5>Total Files Today</h5>
-                        <a data-toggle="modal" data-target="#exampleModal"><strong class="num_style">@Model.CompletedFiles</strong></a>
+                        <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
                     </div>
 
                 </div>
                 <div class="column">
                     <div class="container">
                         <h5>Files In-Flight</h5>
-                        <a data-toggle="modal" data-target="#exampleModal2"><strong class="num_style">@Model.InFlightFiles</strong></a>
+                        <button id="buttonInFlightFiles"><strong class="num_style">@Model.InFlightFiles</strong></button>
                     </div>
 
                 </div>
                 <div class="column">
                     <div class="container">
                         <h5>File Failures</h5>
-                        <a data-toggle="modal" data-target="#exampleModal3"><strong class="failure_style">@Model.FailedFiles</strong></a>
+                        <button id="buttonFailedFiles"><strong class="failure_style">@Model.FailedFiles</strong></button>
                     </div>
 
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="failedFiles">
-        @Html.Partial("_FailedFilesDetails")
-    </div>
-    <div id="completedFiles">
-        @Html.Partial("_CompletedFilesDetails")
-    </div>
-    <div id="inFlightFiles">
-        @Html.Partial("_InFlightFilesDetails")
+    <div class="partialContainer">
+        <div id="failedFiles">
+            @Html.Partial("_FailedFilesDetails")
+        </div>
+        <div id="completedFiles">
+            @Html.Partial("_CompletedFilesDetails")
+        </div>
+        <div id="inFlightFiles">
+            @Html.Partial("_InFlightFilesDetails")
+        </div>
     </div>
 </body>
 </html>
@@ -178,5 +90,70 @@
         padding-right: 25px;
     }
 
-    
+    .partialContainer {
+        text-align: center;
+    }
+
+    #failedFiles, #completedFiles, #inFlightFiles {
+        display: none;
+    }
+
+    button {
+        border: none;
+        background-color: none!important;
+    }
 </style>
+
+<script>
+
+    // Elements of div to be hidden and displayed
+    dashboardDiv = document.getElementById("dashboard");
+    failedFileDiv = document.getElementById("failedFiles");
+    inFlightFilesDiv = document.getElementById("inFlightFiles");
+    completedFilesDiv = document.getElementById("completedFiles");
+
+    // JQuery for toggling Completed File details
+    $(document).ready(function () {
+        $("#buttonCompletedFiles").click(function () {
+            // show hide paragraph on button click
+            $("#completedFiles").toggle("slow", function () {
+                // check paragraph once toggle effect is completed
+                if ($("#completedFiles").is(":visible")) {
+                    //dashboardDiv.style.display = "none";
+                    inFlightFilesDiv.style.display = "none";
+                    failedFileDiv.style.display = "none";
+                } 
+            });
+        });
+    });
+
+    // JQuery for toggling Failed File details
+    $(document).ready(function () {
+        $("#buttonFailedFiles").click(function () {
+            // show hide paragraph on button click
+            $("#failedFiles").toggle("slow", function () {
+                // check paragraph once toggle effect is completed
+                if ($("#failedFiles").is(":visible")) {
+                    //dashboardDiv.style.display = "none";
+                    inFlightFilesDiv.style.display = "none";
+                    completedFilesDiv.style.display = "none";
+                }
+            });
+        });
+    });
+
+    // JQuery for toggling InFlight File details
+    $(document).ready(function () {
+        $("#buttonInFlightFiles").click(function () {
+            // show hide paragraph on button click
+            $("#inFlightFiles").toggle("slow", function () {
+                // check paragraph once toggle effect is completed
+                if ($("#inFlightFiles").is(":visible")) {
+                    //dashboardDiv.style.display = "none";
+                    failedFileDiv.style.display = "none";
+                    completedFilesDiv.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
