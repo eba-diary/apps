@@ -796,15 +796,15 @@ namespace Sentry.data.Core
 
         internal void CreateS3SinkConnector(DataFlow df)
         {
+            //ONLY CreateS3SinkConnector IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
+            if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
+            {
+                Logger.Info($"Method {nameof(CreateS3SinkConnector)} Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
+                return;
+            }
+
             if (df.IngestionType == (int)IngestionType.Topic)
             {
-                //ONLY SEND EMAIL IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
-                if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
-                {
-                    Logger.Info($"Method {nameof(CreateS3SinkConnector)} Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
-                    return;
-                }
-
                 //IF TOPIC NAME EXISTS ON ANY OTHER DATAFLOW (INCLUDING AN UPDATE ON A DATAFLOW WITH SAME TOPIC NAME AS IT ALREADY HAS) THEN DO NOT CREATE S3 SINK CONNECTOR
                 //COULD CREATE SCENARIO IN CONFLUENT API SINK CONNECTOR WHERE MULTIPLE CONNECTORS COULD CONNECT TO THE SAME TOPIC SINCE OLD CONNECTORS NOT CREATED BY UI HAD DIFFERENT NAMING CONVENTIONS
                 //IF YOU UPDATE AN OLD DATAFLOW, S3SINKCONNECTOR WILL BE GENERATED BASED ON TOPIC NAME AND IF EXISTING CONNECTOR HAS DIFFERENT NAMING CONVENTION THEN 2 CONNECTORS WILL POINT TO SAME TOPIC
@@ -815,7 +815,6 @@ namespace Sentry.data.Core
                     return;
                 }
 
-                
                 ConnectorCreateRequestDto requestDto = CreateConnectorRequestDto(df);
                 //NOTE: CreateS3SinkConnectorAsync is Async but we are CHOOSING to call CALL SYNCRONOUSLY WITHOUT AWAIT which releases caller BECAUSE CreateS3SinkConnectorAsync Actually returns immediately 
                 Task<ConnectorCreateResponseDto> task = _connectorService.CreateS3SinkConnectorAsync(requestDto);
