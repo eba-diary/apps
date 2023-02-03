@@ -92,10 +92,12 @@
 
     .partialContainer {
         text-align: center;
+        width: 50%;
     }
 
     #failedFiles, #completedFiles, #inFlightFiles {
         display: none;
+
     }
 
     button {
@@ -116,7 +118,7 @@
     $(document).ready(function () {
         $("#buttonCompletedFiles").click(function () {
             // show hide paragraph on button click
-            $("#completedFiles").toggle("slow", function () {
+            $("#completedFiles").toggle("fast", function () {
                 // check paragraph once toggle effect is completed
                 if ($("#completedFiles").is(":visible")) {
                     //dashboardDiv.style.display = "none";
@@ -131,7 +133,7 @@
     $(document).ready(function () {
         $("#buttonFailedFiles").click(function () {
             // show hide paragraph on button click
-            $("#failedFiles").toggle("slow", function () {
+            $("#failedFiles").toggle("fast", function () {
                 // check paragraph once toggle effect is completed
                 if ($("#failedFiles").is(":visible")) {
                     //dashboardDiv.style.display = "none";
@@ -146,7 +148,7 @@
     $(document).ready(function () {
         $("#buttonInFlightFiles").click(function () {
             // show hide paragraph on button click
-            $("#inFlightFiles").toggle("slow", function () {
+            $("#inFlightFiles").toggle("fast", function () {
                 // check paragraph once toggle effect is completed
                 if ($("#inFlightFiles").is(":visible")) {
                     //dashboardDiv.style.display = "none";
