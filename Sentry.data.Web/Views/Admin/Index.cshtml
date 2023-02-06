@@ -44,13 +44,13 @@
         </div>
     </div>
     <div class="partialContainer">
-        <div id="failedFiles">
+        <div id="failedFiles" class="MainButton">
             @Html.Partial("_FailedFilesDetails")
         </div>
-        <div id="completedFiles">
+        <div id="completedFiles" class="MainButton">
             @Html.Partial("_CompletedFilesDetails")
         </div>
-        <div id="inFlightFiles">
+        <div id="inFlightFiles" class="MainButton">
             @Html.Partial("_InFlightFilesDetails")
         </div>
     </div>
@@ -98,10 +98,10 @@
 
     #failedFiles, #completedFiles, #inFlightFiles {
         display: none;
-
+        margin: auto;
     }
 
-    button {
+    .MainButton {
         /*
         border: none;
         background-color: none!important;
@@ -121,6 +121,11 @@
     inFlightFilesDiv = document.getElementById("inFlightFiles");
     completedFilesDiv = document.getElementById("completedFiles");
 
+    // Elements of div to be hidden for going back to the main page of admin page
+    partialViewFailedFilesDiv = document.getElementById("partialViewFailedFiles");
+    partialViewCompletedFilesDiv = document.getElementById("partialViewCompletedFiles");
+    partialViewInFlightFiles = document.getElementById("partialViewInFlightFiles");
+
     // JQuery for toggling Completed File details
     $(document).ready(function () {
         $("#buttonCompletedFiles").click(function () {
@@ -128,9 +133,10 @@
             $("#completedFiles").toggle("fast", function () {
                 // check paragraph once toggle effect is completed
                 if ($("#completedFiles").is(":visible")) {
-                    //dashboardDiv.style.display = "none";
+                    dashboardDiv.style.display = "none";
                     inFlightFilesDiv.style.display = "none";
                     failedFileDiv.style.display = "none";
+                    partialViewCompletedFilesDiv.style.display = "block";
                 } 
             });
         });
@@ -143,9 +149,10 @@
             $("#failedFiles").toggle("fast", function () {
                 // check paragraph once toggle effect is completed
                 if ($("#failedFiles").is(":visible")) {
-                    //dashboardDiv.style.display = "none";
+                    dashboardDiv.style.display = "none";
                     inFlightFilesDiv.style.display = "none";
                     completedFilesDiv.style.display = "none";
+                    partialViewFailedFilesDiv.style.display = "block";
                 }
             });
         });
@@ -158,11 +165,37 @@
             $("#inFlightFiles").toggle("fast", function () {
                 // check paragraph once toggle effect is completed
                 if ($("#inFlightFiles").is(":visible")) {
-                    //dashboardDiv.style.display = "none";
+                    dashboardDiv.style.display = "none";
                     failedFileDiv.style.display = "none";
                     completedFilesDiv.style.display = "none";
+                    partialViewInFlightFiles.style.display = "block";
                 }
             });
+        });
+    });
+
+    // Go back from the Completed Files partial View
+    $(document).ready(function () {
+        $("#partialFailedButton").click(function () {
+            partialViewFailedFilesDiv.style.display = "none";
+            dashboardDiv.style.display = "block";
+
+        });
+    });
+
+    // Go back from the Completed Files partial View
+    $(document).ready(function () {
+        $("#partialCompletedButton").click(function () {
+            partialViewCompletedFilesDiv.style.display = "none";
+            dashboardDiv.style.display = "block";
+        });
+    });
+
+    // Go back from the Completed Files partial View
+    $(document).ready(function () {
+        $("#partialInFlightButton").click(function () {
+            partialViewInFlightFiles.style.display = "none";
+            dashboardDiv.style.display = "block";
         });
     });
 </script>
