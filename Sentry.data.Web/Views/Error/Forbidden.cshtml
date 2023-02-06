@@ -4,15 +4,16 @@
 }
 
 @*This Forbidden page is triggered by MVC AuthorizeByPermission attribute security around controllers*@
-<div class="sentry-error-container">
-    <br /><br />
-    <em class="fa fa-exclamation-triangle fa-3x text-danger"></em><br />
-    <span class="sentry-error-code">data.sentry.com permission needed</span>
-    <br /><br />
-    <span class="sentry-error-title">Oops!</span><br />
-    <span class="sentry-error-title-descr">(permission)</span>
-    <br /><br /><br />
-    Unfortunately you are not allowed to view this page.<br />
-    Please <a class="forbiddenHero" target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">click here</a> or go to our help menu above to find out how to get access through <a class="forbiddenHero" target="_blank" href="https://myaccess.sentry.com">My Access</a>.
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-8 col-sm-12">
+            <h1 class="error-icon">Oops!</h1>
+            <h4 class="pt-1">Error 401: Unauthorized</h4>
+            <p>
+                You are not authorized to view this page.<br>
+                Please view our <a href="https://confluence.sentry.com/display/CLA/Access+Guide">access guide</a> or contact <a href="mailto:DSCSupport@sentry.com?Subject=Access Help">DSC Support.</a>
+            </p>
+        </div>
+    </div>
 </div>
-
