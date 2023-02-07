@@ -207,6 +207,20 @@ namespace Sentry.data.Web.Helpers
             return items.OrderBy(o => o.Value);
         }
 
+        public static IEnumerable<SelectListItem> BuildSchemaDropDown(IDatasetContext context, int datasetId, int selectedSchemaId)
+        {
+            List<SelectListItem> itemList = new List<SelectListItem>();
+            if (selectedSchemaId == 0)
+            {
+                itemList.Add(new SelectListItem { Text = "Select Schema", Value = selectedSchemaId.ToString(), Selected = true, Disabled = true });
+            }
+
+            itemList.AddRange(context.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId)
+                .Select(s => new SelectListItem { Text = s.Schema.Name, Value = s.Schema.SchemaId.ToString() } ));
+
+            return itemList;
+        }
+
         public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
         {
             List<SelectListItem> options = new List<SelectListItem>();

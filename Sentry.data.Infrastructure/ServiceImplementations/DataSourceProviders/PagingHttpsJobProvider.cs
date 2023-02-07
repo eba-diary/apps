@@ -511,7 +511,7 @@ namespace Sentry.data.Infrastructure
 
         private string RequestLog(PagingHttpsConfiguration config)
         {
-            string log = config.RequestUri;
+            string log = config.Source.BaseUri + config.RequestUri;
 
             if (config.Options.RequestMethod == HttpMethods.post)
             {

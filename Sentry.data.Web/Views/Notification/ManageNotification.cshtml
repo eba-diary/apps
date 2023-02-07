@@ -3,10 +3,14 @@
     ViewBag.Title = "Manage Notifications";
 }
 
+
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+}
+
 <h1>Notifications</h1>
 <hr />
-
-
 
 <div class="form-group">
     @if (Model.CanModifyNotifications)
@@ -51,11 +55,10 @@
 
 
 @section Scripts{
-    @Scripts.Render("~/bundles/dataTables")
+    <script src="@Html.GetContent("datatables.*.js")"></script>
     <script>
         $(function () {
             data.Notification.Init();
         });
     </script>
-
 }

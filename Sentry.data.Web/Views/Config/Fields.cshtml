@@ -194,7 +194,7 @@
 
 
                     <div class="descriptionContainer">
-                        <textarea class="w-75" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
+                        <textarea class="w-75" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description"></textarea>
                         <div class="rightButton float-right" data-bind="visible: $parent.Name === undefined">
 
                             <button type="button" class="btn btn-xs btn-danger p-2" data-bind='click: $parent.removeRow'>
@@ -748,10 +748,7 @@
             };
 
             self.save = function () {
-                console.log(ko.toJS(vm.Rows));
                 var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid', 'Length']);
-                console.log(a);
-
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
                 //since we do not need example.com
                 url_parts.shift();
@@ -933,7 +930,6 @@
                 url: "/api/v1/metadata/datasets/" + url_parts[3] + "/schemas/" + url_parts[5] + "/columns" ,
                 contentType: "application/json",
                 success: function (returnedData) {
-                    console.log(returnedData);
                     $('#panelSpinner').hide();
                     $('#rowsContainer').show();
 

@@ -34,6 +34,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.RejectedReason, (m) => m.Column("Rejected_DSC"));
             this.Property((x) => x.GrantPermissionToUserId, (m) => m.Column("GrantPermissionToUser_ID"));
             this.Property((x) => x.AwsArn);
+            this.Property((x) => x.SnowflakeAccount);
             this.Property((x) => x.IsSystemGenerated);
 
             this.Bag(x => x.AddedPermissions, (m) =>

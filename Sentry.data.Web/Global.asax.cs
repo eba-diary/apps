@@ -1,15 +1,12 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Infrastructure;
-using Sentry.data.Web;
 using StackExchange.Profiling;
 using System;
-using System.Linq;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using System.Web.Optimization;
 using System.Web.Routing;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Web
 {
@@ -33,7 +30,6 @@ namespace Sentry.data.Web
 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
             MiniProfilerConfig.RegisterMiniProfilerSettings();
             ModelBinders.Binders.Add(typeof(DataTables.Shared.DataTablesRequest), new DataTables.Mvc.DataTablesBinder());
 

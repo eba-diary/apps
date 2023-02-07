@@ -796,19 +796,28 @@ namespace Sentry.data.Core
 
         internal void CreateS3SinkConnector(DataFlow df)
         {
-            //ONLY SEND EMAIL IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
+            //ONLY CreateS3SinkConnector IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
             if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
             {
-                Logger.Info($"Method <SendS3SinkConnectorRequestEmail> Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
+                Logger.Info($"Method {nameof(CreateS3SinkConnector)} Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
                 return;
             }
 
             if (df.IngestionType == (int)IngestionType.Topic)
             {
-                ConnectorCreateRequestDto requestDto = CreateConnectorRequestDto(df);
+                //IF TOPIC NAME EXISTS ON ANY OTHER DATAFLOW (INCLUDING AN UPDATE ON A DATAFLOW WITH SAME TOPIC NAME AS IT ALREADY HAS) THEN DO NOT CREATE S3 SINK CONNECTOR
+                //COULD CREATE SCENARIO IN CONFLUENT API SINK CONNECTOR WHERE MULTIPLE CONNECTORS COULD CONNECT TO THE SAME TOPIC SINCE OLD CONNECTORS NOT CREATED BY UI HAD DIFFERENT NAMING CONVENTIONS
+                //IF YOU UPDATE AN OLD DATAFLOW, S3SINKCONNECTOR WILL BE GENERATED BASED ON TOPIC NAME AND IF EXISTING CONNECTOR HAS DIFFERENT NAMING CONVENTION THEN 2 CONNECTORS WILL POINT TO SAME TOPIC
+                //If topic exists on any "deleted" DataFlows matching TopicName, do not create S3SinkConnector since one was already created
+                if (_datasetContext.DataFlow.Any(w => w.TopicName != null && w.TopicName.ToUpper() == df.TopicName.ToUpper() && w.ObjectStatus != ObjectStatusEnum.Active))
+                {
+                    Logger.Info($"Method {nameof(CreateS3SinkConnector)}: {nameof(_connectorService.CreateS3SinkConnectorAsync)} not executed because TopicName already exists on this Dataflow or others.");
+                    return;
+                }
 
+                ConnectorCreateRequestDto requestDto = CreateConnectorRequestDto(df);
                 //NOTE: CreateS3SinkConnectorAsync is Async but we are CHOOSING to call CALL SYNCRONOUSLY WITHOUT AWAIT which releases caller BECAUSE CreateS3SinkConnectorAsync Actually returns immediately 
-                Task<ConnectorCreateResponseDto> task = _connectorService.CreateS3SinkConnectorAsync(requestDto);       
+                Task<ConnectorCreateResponseDto> task = _connectorService.CreateS3SinkConnectorAsync(requestDto);
                 ConnectorCreateResponseDto responseDto = task.Result;                                                   //USE Task.Result to essentially Syncronously wait for Result of task, here we need to know if call to S3Sink was successful or not
                 _emailService.SendS3SinkConnectorRequestEmail(df, requestDto, responseDto);                              //Send email with success or failure
             }

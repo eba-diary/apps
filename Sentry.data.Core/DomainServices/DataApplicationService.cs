@@ -254,6 +254,7 @@ namespace Sentry.data.Core
                 response.IsDatasetMigrated = !datasetExistsInTarget;
                 response.DatasetMigrationReason = datasetExistsInTarget? "Dataset already exists in target named environment" : "Success";
                 response.DatasetId = newDatasetId;
+                response.DatasetName = sourceDatasetMetadata.Item1;
                 response.SchemaMigrationResponses = schemaMigrationResponses;
             }
             catch (Exception ex)
@@ -607,12 +608,14 @@ namespace Sentry.data.Core
 
                     migrationResponse.MigratedSchema = true;
                     migrationResponse.TargetSchemaId = newSchemaId;
+                    migrationResponse.SchemaName = sourceSchemaName;
                     migrationResponse.SchemaMigrationReason = "Success";
                 }
                 else
                 {
                     newSchemaId = targetSchemaMetadata.existingTargetSchemaId;
                     migrationResponse.TargetSchemaId = newSchemaId;
+                    migrationResponse.SchemaName = sourceSchemaName;
                     migrationResponse.SchemaMigrationReason = "Schema configuration existed in target";
                 }
 
@@ -622,6 +625,7 @@ namespace Sentry.data.Core
                 {
                     migrationResponse.MigratedSchemaRevision = true;
                     migrationResponse.TargetSchemaRevisionId = newSchemaRevisionId;
+                    migrationResponse.SchemaRevisionName = _datasetContext.SchemaRevision.Where(w => w.SchemaRevision_Id == newSchemaRevisionId).Select(s => s.SchemaRevision_Name).FirstOrDefault();
                     migrationResponse.SchemaRevisionMigrationReason = "Success";
                 }
                 else
@@ -636,12 +640,14 @@ namespace Sentry.data.Core
                 {
                     migrationResponse.MigratedDataFlow = true;
                     migrationResponse.TargetDataFlowId = newDataFlowId;
+                    migrationResponse.DataFlowName = _datasetContext.DataFlow.Where(w => w.Id == newDataFlowId).Select(s => s.Name).FirstOrDefault();
                     migrationResponse.DataFlowMigrationReason = "Success";
                 }
                 else
                 {
                     string message = (sourceHasDataFlow) ? "Target dataflow metadata already exists" : "Source schema is not associated with dataflow";
                     migrationResponse.DataFlowMigrationReason = message;
+                    migrationResponse.DataFlowName = (!sourceHasDataFlow) ? null : _datasetContext.DataFlow.Where(w => w.Id == newDataFlowId).Select(s => s.Name).FirstOrDefault();
                     migrationResponse.TargetDataFlowId = newDataFlowId;
                 }
             }

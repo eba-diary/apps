@@ -172,6 +172,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_01" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_07" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_20" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -295,7 +296,6 @@
     <Build Include="Tables\HangFire\Set.sql" />
     <Build Include="Tables\HangFire\State.sql" />
     <Build Include="Tables\HangFire\Schema.sql" />
-    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_05\HistoryFix_Populate_Dataset_NamedEnvironments.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_22_01_01\HOTFIX-CLA-3556-DEFAULT-EXHIBIT-SAID-ASSET.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_21_04_06\HistoryFix_UPDATE_SCHEMA_SNOWFLAKESTAGE.sql" />
@@ -332,13 +332,13 @@
     <Build Include="Tables\DatasetFileDrop.sql" />
     <Build Include="Tables\DatasetFileQuery.sql" />
     <Build Include="Tables\DatasetFileRaw.sql" />
+    <Build Include="Scripts\Pre-Deploy\_PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
     <None Include="Sentry.data.Database.sqlproj.user" />
     <None Include="Sentry_1.data.Database.publish.xml" />
     <Build Include="Tables\DatasetCategory.sql" />
-    <PreDeploy Include="Scripts\Pre-Deploy\_PreDeployment.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_2_1\InsertCategoriesToTemp.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\EventType.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_2_2\AddFileExtension.sql" />
@@ -428,6 +428,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4479-MigrateTokensFromDataSourceToTokenTable.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_20\CLA-4921-RemoveStandardizeOnUTCTime.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />

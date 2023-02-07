@@ -21,14 +21,14 @@ data._Layout = {
             return false;
         });
 
-        //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-        //retrieve badges
-        //$.getJSON("/Admin/GetBadges", function (data) {
-        //    if (data.approvalCount > 0) $("#approveBadge").html(data.approvalCount);
-        //    if (data.completedCount > 0) $("#completeBadge").html(data.completedCount);
-        //    if (data.approvalCount > 0 || data.completedCount > 0) $("#adminBadge").html(data.approvalCount + data.completedCount);
-        //});
-        //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
+
+        /* fix for pagination buttons holding onto focus style after click */
+        $(document).on('mouseup', '.pagination .page-item .page-link', () => {
+            document.activeElement.blur();
+        })
 
         $("body").removeClass("prevent-animation");
     }

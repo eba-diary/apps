@@ -28,6 +28,9 @@ pipeline {
  
                 // Restore Nuget packages
                 dotNetNuGetRestore solutionFile: 'Sentry.data.sln'
+
+                // Install NPM dependencies
+                dir('Sentry.data.Web') { npmInstall() }
  
                 // Begin the Sonar Scanner, using defaults (version: 1.0, language: cs)
                 dotNetBeginSonarScanner key: "DATA:Data.Sentry.Com", name: 'Data.Sentry.Com', version: "${currentBuild.displayName}", other: '/d:sonar.exclusions=**/Scripts/**,**/Content/**,**/App_Themes/**'
@@ -47,6 +50,13 @@ pipeline {
                 // Use defaults (MSBuild_2017, configuration: Release, platform: Any CPU, generateProjectSpecificOutputFolder: false)
                 // You can repeat the following line if you have multiple solution files to build
                 dotNetBuild 'Sentry.data.sln', generateProjectSpecificOutputFolder: 'True'
+
+                dir('Sentry.data.Web') {
+                   nodejs("Node 16") {
+                      bat 'npm run build-prod'                     
+                      copyFiles (source: 'dist', destination: '..//build//Sentry.data.Web//_PublishedWebsites//Sentry.data.Web//dist')
+                   }
+                }
             }
         }
  

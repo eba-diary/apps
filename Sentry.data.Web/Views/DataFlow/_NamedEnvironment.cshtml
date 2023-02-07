@@ -13,17 +13,18 @@
 
     @Html.ValidationMessageFor(model => Model.DataFlowNamedEnvironment, "", new { @class = "text-danger" })
 </div>
+
 <div class="md-form">
     <h4>What type of environment is this?</h4>
     <span id="DataFlowNamedEnvironmentSpinner"></span>
     @if (Model.DataFlowNamedEnvironmentDropDown.Any())
     {
         @Html.DropDownListFor(x => x.DataFlowNamedEnvironmentType, Model.DataFlowNamedEnvironmentTypeDropDown, new { @class = "mdb-select", @disabled = "true" })
-        @Html.HiddenFor(x => x.DataFlowNamedEnvironmentType)
     }
     else
     {
         @Html.DropDownListFor(x => x.DataFlowNamedEnvironmentType, Model.DataFlowNamedEnvironmentTypeDropDown, new { @class = "mdb-select" })
     }
-    @Html.HiddenFor(x => x.DataFlowNamedEnvironmentType)</div>
+    @Html.HiddenFor(x => x.DataFlowNamedEnvironmentType)
+</div>
 

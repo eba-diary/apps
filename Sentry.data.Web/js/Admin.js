@@ -827,17 +827,17 @@ data.Admin = {
                 },
                 columns: [
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         orderable: false,
                         data: null,
                         defaultContent: '<center><em id = "expand-collapse-icon" class = "fas fa-plus"></em></center>',
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         data: 'FileName'
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         type: 'date',
                         data: 'FirstEventTime',
                         render: function (data) {
@@ -845,7 +845,7 @@ data.Admin = {
                         }
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         type: 'date',
                         data: 'LastEventTime',
                         render: function (data) {
@@ -853,11 +853,11 @@ data.Admin = {
                         }
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         data: 'Duration'
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         data: null,
                         render: (d) => function (data, type, row) {
                             if (d.AllEventsPresent && d.AllEventsComplete) {
@@ -876,7 +876,7 @@ data.Admin = {
         });
 
         // Add event listener for opening and closing details
-        $('#metricGroupsTable').on('click', 'td.dt-control', function () {
+        $('#metricGroupsTable').on('click', 'td.metric-detail-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row(tr);
             var icon = $(this).closest('tr').find("#expand-collapse-icon");
