@@ -22,6 +22,7 @@ namespace Sentry.data.Web
                 IsAddingPermission = true,
                 Type = model.Type,
                 AwsArn = model.AwsArn,
+                SnowflakeAccount = model.SnowflakeAccount,
                 Scope = model.Scope
             };
         }
@@ -74,7 +75,7 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = new List<string>() { model.Code },
                 SelectedApprover = model.SelectedApprover,
-                Type = model.Code == GlobalConstants.PermissionCodes.S3_ACCESS ? AccessRequestType.AwsArn : AccessRequestType.RemovePermission,
+                Type = model.Type,
                 IsAddingPermission = false,
                 AwsArn = model.Identity,
                 SaidKeyCode = model.SaidKeyCode,

@@ -999,6 +999,11 @@ data.Dataset = {
             data.AccessRequest.InitForDataset($(this).data("id"));
         });
 
+        $("[id^='btnMigrationRqeuest']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.MigrationRequest.InitForMigration($(this).data("id"));
+        });
+
         $("[id^='DownloadLatest']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.DownloadLatestDatasetFile($(this).data("id"));
@@ -2621,6 +2626,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
             $("#RequestAccessConsumerTypeSection").addClass("d-none");
             $("#RequestAccessFormSection").removeClass("d-none");
+            data.Dataset.setupFormSnowflakeAccount();
         });
         $("#RequestAccessConsumeAwsBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("AWS IAM");
@@ -2659,10 +2665,13 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateRequestAccessModal() {
-        var valid;
-        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val != ''
+        let valid;
+        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val() != ''
         if ($("#RequestAccess_Type").val() == "1") {
             valid = valid && data.Dataset.requestAccessValidateAwsArnIam();
+        }
+        if ($("#RequestAccess_Type").val() == "4") {
+            valid = valid && data.Dataset.requestAccessValidateSnowflakeAccount();
         }
         return valid;
     },
@@ -2711,6 +2720,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.requestAccessShowSaveChanges();
     },
 
+    setupFormSnowflakeAccount() {
+        $("#SnowflakeAccountForm").removeClass("d-none");
+        $("#RequestAccess_Type").val("4")
+        data.Dataset.requestAccessShowSaveChanges();
+    },
+
     requestAccessShowSaveChanges() {
         $("#RequestAccessSubmit").removeClass("d-none");
     },
@@ -2728,6 +2743,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
         else {
             $("#AccessRequestAwsArnValidationMessage").removeClass("d-none");
+            return false;
+        }
+    },
+
+    requestAccessValidateSnowflakeAccount() {
+        let valid = $("#RequestAccess_SnowflakeAccount").val() != '';
+        valid = valid && $("#RequestAccess_SnowflakeAccount").val().length < 255;
+        if (valid) {
+            $("#AccessRequestSnowflakeValidationMessage").addClass("d-none");
+            return true;
+        }
+        else {
+            $("#AccessRequestSnowflakeValidationMessage").removeClass("d-none");
             return false;
         }
     },

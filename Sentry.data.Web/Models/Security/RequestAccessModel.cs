@@ -12,6 +12,8 @@ namespace Sentry.data.Web
         //shared
         public int SecurableObjectId { get; set; }
 
+        public bool IsProd { get; set; }
+
         public string SecurableObjectName { get; set; }
 
         [DisplayName("Dataset")]
@@ -41,6 +43,8 @@ namespace Sentry.data.Web
         public AccessRequestType Type { get; set; }
         [DisplayName("AWS IAM Role ARN")]
         public string AwsArn { get; set; }
+        [DisplayName("Snowflake Account")]
+        public string SnowflakeAccount { get; set; }
         public AccessScope Scope { get; set; }
         public string TicketId { get; set; }
     }

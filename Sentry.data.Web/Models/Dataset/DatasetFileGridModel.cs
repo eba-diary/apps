@@ -13,7 +13,7 @@ namespace Sentry.data.Web
         {
         }
 
-        public DatasetFileGridModel(DatasetFile f, IAssociateInfoProvider associateInfoService, bool CLA3048_StandardizeOnUTCTime)
+        public DatasetFileGridModel(DatasetFile f, IAssociateInfoProvider associateInfoService)
         {
             this.Id = f.DatasetFileId;
             this.FileName = f.FileName;
@@ -24,7 +24,7 @@ namespace Sentry.data.Web
             //Used to differentiate between service and user accounts, user accounts will parse into a numeric value
             this.UploadUserName = int.TryParse(f.UploadUserName, out _) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
 
-            this.ModifiedDtm = CLA3048_StandardizeOnUTCTime ? DateTime.SpecifyKind(f.ModifiedDTM, DateTimeKind.Utc) : f.ModifiedDTM;
+            this.ModifiedDtm = DateTime.SpecifyKind(f.ModifiedDTM, DateTimeKind.Utc);
             this.CreatedDtm = DateTime.SpecifyKind(f.CreatedDTM, DateTimeKind.Utc);
             this.S3Key = f.FileLocation;
             this.ConfigFileName = f.DatasetFileConfig.Name;

@@ -28,13 +28,13 @@ namespace Sentry.data.Web.Tests
 
         [TestMethod]
         public void MigrationRequest_ToDto()
-        { 
-            DatasetMigrationRequestModel model = new DatasetMigrationRequestModel()
+        {
+            Models.ApiModels.Migration.DatasetMigrationRequestModel model = new Models.ApiModels.Migration.DatasetMigrationRequestModel()
             {
                 SourceDatasetId = 99,
                 TargetDatasetNamedEnvironment = "TEST",
                 TargetDatasetId = 22,
-                SchemaMigrationRequests = new List<SchemaMigrationRequestModel>()
+                SchemaMigrationRequests = new List<Models.ApiModels.Migration.SchemaMigrationRequestModel>()
                 {
                     new SchemaMigrationRequestModel()
                     {

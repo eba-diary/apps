@@ -86,6 +86,7 @@ namespace Sentry.data.Core
                 AddedPermissions = new List<SecurityPermission>(),
                 RemovedPermissions = new List<SecurityPermission>(),
                 AwsArn = model.AwsArn,
+                SnowflakeAccount = model.SnowflakeAccount,
                 IsSystemGenerated = model.IsSystemGenerated
             };
 
@@ -955,7 +956,6 @@ namespace Sentry.data.Core
             var consumerPermissionCodes = new List<string>() {
                 PermissionCodes.CAN_PREVIEW_DATASET,
                 PermissionCodes.CAN_VIEW_FULL_DATASET,
-                PermissionCodes.CAN_QUERY_DATASET
             };
             return _datasetContext.Permission.Where(x => consumerPermissionCodes.Contains(x.PermissionCode) &&
                                                          x.SecurableObject == SecurableEntityName.DATASET).ToList();

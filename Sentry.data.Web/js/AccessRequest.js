@@ -6,12 +6,12 @@
         $("#RequestAccessModal").remove();
         var modal = Sentry.ShowModalWithSpinner("Request Dataset Access");
         $(modal).attr("id","RequestAccessModal");
-        $("select").materialSelect();
 
         var createRequestUrl = "/Dataset/AccessRequest/?datasetId=" + encodeURI(datasetId);
 
         $.get(createRequestUrl, function (e) {
             modal.ReplaceModalBody(e);
+            $("#RequestAccessFormSection select").materialSelect();
             //auto check the preview 
             $("input[data-code='CanPreviewDataset']").prop('checked', true).attr('disabled', 'disabled');
             $("#SelectedPermissions").val($("input[type='checkbox']").first().data('code'));
