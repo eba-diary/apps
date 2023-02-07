@@ -268,7 +268,9 @@
     <Content Include="ExpectedJSON\Motive_Companies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="ExpectedJSON\Motive_Companies_Unexpected.json" />
+    <Content Include="ExpectedJSON\Motive_Companies_Unexpected.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
