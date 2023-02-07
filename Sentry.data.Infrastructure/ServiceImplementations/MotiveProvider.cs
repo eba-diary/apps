@@ -16,20 +16,18 @@ namespace Sentry.data.Infrastructure
     public class MotiveProvider : IMotiveProvider
     {
         private readonly HttpClient client;
-        private IS3ServiceProvider _s3ServiceProvider;
-        private IDatasetContext _datasetContext;
-        private IDataFlowService _dataFlowService;
-        private IEncryptionService _encryptionService;
-        private IAuthorizationProvider _authorizationProvider;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IDataFlowService _dataFlowService;
+        private readonly IAuthorizationProvider _authorizationProvider;
 
 
-        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IEncryptionService encryptionService, IAuthorizationProvider authorizationProvider)
+        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider)
         {
             client = httpClient;
             _s3ServiceProvider = s3ServiceProvider;
             _datasetContext = datasetContext;
             _dataFlowService = dataFlowService;
-            _encryptionService = encryptionService;
             _authorizationProvider = authorizationProvider;
         }
 
@@ -45,7 +43,6 @@ namespace Sentry.data.Infrastructure
                 using (JsonReader jsonReader = new JsonTextReader(streamReader))
                 {
                     JObject responseObject = JObject.Load(jsonReader);
-                    var temp = responseObject.Value<string>("error");
                     if (string.IsNullOrEmpty(responseObject.Value<string>("error")))
                     {
                         JArray companies = (JArray)responseObject["companies"];
