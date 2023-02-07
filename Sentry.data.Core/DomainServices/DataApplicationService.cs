@@ -265,7 +265,53 @@ namespace Sentry.data.Core
             }
 
             Logger.Info($"{methodName} Method End");
+
+            //AUSTIN call CreateMigrationHistory here
+            CreateMigrationHistory(migrationRequest, response);
+
             return response;
+        }
+
+        //create a method to log all the migration history
+        private void CreateMigrationHistory(DatasetMigrationRequest request, DatasetMigrationRequestResponse response)
+        {
+            List<MigrationHistoryDetail> details = new List<MigrationHistoryDetail>();
+           
+
+            MigrationHistory history = new MigrationHistory(){ CreateDateTime = DateTime.Now};
+
+            try
+            {
+                _datasetContext.Add(history);
+
+                //CREATE DATASET HISTORY
+                MigrationHistoryDetail historyDataset = new MigrationHistoryDetail()
+                {   
+                    MigrationHistoryId = history.MigrationHistoryId,
+                    SourceDatasetId = request.SourceDatasetId,
+                    IsDatasetMigrated = response.IsDatasetMigrated,
+                    DatasetId = response.DatasetId,
+                    DatasetName = response.DatasetName.Substring(0,250),
+                    DatasetMigrationMessage = response.DatasetMigrationReason.Substring(0, 250)
+                };
+                details.Add(historyDataset);
+
+                //AUSTIN
+                //LOOP THROUGH EACH SCHEMA AND ADD SCHEMA HISTORY
+                foreach(SchemaMigrationRequestResponse schemaResponse in response.SchemaMigrationResponses)
+                {
+
+
+                }
+                
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"{nameof(CreateMigrationHistory)} Failed to perform migration", ex);
+                _datasetContext.Clear();
+                throw;
+            }
         }
 
         public SchemaMigrationRequestResponse MigrateSchema(SchemaMigrationRequest request)
@@ -562,6 +608,7 @@ namespace Sentry.data.Core
             Logger.Info($"{methodName} Processing : {JsonConvert.SerializeObject(request)}");
 
             SchemaMigrationRequestResponse migrationResponse =  new SchemaMigrationRequestResponse();
+            migrationResponse.SourceSchemaId = request.SourceSchemaId;      //add sourceSchemaId because migration history will need it and its easier to decorate here then figure it out on backend
 
             bool sourceHasDataFlow = _datasetContext.DataFlow.Where(w => w.SchemaId == request.SourceSchemaId && (w.ObjectStatus == ObjectStatusEnum.Disabled || w.ObjectStatus == ObjectStatusEnum.Active)).Any();
 
@@ -666,6 +713,7 @@ namespace Sentry.data.Core
 
             return migrationResponse;
         }
+      
 
         private (int newDataFlowId, bool wasDataFlowMigrated) MigrateDataFlowWihtoutSave_Internal(int newSchemaId, int sourceSchemaId, bool sourceSchemaHasDataFlow, int targetDatasetId)
         {

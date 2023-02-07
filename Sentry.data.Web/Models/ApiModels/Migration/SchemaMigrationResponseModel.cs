@@ -7,6 +7,7 @@ namespace Sentry.data.Web.Models.ApiModels.Migration
 {
     public class SchemaMigrationResponseModel
     {
+        public int SourceSchemaId { get; set; }
         public bool IsSchemaMigrated { get; set; }
         public string SchemaMigrationMessage { get; set; }
         public int SchemaId { get; set; }

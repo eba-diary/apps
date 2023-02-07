@@ -309,6 +309,8 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
+    <Compile Include="Mappings\MigrationHistory\MigrationHistoryDetailMapping.cs" />
+    <Compile Include="Mappings\MigrationHistory\MigrationHistoryMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleSearchConsoleApiActionMapping.cs" />
