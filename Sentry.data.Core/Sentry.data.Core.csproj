@@ -180,6 +180,7 @@
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
+    <Compile Include="DomainServices\SampleService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\AuditDto.cs" />
     <Compile Include="DTO\BaseAuditDto.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\SampleDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
@@ -258,6 +260,7 @@
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="DTO\ValidationResultDto.cs" />
     <Compile Include="Entities\DataFlowMetrics\DataFlowMetric.cs" />
     <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
@@ -508,6 +511,7 @@
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISampleService.cs" />
     <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
@@ -528,6 +532,7 @@
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
+    <Compile Include="Interfaces\Sample\IDtoValidator.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
@@ -704,6 +709,8 @@
     <Compile Include="Interfaces\IJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />
     <Compile Include="Interfaces\IUserFavoriteService.cs" />
+    <Compile Include="Interfaces\Sample\IIdentifiableDto.cs" />
+    <Compile Include="Interfaces\Sample\IValidatableDto.cs" />
     <Compile Include="PollyPolicyKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />

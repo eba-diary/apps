@@ -507,6 +507,7 @@
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
     <Compile Include="ServiceImplementations\UserFavoriteService.cs" />
+    <Compile Include="ServiceImplementations\Sample\SampleDtoValidator.cs" />
     <Compile Include="ServiceImplementations\WallEService.cs" />
   </ItemGroup>
   <ItemGroup>

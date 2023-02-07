@@ -65,6 +65,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.Core.3.7.13.17\lib\net45\AWSSDK.Core.dll</HintPath>
     </Reference>
@@ -537,6 +540,7 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="AutoMapper\SampleProfile.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DataFlowMetricController.cs" />
     <Compile Include="Controllers\BaseSearchableController.cs" />
@@ -547,9 +551,11 @@
     <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
+    <Compile Include="Controllers\WebApi\BaseApiController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Controllers\WebApi\DataSourceController.cs" />
+    <Compile Include="Controllers\WebApi\SampleController.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DataSourceTokenExtension.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
@@ -600,6 +606,10 @@
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Migration\MigrationRequestModel.cs" />
     <Compile Include="Models\Migration\MigrationResponseModel.cs" />
+    <Compile Include="Models\Sample\AddSampleViewModel.cs" />
+    <Compile Include="Models\Sample\SampleResultViewModel.cs" />
+    <Compile Include="Models\Sample\SampleViewModel.cs" />
+    <Compile Include="Models\Sample\UpdateSampleViewModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionModel.cs" />
     <Compile Include="Models\Dataset\Permission\ManagePermissionsModel.cs" />
@@ -617,6 +627,7 @@
     <Compile Include="Models\Search\TileResultsModel.cs" />
     <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
+    <Compile Include="Models\ValidationResultViewModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
@@ -2170,6 +2181,7 @@
     <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
+    <Folder Include="Views\Playground\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
     <Folder Include="Views\Tag\" />

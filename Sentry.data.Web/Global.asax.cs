@@ -10,6 +10,10 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Sentry.Common.Logging;
+using AutoMapper;
+using System.Reflection;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
@@ -39,6 +43,37 @@ namespace Sentry.data.Web
 
             //Application Initialization
             Bootstrapper.Init();
+
+            var configuration = new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
+            IMapper mapper = new Mapper(configuration);
+            Bootstrapper.Container.Configure(config => {
+                config.For<IMapper>().Use(mapper);
+
+                List<SampleDto> dtos = new List<SampleDto>
+                {
+                    new SampleDto
+                    {
+                        SampleId = 1,
+                        Name = "Sample 1",
+                        Description = "First Sample"
+                    },
+                    new SampleDto
+                    {
+                        SampleId = 2,
+                        Name = "Sample 2",
+                        Description = "Second Sample"
+                    }
+                };
+
+                config.For<IList<SampleDto>>().Use(dtos);
+
+                Dictionary<Type, Lazy<IDtoValidator<IValidatableDto>>> validationRegistry = new Dictionary<Type, Lazy<IDtoValidator<IValidatableDto>>>
+                {
+                    { typeof(SampleDto), new Lazy<IDtoValidator<IValidatableDto>>(() => (IDtoValidator<IValidatableDto>)new SampleDtoValidator()) }
+                };
+
+                config.For<IDictionary<Type, Lazy<IDtoValidator<IValidatableDto>>>>().Singleton().Use(validationRegistry);
+            });
 
             //MVC dependency resolver
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);
