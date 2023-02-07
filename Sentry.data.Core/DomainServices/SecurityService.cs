@@ -118,7 +118,8 @@ namespace Sentry.data.Core
                 ParentSecurity = security,
                 AddedPermissions = new List<SecurityPermission>(),
                 RemovedPermissions = new List<SecurityPermission>(),
-                AwsArn = model.AwsArn
+                AwsArn = model.AwsArn,
+                SnowflakeAccount = model.SnowflakeAccount
             };
 
             foreach (Permission permission in model.Permissions)

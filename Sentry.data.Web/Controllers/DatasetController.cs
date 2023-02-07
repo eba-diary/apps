@@ -744,7 +744,7 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitRemovePermissionRequest([Bind(Prefix = "RemovePermission")]RemovePermissionModel model)
         {
             AccessRequest ar = model.ToCore();
-            
+
             string ticketId = await _datasetService.RequestAccessRemoval(ar);
 
             if (string.IsNullOrEmpty(ticketId))
