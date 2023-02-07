@@ -57,8 +57,6 @@ data.Favorites = {
 
         data.Favorites.HideFavorites();
 
-        console.log(favItems);
-
         $.post("/Favorites/Sort", { orderedFavoriteIds: favItems }, data.Favorites.ShowFavorites).fail(function () {
             $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem re-ordering Favorites.</div>");
         });

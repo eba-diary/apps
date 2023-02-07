@@ -6,6 +6,12 @@
     string textColor = "dsc-" + Model.CategoryColor + "-text";
 }
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+    <link rel="stylesheet" href="@Html.GetContent("fancybox_css.*.css")" />
+}
+
 <a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><em class="fas fa-chevron-left pr-3"></em>Back to list</a>
 
 <div style="font-feature-settings: 'lnum';">
@@ -220,11 +226,9 @@
 </div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/prettyCron")
-    @Scripts.Render("~/bundles/dataTables")
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />
-    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
-    <script src="~/Scripts/jquery.fancybox.min.js"></script>
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    <script src="@Html.GetContent("fancybox.*.js")"></script>
     <script>
         $(function () {
             data.Report.DetailInit(@Model.UseUpdatedSearchPage);

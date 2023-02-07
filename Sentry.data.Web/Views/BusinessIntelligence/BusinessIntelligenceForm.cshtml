@@ -1,5 +1,10 @@
 ﻿@model Sentry.data.Web.BusinessIntelligenceModel
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("fancybox_css.*.css")" />
+}
+
 <h2>@ViewData["Title"]</h2>
 
 @using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post, new { @id = "BusinessIntelligenceForm", @enctype = "multipart/form-data" }))
@@ -198,8 +203,7 @@
 <input type="hidden" id="hidBizObjEnumVal" value="@Model.BusinessObjectsEnumValue" />
 
 @section Scripts {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />
-    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
+    <script src="@Html.GetContent("fancybox.*.js")"></script>
     <script>
         $(function () {
             data.Report.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');

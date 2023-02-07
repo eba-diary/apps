@@ -338,3 +338,6 @@ ASALocalRun/
 .localhistory/
 /Sentry.data.Goldeneye/Sentry.data.Goldeneye.xml
 /Sentry.data.Common/Sentry.data.Common.xml
+
+# The "dist" folder will have all WebPack-compiled output
+/Sentry.data.Web/dist

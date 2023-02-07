@@ -154,7 +154,10 @@
     },
 
     completeDataInventorySearch: function (json) {
-        
+        $(".dataTables_length_select").select2({
+            minimumResultsForSearch: -1
+        });
+
         var table = $("#di-result-table").DataTable();
         var tableInfo = table.page.info();
         
