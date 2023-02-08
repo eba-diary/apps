@@ -33,7 +33,6 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
             HttpResponseMessage responseMessage = new HttpResponseMessage
@@ -70,7 +69,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, s3serviceProvider.Object, datasetContext.Object, dataFlowService.Object, encryptionService.Object, authProvider.Object);
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, s3serviceProvider.Object, datasetContext.Object, dataFlowService.Object, authProvider.Object);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
@@ -93,7 +92,6 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             MockRepository repository = new MockRepository(MockBehavior.Strict);
-            Mock<IEncryptionService> encryptionService = repository.Create<IEncryptionService>();
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
             HttpResponseMessage responseMessage = new HttpResponseMessage
@@ -124,7 +122,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, null, datasetContext.Object, null, encryptionService.Object, authProvider.Object);
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, null, datasetContext.Object, null, authProvider.Object);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
