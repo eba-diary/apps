@@ -46,6 +46,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3945_Telematics { get; }
         public IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
 
+
         public DataFeatures(UserService userService, ILdClient ldClient)
         {
             _userService = userService;
