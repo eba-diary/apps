@@ -10,7 +10,6 @@ using System.Web.Http;
 namespace Sentry.data.Web.Controllers.WebApi
 {
     [RoutePrefix(WebConstants.Routes.VERSION_SAMPLES)]
-    [ApiVersionBegin(WebAPI.Version.v20220609)]
     [WebApiAuthorizeUseApp]
     public class SampleController : BaseApiController
     {
@@ -26,6 +25,7 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// </summary>
         [HttpGet]
         [Route("{id}")]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(GetSampleResponseViewModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.NotFound)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
@@ -39,6 +39,7 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// </summary>
         [HttpPost]
         [Route("")]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
         [SwaggerResponse(System.Net.HttpStatusCode.Created, null, typeof(AddSampleResponseViewModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(List<ValidationResultViewModel>))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
@@ -52,6 +53,7 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// </summary>
         [HttpPut]
         [Route("{id}")]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(UpdateSampleResponseViewModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(List<ValidationResultViewModel>))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
