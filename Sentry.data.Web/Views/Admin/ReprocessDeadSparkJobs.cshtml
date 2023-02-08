@@ -19,13 +19,13 @@
     <input type="checkbox">
     <div class="form-inline">
         <div class="md-form">
-            @Html.TextBoxFor(x => x.currentDate, "{0:yyyy-MM-ddTHH:mm:ss}", new
-                       {
-                           @class = "form-control",
-                           required = "required",
-                           @type = "datetime-local",
-                           @id = "datetime-picker"
-                       })
+           @Html.TextBoxFor(x => x.DefaultDateTime, "{0:yyyy-MM-ddTHH:mm:ss}", new
+           {
+               @class = "form-control",
+               required = "required",
+               @type = "datetime-local",
+               @id = "datetime-picker"
+           })
         </div>
         <button id="timeCheck" class="btn btn-primary mb-2">Check for Dead Jobs</button>
     </div>

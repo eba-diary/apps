@@ -4,22 +4,23 @@
     ViewBag.Fluid = true;
 }
 <!--Styles to make it look decent-->
-@Styles.Render("~/bundles/css/main")
+<link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
 @RenderSection("styles", false)
-@Styles.Render("~/bundles/css/site")
+<link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+<link rel="stylesheet" href="@Html.GetContent("site_css.*.css")" />
+
 <!--Render DSC common header from layout controller-->
 @Html.Action("GetHeader", "Layout")
+
 <!--div containing side nav and current page-->
 <div class="d-flex">
     @RenderPage("~/Views/Shared/_AdminSideNav.cshtml")
-   
+
     <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
     <!--Render bundles necessary for admin pages before layout is applied to page-->
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/js")
-    @Scripts.Render("~/bundles/dataTables")
-    @Styles.Render("~/bundles/css/dataTables")
+    <script src="@Html.GetContent("main.*.js")"></script>
+    <script src="@Html.GetContent("site.*.js")"></script>
+    <script src="@Html.GetContent("datatables.*.js")"></script>
 
     @RenderSection("Scripts", false)
     <!--div containing in-line styling and current page-->
@@ -29,6 +30,7 @@
         </div>
     </div>
 </div>
+
 <!--Render DSC common footer from layout controller-->
 @Html.Action("GetFooter", "Layout")
 

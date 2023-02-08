@@ -57,7 +57,7 @@
 table#deadJobs td.dropdown-control {
     cursor:pointer;
 }
-table#metricGroupsTable td.dt-control {
+table#metricGroupsTable td.metric-detail-control {
     cursor: pointer;
 }
 

@@ -147,22 +147,22 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(DatasetMigrationResponseModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
         [Route("MigrateDataset")]
-        public async Task<IHttpActionResult> MigrateDataset([FromBody] DatasetMigrationRequestModel model)
+        public async Task<IHttpActionResult> MigrateDataset([FromBody] Models.ApiModels.Migration.DatasetMigrationRequestModel model)
         {
             async Task<IHttpActionResult> MigrateDatasetFunction()
             {
-                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateDataset).ToLower()}";
 
                 if (model == null)
                 {
-                    Logger.Debug($"{methodName} - Null {nameof(DatasetMigrationRequestModel)}");
-                    return BadRequest($"{nameof(DatasetMigrationRequestModel)} is required");
+                    Logger.Debug($"{methodName} - Null {nameof(Models.ApiModels.Migration.DatasetMigrationRequestModel)}");
+                    return BadRequest($"{nameof(Models.ApiModels.Migration.DatasetMigrationRequestModel)} is required");
                 }
 
                 Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
 
                 DatasetMigrationRequest request = model.ToDto();
-
+                
                 DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
                 DatasetMigrationResponseModel responseModel = response.ToDatasetMigrationResponseModel();
 
@@ -178,7 +178,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaMigrationResponseModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
         [Route("MigrateSchema")]
-        public async Task<IHttpActionResult> MigrateSchema([FromBody] SchemaMigrationRequestModel model)
+        public async Task<IHttpActionResult> MigrateSchema([FromBody] Models.ApiModels.Migration.SchemaMigrationRequestModel model)
         {
             IHttpActionResult MigrateDatasetFunction()
             {

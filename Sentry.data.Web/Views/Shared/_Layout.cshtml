@@ -2,7 +2,6 @@
 @using StackExchange.Profiling.Mvc;
 
 @{
-    //bool isSubPage = (ViewData["menu"] == null || (bool)ViewData["menu"] == true) ? true : false;
     bool isFluid = (ViewData["fluid"] == null || (bool)ViewData["fluid"] == false) ? false : true;
     string overflowScroll = ViewBag.OverflowScroll != null && (bool)ViewBag.OverflowScroll ? "overflow-scroll" : "";
 }
@@ -14,11 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    @Styles.Render("~/bundles/css/main")
-    @RenderSection("styles", false)
-    @Styles.Render("~/bundles/css/site")
 
+    <link rel="stylesheet" href="@Html.GetContent("main_css.*.css")" />
+    @RenderSection("styles", false)
+    <link rel="stylesheet" href="@Html.GetContent("site_css.*.css")" />
 </head>
+
 <body class="prevent-animation">
     <!-- BEGIN SENTRY COMMON HEADER -->
     @Html.Action("GetHeader", "Layout"@*, new { hasMenu = isSubPage }*@)
@@ -29,39 +29,21 @@
     @if (isFluid)
     {
         <div class="container-fluid body-content">
-            @* ###BEGIN SENTRYBAY### - Code below is SentryBay-specific *@
-            @if (IsSectionDefined("Documentation"))
-            {
-                <div class="row bs-callout bs-callout-info alert alert-dismissible " role="alert">
-                    <button type="button" class="close" data-dismiss="alert" title="Close Documentation"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    @RenderSection("Documentation", false)
-                </div>
-            }
-            @* ###END SENTRYBAY### - Code above is SentryBay-specific *@
             @RenderBody()
         </div>
     }
     else
     {
         <div class="container body-content">
-            @* ###BEGIN SENTRYBAY### - Code below is SentryBay-specific *@
-            @if (IsSectionDefined("Documentation"))
-            {
-            <div class="row bs-callout bs-callout-info alert alert-dismissible " role="alert">
-                <button type="button" class="close" data-dismiss="alert" title="Close Documentation"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                @RenderSection("Documentation", false)
-            </div>
-            }  
-            @* ###END SENTRYBAY### - Code above is SentryBay-specific *@
             @RenderBody()
         </div>
     }
 
     @Html.Action("GetFooter", "Layout")
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @Scripts.Render("~/bundles/js")    
+    <script src="@Html.GetContent("main.*.js")"></script>
+    <script src="@Html.GetContent("knockout.*.js")"></script>
+    <script src="@Html.GetContent("site.*.js")"></script>
 
     <script>
         $(document).ready(function () {

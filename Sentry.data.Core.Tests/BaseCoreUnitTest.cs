@@ -70,7 +70,6 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation => throw new NotImplementedException();
-            public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS => throw new NotImplementedException();

@@ -30,12 +30,28 @@ namespace Sentry.data.Web
         }
 
         public List<string> DatasetNamesForAsset { get; set; }
-        
+
         public string Scope { get; set; }
-        
+
         public string Identity { get; set; }
 
         public string Permission { get; set; }
         public string Code { get; set; }
+        public AccessRequestType AccessRequestType
+        {
+            get
+            {
+                if (Code == GlobalConstants.PermissionCodes.S3_ACCESS)
+                {
+                    return AccessRequestType.AwsArn;
+                }
+                else if (Code == GlobalConstants.PermissionCodes.SNOWFLAKE_ACCESS)
+                {
+                    return AccessRequestType.SnowflakeAccount;
+                }
+                return AccessRequestType.RemovePermission;
+            }
+
+        }
     }
 }

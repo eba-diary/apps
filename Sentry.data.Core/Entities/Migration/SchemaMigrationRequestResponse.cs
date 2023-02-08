@@ -10,14 +10,17 @@ namespace Sentry.data.Core
     {
         public bool MigratedSchema { get; set; }
         public int TargetSchemaId { get; set; }
+        public string SchemaName { get; set; }
         public string SchemaMigrationReason { get; set; }
 
         public bool MigratedSchemaRevision { get; set; }
         public int TargetSchemaRevisionId { get; set; }
+        public string SchemaRevisionName { get; set; }
         public string SchemaRevisionMigrationReason { get; set; }
 
         public bool MigratedDataFlow { get; set; }
         public int TargetDataFlowId { get; set; }
+        public string DataFlowName { get; set; }
         public string DataFlowMigrationReason { get; set; }
     }
 }

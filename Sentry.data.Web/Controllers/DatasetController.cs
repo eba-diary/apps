@@ -443,7 +443,7 @@ namespace Sentry.data.Web.Controllers
         public PartialViewResult EditDatasetFile(int id)
         {
             DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
-            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue());
+            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider);
 
             return PartialView("EditDataFile", item);
 
@@ -548,9 +548,7 @@ namespace Sentry.data.Web.Controllers
         {
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
-            bool CLA3048_StandardizeOnUTCTime = _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue();
-
-            Func<DatasetFile, DatasetFileGridModel> mapToModel = x => new DatasetFileGridModel(x, _associateInfoProvider, CLA3048_StandardizeOnUTCTime)
+            Func<DatasetFile, DatasetFileGridModel> mapToModel = x => new DatasetFileGridModel(x, _associateInfoProvider)
             {
                 HasDataAccess = us.CanViewData,
                 HasDataFileEdit = us.CanEditDataset,
@@ -583,7 +581,7 @@ namespace Sentry.data.Web.Controllers
 
             foreach (DatasetFile df in bundledList)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider, _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue())
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
                 {
                     HasDataAccess = us.CanViewData,
                     HasDataFileEdit = us.CanEditDataset,
@@ -611,7 +609,7 @@ namespace Sentry.data.Web.Controllers
                                                                                                     Fetch(x => x.DatasetFileConfig).ToList();
             foreach (DatasetFile dfversion in datasetFiles)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider, _featureFlags.CLA3048_StandardizeOnUTCTime.GetValue())
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider)
                 {
                     HasDataAccess = us.CanViewData,
                     HasDataFileEdit = us.CanEditDataset,
@@ -674,6 +672,7 @@ namespace Sentry.data.Web.Controllers
             {
                 model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
                 model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+                model.IsProd = Sentry.Configuration.Config.GetDefaultEnvironmentName() == GlobalConstants.Environments.PROD;
                 return PartialView("Permission/RequestAccessCLA3723", model);
             }
             model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
@@ -746,7 +745,7 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitRemovePermissionRequest([Bind(Prefix = "RemovePermission")]RemovePermissionModel model)
         {
             AccessRequest ar = model.ToCore();
-            
+
             string ticketId = await _datasetService.RequestAccessRemoval(ar);
 
             if (string.IsNullOrEmpty(ticketId))

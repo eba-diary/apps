@@ -98,3 +98,4 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_07\CLA-4660-HistoryFixUpperCaseS3ConnectorName.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4668-RemoveQueryPermissionFromDefaultSecurity.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4479-MigrateTokensFromDataSourceToTokenTable.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_02_20\CLA-4921-RemoveStandardizeOnUTCTime.sql
