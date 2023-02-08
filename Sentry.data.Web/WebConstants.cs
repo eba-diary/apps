@@ -17,7 +17,8 @@
             public const string VERSION_DATAFILE = VERSION + "/datafile";
             public const string VERSION_AUTH = VERSION + "/auth";
             public const string VERSION_DATASOURCE = VERSION + "/datasource";
-            public const string VERSION_SAMPLE = VERSION + "/sample";
+            public const string SAMPLES = "/samples";
+            public const string VERSION_SAMPLES = VERSION + SAMPLES;
         }
     }
 }

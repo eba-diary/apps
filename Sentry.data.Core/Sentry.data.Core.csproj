@@ -260,7 +260,6 @@
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
-    <Compile Include="DTO\ValidationResultDto.cs" />
     <Compile Include="Entities\DataFlowMetrics\DataFlowMetric.cs" />
     <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
@@ -357,6 +356,7 @@
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\FeatureNotEnabledException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
+    <Compile Include="Exceptions\ResourceNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DataSourceExtensions.cs" />
@@ -532,7 +532,6 @@
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
-    <Compile Include="Interfaces\Sample\IDtoValidator.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
@@ -710,7 +709,6 @@
     <Compile Include="DTO\TagGroupDto.cs" />
     <Compile Include="Interfaces\IUserFavoriteService.cs" />
     <Compile Include="Interfaces\Sample\IIdentifiableDto.cs" />
-    <Compile Include="Interfaces\Sample\IValidatableDto.cs" />
     <Compile Include="PollyPolicyKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
     public class ValidationResultViewModel
     {
-        public string Field { get; set; }
-        public string ValidationMessage { get; set; }
+        public string InvalidField { get; set; }
+        public List<string> ValidationMessages { get; set; }
     }
 }

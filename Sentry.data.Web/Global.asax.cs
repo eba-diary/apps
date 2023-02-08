@@ -1,19 +1,16 @@
-﻿using Sentry.data.Core;
+﻿using AutoMapper;
+using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Infrastructure;
-using Sentry.data.Web;
 using StackExchange.Profiling;
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Sentry.Common.Logging;
-using AutoMapper;
-using System.Reflection;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
@@ -44,51 +41,23 @@ namespace Sentry.data.Web
             //Application Initialization
             Bootstrapper.Init();
 
-            var configuration = new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
-            IMapper mapper = new Mapper(configuration);
-            Bootstrapper.Container.Configure(config => {
-                config.For<IMapper>().Use(mapper);
-
-                List<SampleDto> dtos = new List<SampleDto>
-                {
-                    new SampleDto
-                    {
-                        SampleId = 1,
-                        Name = "Sample 1",
-                        Description = "First Sample"
-                    },
-                    new SampleDto
-                    {
-                        SampleId = 2,
-                        Name = "Sample 2",
-                        Description = "Second Sample"
-                    }
-                };
-
-                config.For<IList<SampleDto>>().Use(dtos);
-
-                Dictionary<Type, Lazy<IDtoValidator<IValidatableDto>>> validationRegistry = new Dictionary<Type, Lazy<IDtoValidator<IValidatableDto>>>
-                {
-                    { typeof(SampleDto), new Lazy<IDtoValidator<IValidatableDto>>(() => (IDtoValidator<IValidatableDto>)new SampleDtoValidator()) }
-                };
-
-                config.For<IDictionary<Type, Lazy<IDtoValidator<IValidatableDto>>>>().Singleton().Use(validationRegistry);
-            });
-
             //MVC dependency resolver
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);
 
+            var configuration = new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
+            IMapper mapper = new Mapper(configuration);
 
-            var registry = new StructureMap.Registry();
-            registry.Scan((scanner) =>
-            {
-                scanner.TheCallingAssembly();
-                scanner.WithDefaultConventions();
-                scanner.With(new ControllerConvention());
-            });
             Bootstrapper.Container.Configure((x) =>
             {
-                x.AddRegistry(registry);
+                x.For<IList<SampleDto>>().Use(new List<SampleDto>()).Singleton();
+                x.For<IMapper>().Use(mapper);
+                x.Scan((s) =>
+                {
+                    s.TheCallingAssembly();
+                    s.WithDefaultConventions();
+                    s.With(new ControllerConvention());
+                    s.AddAllTypesOf<IViewModelValidator>(); //register all validators
+                });
                 x.For<ICurrentUserIdProvider>().Use<WebCurrentUserIdProvider>();
             });
 

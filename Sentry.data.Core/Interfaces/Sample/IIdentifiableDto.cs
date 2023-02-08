@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Core
 {
-    public interface IIdentifiableDto : IValidatableDto
+    public interface IIdentifiableDto
     {
         void SetId(int id);
     }

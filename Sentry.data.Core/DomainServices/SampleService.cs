@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -17,18 +15,42 @@ namespace Sentry.data.Core
 
         public async Task<SampleDto> AddSample(SampleDto dto)
         {
-            dto.SampleId = _samples.Max(x => x.SampleId) + 1;
+            dto.SampleId = _samples.Any() ? _samples.Max(x => x.SampleId) + 1 : 1;
             _samples.Add(dto);
             return dto;
+        }
+
+        public async Task<SampleDto> GetSample(int id)
+        {
+            SampleDto dto = _samples.FirstOrDefault(x => x.SampleId == id);
+            if (dto != null)
+            {
+                return dto;
+            }
+
+            throw new ResourceNotFoundException();
         }
 
         public async Task<SampleDto> UpdateSample(SampleDto dto)
         {
             SampleDto existing = _samples.FirstOrDefault(x => x.SampleId == dto.SampleId);
-            existing.Name = dto.Name;
-            existing.Description = dto.Description;
 
-            return existing;
+            if (existing != null)
+            {
+                if (!string.IsNullOrWhiteSpace(dto.Name))
+                {
+                    existing.Name = dto.Name;
+                }
+
+                if (!string.IsNullOrWhiteSpace(dto.Description))
+                {
+                    existing.Description = dto.Description;
+                }
+
+                return existing;
+            }
+
+            throw new ResourceNotFoundException();
         }
     }
 }

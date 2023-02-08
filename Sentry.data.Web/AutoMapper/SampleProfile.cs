@@ -11,7 +11,10 @@ namespace Sentry.data.Web
             CreateMap<AddSampleViewModel, SampleDto>();
             CreateMap<UpdateSampleViewModel, SampleDto>();
 
-            CreateMap<ValidationResultDto, ValidationResultViewModel>();
+            CreateMap<SampleDto, SampleResponseViewModel>().ForMember(d => d.Id, x => x.MapFrom(s => s.SampleId)).IncludeAllDerived();
+            CreateMap<SampleDto, AddSampleResponseViewModel>();
+            CreateMap<SampleDto, UpdateSampleResponseViewModel>();
+            CreateMap<SampleDto, GetSampleResponseViewModel>();
         }
     }
 }
