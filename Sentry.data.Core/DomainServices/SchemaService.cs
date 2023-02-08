@@ -361,27 +361,24 @@ namespace Sentry.data.Core
             return 0;
         }
 
-        public void CreateConsumptionLayersForSchemaList(int[] schemaIdList)
+        public void CreateOrUpdateConsumptionLayersForSchema(int[] schemaIdList)
         {
             foreach(int schemaId in schemaIdList)
             {
                 FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
                 Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
                 FileSchemaDto dto = MapToDto(schema);
-                CreateConsumptionLayersForSchema(schema, dto, ds);
+
+                CreateOrUpdateConsumptionLayersForSchema(schema, dto, ds);
             }
         }
 
-        public void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
+        public void CreateOrUpdateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
         {
-            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
 
-            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds).Cast<SchemaConsumptionSnowflake>().ToList())
             {
-                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
-                {
-                    schema.ConsumptionDetails.Add(snowflakeConsumption);
-                }
+                schema.AddOrUpdateSnowflakeConsumptionLayer(snowflakeConsumption);
             }
 
             _datasetContext.SaveChanges();

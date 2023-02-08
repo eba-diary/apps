@@ -573,18 +573,21 @@ namespace Sentry.data.Web.WebApi.Controllers
 
 
         /// <summary>
-        /// Creates consumption layers for schema Id(s) provided.
+        /// Creates or updates consumption layer metadata
         /// </summary>
+        /// <remarks>
+        /// It is on caller to issue a resync consumption layer (syncconsumptionlayer endpoint)
+        /// </remarks>
         [HttpPost]
         [ApiVersionBegin(WebAPI.Version.v20220609)]
         [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-        [Route("CreateConsumptionLayers")]
+        [Route("CreateOrUpdateConsumptionLayers")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
-        public IHttpActionResult CreateConsumptionLayers(int[] schemaIdList)
+        public IHttpActionResult CreateOrUpdateConsumptionLayers(int[] schemaIdList)
         {
-            Sentry.Common.Logging.Logger.Info($"{_userService.GetCurrentRealUser().AssociateId} called CreateConsumptionLayers on Dataset Id(s) {schemaIdList}");
+            Logger.Info($"{_userService.GetCurrentRealUser().AssociateId} called {nameof(CreateOrUpdateConsumptionLayers)} on Schema Id(s) {schemaIdList}");
             //validate
             foreach (int schemaId in schemaIdList)
             {
@@ -595,7 +598,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
             }
             //run jobs
-            _schemaService.CreateConsumptionLayersForSchemaList(schemaIdList);
+            _schemaService.CreateOrUpdateConsumptionLayersForSchema(schemaIdList);
             return Ok();
         }
 
