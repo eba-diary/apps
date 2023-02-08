@@ -24,14 +24,16 @@ namespace Sentry.data.Web.Controllers
         private readonly IAuditService _auditSerivce;
         private readonly IDeadSparkJobService _deadSparkJobService;
         private readonly ISupportLinkService _supportLinkService;
+        private readonly IDataFeatures _dataFeatures;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService, IAuditService auditSerivce)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService, IAuditService auditSerivce, IDataFeatures dataFeatures)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
             _auditSerivce = auditSerivce;
             _deadSparkJobService = deadSparkJobService;
             _supportLinkService = supportLinkService;
+            _dataFeatures = dataFeatures;
         }
 
       
@@ -219,12 +221,17 @@ namespace Sentry.data.Web.Controllers
             // service method that return the number of failed files
             int totalFailedFiles = 2;
 
+            // boolean variable that captures feature flag
+            //bool featureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue();
+            bool featureFlag = true;
+            //bool featureFlag = false;
 
             AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
             {
                 CompletedFiles = totalCompletedFiles,
                 InFlightFiles = totalInFlightFiles,
                 FailedFiles = totalFailedFiles,
+                FeatureFlag = featureFlag,
             };
 
             return View(adminElasticFileModel);

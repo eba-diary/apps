@@ -39,5 +39,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }
         IFeatureFlag<bool> CLA3945_Telematics { get; }
         IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
+
+        IFeatureFlag<bool> CLA4553_PlatformActivity { get; }
     }
 }

@@ -10,50 +10,56 @@
 
 <html>
 <body>
-    <div id="dashboard">
+    @if (Model.FeatureFlag == true) {
+        <div id="dashboard">
 
-        <div>
-            <h1>Welcome to the Admin Page</h1>
-        </div>
-        <div class="processingActivityDiv">
-            <h3>Processing Activity</h3>
-            <br />
-            <div class="row">
-                <div class="column">
-                    <div class="container">
-                        <h5>Total Files Today</h5>
-                        <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
-                    </div> 
+            <div>
+                <h1>Welcome to the Admin Page</h1>
+            </div>
+            <div class="processingActivityDiv">
+                <h3>Processing Activity</h3>
+                <br />
+                <div class="row">
+                    <div class="column">
+                        <div class="container">
+                            <h5>Total Files Today</h5>
+                            <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
+                        </div>
 
-                </div>
-                <div class="column">
-                    <div class="container">
-                        <h5>Files In-Flight</h5>
-                        <button id="buttonInFlightFiles"><strong class="num_style">@Model.InFlightFiles</strong></button>
                     </div>
+                    <div class="column">
+                        <div class="container">
+                            <h5>Files In-Flight</h5>
+                            <button id="buttonInFlightFiles"><strong class="num_style">@Model.InFlightFiles</strong></button>
+                        </div>
 
-                </div>
-                <div class="column">
-                    <div class="container">
-                        <h5>File Failures</h5>
-                        <button id="buttonFailedFiles"><strong class="failure_style">@Model.FailedFiles</strong></button>
                     </div>
+                    <div class="column">
+                        <div class="container">
+                            <h5>File Failures</h5>
+                            <button id="buttonFailedFiles"><strong class="failure_style">@Model.FailedFiles</strong></button>
+                        </div>
 
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="partialContainer">
-        <div id="failedFiles" class="MainButton">
-            @Html.Partial("_FailedFilesDetails")
+        <div class="partialContainer">
+            <div id="failedFiles" class="MainButton">
+                @Html.Partial("_FailedFilesDetails")
+            </div>
+            <div id="completedFiles" class="MainButton">
+                @Html.Partial("_CompletedFilesDetails")
+            </div>
+            <div id="inFlightFiles" class="MainButton">
+                @Html.Partial("_InFlightFilesDetails")
+            </div>
         </div>
-        <div id="completedFiles" class="MainButton">
-            @Html.Partial("_CompletedFilesDetails")
-        </div>
-        <div id="inFlightFiles" class="MainButton">
-            @Html.Partial("_InFlightFilesDetails")
-        </div>
-    </div>
+    }
+    else{
+        <h1>You do not have the right permissions to see this page</h1>
+    }
+
 </body>
 </html>
 

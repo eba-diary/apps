@@ -45,6 +45,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }
         public IFeatureFlag<bool> CLA3945_Telematics { get; }
         public IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
+        public IFeatureFlag<bool> CLA4553_PlatformActivity { get; }
 
 
         public DataFeatures(UserService userService, ILdClient ldClient)
