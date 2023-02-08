@@ -1,0 +1,32 @@
+﻿{
+  "companies": [
+    {
+      "company": {
+        "id": 1111,
+        "company_id": "KT1111111",
+        "name": "COMPANY NAME",
+        "street": "111 SENTRY RD",
+        "city": "STEVENS POINT",
+        "state": "WI",
+        "zip": "23232",
+        "dot_ids": [ "1110000" ],
+        "cycle": "",
+        "time_zone": "Central Time (US & Canada)",
+        "exception_24_hour_restart": "False",
+        "exception_8_hour_break": "False",
+        "exception_wait_time": "False",
+        "exception_short_haul": "False",
+        "exception_ca_farm_school_bus": "False",
+        "exception_adverse_driving": "False",
+        "metric_units": "False",
+        "minute_logs": "False",
+        "subscription_plan": "Starter"
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 25,
+    "page_no": 1,
+    "total": 1
+  }
+}
