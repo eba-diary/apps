@@ -598,7 +598,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
-    <Compile Include="Models\IResponseViewModel.cs" />
+    <Compile Include="Models\IResponseModel.cs" />
     <Compile Include="Models\Config\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
@@ -607,7 +607,6 @@
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Migration\MigrationRequestModel.cs" />
     <Compile Include="Models\Migration\MigrationResponseModel.cs" />
-    <Compile Include="Models\ResponseLinkViewModel.cs" />
     <Compile Include="Models\Sample\AddSampleResponseViewModel.cs" />
     <Compile Include="Models\Sample\AddSampleViewModel.cs" />
     <Compile Include="Models\Sample\GetSampleResponseViewModel.cs" />
@@ -632,15 +631,16 @@
     <Compile Include="Models\Search\TileResultsModel.cs" />
     <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
-    <Compile Include="Models\ValidationResultViewModel.cs" />
+    <Compile Include="Models\ValidationResponseModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
     <Compile Include="Validation\AddSampleViewModelValidator.cs" />
+    <Compile Include="Validation\FieldValidationResponseModel.cs" />
     <Compile Include="Validation\IValidationRegistry.cs" />
-    <Compile Include="Validation\IRequestViewModel.cs" />
-    <Compile Include="Validation\IViewModelValidator.cs" />
+    <Compile Include="Models\IRequestModel.cs" />
+    <Compile Include="Validation\IRequestModelValidator.cs" />
     <Compile Include="Validation\UpdateSampleViewModelValidator.cs" />
     <Compile Include="Validation\ValidationRegistry.cs" />
-    <Compile Include="Validation\ViewModelValidationException.cs" />
+    <Compile Include="Validation\RequestModelValidationException.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
     <Content Include="Content\admin.css" />

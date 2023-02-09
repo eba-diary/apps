@@ -2,7 +2,7 @@
 
 namespace Sentry.data.Web
 {
-    public abstract class SampleViewModel : IRequestViewModel
+    public abstract class SampleViewModel : IRequestModel
     {
         public string Name { get; set; }
         public string Description { get; set; }

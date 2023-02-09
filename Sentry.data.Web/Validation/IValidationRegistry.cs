@@ -2,6 +2,6 @@
 {
     public interface IValidationRegistry
     {
-        bool TryGetValidatorFor<T>(out IViewModelValidator validator) where T : IRequestViewModel;
+        bool TryGetValidatorFor<T>(out IRequestModelValidator validator) where T : IRequestModel;
     }
 }

@@ -56,7 +56,7 @@ namespace Sentry.data.Web
                     s.TheCallingAssembly();
                     s.WithDefaultConventions();
                     s.With(new ControllerConvention());
-                    s.AddAllTypesOf<IViewModelValidator>(); //register all validators
+                    s.AddAllTypesOf<IRequestModelValidator>(); //register all validators
                 });
                 x.For<ICurrentUserIdProvider>().Use<WebCurrentUserIdProvider>();
             });

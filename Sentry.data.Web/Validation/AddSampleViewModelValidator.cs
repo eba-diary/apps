@@ -3,36 +3,33 @@ using System.Linq.Dynamic;
 
 namespace Sentry.data.Web
 {
-    public class AddSampleViewModelValidator : IViewModelValidator<AddSampleViewModel>
+    public class AddSampleViewModelValidator : IRequestModelValidator<AddSampleViewModel>
     {
-        public void Validate(AddSampleViewModel viewModel)
+        public ValidationResponseModel Validate(AddSampleViewModel viewModel)
         {
-            List<ValidationResultViewModel> validationResults = new List<ValidationResultViewModel>();
+            ValidationResponseModel validationResponse = new ValidationResponseModel();
 
             if (string.IsNullOrWhiteSpace(viewModel.Name))
             {
-                validationResults.Add(new ValidationResultViewModel() { InvalidField = "Name", ValidationMessages = new List<string> { "Name is required" } });
+                validationResponse.AddFieldValidation("Name" ,"Name is required");
             }
 
             if (string.IsNullOrWhiteSpace(viewModel.Description))
             {
-                validationResults.Add(new ValidationResultViewModel() { InvalidField = "Description", ValidationMessages = new List<string> { "Description is required" } });
+                validationResponse.AddFieldValidation("Description", "Description is required");
             }
 
             if (string.IsNullOrWhiteSpace(viewModel.OriginalCreator))
             {
-                validationResults.Add(new ValidationResultViewModel() { InvalidField = "Original Creator", ValidationMessages = new List<string> { "Original Creator is required" } });
+                validationResponse.AddFieldValidation("Original Creator", "Original Creator is required");
             }
 
-            if (validationResults.Any())
-            {
-                throw new ViewModelValidationException(validationResults);
-            }
+            return validationResponse;
         }
 
-        public void Validate(IRequestViewModel viewModel)
+        public ValidationResponseModel Validate(IRequestModel viewModel)
         {
-            Validate((AddSampleViewModel)viewModel);
+            return Validate((AddSampleViewModel)viewModel);
         }
     }
 }

@@ -1,26 +1,23 @@
-﻿using System.Collections.Generic;
-
-namespace Sentry.data.Web
+﻿namespace Sentry.data.Web
 {
-    public class UpdateSampleViewModelValidator : IViewModelValidator<UpdateSampleViewModel>
+    public class UpdateSampleViewModelValidator : IRequestModelValidator<UpdateSampleViewModel>
     {
-        public void Validate(UpdateSampleViewModel viewModel)
+        public ValidationResponseModel Validate(UpdateSampleViewModel viewModel)
         {
+            ValidationResponseModel validationResponse = new ValidationResponseModel();
+
             if (string.IsNullOrWhiteSpace(viewModel.Name) && string.IsNullOrWhiteSpace(viewModel.Description))
             {
-                throw new ViewModelValidationException(new List<ValidationResultViewModel>() 
-                { 
-                    new ValidationResultViewModel
-                    {
-                        InvalidField = "Name/Description", ValidationMessages = new List<string> { "Name AND/OR Description is required" }
-                    } 
-                });
+                validationResponse.AddFieldValidation("Name", "Name AND/OR Description is required");
+                validationResponse.AddFieldValidation("Description", "Name AND/OR Description is required");
             }
+
+            return validationResponse;
         }
 
-        public void Validate(IRequestViewModel viewModel)
+        public ValidationResponseModel Validate(IRequestModel viewModel)
         {
-            Validate((UpdateSampleViewModel)viewModel);
+            return Validate((UpdateSampleViewModel)viewModel);
         }
     }
 }

@@ -3,7 +3,6 @@ using Sentry.data.Core;
 using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -41,7 +40,7 @@ namespace Sentry.data.Web.Controllers.WebApi
         [Route("")]
         [ApiVersionBegin(WebAPI.Version.v20220609)]
         [SwaggerResponse(System.Net.HttpStatusCode.Created, null, typeof(AddSampleResponseViewModel))]
-        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(List<ValidationResultViewModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> AddSample(AddSampleViewModel model)
         {
@@ -55,7 +54,7 @@ namespace Sentry.data.Web.Controllers.WebApi
         [Route("{id}")]
         [ApiVersionBegin(WebAPI.Version.v20220609)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(UpdateSampleResponseViewModel))]
-        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(List<ValidationResultViewModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> UpdateSample(int id, UpdateSampleViewModel model)
         {

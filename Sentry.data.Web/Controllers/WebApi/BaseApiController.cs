@@ -27,13 +27,13 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// </list>
         /// </summary>
         /// <typeparam name="dtoOut">Type of service method's OUT DTO</typeparam>
-        /// <typeparam name="viewModelOut">Type of response view model</typeparam>
+        /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="id">ID of the resource to be used by service method</param>
         /// <param name="service">Service method that takes single integer parameter to execute</param>
         /// <returns>IHttpActionResult instance with proper HTTP status code according to HTTP specifications</returns>
-        protected async Task<IHttpActionResult> ProcessRequestAsync<dtoOut, viewModelOut>(int id, Func<int, Task<dtoOut>> service) where viewModelOut : IResponseViewModel
+        protected async Task<IHttpActionResult> ProcessRequestAsync<dtoOut, modelOut>(int id, Func<int, Task<dtoOut>> service) where modelOut : IResponseModel
         {
-            return await Catch(async () => await GetResponse<int, dtoOut, viewModelOut>(id, service));
+            return await Catch(async () => await GetResponse<int, dtoOut, modelOut>(id, service));
         }
 
         /// <summary>
@@ -45,16 +45,16 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// <item><description>Maps service method's resulting DTO to response view model</description></item>
         /// </list>
         /// </summary>
-        /// <typeparam name="viewModelIn">Type of request view model</typeparam>
+        /// <typeparam name="modelIn">Type of request view model</typeparam>
         /// <typeparam name="dtoInOut">Type of service method's IN and OUT DTO</typeparam>
-        /// <typeparam name="viewModelOut">Type of response view model</typeparam>
+        /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="id">ID of the resource to be used by service method</param>
         /// <param name="requestModel">Request view model</param>
         /// <param name="service">Service method with same IN and OUT DTO type</param>
         /// <returns>IHttpActionResult instance with proper HTTP status code according to HTTP specifications</returns>
-        protected async Task<IHttpActionResult> ProcessRequestAsync<viewModelIn, dtoInOut, viewModelOut>(int id, viewModelIn requestModel, Func<dtoInOut, Task<dtoInOut>> service) where viewModelIn: IRequestViewModel where dtoInOut : IIdentifiableDto where viewModelOut : IResponseViewModel
+        protected async Task<IHttpActionResult> ProcessRequestAsync<modelIn, dtoInOut, modelOut>(int id, modelIn requestModel, Func<dtoInOut, Task<dtoInOut>> service) where modelIn: IRequestModel where dtoInOut : IIdentifiableDto where modelOut : IResponseModel
         {
-            return await ProcessRequestAsync<viewModelIn, dtoInOut, dtoInOut, viewModelOut>(id, requestModel, service);
+            return await ProcessRequestAsync<modelIn, dtoInOut, dtoInOut, modelOut>(id, requestModel, service);
         }
 
         /// <summary>
@@ -66,21 +66,21 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// <item><description>Maps service method's resulting DTO to response view model</description></item>
         /// </list>
         /// </summary>
-        /// <typeparam name="viewModelIn">Type of request view model</typeparam>
+        /// <typeparam name="modelIn">Type of request view model</typeparam>
         /// <typeparam name="dtoIn">Type of service method's IN DTO</typeparam>
         /// <typeparam name="dtoOut">Type of service method's OUT DTO</typeparam>
-        /// <typeparam name="viewModelOut">Type of response view model</typeparam>
+        /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="id">ID of the resource to be used by service method</param>
         /// <param name="requestModel">Request view model</param>
         /// <param name="service">Service method with different IN and OUT DTO types</param>
         /// <returns>IHttpActionResult instance with proper HTTP status code according to HTTP specifications</returns>
-        protected async Task<IHttpActionResult> ProcessRequestAsync<viewModelIn, dtoIn, dtoOut, viewModelOut>(int id, viewModelIn requestModel, Func<dtoIn, Task<dtoOut>> service) where viewModelIn : IRequestViewModel where dtoIn : IIdentifiableDto where viewModelOut : IResponseViewModel
+        protected async Task<IHttpActionResult> ProcessRequestAsync<modelIn, dtoIn, dtoOut, modelOut>(int id, modelIn requestModel, Func<dtoIn, Task<dtoOut>> service) where modelIn : IRequestModel where dtoIn : IIdentifiableDto where modelOut : IResponseModel
         {
             return await Catch(async () =>
             {
-                dtoIn dtoInput = MapValidatedViewModel<viewModelIn, dtoIn>(requestModel);
+                dtoIn dtoInput = MapValidatedViewModel<modelIn, dtoIn>(requestModel);
                 dtoInput.SetId(id);
-                return await GetResponse<dtoIn, dtoOut, viewModelOut>(dtoInput, service);
+                return await GetResponse<dtoIn, dtoOut, modelOut>(dtoInput, service);
             });
         }
 
@@ -92,15 +92,15 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// <item><description>Maps service method's resulting DTO to response view model</description></item>
         /// </list>
         /// </summary>
-        /// <typeparam name="viewModelIn">Type of request view model</typeparam>
+        /// <typeparam name="modelIn">Type of request view model</typeparam>
         /// <typeparam name="dtoInOut">Type of service method's IN and OUT DTO</typeparam>
-        /// <typeparam name="viewModelOut">Type of response view model</typeparam>
+        /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="requestModel">Request view model</param>
         /// <param name="service">Service method with same IN and OUT DTO type</param>
         /// <returns>IHttpActionResult instance with proper HTTP status code according to HTTP specifications</returns>
-        protected async Task<IHttpActionResult> ProcessRequestAsync<viewModelIn, dtoInOut, viewModelOut>(viewModelIn requestModel, Func<dtoInOut, Task<dtoInOut>> service) where viewModelIn : IRequestViewModel where viewModelOut : IResponseViewModel
+        protected async Task<IHttpActionResult> ProcessRequestAsync<modelIn, dtoInOut, modelOut>(modelIn requestModel, Func<dtoInOut, Task<dtoInOut>> service) where modelIn : IRequestModel where modelOut : IResponseModel
         {
-            return await ProcessRequestAsync<viewModelIn, dtoInOut, dtoInOut, viewModelOut>(requestModel, service);
+            return await ProcessRequestAsync<modelIn, dtoInOut, dtoInOut, modelOut>(requestModel, service);
         }
 
         /// <summary>
@@ -111,49 +111,53 @@ namespace Sentry.data.Web.Controllers.WebApi
         /// <item><description>Maps service method's resulting DTO to response view model</description></item>
         /// </list>
         /// </summary>
-        /// <typeparam name="viewModelIn">Type of request view model</typeparam>
+        /// <typeparam name="modelIn">Type of request view model</typeparam>
         /// <typeparam name="dtoIn">Type of service method's IN DTO</typeparam>
         /// <typeparam name="dtoOut">Type of service method's OUT DTO</typeparam>
-        /// <typeparam name="viewModelOut">Type of response view model</typeparam>
+        /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="requestModel">Request view model</param>
         /// <param name="service">Service method with different IN and OUT DTO types</param>
         /// <returns>IHttpActionResult instance with proper HTTP status code according to HTTP specifications</returns>
-        protected async Task<IHttpActionResult> ProcessRequestAsync<viewModelIn, dtoIn, dtoOut, viewModelOut>(viewModelIn requestModel, Func<dtoIn, Task<dtoOut>> service) where viewModelIn : IRequestViewModel where viewModelOut : IResponseViewModel
+        protected async Task<IHttpActionResult> ProcessRequestAsync<modelIn, dtoIn, dtoOut, modelOut>(modelIn requestModel, Func<dtoIn, Task<dtoOut>> service) where modelIn : IRequestModel where modelOut : IResponseModel
         {
             return await Catch(async () =>
             {
-                dtoIn dtoInput = MapValidatedViewModel<viewModelIn, dtoIn>(requestModel);
-                return await GetResponse<dtoIn, dtoOut, viewModelOut>(dtoInput, service);
+                dtoIn dtoInput = MapValidatedViewModel<modelIn, dtoIn>(requestModel);
+                return await GetResponse<dtoIn, dtoOut, modelOut>(dtoInput, service);
             });
         }
 
         #region Private
-        private dtoIn MapValidatedViewModel<viewModelIn, dtoIn>(viewModelIn requestModel) where viewModelIn : IRequestViewModel
+        private dtoIn MapValidatedViewModel<modelIn, dtoIn>(modelIn requestModel) where modelIn : IRequestModel
         {
             if (requestModel == null)
             {
-                throw new ViewModelValidationException();
+                throw new RequestModelValidationException();
             }
 
-            if (_validationRegistry.TryGetValidatorFor<viewModelIn>(out IViewModelValidator validator))
+            if (_validationRegistry.TryGetValidatorFor<modelIn>(out IRequestModelValidator validator))
             {
-                validator.Validate(requestModel);
+                ValidationResponseModel validationResponse = validator.Validate(requestModel);
+
+                if (!validationResponse.IsValid())
+                {
+                    throw new RequestModelValidationException(validationResponse);
+                }
             }
 
             dtoIn dto = _mapper.Map<dtoIn>(requestModel);
             return dto;
         }
 
-        private async Task<IHttpActionResult> GetResponse<dtoIn, dtoOut, viewModelOut>(dtoIn dtoInput, Func<dtoIn, Task<dtoOut>> service) where viewModelOut : IResponseViewModel
+        private async Task<IHttpActionResult> GetResponse<dtoIn, dtoOut, modelOut>(dtoIn dtoInput, Func<dtoIn, Task<dtoOut>> service) where modelOut : IResponseModel
         {
             dtoOut dtoOutput = await service(dtoInput);
-            return MapToResult<dtoOut, viewModelOut>(dtoOutput);
+            return MapToResult<dtoOut, modelOut>(dtoOutput);
         }
 
-        private IHttpActionResult MapToResult<dtoOut, viewModelOut>(dtoOut result) where viewModelOut : IResponseViewModel
+        private IHttpActionResult MapToResult<dtoOut, modelOut>(dtoOut result) where modelOut : IResponseModel
         {
-            viewModelOut response = _mapper.Map<viewModelOut>(result);
-            response.SetLinks();
+            modelOut response = _mapper.Map<modelOut>(result);
 
             if (HttpContext.Current.Request.HttpMethod == "POST")
             {
@@ -171,11 +175,11 @@ namespace Sentry.data.Web.Controllers.WebApi
             {
                 return await getResult();
             }
-            catch (ViewModelValidationException vmve)
+            catch (RequestModelValidationException vmve)
             {
-                if (vmve.ValidationResults?.Any() == true)
+                if (vmve.ValidationResponse != null)
                 {
-                    return Content(HttpStatusCode.BadRequest, vmve.ValidationResults);
+                    return Content(HttpStatusCode.BadRequest, vmve.ValidationResponse);
                 }
 
                 return StatusCode(HttpStatusCode.BadRequest);

@@ -6,20 +6,20 @@ namespace Sentry.data.Web
 {
     public class ValidationRegistry : IValidationRegistry
     {
-        private readonly Dictionary<Type, IViewModelValidator> _validators;
+        private readonly Dictionary<Type, IRequestModelValidator> _validators;
 
-        public ValidationRegistry(IList<IViewModelValidator> validators)
+        public ValidationRegistry(IList<IRequestModelValidator> validators)
         {
-            _validators = new Dictionary<Type, IViewModelValidator>();
+            _validators = new Dictionary<Type, IRequestModelValidator>();
 
-            foreach (IViewModelValidator validator in validators)
+            foreach (IRequestModelValidator validator in validators)
             {
                 Type modelType = validator.GetType().GetInterfaces().First(x => x.IsGenericType).GetGenericArguments().First();
                 _validators.Add(modelType, validator);
             }
         }
 
-        public bool TryGetValidatorFor<T>(out IViewModelValidator validator) where T : IRequestViewModel
+        public bool TryGetValidatorFor<T>(out IRequestModelValidator validator) where T : IRequestModel
         {
             return _validators.TryGetValue(typeof(T), out validator);
         }
