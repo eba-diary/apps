@@ -188,6 +188,10 @@ namespace Sentry.data.Web.Controllers.WebApi
             {
                 return NotFound();
             }
+            catch (ResourceForbiddenException)
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
             catch (Exception e)
             {
                 return InternalServerError(e);
