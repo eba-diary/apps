@@ -5,7 +5,6 @@ BEGIN TRAN
 		MERGE INTO FeatureEntity AS Target 
 		USING (VALUES 
 									('CLA3241_DisableDfsDropLocation','False','CLA3241_DisableDfsDropLocation','If true, DSC will no longer create the DFS drop location. If false, DSC will continue to create the DFS drop location.'),
-									('CLA3048_StandardizeOnUTCTime','False','CLA3048_StandardizeOnUTCTime','Flag for selecting UTC time'),
 									('CLA3819_EgressEdgeMigration','False','CLA3819_EgressEdgeMigration','If true, will use new Edge Egress proxy.  If false, will use sentry proxy.')
 								)
 								AS Source (KeyCol, [Value], [Name], [Description]) 

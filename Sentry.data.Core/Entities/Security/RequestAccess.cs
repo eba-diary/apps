@@ -34,7 +34,7 @@ namespace Sentry.data.Core
         public AccessScope Scope { get; set; }
         public string TicketId { get; set; }
         public bool IsSystemGenerated { get; set; }
-
+        public string SnowflakeAccount { get; set; }
 
         public string ConsumeDatasetGroupName { get; set; }
         public string ProducerDatasetGroupName { get; set; }

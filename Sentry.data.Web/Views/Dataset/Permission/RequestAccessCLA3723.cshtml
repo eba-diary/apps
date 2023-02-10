@@ -47,6 +47,8 @@
             </div>
             <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
             <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
+            <h6 class="pt-1">To request access for Snowflake Service Accounts:</h6>
+            <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
         </div>
         <div id="RequestAccessManageTypeSection" class="d-none requestAccessStage">
             <h6 class="pt-1">To Request Manage Access:</h6>
@@ -63,12 +65,19 @@
             <div class="alert alert-danger d-none" id="AccessRequestAwsArnValidationMessage" role="alert">
                 AWS ARN must be properly formatted.
             </div>
+            <div class="alert alert-danger d-none" id="AccessRequestSnowflakeValidationMessage" role="alert">
+                Snowflake Account name is required and must be less than 255 characters.
+            </div>
             @Html.HiddenFor(m => m.Type)
             @Html.HiddenFor(m => m.Scope)
             @Html.HiddenFor(m => m.SecurableObjectId)
             <div class="md-form d-none" id="AwsArnForm">
                 @Html.LabelFor(model => model.AwsArn, new { @class = "" })
                 @Html.TextBoxFor(model => model.AwsArn, new { @class = "form-control" })
+            </div>
+            <div class="md-form d-none" id="SnowflakeAccountForm">
+                @Html.LabelFor(model => model.SnowflakeAccount, new { @class = "" })
+                @Html.TextBoxFor(model => model.SnowflakeAccount, new { @class = "form-control" })
             </div>
             <div class="md-form">
                 @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled" })
