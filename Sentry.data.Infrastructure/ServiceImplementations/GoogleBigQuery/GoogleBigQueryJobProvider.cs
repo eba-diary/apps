@@ -1,16 +1,19 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Nest;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Sentry.Common.Logging;
-using System.Globalization;
-using System.IO;
-using static Sentry.data.Core.GlobalConstants;
 using System.Text;
-using Sentry.data.Core.Entities.DataProcessing;
+using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -37,79 +40,64 @@ namespace Sentry.data.Infrastructure
             GoogleBigQueryConfiguration config = GetConfig(job);
 
             Logger.Info($"Google BigQuery Retriever Job start - Job: {job.Id}");
-
-            //get Google token
-            string accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
-            Logger.Info($"Google BigQuery Retriever Job access token retrieved - Job: {job.Id}");
-
-            //get Google schema
-            HttpClient httpClient = _httpClientGenerator.GenerateHttpClient();
-            httpClient.BaseAddress = job.DataSource.BaseUri;
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
-            httpClient.Timeout = new TimeSpan(0, 10, 0);
-
-            using (httpClient)
+            using (_authorizationProvider)
             {
-                try
+                //get Google token
+                HTTPSSource source = (HTTPSSource)job.DataSource;
+                string accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.Tokens.FirstOrDefault());
+                Logger.Info($"Google BigQuery Retriever Job access token retrieved - Job: {job.Id}");
+
+                using (HttpClient httpClient = _httpClientGenerator.GenerateHttpClient(job.DataSource.BaseUri.ToString()))
                 {
-                    //update DSC schema
-                    JArray bigQueryFields = GetBigQueryFields(httpClient, config);
-                    Logger.Info($"Google BigQuery Retriever Job fields retrieved - Job: {job.Id}");
-                    _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
-                    Logger.Info($"Google BigQuery Retriever Job fields saved - Job: {job.Id}");
+                    httpClient.BaseAddress = job.DataSource.BaseUri;
+                    httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+                    httpClient.Timeout = new TimeSpan(0, 10, 0);
 
-                    //get data flow step for drop location info
-                    DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop).FirstOrDefault();
-
-                    do
+                    try
                     {
-                        Logger.Info($"Google BigQuery Retriever Job start data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
-                        string requestKey = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                        //update DSC schema
+                        JArray bigQueryFields = GetBigQueryFieldsAsync(httpClient, config).Result;
+                        Logger.Info($"Google BigQuery Retriever Job fields retrieved - Job: {job.Id}");
+                        _googleBigQueryService.UpdateSchemaFields(job.DataFlow.SchemaId, bigQueryFields);
+                        Logger.Info($"Google BigQuery Retriever Job fields saved - Job: {job.Id}");
 
-                        //make request
-                        MemoryStream stream = GetBigQueryDataStream(httpClient, config);
-                        Logger.Info($"Google BigQuery Retriever Job end data retrieval - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
-
-                        //if rows to upload
-                        if (stream != null)
+                        do
                         {
-                            using (stream)
+                            //make request
+                            GetBigQueryDataAsync(httpClient, config).Wait();
+
+                            if (string.IsNullOrEmpty(config.PageToken))
                             {
-                                //manufacture target key
-                                string targetKey = $"{step.TriggerKey}{job.JobOptions.TargetFileName}_{config.TableId}_{config.LastIndex}_{requestKey}.json";
-
-                                //upload to S3
-                                Logger.Info($"Google BigQuery Retriever Job start S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
-                                _s3ServiceProvider.UploadDataFile(stream, step.TriggerBucket, targetKey);
-                                Logger.Info($"Google BigQuery Retriever Job end S3 upload - Job: {job.Id}, Bucket: {step.TriggerBucket}, Key: {targetKey}");
-
-                                //update execution parameters
-                                SaveProgress(config, job);
-                                Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                                IncrementTableId(config);
                             }
-                        }
 
-                        if (string.IsNullOrEmpty(config.PageToken))
-                        {
-                            IncrementTableId(config);
+                            //refresh token if expired
+                            accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.Tokens.FirstOrDefault());
+                            httpClient.DefaultRequestHeaders.Clear();
+                            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
                         }
-
-                        //refresh token if expired
-                        accessToken = _authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource);
-                        httpClient.DefaultRequestHeaders.Clear();
-                        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+                        while (true); //only break loop on exception
                     }
-                    while (true); //only break loop on exception
-                }
-                catch (GoogleBigQueryNotFoundException)
-                {
-                    //no more tables to collect from
-                    DateTime expectedDate = DateTime.Today.AddDays(-1);
-                    DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
-                    if (stopDate < expectedDate)
-                    {
-                        //means there may be an unexpected gap
-                        Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                    catch (AggregateException ae)
+                    {                        
+                        ae.Handle(e =>
+                        {
+                            if (e is GoogleBigQueryNotFoundException)
+                            {
+                                //no more tables to collect from
+                                DateTime expectedDate = DateTime.Today.AddDays(-1);
+                                DateTime stopDate = DateTime.ParseExact(config.TableId.Split('_').Last(), "yyyyMMdd", CultureInfo.InvariantCulture);
+                                if (stopDate < expectedDate)
+                                {
+                                    //means there may be an unexpected gap
+                                    Logger.Error($"Google BigQuery Job Provider stopped before reaching the expected date partition ({expectedDate:yyyyMMdd}). Project: {config.ProjectId}, Dataset: {config.DatasetId}, Table: {config.TableId}");
+                                }
+
+                                return true;
+                            }
+
+                            return false;
+                        });      
                     }
                 }
             }
@@ -127,7 +115,10 @@ namespace Sentry.data.Infrastructure
                 ProjectId = uriParts[1],
                 DatasetId = uriParts[3],
                 TableId = uriParts[5],
-                RelativeUri = job.RelativeUri
+                RelativeUri = job.RelativeUri,
+                Job = job,
+                ExecutionKey = DateTime.Now.ToString("yyyyMMddHHmmssfff"),
+                S3DropStep = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == job.DataFlow.Id && w.DataAction_Type_Id == DataActionType.ProducerS3Drop).FirstOrDefault()
             };
 
             Dictionary<string, string> parameters = job.ExecutionParameters;
@@ -164,15 +155,21 @@ namespace Sentry.data.Infrastructure
             config.RelativeUri = string.Join("/", uriParts);
         }
 
-        private JArray GetBigQueryFields(HttpClient httpClient, GoogleBigQueryConfiguration config)
+        private async Task<JArray> GetBigQueryFieldsAsync(HttpClient httpClient, GoogleBigQueryConfiguration config)
         {
             List<string> uriParts = config.RelativeUri.Split('/').ToList();
             string uri = string.Join("/", uriParts.GetRange(0, 6));
-            JObject response = GetBigQueryResponse(httpClient, uri);
-            return (JArray)response.SelectToken("schema.fields");
+
+            using (HttpResponseMessage response = await GetBigQueryResponseAsync(httpClient, uri))
+            using (StreamReader streamReader = new StreamReader(await response.Content.ReadAsStreamAsync()))
+            using (JsonReader jsonReader = new JsonTextReader(streamReader))
+            {
+                JObject responseObject = JObject.Load(jsonReader);
+                return (JArray)responseObject.SelectToken("schema.fields");
+            }
         }
 
-        private MemoryStream GetBigQueryDataStream(HttpClient httpClient, GoogleBigQueryConfiguration config)
+        private async Task GetBigQueryDataAsync(HttpClient httpClient, GoogleBigQueryConfiguration config)
         {
             string uri = config.RelativeUri;
 
@@ -185,19 +182,69 @@ namespace Sentry.data.Infrastructure
                 AddUriParameter(ref uri, "startIndex", config.LastIndex.ToString());
             }
 
-            JObject response = GetBigQueryResponse(httpClient, uri);
+            Logger.Info($"Google BigQuery Retriever Job start data retrieval - Job: {config.Job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
 
-            //when at the end, there is no rows or pageToken field
-            config.TotalRows = response.Value<int>("totalRows");
-            config.PageToken = response.Value<string>("pageToken");
-
-            if (response.ContainsKey("rows"))
+            using (Stream memoryStream = new MemoryStream())
             {
-                config.LastIndex += ((JArray)response.SelectToken("rows")).Count();
-                return new MemoryStream(Encoding.UTF8.GetBytes(response.ToString()));
+                using (HttpResponseMessage response = await GetBigQueryResponseAsync(httpClient, uri))
+                using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                {
+                    contentStream.CopyTo(memoryStream);
+                }
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                if (ResponseHasRows(memoryStream, config))
+                {
+                    //manufacture target key
+                    string targetKey = $"{config.S3DropStep.TriggerKey}{config.Job.JobOptions.TargetFileName}_{config.TableId}_{config.LastIndex}_{config.ExecutionKey}.json";
+
+                    //upload to S3
+                    Logger.Info($"Google BigQuery Retriever Job start S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
+                    _s3ServiceProvider.UploadDataFile(memoryStream, config.S3DropStep.TriggerBucket, targetKey);
+                    Logger.Info($"Google BigQuery Retriever Job end S3 upload - Job: {config.Job.Id}, Bucket: {config.S3DropStep.TriggerBucket}, Key: {targetKey}");
+
+                    //update execution parameters
+                    SaveProgress(config, config.Job);
+                    Logger.Info($"Google BigQuery Retriever Job progress saved - Job: {config.Job.Id}, Uri: {config.RelativeUri}, Index:{config.LastIndex}, Total:{config.TotalRows}");
+                }
+            }
+        }
+
+        private bool ResponseHasRows(Stream contentStream, GoogleBigQueryConfiguration config)
+        {
+            int rowCount = 0;
+            int totalRows = 0;
+            string pageToken = null;
+
+            using (StreamReader streamReader = new StreamReader(contentStream, Encoding.UTF8, true, 1024, true))
+            using (JsonReader jsonReader = new JsonTextReader(streamReader))
+            {
+                while (jsonReader.Read())
+                {
+                    if (jsonReader.TokenType == JsonToken.String)
+                    {
+                        if (jsonReader.Path == "pageToken")
+                        {
+                            pageToken = jsonReader.Value.ToString();
+                        }
+                        else if (jsonReader.Path == "totalRows")
+                        {
+                            totalRows = int.Parse(jsonReader.Value.ToString());
+                        }
+                    }
+                    else if (jsonReader.TokenType == JsonToken.StartObject && jsonReader.Path.StartsWith("rows"))
+                    {
+                        rowCount++;
+                        jsonReader.Skip();
+                    }
+                }
             }
 
-            return null;
+            config.TotalRows = totalRows;
+            config.PageToken = pageToken;
+            config.LastIndex += rowCount;
+
+            return rowCount > 0;
         }
 
         private void AddUriParameter(ref string uri, string parameterKey, string parameterValue)
@@ -205,24 +252,28 @@ namespace Sentry.data.Infrastructure
             uri += (uri.Contains("?") ? "&" : "?") + $"{parameterKey}={Uri.EscapeDataString(parameterValue)}";
         }
 
-        private JObject GetBigQueryResponse(HttpClient httpClient, string uri)
+        private async Task<HttpResponseMessage> GetBigQueryResponseAsync(HttpClient httpClient, string uri)
         {
-            HttpResponseMessage response = httpClient.GetAsync(uri).Result;
-            string responseString = response.Content.ReadAsStringAsync().Result;
+            HttpResponseMessage response = await httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
 
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
+                return response;
+            }
+            else
+            {
+                string responseString = response.Content.ReadAsStringAsync().Result;
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     Logger.Info($"Google BigQuery request to {uri} returned NotFound. {responseString}");
+                    response.Dispose();
                     throw new GoogleBigQueryNotFoundException();
                 }
 
                 Logger.Error($"Google BigQuery request to {uri} failed. {responseString}");
+                response.Dispose();
                 throw new GoogleBigQueryJobProviderException(responseString);
             }
-
-            return JObject.Parse(responseString);
         }
 
         private void SaveProgress(GoogleBigQueryConfiguration config, RetrieverJob job)

@@ -22,7 +22,7 @@ namespace Sentry.data.Core.Tests
                 {
                     HttpOptions = new RetrieverJobOptions.HttpsOptions()
                     {
-                        Body = "This is the body",
+                        Body = "{}",
                         RequestMethod = HttpMethods.post,
                         RequestDataFormat = HttpDataFormat.json
                     },
@@ -53,9 +53,9 @@ namespace Sentry.data.Core.Tests
                 {
                     HttpOptions = new RetrieverJobOptions.HttpsOptions()
                     {
-                        Body = "This is the body",
+                        Body = "{}",
                         RequestMethod = HttpMethods.post,
-                        RequestDataFormat = HttpDataFormat.none
+                        RequestDataFormat = HttpDataFormat.json
                     },
                     TargetFileName = null
                 },
@@ -99,6 +99,123 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void Validate_HTTPSSource_InvalidJson()
+        {
+            HTTPSSource httpsSource = new HTTPSSource();
+            RetrieverJob retrieverJob = new RetrieverJob()
+            {
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        Body = @"{ ""field"": ""value"" ",
+                        RequestMethod = HttpMethods.post,
+                        RequestDataFormat = HttpDataFormat.json
+                    },
+                    TargetFileName = "filename"
+
+                },
+                RelativeUri = "relative_uri_value"
+            };
+
+            ValidationResults results = new ValidationResults();
+
+            httpsSource.Validate(retrieverJob, results);
+
+            Assert.IsFalse(results.IsValid());
+            Assert.AreEqual(1, results.GetAll().Count);
+            Assert.AreEqual(ValidationErrors.httpsRequestBodyIsInvalidJson, results.GetAll().First().Id);
+            Assert.AreEqual("Request body is invalid JSON", results.GetAll().First().Description);
+        }
+
+        [TestMethod]
+        public void Validate_HTTPSSource_EmptyBody()
+        {
+            HTTPSSource httpsSource = new HTTPSSource();
+            RetrieverJob retrieverJob = new RetrieverJob()
+            {
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        Body = "",
+                        RequestMethod = HttpMethods.post,
+                        RequestDataFormat = HttpDataFormat.json
+                    },
+                    TargetFileName = "filename"
+
+                },
+                RelativeUri = "relative_uri_value"
+            };
+
+            ValidationResults results = new ValidationResults();
+
+            httpsSource.Validate(retrieverJob, results);
+
+            Assert.IsFalse(results.IsValid());
+            Assert.AreEqual(1, results.GetAll().Count);
+            Assert.AreEqual(ValidationErrors.httpsRequestBodyIsBlank, results.GetAll().First().Id);
+            Assert.AreEqual("Request body is required", results.GetAll().First().Description);
+        }
+
+        [TestMethod]
+        public void Validate_HTTPSSource_FormatNone()
+        {
+            HTTPSSource httpsSource = new HTTPSSource();
+            RetrieverJob retrieverJob = new RetrieverJob()
+            {
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        Body = @"{ ""field"": ""value"" }",
+                        RequestMethod = HttpMethods.post,
+                        RequestDataFormat = HttpDataFormat.none
+                    },
+                    TargetFileName = "filename"
+
+                },
+                RelativeUri = "relative_uri_value"
+            };
+
+            ValidationResults results = new ValidationResults();
+
+            httpsSource.Validate(retrieverJob, results);
+
+            Assert.IsFalse(results.IsValid());
+            Assert.AreEqual(1, results.GetAll().Count);
+            Assert.AreEqual(ValidationErrors.httpsRequestDataFormatNotSelected, results.GetAll().First().Id);
+            Assert.AreEqual("Request Body Format is required", results.GetAll().First().Description);
+        }
+
+        [TestMethod]
+        public void Validate_HTTPSSource_PostMethod_Success()
+        {
+            HTTPSSource httpsSource = new HTTPSSource();
+            RetrieverJob retrieverJob = new RetrieverJob()
+            {
+                JobOptions = new RetrieverJobOptions()
+                {
+                    HttpOptions = new RetrieverJobOptions.HttpsOptions()
+                    {
+                        Body = @"{ ""field"": ""value"" }",
+                        RequestMethod = HttpMethods.post,
+                        RequestDataFormat = HttpDataFormat.json
+                    },
+                    TargetFileName = "filename"
+
+                },
+                RelativeUri = "relative_uri_value"
+            };
+
+            ValidationResults results = new ValidationResults();
+
+            httpsSource.Validate(retrieverJob, results);
+
+            Assert.IsTrue(results.IsValid());
+        }
+
+        [TestMethod]
         public void GoogleApiDataSourceValidations()
         {
             GoogleApiSource googleApiSource = new GoogleApiSource();
@@ -108,7 +225,7 @@ namespace Sentry.data.Core.Tests
                 {
                     HttpOptions = new RetrieverJobOptions.HttpsOptions()
                     {
-                        Body = "This is the body",
+                        Body = "{}",
                         RequestMethod = HttpMethods.post,
                         RequestDataFormat = HttpDataFormat.json
                     },
@@ -124,7 +241,7 @@ namespace Sentry.data.Core.Tests
                 {
                     HttpOptions = new RetrieverJobOptions.HttpsOptions()
                     {
-                        Body = "This is the Body",
+                        Body = "{}",
                         RequestMethod = HttpMethods.none,
                         RequestDataFormat = HttpDataFormat.json
                     },
@@ -139,7 +256,7 @@ namespace Sentry.data.Core.Tests
                 {
                     HttpOptions = new RetrieverJobOptions.HttpsOptions()
                     {
-                        Body = "This is the body",
+                        Body = "{}",
                         RequestMethod = HttpMethods.post,
                         RequestDataFormat = HttpDataFormat.none
                     },

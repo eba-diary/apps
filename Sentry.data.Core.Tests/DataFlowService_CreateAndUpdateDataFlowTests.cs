@@ -155,6 +155,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
 
@@ -205,6 +206,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             Mock<IKafkaConnectorService> connectorService = mockRepository.Create<IKafkaConnectorService>();
             ConnectorCreateResponseDto connectorCreateResponseDto = new ConnectorCreateResponseDto();
@@ -237,6 +239,68 @@ namespace Sentry.data.Core.Tests
             mockRepository.VerifyAll();
         }
 
+
+        [TestMethod]
+        public void EditDataFlow_EnsureS3SinkConnectorNotCalled()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Dataset dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Dataset Name",
+                DatasetCategories = new List<Category>(),
+                Asset = new Asset() { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            //AUSTIN
+            Mock<IApplicationUser> appUser = GetApplicationUser(mockRepository);
+            Mock<IUserService> userService = GetUserService(mockRepository, appUser.Object);
+            Mock<ISecurityService> securityService = GetSecurityService(mockRepository, dataset, appUser.Object);
+            securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataFlow(3));
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mockRepository, dataset);
+
+            //Create an extra DataFlow in the datasetContext which is a "deleted" version of the dataflow with Fred as topic name, basically this simulates that someone
+            //created a dataflow with a topicname=Fred and a s3SinkConnector was created for Fred Topic already, therefore if they create another dataflow with Fred, we will NOT want to recreated S3SinkConnector
+            DataFlow dataFlowDuplicate = new DataFlow() { DatasetId = 1, SchemaId = 2, ObjectStatus = GlobalEnums.ObjectStatusEnum.Deleted,TopicName="Fred"};
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>() { dataFlowDuplicate }.AsQueryable());
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("NonProd");
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+
+            //create a dataflow with a topicname=Fred which should NOT create a S3SinkConnector if code is working properly
+            DataFlowDto dto = new DataFlowDto()
+            {
+                SchemaMap = new List<SchemaMapDto>()
+                {
+                    new SchemaMapDto() { DatasetId = 1, SchemaId = 2 }
+                },
+                IngestionType = 4,
+                PreProcessingOption = 0,
+                DatasetId = 1,
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                TopicName = "Fred"
+            };
+
+            int result = service.CreateDataFlow(dto);
+
+            Assert.AreEqual(3, result);
+
+            //Since we DIDN'T mock up CreateS3SinkConnectorAsync, essentially what this is doing is verifying ALL endpoints executed were mocked up
+            //therefore since we DID NOT mock up CreateS3SinkConnectorAsync this ensures that it was NOT executed in this unit test
+            mockRepository.VerifyAll();
+        }
+
         [TestMethod]
         public void CreateDataFlow_DSCPull_Id()
         {
@@ -262,9 +326,11 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
-            jobService.Setup(x => x.CreateAndSaveRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Returns(new RetrieverJob());
+            jobService.Setup(x => x.CreateRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Returns(new RetrieverJob());
 
             DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
 
@@ -328,7 +394,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.Clear());
 
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
-            jobService.Setup(x => x.CreateAndSaveRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Throws(new ValidationException("invalid"));
+            jobService.Setup(x => x.CreateRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Throws(new ValidationException("invalid"));
 
             DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, null, null, null, null);
 
@@ -393,6 +459,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
             DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, null, null, dataFeatures.Object, null, null, null);
 
@@ -535,12 +602,14 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.SetupGet(x => x.DataSources).Returns(new List<DataSource>() { dataSource }.AsQueryable());
 
-            Mock<IJobService> jobService = mockRepository.Create<IJobService>();
-            RetrieverJob retrieverJob = new RetrieverJob();
-            jobService.Setup(x => x.InstantiateJobsForCreation(It.Is<DataFlow>(d => d.Id == 3), dataSource)).Returns(retrieverJob);
-            jobService.Setup(x => x.CreateDropLocation(retrieverJob));
+            RetrieverJob retrieverJob = MockClasses.GetMockRetrieverJob();
+            retrieverJob.DataFlow = new DataFlow() { Id = 3 };
+            retrieverJob.DataSource = dataSource;
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>() { retrieverJob }.AsQueryable());
 
-            datasetContext.Setup(x => x.Add(retrieverJob));
+            Mock<IJobService> jobService = mockRepository.Create<IJobService>();
+            jobService.Setup(x => x.CreateDfsRetrieverJob(It.Is<DataFlow>(d => d.Id == 3), dataSource)).Returns(retrieverJob);
+            jobService.Setup(x => x.CreateDropLocation(retrieverJob));
 
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);

@@ -87,25 +87,35 @@
                 @Html.ValidationMessageFor(model => model.SelectedRequestMethod, "", new { @class = "text-danger" })
             </div>
 
-            <div class="httpParameterPanel" style="display:none;">
+            <div class="httpPagingPanel" style="display:none;">
                 <div class="md-form">
                     @Html.LabelFor(model => model.PagingType, htmlAttributes: new { @class = "mdb-main-label" })
                     @Html.DropDownListFor(model => model.PagingType, Model.PagingTypeDropdown, new { @class = "mdb-select", })
                     @Html.ValidationMessageFor(model => model.PagingType, "", new { @class = "text-danger" })
                 </div>
-                <div class="md-form paging-token-field" style="display:none;">
-                    @Html.LabelFor(model => model.PageTokenField, htmlAttributes: new { @class = "control-label" })
-                    @Html.TextBoxFor(model => model.PageTokenField, new { @class = "form-control", @placeholder = "Path to the token field on the response" })
-                    @Html.ValidationMessageFor(model => model.PageTokenField, "", new { @class = "text-danger" })
-                </div>
+
                 <div class="md-form paging-request-parameter" style="display:none;">
                     @Html.LabelFor(model => model.PageParameterName, htmlAttributes: new { @class = "control-label" })
                     @Html.TextBoxFor(model => model.PageParameterName, new { @class = "form-control", @placeholder = "Parameter name to include on paging requests" })
                     @Html.ValidationMessageFor(model => model.PageParameterName, "", new { @class = "text-danger" })
                 </div>
+
+                <h6 id="request-variable-header" class="pt-0">
+                    Request Variables
+                    <a class="icon-info-solid dsc-blue-text" data-toggle="popover" title="" data-placement="right" data-content="Use variables in the Relative URI by wrapping the variable name with ~[ ]~ (Ex: Search/~[variablename]~/Data). On each scheduled run, the value will be substituted in for the matching variable name and incremented accordingly until end is reached." href="javascript:void(0)"> </a>
+                </h6>
+
+                <div id="request-variable-container">
+                    @foreach (RequestVariableModel variable in Model.RequestVariables)
+                    {
+                        Html.RenderPartial("_RequestVariable", variable);
+                    }
+                </div>
+
+                <button id="add-request-variable" type="button" class="btn btn-sm btn-outline-primary waves-effect waves-light ml-0 mt-2"><em class="fas fa-plus"></em></button>
             </div>
 
-            <div class="text-muted font-italic">
+            <div class="text-muted font-italic mt-3">
                 Full URL: <span id="base-url"></span><span id="relative-url"></span><span id="parameter-url"></span>
             </div>
 
@@ -115,16 +125,11 @@
                     @Html.DropDownListFor(model => model.SelectedRequestDataFormat, Model.RequestDataFormatDropdown, new { @class = "mdb-select", })
                     @Html.ValidationMessageFor(model => model.SelectedRequestDataFormat, "", new { @class = "text-danger" })
                 </div>
+
                 <div class="md-form">
-                    @Html.LabelFor(model => model.HttpRequestBody, htmlAttributes: new { @class = "control-label" })
-                    @Html.TextAreaFor(model => model.HttpRequestBody, new { rows = "15", cols = "132", htmlAttributes = new { @class = "form-control", @placeholder = "JSON format" } })
+                    @Html.TextAreaFor(model => model.HttpRequestBody, new { @class = "md-textarea w-100" })
+                    @Html.LabelFor(model => model.HttpRequestBody, htmlAttributes: new { @class = "disabled" })
                     @Html.ValidationMessageFor(model => model.HttpRequestBody, "", new { @class = "text-danger" })
-                </div>
-                <div class="md-form">
-                    <input type="button" id="jsonPreview" value="Validate Body" class="btn btn-primary" />
-                </div>
-                <div class="jsonValidateResultsPanel md-form" style="display:none;">
-                    <pre id="json-viewer"></pre>
                 </div>
             </div>
         </div>
@@ -193,94 +198,94 @@
 
     @Html.HiddenFor(model => model.Schedule)
 
-    <div class="jobquestion schedule">
-        <div id="schedulePanel" style="display:none">
-            <div class="form-group configQuestion">
-                <h5>How often would you like us to pull the data?</h5>
-            </div>
-            <div class="md-form">
-                @Html.LabelFor(model => model.SchedulePicker, htmlAttributes: new { @class = "mdb-main-label" })
-                @Html.DropDownListFor(model => model.SchedulePicker, Model.SchedulePickerDropdown, new { @class = "mdb-select" })
-                @Html.ValidationMessageFor(model => model.SchedulePicker, "", new { @class = "text-danger" })
-            </div>
+<div class="jobquestion schedule">
+    <div id="schedulePanel" style="display:none">
+        <div class="form-group configQuestion">
+            <h5>How often would you like us to pull the data?</h5>
         </div>
-
-        <div class="md-form scheduler" id="hourlyPicker">
-            <label class="control-label">Every Hour at</label>
-            <input id="cronHourlyTimePicker" type="number" max="59" min="0" class="form-control" placeholder="Minute" />
-        </div>
-
-        <div class="md-form scheduler input-group" id="dailyPicker">
-            <div class="input-group-prepend">
-                <span class="input-group-text md-addon">Every Day at</span>
-            </div>
-            <input class="form-control timepicker" placeholder="Time" id="cronDailyJobTimePicker" />
-            <div class="input-group-append">
-                <span class="input-group-text md-addon">CST</span>
-            </div>
-        </div>
-
-        <div class="md-form scheduler input-group" id="weeklyPicker">
-            <div class="input-group-prepend">
-                <span class="input-group-text md-addon">Every Week on</span>
-            </div>
-            <select id="cronWeeklyDayPicker" class="mdb-select">
-                <option selected disabled>Day of the Week</option>
-                <option value="0">Sunday</option>
-                <option value="1">Monday</option>
-                <option value="2">Tuesday</option>
-                <option value="3">Wednesday</option>
-                <option value="4">Thursday</option>
-                <option value="5">Friday</option>
-                <option value="6">Saturday</option>
-            </select>
-            <input class="form-control timepicker" placeholder="Time" id="cronWeeklyJobTimePicker" />
-            <div class="input-group-append">
-                <span class="input-group-text md-addon">CST</span>
-            </div>
-        </div>
-
-        <div class="md-form scheduler input-group" id="monthlyPicker">
-            <div class="input-group-prepend">
-                <span class="input-group-text md-addon">Day and Time</span>
-            </div>
-            <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
-            <input class="form-control timepicker" placeholder="Time" id="cronMonthlyJobTimePicker" aria-describedby="cronMonthlyTimeAddOn" />
-            <div class="input-group-append">
-                <span class="input-group-text md-addon">CST</span>
-            </div>
-        </div>
-
-        <div class="md-form scheduler input-group" id="yearlyPicker">
-            <div class="input-group-prepend">
-                <span class="input-group-text md-addon">Month, Day, and Time</span>
-            </div>
-            <select id="cronYearlyMonthPicker" class="mdb-select">
-                <option selected disabled>Month</option>
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
-            <input id="cronYearlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
-            <input class="form-control timepicker" placeholder="Time" id="cronYearlyJobTimePicker" />
-            <div class="input-group-append">
-                <span class="input-group-text md-addon">CST</span>
-            </div>
-        </div>
-
-        <div id="scheduleRow" class="form-group" style="display: none;">
-            <label class="control-label">The next four scheduled times will be in your local Time</label>
-            <div id="scheduledTimes" class="">
-            </div>
+        <div class="md-form">
+            @Html.LabelFor(model => model.SchedulePicker, htmlAttributes: new { @class = "mdb-main-label" })
+            @Html.DropDownListFor(model => model.SchedulePicker, Model.SchedulePickerDropdown, new { @class = "mdb-select" })
+            @Html.ValidationMessageFor(model => model.SchedulePicker, "", new { @class = "text-danger" })
         </div>
     </div>
+
+    <div class="md-form scheduler" id="hourlyPicker">
+        <label class="control-label">Every Hour at</label>
+        <input id="cronHourlyTimePicker" type="number" max="59" min="0" class="form-control" placeholder="Minute" />
+    </div>
+
+    <div class="md-form scheduler input-group" id="dailyPicker">
+        <div class="input-group-prepend">
+            <span class="input-group-text md-addon">Every Day at</span>
+        </div>
+        <input class="form-control timepicker" placeholder="Time" id="cronDailyJobTimePicker" />
+        <div class="input-group-append">
+            <span class="input-group-text md-addon">CST</span>
+        </div>
+    </div>
+
+    <div class="md-form scheduler input-group" id="weeklyPicker">
+        <div class="input-group-prepend">
+            <span class="input-group-text md-addon">Every Week on</span>
+        </div>
+        <select id="cronWeeklyDayPicker" class="mdb-select">
+            <option selected disabled>Day of the Week</option>
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+        </select>
+        <input class="form-control timepicker" placeholder="Time" id="cronWeeklyJobTimePicker" />
+        <div class="input-group-append">
+            <span class="input-group-text md-addon">CST</span>
+        </div>
+    </div>
+
+    <div class="md-form scheduler input-group" id="monthlyPicker">
+        <div class="input-group-prepend">
+            <span class="input-group-text md-addon">Day and Time</span>
+        </div>
+        <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
+        <input class="form-control timepicker" placeholder="Time" id="cronMonthlyJobTimePicker" aria-describedby="cronMonthlyTimeAddOn" />
+        <div class="input-group-append">
+            <span class="input-group-text md-addon">CST</span>
+        </div>
+    </div>
+
+    <div class="md-form scheduler input-group" id="yearlyPicker">
+        <div class="input-group-prepend">
+            <span class="input-group-text md-addon">Month, Day, and Time</span>
+        </div>
+        <select id="cronYearlyMonthPicker" class="mdb-select">
+            <option selected disabled>Month</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+        <input id="cronYearlyDayPicker" type="number" max="31" min="1" class="form-control" placeholder="Day of the Month (1-31)" />
+        <input class="form-control timepicker" placeholder="Time" id="cronYearlyJobTimePicker" />
+        <div class="input-group-append">
+            <span class="input-group-text md-addon">CST</span>
+        </div>
+    </div>
+
+    <div id="scheduleRow" class="form-group" style="display: none;">
+        <label class="control-label">The next four scheduled times will be in your local Time</label>
+        <div id="scheduledTimes" class="">
+        </div>
+    </div>
+</div>
 </div>

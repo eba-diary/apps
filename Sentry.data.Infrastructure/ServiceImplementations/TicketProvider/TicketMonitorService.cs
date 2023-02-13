@@ -19,7 +19,7 @@ namespace Sentry.data.Infrastructure
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
 
-                List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING && x.TicketId != null && !x.TicketId.Equals("DEFAULT_SECURITY")).ToList();
+                List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING && x.TicketId != null && !x.TicketId.Equals("DEFAULT_SECURITY") && !x.TicketId.Equals("DEFAULT_SECURITY_INHERITANCE")).ToList();
 
                 foreach (SecurityTicket ticket in tickets)
                 {

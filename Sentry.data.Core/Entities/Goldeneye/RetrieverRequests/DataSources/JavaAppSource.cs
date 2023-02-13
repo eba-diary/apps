@@ -38,7 +38,7 @@ namespace Sentry.data.Core
 
         public override void Validate(RetrieverJob job, ValidationResults validationResults)
         {
-            throw new NotImplementedException();
+            //Legacy: nothing to validate
         }
 
         public virtual SourceOptions Options

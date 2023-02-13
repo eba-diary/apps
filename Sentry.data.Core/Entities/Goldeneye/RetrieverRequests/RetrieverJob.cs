@@ -5,6 +5,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
@@ -13,6 +14,7 @@ namespace Sentry.data.Core
     {
         private string _jobOptions;
         private string _executionParameters;
+        private string _requestVariables;
 
         public RetrieverJob()
         {
@@ -106,7 +108,6 @@ namespace Sentry.data.Core
             }
         }
         public virtual IList<JobHistory> JobHistory { get; set; }
-
         public virtual IList<Submission> Submissions { get; set; }
         public virtual FileSchema FileSchema { get; set; }
         public virtual DataFlow DataFlow { get; set; }
@@ -124,12 +125,53 @@ namespace Sentry.data.Core
                 _executionParameters = JsonConvert.SerializeObject(value);
             }
         }
+        public virtual List<RequestVariable> RequestVariables
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_requestVariables) ? new List<RequestVariable>() : JsonConvert.DeserializeObject<List<RequestVariable>>(_requestVariables);
+
+            }
+            set
+            {
+                _requestVariables = JsonConvert.SerializeObject(value);
+            }
+        }
 
         public virtual void AddOrUpdateExecutionParameter(string key, string value)
         {
             Dictionary<string, string> parameters = ExecutionParameters;
             parameters[key] = value;
             ExecutionParameters = parameters;
+        }
+
+        public virtual void IncrementRequestVariables()
+        {
+            List<RequestVariable> variables = RequestVariables;
+
+            if (variables.Any())
+            {
+                foreach (RequestVariable variable in variables)
+                {
+                    variable.IncrementVariableValue();
+                }
+
+                RequestVariables = variables;
+            }
+        }
+
+        public virtual bool HasValidRequestVariables()
+        {
+            foreach (RequestVariable variable in RequestVariables)
+            {
+                //if 1 request variable is invalid, treat as if all are invalid
+                if (!variable.IsValidVariableValue())
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public virtual Uri GetUri()

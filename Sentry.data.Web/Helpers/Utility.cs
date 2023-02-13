@@ -1,8 +1,10 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
@@ -205,9 +207,24 @@ namespace Sentry.data.Web.Helpers
             return items.OrderBy(o => o.Value);
         }
 
+        public static IEnumerable<SelectListItem> BuildSchemaDropDown(IDatasetContext context, int datasetId, int selectedSchemaId)
+        {
+            List<SelectListItem> itemList = new List<SelectListItem>();
+            if (selectedSchemaId == 0)
+            {
+                itemList.Add(new SelectListItem { Text = "Select Schema", Value = selectedSchemaId.ToString(), Selected = true, Disabled = true });
+            }
+
+            itemList.AddRange(context.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId)
+                .Select(s => new SelectListItem { Text = s.Schema.Name, Value = s.Schema.SchemaId.ToString() } ));
+
+            return itemList;
+        }
+
         public static List<SelectListItem> BuildSelectListFromEnum<T>(int selectedValue) where T : Enum
         {
             List<SelectListItem> options = new List<SelectListItem>();
+
             foreach (T item in Enum.GetValues(typeof(T)))
             {
                 int value = (int)Convert.ChangeType(item, item.GetTypeCode());
@@ -562,8 +579,7 @@ namespace Sentry.data.Web.Helpers
                 {
                     Text = "Pick a Data Format",
                     Value = "0",
-                    Selected = true,
-                    Disabled = true
+                    Selected = true
                 });
             }
 

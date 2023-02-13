@@ -20,11 +20,8 @@ namespace Sentry.data.Infrastructure
             {
                 connection.Open();
 
-                SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @JobID, @TimeCreated", connection);
-
-                //add parameter for current enviroment (@JobId)
-                command.Parameters.AddWithValue("@JobID", System.Data.SqlDbType.Int);
-                command.Parameters["@JobID"].Value = Configuration.Config.GetHostSetting("DeadDataSparkJobID");
+                SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @TimeCreated", connection);
+                command.CommandTimeout = 300;
 
                 //add parameter for time window of jobs created (@TimeCreated) 
                 command.Parameters.AddWithValue("@TimeCreated", System.Data.SqlDbType.DateTime);

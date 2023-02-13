@@ -1,6 +1,10 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     String livyURL = ViewBag.LivyURL + "/ui/session/";
+}
+
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
 }
 
 <div id="bannerRow" class="row" style="position: fixed; z-index: 999">
@@ -615,18 +619,7 @@
 
 
 @section Scripts {
-    <script src="~/Scripts/dot.js"></script>
-    <script src="~/Scripts/jQuery.extendext.min.js"></script>
-    <script src="~/Scripts/query-builder.js"></script>
-    @Scripts.Render("~/bundles/dataTables")
-
-    <script src="~/js/QueryTool/QueryToolModel.js"></script>
-    <script src="~/js/QueryTool/Startup.js"></script>
-    <script src="~/js/QueryTool/SaveTo.js"></script>
-    <script src="~/js/QueryTool/BannerControls.js"></script>
-    <script src="~/js/QueryTool/RenderTable.js"></script>
-    <script src="~/js/QueryTool/AddRule.js"></script>
-
+    <script src="@Html.GetContent("datatables.*.js")"></script>
     <script>
         data.QueryTool.Init();
 

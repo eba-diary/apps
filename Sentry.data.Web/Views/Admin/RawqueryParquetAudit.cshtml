@@ -97,7 +97,6 @@
     </div>
 </div>
 
-
 <br />
 <br />
 <br />
@@ -125,7 +124,9 @@
 <div id="AuditResultTable"></div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
+        data.Admin.SideBarUtility();
         data.Admin.AuditInit();
         $("#tab-spinner").hide();
         $('select.admin-audit-dropdown.active option[value=-1]').each(function () {

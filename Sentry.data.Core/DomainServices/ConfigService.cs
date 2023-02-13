@@ -20,26 +20,24 @@ namespace Sentry.data.Core
 {
     public class ConfigService : IConfigService
     {
-        public IDatasetContext _datasetContext;
-        public IUserService _userService;
-        public IEventService _eventService;
-        public IMessagePublisher _messagePublisher;
-        public IEncryptionService _encryptService;
-        public IJobService _jobService;
-        public readonly IDataFlowService _dataFlowService;
-        private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
+        private readonly IEventService _eventService;
+        private readonly IMessagePublisher _messagePublisher;
+        private readonly IEncryptionService _encryptService;
+        private readonly IJobService _jobService;
+        private readonly IDataFlowService _dataFlowService;
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
         private readonly IDataFeatures _featureFlags;
-        private string _bucket;
         private readonly ISAIDService _saidService;
         private readonly IDatasetFileService _datasetFileService;
 
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService, IS3ServiceProvider s3ServiceProvider,
-            ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, ISAIDService saidService, IDatasetFileService datasetFileService)
+            IJobService jobService, ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, 
+            ISAIDService saidService, IDatasetFileService datasetFileService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -47,37 +45,12 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _encryptService = encryptService;
             _securityService = securityService;
-            JobService = jobService;
-            _s3ServiceProvider = s3ServiceProvider;
+            _jobService = jobService;
             _schemaService = schemaService;
             _featureFlags = dataFeatures;
             _dataFlowService = dataFlowService;
             _saidService = saidService;
             _datasetFileService = datasetFileService;
-        }
-
-        private IJobService JobService
-        {
-            get
-            {
-                return _jobService;
-            }
-            set
-            {
-                _jobService = value;
-            }
-        }
-
-        private string RootBucket
-        {
-            get
-            {
-                if (_bucket == null)
-                {
-                    _bucket = Config.GetHostSetting("AWS2_0RootBucket");
-                }
-                return _bucket;
-            }
         }
 
         public List<string> Validate(FileSchemaDto dto)
@@ -234,16 +207,16 @@ namespace Sentry.data.Core
                 {
                     errors.Add("OAuth requires a Client Private ID.");
                 }
-
-                if (string.IsNullOrWhiteSpace(dto.Tokens.FirstOrDefault().TokenUrl))
+                if(!dto.Tokens.Any(t => !String.IsNullOrEmpty(t.TokenUrl) && !t.ToDelete))
                 {
                     errors.Add("OAuth requires a Token URL.");
                 }
-                if (dto.Tokens.Count < 1)
+                if (!dto.Tokens.Any(t => !t.ToDelete))
                 {
                     errors.Add("OAuth requires at least one token.");
                 }
-                foreach (var token in dto.Tokens)
+                List<DataSourceTokenDto> tokensToValidate = dto.Tokens.Where(t => !t.ToDelete).ToList(); //skip validation on tokens we plan on removing 
+                foreach (var token in tokensToValidate)
                 {
                     if (string.IsNullOrWhiteSpace(token.TokenName))
                     {
@@ -350,6 +323,28 @@ namespace Sentry.data.Core
 
                 return false;
             }
+        }
+
+        public int Create(DatasetFileConfigDto dto)
+        {
+            DatasetFileConfig datasetFileConfig;
+            try
+            {
+                datasetFileConfig = CreateDatasetFileConfig(dto);
+
+                Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+                List<DatasetFileConfig> datasetFileConfigList = (parentDataset.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parentDataset.DatasetFileConfigs.ToList();
+                datasetFileConfigList.Add(datasetFileConfig);
+                _datasetContext.Add(datasetFileConfig);
+                parentDataset.DatasetFileConfigs = datasetFileConfigList;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error creating Dataset File Config", ex);
+                throw;
+            }
+
+            return datasetFileConfig.ConfigId;
         }
 
         public bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)
@@ -1140,32 +1135,41 @@ namespace Sentry.data.Core
         {
             foreach(DataSourceTokenDto dtoToken in dataSourceDto.Tokens)
             {
-                bool update = false;
-                DataSourceToken token = new DataSourceToken();
-
-                if (dtoToken.Id != 0 && httpsSource.Tokens.Any(dsToken => dsToken.Id == dtoToken.Id))
+                if (dtoToken.ToDelete)
                 {
-                    token = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
-                    update = true;
-                }
-
-                token.ParentDataSource = httpsSource;
-                token.TokenName = dtoToken.TokenName;
-                token.RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey);
-                token.CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey);
-                token.CurrentTokenExp = dtoToken.CurrentTokenExp;
-                token.TokenExp = dtoToken.TokenExp;
-                token.TokenUrl = dtoToken.TokenUrl;
-                token.Scope = dtoToken.Scope;
-
-                if (update)
-                {
-                    UpdateClaimsForToken(token, dataSourceDto);
+                    _datasetContext.RemoveById<DataSourceToken>(dtoToken.Id);
+                    var toRemove = httpsSource.Tokens.First(t => t.Id == dtoToken.Id);
+                    httpsSource.Tokens.Remove(toRemove);
                 }
                 else
                 {
-                    CreateClaimsForToken(token, dataSourceDto, httpsSource);
-                    httpsSource.Tokens.Add(token);
+                    bool update = false;
+                    DataSourceToken token = new DataSourceToken();
+
+                    if (dtoToken.Id != 0 && httpsSource.Tokens.Any(dsToken => dsToken.Id == dtoToken.Id))
+                    {
+                        token = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
+                        update = true;
+                    }
+
+                    token.ParentDataSource = httpsSource;
+                    token.TokenName = dtoToken.TokenName;
+                    token.RefreshToken = EncryptString(dtoToken.RefreshToken, httpsSource.IVKey);
+                    token.CurrentToken = EncryptString(dtoToken.CurrentToken, httpsSource.IVKey);
+                    token.CurrentTokenExp = dtoToken.CurrentTokenExp;
+                    token.TokenExp = dtoToken.TokenExp;
+                    token.TokenUrl = dtoToken.TokenUrl;
+                    token.Scope = dtoToken.Scope;
+
+                    if (update)
+                    {
+                        UpdateClaimsForToken(token, dataSourceDto);
+                    }
+                    else
+                    {
+                        CreateClaimsForToken(token, dataSourceDto, httpsSource);
+                        httpsSource.Tokens.Add(token);
+                    }
                 }
             }
         }
@@ -1179,7 +1183,7 @@ namespace Sentry.data.Core
 
             if (_encryptService.IsEncrypted(input))
             {
-                return input.Replace(Encryption.ENCRYPTIONINDICATOR, "");
+                return input.Replace(Indicators.ENCRYPTIONINDICATOR, "");
             }
 
             return _encryptService.EncryptString(input, Config.GetHostSetting("EncryptionServiceKey"), ivKey).Item1;
@@ -1256,8 +1260,12 @@ namespace Sentry.data.Core
             {
                 ((HTTPSSource)dsrc).ClientId = dto.ClientId;
                 ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
-                ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders.Any() ? dto.RequestHeaders : null;
                 ((HTTPSSource)dsrc).SupportsPaging = dto.SupportsPaging;
+
+                if (dto.RequestHeaders.Any())
+                {
+                    ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders;
+                }
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
@@ -1316,6 +1324,12 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(source);
 
+            if (auth.Is<OAuthAuthentication>())
+            {
+                ((HTTPSSource)source).Tokens = new List<DataSourceToken>();
+                MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
+            }
+
             if (source.IsSecured)
             {
                 source.Security = new Security(SecurableEntityName.DATASOURCE)
@@ -1371,8 +1385,6 @@ namespace Sentry.data.Core
                         ((HTTPSSource)source).ClientId = dto.ClientId;
                         ((HTTPSSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1;
                         ((HTTPSSource)source).GrantType = dto.GrantType;
-                        ((HTTPSSource)source).Tokens = new List<DataSourceToken>();
-                        MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
                     }
                     break;
                 case DataSourceDiscriminator.GOOGLE_API_SOURCE:
@@ -1397,8 +1409,6 @@ namespace Sentry.data.Core
                     {
                         ((GoogleApiSource)source).ClientId = dto.ClientId;
                         ((GoogleApiSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1;
-                        ((GoogleApiSource)source).Tokens = new List<DataSourceToken>();
-                        MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
                     }
                     break;
                 case DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE:
@@ -1406,10 +1416,8 @@ namespace Sentry.data.Core
                     {
                         IVKey = ivKey,
                         ClientId = dto.ClientId,
-                        ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1,
-                        Tokens = new List<DataSourceToken>()
+                        ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, encryptionKey, ivKey).Item1
                     };
-                    MapDtoTokensToDataSourceTokens(dto, (GoogleBigQueryApiSource)source);
 
                     break;
                 default:

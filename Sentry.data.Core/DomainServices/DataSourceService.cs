@@ -1,6 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
+using Sentry.data.Core.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
@@ -9,12 +17,21 @@ namespace Sentry.data.Core
     {
         #region Fields
         private readonly IDatasetContext _datasetContext;
+        private readonly IEncryptionService _encryptionService;
+        private readonly IMotiveProvider _motiveProvider;
+        private readonly HttpClient client;
         #endregion
 
         #region Constructor
-        public DataSourceService(IDatasetContext datasetContext)
+        public DataSourceService(IDatasetContext datasetContext,
+                            IEncryptionService encryptionService,
+                            HttpClient httpClient,
+                            IMotiveProvider motiveProvider)
         {
             _datasetContext = datasetContext;
+            _encryptionService = encryptionService;
+            client = httpClient;
+            _motiveProvider = motiveProvider;
         }
         #endregion
 
@@ -76,13 +93,60 @@ namespace Sentry.data.Core
             return authenticationTypeDtos;
         }
 
+        public async Task<bool> ExchangeAuthToken(DataSource dataSource, string authToken)
+        {
+            var content = new Dictionary<string, string>
+            {
+              {"grant_type", "authorization_code"}, {"code", authToken}, {"redirect_uri", Configuration.Config.GetHostSetting("MotiveRedirectURI")}, {"client_id", ((HTTPSSource)dataSource).ClientId }, {"client_secret", _encryptionService.DecryptString(((HTTPSSource)dataSource).ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey) }
+            };
+            var jsonContent = JsonConvert.SerializeObject(content);
+            var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var stringContent = jsonContent.ToString();
+            Sentry.Common.Logging.Logger.Info($"Attempting to add token {authToken} to datasource {dataSource.Name} with payload: {stringContent}");
+            try
+            {
+                using (var response = await client.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent))
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    Sentry.Common.Logging.Logger.Info($"Response {response.StatusCode}: {responseContent}");
+                    JObject responseAsJson = JObject.Parse(responseContent);
+                    string accessToken = responseAsJson.Value<string>("access_token");
+                    string refreshToken = responseAsJson.Value<string>("refresh_token");
+                    if(String.IsNullOrEmpty(accessToken) || String.IsNullOrEmpty(refreshToken))
+                    {
+                        Sentry.Common.Logging.Logger.Error($"Unable to parse response tokens from JSON: {responseContent}");
+                        return false;
+                    }
+
+                    var newToken = new DataSourceToken()
+                    {
+                        CurrentToken = _encryptionService.EncryptString(accessToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey).Item1,
+                        RefreshToken = _encryptionService.EncryptString(refreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey).Item1,
+                        ParentDataSource = ((HTTPSSource)dataSource),
+                        TokenExp = 7200,
+                        TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret"
+                    };
+
+                    ((HTTPSSource)dataSource).Tokens.Add(newToken);
+                    _datasetContext.SaveChanges();
+                    _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}. Exception {e.Message}.");
+                return false;
+            }
+            return true;
+        }
+
         public List<AuthenticationTypeDto> GetAuthenticationTypeDtos()
         {
             List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
             List<AuthenticationTypeDto> authenticationTypeDtos = allAuthTypes.Select(x => x.ToDto()).ToList();
-
             return authenticationTypeDtos;
         }
+
         #endregion
     }
 }

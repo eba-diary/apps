@@ -6,7 +6,9 @@ using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Dataset;
+using Sentry.data.Web.Models.ApiModels.Migration;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -54,6 +56,11 @@ namespace Sentry.data.Web.WebApi.Controllers
         public IDatasetFileService DatasetFileService
         {
             get { return _datasetFileService.Value; }
+        }
+
+        public IDataApplicationService DataApplicationService
+        {
+            get { return _dataApplicationService.Value; }
         }
 
         #region Classes
@@ -133,6 +140,70 @@ namespace Sentry.data.Web.WebApi.Controllers
 
 
         #region Dataset_Endpoints
+
+        /* This code will be used within next two iterations*/
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(DatasetMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
+        [Route("MigrateDataset")]
+        public async Task<IHttpActionResult> MigrateDataset([FromBody] Models.ApiModels.Migration.DatasetMigrationRequestModel model)
+        {
+            async Task<IHttpActionResult> MigrateDatasetFunction()
+            {
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateDataset).ToLower()}";
+
+                if (model == null)
+                {
+                    Logger.Debug($"{methodName} - Null {nameof(Models.ApiModels.Migration.DatasetMigrationRequestModel)}");
+                    return BadRequest($"{nameof(Models.ApiModels.Migration.DatasetMigrationRequestModel)} is required");
+                }
+
+                Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
+
+                DatasetMigrationRequest request = model.ToDto();
+                
+                DatasetMigrationRequestResponse response = await DataApplicationService.MigrateDataset(request);
+                DatasetMigrationResponseModel responseModel = response.ToDatasetMigrationResponseModel();
+
+                return Ok(responseModel);
+            }
+
+            return await ApiTryCatchAsync(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        }
+
+        /* This code will be used within next two iterations*/
+        [HttpPost]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v20220609)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaMigrationResponseModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, typeof(string[]))]
+        [Route("MigrateSchema")]
+        public async Task<IHttpActionResult> MigrateSchema([FromBody] Models.ApiModels.Migration.SchemaMigrationRequestModel model)
+        {
+            IHttpActionResult MigrateDatasetFunction()
+            {
+                string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(MigrateSchema).ToLower()}";
+
+                if (model == null)
+                {
+                    Logger.Debug($"{methodName} - Null {nameof(SchemaMigrationRequestModel)}");
+                    return BadRequest($"{nameof(SchemaMigrationRequestModel)} is required");
+                }
+
+                Logger.Debug($"{methodName} - {JsonConvert.SerializeObject(model)}");
+
+                SchemaMigrationRequest request = model.ToDto();
+
+                SchemaMigrationRequestResponse response = DataApplicationService.MigrateSchema(request);
+                SchemaMigrationResponseModel responseModel = response.ToSchemaMigrationRequestModel();
+
+                return Ok(responseModel);
+            }
+
+            return ApiTryCatch(nameof(MetadataController), nameof(MigrateDatasetFunction), null, MigrateDatasetFunction);
+        }
+
+
         /// <summary>
         /// List of all datasets
         /// </summary>
@@ -397,9 +468,9 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("GenerateSchemaFromSampleData")]
         public async Task<IHttpActionResult> GenerateSchema([FromBody] JObject data)
         {
-            var schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
-            string schema2 = JsonSchemaReferenceUtilities.ConvertPropertyReferences(schema.ToJson());
-            return Ok(JsonConvert.DeserializeObject<JsonSchema>(schema2));
+            JsonSchema schema = JsonSchema.FromSampleJson(JsonConvert.SerializeObject(data));
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(schema);
+            return Ok(schema);
         }
 
         /// <summary>
@@ -711,31 +782,40 @@ namespace Sentry.data.Web.WebApi.Controllers
         [Route("PublishMessage")]
         public IHttpActionResult PublishMessage([FromBody] KafkaMessage message)
         {
+            string methodName = $"{nameof(MetadataController).ToLower()}_{nameof(PublishMessage).ToLower()}";
+            Logger.Info($"{methodName} Method Start");
+
+            Logger.AddContextVariable(new TextVariable("requestcontextguid", DateTime.UtcNow.ToString(GlobalConstants.System.REQUEST_CONTEXT_GUID_FORMAT)));
+            Logger.AddContextVariable(new TextVariable("requestcontextmethod", methodName));
+
             try
             {
                 if (message == null)
                 {
-                    Logger.Error($"jobcontroller-publishmessage null message");
+                    Logger.Error($"{methodName} null message");
                     throw new ArgumentException("message parameter is null");
                 }
                 else
                 {
-                    Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
+                    Logger.Info($"{methodName} message:{ JsonConvert.SerializeObject(message) }");
                 }
 
-                _messagePublisher.PublishDSCEvent(message.Key, message.Message, message.Topic);
-                return Ok();
+                _messagePublisher.PublishDSCEvent(message.Key, message.Message, message.Topic);                
             }
             catch (KafkaProducerException ex)
             {
-                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                Logger.Error($"{methodName} failure", ex);
                 return Content(System.Net.HttpStatusCode.BadGateway, "Unable to produce messages to kafka");
             }
             catch (Exception ex)
             {
-                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                Logger.Error($"{methodName} failure", ex);
                 return InternalServerError();
             }
+
+            Logger.Info($"{methodName} Method End");
+            return Ok();
+
         }
         
         /// <summary>

@@ -35,6 +35,12 @@ namespace Sentry.data.Core
             };
         }
 
+        public static void MapToRetrieverJobDto(this DataFlow dataFlow, RetrieverJobDto dto)
+        {
+            dto.DataFlow = dataFlow.Id;
+            dto.FileSchema = dataFlow.SchemaId;
+        }
+
         public static SchemaMapDto ToDto(this SchemaMap scmMap)
         {
             return new SchemaMapDto()

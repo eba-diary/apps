@@ -27,6 +27,18 @@ data.Admin = {
         });
     },
 
+    SideBarUtility: function ()
+    {
+        var currentHref = $(location).attr("href");
+
+        // Gets title of current page
+        var navID = /[^/]*$/.exec(currentHref)[0].toLowerCase();
+
+        // Selects nav bar item that matches the current page title and sets the link to bold + blue font
+        $("#sideNav").find(`[data-nav-id='${navID}']`).addClass("font-weight-bold text-primary");
+        
+    },
+
     // Reduce and group json fields by the specified key
     JsonReduce: function (jsonObject, groupKey, itemsKey) {    
         
@@ -163,7 +175,15 @@ data.Admin = {
         $.ajax({
             type: "GET",
             url: url,
-            success: function (schemaApiResponse) {
+            success: function (schemaApiResponse)
+            {
+                // reduces api json response to only active schemas
+                schemaApiResponse = schemaApiResponse.filter(function (jsonObject)
+                {
+                    return jsonObject.ObjectStatus === 'ACTIVE';
+                });
+
+                // sort schema results alphabetically
                 schemaApiResponse.sort(function (a, b) {
                     if (a.Name < b.Name) {
                         return -1;
@@ -175,9 +195,12 @@ data.Admin = {
                         return 0;
                     }
                 });
+
+
                 var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
 
-                for (let schema of schemaApiResponse) {
+                for (let schema of schemaApiResponse)
+                {
                     scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
                 }
 
@@ -301,15 +324,9 @@ data.Admin = {
 
     // activate or deactivate reprocess button based on input list of checked boxes
     ActivateDeactivateAuditSearchButton: function () {
-        console.log("calls")
-
         var searchStatus = false;
 
         $("select.admin-audit-dropdown.active").each(function () {
-
-            console.log($(this).attr("id"));
-            console.log($(this).find(":selected").val());
-
             // Checks if any acive dropdown items are not selected
             if ($(this).find(":selected").val() == null || $(this).find(":selected").val() == "" || $(this).find(":selected").val() == "-1") {
                 searchStatus = true;
@@ -317,8 +334,6 @@ data.Admin = {
                 // Break from each loop
                 return false;
             }
-
-            console.log(searchStatus);
         })
 
         $("#auditSearchButton").prop("disabled", searchStatus);
@@ -441,7 +456,6 @@ data.Admin = {
 
             // Show spinner + Reprocess button
             $("#tab-spinner").show();
-            $("#auditReprocessButton").show();
 
             if (postCheck) {
                 $.ajax({
@@ -475,7 +489,103 @@ data.Admin = {
         });
     },
 
-    AuditTableInit: function () {
+    TableDifferenceFilter: function (tableID, showDifference)
+    {
+        var table = $(tableID).DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex)
+            {
+                return $(table.row(dataIndex).node()).data("record-difference") == showDifference;
+            }
+        );
+
+        table.draw();
+    },
+
+    TableAllFilter: function (tableID)
+    {
+        var table = $(tableID).DataTable();
+
+        $.fn.dataTable.ext.search.pop();
+        table.draw();
+    },
+
+    RowCountCompareTableInit: function () {
+        var table = $('#AuditTable').DataTable({
+            columnDefs: [
+                {
+                    targets: [0],
+                    orderable: true
+                }
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: '<i class="fas fa-asterisk"></i> All',
+                    action: function (e, dt, node, config)
+                    {
+                        data.Admin.TableAllFilter('#AuditTable');
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    text: '<i class="text-warning fas fa-not-equal"></i> Diffs',
+                    action: function(e, dt, node, config)
+                    {
+                        data.Admin.TableDifferenceFilter('#AuditTable', "True");
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    text: '<i class="text-dark fas fa-equals"></i> Same',
+                    action: function (e, dt, node, config)
+                    {
+                        data.Admin.TableDifferenceFilter('#AuditTable', "False");
+                    },
+                    className: 'btn-sm btn-outline-primary shadow-none',
+                    init: function (api, node, config)
+                    {
+                        $(node).removeClass('btn-secondary')
+                    }
+                }
+            ],
+            select: true
+        });
+
+        // ensures that table is reset of all filters that might have been applied
+        $.fn.dataTable.ext.search.pop();
+        table.draw();
+
+        // event for applying solid bg color for selected filter btns
+        $(".dt-buttons .btn").click(function ()
+        {
+            // loops through all audit filtter buttons and reset them to default outline style
+            $(".dt-buttons .btn").each(function ()
+            {
+                $(this).removeClass("btn-primary");
+                $(this).removeClass("btn-outline-primary");
+                $(this).addClass("btn-outline-primary");
+            });
+
+            $(this).removeClass("btn-outline-primary");
+            $(this).removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+        });
+    },
+
+    NonParquetFilesTableInit: function ()
+    {
         $('#AuditTable').DataTable({
             columnDefs: [
                 {
@@ -483,7 +593,8 @@ data.Admin = {
                     orderable: true
                 }
             ],
-            drawCallback: function () {
+            drawCallback: function ()
+            {
                 $('#data-file-select-all').prop('checked', false);
                 $('.select-all-target').prop('checked', false);
             }
@@ -716,17 +827,17 @@ data.Admin = {
                 },
                 columns: [
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         orderable: false,
                         data: null,
                         defaultContent: '<center><em id = "expand-collapse-icon" class = "fas fa-plus"></em></center>',
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         data: 'FileName'
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         type: 'date',
                         data: 'FirstEventTime',
                         render: function (data) {
@@ -734,7 +845,7 @@ data.Admin = {
                         }
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         type: 'date',
                         data: 'LastEventTime',
                         render: function (data) {
@@ -742,11 +853,11 @@ data.Admin = {
                         }
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         data: 'Duration'
                     },
                     {
-                        className: 'dt-control',
+                        className: 'metric-detail-control',
                         data: null,
                         render: (d) => function (data, type, row) {
                             if (d.AllEventsPresent && d.AllEventsComplete) {
@@ -765,7 +876,7 @@ data.Admin = {
         });
 
         // Add event listener for opening and closing details
-        $('#metricGroupsTable').on('click', 'td.dt-control', function () {
+        $('#metricGroupsTable').on('click', 'td.metric-detail-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row(tr);
             var icon = $(this).closest('tr').find("#expand-collapse-icon");

@@ -20,7 +20,7 @@ $(function () {
 
 // Put your application's custom functions in a JavaScript "namespace" to avoid collisions
 // with other libraries
-var data = new function () {
+window.data = new function () {
 
     // Use the format below for adding global methods
     this.HelperMethod = function (param1, param2) {

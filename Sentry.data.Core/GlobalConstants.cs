@@ -150,6 +150,7 @@ namespace Sentry.data.Core
             public const string GENERIC_HTTPS_DATAFLOW_SOURCE = "GENERICHTTPSDATAFLOW";
             public const string GOOGLE_BIG_QUERY_API_SOURCE = "GoogleBigQueryApi";
             public const string PAGING_HTTPS_SOURCE = "PagingHttps";
+            public const string GOOGLE_SEARCH_CONSOLE_API_SOURCE = "GoogleSearchConsoleApi";
         }
 
         public static class DataFeedType
@@ -239,6 +240,7 @@ namespace Sentry.data.Core
         {
             public const string AD = "AD";
             public const string AWS_IAM = "AWS_IAM";
+            public const string SNOWFLAKE = "SNOWFLAKE";
         }
 
         public static class ConvertedFileStoragePrefix
@@ -553,6 +555,11 @@ namespace Sentry.data.Core
                 public const string LASTINDEX = "LastIndex";
                 public const string TOTALROWS = "TotalRows";
             }
+
+            public static class PagingHttps
+            {
+                public const string CURRENTDATASOURCETOKENID = "CurrentDataSourceTokenId";
+            }
         }
 
         public static class HostSettings
@@ -584,9 +591,10 @@ namespace Sentry.data.Core
             public const string PROD = "PROD";
         }
 
-        public static class Encryption
+        public static class Indicators
         {
             public const string ENCRYPTIONINDICATOR = "<--!-->";
+            public const string REQUESTVARIABLEINDICATOR = "~[{0}]~";
         }
     }
 }

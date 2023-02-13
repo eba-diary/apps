@@ -10,7 +10,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> Remove_ClaimIQ_mock_logic_CLA_758 { get; }
         IFeatureFlag<bool> Expose_Dataflow_Metadata_CLA_2146 { get; }
         IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; }
-        IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; }
         IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
         IFeatureFlag<bool> CLA3329_Expose_HR_Category { get; }
         IFeatureFlag<bool> CLA1656_DataFlowEdit_ViewEditPage { get; }
@@ -41,5 +40,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
 
         IFeatureFlag<bool> CLA4553_PlatformActivity { get; }
+        IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
     }
 }

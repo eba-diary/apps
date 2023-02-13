@@ -37,6 +37,15 @@ namespace Sentry.data.Core
         SchemaRevisionJsonStructureDto GetLatestSchemaRevisionJsonStructureBySchemaId(int datasetId, int schemaId);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
+        /// <returns></returns>
+        SchemaRevisionFieldStructureDto GetLatestSchemaRevisionFieldStructureBySchemaId(int datasetId, int schemaId);
+
+        /// <summary>
         /// Create new FileSchema entity and add it to context.  Does not save changes.
         /// </summary>
         /// <param name="dto">FileSchemaDto</param>
@@ -60,7 +69,26 @@ namespace Sentry.data.Core
         /// <param name="jsonSchema"></param>
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         /// <returns></returns>
+        /// 
+        [Obsolete("Use " + nameof(CreateSchemaRevision) + "method excepting " + nameof(SchemaRevisionFieldStructureDto), false)]
         int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null);
+
+        /// <summary>
+        /// Creates SchemaRevision and SchemaField entity objects.
+        /// <para>Objects are not saved to domain context</para>
+        /// </summary>
+        /// <param name="schemaRevisionFieldsStructureDto"></param>
+        /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
+        /// <exception cref="DatasetNotFoundException">Thrown when dataset does not exist</exception>"
+        /// <returns></returns>
+        int CreateSchemaRevision(SchemaRevisionFieldStructureDto schemaRevisionFieldsStructureDto);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <param name="schemaRevisionId"></param>
+        void CreateSchemaRevisionExternalDependencies(int schemaId, int schemaRevisionId);
 
         /// <summary>
         /// 
@@ -132,5 +160,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="schemaId">Schema ID</param>
         void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
+
+        (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName);
     }
 }

@@ -56,11 +56,10 @@
 <!--Reprocess button-->
 <button type="button" class="btn btn-primary waves-effect waves-light" id="reprocessButton" disabled>Reprocess Selected</button>
 
-    <script>
-        $(function () {
-            data.Admin.ReprocessInit();
-        });
-    </script>
-
-
-
+<script>
+    $(function ()
+    {
+        data.Admin.SideBarUtility();
+        data.Admin.ReprocessInit();
+    });
+</script>

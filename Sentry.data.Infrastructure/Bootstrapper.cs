@@ -100,14 +100,15 @@ namespace Sentry.data.Infrastructure
             //Register other services
             registry.For<IBaseJobProvider>().AddInstances(x =>
             {
-                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSourceDiscriminator.HTTPS_SOURCE);
-                x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_SOURCE);
-                x.Type<DfsDataFlowBasicProvider>().Named(GlobalConstants.DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
-                x.Type<FtpDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.FTP_DATAFLOW_SOURCE);
-                x.Type<GoogleAPIDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
-                x.Type<GenericHttpsDataFlowProvider>().Named(GlobalConstants.DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
+                x.Type<GenericHttpsProvider>().Named(DataSourceDiscriminator.HTTPS_SOURCE);
+                x.Type<GoogleApiProvider>().Named(DataSourceDiscriminator.GOOGLE_API_SOURCE);
+                x.Type<DfsDataFlowBasicProvider>().Named(DataSourceDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+                x.Type<FtpDataFlowProvider>().Named(DataSourceDiscriminator.FTP_DATAFLOW_SOURCE);
+                x.Type<GoogleAPIDataFlowProvider>().Named(DataSourceDiscriminator.GOOGLE_API_DATAFLOW_SOURCE);
+                x.Type<GenericHttpsDataFlowProvider>().Named(DataSourceDiscriminator.GENERIC_HTTPS_DATAFLOW_SOURCE);
                 x.Type<GoogleBigQueryJobProvider>().Named(DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
                 x.Type<PagingHttpsJobProvider>().Named(DataSourceDiscriminator.PAGING_HTTPS_SOURCE);
+                x.Type<GoogleSearchConsoleJobProvider>().Named(DataSourceDiscriminator.GOOGLE_SEARCH_CONSOLE_API_SOURCE);
             });
 
             //Register event handlers for MetadataProcessorService
@@ -171,6 +172,20 @@ namespace Sentry.data.Infrastructure
                     registry.For<IDfsRetrieverJobProvider>().Use<ProdRetrieverJobProvider>();
                     break;
             }
+
+            WebHelper.TryGetWebProxy(true, out WebProxy webProxy);
+
+            var dataSourceClient = new HttpClient(new HttpClientHandler()
+            {
+                Proxy = webProxy
+            });
+            registry.For<IDataSourceService>().Use<DataSourceService>().Ctor<HttpClient>().Is(dataSourceClient);
+
+            var motiveProviderClient = new HttpClient(new HttpClientHandler()
+            {
+                Proxy = webProxy
+            });
+            registry.For<IMotiveProvider>().Use<MotiveProvider>().Ctor<HttpClient>().Is(motiveProviderClient);
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

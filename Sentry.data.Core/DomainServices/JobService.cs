@@ -68,6 +68,33 @@ namespace Sentry.data.Core
             return histRecordList;
         }
 
+        /// <summary>
+        /// Returns the dfs datasource based on the NamedEnvironmentType
+        /// </summary>
+        /// <param name="namedEnviornmentType"></param>
+        /// <remarks>This is used by <see cref="DataApplicationService.CreateWithoutSave_DfsRetrieverJob"/>.</remarks>
+        /// <returns></returns>
+        public DataSource GetDfsDataSourceByDatasetNamedEnvironmentType(NamedEnvironmentType namedEnviornmentType)
+        {
+            DataSource dfsDataSource;
+            if (string.IsNullOrEmpty(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+            {
+                if (namedEnviornmentType == NamedEnvironmentType.NonProd)
+                {
+                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsNonProdSource);
+                }
+                else
+                {
+                    dfsDataSource = _datasetContext.DataSources.FirstOrDefault(x => x is DfsProdSource);
+                }
+            }
+            else
+            {
+                dfsDataSource = _datasetContext.DataSources.FirstOrDefault(w => w is DfsDataFlowBasic);
+            }
+            return dfsDataSource;
+        }
+
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
         {
             JobHistory histRecord = null;
@@ -133,7 +160,15 @@ namespace Sentry.data.Core
             return basicJob;
         }
 
-        public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
+        public void CreateDfsRetrieverJob(DataFlow dataFlow)
+        {
+            NamedEnvironmentType datasetEnvironmentType = _datasetContext.Datasets.Where(x => x.DatasetId == dataFlow.DatasetId).Select(x => x.NamedEnvironmentType).FirstOrDefault();
+            DataSource dfsDataSource = GetDfsDataSourceByDatasetNamedEnvironmentType(datasetEnvironmentType);
+
+            _ = CreateDfsRetrieverJob(dataFlow, dfsDataSource);
+        }
+
+        public RetrieverJob CreateDfsRetrieverJob(DataFlow df, DataSource dataSource)
         {
             Logger.Info($"InstantiateJobsForCreation Method Start");
 
@@ -185,12 +220,14 @@ namespace Sentry.data.Core
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
 
+            _datasetContext.Add(rj);
+
             Logger.Info($"InstantiateJobsForCreation Method End");
 
             return rj;
         }
 
-        public RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto)
+        public RetrieverJob CreateRetrieverJob(RetrieverJobDto dto)
         {
             Compression compress = new Compression();
             if (dto.IsCompressed)
@@ -215,16 +252,13 @@ namespace Sentry.data.Core
             //if we have previous execution parameters from a data flow edit, only keep if RelativeUri did not change
             if (dto.ExecutionParameters?.Any() == true && dto.FileSchema > 0)
             {
-                //check that all jobs are currently deleted and get the most recent deleted job
                 RetrieverJob previousRetrieverJob = _datasetContext.RetrieverJob.OrderByDescending(x => x.Id).FirstOrDefault(w => w.DataFlow.SchemaId == dto.FileSchema);
-                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && previousRetrieverJob.RelativeUri == job.RelativeUri)
+                if (previousRetrieverJob != null && previousRetrieverJob.ObjectStatus == ObjectStatusEnum.Deleted && AreSameHttpsRequests(previousRetrieverJob, job))
                 {
                     job.ExecutionParameters = dto.ExecutionParameters;
                 }
             }
             _datasetContext.Add(job);
-
-            CreateDropLocation(job);
 
             return job;
         }
@@ -546,6 +580,7 @@ namespace Sentry.data.Core
             return GetApacheLivyBatchStatusInternalAsync(hr);
         }
 
+        #region Private Methods
         private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
         {
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
@@ -601,13 +636,32 @@ namespace Sentry.data.Core
                 historyRecord.Active = false;
 
                 _datasetContext.SaveChanges();
-            }            
+            }
 
             Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
             return response;
         }
 
-#region Private Methods
+        private bool AreSameHttpsRequests(RetrieverJob previousJob, RetrieverJob newJob)
+        {
+            bool areSame = previousJob.RelativeUri == newJob.RelativeUri &&
+                previousJob.JobOptions.HttpOptions.PagingType == newJob.JobOptions.HttpOptions.PagingType &&
+                previousJob.JobOptions.HttpOptions.PageParameterName == newJob.JobOptions.HttpOptions.PageParameterName &&
+                previousJob.JobOptions.HttpOptions.Body == newJob.JobOptions.HttpOptions.Body &&
+                previousJob.JobOptions.HttpOptions.RequestMethod == newJob.JobOptions.HttpOptions.RequestMethod &&
+                previousJob.RequestVariables.Count == newJob.RequestVariables.Count;
+
+            if (areSame && previousJob.RequestVariables.Any())
+            {
+                //if request variables exist, make sure they are all the same (we already verified we have the same number of variables)
+                areSame = previousJob.RequestVariables.All(previous =>
+                    newJob.RequestVariables.Any(newVar => newVar.VariableValue == previous.VariableValue &&
+                    newVar.VariableName == previous.VariableName &&
+                    newVar.VariableIncrementType == previous.VariableIncrementType));
+            }
+
+            return areSame;
+        }
 
         internal JobHistory MapToJobHistory(JobHistory previousHistoryRec, LivyReply reply)
         {
@@ -896,7 +950,6 @@ namespace Sentry.data.Core
             httpOptions.RequestMethod = dto.RequestMethod?? HttpMethods.none;
             httpOptions.RequestDataFormat = dto.RequestDataFormat?? HttpDataFormat.none;
             httpOptions.PagingType = dto.PagingType;
-            httpOptions.PageTokenField = dto.PageTokenField;
             httpOptions.PageParameterName = dto.PageParameterName;
         }
 
@@ -916,6 +969,7 @@ namespace Sentry.data.Core
             job.ObjectStatus = dto.ObjectStatus;
             job.DeleteIssueDTM = dto.DeleteIssueDTM;
             job.DeleteIssuer = dto.DeleteIssuer;
+            job.RequestVariables = dto.RequestVariables?.Select(x => x.ToEntity()).ToList();
         }
 
         private void DeleteJobFromScheduler(RetrieverJob job)

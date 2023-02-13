@@ -10,7 +10,9 @@ namespace Sentry.data.Core.Tests
     public static class MockClasses
     {
         const string HrDatasetBucket = "sentry-dlst-dev-hrdroplocation-ae2";
+        const string HrDatasetBucketNonProd = "sentry-dlst-qualnp-hrdroplocation-ae2";
         const string DlstDatasetBucket = "sentry-dlst-dev-droplocation-ae2";
+        const string DlstDatasetBucketNonProd = "sentry-dlst-qualnp-droplocation-ae2";
         const string DataDatasetBucket = "sentry-data-dev-hrdroplocation-ae2";
         public static Dataset MockDataset(IApplicationUser user = null, Boolean addConfig = false, Boolean isSecured = false)
         {
@@ -37,7 +39,7 @@ namespace Sentry.data.Core.Tests
 
             if (addConfig)
             {
-                ds.DatasetFileConfigs.Add(MockDataFileConfig(ds));
+                ds.DatasetFileConfigs.Add(MockDatasetFileConfig(ds));
             }
 
             return ds;
@@ -51,7 +53,8 @@ namespace Sentry.data.Core.Tests
                 {
                     DatasetId = dsItem.DatasetId,
                     DatasetName = dsItem.DatasetName,
-                    DatasetDesc = dsItem.DatasetDesc
+                    DatasetDesc = dsItem.DatasetDesc,
+                    SAIDAssetKeyCode = "ABCD"
                 };
                 dsDtoList.Add(dsItemDto);
             }
@@ -89,7 +92,7 @@ namespace Sentry.data.Core.Tests
             return categories;
         }
 
-        public static DatasetFileConfig MockDataFileConfig(Dataset ds = null, FileSchema schema = null)
+        public static DatasetFileConfig MockDatasetFileConfig(Dataset ds = null, FileSchema schema = null)
         {
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
@@ -119,7 +122,8 @@ namespace Sentry.data.Core.Tests
                 {
                     ConfigId = config.ConfigId,
                     Description = config.Description,
-                    Schema = MockFileSchemaDto(config.Schema)
+                    Schema = MockFileSchemaDto(config.Schema),
+                    ParentDatasetId = config.ParentDataset.DatasetId
                 };
 
                 dtoList.Add(dto);
@@ -450,7 +454,7 @@ namespace Sentry.data.Core.Tests
 
                 DataSource = MockDataSource(dsrc, authType),
 
-                DatasetConfig = dfc != null ? dfc : MockDataFileConfig(null),
+                DatasetConfig = dfc != null ? dfc : MockDatasetFileConfig(null),
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
@@ -616,9 +620,21 @@ namespace Sentry.data.Core.Tests
                 TargetStoragePrefix = prefix
             },
             new ProducerS3DropAction(){
+                Id = 35,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
+            },
+            new ProducerS3DropAction(){
                 Id = 20,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ProducerS3DropAction(){
+                Id = 40,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
 
@@ -643,9 +659,21 @@ namespace Sentry.data.Core.Tests
                 TargetStoragePrefix = prefix
             },
             new RawStorageAction(){
+                Id = 42,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
+            },
+            new RawStorageAction(){
                 Id = 16,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new RawStorageAction(){
+                Id = 36,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
             return actions.ToList();
@@ -669,9 +697,21 @@ namespace Sentry.data.Core.Tests
                 TargetStoragePrefix = prefix
             },
             new QueryStorageAction(){
+                Id = 43,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
+            },
+            new QueryStorageAction(){
                 Id = 17,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new QueryStorageAction(){
+                Id = 37,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
             return actions.ToList();
@@ -695,9 +735,21 @@ namespace Sentry.data.Core.Tests
                 TargetStoragePrefix = prefix
             },
             new ConvertToParquetAction(){
-                Id = 19,
+                Id = 44,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
+            },
+            new ConvertToParquetAction(){
+                Id = 39,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new ConvertToParquetAction(){
+                Id = 19,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
             return actions.ToList();
@@ -719,6 +771,12 @@ namespace Sentry.data.Core.Tests
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
                 TargetStoragePrefix = prefix
+            },
+            new UncompressZipAction(){
+                Id = 45,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
             } };
             return actions.ToList();
         }
@@ -736,6 +794,12 @@ namespace Sentry.data.Core.Tests
             },
             new GoogleApiAction(){
                 Id = 26,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new GoogleApiAction(){
+                Id = 46,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
                 TargetStoragePrefix = prefix
@@ -759,6 +823,12 @@ namespace Sentry.data.Core.Tests
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
                 TargetStoragePrefix = prefix
+            },
+            new ClaimIQAction(){
+                Id = 47,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
             } };
             return actions.ToList();
         }
@@ -778,6 +848,12 @@ namespace Sentry.data.Core.Tests
                 Id = 28,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new UncompressGzipAction(){
+                Id = 48,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
             return actions.ToList();
@@ -799,6 +875,12 @@ namespace Sentry.data.Core.Tests
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
                 TargetStoragePrefix = prefix
+            },
+            new FixedWidthAction(){
+                Id = 49,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
             } };
             return actions.ToList();
         }
@@ -811,7 +893,13 @@ namespace Sentry.data.Core.Tests
             {
                 Id = 21,
                 Name = $"HR {name}",
-                TargetStorageBucket = DataDatasetBucket,
+                TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            },new XMLAction()
+            {
+                Id = 41,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             },new XMLAction()
             {
@@ -824,6 +912,12 @@ namespace Sentry.data.Core.Tests
                 Id = 30,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new XMLAction(){
+                Id = 50,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
             return actions.ToList();
@@ -845,7 +939,13 @@ namespace Sentry.data.Core.Tests
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
                 TargetStoragePrefix = prefix
-            } };
+            },
+            new JsonFlatteningAction(){
+                Id = 51,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
+                TargetStoragePrefix = prefix
+             } };
             return actions.ToList();
         }
 
@@ -857,7 +957,13 @@ namespace Sentry.data.Core.Tests
             {
                 Id = 18,
                 Name = $"HR {name}",
-                TargetStorageBucket = DataDatasetBucket,
+                TargetStorageBucket = HrDatasetBucket,
+                TargetStoragePrefix = prefix
+            },new SchemaLoadAction()
+            {
+                Id = 38,
+                Name = $"HR {name}",
+                TargetStorageBucket = HrDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             },new SchemaLoadAction()
             {
@@ -870,6 +976,12 @@ namespace Sentry.data.Core.Tests
                 Id = 32,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
+                TargetStoragePrefix = prefix
+            },
+            new SchemaLoadAction(){
+                Id = 52,
+                Name = name,
+                TargetStorageBucket = DlstDatasetBucketNonProd,
                 TargetStoragePrefix = prefix
             } };
             return actions.ToList();
@@ -913,7 +1025,8 @@ namespace Sentry.data.Core.Tests
                 NamedEnvironmentType = NamedEnvironmentType.NonProd,
                 ObjectStatus = ObjectStatusEnum.Active,
                 DeleteIssuer = null,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)IngestionType.DFS_Drop
             };
             return df;
         }

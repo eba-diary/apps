@@ -30,13 +30,13 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             FileSchema schema = MockClasses.MockFileSchema();
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
             securityService.Setup(s => s.GetUserSecurity(dfc.ParentDataset, user.Object));
 
-            var configService = new ConfigService(context.Object,null,null,null,null,null,null,null,null,null,null,null,null);
+            var configService = new ConfigService(context.Object,null,null,null,null,null,null,null,null,null,null,null);
 
             //Act
             configService.Delete(dfc.ConfigId, user.Object, true);
@@ -57,12 +57,12 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, true);
@@ -84,13 +84,13 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             configService.Delete(dfc.ConfigId, user.Object, true);
@@ -111,12 +111,12 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Deleted;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, false);
@@ -137,13 +137,13 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Deleted;
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, false);
@@ -165,7 +165,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             var dataflows = new[] { MockClasses.MockDataFlow() };
@@ -190,7 +190,7 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
             dataFlowService.Setup(s => s.GetDataFlowNameForFileSchema(It.IsAny<FileSchema>())).Returns("DataflowName");
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null);
 
             // Act
             configService.Delete(dfc.ConfigId, user.Object, false);
@@ -210,7 +210,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = MockClasses.MockFileSchema();
             schema.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            DatasetFileConfig dfc = MockClasses.MockDataFileConfig(null, schema);
+            DatasetFileConfig dfc = MockClasses.MockDatasetFileConfig(null, schema);
             dfc.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
             var dataflows = new[] { MockClasses.MockDataFlow() };
@@ -235,13 +235,37 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
             dataFlowService.Setup(s => s.GetDataFlowNameForFileSchema(It.IsAny<FileSchema>())).Returns("DataflowName");
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null);
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null);
 
             // Act
             configService.Delete(dfc.ConfigId, null, false);
 
             // Assert
             dataFlowService.Verify(x => x.Delete(It.IsAny<List<int>>(), null, false), Times.Once);
+        }
+
+        [TestMethod]
+        public void Create()
+        {
+            //Arange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            var mockSchema = MockClasses.MockFileSchema();
+            var mockDataset = MockClasses.MockDataset();
+            var DatasetFileConfig = MockClasses.MockDatasetFileConfig(mockDataset,mockSchema);
+            DatasetFileConfigDto dto = MockClasses.MockDatasetFileConfigDtoList(new List<DatasetFileConfig>() { DatasetFileConfig }).First();
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<DatasetFileConfig>()));
+            context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(mockDataset);
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            _ = configService.Create(dto);
+
+            //Assert
+            mr.VerifyAll();
         }
 
         [TestMethod]
@@ -278,7 +302,7 @@ namespace Sentry.data.Core.Tests
             Mock<IEventService> eventService = mock.Create<IEventService>();
             eventService.Setup(x => x.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, "DataFlowName was created.", null)).Returns<Task>(null);
 
-            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null);
 
             DataSourceDto dataSourceDto = new DataSourceDto
             {
@@ -388,7 +412,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<AuthenticationType>(2)).Throws<Exception>();
             datasetContext.Setup(x => x.Clear());
 
-            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null);
             
             DataSourceDto dataSourceDto = new DataSourceDto { AuthID = "2" };
 
@@ -475,7 +499,7 @@ namespace Sentry.data.Core.Tests
             Mock<IUserService> userService = mock.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000001");
 
-            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null);
 
             DataSourceDto dataSourceDto = new DataSourceDto
             {
@@ -624,7 +648,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<DataSource>(1)).Throws<Exception>();
             datasetContext.Setup(x => x.Clear());
 
-            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             DataSourceDto dataSourceDto = new DataSourceDto { OriginatingId = 1 };
 
@@ -704,11 +728,11 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataSource>(), appUser2.Object)).Returns(userSecurity);
 
             Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
-            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedClientPrivateId")).Returns<string>(x => Encryption.ENCRYPTIONINDICATOR + x + Encryption.ENCRYPTIONINDICATOR);
-            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedCurrentToken")).Returns<string>(x => Encryption.ENCRYPTIONINDICATOR + x + Encryption.ENCRYPTIONINDICATOR);
-            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedRefreshToken")).Returns<string>(x => Encryption.ENCRYPTIONINDICATOR + x + Encryption.ENCRYPTIONINDICATOR);
+            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedClientPrivateId")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
+            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedCurrentToken")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
+            encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedRefreshToken")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
 
-            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, null, null, encryptionService.Object, securityService.Object, null, null, null, null, null, null, null);
+            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, null, null, encryptionService.Object, securityService.Object, null, null, null, null, null, null);
 
             DataSourceDto dataSource = configService.GetDataSourceDto(1);
 
@@ -728,7 +752,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(userSecurity, dataSource.Security);
             Assert.AreEqual($"mailto:username@sentry.com?Subject=Data%20Source%20Inquiry%20-%20DataSourceName", dataSource.MailToLink);
             Assert.AreEqual("ClientId", dataSource.ClientId);
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedClientPrivateId{Encryption.ENCRYPTIONINDICATOR}", dataSource.ClientPrivateId);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}EncryptedClientPrivateId{Indicators.ENCRYPTIONINDICATOR}", dataSource.ClientPrivateId);
             Assert.IsTrue(dataSource.SupportsPaging);
             Assert.AreEqual("AuthHeaderName", dataSource.TokenAuthHeader);
             Assert.AreEqual(OAuthGrantType.JwtBearer, dataSource.GrantType);
@@ -743,8 +767,8 @@ namespace Sentry.data.Core.Tests
 
             DataSourceTokenDto dataSourceToken = dataSource.Tokens.First();
             Assert.AreEqual(3, dataSourceToken.Id);
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedCurrentToken{Encryption.ENCRYPTIONINDICATOR}", dataSourceToken.CurrentToken);
-            Assert.AreEqual($"{Encryption.ENCRYPTIONINDICATOR}EncryptedRefreshToken{Encryption.ENCRYPTIONINDICATOR}", dataSourceToken.RefreshToken);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}EncryptedCurrentToken{Indicators.ENCRYPTIONINDICATOR}", dataSourceToken.CurrentToken);
+            Assert.AreEqual($"{Indicators.ENCRYPTIONINDICATOR}EncryptedRefreshToken{Indicators.ENCRYPTIONINDICATOR}", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 21, 8, 0, 0), dataSourceToken.CurrentTokenExp);
             Assert.AreEqual(100, dataSourceToken.TokenExp);
             Assert.AreEqual("TokenName", dataSourceToken.TokenName);

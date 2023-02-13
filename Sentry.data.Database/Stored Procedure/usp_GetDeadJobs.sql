@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[usp_GetDeadJobs] @JobID INT, @TimeCreated datetime
+﻿CREATE PROCEDURE [dbo].[usp_GetDeadJobs] @TimeCreated datetime
 
 AS
 
@@ -11,18 +11,46 @@ IF OBJECT_ID('tempdb..#tempSubmissionDetails') IS NOT NULL DROP TABLE #tempSubmi
 IF OBJECT_ID('tempdb..#TempSubmissionDetails_RowNum') IS NOT NULL DROP TABLE #TempSubmissionDetails_RowNum
 IF OBJECT_ID('tempdb..#IdentifiedDeadJobs') IS NOT NULL DROP TABLE #IdentifiedDeadJobs
 IF OBJECT_ID('tempdb..#EventMetadata') IS NOT NULL DROP TABLE #EventMetadata
+IF OBJECT_ID('tempdb..#EnvironmentJobIDs') IS NOT NULL DROP TABLE #EnvironmentJobIDs
 
 /************************
-Job IDs
-prod = 465
-QUAL = 529
-TEST = 262
+This stored procedure is used to produce results to UI
+
+Do not change output format unless UI is tested. 
+
+Job IDs:
+PRDO     = 465
+QUAL OG  = 529
+QUAL NEW = 4638
+QUALNP   = 4637
+TEST     = 262
 ************************/
+
+/* Determine current named environment */
+DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
+
+CREATE TABLE #EnvironmentJobIDs (Job_ID int);
+
+/* Select Job IDs associated with current Environment */
+IF (@ENV = 'DEV' OR @ENV = 'NRDEV' OR @ENV = 'TEST' OR @ENV = 'NRTEST')
+BEGIN 
+    INSERT #EnvironmentJobIDs(Job_ID) values(262);
+END
+ELSE IF @ENV = 'QUAL'
+BEGIN 
+    INSERT #EnvironmentJobIDs(Job_ID) values(529),(4638),(4637);
+END
+ELSE IF @ENV = 'PROD'
+BEGIN 
+    INSERT #EnvironmentJobIDs(Job_ID) values(465);
+END
+
 
 select distinct Submission,History_Id
 into #Submissions
 from JobHistory
-where State = 'Dead' and Job_ID = @JobID and Created > @TimeCreated
+inner join #EnvironmentJobIDs ON JobHistory.Job_ID = #EnvironmentJobIDs.Job_ID
+where State = 'Dead' and Created > @TimeCreated
 order by History_Id DESC
 
 /* SELECT * FROM #Submissions */
@@ -142,7 +170,7 @@ left join DataFlow DFlow on
        TSD.Schema_ID = DFlow.SchemaId
 left join DataFlowStep DFlowStep on
        DFlowStep.DataFlow_Id = DFlow.Id and
-       DFlowStep.DataAction_Type_Id = 5 -- Convert to Parquet --
+       DFlowStep.DataAction_Type_Id = 2
 where TSD.RowNumber = 1 and EvMetadata.RowNumber = 1
 order by TSD.sub_Created
 

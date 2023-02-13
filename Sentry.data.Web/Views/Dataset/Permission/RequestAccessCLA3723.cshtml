@@ -28,7 +28,7 @@
         <span class="hidden-item" id="consumeAssetGroupName">@Model.ConsumeAssetGroupName</span>
         <span class="hidden-item" id="producerAssetGroupName">@Model.ProducerAssetGroupName</span>
 
-        <ol class="breadcrumb p-0" id="RequestAccessBreadcrumb">
+        <ol class="breadcrumb p-0 mb-1" id="RequestAccessBreadcrumb">
         </ol>
         <div id="RequestAccessToSection" class="requestAccessStage">
             <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <em id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</em></button>
@@ -39,16 +39,32 @@
             <button id="RequestAccessTypeManageBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Producer/Admin Access</button>
         </div>
         <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
+            @if (!Model.IsProd)
+            {
+                <div class="alert alert-warning mb-1" role="alert">
+                    AD Groups must be requested in non-prod environments. See <a target="_blank" href="https://confluence.sentry.com/display/CLA/Dataset+Access">Here</a>.
+                </div>
+            }
             <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
+            <p class="mb-0">Request the entitlement for both normal and RA accounts.</p>
             <div class="btn-group" role="group">
                 <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton ml-0">Use MyAccess to Request <em id="RequestAccessConsumeEntitlement" class="font-style-normal"></em></button>
                 <button id="RequestAccessConsumeCopyBtn" type="button" class="w-20 btn btn-default waves-effect waves-light requestAccessButton mr-0" data-toggle="tooltip" data-placement="right" title="Copy to clipboard" data-original-title="Copy to clipboard" md-z-index="9999"><i class="far fa-copy fa-2x"></i></button>
             </div>
             <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
             <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
+            <h6 class="pt-1">To request access for Snowflake Service Accounts:</h6>
+            <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
         </div>
         <div id="RequestAccessManageTypeSection" class="d-none requestAccessStage">
+            @if (!Model.IsProd)
+            {
+                <div class="alert alert-warning mb-1" role="alert">
+                    AD Groups must be requested in non-prod environments. See <a target="_blank" href="https://confluence.sentry.com/display/CLA/Dataset+Access">Here</a>.
+                </div>
+            }
             <h6 class="pt-1">To Request Manage Access:</h6>
+            <p class="mb-0">Request the entitlement for both normal and RA accounts.</p>
             <div class="btn-group" role="group">
                 <button id="RequestAccessManageMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton">Use MyAccess to Request <em id="RequestAccessManageEntitlement" class="font-style-normal"></em></button>
                 <button id="RequestAccessManageCopyBtn" type="button" class="w-20 btn btn-default waves-effect waves-light requestAccessButton material-tooltip-main" data-toggle="tooltip" data-placement="right" title="Copy to clipboard" data-original-title="Copy to clipboard"><i class="far fa-copy fa-2x"></i></button>
@@ -61,12 +77,19 @@
             <div class="alert alert-danger d-none" id="AccessRequestAwsArnValidationMessage" role="alert">
                 AWS ARN must be properly formatted.
             </div>
+            <div class="alert alert-danger d-none" id="AccessRequestSnowflakeValidationMessage" role="alert">
+                Snowflake Account name is required and must be less than 255 characters.
+            </div>
             @Html.HiddenFor(m => m.Type)
             @Html.HiddenFor(m => m.Scope)
             @Html.HiddenFor(m => m.SecurableObjectId)
             <div class="md-form d-none" id="AwsArnForm">
                 @Html.LabelFor(model => model.AwsArn, new { @class = "" })
                 @Html.TextBoxFor(model => model.AwsArn, new { @class = "form-control" })
+            </div>
+            <div class="md-form d-none" id="SnowflakeAccountForm">
+                @Html.LabelFor(model => model.SnowflakeAccount, new { @class = "" })
+                @Html.TextBoxFor(model => model.SnowflakeAccount, new { @class = "form-control" })
             </div>
             <div class="md-form">
                 @Html.LabelFor(model => model.BusinessReason, new { @class = "disabled" })

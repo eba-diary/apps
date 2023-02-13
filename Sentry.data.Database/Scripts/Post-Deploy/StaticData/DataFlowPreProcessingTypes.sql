@@ -4,7 +4,8 @@
         USING (VALUES 
           (1,	'googleapi', 'Google API'),
 		  (2,	'claimiq', 'Claim IQ'),
-		  (3,	'googlebigqueryapi', 'Google BigQuery API')
+		  (3,	'googlebigqueryapi', 'Google BigQuery API'),
+		  (4,	'googlesearchconsoleapi', 'Google Search Console API')
         )
         AS Source ([ID], [Name], [Description])
         ON Target.[ID] = Source.[ID]   

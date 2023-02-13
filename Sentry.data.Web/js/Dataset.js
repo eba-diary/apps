@@ -159,7 +159,7 @@ data.Dataset = {
     //RELOAD EVERYTHING:  clean datatable, breadcrumbs and reload with schema selected
     delroyReloadEverything: function (datasetId, schemaId, snowflakeViews) {
 
-        $('#delroySpinner').show();
+        $('#delroyTable_processing').show();
         $('#delroyTable').DataTable().clear();
         $('#delroyTable').DataTable().draw();
         $('#delroyBreadcrumb').empty();
@@ -173,11 +173,11 @@ data.Dataset = {
             data.Dataset.delroyAddFieldArray(result.Fields);
             data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("Home"), 0);
             data.Dataset.delroyGridRefresh();
-            $('#delroySpinner').hide();
+            $('#delroyTable_processing').hide();
 
         }).fail(function (result) {
             if (result.status === 404) {
-                $('#delroySpinner').hide();
+                $('#delroyTable_processing').hide();
                 data.Dataset.delroyAddBreadCrumb(data.Dataset.delroyCreateBogusField("No Columns Exist"), -1);       //PASS -1 which indicates this is a FAKE breadcrumb
                 data.Dataset.makeToast("success", "No columns Exist.");
             }
@@ -202,28 +202,19 @@ data.Dataset = {
         //init DataTable,
         var delroyTable = $("#delroyTable").DataTable({
             orderCellsTop: true,
-
+            processing: true,
             //client side setup
             pageLength: 100,
-
-            //Code if i wanted the grid to reload and make AJAX call, but i reload manually without AJAX call in delroyGridRefresh
-            //ajax: {
-            //    url: "/api/v2/metadata/dataset/230/schema/4039/revision/latest/fields",
-            //    type: "GET",
-            //    dataSrc: "Fields"       //this is a trick too specify a property within the obj coming back from URL call, in this scenario i need to sepcify WHERE array of columns exists to load
-            //},
-
             columns: [
                 { data: "OrdinalPosition", className: "OrdinalPosition" },
                 {
                     data: "Name", className: "Name",
                     render: function (d, type, row, meta) {
                         var color = $('#delroyBreadcrumb').data('page-color');
-                        var innerLink = "<a  class='" + color + "' style='cursor:pointer' > " + d + "</a >";                        //want cursor too turn pointer
-                        var parent = "<em class='far fa-folder-open " + color + "' > " + innerLink + "</em>";
+                        var link = "<a href='javascript:void(0)' class='clickable'><em class='far fa-folder-open " + color + "'></em> " + d + "</a>";
 
                         if (row.Fields != null) {
-                            return parent;
+                            return link;
                         }
                         else {
                             return d;
@@ -237,18 +228,12 @@ data.Dataset = {
                 { data: "Precision", className: "Precision", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } },
                 { data: "Scale", className: "Scale", visible: false, render: function (d, type, row, meta) { return data.Dataset.delroyFillGridPrecisionScale(d, row); } }
             ],
-
             aLengthMenu: [
                 [20, 100, 500],
                 [20, 100, 500]
             ],
-
             order: [0, 'asc'],
-
-            //style for columnVisibility and paging to show
-            //dom: 'B',
-
-            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>t<"d-inline-block"i><"float-right d-inline-block"p>',
+            dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<"d-inline-block"i><"float-right d-inline-block"p>',
             buttons: {
                 dom: {
                     container: {
@@ -258,10 +243,8 @@ data.Dataset = {
                         className: 'btn btn-primary p-2'
                     },
                     collection: {
-                        //tag: 'div',
                         className: 'dt-button-collection dropdown-menu',
                         button: {
-                            //tag: 'a',
                             className: 'dropdown-item'
                         }
                     }
@@ -269,7 +252,6 @@ data.Dataset = {
                 buttons: [
                     {
                         extend: 'colvis',
-                        //text: "<i class='icon-onecol_twocol'></i>"
                     },
                     {
                         text: 'Snowflake Query',
@@ -296,6 +278,8 @@ data.Dataset = {
                 }
             );
         }
+
+        $('#delroyTable_processing').show();
     },
 
 
@@ -304,7 +288,7 @@ data.Dataset = {
     delroySetupClickAttack: function () {
 
         //DELROY GRID CLICK
-        $('#delroyTable tbody').on('click', 'tr', function () {                         //anything clicked in delroyTable tbody, filter down to capture 'tr' class clicks only
+        $('#delroyTable tbody').on('click', 'tr', function (e) {                         //anything clicked in delroyTable tbody, filter down to capture 'tr' class clicks only
 
             var table = $('#delroyTable').DataTable();
             var field = table.row(this).data();
@@ -461,14 +445,11 @@ data.Dataset = {
     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
     delroyQueryGenerator: function () {
 
-        $('#delroySpinner').show();
-
         var field = data.Dataset.delroyGetLatestField();
 
         //if field is null, means no columns to generate a query so hide spinner and create a toastr
         if (field == null) {
             data.Dataset.makeToast("warning", "No columns Exist, Query not Generated.  Please select a schema with columns to see a query.");
-            $('#delroySpinner').hide();
         }
         else {
             //pass the current field array and necessary info to controller and get back the snowflake query
@@ -481,15 +462,12 @@ data.Dataset = {
                 success: function (r) {
                     var modal = Sentry.ShowModalWithSpinner("Snowflake Query");
                     modal.ReplaceModalBody(data.Dataset.delroyCreateModalHTML(r.snowQuery));
-                    $('#delroySpinner').hide();
                 },
                 failure: function () {
                     data.Dataset.makeToast("error", "Error creating Snowflake Query.");
-                    $('#delroySpinner').hide();
                 },
                 error: function () {
                     data.Dataset.makeToast("error", "Error creating Snowflake Query.");
-                    $('#delroySpinner').hide();
                 }
             });
         }
@@ -818,57 +796,6 @@ data.Dataset = {
         data.Dataset.DataFlowIdSelected = dataInput.Id
     },
 
-
-
-
-
-    IndexInit: function () {
-        /// Initialize the Index page for data assets (with the categories)
-
-        $(".sentry-app-version").hide();
-
-        $("[id^='CreateDataset']").click(function (e) {
-            e.preventDefault();
-            window.location = "/Dataset/Create";
-        });
-
-        $("[id^='CreateDataflow']").click(function (e) {
-            e.preventDefault();
-            window.location = "/Dataflow/Create";
-        });
-
-        $("[id^='UploadDatafile']").click(function (e) {
-            e.preventDefault();
-            data.Dataset.LoadUploadFileModal(0);
-        });
-
-        $('.tile').click(function (e) {
-            var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-            if (storedNames !== null) {
-                for (i = 0; i < storedNames.length; i++) {
-                    $('#' + storedNames[i]).prop('checked', false);
-                }
-                localStorage.removeItem("filteredIds");
-            }
-
-            localStorage.removeItem("searchText");
-        });
-
-        $('#DatasetSearch').submit(function (e) {
-            localStorage.removeItem("filteredIds");
-
-            localStorage.removeItem("searchText");
-
-            localStorage.setItem("searchText", $('#SearchText')[0].value);
-        });
-
-        $('.input-group-prepend').click(function (e) {
-            $('#DatasetSearch').submit();
-        });
-
-    },
-
     FormSubmitInit: function () {
         $("#DatasetFormContent #IsSecured").removeAttr("disabled");
         $.ajax({
@@ -921,7 +848,8 @@ data.Dataset = {
             $("#saidAsset").materialSelect();
             $("#OriginationID").materialSelect();
             $("#DataClassification").materialSelect();
-            $("#NamedEnvironmentPartial select").materialSelect();
+            $("#DatasetNamedEnvironment.mdb-select").materialSelect();
+            $("#DatasetNamedEnvironmentType.mdb-select").materialSelect();
             $("#DatasetScopeTypeId").materialSelect();
             $("#FileExtensionId").materialSelect();
         });
@@ -935,7 +863,7 @@ data.Dataset = {
         //saidAsset onChange needs to update #PrimaryOwnerName and #PrimaryOwnerId based on saidAsset picked
         $("#saidAsset").change(function () {
             //Load the named environments for the selected asset
-            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentSpinner"), 30);
+            Sentry.InjectSpinner($("#DatasetNamedEnvironmentSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
         });
 
@@ -958,7 +886,6 @@ data.Dataset = {
                 $('#DatasetFormContent #PrimaryContactId').val(associate.Id);
             },
             filterPermission: permissionFilter,
-            minLength: 0,
             maxResults: 10
         });
 
@@ -1070,6 +997,11 @@ data.Dataset = {
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
             e.preventDefault();
             data.AccessRequest.InitForDataset($(this).data("id"));
+        });
+
+        $("[id^='btnMigrationRqeuest']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.MigrationRequest.InitForMigration($(this).data("id"));
         });
 
         $("[id^='DownloadLatest']").off('click').on('click', function (e) {
@@ -1347,7 +1279,6 @@ data.Dataset = {
                         $('#tabSchemaColumns').html(view);
                         data.Dataset.delroyInit();
                         data.Dataset.UpdateMetadata();
-                        $('#delroySpinner').hide();
                         $("#tab-spinner").hide();
                     }
                 });
@@ -1826,7 +1757,6 @@ data.Dataset = {
                 { data: null, name: "deleteFile", className: "deleteFile text-center", render: (d) => data.Dataset.renderDeleteFileOption(d, datasetDetailModel.CategoryColor), searchable: false, orderable: false }
             ],
             language: {
-                processing: '<div class="progress md-progress sentry-dark-blue data-file-table-loading"><div class="indeterminate"></div></div>',
                 emptyTable: 'No Data Files Available'
             },
             order: [5, 'desc'],
@@ -2432,19 +2362,24 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
 
     initNamedEnvironmentEvents() {
         //When the NamedEnvironment drop down changes (but only when it's rendered as a drop-down), reload the name environment type
-        $("div#DatasetFormContent select#NamedEnvironment").change(function () {
-            Sentry.InjectSpinner($("div#DatasetFormContent #namedEnvironmentTypeSpinner"), 30);
+        $("#DatasetNamedEnvironment.mdb-select").change(function () {
+            Sentry.InjectSpinner($("#DatasetNamedEnvironmentTypeSpinner"), 30);
             data.Dataset.populateNamedEnvironments();
         });
     },
 
     populateNamedEnvironments() {
         var assetKeyCode = $("div#DatasetFormContent #saidAsset").val();
-        var selectedEnvironment = $("div#DatasetFormContent #NamedEnvironment").val();
+        var selectedEnvironment = $("#DatasetNamedEnvironment").val();
         $.get("/Dataset/NamedEnvironment?assetKeyCode=" + assetKeyCode + "&namedEnvironment=" + selectedEnvironment, function (result) {
-            $('div#DatasetFormContent #NamedEnvironmentPartial').html(result);
+            $("#DatasetNamedEnvironment.mdb-select").materialSelect({ destroy: true });
+            $("#DatasetNamedEnvironmentType.mdb-select").materialSelect({ destroy: true });
+
+            $('#DatasetNamedEnvironmentPartial').html(result);
             data.Dataset.initNamedEnvironmentEvents();
-            $("#NamedEnvironmentPartial select").materialSelect();
+
+            $("#DatasetNamedEnvironment.mdb-select").materialSelect();
+            $("#DatasetNamedEnvironmentType.mdb-select").materialSelect();
         });
     },
 
@@ -2463,9 +2398,6 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 }
             },
             "processing": true,
-            "language": {
-                "processing": "Searching..."
-            },
             "sort": false,
             "columns": [
                 { "data": "Name" },
@@ -2694,6 +2626,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
             data.Dataset.addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
             $("#RequestAccessConsumerTypeSection").addClass("d-none");
             $("#RequestAccessFormSection").removeClass("d-none");
+            data.Dataset.setupFormSnowflakeAccount();
         });
         $("#RequestAccessConsumeAwsBtn").click(function (e) {
             data.Dataset.editActiveRequestAccessBreadcrumb("AWS IAM");
@@ -2732,10 +2665,13 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     validateRequestAccessModal() {
-        var valid;
-        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val != ''
+        let valid;
+        valid = $("#RequestAccess_BusinessReason").val() != '' && $("#RequestAccess_SelectedApprover").val() != ''
         if ($("#RequestAccess_Type").val() == "1") {
             valid = valid && data.Dataset.requestAccessValidateAwsArnIam();
+        }
+        if ($("#RequestAccess_Type").val() == "4") {
+            valid = valid && data.Dataset.requestAccessValidateSnowflakeAccount();
         }
         return valid;
     },
@@ -2784,6 +2720,12 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         data.Dataset.requestAccessShowSaveChanges();
     },
 
+    setupFormSnowflakeAccount() {
+        $("#SnowflakeAccountForm").removeClass("d-none");
+        $("#RequestAccess_Type").val("4")
+        data.Dataset.requestAccessShowSaveChanges();
+    },
+
     requestAccessShowSaveChanges() {
         $("#RequestAccessSubmit").removeClass("d-none");
     },
@@ -2801,6 +2743,19 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         }
         else {
             $("#AccessRequestAwsArnValidationMessage").removeClass("d-none");
+            return false;
+        }
+    },
+
+    requestAccessValidateSnowflakeAccount() {
+        let valid = $("#RequestAccess_SnowflakeAccount").val() != '';
+        valid = valid && $("#RequestAccess_SnowflakeAccount").val().length < 255;
+        if (valid) {
+            $("#AccessRequestSnowflakeValidationMessage").addClass("d-none");
+            return true;
+        }
+        else {
+            $("#AccessRequestSnowflakeValidationMessage").removeClass("d-none");
             return false;
         }
     },

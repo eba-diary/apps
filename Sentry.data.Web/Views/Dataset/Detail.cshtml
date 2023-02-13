@@ -7,6 +7,11 @@
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+}
+
 @if (@Model.HasSchema && @Model.DatasetFileCount == 0)
 {
     <div>
@@ -83,6 +88,10 @@
                                 <em class="fas fa-bars dsc-icon-button @textColor mr-0 align-middle"></em>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-start">
+                                @if (Model.Security.CanManageSchema && Model.Security.CanEditDataset)
+                                {
+                                    <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
+                                }
                                 @if (Model.ShowManagePermissionsLink)
                                 {
                                     @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId = Model.DatasetId }, new { @class = "dropdown-item" })
@@ -90,11 +99,10 @@
                                 @if (Model.Security.CanManageSchema)
                                 {
                                     <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
-                                    <a class="dropdown-item" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId">Sync All Consumption Layers</a>
-                                    if (Model.Security.CanEditDataset)
-                                    {
-                                        <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
-                                    }
+                                }
+                                @if (Model.Security.CanManageSchema && Model.Security.CanEditDataset)
+                                {
+                                    <a class="dropdown-item" id="btnMigrationRqeuest" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Migration Request</a>
                                 }
                                 <a class="dropdown-item" href="@Model.MailtoLink">Share Dataset</a>
                                 @if (Model.Security.CanViewFullDataset)
@@ -102,6 +110,10 @@
                                     <a id="SubscribeModal" class="dropdown-item" data-id="@Model.DatasetId">
                                         Subscribe
                                     </a>
+                                }
+                                @if (Model.Security.CanManageSchema)
+                                {
+                                    <a class="dropdown-item" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId">Sync All Consumption Layers</a>
                                 }
                             </div>
                         </div>
@@ -223,10 +235,16 @@
             }
         </div>
 
+        @*****************************************************************************************************************
+            *DATASET INFO BOX
+            ******************************************************************************************************************@
         <div class="col-lg-5">
             <div class="container">
                 <div class="row" style="border: 1px #DDDDDD solid; padding: 20px;">
 
+                    @*****************************************************************************************************************
+                        *ROW 1
+                        ******************************************************************************************************************@
                     <div class="row w-100">
                         <div class="col">
                             <h5 class="@textColor pt-1">Last Activity Date</h5>
@@ -240,67 +258,74 @@
 
                     <hr class="datasetMetadataBoxHr" />
 
-
+                    @*****************************************************************************************************************
+                        *ROW 2
+                        ******************************************************************************************************************@
                     <div class="row w-100">
+                        <div class="col">
+                            <h5 class="@textColor pt-1">Contact</h5>
+                            <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
+                        </div>
 
-                        @if (!@Model.CLA1130_SHOW_ALTERNATE_EMAIL)
-                        {
-                            //ORIGINAL WAY IT LOOKED, DELETE THIS WHOLE CODE BLOCK WHEN REMOVING FEATURE FLAG
-                            <div class="col">
-                                <h5 class="@textColor pt-1">SAID Asset</h5>
-                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
-                            </div>
+                        <div class="col">
 
-                            <div class="col">
-                                <h5 class="@textColor pt-1">Contact</h5>
-                                <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
-                            </div>
-
-                        }
-                        else
-                        {
-                            //NEW WAY IT lOOKS WITH FEATURE ON, LEAVE THIS CODE WHEN REMOVING FEATURE FLAG
-                            <div class="col">
-                                <h5 class="@textColor pt-1">Contact</h5>
-                                <p><a href="@mailTo">@Model.PrimaryContactName</a></p>
-                            </div>
-
-                            <div class="col">
-
-                                <h5 class="@textColor pt-1">Alternative Email</h5>
-                                @if (@Model.AlternateContactEmail != null)
-                                {
-                                    string emailAddress = "mailto:" + @Model.AlternateContactEmail;
-                                    <p class="ds-format-email">
-                                        <a href="@emailAddress">@Model.AlternateContactEmail</a>
-                                    </p>
-                                }
-
-                            </div>
-                        }
-
+                            <h5 class="@textColor pt-1">Alternative Email</h5>
+                            @if (@Model.AlternateContactEmail != null)
+                            {
+                                string emailAddress = "mailto:" + @Model.AlternateContactEmail;
+                                <p class="ds-format-email">
+                                    <a href="@emailAddress">@Model.AlternateContactEmail</a>
+                                </p>
+                            }
+                        </div>
                     </div>
 
                     <hr class="datasetMetadataBoxHr" />
 
+
+                    @*****************************************************************************************************************
+                        *ROW 3
+                        ******************************************************************************************************************@
                     <div class="row w-100">
 
-                        @if (@Model.CLA1130_SHOW_ALTERNATE_EMAIL)
-                        {
-                            //LEAVE THIS CODE WHEN REMOVING FEATURE FLAG
-                            <div class="col">
-                                <h5 class="@textColor pt-1">SAID Asset</h5>
-                                <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
-                            </div>
-                        }
+                        @*SAID ASSET*@
+                        <div class="col margin-right-inherit">
+                            <h5 class="@textColor pt-1">SAID Asset</h5>
+                            <a target="_blank" rel="noopener noreferrer" href="https://said.sentry.com/ViewAsset.aspx?ID=@Model.SAIDAssetKeyCode">@Model.SAIDAssetKeyCode</a>
+                        </div>
 
-                        <div class="col">
+                        @*CLASSIFICATION*@
+                        <div class="col margin-left-inherit margin-right-inherit padding-left-zero padding-right-one">
                             <h5 class="@textColor pt-1">Classification</h5>
                             <p>@Model.DataClassificationDescription</p>
                         </div>
-                        <div class="col">
+
+                        @*NAMED ENVIRONMENT DROP DOWN OR LABEL*@
+                        <div class="col margin-left-inherit margin-right-inherit padding-right-one">
                             <h5 class="@textColor pt-1">Environment</h5>
-                            <p>@Model.NamedEnvironment</p>
+
+                            @*ONLY DISPLAY DROP DOWN IF RELATIVES FOUND ARE ATLEAST 2*@
+                            @if (Model.DatasetRelatives != null && Model.DatasetRelatives.Count() > 1)
+                            {
+                                <select class="form-control" onchange="location = this.value;">
+                                    @foreach (DatasetRelativeModel datasetRelativeModel in Model.DatasetRelatives)
+                                    {
+                                        if (datasetRelativeModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)
+                                        {
+                                            <option value=@datasetRelativeModel.Url selected> @datasetRelativeModel.DatasetNamedEnvironment</option>
+                                        }
+                                        else
+                                        {
+                                            <option value=@datasetRelativeModel.Url> @datasetRelativeModel.DatasetNamedEnvironment</option>
+                                        }
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                //DISPLAY JUST LABEL SINCE ONLY 1 NAMED ENV
+                                <p>@Model.DatasetNamedEnvironment</p>
+                            }
                         </div>
 
                     </div>
@@ -330,7 +355,7 @@
         {
             @Html.Partial("Details/_DataPreview", Model)
         }
-        if ( Model.Security.CanViewFullDataset)
+        if (Model.Security.CanViewFullDataset)
         {
             @Html.Partial("Details/_DataFiles", Model)
         }
@@ -340,7 +365,7 @@ else
 {
 
 
-<div id="datasetDetailTabs">
+    <div id="datasetDetailTabs">
         <div class="tabs-wrapper">
             <ul class="nav classic-tabs" role="tablist">
                 <li class="nav-item">
@@ -442,13 +467,12 @@ else
         </div>
     </div>
 }
-</div>
+
+<div class="migration-modal-container"></div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/prettyCron")
-    @Scripts.Render("~/bundles/dataTables")
-    @Styles.Render("~/bundles/css/dataTables")
-
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
+    <script src="@Html.GetContent("datatables.*.js")"></script>
     <script>
 
         $(function () {

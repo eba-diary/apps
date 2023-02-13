@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Dataset;
-
+using Sentry.data.Web.Models.Migration;
 
 namespace Sentry.data.Web
 {
@@ -41,8 +42,8 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CreateCurrentView,
                 ObjectStatus = model.ObjectStatus,
                 SAIDAssetKeyCode = model.SAIDAssetKeyCode,
-                NamedEnvironment = model.NamedEnvironment,
-                NamedEnvironmentType = model.NamedEnvironmentType
+                NamedEnvironment = model.DatasetNamedEnvironment,
+                NamedEnvironmentType = model.DatasetNamedEnvironmentType
             };
         }
 
@@ -83,6 +84,16 @@ namespace Sentry.data.Web
                 ConfigId = dto.ConfigId,
                 SchemaId = dto.SchemaId,
                 SchemaName = dto.SchemaName
+            };
+        }
+
+        public static DatasetRelativeModel ToModel(this DatasetRelativeDto dto)
+        {
+            return new DatasetRelativeModel()
+            {
+                DatasetId = dto.DatasetId,
+                DatasetNamedEnvironment = dto.NamedEnvironment,
+                Url = dto.Url
             };
         }
     }

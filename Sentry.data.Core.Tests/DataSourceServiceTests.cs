@@ -31,7 +31,7 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.SetupGet(x => x.DataSourceTypes).Returns(dataSourceTypes.AsQueryable());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<DataSourceTypeDto> results = dataSourceService.GetDataSourceTypeDtosForDropdown();
 
@@ -78,7 +78,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetValidAuthenticationTypeDtosByType(DataSourceDiscriminator.FTP_SOURCE);
 
@@ -103,7 +103,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetValidAuthenticationTypeDtosByType(DataSourceDiscriminator.SFTP_SOURCE);
 
@@ -124,7 +124,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetValidAuthenticationTypeDtosByType(DataSourceDiscriminator.DFS_CUSTOM);
 
@@ -145,7 +145,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetValidAuthenticationTypeDtosByType(DataSourceDiscriminator.HTTPS_SOURCE);
 
@@ -174,7 +174,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetValidAuthenticationTypeDtosByType(DataSourceDiscriminator.GOOGLE_API_SOURCE);
 
@@ -195,7 +195,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetValidAuthenticationTypeDtosByType(DataSourceDiscriminator.GOOGLE_BIG_QUERY_API_SOURCE);
 
@@ -216,7 +216,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.AuthTypes).Returns(GetAuthenticationTypes());
 
-            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object);
+            DataSourceService dataSourceService = new DataSourceService(datasetContext.Object, null, null, null);
 
             List<AuthenticationTypeDto> results = dataSourceService.GetAuthenticationTypeDtos();
 

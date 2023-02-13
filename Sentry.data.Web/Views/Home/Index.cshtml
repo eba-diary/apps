@@ -1,7 +1,6 @@
 ﻿@model HomeModel
 @{
     ViewData["Title"] = "Data at Sentry";
-    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
 }
 
 
@@ -153,24 +152,8 @@
 @section Scripts {
     <script>
         $(function () {
-
             data.Home.CLA2838_DSC_ANOUNCEMENTS = @Model.CLA2838_DSC_ANOUNCEMENTS.ToString().ToLower();      //SET FEATURE FLAG SO JS CAN USE LATER.  DELETE THIS WHEN THIS FEATURE GOES LIVE
             data.Home.Init();
-            data.Dataset.IndexInit();
-
-            $('.browse-category-card').click(function (e) {
-                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                if (storedNames != null) {
-                    for (i = 0; i < storedNames.length; i++) {
-                        $('#' + storedNames[i]).prop('checked', false);
-                    }
-
-                    localStorage.removeItem("filteredIds");
-                }
-
-                localStorage.removeItem("searchText");
-            });
 
             $('#DatasetSearch').click(function (e) {
                 localStorage.removeItem("filteredIds");
@@ -183,9 +166,7 @@
             $('.input-group-addon').click(function (e) {
                 $('#DatasetSearch').submit();
             });
-
         });
-
 
         function GetFile(location, datasetId) {
             var link = $(this);

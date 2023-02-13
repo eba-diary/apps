@@ -50,14 +50,14 @@
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.2.2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
-    <Reference Include="Namotion.Reflection, Version=1.0.11.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
-      <HintPath>..\packages\Namotion.Reflection.1.0.11\lib\net45\Namotion.Reflection.dll</HintPath>
+    <Reference Include="Namotion.Reflection, Version=2.1.1.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
+      <HintPath>..\packages\Namotion.Reflection.2.1.1\lib\net45\Namotion.Reflection.dll</HintPath>
     </Reference>
     <Reference Include="Nest, Version=7.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\NEST.7.17.4\lib\net461\Nest.dll</HintPath>
@@ -65,8 +65,8 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NJsonSchema, Version=10.1.18.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
-      <HintPath>..\packages\NJsonSchema.10.1.18\lib\net45\NJsonSchema.dll</HintPath>
+    <Reference Include="NJsonSchema, Version=10.8.0.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
+      <HintPath>..\packages\NJsonSchema.10.8.0\lib\net45\NJsonSchema.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -101,14 +101,18 @@
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.7.0.0\lib\net462\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.7.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
@@ -120,17 +124,29 @@
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.6.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Permissions.7.0.0\lib\net462\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Http, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ServiceModel.Http.4.8.1\lib\net461\System.ServiceModel.Http.dll</HintPath>
+    <Reference Include="System.ServiceModel.Http, Version=4.10.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ServiceModel.Http.4.10.0\lib\net461\System.ServiceModel.Http.dll</HintPath>
     </Reference>
-    <Reference Include="System.ServiceModel.Primitives, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ServiceModel.Primitives.4.8.1\lib\net461\System.ServiceModel.Primitives.dll</HintPath>
+    <Reference Include="System.ServiceModel.Primitives, Version=4.10.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ServiceModel.Primitives.4.10.0\lib\net461\System.ServiceModel.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="System.ServiceModel.Security, Version=4.8.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ServiceModel.Security.4.8.1\lib\net461\System.ServiceModel.Security.dll</HintPath>
+    <Reference Include="System.ServiceModel.Security, Version=4.10.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ServiceModel.Security.4.10.0\lib\net461\System.ServiceModel.Security.dll</HintPath>
     </Reference>
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
@@ -140,6 +156,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\FilterSearchField.cs" />
@@ -195,6 +212,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetRelativeDto.cs" />
     <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
@@ -207,6 +225,7 @@
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
+    <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
@@ -225,6 +244,7 @@
     <Compile Include="DTO\Schema\SchemaConsumptionSnowflakeDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
+    <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
@@ -243,6 +263,7 @@
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\GoogleSearchConsoleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleBigQueryApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\JsonFlatteningAction.cs" />
@@ -287,6 +308,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Goldeneye\FileProcess.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\RequestVariable.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\Jira\JiraComponentResponse.cs" />
@@ -314,6 +336,11 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
+    <Compile Include="Entities\Migration\DatasetMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\DatasetMigrationRequestResponse.cs" />
+    <Compile Include="Entities\Migration\MigrationRequest.cs" />
+    <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\SchemaMigrationRequestResponse.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Schema\SchemaConsumption.cs" />
     <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
@@ -323,7 +350,9 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Exceptions\DataApplicationServiceException.cs" />
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
+    <Compile Include="Exceptions\FeatureNotEnabledException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
@@ -340,6 +369,7 @@
     <Compile Include="GlobalEnums\NotificationSubCategoryReleaseNotes.cs" />
     <Compile Include="GlobalEnums\ConnectorState.cs" />
     <Compile Include="GlobalEnums\PagingType.cs" />
+    <Compile Include="GlobalEnums\RequestVariableIncrementType.cs" />
     <Compile Include="GlobalEnums\TileSearchSortByOption.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />
@@ -448,7 +478,9 @@
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
+    <Compile Include="Interfaces\IAuthorizationSigner.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
+    <Compile Include="Interfaces\IFileProvider.cs" />
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
     <Compile Include="Interfaces\IHttpClientGenerator.cs" />
@@ -472,6 +504,7 @@
     <Compile Include="Interfaces\IDataInventoryService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IHttpClientProvider.cs" />
+    <Compile Include="Interfaces\IMotiveProvider.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevRestClient.cs" />
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
@@ -710,13 +743,13 @@
     </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\Google.Protobuf.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CFG.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.CSharp.dll" />
-    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.8.0.18411\analyzers\SonarAnalyzer.dll" />
+    <Folder Include="Interfaces\MessageFormats\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interfaces\MessageFormats\" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\Google.Protobuf.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CFG.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
+    <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

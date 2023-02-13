@@ -1,15 +1,44 @@
-﻿.side-nav-wrapper 
-{
-    border: 4px solid #00A3E0;
-    padding-left: 0px;
-    padding-right:0px;
+﻿.side-nav-wrapper {
+    padding-left: 20px;
+    padding-right: 0px;
+    border-right: 0;
+    border-color: #f4f5f7;
+    background-color: #f8f8f8;
     height: 100vh;
 }
-.admin-reprocess-dropdown
+
+.side-nav-wrapper h2,
+.side-nav-wrapper h5
 {
+    padding-top: 20px;
+}
+
+.side-nav-wrapper ul {
+    list-style: none;
+    padding: 0;
+    line-height: 17px;
+    padding: 3px 5px;
+    margin-bottom: 0;
+}
+
+.side-nav-wrapper .side-nav-links {
+    font-size: 17.5px;
+    margin: 0px;
+}
+
+.side-nav-wrapper ul li {
+    position: relative;
+    line-height: 20px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.admin-reprocess-dropdown {
     width: 400px;
     height: 30px;
 }
+
 .admin-logs-dropdown 
 {
     width: 400px;
@@ -28,8 +57,12 @@
 table#deadJobs td.dropdown-control {
     cursor:pointer;
 }
-table#metricGroupsTable td.dt-control {
+table#metricGroupsTable td.metric-detail-control {
     cursor: pointer;
+}
+
+.metricsButton {
+    margin-bottom: 20px;
 }
 
 .audit-search-selection.hidden {
@@ -40,10 +73,6 @@ table#metricGroupsTable td.dt-control {
     display: inline-block !important;
 }
 
-.metricsButton{
-    margin-top:20px;
-    margin-bottom:20px;
-}
 #link-results {
     display: flex;
     flex-wrap: wrap;

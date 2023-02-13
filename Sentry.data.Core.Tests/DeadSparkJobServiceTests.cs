@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Sentry.data.Core.DomainServices;
 using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace Sentry.data.Core.Tests
 {

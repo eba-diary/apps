@@ -10,6 +10,12 @@ namespace Sentry.data.Core
     {
         Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
         int Create(DatasetDto dto);
+        /// <summary>
+        /// Performs all necessary external dependency creation statements.
+        /// </summary>
+        /// <remarks>To be executed after creation of dataset</remarks>
+        /// <param name="datasetId"></param>
+        void CreateExternalDependencies(int datasetId);
         int CreateAndSaveNewDataset(DatasetSchemaDto dto);
         DatasetDto GetDatasetDto(int id);
 
@@ -46,5 +52,14 @@ namespace Sentry.data.Core
         Task<string> RequestAccessRemoval(AccessRequest request);
 
         IQueryable<DatasetFile> GetDatasetFileTableQueryable(int configId);
+
+        /// <summary>
+        /// Does the dataset exist in the target environment
+        /// </summary>
+        /// <param name="datasetName"></param>
+        /// <param name="saidAssetKey"></param>
+        /// <param name="targetNamedEnvironment"></param>
+        /// <returns></returns>
+        (int targetDatasetId, bool datasetExistsInTarget) DatasetExistsInTargetNamedEnvironment(string datasetName, string saidAssetKey, string targetNamedEnvironment);
     }
 }

@@ -45,6 +45,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }
         public IFeatureFlag<bool> CLA3945_Telematics { get; }
         public IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
+        public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
         public IFeatureFlag<bool> CLA4553_PlatformActivity { get; }
 
 
@@ -81,6 +82,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4411_Goldeneye_Consume_NP_Topics = new BooleanFeatureFlagAmbientContext("CLA4411_Goldeneye_Consume_NP_Topics", false, _ldClient, () => LdUser);
             CLA3945_Telematics = new BooleanFeatureFlagAmbientContext("CLA3945_Telematics", false, _ldClient, () => LdUser);
             CLA2868_APIPaginationSupport = new BooleanFeatureFlagAmbientContext("CLA2868_APIPaginationSupport", false, _ldClient, () => LdUser);
+            CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
@@ -124,7 +126,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             Database feature flags
         */
         public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; } = new BooleanFeatureFlag("CLA3241_DisableDfsDropLocation", databaseRepo_longCache);
-        public IFeatureFlag<bool> CLA3048_StandardizeOnUTCTime { get; } = new BooleanFeatureFlag("CLA3048_StandardizeOnUTCTime", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; } = new BooleanFeatureFlag("CLA3819_EgressEdgeMigration", databaseRepo_longCache);
 
         #endregion

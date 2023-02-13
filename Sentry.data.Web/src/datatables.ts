@@ -1,0 +1,9 @@
+﻿import 'datatables.net';
+import 'datatables.net-bs4';
+import 'datatables.net-responsive';
+import 'datatables.net-responsive-bs4';
+import 'datatables.net-buttons';
+import 'datatables.net-buttons/js/buttons.colVis.js';
+import 'datatables.net-buttons-bs4';
+import 'yadcf';
+import 'expose-loader?exposes=moment!moment';

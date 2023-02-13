@@ -1,9 +1,6 @@
 ﻿@using Sentry.data.Core;
 @model Sentry.data.Web.CreateExtensionMapModel
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
 @using(Html.BeginForm("CreateExtensionMapping", "Config", FormMethod.Post, new { @id = "ExtensionForm"}))
 {
 @Html.AntiForgeryToken()
