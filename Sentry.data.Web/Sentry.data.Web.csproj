@@ -42,7 +42,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\.sonarlint\data_data.sentry.comcsharp.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
     <DocumentationFile>bin\Sentry.data.Web.xml</DocumentationFile>
     <NoWarn>1591,S125</NoWarn>
   </PropertyGroup>
@@ -53,7 +54,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\.sonarlint\data_data.sentry.comcsharp.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
     <DocumentationFile>bin\Sentry.data.Web.xml</DocumentationFile>
     <NoWarn>1591,S125</NoWarn>
   </PropertyGroup>
@@ -64,6 +66,9 @@
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.Core.3.7.13.17\lib\net45\AWSSDK.Core.dll</HintPath>
@@ -540,6 +545,7 @@
     <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
+    <Compile Include="Controllers\WebApi\BaseApiController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Controllers\WebApi\DataSourceController.cs" />
@@ -585,6 +591,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
+    <Compile Include="Models\IResponseModel.cs" />
     <Compile Include="Models\Config\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
@@ -610,7 +617,14 @@
     <Compile Include="Models\Search\TileResultsModel.cs" />
     <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
+    <Compile Include="Models\Validation\ValidationResponseModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
+    <Compile Include="Models\Validation\FieldValidationResponseModel.cs" />
+    <Compile Include="Validation\Registry\IValidationRegistry.cs" />
+    <Compile Include="Models\IRequestModel.cs" />
+    <Compile Include="Validation\IRequestModelValidator.cs" />
+    <Compile Include="Validation\Registry\ValidationRegistry.cs" />
+    <Compile Include="Validation\RequestModelValidationException.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
     <Content Include="Content\admin.css" />
@@ -1156,6 +1170,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="AutoMapper\" />
     <Folder Include="Helpers\Validation\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Models\ApiModels\Admin\" />
@@ -1172,6 +1187,7 @@
     <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
+    <Folder Include="Views\Playground\" />
     <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
     <Folder Include="Views\Tag\" />

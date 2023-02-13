@@ -67,7 +67,7 @@ namespace Sentry.data.Infrastructure
             {
                 throw new AwsLambdaInvalidParameterException("One of the parameters in the request is invalid.", paramEx);
             }
-            catch (ResourceNotFoundException resourceEx)
+            catch (Amazon.Lambda.Model.ResourceNotFoundException resourceEx)
             {
                 throw new AwsLambdaNotFoundException("The resource specified in the request does not exist.", resourceEx);
             }

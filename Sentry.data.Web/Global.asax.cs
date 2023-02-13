@@ -1,8 +1,11 @@
-﻿using Sentry.Common.Logging;
+﻿using AutoMapper;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using StackExchange.Profiling;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -26,7 +29,6 @@ namespace Sentry.data.Web
             AreaRegistration.RegisterAllAreas();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            //WebApiConfig.Register(GlobalConfiguration.Configuration);
 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -39,17 +41,20 @@ namespace Sentry.data.Web
             //MVC dependency resolver
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);
 
+            //register all mapping profiles
+            var configuration = new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
+            IMapper mapper = new Mapper(configuration);
 
-            var registry = new StructureMap.Registry();
-            registry.Scan((scanner) =>
-            {
-                scanner.TheCallingAssembly();
-                scanner.WithDefaultConventions();
-                scanner.With(new ControllerConvention());
-            });
             Bootstrapper.Container.Configure((x) =>
             {
-                x.AddRegistry(registry);
+                x.For<IMapper>().Use(mapper);
+                x.Scan((s) =>
+                {
+                    s.TheCallingAssembly();
+                    s.WithDefaultConventions();
+                    s.With(new ControllerConvention());
+                    s.AddAllTypesOf<IRequestModelValidator>(); //register all validators
+                });
                 x.For<ICurrentUserIdProvider>().Use<WebCurrentUserIdProvider>();
             });
 
