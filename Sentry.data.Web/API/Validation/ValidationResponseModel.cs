@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Linq.Dynamic;
 
-namespace Sentry.data.Web
+namespace Sentry.data.Web.API
 {
     public class ValidationResponseModel : IResponseModel
     {

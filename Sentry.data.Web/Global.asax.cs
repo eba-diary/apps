@@ -2,6 +2,7 @@
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
+using Sentry.data.Web.API;
 using StackExchange.Profiling;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,6 @@ namespace Sentry.data.Web
 
             Bootstrapper.Container.Configure((x) =>
             {
-                x.For<IMapper>().Use(mapper);
                 x.Scan((s) =>
                 {
                     s.TheCallingAssembly();
@@ -55,6 +55,8 @@ namespace Sentry.data.Web
                     s.With(new ControllerConvention());
                     s.AddAllTypesOf<IRequestModelValidator>(); //register all validators
                 });
+
+                x.For<IMapper>().Use(mapper);
                 x.For<ICurrentUserIdProvider>().Use<WebCurrentUserIdProvider>();
             });
 

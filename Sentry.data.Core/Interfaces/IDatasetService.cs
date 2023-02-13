@@ -9,6 +9,7 @@ namespace Sentry.data.Core
     public interface IDatasetService : IEntityService
     {
         Task<ValidationException> ValidateAsync(DatasetSchemaDto dto);
+        Task<DatasetResultDto> AddDatasetAsync(DatasetDto datasetDto);
         int Create(DatasetDto dto);
         /// <summary>
         /// Performs all necessary external dependency creation statements.

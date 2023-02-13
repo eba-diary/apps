@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using Sentry.data.Core;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
-namespace Sentry.data.Web.Controllers.WebApi
+namespace Sentry.data.Web.API
 {
     public abstract class BaseApiController : ApiController
     {

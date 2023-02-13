@@ -349,6 +349,19 @@ namespace Sentry.data.Core
             return request;
         }
 
+        public async Task<DatasetResultDto> AddDatasetAsync(DatasetDto datasetDto)
+        {
+            Dataset dataset = CreateDataset(datasetDto);
+
+            await _datasetContext.AddAsync(dataset);
+            await _datasetContext.SaveChangesAsync();
+
+            //DatasetResultDto resultDto = dataset.ToResultDto();
+            //return resultDto;
+
+            throw new NotImplementedException();
+        }
+
         public int Create(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);

@@ -526,6 +526,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Dataset\DatasetProfile.cs" />
+    <Compile Include="API\Dataset\AddDataset\AddDatasetRequestModel.cs" />
+    <Compile Include="API\Dataset\AddDataset\AddDatasetResponseModel.cs" />
+    <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidator.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -536,6 +540,7 @@
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="API\Dataset\DatasetController.cs" />
     <Compile Include="Controllers\DataFlowMetricController.cs" />
     <Compile Include="Controllers\BaseSearchableController.cs" />
     <Compile Include="Controllers\BusinessIntelligenceSearchController.cs" />
@@ -545,7 +550,7 @@
     <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
-    <Compile Include="Controllers\WebApi\BaseApiController.cs" />
+    <Compile Include="API\BaseApiController.cs" />
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Controllers\WebApi\DataSourceController.cs" />
@@ -591,7 +596,7 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaConsumptionSnowflakeModel.cs" />
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
-    <Compile Include="Models\IResponseModel.cs" />
+    <Compile Include="API\IResponseModel.cs" />
     <Compile Include="Models\Config\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
@@ -617,14 +622,14 @@
     <Compile Include="Models\Search\TileResultsModel.cs" />
     <Compile Include="Models\Shared\PageItemModel.cs" />
     <Compile Include="Models\Subscription\BusinessAreaSubscriptionModel.cs" />
-    <Compile Include="Models\Validation\ValidationResponseModel.cs" />
+    <Compile Include="API\Validation\ValidationResponseModel.cs" />
     <Compile Include="Smarts_Resources\HangfireFailedJobsResource.cs" />
-    <Compile Include="Models\Validation\FieldValidationResponseModel.cs" />
-    <Compile Include="Validation\Registry\IValidationRegistry.cs" />
-    <Compile Include="Models\IRequestModel.cs" />
-    <Compile Include="Validation\IRequestModelValidator.cs" />
-    <Compile Include="Validation\Registry\ValidationRegistry.cs" />
-    <Compile Include="Validation\RequestModelValidationException.cs" />
+    <Compile Include="API\Validation\FieldValidationResponseModel.cs" />
+    <Compile Include="API\Validation\IValidationRegistry.cs" />
+    <Compile Include="API\IRequestModel.cs" />
+    <Compile Include="API\Validation\IRequestModelValidator.cs" />
+    <Compile Include="API\Validation\ValidationRegistry.cs" />
+    <Compile Include="API\Validation\RequestModelValidationException.cs" />
     <Compile Include="WebProxy\SentryProxy.cs" />
     <Compile Include="WebProxy\Win32Api.cs" />
     <Content Include="Content\admin.css" />

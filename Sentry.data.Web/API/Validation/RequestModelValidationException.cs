@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Sentry.data.Web
+namespace Sentry.data.Web.API
 {
     [Serializable]
     public class RequestModelValidationException : Exception

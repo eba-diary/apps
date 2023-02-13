@@ -1,8 +1,7 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.Charts;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Dynamic;
 
-namespace Sentry.data.Web
+namespace Sentry.data.Web.API
 {
     public class FieldValidationResponseModel
     {
