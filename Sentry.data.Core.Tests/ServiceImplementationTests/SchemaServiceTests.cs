@@ -1863,19 +1863,47 @@ namespace Sentry.data.Core.Tests
 
 
         [TestMethod]
-        public void SchemaService_GenerateSnowflakeDatabaseName_Include_Prefix()
+        [DataRow(" ")]
+        [DataRow("ABC")]
+        public void SchemaService_GenerateSnowflakeDatabaseName_Include_Prefix(string allowableEnvironments)
         {
             //Arrange
             Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
-            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("All");
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(allowableEnvironments);
 
             var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null);
 
             //Act
             string dbName_TESTNP = schemaService.GenerateSnowflakeDatabaseName(false, "TEST", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_QUALNP = schemaService.GenerateSnowflakeDatabaseName(false, "QUAL", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_QUALPROD = schemaService.GenerateSnowflakeDatabaseName(false, "QUAL", NamedEnvironmentType.Prod.ToString(), "RAWQUERY_");
+            string dbName_PRODNP = schemaService.GenerateSnowflakeDatabaseName(false, "PROD", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_PRODPROD = schemaService.GenerateSnowflakeDatabaseName(false, "PROD", NamedEnvironmentType.Prod.ToString(), "RAWQUERY_");
+            string dbName_PRODNP_HR = schemaService.GenerateSnowflakeDatabaseName(true, "PROD", NamedEnvironmentType.NonProd.ToString(), "RAWQUERY_");
+            string dbName_PRODPROD_HR = schemaService.GenerateSnowflakeDatabaseName(true, "PROD", NamedEnvironmentType.Prod.ToString(), "RAWQUERY_");
 
             //Assert
-            Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+            if (allowableEnvironments == " ")
+            {
+                Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUALNP", dbName_QUALNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUAL", dbName_QUALPROD);
+                Assert.AreEqual("DATA_RAWQUERY_PRODNP", dbName_PRODNP);
+                Assert.AreEqual("DATA_RAWQUERY_PROD", dbName_PRODPROD);
+                Assert.AreEqual("WDAY_RAWQUERY_PRODNP", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_RAWQUERY_PROD", dbName_PRODPROD_HR);
+            }
+            else
+            {
+                Assert.AreEqual("DATA_RAWQUERY_TEST", dbName_TESTNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUAL", dbName_QUALNP);
+                Assert.AreEqual("DATA_RAWQUERY_QUAL", dbName_QUALPROD);
+                Assert.AreEqual("DATA_RAWQUERY_PROD", dbName_PRODNP);
+                Assert.AreEqual("DATA_RAWQUERY_PROD", dbName_PRODPROD);
+                Assert.AreEqual("WDAY_RAWQUERY_PROD", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_RAWQUERY_PROD", dbName_PRODPROD_HR);
+            }
+
         }
 
         [TestMethod]
@@ -1914,12 +1942,12 @@ namespace Sentry.data.Core.Tests
 
                 Assert.AreEqual("DATA_QUALNP", dbName_QUALNP);
                 Assert.AreEqual("DATA_QUAL", dbName_QUALPROD);
-                Assert.AreEqual("DATA_NONPROD", dbName_PRODNP);
+                Assert.AreEqual("DATA_PRODNP", dbName_PRODNP);
                 Assert.AreEqual("DATA_PROD", dbName_PRODPROD);
 
                 Assert.AreEqual("WDAY_QUALNP", dbName_QUALNP_HR);
                 Assert.AreEqual("WDAY_QUAL", dbName_QUALPROD_HR);
-                Assert.AreEqual("WDAY_NONPROD", dbName_PRODNP_HR);
+                Assert.AreEqual("WDAY_PRODNP", dbName_PRODNP_HR);
                 Assert.AreEqual("WDAY_PROD", dbName_PRODPROD_HR);
             }
             else
@@ -2070,10 +2098,79 @@ namespace Sentry.data.Core.Tests
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
 
             //Act
-            schemaService.Object.CreateConsumptionLayersForSchema(schema, fileSchemaDto, dataset);
+            schemaService.Object.CreateOrUpdateConsumptionLayersForSchema(schema, fileSchemaDto, dataset);
 
             //Assert
             Assert.AreEqual(4, schema.ConsumptionDetails.Count());
+        }
+
+        [TestMethod]
+        public void SchemaService_CreateConsumptionLayersForSchema_Removes_Existing()
+        {
+            //Arrange
+            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(false);
+            dataFeatures.Setup(s => s.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue()).Returns("2022-08-15");
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            Dataset dataset = MockClasses.MockDataset();
+            dataset.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
+            dataset.NamedEnvironment = "QUAL";
+
+            FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
+            FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
+
+            schema.ConsumptionDetails.Add(new SchemaConsumptionSnowflake()
+            {
+                SchemaConsumptionId = 1,
+                SnowflakeDatabase = "1_DBName",
+                SnowflakeWarehouse = "1_WHName",
+                SnowflakeStage = "1_StageName",
+                SnowflakeTable = "1_TBLName",
+                SnowflakeSchema = "1_SchemaName",
+                SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString(),
+                SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
+            });
+            schema.ConsumptionDetails.Add(new SchemaConsumptionSnowflake()
+            {
+                SchemaConsumptionId = 2,
+                SnowflakeDatabase = "2_DBName",
+                SnowflakeWarehouse = "2_WHName",
+                SnowflakeStage = "2_StageName",
+                SnowflakeTable = "2_TBLName",
+                SnowflakeSchema = "2_SchemaName",
+                SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString(),
+                SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery
+            });
+            schema.ConsumptionDetails.Add(new SchemaConsumptionSnowflake()
+            {
+                SchemaConsumptionId = 3,
+                SnowflakeDatabase = "3_DBName",
+                SnowflakeWarehouse = "3_WHName",
+                SnowflakeStage = "3_StageName",
+                SnowflakeTable = "3_TBLName",
+                SnowflakeSchema = "3_SchemaName",
+                SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString(),
+                SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+            });
+
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(datasetContext.Object, null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
+            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
+            schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
+            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
+
+            //Act
+            schemaService.Object.CreateOrUpdateConsumptionLayersForSchema(schema, fileSchemaDto, dataset);
+
+            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
+
+            //Assert
+            Assert.AreEqual(4, schema.ConsumptionDetails.Count());
+            Assert.IsFalse(schemaConsumptionSnowflakeList.Any(w => w.SnowflakeDatabase != "DB_Name"));
+            Assert.IsFalse(schemaConsumptionSnowflakeList.Any(w => w.SnowflakeSchema != "YYYY"));
         }
 
         #endregion
