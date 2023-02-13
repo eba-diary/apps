@@ -98,3 +98,51 @@ table#metricGroupsTable td.metric-detail-control {
     align-items: end;
 }
 
+/* index page */
+.column {
+    text-align: center;
+    width: 20%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.failure_style {
+    color: red;
+    font-size: 45px;
+}
+
+.num_style {
+    font-size: 45px;
+}
+
+.container {
+    width: 200px;
+}
+
+.processingActivityDiv {
+    padding: 40px;
+    width: 90%;
+    right: auto;
+    padding-right: 25px;
+}
+
+.partialContainer {
+    margin: auto;
+    text-align: center;
+    width: 50%;
+}
+
+#failedFiles, #completedFiles, #inFlightFiles {
+    display: none;
+    margin: auto;
+}
+
+#buttonCompletedFiles, #buttonFailedFiles, #buttonInFlightFiles {
+    border: none;
+    background-color: none !important;
+    background: unset !important;
+}
