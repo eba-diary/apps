@@ -1462,6 +1462,7 @@ namespace Sentry.data.Core
                 //These send output to schema aware storage
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
+                case DataActionType.CopyToParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
                     step.TargetPrefix = $"{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{schemaStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
@@ -1576,8 +1577,15 @@ namespace Sentry.data.Core
             AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
             AddDataFlowStep(dto, df, DataActionType.QueryStorage);
 
-            ////Generate consumption layer steps
-            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            //Generate consumption layer steps
+            if (scm.Extension.Name == GlobalConstants.ExtensionNames.PARQUET)
+            {
+                AddDataFlowStep(dto, df, DataActionType.CopyToParquet);
+            }
+            else
+            {
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
 
         }
 
