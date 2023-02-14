@@ -247,7 +247,7 @@ BEGIN TRAN
 			( 'DSCDISPATCHERBATCHHANDLER', 'QUAL', 's3.configuration.bucket', 'sentry-dlst-qual-dataset-ae2' ),
 			( 'DSCDISPATCHERBATCHHANDLER', 'QUAL', 's3.configuration.key', 'conf/dsc_dispatcher_batch/configuration.txt' ),
 			
-			( 'FILECOPYBATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.db.sentry.local' ),
+			( 'FILECOPYBATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.dbal.sentry.local' ),
 			( 'FILECOPYBATCHHANDLER', 'QUAL', 'support.database.name', 'SentryDatasets' ),
 			( 'FILECOPYBATCHHANDLER', 'QUAL', 'support.database.authentication', 'Windows' ),
 			( 'FILECOPYBATCHHANDLER', 'QUAL', 'support.database.secure.file.path', '' ),
@@ -263,7 +263,7 @@ BEGIN TRAN
 			( 'FILECOPYBATCHHANDLER', 'QUAL', 'sql.readDatasetFileQuery', 'SELECT DatasetFileDrop.ObjectBucket AS [SourceBucket], DatasetFileDrop.ObjectKey AS [SourceKey], DatasetFileDrop.ObjectVersionID AS [SourceVersionID], DatasetFileQuery.ObjectBucket AS [TargetBucket], DatasetFileQuery.ObjectKey AS [TargetKey], DatasetFileQuery.DatasetFileQueryID AS [DatasetFileQueryID] FROM DatasetFileQuery LEFT JOIN DatasetFileDrop ON DatasetFileQuery.DatasetFileDropID = DatasetFileDrop.DatasetFileDropID LEFT JOIN Dataset ON DatasetFileQuery.DatasetID = Dataset.Dataset_ID WHERE DatasetFileQuery.ObjectStatus = 6 and Dataset.NamedEnvironmentType = ''Prod'';' ),
 			( 'FILECOPYBATCHHANDLER', 'QUAL', 'sql.updateDatasetFileQuery', 'UPDATE DatasetFileQuery SET ObjectStatus = 1, ObjectVersionID = {ObjectVersionID}, ObjectETag = {ObjectETag}, ObjectSizeAMT = {ObjectSizeAMT}, UpdateDTM = GETDATE() WHERE DatasetFileQueryID = {DatasetFileQueryID};' ),
 			
-			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.db.sentry.local' ),
+			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.dbal.sentry.local' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'support.database.name', 'SentryDatasets' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'support.database.authentication', 'Windows' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'support.database.secure.file.path', '' ),
@@ -290,7 +290,7 @@ BEGIN TRAN
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'snowflake.proxyHost', 'webproxy.sentry.com' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUAL', 'snowflake.proxyPort', '80' ),
 			
-			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.db.sentry.local' ),
+			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.dbal.sentry.local' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 'support.database.name', 'SentryDatasets' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 'support.database.authentication', 'Windows' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 'support.database.secure.file.path', '' ),
@@ -304,7 +304,7 @@ BEGIN TRAN
 			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 's3.configuration.bucket', 'sentry-dlst-qual-dataset-ae2' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUAL', 's3.configuration.key', 'conf/s3_files_merge_batch/configuration.txt' ),
 
-			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.db.sentry.local' ),
+			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.dbal.sentry.local' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'support.database.name', 'SentryDatasets' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'support.database.authentication', 'Windows' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUAL', 'support.database.secure.file.path', '' ),
@@ -336,7 +336,7 @@ BEGIN TRAN
 			( 'SNDQUALBATCHHANDLER', 'QUALNP', 'source.object.key', 'users/data/01/gb_001.csv' ),
 			( 'SNDQUALBATCHHANDLER', 'QUALNP', 'target.file.key', 'users/cla4137/sndbatchhandler/target.txt' ),
 		
-			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.server', 'dlpp-qualnp-plur.db.sentry.local' ),
+			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.server', 'dlpp-qualnp-plur.dbal.sentry.local' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.name', 'QUAL_PLUR' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.authentication', 'Windows' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.secure.file.path', '' ),
@@ -408,7 +408,7 @@ BEGIN TRAN
 			( 'DSCDISPATCHERBATCHHANDLER', 'QUALNP', 's3.configuration.bucket', 'sentry-dlst-qualnp-dataset-ae2' ),
 			( 'DSCDISPATCHERBATCHHANDLER', 'QUALNP', 's3.configuration.key', 'conf/dsc_dispatcher_batch/configuration.txt' ),
 			
-			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.db.sentry.local' ),
+			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.dbal.sentry.local' ),
 			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'support.database.name', 'SentryDatasets' ),
 			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'support.database.authentication', 'Windows' ),
 			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'support.database.secure.file.path', '' ),
@@ -424,7 +424,7 @@ BEGIN TRAN
 			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'sql.readDatasetFileQuery', 'SELECT DatasetFileDrop.ObjectBucket AS [SourceBucket], DatasetFileDrop.ObjectKey AS [SourceKey], DatasetFileDrop.ObjectVersionID AS [SourceVersionID], DatasetFileQuery.ObjectBucket AS [TargetBucket], DatasetFileQuery.ObjectKey AS [TargetKey], DatasetFileQuery.DatasetFileQueryID AS [DatasetFileQueryID] FROM DatasetFileQuery LEFT JOIN DatasetFileDrop ON DatasetFileQuery.DatasetFileDropID = DatasetFileDrop.DatasetFileDropID LEFT JOIN Dataset ON DatasetFileQuery.DatasetID = Dataset.Dataset_ID WHERE DatasetFileQuery.ObjectStatus = 6 and Dataset.NamedEnvironmentType = ''NonProd'';' ),
 			( 'FILECOPYBATCHHANDLER', 'QUALNP', 'sql.updateDatasetFileQuery', 'UPDATE DatasetFileQuery SET ObjectStatus = 1, ObjectVersionID = {ObjectVersionID}, ObjectETag = {ObjectETag}, ObjectSizeAMT = {ObjectSizeAMT}, UpdateDTM = GETDATE() WHERE DatasetFileQueryID = {DatasetFileQueryID};' ),
 			
-			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.db.sentry.local' ),
+			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.dbal.sentry.local' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'support.database.name', 'SentryDatasets' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'support.database.authentication', 'Windows' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'support.database.secure.file.path', '' ),
@@ -451,7 +451,7 @@ BEGIN TRAN
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'snowflake.proxyHost', 'webproxy.sentry.com' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'QUALNP', 'snowflake.proxyPort', '80' ),
 			
-			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.db.sentry.local' ),
+			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.dbal.sentry.local' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 'support.database.name', 'SentryDatasets' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 'support.database.authentication', 'Windows' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 'support.database.secure.file.path', '' ),
@@ -465,7 +465,7 @@ BEGIN TRAN
 			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 's3.configuration.bucket', 'sentry-dlst-qual-dataset-ae2' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'QUALNP', 's3.configuration.key', 'conf/s3_files_merge_batch/configuration.txt' ),
 
-			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.db.sentry.local' ),
+			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.dbal.sentry.local' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUALNP', 'support.database.name', 'SentryDatasets' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUALNP', 'support.database.authentication', 'Windows' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'QUALNP', 'support.database.secure.file.path', '' ),
@@ -570,7 +570,7 @@ BEGIN TRAN
 			( 'DSCDISPATCHERBATCHHANDLER', 'PROD', 's3.configuration.bucket', 'sentry-dlst-prod-dataset-ae2' ),
 			( 'DSCDISPATCHERBATCHHANDLER', 'PROD', 's3.configuration.key', 'conf/dsc_dispatcher_batch/configuration.txt' ),
 			
-			( 'FILECOPYBATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.db.sentry.local' ),
+			( 'FILECOPYBATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.dbal.sentry.local' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'support.database.name', 'SentryDatasets' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'support.database.authentication', 'Windows' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'support.database.secure.file.path', '' ),
@@ -586,7 +586,7 @@ BEGIN TRAN
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'sql.readDatasetFileQuery', 'SELECT DatasetFileDrop.ObjectBucket AS [SourceBucket], DatasetFileDrop.ObjectKey AS [SourceKey], DatasetFileDrop.ObjectVersionID AS [SourceVersionID], DatasetFileQuery.ObjectBucket AS [TargetBucket], DatasetFileQuery.ObjectKey AS [TargetKey], DatasetFileQuery.DatasetFileQueryID AS [DatasetFileQueryID] FROM DatasetFileQuery LEFT JOIN DatasetFileDrop ON DatasetFileQuery.DatasetFileDropID = DatasetFileDrop.DatasetFileDropID LEFT JOIN Dataset ON DatasetFileQuery.DatasetID = Dataset.Dataset_ID WHERE DatasetFileQuery.ObjectStatus = 6 and Dataset.NamedEnvironmentType = ''Prod'';' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'sql.updateDatasetFileQuery', 'UPDATE DatasetFileQuery SET ObjectStatus = 1, ObjectVersionID = {ObjectVersionID}, ObjectETag = {ObjectETag}, ObjectSizeAMT = {ObjectSizeAMT}, UpdateDTM = GETDATE() WHERE DatasetFileQueryID = {DatasetFileQueryID};' ),
 			
-			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.db.sentry.local' ),
+			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.dbal.sentry.local' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'support.database.name', 'SentryDatasets' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'support.database.authentication', 'Windows' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'support.database.secure.file.path', '' ),
@@ -613,7 +613,7 @@ BEGIN TRAN
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'snowflake.proxyHost', 'webproxy.sentry.com' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PROD', 'snowflake.proxyPort', '80' ),
 			
-			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.db.sentry.local' ),
+			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.dbal.sentry.local' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 'support.database.name', 'SentryDatasets' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 'support.database.authentication', 'Windows' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 'support.database.secure.file.path', '' ),
@@ -627,7 +627,7 @@ BEGIN TRAN
 			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 's3.configuration.bucket', 'sentry-dlst-prod-dataset-ae2' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PROD', 's3.configuration.key', 'conf/s3_files_merge_batch/configuration.txt' ),
 
-			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.db.sentry.local' ),
+			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.dbal.sentry.local' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PROD', 'support.database.name', 'SentryDatasets' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PROD', 'support.database.authentication', 'Windows' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PROD', 'support.database.secure.file.path', '' ),
@@ -659,7 +659,6 @@ BEGIN TRAN
 			( 'SNDPRODBATCHHANDLER', 'PRODNP', 'prodnp.object.key', 'users/data/01/gb_001.csv' ),
 			( 'SNDPRODBATCHHANDLER', 'PRODNP', 'target.file.key', 'users/cla4137/sndbatchhandler/target.txt' ),
 			
-
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PRODNP', 'support.database.server', 'dblo-prod-plur.dbal.sentry.local' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PRODNP', 'support.database.name', 'PLUR' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PRODNP', 'support.database.authentication', 'Windows' ),
@@ -732,7 +731,7 @@ BEGIN TRAN
 			( 'DSCDISPATCHERBATCHHANDLER', 'PRODNP', 's3.configuration.bucket', 'sentry-dlst-prodnp-dataset-ae2' ),
 			( 'DSCDISPATCHERBATCHHANDLER', 'PRODNP', 's3.configuration.key', 'conf/dsc_dispatcher_batch/configuration.txt' ),
 			
-			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.db.sentry.local' ),
+			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.dbal.sentry.local' ),
 			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'support.database.name', 'SentryDatasets' ),
 			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'support.database.authentication', 'Windows' ),
 			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'support.database.secure.file.path', '' ),
@@ -748,7 +747,7 @@ BEGIN TRAN
 			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'sql.readDatasetFileQuery', 'SELECT DatasetFileDrop.ObjectBucket AS [SourceBucket], DatasetFileDrop.ObjectKey AS [SourceKey], DatasetFileDrop.ObjectVersionID AS [SourceVersionID], DatasetFileQuery.ObjectBucket AS [TargetBucket], DatasetFileQuery.ObjectKey AS [TargetKey], DatasetFileQuery.DatasetFileQueryID AS [DatasetFileQueryID] FROM DatasetFileQuery LEFT JOIN DatasetFileDrop ON DatasetFileQuery.DatasetFileDropID = DatasetFileDrop.DatasetFileDropID LEFT JOIN Dataset ON DatasetFileQuery.DatasetID = Dataset.Dataset_ID WHERE DatasetFileQuery.ObjectStatus = 6 and Dataset.NamedEnvironmentType = ''NonProd'';' ),
 			( 'FILECOPYBATCHHANDLER', 'PRODNP', 'sql.updateDatasetFileQuery', 'UPDATE DatasetFileQuery SET ObjectStatus = 1, ObjectVersionID = {ObjectVersionID}, ObjectETag = {ObjectETag}, ObjectSizeAMT = {ObjectSizeAMT}, UpdateDTM = GETDATE() WHERE DatasetFileQueryID = {DatasetFileQueryID};' ),
 			
-			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.db.sentry.local' ),
+			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.dbal.sentry.local' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'support.database.name', 'SentryDatasets' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'support.database.authentication', 'Windows' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'support.database.secure.file.path', '' ),
@@ -775,7 +774,7 @@ BEGIN TRAN
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'snowflake.proxyHost', 'webproxy.sentry.com' ),
 			( 'KAFKACONNECTORTOS3BATCHHANDLER', 'PRODNP', 'snowflake.proxyPort', '80' ),
 			
-			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.db.sentry.local' ),
+			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.dbal.sentry.local' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 'support.database.name', 'SentryDatasets' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 'support.database.authentication', 'Windows' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 'support.database.secure.file.path', '' ),
@@ -789,7 +788,7 @@ BEGIN TRAN
 			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 's3.configuration.bucket', 'sentry-dlst-prodnp-dataset-ae2' ),
 			( 'S3FILESMERGEBATCHHANDLER', 'PRODNP', 's3.configuration.key', 'conf/s3_files_merge_batch/configuration.txt' ),
 
-			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.db.sentry.local' ),
+			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.dbal.sentry.local' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PRODNP', 'support.database.name', 'SentryDatasets' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PRODNP', 'support.database.authentication', 'Windows' ),
 			( 'SNOWFLAKEREFRESHBATCHHANDLER', 'PRODNP', 'support.database.secure.file.path', '' ),
