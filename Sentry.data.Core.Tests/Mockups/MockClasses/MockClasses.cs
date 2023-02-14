@@ -1298,11 +1298,27 @@ namespace Sentry.data.Core.Tests
             return schemaResponse;
         }
 
+        public static SchemaMigrationRequestResponse MockSchemaResponseNewYork()
+        {
+            SchemaMigrationRequestResponse schemaResponse = new SchemaMigrationRequestResponse()
+            {
+                DataFlowMigrationReason = "Target dataflow metadata already exists",
+                MigratedDataFlow = false,
+                MigratedSchema = false,
+                MigratedSchemaRevision = false,
+                SchemaMigrationReason = "Schema configuration existed in target",
+                SourceSchemaId = 7
+                
+            };
+            return schemaResponse;
+        }
+
         public static DatasetMigrationRequestResponse MockResponseMontana()
         {
             List<SchemaMigrationRequestResponse> schemaResponses = new List<SchemaMigrationRequestResponse>();
             schemaResponses.Add(MockClasses.MockSchemaResponseGlacier());
             schemaResponses.Add(MockClasses.MockSchemaResponseGreatFalls());
+            schemaResponses.Add(MockClasses.MockSchemaResponseNewYork());
 
             DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
             {
@@ -1387,6 +1403,27 @@ namespace Sentry.data.Core.Tests
                 SchemaMigrationMessage = "Schema configuration existed in target",
                 SchemaRevisionId = 52,
                 SchemaRevisionName = "GreatFallsRevisionName"
+
+            };
+            return historyDetail;
+        }
+
+        public static MigrationHistoryDetail MockHistoryDetailSchemaNewYork()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = null,
+                SchemaName = "NewYork",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SourceSchemaId = 7,
+                SchemaId = null,
+                SchemaMigrationMessage = "Schema configuration existed in target",
+                SchemaRevisionId = null,
+                SchemaRevisionName = null
 
             };
             return historyDetail;

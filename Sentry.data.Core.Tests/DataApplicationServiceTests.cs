@@ -349,6 +349,14 @@ namespace Sentry.data.Core.Tests
                 Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGreatFalls().SchemaRevisionName, x.SchemaRevisionName);
             });
 
+            //ENSURE MigrationHistoryDetail is null
+            context.Setup(s => s.Add(It.Is<MigrationHistoryDetail>(x => x.SchemaId == MockClasses.MockHistoryDetailSchemaNewYork().SchemaId))).Callback<MigrationHistoryDetail>(x =>
+            {
+                Assert.IsNull(x.SchemaId);
+                Assert.IsNull(x.SchemaName);
+                Assert.IsNull(x.SchemaRevisionName);
+            });
+
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
 
             //EXECUTE 
