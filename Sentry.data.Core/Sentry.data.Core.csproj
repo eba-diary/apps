@@ -262,6 +262,7 @@
     <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\CopyToParquetAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleSearchConsoleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleBigQueryApiAction.cs" />

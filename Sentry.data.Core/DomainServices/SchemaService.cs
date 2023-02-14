@@ -1086,9 +1086,7 @@ namespace Sentry.data.Core
             file.DatasetFileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == stepEvent.SchemaId).FirstOrDefault();
             file.FlowExecutionGuid = stepEvent.FlowExecutionGuid;
             file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
-        }
-
-        
+        }        
 
         private FileSchema MapToFileSchema(FileSchemaDto dto)
         {

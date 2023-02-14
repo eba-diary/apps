@@ -1097,8 +1097,15 @@ namespace Sentry.data.Core
             AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
             AddDataFlowStep(dto, df, DataActionType.QueryStorage);
 
-            ////Generate consumption layer steps
-            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            //Generate consumption layer steps
+            if (scm.Extension.Name == GlobalConstants.ExtensionNames.PARQUET)
+            {
+                AddDataFlowStep(dto, df, DataActionType.CopyToParquet);
+            }
+            else
+            {
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
         }
 
         private SchemaMap MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
@@ -1324,6 +1331,9 @@ namespace Sentry.data.Core
                     break;
                 case DataActionType.ConvertParquet:
                     action = _datasetContext.ConvertToParquetAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
+                    break;
+                case DataActionType.CopyToParquet:
+                    action = _datasetContext.CopyToParquetAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
                 case DataActionType.UncompressZip:
                     action = _datasetContext.UncompressZipAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);

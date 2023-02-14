@@ -497,6 +497,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<CopyToParquetAction> CopyToParquetAction
+        {
+            get
+            {
+                return Query<CopyToParquetAction>();
+            }
+        }
+
         public IQueryable<UncompressZipAction> UncompressZipAction
         {
             get
