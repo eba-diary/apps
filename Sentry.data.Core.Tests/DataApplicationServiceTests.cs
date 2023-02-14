@@ -276,13 +276,14 @@ namespace Sentry.data.Core.Tests
             //MOCK _datasetContext Calls
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, sourceDataset }.AsQueryable());
-            
+
             //MAGIC HERE IS VERIFICATION THAT WHAT WAS ADDED TO CONTEXT IN UNIT TEST CALLED MATCHED the ASSERT
+            MigrationHistory historyMontana = MockClasses.MockHistoryMontana();
             context.Setup(s => s.Add(It.IsAny<MigrationHistory>())).Callback<MigrationHistory>(x => 
             {
-                    Assert.AreEqual(MockClasses.MockHistoryMontana().SourceDatasetId, x.SourceDatasetId);
-                    Assert.AreEqual(MockClasses.MockHistoryMontana().TargetDatasetId, x.TargetDatasetId);
-                    Assert.AreEqual(MockClasses.MockHistoryMontana().TargetNamedEnvironment, x.TargetNamedEnvironment);
+                Assert.AreEqual(historyMontana.SourceDatasetId, x.SourceDatasetId);
+                Assert.AreEqual(historyMontana.TargetDatasetId, x.TargetDatasetId);
+                Assert.AreEqual(historyMontana.TargetNamedEnvironment, x.TargetNamedEnvironment);
             });
 
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
@@ -303,16 +304,17 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
 
             //MAGIC HERE IS VERIFICATION THAT WHAT WAS ADDED TO CONTEXT IN UNIT TEST CALLED MATCHED the ASSERT
+            MigrationHistoryDetail historyDetailDataset = MockClasses.MockHistoryDetailDataset();
             context.Setup(s => s.Add(It.IsAny<MigrationHistoryDetail>())).Callback<MigrationHistoryDetail>(x =>
             {
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().SourceDatasetId, x.SourceDatasetId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().DatasetId, x.DatasetId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().DatasetMigrationMessage, x.DatasetMigrationMessage);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().DatasetName, x.DatasetName);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().MigrationHistoryId, x.MigrationHistoryId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().DataFlowId, x.DataFlowId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().SchemaId, x.SchemaId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailDataset().SchemaRevisionId, x.SchemaRevisionId);
+                Assert.AreEqual(historyDetailDataset.SourceDatasetId, x.SourceDatasetId);
+                Assert.AreEqual(historyDetailDataset.DatasetId, x.DatasetId);
+                Assert.AreEqual(historyDetailDataset.DatasetMigrationMessage, x.DatasetMigrationMessage);
+                Assert.AreEqual(historyDetailDataset.DatasetName, x.DatasetName);
+                Assert.AreEqual(historyDetailDataset.MigrationHistoryId, x.MigrationHistoryId);
+                Assert.AreEqual(historyDetailDataset.DataFlowId, x.DataFlowId);
+                Assert.AreEqual(historyDetailDataset.SchemaId, x.SchemaId);
+                Assert.AreEqual(historyDetailDataset.SchemaRevisionId, x.SchemaRevisionId);
             });
 
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
@@ -335,18 +337,20 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
 
             //MAGIC HERE IS VERIFICATION THAT WHAT WAS ADDED TO CONTEXT IN UNIT TEST CALLED MATCHED the ASSERT
+            MigrationHistoryDetail historyDetailSchemaGlacier = MockClasses.MockHistoryDetailSchemaGlacier();
             context.Setup(s => s.Add(It.Is<MigrationHistoryDetail>(x => x.SchemaId == MockClasses.MockHistoryDetailSchemaGlacier().SchemaId))).Callback<MigrationHistoryDetail>(x =>
             {
-                Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGlacier().SchemaId, x.SchemaId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGlacier().SchemaName, x.SchemaName);
-                Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGlacier().SchemaRevisionName, x.SchemaRevisionName);
+                Assert.AreEqual(historyDetailSchemaGlacier.SchemaId, x.SchemaId);
+                Assert.AreEqual(historyDetailSchemaGlacier.SchemaName, x.SchemaName);
+                Assert.AreEqual(historyDetailSchemaGlacier.SchemaRevisionName, x.SchemaRevisionName);
             });
 
+            MigrationHistoryDetail historyDetailSchemaGreatFalls = MockClasses.MockHistoryDetailSchemaGreatFalls();
             context.Setup(s => s.Add(It.Is<MigrationHistoryDetail>(x => x.SchemaId == MockClasses.MockHistoryDetailSchemaGreatFalls().SchemaId))).Callback<MigrationHistoryDetail>(x =>
             {
-                Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGreatFalls().SchemaId, x.SchemaId);
-                Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGreatFalls().SchemaName, x.SchemaName);
-                Assert.AreEqual(MockClasses.MockHistoryDetailSchemaGreatFalls().SchemaRevisionName, x.SchemaRevisionName);
+                Assert.AreEqual(historyDetailSchemaGreatFalls.SchemaId, x.SchemaId);
+                Assert.AreEqual(historyDetailSchemaGreatFalls.SchemaName, x.SchemaName);
+                Assert.AreEqual(historyDetailSchemaGreatFalls.SchemaRevisionName, x.SchemaRevisionName);
             });
 
             //ENSURE MigrationHistoryDetail is null
