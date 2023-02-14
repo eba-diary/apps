@@ -20,7 +20,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("MigrationHistoryId");
                 m.Generator(Generators.Identity);
             });
-            
+
+            this.Property(x => x.SourceNamedEnvironment);
+            this.Property(x => x.TargetNamedEnvironment);
+            this.Property(x => x.SourceDatasetId);
+            this.Property(x => x.TargetDatasetId);
+
+
             this.Property(x => x.CreateDateTime);
             
             this.Bag(x => x.MigrationHistoryDetails, (m) =>

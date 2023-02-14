@@ -5,7 +5,7 @@
 	[SourceDatasetId] [int] NULL,
 	[IsDatasetMigrated] [bit] NULL,
 	[DatasetId] [int] NULL,
-	[DatasetName] [varchar](250) NULL,
+	[DatasetName] [varchar](1024) NULL,
 	[DatasetMigrationMessage] [varchar](250) NULL,
 
 	[SourceSchemaId] [int] NULL,
@@ -30,7 +30,7 @@
  CONSTRAINT [FK_MigrationHistoryDetail_MigrationHistory_MigrationHistoryId] FOREIGN KEY ([MigrationHistoryId]) REFERENCES [MigrationHistory]([MigrationHistoryId]),
  CONSTRAINT [FK_MigrationHistoryDetail_Dataset_SourceDatasetId] FOREIGN KEY ([SourceDatasetId]) REFERENCES [Dataset]([Dataset_ID]),
  CONSTRAINT [FK_MigrationHistoryDetail_Schema_SourceSchemaId] FOREIGN KEY ([SourceSchemaId]) REFERENCES [Schema]([Schema_Id]),
- CONSTRAINT [FK_MigrationHistoryDetail_Dataset_DatasetId] FOREIGN KEY ([DataFlowId]) REFERENCES [Dataset]([Dataset_ID]),
+ CONSTRAINT [FK_MigrationHistoryDetail_Dataset_DatasetId] FOREIGN KEY ([DatasetId]) REFERENCES [Dataset]([Dataset_ID]),
  CONSTRAINT [FK_MigrationHistoryDetail_DataFlow_DataFlowId] FOREIGN KEY ([DataFlowId]) REFERENCES [DataFlow]([Id]),
  CONSTRAINT [FK_MigrationHistoryDetail_Schema_SchemaId] FOREIGN KEY ([SchemaId]) REFERENCES [Schema]([Schema_Id]),
  CONSTRAINT [FK_MigrationHistoryDetail_SchemaRevision_SchemaId] FOREIGN KEY ([SchemaRevisionId]) REFERENCES [SchemaRevision]([SchemaRevision_Id])

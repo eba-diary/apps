@@ -1243,5 +1243,154 @@ namespace Sentry.data.Core.Tests
         }
 
 
+        public static DatasetMigrationRequest MockRequestMontana()
+        {
+            DatasetMigrationRequest request = new DatasetMigrationRequest()
+            {
+                SourceDatasetId = 3,
+                TargetDatasetId = 53,
+                TargetDatasetNamedEnvironment = "NRDEV"
+            };
+
+            return request;
+        }
+
+
+        public static SchemaMigrationRequestResponse MockSchemaResponseGlacier()
+        {
+            SchemaMigrationRequestResponse schemaResponse = new SchemaMigrationRequestResponse()
+            {
+                DataFlowMigrationReason = "Target dataflow metadata already exists",
+                DataFlowName =  "Glacier",
+                MigratedDataFlow =   true ,
+                MigratedSchema  = true,
+                MigratedSchemaRevision = true,
+                SchemaMigrationReason =  "Schema configuration existed in target",
+                SchemaName = "Glacier",
+                SchemaRevisionMigrationReason  = "No column metadata on source schema",
+                SchemaRevisionName = "GlacierRevisionName",
+                SourceSchemaId  = 1,
+                TargetDataFlowId  =  51,
+                TargetSchemaId = 51,
+                TargetSchemaRevisionId = 51
+            };
+            return schemaResponse;
+        }
+
+        public static SchemaMigrationRequestResponse MockSchemaResponseGreatFalls()
+        {
+            SchemaMigrationRequestResponse schemaResponse = new SchemaMigrationRequestResponse()
+            {
+                DataFlowMigrationReason = "Target dataflow metadata already exists",
+                DataFlowName = "GreatFalls",
+                MigratedDataFlow = true,
+                MigratedSchema = true,
+                MigratedSchemaRevision = true,
+                SchemaMigrationReason = "Schema configuration existed in target",
+                SchemaName = "GreatFalls",
+                SchemaRevisionMigrationReason = "No column metadata on source schema",
+                SchemaRevisionName = "GreatFallsRevisionName",
+                SourceSchemaId = 2,
+                TargetDataFlowId = 52,
+                TargetSchemaId = 52,
+                TargetSchemaRevisionId = 52
+            };
+            return schemaResponse;
+        }
+
+        public static DatasetMigrationRequestResponse MockResponseMontana()
+        {
+            List<SchemaMigrationRequestResponse> schemaResponses = new List<SchemaMigrationRequestResponse>();
+            schemaResponses.Add(MockClasses.MockSchemaResponseGlacier());
+            schemaResponses.Add(MockClasses.MockSchemaResponseGreatFalls());
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                DatasetId = 53,
+                DatasetMigrationReason = "Dataset already exists in target named environment",
+                DatasetName = "Montana",
+                IsDatasetMigrated = true,
+                SchemaMigrationResponses = schemaResponses
+            };
+            return response;
+        }
+
+        public static MigrationHistory MockHistoryMontana()
+        {
+            MigrationHistory history = new MigrationHistory()
+            {
+                CreateDateTime = DateTime.Now,
+                MigrationHistoryId	= 0,
+                SourceDatasetId = 3,
+                SourceNamedEnvironment = "DEV",
+                TargetDatasetId = 53,
+                TargetNamedEnvironment	= "NRDEV"
+            };
+            return history;
+        }
+
+
+        public static MigrationHistoryDetail MockHistoryDetailDataset()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = 53,
+                DatasetMigrationMessage =  "Dataset already exists in target named environment",
+                DatasetName = "Montana",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SchemaId = null,
+                SchemaRevisionId = null
+            };
+            return historyDetail;
+        }
+
+
+        public static MigrationHistoryDetail MockHistoryDetailSchemaGlacier()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = null,
+                SchemaName = "Glacier",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SourceSchemaId = 1,
+                SchemaId = 51,
+                SchemaMigrationMessage = "Schema configuration existed in target",
+                SchemaRevisionId = 51,
+                SchemaRevisionName = "GlacierRevisionName"
+
+            };
+            return historyDetail;
+        }
+
+
+        public static MigrationHistoryDetail MockHistoryDetailSchemaGreatFalls()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = null,
+                SchemaName = "GreatFalls",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SourceSchemaId = 2,
+                SchemaId = 52,
+                SchemaMigrationMessage = "Schema configuration existed in target",
+                SchemaRevisionId = 52,
+                SchemaRevisionName = "GreatFallsRevisionName"
+
+            };
+            return historyDetail;
+        }
+
     }
 }
