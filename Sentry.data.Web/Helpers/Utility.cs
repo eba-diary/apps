@@ -215,7 +215,7 @@ namespace Sentry.data.Web.Helpers
                 itemList.Add(new SelectListItem { Text = "Select Schema", Value = selectedSchemaId.ToString(), Selected = true, Disabled = true });
             }
 
-            itemList.AddRange(context.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId && w.ObjectStatus == ObjectStatusEnum.Active)
+            itemList.AddRange(context.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId && w.Schema.ObjectStatus == ObjectStatusEnum.Active)
                 .Select(s => new SelectListItem { Text = s.Schema.Name, Value = s.Schema.SchemaId.ToString() } ));
 
             return itemList;
