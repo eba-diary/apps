@@ -530,6 +530,7 @@
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetResponseModel.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidator.cs" />
+    <Compile Include="API\Dataset\DatasetRequestModel.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

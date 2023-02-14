@@ -5,8 +5,7 @@ using System.Web;
 
 namespace Sentry.data.Web.API
 {
-    public class AddDatasetRequestModel : DatasetRequestModel
+    public abstract class DatasetRequestModel : IRequestModel
     {
-
     }
 }
