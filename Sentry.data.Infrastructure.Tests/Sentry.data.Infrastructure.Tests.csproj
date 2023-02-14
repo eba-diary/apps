@@ -189,6 +189,7 @@
     <Compile Include="ApacheLivyProviderTests.cs" />
     <Compile Include="DataFlowMetricServiceTests.cs" />
     <Compile Include="MockClasses.cs" />
+    <Compile Include="MotiveProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="ElasticDataInventorySearchProviderTests.cs" />
@@ -279,6 +280,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ExpectedJSON\PagingHttps_SimpleNestedResponse.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\Motive_Companies.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\Motive_Companies_Unexpected.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

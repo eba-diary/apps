@@ -208,3 +208,7 @@ div.dataTables_wrapper div.dataTables_filter input {
 .padding-right-one {
     padding-right: 1px;
 }
+
+.yadcf-filter-range {
+    width: auto;
+}

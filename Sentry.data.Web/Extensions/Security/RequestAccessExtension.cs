@@ -22,6 +22,7 @@ namespace Sentry.data.Web
                 IsAddingPermission = true,
                 Type = model.Type,
                 AwsArn = model.AwsArn,
+                SnowflakeAccount = model.SnowflakeAccount,
                 Scope = model.Scope
             };
         }
@@ -74,9 +75,10 @@ namespace Sentry.data.Web
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = new List<string>() { model.Code },
                 SelectedApprover = model.SelectedApprover,
-                Type = model.Code == GlobalConstants.PermissionCodes.S3_ACCESS ? AccessRequestType.AwsArn : AccessRequestType.RemovePermission,
+                Type = model.AccessRequestType,
                 IsAddingPermission = false,
-                AwsArn = model.Identity,
+                AwsArn = model.AccessRequestType == AccessRequestType.AwsArn ? model.Identity : null,
+                SnowflakeAccount = model.AccessRequestType == AccessRequestType.SnowflakeAccount ? model.Identity : null,
                 SaidKeyCode = model.SaidKeyCode,
                 Scope = model.Scope.Equals(model.SaidKeyCode) ? AccessScope.Asset : AccessScope.Dataset,
                 TicketId = model.TicketId

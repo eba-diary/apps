@@ -506,6 +506,7 @@
     <Compile Include="Interfaces\IDataInventoryService.cs" />
     <Compile Include="Interfaces\IDataFeatures.cs" />
     <Compile Include="Interfaces\IHttpClientProvider.cs" />
+    <Compile Include="Interfaces\IMotiveProvider.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevRestClient.cs" />
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />

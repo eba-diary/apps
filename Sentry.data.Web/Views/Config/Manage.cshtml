@@ -1,8 +1,13 @@
 ﻿@model Sentry.data.Web.DatasetFileConfigsModel
+
 @{
     ViewBag.Title = "Manage Data File Configs";
 }
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+}
 
 <div>
     <div id="detailSectionHeader_DataFileConfigs">
@@ -31,14 +36,10 @@
 </div>
 
 @section Scripts{
-
-@*@Scripts.Render("~/bundles/jquery")*@
-@Scripts.Render("~/bundles/dataTables")
-
-<script>
-    $(function () {
-        data.ManageConfigs.Init();
-    });
-</script>
-    
+    <script src="@Html.GetContent("datatables.*.js")"></script>
+    <script>
+        $(function () {
+            data.ManageConfigs.Init();
+        });
+    </script>
 }

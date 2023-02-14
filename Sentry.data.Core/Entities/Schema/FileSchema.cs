@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -24,6 +25,33 @@ namespace Sentry.data.Core
         public virtual string ParquetStoragePrefix { get; set; }
 
         public virtual IList<SchemaConsumption> ConsumptionDetails { get; set; }
-        
+
+        public virtual void AddOrUpdateSnowflakeConsumptionLayer(SchemaConsumptionSnowflake newConsumptionLayerMetadata)
+        {
+            if (ConsumptionDetails == null)
+            {
+                ConsumptionDetails = new List<SchemaConsumption>();
+            }
+
+            //Add consumption layer metadata if it does not exist
+            if (!ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().Any(c => c.SnowflakeType == newConsumptionLayerMetadata.SnowflakeType))
+            {
+                ConsumptionDetails.Add(newConsumptionLayerMetadata);
+            }
+            //Update existing consumption layer metadata if it exists
+            else
+            {
+                SchemaConsumptionSnowflake originalConsumptionItem = ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().FirstOrDefault(w => w.SnowflakeType == newConsumptionLayerMetadata.SnowflakeType);
+
+                if (originalConsumptionItem != null)
+                {
+                    originalConsumptionItem.SnowflakeWarehouse = newConsumptionLayerMetadata.SnowflakeWarehouse;
+                    originalConsumptionItem.SnowflakeStage = newConsumptionLayerMetadata.SnowflakeStage;
+                    originalConsumptionItem.SnowflakeDatabase = newConsumptionLayerMetadata.SnowflakeDatabase;
+                    originalConsumptionItem.SnowflakeSchema = newConsumptionLayerMetadata.SnowflakeSchema;
+                    originalConsumptionItem.SnowflakeTable = newConsumptionLayerMetadata.SnowflakeTable;
+                }
+            }
+        }        
     }
 }

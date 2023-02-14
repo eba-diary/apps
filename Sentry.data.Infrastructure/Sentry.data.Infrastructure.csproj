@@ -461,6 +461,7 @@
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsJobProvider.cs" />
+    <Compile Include="ServiceImplementations\MotiveProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />

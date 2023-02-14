@@ -181,6 +181,12 @@ namespace Sentry.data.Infrastructure
             });
             registry.For<IDataSourceService>().Use<DataSourceService>().Ctor<HttpClient>().Is(dataSourceClient);
 
+            var motiveProviderClient = new HttpClient(new HttpClientHandler()
+            {
+                Proxy = webProxy
+            });
+            registry.For<IMotiveProvider>().Use<MotiveProvider>().Ctor<HttpClient>().Is(motiveProviderClient);
+
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });
             registry.For<HttpClient>().Use(client);

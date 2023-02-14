@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "ES6",
+    "moduleResolution": "Node",
+    "skipLibCheck": true //only type check source code
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
