@@ -3,13 +3,6 @@
     string tableColor = "dsc-" + Model.CategoryColor + "-table";
 }
 
-@if (!Model.DisplayTabSections)
-{
-    <div>
-        <h3 class="@color pt-1">Data Files</h3>
-    </div>
-}
-
 <div id="hide_detailSectionHeader_DataFiles">
     <table class="table @tableColor table-bordered table-hover table-striped nowrap" aria-describedby="Dataset Schema Files Table" id="datasetFilesTable">
         <thead>
