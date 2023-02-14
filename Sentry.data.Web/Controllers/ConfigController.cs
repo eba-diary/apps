@@ -1048,37 +1048,38 @@ namespace Sentry.data.Web.Controllers
 
             switch (fe.Name)
             {
-                case GlobalConstants.ExtensionNames.CSV:
+                case ExtensionNames.CSV:
                     model.IsPositional = true;
                     model.IsFixedWidth = false;
                     break;
-                case GlobalConstants.ExtensionNames.ANY:
-                case GlobalConstants.ExtensionNames.DELIMITED:
-                case GlobalConstants.ExtensionNames.TXT:
+                case ExtensionNames.ANY:
+                case ExtensionNames.DELIMITED:
+                case ExtensionNames.TXT:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     break;
-                case GlobalConstants.ExtensionNames.FIXEDWIDTH:
+                case ExtensionNames.FIXEDWIDTH:
                     model.IsPositional = true;
                     model.IsFixedWidth = true;
                     break;
-                case GlobalConstants.ExtensionNames.JSON:
-                case GlobalConstants.ExtensionNames.XML:
+                case ExtensionNames.JSON:
+                case ExtensionNames.XML:
+                case ExtensionNames.PARQUET:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
-                    model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    model.ValidDatatypes.Add(new DataTypeModel(Datatypes.STRUCT, "A struct", "Complex Data Types"));
                     break;
                 default:
                     break;
             }
 
             //Common datatypes across all FileExtensions
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }

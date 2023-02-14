@@ -20,7 +20,7 @@ namespace Sentry.data.Web
         public bool AllowArrays {
             get
             {
-                return FileExtensionName == GlobalConstants.ExtensionNames.JSON || FileExtensionName == GlobalConstants.ExtensionNames.XML;
+                return FileExtensionName == GlobalConstants.ExtensionNames.JSON || FileExtensionName == GlobalConstants.ExtensionNames.XML || FileExtensionName == GlobalConstants.ExtensionNames.PARQUET;
             }          
         }
     }
