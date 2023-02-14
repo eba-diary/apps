@@ -63,6 +63,7 @@ namespace Sentry.data.Web.Extensions
         {
             return new SchemaMigrationResponseModel()
             {
+                SourceSchemaId = response.SourceSchemaId,
                 IsSchemaMigrated = response.MigratedSchema,
                 SchemaId = response.TargetSchemaId,
                 SchemaName = response.SchemaName,
