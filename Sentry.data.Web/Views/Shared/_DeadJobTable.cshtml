@@ -38,7 +38,7 @@
         {
         <tr data-file-id=@job.SubmissionID>
             <td class="dropdown-toggle-col">
-<em id=@("dropdown-toggle-" + job.SubmissionID) class="fas fa-plus"></em></td>
+            <em id=@("dropdown-toggle-" + job.SubmissionID) class="fas fa-plus"></em></td>
             <td>
             @*
                 Data-Group-Id's purpose to create a (1) unique identifier & (2) act as a string to store the correlated data flow step for each row. 
@@ -49,7 +49,14 @@
             <label for=@(job.SubmissionID + "-select-input") class="form-check-label"></label></td>
             <td>@job.SubmissionTime</td>
             <td>@job.DatasetName</td>
-            <td class="@((job.ReprocessingRequired) ? "text-warning": "text-success")">@((job.ReprocessingRequired) ? new HtmlString("YES"): new HtmlString("NO"))</td>
+
+            @if(job.ReprocessingRequired)
+            {
+                <td class="text-warning">YES</td>
+            } else {
+                <td class="text-success">NO</td>
+            }
+
             <td>@job.SchemaName</td>
             <td>@job.SourceKey</td>
             <td>@job.FlowExecutionGuid</td>
