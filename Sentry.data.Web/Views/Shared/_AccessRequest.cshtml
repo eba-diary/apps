@@ -22,8 +22,8 @@
         @foreach (var item in Model.AllPermissions)
         {
             <div class="form-group">
-                <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" class="form-check-input" id="PermissionName" />
-                <label for="PermissionName" class="form-check-label">@item.PermissionDescription</label>
+                <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" class="form-check-input" id="@item.PermissionCode" />
+                <label for="@item.PermissionCode" class="form-check-label">@item.PermissionDescription</label>
             </div>
         }
 
