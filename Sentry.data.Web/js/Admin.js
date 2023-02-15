@@ -94,7 +94,7 @@ data.Admin = {
                     orderable: false
                 }
             ],
-            order: [],
+            order: [4, 'desc'],
             drawCallback: function () {
                 $('#data-file-select-all').prop('checked', false);
                 $('.select-all-target').prop('checked', false);
