@@ -69,7 +69,10 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, s3serviceProvider.Object, datasetContext.Object, dataFlowService.Object, authProvider.Object);
+            Mock<IDataFeatures> dataFeatures = repository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4485_DropCompaniesFile.GetValue()).Returns(true);
+
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, s3serviceProvider.Object, datasetContext.Object, dataFlowService.Object, authProvider.Object, dataFeatures.Object);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
@@ -122,7 +125,9 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, null, datasetContext.Object, null, authProvider.Object);
+            Mock<IDataFeatures> dataFeatures = repository.Create<IDataFeatures>();
+
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, null, datasetContext.Object, null, authProvider.Object, dataFeatures.Object);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
