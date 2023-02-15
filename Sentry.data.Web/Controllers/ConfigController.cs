@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IAssociateInfoProvider _associateInfoProvider;
         private readonly IDatasetContext _datasetContext;
         private readonly IConfigService _configService;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly IEventService _eventService;
         private readonly IDatasetService _DatasetService;
         private readonly IObsidianService _obsidianService;
@@ -35,7 +35,7 @@ namespace Sentry.data.Web.Controllers
         #endregion
 
         #region Constructor
-        public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
+        public ConfigController(IDatasetContext dsCtxt, IUserService userService, IAssociateInfoProvider associateInfoService,
             IConfigService configService, IEventService eventService, IDatasetService datasetService, 
             IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
             IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService, IDataSourceService dataSourceService)
@@ -246,7 +246,7 @@ namespace Sentry.data.Web.Controllers
 
                 dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
+                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags, dfcm.FileExtensionID);
                 dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
                 dfcm.FileExtensionReadonly = dfcm.ExtensionList.Where(s => s.Value == dfcm.FileExtensionID.ToString()).Select(n => n.Text).FirstOrDefault();
 
@@ -278,41 +278,12 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
+            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags, edfc.FileExtensionID);
             edfc.DatasetScopeReadonly = edfc.AllDatasetScopeTypes.Where(s => s.Value == edfc.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
             ViewBag.ModifyType = "Edit";
 
             return PartialView("_EditConfigFile", edfc);
         }
-
-        //[HttpPost]
-        //[Route("Config/Edit/{configId}")]
-        //[AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        //public ActionResult Edit(EditDatasetFileConfigModel edfc)
-        //{
-        //    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
-
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
-        //            dfc.FileTypeId = edfc.FileTypeId;
-        //            dfc.Description = edfc.ConfigFileDesc;
-        //            dfc.FileExtension = _datasetContext.GetById<FileExtension>(edfc.FileExtensionID);
-        //            _datasetContext.SaveChanges();
-
-        //            return RedirectToAction("Index", new { id = edfc.DatasetId });
-        //        }
-        //    }
-        //    catch (Sentry.Core.ValidationException ex)
-        //    {
-        //        AddCoreValidationExceptionsToModel(ex);
-        //        _datasetContext.Clear();
-        //    }
-
-        //    return View(edfc);
-        //}
 
         [HttpGet]
         [Route("Config/{configId}/Job/Create")]
@@ -1142,7 +1113,7 @@ namespace Sentry.data.Web.Controllers
         {
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
             dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags);
             dfcm.Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
         }
 

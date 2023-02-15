@@ -29,9 +29,9 @@ namespace Sentry.data.Web.Controllers
     [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
     public class DatasetController : BaseController
     {
-        public readonly IAssociateInfoProvider _associateInfoProvider;
-        public readonly IDatasetContext _datasetContext;
-        private readonly UserService _userService;
+        private readonly IAssociateInfoProvider _associateInfoProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
         private readonly S3ServiceProvider _s3Service;
         private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
@@ -48,7 +48,7 @@ namespace Sentry.data.Web.Controllers
         public DatasetController(
             IDatasetContext dsCtxt,
             S3ServiceProvider dsSvc,
-            UserService userService,
+            IUserService userService,
             IAssociateInfoProvider associateInfoService,
             IObsidianService obsidianService,
             IDatasetService datasetService,

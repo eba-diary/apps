@@ -1440,7 +1440,7 @@ namespace Sentry.data.Core
             {
                 string datasetSaidAsset = GetDatasetSaidAsset(step.DataFlow.Id);
                 string datasetNamedEnv = GetDatasetNamedEnvironment(step.DataFlow.Id);
-                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{datasetSaidAsset}/{datasetNamedEnv}/{step.DataFlow.FlowStorageCode}/";
+                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TriggerPrefix}{datasetSaidAsset}/{datasetNamedEnv}/{step.DataFlow.FlowStorageCode}/";
                 step.TriggerKey = triggerPrefix;
                 step.TriggerBucket = step.Action.TargetStorageBucket;
             }

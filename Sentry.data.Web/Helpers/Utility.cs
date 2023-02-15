@@ -316,7 +316,7 @@ namespace Sentry.data.Web.Helpers
             return dScopeTypes;
         }
 
-        public static IEnumerable<SelectListItem> GetFileExtensionListItems(IDatasetContext _datasetContext, int id = -1)
+        public static IEnumerable<SelectListItem> GetFileExtensionListItems(IDatasetContext _datasetContext, IDataFeatures features, int id = -1)
         {
             IEnumerable<SelectListItem> dFileExtensions;
 
@@ -341,6 +341,11 @@ namespace Sentry.data.Web.Helpers
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
+            }
+
+            if (!features.CLA4925_ParquetFileType.GetValue())
+            {
+                dFileExtensions = dFileExtensions.Where(x => x.Text != ExtensionNames.PARQUET);
             }
 
             return dFileExtensions.OrderByDescending(x => x.Selected);

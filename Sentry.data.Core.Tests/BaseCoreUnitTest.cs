@@ -96,6 +96,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3945_Telematics => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA2868_APIPaginationSupport => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4925_ParquetFileType => new MockBooleanFeatureFlag(true);
         }
     }
 }
