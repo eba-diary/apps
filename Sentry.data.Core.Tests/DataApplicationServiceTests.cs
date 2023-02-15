@@ -221,7 +221,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Datasets).Returns(new List<Dataset>() { dataset, sourceDataset }.AsQueryable());
             context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(dataset);
             context.Setup(s => s.SaveChanges(It.IsAny<bool>())).Callback<bool>(s => calls.Add(new Tuple<string, int>($"{nameof(IDatasetContext.SaveChanges)}", ++callOrder)));
-
+            
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
             securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(new UserSecurity() { CanEditDataset = true }).Callback<ISecurable, IApplicationUser>((s,a) => calls.Add(new Tuple<string, int>($"{nameof(SecurityService.GetUserSecurity)}", ++callOrder)));
 
@@ -245,20 +245,132 @@ namespace Sentry.data.Core.Tests
             dataApplicationService.Setup(s => s.MigrateSchemaWithoutSave_Internal(It.IsAny<List<SchemaMigrationRequest>>())).Returns(new List<SchemaMigrationRequestResponse>()).Callback<List<SchemaMigrationRequest>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}", ++callOrder)));
             dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataFlowBySchemaId(It.IsAny<List<int>>())).Callback<List<int>>(s => calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}", ++callOrder)));
+            
+            //MOCK CreateMigrationHistory as well
+            dataApplicationService.Setup(s => s.CreateMigrationHistory(It.IsAny<DatasetMigrationRequest>(), It.IsAny<DatasetMigrationRequestResponse>())).Callback( ()=> calls.Add(new Tuple<string, int>($"{nameof(DataApplicationService.CreateMigrationHistory)}", ++callOrder)));
 
             //Act
             await dataApplicationService.Object.MigrateDataset(request);
 
             //Arrage
             mr.VerifyAll();
-            Assert.AreEqual(6, calls.Count);
+            Assert.AreEqual(8, calls.Count);
             Assert.AreEqual(1, calls.Where(w => w.Item1 == $"{nameof(SecurityService.GetUserSecurity)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(SecurityService.GetUserSecurity)} called out of order");
             Assert.AreEqual(2, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateWithoutSave)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateWithoutSave)} called out of order");
             Assert.AreEqual(3, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.MigrateSchemaWithoutSave_Internal)} called out of order");
             Assert.AreEqual(4, calls.Where(w => w.Item1 == $"{nameof(IDatasetContext.SaveChanges)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
             Assert.AreEqual(5, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataset)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(IDatasetContext.SaveChanges)} called out of order");
             Assert.AreEqual(6, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
+            
+            //VERIFY CreateMigrationHistory was called in order
+            Assert.AreEqual(7, calls.Where(w => w.Item1 == $"{nameof(DataApplicationService.CreateMigrationHistory)}").Select(s => s.Item2).FirstOrDefault(), $"{nameof(DataApplicationService.CreateWithoutSave)} called out of order");
+            Assert.AreEqual(8, calls.Where(w => w.Item1 == $"{nameof(IDatasetContext.SaveChanges)}").Select(s => s.Item2).LastOrDefault(), $"{nameof(DataApplicationService.CreateExternalDependenciesForDataFlowBySchemaId)} called out of order");
         }
+
+        [TestMethod]
+        public void Verify_AddMigrationHistory_Inserted()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Dataset sourceDataset = new Dataset() { DatasetId = 1, DatasetName = "MyDataset", Asset = new Asset() { SaidKeyCode = "ABCD" }, NamedEnvironment = "DEV" };
+          
+            //MOCK _datasetContext Calls
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, sourceDataset }.AsQueryable());
+
+            //MAGIC HERE IS VERIFICATION THAT WHAT WAS ADDED TO CONTEXT IN UNIT TEST CALLED MATCHED the ASSERT
+            MigrationHistory historyMontana = MockClasses.MockHistoryMontana();
+            context.Setup(s => s.Add(It.IsAny<MigrationHistory>())).Callback<MigrationHistory>(x => 
+            {
+                Assert.AreEqual(historyMontana.SourceDatasetId, x.SourceDatasetId);
+                Assert.AreEqual(historyMontana.TargetDatasetId, x.TargetDatasetId);
+                Assert.AreEqual(historyMontana.TargetNamedEnvironment, x.TargetNamedEnvironment);
+            });
+
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
+
+            //EXECUTE 
+            dataApplicationService.AddMigrationHistory(MockClasses.MockRequestMontana(), MockClasses.MockResponseMontana());
+
+            //VERIFY ANYTHING CALLED WAS MOCKED
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Verify_MigrationHistoryDetail_Dataset_Inserted()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //MOCK _datasetContext Calls
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+
+            //MAGIC HERE IS VERIFICATION THAT WHAT WAS ADDED TO CONTEXT IN UNIT TEST CALLED MATCHED the ASSERT
+            MigrationHistoryDetail historyDetailDataset = MockClasses.MockHistoryDetailDataset();
+            context.Setup(s => s.Add(It.IsAny<MigrationHistoryDetail>())).Callback<MigrationHistoryDetail>(x =>
+            {
+                Assert.AreEqual(historyDetailDataset.SourceDatasetId, x.SourceDatasetId);
+                Assert.AreEqual(historyDetailDataset.DatasetId, x.DatasetId);
+                Assert.AreEqual(historyDetailDataset.DatasetMigrationMessage, x.DatasetMigrationMessage);
+                Assert.AreEqual(historyDetailDataset.DatasetName, x.DatasetName);
+                Assert.AreEqual(historyDetailDataset.MigrationHistoryId, x.MigrationHistoryId);
+                Assert.AreEqual(historyDetailDataset.DataFlowId, x.DataFlowId);
+                Assert.AreEqual(historyDetailDataset.SchemaId, x.SchemaId);
+                Assert.AreEqual(historyDetailDataset.SchemaRevisionId, x.SchemaRevisionId);
+            });
+
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
+
+            //EXECUTE 
+            dataApplicationService.AddMigrationHistoryDetailDataset(MockClasses.MockHistoryMontana(), MockClasses.MockRequestMontana(), MockClasses.MockResponseMontana());
+
+            //VERIFY ANYTHING CALLED WAS MOCKED
+            mr.VerifyAll();
+        }
+
+
+
+        [TestMethod]
+        public void Verify_MigrationHistoryDetail_Schemas_Inserted()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            //MOCK _datasetContext Calls
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+
+            //MAGIC HERE IS VERIFICATION THAT WHAT WAS ADDED TO CONTEXT IN UNIT TEST CALLED MATCHED the ASSERT
+            MigrationHistoryDetail historyDetailSchemaGlacier = MockClasses.MockHistoryDetailSchemaGlacier();
+            context.Setup(s => s.Add(It.Is<MigrationHistoryDetail>(x => x.SchemaId == MockClasses.MockHistoryDetailSchemaGlacier().SchemaId))).Callback<MigrationHistoryDetail>(x =>
+            {
+                Assert.AreEqual(historyDetailSchemaGlacier.SchemaId, x.SchemaId);
+                Assert.AreEqual(historyDetailSchemaGlacier.SchemaName, x.SchemaName);
+                Assert.AreEqual(historyDetailSchemaGlacier.SchemaRevisionName, x.SchemaRevisionName);
+            });
+
+            MigrationHistoryDetail historyDetailSchemaGreatFalls = MockClasses.MockHistoryDetailSchemaGreatFalls();
+            context.Setup(s => s.Add(It.Is<MigrationHistoryDetail>(x => x.SchemaId == MockClasses.MockHistoryDetailSchemaGreatFalls().SchemaId))).Callback<MigrationHistoryDetail>(x =>
+            {
+                Assert.AreEqual(historyDetailSchemaGreatFalls.SchemaId, x.SchemaId);
+                Assert.AreEqual(historyDetailSchemaGreatFalls.SchemaName, x.SchemaName);
+                Assert.AreEqual(historyDetailSchemaGreatFalls.SchemaRevisionName, x.SchemaRevisionName);
+            });
+
+            //ENSURE MigrationHistoryDetail is null
+            context.Setup(s => s.Add(It.Is<MigrationHistoryDetail>(x => x.SchemaId == MockClasses.MockHistoryDetailSchemaNewYork().SchemaId))).Callback<MigrationHistoryDetail>(x =>
+            {
+                Assert.IsNull(x.SchemaId);
+                Assert.IsNull(x.SchemaName);
+                Assert.IsNull(x.SchemaRevisionName);
+            });
+
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
+
+            //EXECUTE 
+            dataApplicationService.AddMigrationHistoryDetailSchemas(MockClasses.MockHistoryMontana(), MockClasses.MockRequestMontana(), MockClasses.MockResponseMontana());
+
+            //VERIFY ANYTHING CALLED WAS MOCKED
+            mr.VerifyAll();
+        }
+
+
 
         [TestMethod]
         public async Task MigrateDataset__NoPermissions_To_Migrate()

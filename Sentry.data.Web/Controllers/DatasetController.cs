@@ -294,7 +294,6 @@ namespace Sentry.data.Web.Controllers
                 DatasetDetailModel model = new DatasetDetailModel(dto)
                 {
                     DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
-                    DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue(),
                     DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue(),
                     DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
                     ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),

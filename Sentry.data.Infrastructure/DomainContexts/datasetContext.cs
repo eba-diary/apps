@@ -601,6 +601,23 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<MigrationHistory> MigrationHistory
+        {
+            get
+            {
+                return Query<MigrationHistory>();
+            }
+        }
+
+
+        public IQueryable<MigrationHistoryDetail> MigrationHistoryDetail
+        {
+            get
+            {
+                return Query<MigrationHistoryDetail>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();
