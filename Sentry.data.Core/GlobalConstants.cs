@@ -514,6 +514,7 @@ namespace Sentry.data.Core
             public const string TXT = "TXT";
             [Obsolete("Format not supported")]
             public const string XLSX = "XLSX"; //deprecated
+            public const string PARQUET = "PARQUET";
         }
 
         public static class DeleteFileResponseStatus

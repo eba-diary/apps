@@ -1099,4 +1099,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="SupportsPaging" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="65f63845-c442-4318-8492-fe0b2fa4af42" ChangeDateTime="02/15/2023 17:53:17">
+    <Property Name="ElementName" Value="[dbo].[DataAction].[TriggerStoragePrefix]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataAction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TriggerPrefix" />
+  </Operation>
 </Operations>

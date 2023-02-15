@@ -375,6 +375,11 @@
 
             });
             createSchemaLink.show();
+
+            $('#CreateSchema').click(function () {
+                $('#DataFlowFormContainer').hide();
+                data.DataFlow.RenderSchemaCreatePage($(".dataset-select").val());
+            });
         }
         else {
             var options;
@@ -383,11 +388,6 @@
             targetElement.html(options);
             createSchemaLink.hide();
         }
-
-        $('#CreateSchema').click(function () {
-            $('#DataFlowFormContainer').hide();
-            data.DataFlow.RenderSchemaCreatePage($(".dataset-select").val());
-        });
     },
 
     InitSchemaMaps(datasetId, schemaId) {

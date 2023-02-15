@@ -1097,8 +1097,15 @@ namespace Sentry.data.Core
             AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
             AddDataFlowStep(dto, df, DataActionType.QueryStorage);
 
-            ////Generate consumption layer steps
-            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            //Generate consumption layer steps
+            if (scm.Extension.Name == GlobalConstants.ExtensionNames.PARQUET)
+            {
+                AddDataFlowStep(dto, df, DataActionType.CopyToParquet);
+            }
+            else
+            {
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
         }
 
         private SchemaMap MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
@@ -1325,6 +1332,9 @@ namespace Sentry.data.Core
                 case DataActionType.ConvertParquet:
                     action = _datasetContext.ConvertToParquetAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
+                case DataActionType.CopyToParquet:
+                    action = _datasetContext.CopyToParquetAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
+                    break;
                 case DataActionType.UncompressZip:
                     action = _datasetContext.UncompressZipAction.GetAction(_dataFeatures, isHumanResources, datasetNamedEnviornmentType, checkNamedEnviornmentType);
                     break;
@@ -1430,7 +1440,7 @@ namespace Sentry.data.Core
             {
                 string datasetSaidAsset = GetDatasetSaidAsset(step.DataFlow.Id);
                 string datasetNamedEnv = GetDatasetNamedEnvironment(step.DataFlow.Id);
-                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{datasetSaidAsset}/{datasetNamedEnv}/{step.DataFlow.FlowStorageCode}/";
+                string triggerPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TriggerPrefix}{datasetSaidAsset}/{datasetNamedEnv}/{step.DataFlow.FlowStorageCode}/";
                 step.TriggerKey = triggerPrefix;
                 step.TriggerBucket = step.Action.TargetStorageBucket;
             }
@@ -1452,6 +1462,7 @@ namespace Sentry.data.Core
                 //These send output to schema aware storage
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
+                case DataActionType.CopyToParquet:
                     string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
                     step.TargetPrefix = $"{step.Action.TargetStoragePrefix}{GetDatasetSaidAsset(step.DataFlow.Id)}/{GetDatasetNamedEnvironment(step.DataFlow.Id)}/{schemaStorageCode}/";
                     step.TargetBucket = step.Action.TargetStorageBucket;
@@ -1566,8 +1577,15 @@ namespace Sentry.data.Core
             AddDataFlowStep(dto, df, DataActionType.SchemaLoad);
             AddDataFlowStep(dto, df, DataActionType.QueryStorage);
 
-            ////Generate consumption layer steps
-            AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            //Generate consumption layer steps
+            if (scm.Extension.Name == GlobalConstants.ExtensionNames.PARQUET)
+            {
+                AddDataFlowStep(dto, df, DataActionType.CopyToParquet);
+            }
+            else
+            {
+                AddDataFlowStep(dto, df, DataActionType.ConvertParquet);
+            }
 
         }
 

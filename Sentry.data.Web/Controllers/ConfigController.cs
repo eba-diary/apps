@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IAssociateInfoProvider _associateInfoProvider;
         private readonly IDatasetContext _datasetContext;
         private readonly IConfigService _configService;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly IEventService _eventService;
         private readonly IDatasetService _DatasetService;
         private readonly IObsidianService _obsidianService;
@@ -35,7 +35,7 @@ namespace Sentry.data.Web.Controllers
         #endregion
 
         #region Constructor
-        public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
+        public ConfigController(IDatasetContext dsCtxt, IUserService userService, IAssociateInfoProvider associateInfoService,
             IConfigService configService, IEventService eventService, IDatasetService datasetService, 
             IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
             IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService, IDataSourceService dataSourceService)
@@ -246,7 +246,7 @@ namespace Sentry.data.Web.Controllers
 
                 dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
+                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags, dfcm.FileExtensionID);
                 dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
                 dfcm.FileExtensionReadonly = dfcm.ExtensionList.Where(s => s.Value == dfcm.FileExtensionID.ToString()).Select(n => n.Text).FirstOrDefault();
 
@@ -278,41 +278,12 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
+            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags, edfc.FileExtensionID);
             edfc.DatasetScopeReadonly = edfc.AllDatasetScopeTypes.Where(s => s.Value == edfc.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
             ViewBag.ModifyType = "Edit";
 
             return PartialView("_EditConfigFile", edfc);
         }
-
-        //[HttpPost]
-        //[Route("Config/Edit/{configId}")]
-        //[AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        //public ActionResult Edit(EditDatasetFileConfigModel edfc)
-        //{
-        //    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
-
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
-        //            dfc.FileTypeId = edfc.FileTypeId;
-        //            dfc.Description = edfc.ConfigFileDesc;
-        //            dfc.FileExtension = _datasetContext.GetById<FileExtension>(edfc.FileExtensionID);
-        //            _datasetContext.SaveChanges();
-
-        //            return RedirectToAction("Index", new { id = edfc.DatasetId });
-        //        }
-        //    }
-        //    catch (Sentry.Core.ValidationException ex)
-        //    {
-        //        AddCoreValidationExceptionsToModel(ex);
-        //        _datasetContext.Clear();
-        //    }
-
-        //    return View(edfc);
-        //}
 
         [HttpGet]
         [Route("Config/{configId}/Job/Create")]
@@ -1048,37 +1019,38 @@ namespace Sentry.data.Web.Controllers
 
             switch (fe.Name)
             {
-                case GlobalConstants.ExtensionNames.CSV:
+                case ExtensionNames.CSV:
                     model.IsPositional = true;
                     model.IsFixedWidth = false;
                     break;
-                case GlobalConstants.ExtensionNames.ANY:
-                case GlobalConstants.ExtensionNames.DELIMITED:
-                case GlobalConstants.ExtensionNames.TXT:
+                case ExtensionNames.ANY:
+                case ExtensionNames.DELIMITED:
+                case ExtensionNames.TXT:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     break;
-                case GlobalConstants.ExtensionNames.FIXEDWIDTH:
+                case ExtensionNames.FIXEDWIDTH:
                     model.IsPositional = true;
                     model.IsFixedWidth = true;
                     break;
-                case GlobalConstants.ExtensionNames.JSON:
-                case GlobalConstants.ExtensionNames.XML:
+                case ExtensionNames.JSON:
+                case ExtensionNames.XML:
+                case ExtensionNames.PARQUET:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
-                    model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    model.ValidDatatypes.Add(new DataTypeModel(Datatypes.STRUCT, "A struct", "Complex Data Types"));
                     break;
                 default:
                     break;
             }
 
             //Common datatypes across all FileExtensions
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }
@@ -1141,7 +1113,7 @@ namespace Sentry.data.Web.Controllers
         {
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
             dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags);
             dfcm.Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
         }
 

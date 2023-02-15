@@ -286,12 +286,14 @@ namespace Sentry.data.Web.Helpers
             }
             return items;
         }
+
         public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
             return items;
         }
+
         public static IEnumerable<SelectListItem> GetDatasetScopeTypesListItems(IDatasetContext _datasetContext, int id = -1)
         {
             IEnumerable<SelectListItem> dScopeTypes;
@@ -313,18 +315,18 @@ namespace Sentry.data.Web.Helpers
 
             return dScopeTypes;
         }
-        public static IEnumerable<SelectListItem> GetFileExtensionListItems(IDatasetContext _datasetContext, int id = -1)
-        {
 
+        public static IEnumerable<SelectListItem> GetFileExtensionListItems(IDatasetContext _datasetContext, IDataFeatures features, int id = -1)
+        {
             IEnumerable<SelectListItem> dFileExtensions;
 
             if (id == -1)
             {
                 dFileExtensions = _datasetContext.FileExtensions
-                    .Where(fe => fe.Name != GlobalConstants.ExtensionNames.XLSX && fe.Name != GlobalConstants.ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
+                    .Where(fe => fe.Name != ExtensionNames.XLSX && fe.Name != ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains(GlobalConstants.ExtensionNames.ANY) ? true : false,
+                        Selected = c.Name.Contains(ExtensionNames.ANY),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
@@ -332,17 +334,23 @@ namespace Sentry.data.Web.Helpers
             else
             {
                 dFileExtensions = _datasetContext.FileExtensions
-                    .Where(fe => fe.Name != GlobalConstants.ExtensionNames.XLSX && fe.Name != GlobalConstants.ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
+                    .Where(fe => fe.Name != ExtensionNames.XLSX && fe.Name != ExtensionNames.ANY) //filtering these out to prevent users from choosing them, while we need to support supplementary "ANY" schemas currently
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Id == id ? true : false,
+                        Selected = c.Id == id,
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
             }
 
+            if (!features.CLA4925_ParquetFileType.GetValue())
+            {
+                dFileExtensions = dFileExtensions.Where(x => x.Text != ExtensionNames.PARQUET);
+            }
+
             return dFileExtensions.OrderByDescending(x => x.Selected);
         }
+
         public static RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
         {
             Compression compression = new Compression()

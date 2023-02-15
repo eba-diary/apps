@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
         public IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
         public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
-
+        public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
 
         public DataFeatures(UserService userService, ILdClient ldClient)
         {
@@ -82,6 +82,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3945_Telematics = new BooleanFeatureFlagAmbientContext("CLA3945_Telematics", false, _ldClient, () => LdUser);
             CLA2868_APIPaginationSupport = new BooleanFeatureFlagAmbientContext("CLA2868_APIPaginationSupport", false, _ldClient, () => LdUser);
             CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
+            CLA4925_ParquetFileType = new BooleanFeatureFlagAmbientContext("CLA4925_ParquetFileType", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
