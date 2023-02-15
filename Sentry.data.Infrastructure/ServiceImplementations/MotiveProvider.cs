@@ -20,15 +20,17 @@ namespace Sentry.data.Infrastructure
         private readonly IDatasetContext _datasetContext;
         private readonly IDataFlowService _dataFlowService;
         private readonly IAuthorizationProvider _authorizationProvider;
+        private readonly IDataFeatures _featureFlags;
 
 
-        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider)
+        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider, IDataFeatures featureFlags)
         {
             client = httpClient;
             _s3ServiceProvider = s3ServiceProvider;
             _datasetContext = datasetContext;
             _dataFlowService = dataFlowService;
             _authorizationProvider = authorizationProvider;
+            _featureFlags = featureFlags;
         }
 
         public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
@@ -48,9 +50,11 @@ namespace Sentry.data.Infrastructure
                         JArray companies = (JArray)responseObject["companies"];
                         JObject firstCompany = (JObject)companies[0];
                         token.TokenName = firstCompany.GetValue("company").Value<string>("name");
-
-                        var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
-                        _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                        if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
+                        {
+                            var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
+                            _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                        }
                     }
                 }
                 _datasetContext.SaveChanges();

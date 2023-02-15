@@ -98,7 +98,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken((HTTPSSource)job.DataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            GoogleSearchConsoleJobProvider provider = new GoogleSearchConsoleJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            GoogleSearchConsoleJobProvider provider = new GoogleSearchConsoleJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -220,7 +223,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken((HTTPSSource)job.DataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            GoogleSearchConsoleJobProvider provider = new GoogleSearchConsoleJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            GoogleSearchConsoleJobProvider provider = new GoogleSearchConsoleJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -336,7 +342,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken((HTTPSSource)job.DataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            GoogleSearchConsoleJobProvider provider = new GoogleSearchConsoleJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            GoogleSearchConsoleJobProvider provider = new GoogleSearchConsoleJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 

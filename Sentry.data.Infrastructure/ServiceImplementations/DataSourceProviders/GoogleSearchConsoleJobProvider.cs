@@ -11,7 +11,7 @@ namespace Sentry.data.Infrastructure
     {
         private UTF8Encoding UTF8NoBOM;
 
-        public GoogleSearchConsoleJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IFileProvider fileProvider) : base(datasetContext, s3ServiceProvider, authorizationProvider, httpClientGenerator, fileProvider)
+        public GoogleSearchConsoleJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IFileProvider fileProvider, IDataFeatures featureFlags) : base(datasetContext, s3ServiceProvider, authorizationProvider, httpClientGenerator, fileProvider, featureFlags)
         {
         }
 
