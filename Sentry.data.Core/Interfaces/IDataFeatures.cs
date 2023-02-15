@@ -40,5 +40,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
         IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
         IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
+        IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
     }
 }

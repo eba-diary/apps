@@ -47,6 +47,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
         public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
         public IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
+        public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
 
 
         public DataFeatures(UserService userService, ILdClient ldClient)
