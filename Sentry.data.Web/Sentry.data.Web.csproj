@@ -813,6 +813,7 @@
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fields.css" />
     <Content Include="Content\home.css" />
+    <Content Include="Content\migration.css" />
     <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
     <Content Include="Images\Category\hr.png" />
     <Content Include="Images\Category\hr.svg" />

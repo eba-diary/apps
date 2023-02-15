@@ -16,7 +16,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage { get; }
         IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
         IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
-        IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
         IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
@@ -39,5 +38,7 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3945_Telematics { get; }
         IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
         IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
+        IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
+        IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
     }
 }

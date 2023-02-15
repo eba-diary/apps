@@ -151,15 +151,21 @@ namespace Sentry.data.Core
         void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList);
         IDictionary<int, string> GetSchemaList();
         /// <summary>
-        /// Creates jobs to create new consumption layer(s) for a schema.
+        /// Create or Update consumption layer(s) for each schema.
         /// </summary>
-        /// <param name="schemaIdList">List of schemas to create a job for.</param>
-        void CreateConsumptionLayersForSchemaList(int[] schemaIdList);
+        /// <remarks>
+        /// It is callers responsibility to sync consumption layer if necessary (e.g. with Snowflake)
+        /// </remarks>
+        /// <param name="schemaIdList">List of schemas.</param>
+        void CreateOrUpdateConsumptionLayersForSchema(int[] schemaIdList);
         /// <summary>
-        /// Creates new consumption layer(s) for a schema.
+        /// Create or Update consumption layer(s) for a schema.
         /// </summary>
+        /// <remarks>
+        /// It is callers responsibility to sync consumption layer if necessary (e.g. with Snowflake)
+        /// </remarks>
         /// <param name="schemaId">Schema ID</param>
-        void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
+        void CreateOrUpdateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
 
         (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName);
     }

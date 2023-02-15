@@ -73,7 +73,6 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3497_UniqueLivySessionName => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS => throw new NotImplementedException();
-            public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3553_SchemaSearch => throw new NotImplementedException();
@@ -96,6 +95,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3945_Telematics => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA2868_APIPaginationSupport => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4485_DropCompaniesFile => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA2869_AllowMotiveJobs => new MockBooleanFeatureFlag(true);
         }
     }
 }

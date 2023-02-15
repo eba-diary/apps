@@ -3,6 +3,10 @@
     font-size: 15px;
 }
 
+#MigrationResponseTable_wrapper .table, #MigrationResponseTable_wrapper .table caption, #MigrationResponseTable_wrapper .dataTables_info {
+    padding-left: 10px;
+    padding-right: 10px;
+}
 
 #MigrationResponseTable tr.group {
     background-color: #ddd;
