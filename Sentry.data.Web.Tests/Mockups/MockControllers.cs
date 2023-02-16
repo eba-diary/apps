@@ -1,4 +1,4 @@
-﻿using Rhino.Mocks;
+﻿using Moq;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Controllers;
@@ -13,35 +13,32 @@ namespace Sentry.data.Web.Tests
     {
         public static DataAssetController MockDataAssetController(DataAsset da, IApplicationUser user = null)
         {
-            List<DataAsset> daList = new List<DataAsset>();
-            daList.Add(da);
+            List<DataAsset> daList = new List<DataAsset> { da };
 
-            var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
-            var mockAssociateService = MockRepository.GenerateStub<IAssociateInfoProvider>();
-            var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
-            var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
-            var mockMetadataRepositoryProvider = MockRepository.GenerateStub<IMetadataRepositoryProvider>();
-            var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
-            var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
+            MockRepository mr = new MockRepository(MockBehavior.Default);
 
-            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>(mockMetadataRepositoryProvider);
-            var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
+            var mockDatasetContext = mr.Create<IDatasetContext>();
+            var mockAssociateService = mr.Create<IAssociateInfoProvider>();
+            var mockMetadataRepositoryProvider = mr.Create<IMetadataRepositoryProvider>();
+            var mockDataAssetContext = mr.Create<IDataAssetContext>();
 
-            mockDataAssetContext.Stub(x => x.GetDataAsset(da.Name)).Return(da);
-            mockDataAssetContext.Stub(x => x.GetDataAsset(da.Id)).Return(da);
-            mockDataAssetContext.Stub(x => x.GetDataAssets()).Return(daList);
-            mockDataAssetContext.Stub(x => x.GetAssetNotificationsByDataAssetId(da.Id)).Return(da.AssetNotifications);
+            var mockMetadataRepositoryService = new MetadataRepositoryService(mockMetadataRepositoryProvider.Object);
+            var mockUserService = mr.Create<IUserService>();
 
-            mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
-            mockDatasetContext.Stub(x => x.EventStatus).Return(MockClasses.MockEventStatuses().AsQueryable());
+            mockDataAssetContext.Setup(x => x.GetDataAsset(da.Name)).Returns(da);
+            mockDataAssetContext.Setup(x => x.GetDataAsset(da.Id)).Returns(da);
+            mockDataAssetContext.Setup(x => x.GetDataAssets()).Returns(daList);
+            mockDataAssetContext.Setup(x => x.GetAssetNotificationsByDataAssetId(da.Id)).Returns(da.AssetNotifications);
 
-            mockDataAssetContext.Stub(x => x.GetAssetNotificationByID(da.AssetNotifications[0].NotificationId)).Return(da.AssetNotifications[0]);
+            mockDatasetContext.Setup(x => x.EventTypes).Returns(MockClasses.MockEventTypes().AsQueryable());
+            mockDatasetContext.Setup(x => x.EventStatus).Returns(MockClasses.MockEventStatuses().AsQueryable());
 
-            mockSharedContextModel.CurrentUser = user != null ? user : MockUsers.App_DataMgmt_Admin_User();
-            mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
+            mockDataAssetContext.Setup(x => x.GetAssetNotificationByID(da.AssetNotifications[0].NotificationId)).Returns(da.AssetNotifications[0]);
 
-            var dac = new DataAssetController(mockMetadataRepositoryService, mockDataAssetContext, mockDatasetContext, mockAssociateService, mockUserService);
-            dac.SharedContext = mockSharedContextModel;
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User());
+
+            var dac = new DataAssetController(mockMetadataRepositoryService, mockDataAssetContext.Object, mockDatasetContext.Object, mockAssociateService.Object, mockUserService.Object);
+            dac.SharedContext = new SharedContextModel { CurrentUser = user };
 
             return dac;
         }
@@ -49,118 +46,105 @@ namespace Sentry.data.Web.Tests
         public static DatasetController MockDatasetController(Dataset ds, IApplicationUser user, List<DatasetSubscription> datasetSubscriptions = null)
         {
             Random r = new Random();
+            MockRepository mr = new MockRepository(MockBehavior.Default);
 
-            var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
-            var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
-            var mockAssociateService = MockRepository.GenerateStub<IAssociateInfoProvider>();
-            var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
-            var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
+            var mockDatasetContext = mr.Create<IDatasetContext>();
+            var mockAssociateService = mr.Create<IAssociateInfoProvider>();
 
-            var mockObsidianService = MockRepository.GenerateStub<IObsidianService>();
-            var mockS3Provider = MockRepository.GenerateStub<S3ServiceProvider>();
+            var mockObsidianService = mr.Create<IObsidianService>();
+            var mockS3Provider = mr.Create<S3ServiceProvider>();
 
-            var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
-            var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
+            var mockUserService = mr.Create<IUserService>();
 
-            var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
-            var mockConfigService = MockRepository.GenerateStub<IConfigService>();
+            var mockDatasetService = mr.Create<IDatasetService>();
+            var mockConfigService = mr.Create<IConfigService>();
             
-            var mockEventService = MockRepository.GenerateStub<IEventService>();
+            var mockEventService = mr.Create<IEventService>();
 
-            var mockFeatureFlag = new Moq.Mock<IDataFeatures>();
+            var mockFeatureFlag = new Mock<IDataFeatures>();
 
-            mockSharedContextModel.CurrentUser = user;
-            mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User());
 
-            mockAssociateService.Stub(x => x.GetAssociateInfo(user.AssociateId)).Return(new Associates.Associate() { FullName = "Bill Nye" });
+            mockAssociateService.Setup(x => x.GetAssociateInfo(user.AssociateId)).Returns(new Associates.Associate() { FullName = "Bill Nye" });
 
             if (ds != null)
             {
-                List<Dataset> dsList = new List<Dataset>();
-                dsList.Add(ds);
+                List<Dataset> dsList = new List<Dataset> { ds };
 
-                mockDatasetContext.Stub(x => x.Datasets).Return(dsList.AsQueryable());
-                mockDatasetContext.Stub(x => x.GetDatasetCount()).Return(dsList.Count);
-                mockDatasetContext.Stub(x => x.GetById(ds.DatasetId)).Return(ds);
-                mockDatasetContext.Stub(x => x.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId)).Return(datasetSubscriptions == null ? new List<DatasetSubscription>() : datasetSubscriptions);
+                mockDatasetContext.Setup(x => x.Datasets).Returns(dsList.AsQueryable());
+                mockDatasetContext.Setup(x => x.GetDatasetCount()).Returns(dsList.Count);
+                mockDatasetContext.Setup(x => x.GetById(ds.DatasetId)).Returns(ds);
+                mockDatasetContext.Setup(x => x.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId)).Returns(datasetSubscriptions ?? new List<DatasetSubscription>());
             }
 
-            mockDatasetContext.Stub(x => x.Merge<Dataset>(ds)).Return(ds);
-            mockDatasetContext.Stub(x => x.Events).Return(new List<Event>().AsQueryable());
-            mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
-            mockDatasetContext.Stub(x => x.GetAllIntervals()).Return(MockClasses.MockIntervals());
-            mockDatasetContext.Stub(x => x.GetInterval("Never")).Return(MockClasses.MockIntervals().FirstOrDefault(x =>x.Description == "Never"));
-            mockDatasetContext.Stub(x => x.EventStatus).Return(MockClasses.MockEventStatuses().AsQueryable());
-            mockDatasetContext.Stub(x => x.FileExtensions).Return(MockClasses.MockFileExtensions().AsQueryable());
-            mockDatasetContext.Stub(x => x.DataSources).Return(MockClasses.MockDataSources().AsQueryable());
-            mockDatasetContext.Stub(x => x.Categories).Return(MockClasses.MockCategories().AsQueryable());
-            mockDatasetContext.Stub(x => x.GetCategoryById(0)).Return(MockClasses.MockCategories()[0]);
-            mockDatasetContext.Stub(x => x.GetAllDatasetScopeTypes()).Return(MockClasses.MockScopeTypes());
-            mockDatasetContext.Stub(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.DatasetCategories.First().Name)).Return(false);
-            mockDatasetContext.Stub(x => x.GetNextStorageCDE()).Return(r.Next(0, 1000000));
+            mockDatasetContext.Setup(x => x.Merge<Dataset>(ds)).Returns(ds);
+            mockDatasetContext.Setup(x => x.Events).Returns(new List<Event>().AsQueryable());
+            mockDatasetContext.Setup(x => x.EventTypes).Returns(MockClasses.MockEventTypes().AsQueryable());
+            mockDatasetContext.Setup(x => x.GetAllIntervals()).Returns(MockClasses.MockIntervals());
+            mockDatasetContext.Setup(x => x.GetInterval("Never")).Returns(MockClasses.MockIntervals().FirstOrDefault(x =>x.Description == "Never"));
+            mockDatasetContext.Setup(x => x.EventStatus).Returns(MockClasses.MockEventStatuses().AsQueryable());
+            mockDatasetContext.Setup(x => x.FileExtensions).Returns(MockClasses.MockFileExtensions().AsQueryable());
+            mockDatasetContext.Setup(x => x.DataSources).Returns(MockClasses.MockDataSources().AsQueryable());
+            mockDatasetContext.Setup(x => x.Categories).Returns(MockClasses.MockCategories().AsQueryable());
+            mockDatasetContext.Setup(x => x.GetCategoryById(0)).Returns(MockClasses.MockCategories()[0]);
+            mockDatasetContext.Setup(x => x.GetAllDatasetScopeTypes()).Returns(MockClasses.MockScopeTypes());
+            mockDatasetContext.Setup(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.DatasetCategories.First().Name)).Returns(false);
+            mockDatasetContext.Setup(x => x.GetNextStorageCDE()).Returns(r.Next(0, 1000000));
 
-            mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user);
 
-            var updateSearchPagesFeature = new Moq.Mock<IFeatureFlag<bool>>();
+            var updateSearchPagesFeature = new Mock<IFeatureFlag<bool>>();
             updateSearchPagesFeature.Setup(x => x.GetValue()).Returns(false);
             mockFeatureFlag.SetupGet(x => x.CLA3756_UpdateSearchPages).Returns(updateSearchPagesFeature.Object);
 
-            var exposeDataFlowFeature = new Moq.Mock<IFeatureFlag<bool>>();
+            var exposeDataFlowFeature = new Mock<IFeatureFlag<bool>>();
             exposeDataFlowFeature.Setup(x => x.GetValue()).Returns(false);
             mockFeatureFlag.SetupGet(x => x.Expose_Dataflow_Metadata_CLA_2146).Returns(exposeDataFlowFeature.Object);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, 
-                mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService,
+            var dsc = new DatasetController(mockDatasetContext.Object, mockS3Provider.Object, mockUserService.Object, 
+                mockAssociateService.Object, mockObsidianService.Object, mockDatasetService.Object, mockEventService.Object, mockConfigService.Object,
                 mockFeatureFlag.Object, null, null, null, null, null, null);
-            dsc.SharedContext = mockSharedContextModel;
+            dsc.SharedContext = new SharedContextModel { CurrentUser = user };
 
             return dsc;
         }
 
         public static ConfigController MockConfigController(DatasetFileConfig dfc, IApplicationUser user)
         {
-            var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
-            var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
-            var mockAssociateService = MockRepository.GenerateStub<IAssociateInfoProvider>();
-            var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
-            var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
+            MockRepository mr = new MockRepository(MockBehavior.Default);
+            var mockDatasetContext = mr.Create<IDatasetContext>();
+            var mockAssociateService = mr.Create<IAssociateInfoProvider>();
 
-            var mockS3Provider = MockRepository.GenerateStub<S3ServiceProvider>();
-            var mockConfigService = MockRepository.GenerateStub<IConfigService>();
-            var mockEvensService = MockRepository.GenerateStub<IEventService>();
-            var mockDataFeatures = MockRepository.GenerateStub<IDataFeatures>();
+            var mockConfigService = mr.Create<IConfigService>();
+            var mockEvensService = mr.Create<IEventService>();
+            var mockDataFeatures = mr.Create<IDataFeatures>();
+            mockDataFeatures.Setup(x => x.CLA4925_ParquetFileType.GetValue()).Returns(true);
 
-            var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
-            var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
-            var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
-            var mockObsidianService = MockRepository.GenerateStub<IObsidianService>();
-            var mockSecurityService = MockRepository.GenerateStub<ISecurityService>();
-            var mockSchemaService = MockRepository.GenerateStub<ISchemaService>();
-
-            mockSharedContextModel.CurrentUser = user;
+            var mockUserService = mr.Create<IUserService>();
+            var mockDatasetService = mr.Create<IDatasetService>();
+            var mockObsidianService = mr.Create<IObsidianService>();
+            var mockSecurityService = mr.Create<ISecurityService>();
+            var mockSchemaService = mr.Create<ISchemaService>();
 
             var ds = dfc.ParentDataset;
 
             if (ds != null)
             {
-                List<Dataset> dsList = new List<Dataset>();
-                dsList.Add(ds);
-
-                mockDatasetContext.Stub(x => x.GetById(ds.DatasetId)).Return(ds);
-                mockDatasetContext.Stub(x => x.GetById<Dataset>(ds.DatasetId)).Return(ds);
-                mockDatasetContext.Stub(x => x.getDatasetFileConfigs(dfc.ConfigId)).Return(dfc);
-                mockDatasetContext.Stub(x => x.GetAllDatasetScopeTypes()).Return(new List<DatasetScopeType>());
+                mockDatasetContext.Setup(x => x.GetById(ds.DatasetId)).Returns(ds);
+                mockDatasetContext.Setup(x => x.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+                mockDatasetContext.Setup(x => x.getDatasetFileConfigs(dfc.ConfigId)).Returns(dfc);
+                mockDatasetContext.Setup(x => x.GetAllDatasetScopeTypes()).Returns(new List<DatasetScopeType>());
             }
 
-            mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
-            mockDatasetContext.Stub(x => x.EventStatus).Return(MockClasses.MockEventStatuses().AsQueryable());
-            mockDatasetContext.Stub(x => x.FileExtensions).Return(MockClasses.MockFileExtensions().AsQueryable());
+            mockDatasetContext.Setup(x => x.EventTypes).Returns(MockClasses.MockEventTypes().AsQueryable());
+            mockDatasetContext.Setup(x => x.EventStatus).Returns(MockClasses.MockEventStatuses().AsQueryable());
+            mockDatasetContext.Setup(x => x.FileExtensions).Returns(MockClasses.MockFileExtensions().AsQueryable());
 
-            mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User());
 
-            var cc = new ConfigController(mockDatasetContext, mockUserService, mockAssociateService, mockConfigService, mockEvensService, 
-                mockDatasetService, mockObsidianService, mockSecurityService, mockSchemaService, mockDataFeatures, null, null);
-            cc.SharedContext = mockSharedContextModel;
+            var cc = new ConfigController(mockDatasetContext.Object, mockUserService.Object, mockAssociateService.Object, mockConfigService.Object, mockEvensService.Object, 
+                mockDatasetService.Object, mockObsidianService.Object, mockSecurityService.Object, mockSchemaService.Object, mockDataFeatures.Object, null, null);
+            cc.SharedContext = new SharedContextModel { CurrentUser = user };
 
             return cc;
         }

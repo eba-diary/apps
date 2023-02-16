@@ -312,6 +312,7 @@
     <Compile Include="Mappings\MigrationHistory\MigrationHistoryDetailMapping.cs" />
     <Compile Include="Mappings\MigrationHistory\MigrationHistoryMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\CopyToParquetMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\FixedWidthActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleSearchConsoleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleBigQueryApiActionMapping.cs" />

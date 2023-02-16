@@ -16,11 +16,11 @@ namespace Sentry.data.Web.Controllers
         public readonly IDataAssetContext _dataAssetContext;
         public readonly IDatasetContext _dataSetContext;
         public readonly IAssociateInfoProvider _associateInfoService;
-        public readonly UserService _userService;
+        public readonly IUserService _userService;
         #endregion
 
         #region Constructor
-        public DataAssetController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, IDatasetContext datasetContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public DataAssetController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, IDatasetContext datasetContext, IAssociateInfoProvider associateInfoService, IUserService userService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dataAssetContext = dataAssetContext;
