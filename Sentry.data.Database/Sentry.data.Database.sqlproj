@@ -335,6 +335,7 @@
     <Build Include="Scripts\Pre-Deploy\_PreDeployment.sql" />
     <Build Include="Tables\MigrationHistory.sql" />
     <Build Include="Tables\MigrationHistoryDetail.sql" />
+    <Build Include="Scripts\Post-Deploy\StaticData\ApplicationConfigurationProperties.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
