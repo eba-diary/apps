@@ -84,6 +84,8 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3945_Telematics = new BooleanFeatureFlagAmbientContext("CLA3945_Telematics", false, _ldClient, () => LdUser);
             CLA2868_APIPaginationSupport = new BooleanFeatureFlagAmbientContext("CLA2868_APIPaginationSupport", false, _ldClient, () => LdUser);
             CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
+            CLA4485_DropCompaniesFile = new BooleanFeatureFlagAmbientContext("CLA4485_DropCompaniesFile", false, _ldClient, () => LdUser);
+            CLA2869_AllowMotiveJobs = new BooleanFeatureFlagAmbientContext("CLA2869_AllowMotiveJobs", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
