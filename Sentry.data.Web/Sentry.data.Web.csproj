@@ -526,11 +526,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\Dataset\DatasetProfile.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestModel.cs" />
+    <Compile Include="API\Dataset\DatasetProfile.cs" />
+    <Compile Include="API\Dataset\DatasetModel.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetResponseModel.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidator.cs" />
-    <Compile Include="API\Dataset\DatasetRequestModel.cs" />
+    <Compile Include="API\Dataset\BaseDatasetModel.cs" />
+    <Compile Include="API\Dataset\DatasetResponseModel.cs" />
+    <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestModel.cs" />
+    <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidator.cs" />
+    <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

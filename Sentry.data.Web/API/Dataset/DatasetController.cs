@@ -1,14 +1,9 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Sentry.data.Core;
 using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 

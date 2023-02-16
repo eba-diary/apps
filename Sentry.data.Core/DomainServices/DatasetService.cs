@@ -351,6 +351,8 @@ namespace Sentry.data.Core
 
         public async Task<DatasetResultDto> AddDatasetAsync(DatasetDto datasetDto)
         {
+            datasetDto.UploadUserId = _userService.GetCurrentUser().AssociateId;
+
             Dataset dataset = CreateDataset(datasetDto);
 
             await _datasetContext.AddAsync(dataset);
@@ -785,7 +787,6 @@ namespace Sentry.data.Core
             Dataset ds = new Dataset()
             {
                 DatasetId = dto.DatasetId,
-                DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList(),
                 DatasetName = dto.DatasetName,
                 ShortName = dto.ShortName,
                 DatasetDesc = dto.DatasetDesc,
@@ -810,6 +811,15 @@ namespace Sentry.data.Core
                 NamedEnvironmentType = dto.NamedEnvironmentType,
                 AlternateContactEmail = dto.AlternateContactEmail
             };
+
+            if (dto.DatasetCategoryIds?.Any() == true)
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList();
+            }
+            else if (!string.IsNullOrEmpty(dto.CategoryName))
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name == dto.CategoryName).ToList();
+            }
 
             switch (dto.DataClassification)
             {

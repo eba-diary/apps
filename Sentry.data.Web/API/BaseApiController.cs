@@ -25,7 +25,7 @@ namespace Sentry.data.Web.API
         /// <item><description>Maps service method's resulting DTO to response view model</description></item>
         /// </list>
         /// </summary>
-        /// <typeparam name="dtoOut">Type of service method's OUT DTO</typeparam>
+        /// <typeparam name="dtoOut">Output type of service method</typeparam>
         /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="id">ID of the resource to be used by service method</param>
         /// <param name="service">Service method that takes single integer parameter to execute</param>
@@ -66,8 +66,8 @@ namespace Sentry.data.Web.API
         /// </list>
         /// </summary>
         /// <typeparam name="modelIn">Type of request view model</typeparam>
-        /// <typeparam name="dtoIn">Type of service method's IN DTO</typeparam>
-        /// <typeparam name="dtoOut">Type of service method's OUT DTO</typeparam>
+        /// <typeparam name="dtoIn">Input type for the service method</typeparam>
+        /// <typeparam name="dtoOut">Output type of service method</typeparam>
         /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="id">ID of the resource to be used by service method</param>
         /// <param name="requestModel">Request view model</param>
@@ -92,7 +92,7 @@ namespace Sentry.data.Web.API
         /// </list>
         /// </summary>
         /// <typeparam name="modelIn">Type of request view model</typeparam>
-        /// <typeparam name="dtoInOut">Type of service method's IN and OUT DTO</typeparam>
+        /// <typeparam name="dtoInOut">Input and output type for the service method</typeparam>
         /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="requestModel">Request view model</param>
         /// <param name="service">Service method with same IN and OUT DTO type</param>
@@ -111,8 +111,8 @@ namespace Sentry.data.Web.API
         /// </list>
         /// </summary>
         /// <typeparam name="modelIn">Type of request view model</typeparam>
-        /// <typeparam name="dtoIn">Type of service method's IN DTO</typeparam>
-        /// <typeparam name="dtoOut">Type of service method's OUT DTO</typeparam>
+        /// <typeparam name="dtoIn">Input type for the service method</typeparam>
+        /// <typeparam name="dtoOut">Output type of service method</typeparam>
         /// <typeparam name="modelOut">Type of response view model</typeparam>
         /// <param name="requestModel">Request view model</param>
         /// <param name="service">Service method with different IN and OUT DTO types</param>
