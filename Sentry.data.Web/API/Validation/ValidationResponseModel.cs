@@ -45,7 +45,7 @@ namespace Sentry.data.Web.API
             }
         }
 
-        public ValidationResponseModel Requires(Expression<Func<string>> getPropertyValue)
+        public ValidationResponseModel Required(Expression<Func<string>> getPropertyValue)
         {
             if (string.IsNullOrWhiteSpace(getPropertyValue.Compile()()))
             {

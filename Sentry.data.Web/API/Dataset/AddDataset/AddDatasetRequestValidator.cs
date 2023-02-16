@@ -17,19 +17,19 @@ namespace Sentry.data.Web.API
         {
             ValidationResponseModel validationResponse = new ValidationResponseModel();
 
-            validationResponse.Requires(() => requestModel.DatasetName)
-                .Requires(() => requestModel.DatasetDescription)
-                .Requires(() => requestModel.ShortName)
+            validationResponse.Required(() => requestModel.DatasetName)
+                .Required(() => requestModel.DatasetDescription)
+                .Required(() => requestModel.ShortName)
                 .MaxLength(() => requestModel.ShortName, 12)
                 .RegularExpression(() => requestModel.ShortName, "^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed")
-                .Requires(() => requestModel.SaidAssetCode)
-                .Requires(() => requestModel.CategoryName)
-                .Requires(() => requestModel.OriginationCode)
-                .Requires(() => requestModel.DataClassificationTypeCode)
-                .Requires(() => requestModel.OriginalCreator)
-                .Requires(() => requestModel.NamedEnvironment)
+                .Required(() => requestModel.SaidAssetCode)
+                .Required(() => requestModel.CategoryName)
+                .Required(() => requestModel.OriginationCode)
+                .Required(() => requestModel.DataClassificationTypeCode)
+                .Required(() => requestModel.OriginalCreator)
+                .Required(() => requestModel.NamedEnvironment)
                 .RegularExpression(() => requestModel.NamedEnvironment, "^[A-Z0-9]{1,10}$", "Must be alphanumeric, all caps, and less than 10 characters")
-                .Requires(() => requestModel.NamedEnvironmentTypeCode)
+                .Required(() => requestModel.NamedEnvironmentTypeCode)
                 .MaxLength(() => requestModel.UsageInformation, 4096);
 
             //dataset name exists
