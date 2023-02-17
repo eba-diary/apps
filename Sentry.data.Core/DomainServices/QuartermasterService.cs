@@ -1,9 +1,11 @@
-﻿using Sentry.Core;
+﻿using Nest;
+using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -11,7 +13,7 @@ namespace Sentry.data.Core
     /// <summary>
     /// Domain Service responsible for interactions with Quartermaster
     /// </summary>
-    public class QuartermasterService:IQuartermasterService
+    public class QuartermasterService : IQuartermasterService
     {
         private readonly IClient _quartermasterClient;
         private readonly IDataFeatures _dataFeatures;
@@ -32,11 +34,13 @@ namespace Sentry.data.Core
         public async Task<ValidationResults> VerifyNamedEnvironmentAsync(string saidAssetKeyCode, string namedEnvironment, NamedEnvironmentType namedEnvironmentType)
         {
             var results = new ValidationResults();
+
             //validate parameters
             if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
             {
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset Key Code is required.");
             }
+
             if (string.IsNullOrWhiteSpace(namedEnvironment))
             {
                 results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, "Named Environment is required.");
@@ -44,20 +48,9 @@ namespace Sentry.data.Core
 
             if (results.GetAll().Count == 0)
             {
-                var namedEnvironmentList = (await GetNamedEnvironmentsAsync(saidAssetKeyCode)).ToList();
-                if (namedEnvironmentList.Any())
-                {
-                    if (!namedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
-                    {
-                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}.");
-                    }
-                    else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
-                    {
-                        var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
-                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType.ToString()}\")");
-                    }
-                }
+                results.MergeInResults(await ValidateNamedEnvironmentAsync(saidAssetKeyCode, namedEnvironment, namedEnvironmentType));
             }
+
             return results;
         }
 
@@ -99,6 +92,38 @@ namespace Sentry.data.Core
                 }).ToList();
             }
             return GetNamedEnvironmentsInternalAsync();
+        }
+
+        /// <summary>
+        /// If the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
+        /// </summary>
+        /// <param name="saidAssetKeyCode">The 4-digit SAID asset key code</param>
+        /// <param name="namedEnvironment">The named environment to validate</param>
+        /// <param name="namedEnvironmentType">The named environment type to validate</param>
+        /// <returns>A list of ValidationResults. These should be merged into any existing ValidationResults.</returns>
+        public async Task<ValidationResults> ValidateNamedEnvironmentAsync(string saidAssetKeyCode, string namedEnvironment, NamedEnvironmentType namedEnvironmentType)
+        {
+            ValidationResults results = new ValidationResults();
+
+            List<NamedEnvironmentDto> namedEnvironmentList = await GetNamedEnvironmentsAsync(saidAssetKeyCode);
+            if (namedEnvironmentList.Any())
+            {
+                if (!namedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
+                {
+                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}.");
+                }
+                else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
+                {
+                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
+                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType.ToString()}\")");
+                }
+            }
+            else
+            {
+                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_NOT_FOUND, "SAID asset not found.");
+            }
+
+            return results;
         }
     }
 }

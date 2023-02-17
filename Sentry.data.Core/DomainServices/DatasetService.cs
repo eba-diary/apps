@@ -818,7 +818,7 @@ namespace Sentry.data.Core
             }
             else if (!string.IsNullOrEmpty(dto.CategoryName))
             {
-                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name == dto.CategoryName).ToList();
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
             }
 
             switch (dto.DataClassification)

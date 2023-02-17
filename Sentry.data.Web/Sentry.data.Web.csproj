@@ -536,6 +536,8 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidator.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
+    <Compile Include="API\Validation\FluentValidationResponse.cs" />
+    <Compile Include="API\Validation\ValidationExtensions.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

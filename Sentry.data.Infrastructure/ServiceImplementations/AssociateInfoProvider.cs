@@ -2,6 +2,7 @@
 using Sentry.Associates;
 using System.Linq;
 using Sentry.data.Core;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -34,6 +35,11 @@ namespace Sentry.data.Infrastructure
                 IncludeInactive = true
             };
             _associateService.LoadLocalCacheWithRetry(associateCacheOptions);
+        }
+
+        public async Task<Associate> GetActiveAssociateByIdAsync(string associateId)
+        {
+            return await _associateService.GetAssociateByIdAsync(associateId);
         }
 
         public Associate GetAssociateInfo(string associateId)

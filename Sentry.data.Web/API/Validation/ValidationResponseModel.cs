@@ -44,39 +44,5 @@ namespace Sentry.data.Web.API
                 fieldValidation.AddValidationMessage(message);
             }
         }
-
-        public ValidationResponseModel Required(Expression<Func<string>> getPropertyValue)
-        {
-            if (string.IsNullOrWhiteSpace(getPropertyValue.Compile()()))
-            {
-                MemberExpression memberExp = getPropertyValue.Body as MemberExpression;
-                AddFieldValidation(memberExp.Member.Name, $"Required field");
-            }
-
-            return this;
-        }
-
-        public ValidationResponseModel MaxLength(Expression<Func<string>> getPropertyValue, int maxLength)
-        {
-            if (getPropertyValue.Compile()()?.Length > maxLength)
-            {
-                MemberExpression memberExp = getPropertyValue.Body as MemberExpression;
-                AddFieldValidation(memberExp.Member.Name, $"Max length of {maxLength} characters");
-            }
-
-            return this;
-        }
-
-        public ValidationResponseModel RegularExpression(Expression<Func<string>> getPropertyValue, string pattern, string message)
-        {
-            string value = getPropertyValue.Compile()();
-            if (!string.IsNullOrEmpty(value) && !Regex.IsMatch(getPropertyValue.Compile()(), pattern))
-            {
-                MemberExpression memberExp = getPropertyValue.Body as MemberExpression;
-                AddFieldValidation(memberExp.Member.Name, message);
-            }
-
-            return this;
-        }
     }
 }

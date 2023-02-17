@@ -24,6 +24,7 @@ namespace Sentry.data.Core
             public const string NAME_IS_BLANK = "nameIsBlank";
             public const string NAME_IS_IDEMPOTENT = "nameIsIdempotent";
             public const string SAID_ASSET_REQUIRED = "saidAssetRequired";
+            public const string SAID_ASSET_NOT_FOUND = "saidAssetNotFound";
             public const string SAID_ASSET_IDEMPOTENT = "saidAssetIdempotent";
             public const string NAMED_ENVIRONMENT_INVALID = "namedEnvironmentInvalid";
             public const string NAMED_ENVIRONMENT_IDEMPOTENT = "namedEnvironmentIdempotent";
