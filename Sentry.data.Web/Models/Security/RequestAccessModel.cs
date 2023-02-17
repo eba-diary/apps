@@ -12,6 +12,8 @@ namespace Sentry.data.Web
         //shared
         public int SecurableObjectId { get; set; }
 
+        public bool IsProd { get; set; }
+
         public string SecurableObjectName { get; set; }
 
         [DisplayName("Dataset")]

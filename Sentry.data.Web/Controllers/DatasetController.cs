@@ -672,6 +672,7 @@ namespace Sentry.data.Web.Controllers
             {
                 model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
                 model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+                model.IsProd = Sentry.Configuration.Config.GetDefaultEnvironmentName() == GlobalConstants.Environments.PROD;
                 return PartialView("Permission/RequestAccessCLA3723", model);
             }
             model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();

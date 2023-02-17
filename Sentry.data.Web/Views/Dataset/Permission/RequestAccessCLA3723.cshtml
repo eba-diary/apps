@@ -28,7 +28,7 @@
         <span class="hidden-item" id="consumeAssetGroupName">@Model.ConsumeAssetGroupName</span>
         <span class="hidden-item" id="producerAssetGroupName">@Model.ProducerAssetGroupName</span>
 
-        <ol class="breadcrumb p-0" id="RequestAccessBreadcrumb">
+        <ol class="breadcrumb p-0 mb-1" id="RequestAccessBreadcrumb">
         </ol>
         <div id="RequestAccessToSection" class="requestAccessStage">
             <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <em id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</em></button>
@@ -39,6 +39,12 @@
             <button id="RequestAccessTypeManageBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Producer/Admin Access</button>
         </div>
         <div id="RequestAccessConsumerTypeSection" class="d-none requestAccessStage">
+            @if (!Model.IsProd)
+            {
+                <div class="alert alert-warning mb-1" role="alert">
+                    AD Groups must be requested in non-prod environments. See <a target="_blank" href="https://confluence.sentry.com/display/CLA/Dataset+Access">Here</a>.
+                </div>
+            }
             <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
             <p class="mb-0">Request the entitlement for both normal and RA accounts.</p>
             <div class="btn-group" role="group">
@@ -51,6 +57,12 @@
             <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
         </div>
         <div id="RequestAccessManageTypeSection" class="d-none requestAccessStage">
+            @if (!Model.IsProd)
+            {
+                <div class="alert alert-warning mb-1" role="alert">
+                    AD Groups must be requested in non-prod environments. See <a target="_blank" href="https://confluence.sentry.com/display/CLA/Dataset+Access">Here</a>.
+                </div>
+            }
             <h6 class="pt-1">To Request Manage Access:</h6>
             <p class="mb-0">Request the entitlement for both normal and RA accounts.</p>
             <div class="btn-group" role="group">

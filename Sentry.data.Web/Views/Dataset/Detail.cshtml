@@ -7,6 +7,11 @@
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+}
+
 @if (@Model.HasSchema && @Model.DatasetFileCount == 0)
 {
     <div>
@@ -231,15 +236,15 @@
         </div>
 
         @*****************************************************************************************************************
-        *DATASET INFO BOX
-        ******************************************************************************************************************@
+            *DATASET INFO BOX
+            ******************************************************************************************************************@
         <div class="col-lg-5">
             <div class="container">
                 <div class="row" style="border: 1px #DDDDDD solid; padding: 20px;">
 
                     @*****************************************************************************************************************
-                    *ROW 1
-                    ******************************************************************************************************************@
+                        *ROW 1
+                        ******************************************************************************************************************@
                     <div class="row w-100">
                         <div class="col">
                             <h5 class="@textColor pt-1">Last Activity Date</h5>
@@ -254,8 +259,8 @@
                     <hr class="datasetMetadataBoxHr" />
 
                     @*****************************************************************************************************************
-                    *ROW 2
-                    ******************************************************************************************************************@
+                        *ROW 2
+                        ******************************************************************************************************************@
                     <div class="row w-100">
                         <div class="col">
                             <h5 class="@textColor pt-1">Contact</h5>
@@ -279,9 +284,9 @@
 
 
                     @*****************************************************************************************************************
-                    *ROW 3
-                    ******************************************************************************************************************@
-                    <div class="row w-100" >
+                        *ROW 3
+                        ******************************************************************************************************************@
+                    <div class="row w-100">
 
                         @*SAID ASSET*@
                         <div class="col margin-right-inherit">
@@ -350,7 +355,7 @@
         {
             @Html.Partial("Details/_DataPreview", Model)
         }
-        if ( Model.Security.CanViewFullDataset)
+        if (Model.Security.CanViewFullDataset)
         {
             @Html.Partial("Details/_DataFiles", Model)
         }
@@ -360,7 +365,7 @@ else
 {
 
 
-<div id="datasetDetailTabs">
+    <div id="datasetDetailTabs">
         <div class="tabs-wrapper">
             <ul class="nav classic-tabs" role="tablist">
                 <li class="nav-item">
@@ -466,10 +471,8 @@ else
 <div class="migration-modal-container"></div>
 
 @section Scripts {
-    @Scripts.Render("~/bundles/prettyCron")
-    @Scripts.Render("~/bundles/dataTables")
-    @Styles.Render("~/bundles/css/dataTables")
-
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
+    <script src="@Html.GetContent("datatables.*.js")"></script>
     <script>
 
         $(function () {
