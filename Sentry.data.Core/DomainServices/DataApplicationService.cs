@@ -235,27 +235,40 @@ namespace Sentry.data.Core
                 //All entity objects have been created, therefore, save changes
                 _datasetContext.SaveChanges();
 
-                //Only create dataset external dependencies if this migration created the dataset
-                if (!datasetExistsInTarget)
-                {
-                    //Create dataset external dependencies
-                    CreateExternalDependenciesForDataset(new List<int>() { newDatasetId });
-                }
-
-                //Only kick off dataflow external dependencies if the dataflow metadata was migrated
-                var schemaWithMigratedDataflows = schemaMigrationResponses.Where(w => w.MigratedDataFlow).ToList();
-                List<int> newSchemaIds = Enumerable.Range(0, schemaWithMigratedDataflows.Count).Select(i => schemaMigrationResponses[i].TargetSchemaId).ToList();
-                CreateExternalDependenciesForDataFlowBySchemaId(newSchemaIds);
-
-                //Only kick off schema revision external dependecies if the schema revision was migrated
-                var migratedSchemaRevisions = schemaMigrationResponses.Where(w => w.MigratedSchemaRevision).Select(s => (s.TargetSchemaId, s.TargetSchemaRevisionId)).ToList();
-                CreateExternalDependenciesForSchemaRevision(migratedSchemaRevisions);
-
                 response.IsDatasetMigrated = !datasetExistsInTarget;
-                response.DatasetMigrationReason = datasetExistsInTarget? "Dataset already exists in target named environment" : "Success";
+                response.DatasetMigrationReason = datasetExistsInTarget ? "Dataset already exists in target named environment" : "Success";
                 response.DatasetId = newDatasetId;
                 response.DatasetName = sourceDatasetMetadata.Item1;
                 response.SchemaMigrationResponses = schemaMigrationResponses;
+
+                try
+                {                    
+                    //Only create dataset external dependencies if this migration created the dataset
+                    if (!datasetExistsInTarget)
+                    {
+                        //Create dataset external dependencies
+                        CreateExternalDependenciesForDataset(new List<int>() { newDatasetId });
+                    }
+
+                    //Only kick off dataflow external dependencies if the dataflow metadata was migrated
+                    var schemaWithMigratedDataflows = schemaMigrationResponses.Where(w => w.MigratedDataFlow).ToList();
+                    List<int> newSchemaIds = Enumerable.Range(0, schemaWithMigratedDataflows.Count).Select(i => schemaMigrationResponses[i].TargetSchemaId).ToList();
+                    CreateExternalDependenciesForDataFlowBySchemaId(newSchemaIds);
+                    
+                    //Only kick off schema revision external dependecies if the schema revision was migrated
+                    var migratedSchemaRevisions = schemaMigrationResponses.Where(w => w.MigratedSchemaRevision).Select(s => (s.TargetSchemaId, s.TargetSchemaRevisionId)).ToList();
+                    CreateExternalDependenciesForSchemaRevision(migratedSchemaRevisions);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"{methodName} - Failed creating external dependencies", ex);
+
+                    // Rollback newly created objects
+                    Logger.Info($"{methodName} - Rollback initiated");
+                    RollbackDatasetMigration(response);
+                    Logger.Info($"{methodName} - Rollback completed");
+                    throw;
+                }
 
                 CreateMigrationHistory(migrationRequest, response);
                 _datasetContext.SaveChanges();
@@ -263,7 +276,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error($"{methodName} Failed to perform migration", ex);
-                _datasetContext.Clear();
+                _datasetContext.Clear();                
                 throw;
             }
 
@@ -807,6 +820,7 @@ namespace Sentry.data.Core
                 (string targetDatasetNamedEnvironment, NamedEnvironmentType targetDatasetNamedEnvironmentType) = _datasetContext.Datasets.Where(w => w.DatasetId == targetDatasetId).Select(s => new Tuple<string, NamedEnvironmentType>(s.NamedEnvironment, s.NamedEnvironmentType)).FirstOrDefault();
 
                 //Adjust dataFlowDto associations and create new entity
+                dataflowDto.Id = 0;
                 dataflowDto.DatasetId = targetDatasetId;
                 dataflowDto.NamedEnvironment = targetDatasetNamedEnvironment;
                 dataflowDto.NamedEnvironmentType = targetDatasetNamedEnvironmentType;
@@ -846,20 +860,44 @@ namespace Sentry.data.Core
 
         internal SchemaMigrationRequestResponse MigrateSchema_Internal(SchemaMigrationRequest migrationRequest)
         {
-            SchemaMigrationRequestResponse response = MigrateSchemaWithoutSave_Internal(migrationRequest);
-            _datasetContext.SaveChanges();
+            string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateDataset).ToLower()}";
 
-            if (response.MigratedDataFlow)
+            try
             {
-                CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { response.TargetSchemaId });
-            }
+                SchemaMigrationRequestResponse response = MigrateSchemaWithoutSave_Internal(migrationRequest);
+                _datasetContext.SaveChanges();
 
-            if (response.MigratedSchemaRevision)
+                try
+                {
+                    if (response.MigratedDataFlow)
+                    {
+                        CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { response.TargetSchemaId });
+                    }
+
+                    if (response.MigratedSchemaRevision)
+                    {
+                        CreateExternalDependenciesForSchemaRevision(new List<(int, int)> { (response.TargetSchemaId, response.TargetSchemaRevisionId) });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"{methodName} - Failed creating external dependencies", ex);
+
+                    // Rollback newly created objects
+                    Logger.Info($"{methodName} - Rollback initiated");
+                    RollbackSchemaMigration(response);
+                    Logger.Info($"{methodName} - Rollback completed");
+                    throw;
+                }
+
+                return response;
+            }
+            catch (Exception ex)
             {
-                CreateExternalDependenciesForSchemaRevision(new List<(int, int)> { (response.TargetSchemaId, response.TargetSchemaRevisionId) });
+                Logger.Error($"{methodName} Failed to perform migration", ex);
+                _datasetContext.Clear();
+                throw;
             }
-
-            return response;
         }
 
 
@@ -897,6 +935,65 @@ namespace Sentry.data.Core
                 int dataFlowId = _datasetContext.DataFlow.FirstOrDefault(w => w.SchemaId == schemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Id;
                 DataFlowService.CreateExternalDependencies(dataFlowId);
             }
+        }
+
+        private void RollbackDatasetMigration(DatasetMigrationRequestResponse response)
+        {            
+            if (response.IsDatasetMigrated)
+            {   
+                //Delete dataset
+                //  No need for any other deletes as this will remove all associated objects
+                DatasetService.Delete(response.DatasetId, null, true);
+            }
+            else
+            {
+                //Issue you any schema migration rollbacks if necessary
+                if (response.SchemaMigrationResponses.Count > 0)
+                {
+                    foreach(SchemaMigrationRequestResponse schemaResponse in response.SchemaMigrationResponses)
+                    {
+                        RollbackSchemaMigration(schemaResponse);
+                    }
+                }
+            }
+
+            _datasetContext.SaveChanges();
+        }
+
+        private void RollbackSchemaMigration(SchemaMigrationRequestResponse response)
+        {
+            if (response.MigratedSchema)
+            {
+                // Delete schema
+                // No need for other deletes as this will take care of all associated objects
+                int datasetFileConfigId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == response.TargetSchemaId).Select(s => s.ConfigId).FirstOrDefault();
+                ConfigService.Delete(datasetFileConfigId, null, true);
+            }
+            else 
+            {
+                if (response.MigratedSchemaRevision)
+                {
+                    RollbackSchemaRevisionMigration(response);
+                }
+
+                if (response.MigratedDataFlow)
+                {
+                    //Delete dataflow
+                    DataFlowService.Delete(response.TargetDataFlowId, null, true);
+                }
+            }            
+        }
+
+        private void RollbackSchemaRevisionMigration(SchemaMigrationRequestResponse response)
+        {
+            //Delete schema revision
+            List<BaseField> fieldList = _datasetContext.BaseFields.Where(w => w.ParentSchemaRevision.SchemaRevision_Id == response.TargetSchemaRevisionId).ToList();
+            foreach (BaseField field in fieldList)
+            {
+                _datasetContext.RemoveById<BaseField>(field.FieldId);
+            }
+
+            _datasetContext.RemoveById<SchemaRevision>(response.TargetSchemaRevisionId);
         }
 
         /// <summary>

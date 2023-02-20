@@ -750,6 +750,12 @@ namespace Sentry.data.Core
                 throw new ArgumentOutOfRangeException(nameof(datasetId), $"Dataset with ID \"{datasetId}\" could not be found.");
             }
 
+            if (ds.ObjectStatus != ObjectStatusEnum.Active)
+            {
+                Common.Logging.Logger.Info($"Dataset is not active ({datasetId}), default security will not be created");
+                return Task.CompletedTask;
+            }
+
             // This "wrapping" of the async portion of this method is required so that the error checking above runs immediately.
             // See https://sonarqube.sentry.com/coding_rules?open=csharpsquid%3AS4457&rule_key=csharpsquid%3AS4457
             return CreateDefaultSecurityForDatasetAsync();
@@ -768,7 +774,6 @@ namespace Sentry.data.Core
                 //actually create the AD groups
                 await CreateDefaultSecurityForDataset_Internal(ds, groups, permissions, datasetTickets, assetTickets);
             }
-
         }
 
         public Task CreateDefaultSecuityForDataflow(int dataflowId)
@@ -783,6 +788,12 @@ namespace Sentry.data.Core
             if (ds == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(dataflowId), $"Dataset with ID \"{df.DatasetId}\" could not be found.");
+            }
+
+            if (ds.ObjectStatus != ObjectStatusEnum.Active || df.ObjectStatus != ObjectStatusEnum.Active)
+            {
+                Common.Logging.Logger.Info($"Dataflow is not active ({dataflowId}), default security will not be created");
+                return Task.CompletedTask;
             }
 
             return CreateDefaultSecurityForDataflowAsync();
