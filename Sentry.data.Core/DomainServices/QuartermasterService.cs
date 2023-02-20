@@ -110,17 +110,17 @@ namespace Sentry.data.Core
             {
                 if (!namedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
                 {
-                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}.");
+                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}");
                 }
                 else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
                 {
                     var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
-                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType.ToString()}\")");
+                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\") for asset {saidAssetKeyCode}");
                 }
             }
             else
             {
-                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_NOT_FOUND, "SAID asset not found.");
+                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_NOT_FOUND, "SAID asset not found in Quartermaster");
             }
 
             return results;

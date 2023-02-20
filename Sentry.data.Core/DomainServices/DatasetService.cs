@@ -358,10 +358,8 @@ namespace Sentry.data.Core
             await _datasetContext.AddAsync(dataset);
             await _datasetContext.SaveChangesAsync();
 
-            //DatasetResultDto resultDto = dataset.ToResultDto();
-            //return resultDto;
-
-            throw new NotImplementedException();
+            DatasetResultDto resultDto = dataset.ToDatasetResultDto();
+            return resultDto;
         }
 
         public int Create(DatasetDto dto)

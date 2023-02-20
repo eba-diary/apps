@@ -21,7 +21,7 @@ namespace Sentry.data.Web.API
         }
 
         /// <summary>
-        /// Create dataset
+        /// Add new dataset
         /// </summary>
         [HttpPost]
         [Route("")]
@@ -29,7 +29,7 @@ namespace Sentry.data.Web.API
         [SwaggerResponse(HttpStatusCode.Created, null, typeof(AddDatasetResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
-        public async Task<IHttpActionResult> CreateDataset(AddDatasetRequestModel model)
+        public async Task<IHttpActionResult> AddDataset(AddDatasetRequestModel model)
         {
             return await ProcessRequestAsync<AddDatasetRequestModel, DatasetDto, DatasetResultDto, AddDatasetResponseModel>(model, _datasetService.AddDatasetAsync);
         }

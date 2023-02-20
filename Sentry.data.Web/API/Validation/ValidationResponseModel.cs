@@ -1,21 +1,16 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.Ajax.Utilities;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace Sentry.data.Web.API
 {
     public class ValidationResponseModel : IResponseModel
     {
-        public List<FieldValidationResponseModel> FieldValidations { get; set; }
+        public List<FieldValidationResponseModel> FieldValidations { get; protected set; }
 
         public bool IsValid()
         {
-            return FieldValidations?.Any() == false;
+            return FieldValidations == null || !FieldValidations.Any();
         }
 
         /// <summary>
@@ -25,7 +20,7 @@ namespace Sentry.data.Web.API
         /// <param name="message"></param>
         public void AddFieldValidation(string field, string message)
         {
-            if (FieldValidations?.Any() == false)
+            if (FieldValidations == null)
             {
                 FieldValidations = new List<FieldValidationResponseModel>();
             }
@@ -43,6 +38,11 @@ namespace Sentry.data.Web.API
             {
                 fieldValidation.AddValidationMessage(message);
             }
+        }
+
+        public bool HasValidationsFor(string field)
+        {
+            return FieldValidations?.Any(x => x.Field == field) == true;
         }
     }
 }

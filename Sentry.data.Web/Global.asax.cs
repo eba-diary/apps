@@ -43,8 +43,7 @@ namespace Sentry.data.Web
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);
 
             //register all mapping profiles
-            var configuration = new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
-            IMapper mapper = new Mapper(configuration);
+            IMapper mapper = AutoMapperHelper.InitMapper();
 
             Bootstrapper.Container.Configure((x) =>
             {

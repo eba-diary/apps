@@ -9,9 +9,6 @@ namespace Sentry.data.Infrastructure
     public class AssociateInfoProvider : IAssociateInfoProvider
     {
         private readonly IAssociatesServiceClient _associateService;
-        private bool _localCacheProcessing = false;
-        private object _lockObject = new object();
-
 
         public AssociateInfoProvider()
         {

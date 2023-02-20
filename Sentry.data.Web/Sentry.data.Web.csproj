@@ -526,6 +526,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\AutoMapperHelper.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\DatasetProfile.cs" />
     <Compile Include="API\Dataset\DatasetModel.cs" />
@@ -1184,7 +1185,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="AutoMapper\" />
     <Folder Include="Helpers\Validation\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Models\ApiModels\Admin\" />

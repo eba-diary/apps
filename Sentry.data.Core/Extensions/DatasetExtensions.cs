@@ -51,5 +51,30 @@ namespace Sentry.data.Core
                 }
             }
         }
+
+        public static DatasetResultDto ToDatasetResultDto(this Dataset dataset)
+        {
+            return new DatasetResultDto
+            {
+                DatasetId = dataset.DatasetId,
+                DatasetName = dataset.DatasetName,
+                DatasetDescription = dataset.DatasetDesc,
+                CategoryName = dataset.DatasetCategories.First()?.Name,
+                ShortName = dataset.ShortName,
+                SaidAssetCode = dataset.Asset.SaidKeyCode,
+                NamedEnvironment = dataset.NamedEnvironment,
+                NamedEnvironmentType = dataset.NamedEnvironmentType,
+                UsageInformation = dataset.DatasetInformation,
+                DataClassificationType = dataset.DataClassification,
+                IsSecured = dataset.IsSecured,
+                PrimaryContactId = dataset.PrimaryContactId,
+                AlternateContactEmail = dataset.AlternateContactEmail,
+                OriginationCode = (DatasetOriginationCode)Enum.Parse(typeof(DatasetOriginationCode), dataset.OriginationCode, true),
+                OriginalCreator = dataset.CreationUserName,
+                CreatedDateTime = dataset.DatasetDtm,
+                UpdatedDateTime = dataset.ChangedDtm,
+                ObjectStatus = dataset.ObjectStatus
+            };
+        }
     }
 }
