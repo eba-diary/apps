@@ -40,7 +40,7 @@ namespace Sentry.data.Web.API
                 .Validate(x => x.NamedEnvironmentTypeCode).EnumValue(typeof(NamedEnvironmentType))
                 .Validate(x => x.PrimaryContactId).Required()
                 .Validate(x => x.UsageInformation).MaxLength(4096)
-                .ToValidationResponse();
+                .ValidationResponse;
 
             bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
