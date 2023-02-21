@@ -441,6 +441,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, targetDataset }.AsQueryable());
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { sourceDatasetFileConfig }.AsQueryable());
             context.Setup(s => s.DataFlow).Returns(new List<DataFlow>().AsQueryable());
+            context.Setup(s => s.Clear());
 
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
 
