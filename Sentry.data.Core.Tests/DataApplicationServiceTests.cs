@@ -1264,5 +1264,167 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(errors.Any());
             Assert.IsTrue(errors.Contains("Named environment must be alphanumeric, all caps, and less than 10 characters"));
         }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DatasetMigrated_Issues_Delete_Dataset()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                IsDatasetMigrated = true,
+                DatasetId = 1
+            };
+
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(d => d.Delete(response.DatasetId, null, true)).Returns(true);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+
+            var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, lazyDatasetService, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackDatasetMigration(response);
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DatasetNotMigrated_With_No_SchemaResponses()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                IsDatasetMigrated = false,
+                DatasetId = 1
+            };
+
+            DataApplicationService dataApplicationService = new DataApplicationService(null,null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackDatasetMigration(response);
+        }
+
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DatasetNotMigrated_With_SchemaResponses()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                IsDatasetMigrated = false,
+                DatasetId = 1,
+                SchemaMigrationResponses = new List<SchemaMigrationRequestResponse>()
+                {
+                    new SchemaMigrationRequestResponse()
+                    {
+                    }
+                }
+            };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+
+            Mock<DataApplicationService> dataApplicationService = mr.Create<DataApplicationService>(context.Object, null, null, null, null, null, null, null, null, null, null);
+            dataApplicationService.Setup(s => s.RollbackSchemaMigration(It.IsAny<SchemaMigrationRequestResponse>()));
+
+            //Act
+            dataApplicationService.Object.RollbackDatasetMigration(response);
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_SchemaMigrated_Calls_SchemaDelete()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse()
+            {
+                MigratedSchema = true,
+                TargetSchemaId = 2
+            };
+
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig();
+            config.Schema = new FileSchema() { SchemaId = 2 };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { config }.AsQueryable());
+
+            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            configService.Setup(s => s.Delete(config.ConfigId, null, true)).Returns(true);
+
+            var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, lazyConfigService, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackSchemaMigration(response);
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DataFlowMigrated_Calls_DataFlowDelete()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse()
+            {
+                MigratedSchema = false,
+                MigratedSchemaRevision = false,
+                MigratedDataFlow = true,
+                TargetDataFlowId = 3
+            };
+
+            Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
+            dataFlowService.Setup(s => s.Delete(response.TargetDataFlowId, null, true)).Returns(true);
+
+            var lazyDataFlowService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, lazyDataFlowService, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackSchemaMigration(response);
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_SchemaRevisionMigrated_Calls_RollbackSchemaRevision()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse()
+            {
+                MigratedSchema = false,
+                MigratedSchemaRevision = true,
+                TargetSchemaRevisionId = 3,
+                MigratedDataFlow = false
+            };
+
+            BaseField field1 = new VarcharField()
+            {
+                FieldId = 9,
+                ParentSchemaRevision = new SchemaRevision() { SchemaRevision_Id = 3 }
+            };
+
+            BaseField field2 = new VarcharField()
+            {
+                FieldId = 20,
+                ParentSchemaRevision = new SchemaRevision() { SchemaRevision_Id = 3 }
+            };
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.BaseFields).Returns(new List<BaseField> { field1, field2 }.AsQueryable());
+            context.Setup(s => s.RemoveById<BaseField>(field1.FieldId));
+            context.Setup(s => s.RemoveById<BaseField>(field2.FieldId));
+            context.Setup(s => s.RemoveById<SchemaRevision>(response.TargetSchemaRevisionId));
+
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackSchemaMigration(response);
+        }
     }
 }

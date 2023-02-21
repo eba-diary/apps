@@ -937,8 +937,10 @@ namespace Sentry.data.Core
             }
         }
 
-        private void RollbackDatasetMigration(DatasetMigrationRequestResponse response)
-        {            
+        internal void RollbackDatasetMigration(DatasetMigrationRequestResponse response)
+        {
+            bool saveChanges = true;
+
             if (response.IsDatasetMigrated)
             {   
                 //Delete dataset
@@ -955,12 +957,19 @@ namespace Sentry.data.Core
                         RollbackSchemaMigration(schemaResponse);
                     }
                 }
+                else
+                {
+                    saveChanges = false;
+                }
             }
 
-            _datasetContext.SaveChanges();
+            if (saveChanges)
+            {
+                _datasetContext.SaveChanges();
+            }
         }
 
-        private void RollbackSchemaMigration(SchemaMigrationRequestResponse response)
+        internal virtual void RollbackSchemaMigration(SchemaMigrationRequestResponse response)
         {
             if (response.MigratedSchema)
             {
