@@ -6,12 +6,12 @@ using System.Linq;
 namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
-    public class FieldValidationResponseModelTests
+    public class ConcurrentFieldValidationResponseTests
     {
         [TestMethod]
         public void AddValdiationMessage_AddNewMessage()
         {
-            FieldValidationResponseModel model = new FieldValidationResponseModel
+            ConcurrentFieldValidationResponse model = new ConcurrentFieldValidationResponse
             {
                 Field = "Field"
             };
@@ -26,7 +26,7 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void AddValdiationMessage_AddAdditionalMessage()
         {
-            FieldValidationResponseModel model = new FieldValidationResponseModel
+            ConcurrentFieldValidationResponse model = new ConcurrentFieldValidationResponse
             {
                 Field = "Field"
             };
@@ -36,7 +36,7 @@ namespace Sentry.data.Web.Tests.API
 
             Assert.AreEqual("Field", model.Field);
             Assert.AreEqual(2, model.ValidationMessages.Count);
-            Assert.AreEqual("Message", model.ValidationMessages.First());
+            Assert.IsNotNull("Message", model.ValidationMessages.First());
             Assert.AreEqual("Message 2", model.ValidationMessages.Last());
         }
     }

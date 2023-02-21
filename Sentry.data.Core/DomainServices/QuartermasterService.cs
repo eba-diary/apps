@@ -34,13 +34,11 @@ namespace Sentry.data.Core
         public async Task<ValidationResults> VerifyNamedEnvironmentAsync(string saidAssetKeyCode, string namedEnvironment, NamedEnvironmentType namedEnvironmentType)
         {
             var results = new ValidationResults();
-
             //validate parameters
             if (string.IsNullOrWhiteSpace(saidAssetKeyCode))
             {
                 results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_REQUIRED, "SAID Asset Key Code is required.");
             }
-
             if (string.IsNullOrWhiteSpace(namedEnvironment))
             {
                 results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, "Named Environment is required.");
@@ -48,9 +46,20 @@ namespace Sentry.data.Core
 
             if (results.GetAll().Count == 0)
             {
-                results.MergeInResults(await ValidateNamedEnvironmentAsync(saidAssetKeyCode, namedEnvironment, namedEnvironmentType));
+                var namedEnvironmentList = (await GetNamedEnvironmentsAsync(saidAssetKeyCode)).ToList();
+                if (namedEnvironmentList.Any())
+                {
+                    if (!namedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
+                    {
+                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}.");
+                    }
+                    else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
+                    {
+                        var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
+                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
+                    }
+                }
             }
-
             return results;
         }
 
@@ -92,38 +101,6 @@ namespace Sentry.data.Core
                 }).ToList();
             }
             return GetNamedEnvironmentsInternalAsync();
-        }
-
-        /// <summary>
-        /// If the asset is managed in Quartermaster, then the named environment and named environment type must be valid according to Quartermaster
-        /// </summary>
-        /// <param name="saidAssetKeyCode">The 4-digit SAID asset key code</param>
-        /// <param name="namedEnvironment">The named environment to validate</param>
-        /// <param name="namedEnvironmentType">The named environment type to validate</param>
-        /// <returns>A list of ValidationResults. These should be merged into any existing ValidationResults.</returns>
-        public async Task<ValidationResults> ValidateNamedEnvironmentAsync(string saidAssetKeyCode, string namedEnvironment, NamedEnvironmentType namedEnvironmentType)
-        {
-            ValidationResults results = new ValidationResults();
-
-            List<NamedEnvironmentDto> namedEnvironmentList = await GetNamedEnvironmentsAsync(saidAssetKeyCode);
-            if (namedEnvironmentList.Any())
-            {
-                if (!namedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
-                {
-                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"{namedEnvironment}\") doesn't match a Quartermaster Named Environment for asset {saidAssetKeyCode}");
-                }
-                else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
-                {
-                    var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
-                    results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\") for asset {saidAssetKeyCode}");
-                }
-            }
-            else
-            {
-                results.Add(GlobalConstants.ValidationErrors.SAID_ASSET_NOT_FOUND, "SAID asset not found in Quartermaster");
-            }
-
-            return results;
         }
     }
 }

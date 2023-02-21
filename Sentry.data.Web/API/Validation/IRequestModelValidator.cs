@@ -2,11 +2,11 @@
 {
     public interface IRequestModelValidator<in T> : IRequestModelValidator where T : IRequestModel
     {
-        ValidationResponseModel Validate(T requestModel);
+        ConcurrentValidationResponse Validate(T requestModel);
     }
 
     public interface IRequestModelValidator
     {
-        ValidationResponseModel Validate(IRequestModel requestModel);
+        ConcurrentValidationResponse Validate(IRequestModel requestModel);
     }
 }

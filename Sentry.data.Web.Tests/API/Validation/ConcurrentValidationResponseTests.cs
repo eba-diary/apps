@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using NHibernate.Util;
 using Sentry.data.Web.API;
 using System.Linq;
@@ -7,12 +6,12 @@ using System.Linq;
 namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
-    public class ValidationResponseModelTests
+    public class ConcurrentValidationResponseTests
     {
         [TestMethod]
         public void IsValid_NoFieldValidations_True()
         {
-            ValidationResponseModel model = new ValidationResponseModel();
+            ConcurrentValidationResponse model = new ConcurrentValidationResponse();
 
             Assert.IsTrue(model.IsValid());
         }
@@ -20,7 +19,7 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void AddFieldValidation_NewField()
         {
-            ValidationResponseModel model = new ValidationResponseModel();
+            ConcurrentValidationResponse model = new ConcurrentValidationResponse();
 
             model.AddFieldValidation("Field", "Message");
 
@@ -32,7 +31,7 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void AddFieldValidation_ExistingField()
         {
-            ValidationResponseModel model = new ValidationResponseModel();
+            ConcurrentValidationResponse model = new ConcurrentValidationResponse();
 
             model.AddFieldValidation("Field", "Message");
             model.AddFieldValidation("Field", "Message 2");
@@ -45,7 +44,7 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void AddFieldValidation_AdditionalField()
         {
-            ValidationResponseModel model = new ValidationResponseModel();
+            ConcurrentValidationResponse model = new ConcurrentValidationResponse();
 
             model.AddFieldValidation("Field", "Message");
             model.AddFieldValidation("Field", "Message 2");
@@ -60,7 +59,7 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void HasValidationsFor_Field_True()
         {
-            ValidationResponseModel model = new ValidationResponseModel();
+            ConcurrentValidationResponse model = new ConcurrentValidationResponse();
 
             model.AddFieldValidation("Field", "Message");
 
@@ -70,7 +69,7 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void HasValidationsFor_Field_False()
         {
-            ValidationResponseModel model = new ValidationResponseModel();
+            ConcurrentValidationResponse model = new ConcurrentValidationResponse();
 
             model.AddFieldValidation("Field", "Message");
 

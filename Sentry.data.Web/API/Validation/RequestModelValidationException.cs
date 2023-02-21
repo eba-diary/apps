@@ -10,7 +10,7 @@ namespace Sentry.data.Web.API
         {
         }
 
-        public RequestModelValidationException(ValidationResponseModel validationResponse)
+        public RequestModelValidationException(ConcurrentValidationResponse validationResponse)
         {
             ValidationResponse = validationResponse;
         }
@@ -27,6 +27,6 @@ namespace Sentry.data.Web.API
         {
         }
 
-        public ValidationResponseModel ValidationResponse { get; }
+        public ConcurrentValidationResponse ValidationResponse { get; }
     }
 }

@@ -2,7 +2,7 @@
 using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Core.Interfaces.QuartermasterRestClient;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,33 +14,41 @@ namespace Sentry.data.Web.API
     public class AddDatasetRequestValidator : IRequestModelValidator<AddDatasetRequestModel>
     {
         private readonly IDatasetContext _datasetContext;
+        private readonly ISAIDService _saidService;
         private readonly IQuartermasterService _quartermasterService;
         private readonly IAssociateInfoProvider _associateInfoProvider;
 
-        public AddDatasetRequestValidator(IDatasetContext datasetContext, IQuartermasterService quartermasterService, IAssociateInfoProvider associateInfoProvider)
+        public AddDatasetRequestValidator(IDatasetContext datasetContext, ISAIDService saidService, IQuartermasterService quartermasterService, IAssociateInfoProvider associateInfoProvider)
         {
             _datasetContext = datasetContext;
+            _saidService = saidService;
             _quartermasterService = quartermasterService;
             _associateInfoProvider = associateInfoProvider;
         }
 
-        public ValidationResponseModel Validate(AddDatasetRequestModel requestModel)
+        public ConcurrentValidationResponse Validate(AddDatasetRequestModel requestModel)
         {
-            ValidationResponseModel validationResponse = requestModel.Validate(x => x.DatasetName).Required().MaxLength(1024)
+            ConcurrentValidationResponse validationResponse = requestModel.Validate(x => x.DatasetName).Required().MaxLength(1024)
                 .Validate(x => x.DatasetDescription).Required().MaxLength(4096)
                 .Validate(x => x.ShortName).Required().MaxLength(12).RegularExpression("^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed")
                 .Validate(x => x.SaidAssetCode).Required()
                 .Validate(x => x.CategoryName).Required()
-                .Validate(x => x.OriginationCode).Required().EnumValue(typeof(DatasetOriginationCode))
-                .Validate(x => x.DataClassificationTypeCode).Required().EnumValue(typeof(DataClassificationType))
+                .Validate(x => x.OriginationCode).EnumValue(typeof(DatasetOriginationCode))
+                .Validate(x => x.DataClassificationTypeCode).EnumValue(typeof(DataClassificationType))
                 .Validate(x => x.OriginalCreator).Required().MaxLength(128)
                 .Validate(x => x.NamedEnvironment).Required().RegularExpression("^[A-Z0-9]{1,10}$", "Must be alphanumeric, all caps, and less than 10 characters")
-                .Validate(x => x.NamedEnvironmentTypeCode).Required().EnumValue(typeof(NamedEnvironmentType))
+                .Validate(x => x.NamedEnvironmentTypeCode).EnumValue(typeof(NamedEnvironmentType))
                 .Validate(x => x.PrimaryContactId).Required()
                 .Validate(x => x.UsageInformation).MaxLength(4096)
-                .ToValidationResponse();
+                .ValidationResponse;
 
             bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
+
+            List<Task> asyncValidations = new List<Task>
+            {
+                ValidatePrimaryContactIdAsync(requestModel.PrimaryContactId, validationResponse),
+                ValidateSaidAssetCodeNamedEnvironmentAsync(requestModel, validationResponse)
+            };
 
             //dataset name exists
             if (!validationResponse.HasValidationsFor(nameof(requestModel.DatasetName)) && isValidNamedEnvironment &&
@@ -77,66 +85,64 @@ namespace Sentry.data.Web.API
                 validationResponse.AddFieldValidation(nameof(requestModel.CategoryName), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");
             }
 
-            //async check contact id exists
-            Task<string> primaryContactIdMessage = ValidatePrimaryContactIdAsync(requestModel.PrimaryContactId);
-
-            //async check SAID asset, named environment, and named environment type are aligned
-            Task<ValidationResults> saidAssetValidationResults = null;
-            if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)) && isValidNamedEnvironment && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, out NamedEnvironmentType namedEnvironmentType))
-            {
-                saidAssetValidationResults = _quartermasterService.ValidateNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
-            }
-
-            if (!string.IsNullOrEmpty(primaryContactIdMessage.Result))
-            {
-                validationResponse.AddFieldValidation(nameof(requestModel.PrimaryContactId), primaryContactIdMessage.Result);
-            }
-
-            AddFieldValidationsForNamedEnvironment(validationResponse, saidAssetValidationResults);
+            Task.WaitAll(asyncValidations.ToArray());
 
             return validationResponse;
         }
 
-        public ValidationResponseModel Validate(IRequestModel requestModel)
+        public ConcurrentValidationResponse Validate(IRequestModel requestModel)
         {
             return Validate((AddDatasetRequestModel)requestModel);
         }
 
         #region Private
-        private async Task<string> ValidatePrimaryContactIdAsync(string contactId)
+        private async Task ValidateSaidAssetCodeNamedEnvironmentAsync(AddDatasetRequestModel requestModel, ConcurrentValidationResponse validationResponse)
         {
-            if (!string.IsNullOrWhiteSpace(contactId))
+            if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)))
+            {
+                try
+                {
+                    await _saidService.GetAssetByKeyCodeAsync(requestModel.SaidAssetCode);
+                }
+                catch (Exception)
+                {
+                    validationResponse.AddFieldValidation(nameof(requestModel.SaidAssetCode), "Not a valid SAID asset code");
+                    return;
+                }
+
+                if (!validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment)) && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, out NamedEnvironmentType namedEnvironmentType))
+                {
+                    ValidationResults validationResults = await _quartermasterService.VerifyNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
+
+                    if (!validationResults.IsValid())
+                    {
+                        //loop over results and align properties with the validation error returned
+                        foreach (ValidationResult result in validationResults.GetAll())
+                        {
+                            switch (result.Id)
+                            {
+                                case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
+                                    validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironment), result.Description);
+                                    break;
+                                case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
+                                    validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironmentTypeCode), result.Description);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task ValidatePrimaryContactIdAsync(string contactId, ConcurrentValidationResponse validationResponse)
+        {
+            if (!validationResponse.HasValidationsFor(nameof(AddDatasetRequestModel.PrimaryContactId)))
             {
                 Associate associate = await _associateInfoProvider.GetActiveAssociateByIdAsync(contactId);
 
                 if (associate == null)
                 {
-                    return "Not an active associate";
-                }
-            }
-
-            return null;
-        }
-
-        private void AddFieldValidationsForNamedEnvironment(ValidationResponseModel validationResponse, Task<ValidationResults> validationResults)
-        {
-            if (validationResults != null && !validationResults.Result.IsValid())
-            {
-                //loop over results and align properties with the validation error returned
-                foreach (ValidationResult result in validationResults.Result.GetAll())
-                {
-                    switch (result.Id)
-                    {
-                        case ValidationErrors.SAID_ASSET_NOT_FOUND:
-                            validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.SaidAssetCode), result.Description);
-                            break;
-                        case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
-                            validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.NamedEnvironment), result.Description);
-                            break;
-                        case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
-                            validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode), result.Description);
-                            break;
-                    }
+                    validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.PrimaryContactId), "Not an active associate");
                 }
             }
         }

@@ -13,7 +13,7 @@ namespace Sentry.data.Web.API
 
             return new FluentValidationResponse<TModel, TProperty>
             {
-                ValidationResponse = new ValidationResponseModel(),
+                ValidationResponse = new ConcurrentValidationResponse(),
                 PropertyName = memberExp.Member.Name,
                 PropertyValue = propertyValueExpression.Compile().Invoke(requestModel),
                 RequestModel = requestModel
@@ -76,11 +76,6 @@ namespace Sentry.data.Web.API
             }
 
             return fluentResponse;
-        }
-
-        public static ValidationResponseModel ToValidationResponse<TModel>(this FluentValidationResponse<TModel, string> fluentResponse) where TModel : IRequestModel
-        {
-            return fluentResponse.ValidationResponse;
         }
     }
 }

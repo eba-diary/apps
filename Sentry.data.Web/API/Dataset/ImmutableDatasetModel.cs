@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Web.API
 {
-    public abstract class DatasetModel : BaseDatasetModel
+    public abstract class ImmutableDatasetModel : BaseDatasetModel
     {
         public string DatasetName { get; set; }
         public string CategoryName { get; set; }

@@ -529,7 +529,7 @@
     <Compile Include="API\AutoMapperHelper.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\DatasetProfile.cs" />
-    <Compile Include="API\Dataset\DatasetModel.cs" />
+    <Compile Include="API\Dataset\ImmutableDatasetModel.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetResponseModel.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidator.cs" />
     <Compile Include="API\Dataset\BaseDatasetModel.cs" />
@@ -537,8 +537,11 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidator.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
+    <Compile Include="API\Validation\ConcurrentFieldValidationResponse.cs" />
+    <Compile Include="API\Validation\ConcurrentValidationResponse.cs" />
     <Compile Include="API\Validation\FluentValidationResponse.cs" />
     <Compile Include="API\Validation\ValidationExtensions.cs" />
+    <Compile Include="API\Validation\ValidationProfile.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MiniProfilerConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

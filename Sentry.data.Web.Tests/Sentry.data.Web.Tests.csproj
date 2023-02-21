@@ -181,9 +181,10 @@
     <Compile Include="AccessControlTests.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetModelMappingTests.cs" />
     <Compile Include="API\BaseModelMappingsTests.cs" />
-    <Compile Include="API\Validation\FieldValidationResponseModelTests.cs" />
+    <Compile Include="API\Validation\ConcurrentFieldValidationResponseTests.cs" />
+    <Compile Include="API\Validation\ValidationModelMappingTests.cs" />
     <Compile Include="API\Validation\ValidationExtensionsTests.cs" />
-    <Compile Include="API\Validation\ValidationResponseModelTests.cs" />
+    <Compile Include="API\Validation\ConcurrentValidationResponseTests.cs" />
     <Compile Include="BaseWebUnitTests.cs" />
     <Compile Include="CategoryTests.cs" />
     <Compile Include="ConfigTests.cs" />

@@ -19,7 +19,7 @@ namespace Sentry.data.Web.API
                 .ForMember(dest => dest.ChangedDtm, x => x.MapFrom(src => DateTime.Now))
                 .IncludeAllDerived();
 
-            CreateMap<DatasetModel, DatasetDto>(MemberList.Source)
+            CreateMap<ImmutableDatasetModel, DatasetDto>(MemberList.Source)
                 .ForMember(dest => dest.SAIDAssetKeyCode, x => x.MapFrom(src => src.SaidAssetCode))
                 .ForMember(dest => dest.NamedEnvironmentType, x => x.MapFrom(src => (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), src.NamedEnvironmentTypeCode, true)))
                 .IncludeAllDerived();
@@ -33,7 +33,7 @@ namespace Sentry.data.Web.API
                 .ForMember(dest => dest.OriginationCode, x => x.MapFrom(src => src.OriginationCode.ToString()))
                 .IncludeAllDerived();
 
-            CreateMap<DatasetResultDto, DatasetModel>(MemberList.Destination)
+            CreateMap<DatasetResultDto, ImmutableDatasetModel>(MemberList.Destination)
                 .ForMember(dest => dest.NamedEnvironmentTypeCode, x => x.MapFrom(src => src.NamedEnvironmentType.ToString()))
                 .IncludeAllDerived();
 

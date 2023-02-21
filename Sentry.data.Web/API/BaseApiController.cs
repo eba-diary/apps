@@ -136,7 +136,7 @@ namespace Sentry.data.Web.API
 
             if (_validationRegistry.TryGetValidatorFor<modelIn>(out IRequestModelValidator validator))
             {
-                ValidationResponseModel validationResponse = validator.Validate(requestModel);
+                ConcurrentValidationResponse validationResponse = validator.Validate(requestModel);
 
                 if (!validationResponse.IsValid())
                 {
@@ -178,7 +178,8 @@ namespace Sentry.data.Web.API
             {
                 if (vmve.ValidationResponse != null)
                 {
-                    return Content(HttpStatusCode.BadRequest, vmve.ValidationResponse);
+                    ValidationResponseModel validationResponseModel = _mapper.Map<ValidationResponseModel>(vmve.ValidationResponse);
+                    return Content(HttpStatusCode.BadRequest, validationResponseModel);
                 }
 
                 return StatusCode(HttpStatusCode.BadRequest);

@@ -3,9 +3,13 @@ using Moq;
 using Sentry.Associates;
 using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Web.API;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
@@ -57,15 +61,18 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsTrue(validationResponse.IsValid());
 
@@ -91,71 +98,68 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, null, null);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, null, null, null);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(11, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
-            Assert.AreEqual(nameof(AddDatasetRequestModel.DatasetName), fieldValidation.Field);
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DatasetName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[1];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.DatasetDescription), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DatasetDescription));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[2];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.ShortName), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.ShortName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[3];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.SaidAssetCode), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.SaidAssetCode));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[4];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.CategoryName), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", categories.Select(x => x.Name))}", fieldValidation.ValidationMessages.Last());
 
-            fieldValidation = fieldValidations[5];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.OriginationCode), fieldValidation.Field);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.Last());
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginationCode));
+            Assert.IsNotNull(fieldValidation);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[6];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.DataClassificationTypeCode), fieldValidation.Field);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)))}", fieldValidation.ValidationMessages.Last());
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DataClassificationTypeCode));
+            Assert.IsNotNull(fieldValidation);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)))}", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[7];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.OriginalCreator), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginalCreator));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[8];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.NamedEnvironment), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironment));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[9];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode), fieldValidation.Field);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.Last());
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode));
+            Assert.IsNotNull(fieldValidation);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[10];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.PrimaryContactId), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.PrimaryContactId));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
@@ -204,31 +208,34 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, null, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, null, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(3, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
-            Assert.AreEqual(nameof(AddDatasetRequestModel.OriginationCode), fieldValidation.Field);
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginationCode));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.Last());
 
-            fieldValidation = fieldValidations[1];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.DataClassificationTypeCode), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DataClassificationTypeCode));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)))}", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[2];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode));
+            Assert.IsNotNull(fieldValidation);    
             Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.Last());
@@ -278,22 +285,25 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.ShortName), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Max length of 12 characters", fieldValidation.ValidationMessages.First());
@@ -331,25 +341,28 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, null, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, null, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(2, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
-            Assert.AreEqual(nameof(AddDatasetRequestModel.ShortName), fieldValidation.Field);
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.ShortName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Only alphanumeric characters are allowed", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[1];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.NamedEnvironment), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironment));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Must be alphanumeric, all caps, and less than 10 characters", fieldValidation.ValidationMessages.First());
 
@@ -398,22 +411,25 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.ShortName), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Short name cannot be '{SecurityConstants.ASSET_LEVEL_GROUP_NAME}'", fieldValidation.ValidationMessages.First());
@@ -462,33 +478,36 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(3, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
-            Assert.AreEqual(nameof(AddDatasetRequestModel.DatasetName), fieldValidation.Field);
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DatasetName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Dataset name already exists for the named environment", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[1];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.ShortName), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.ShortName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Short name is already in use by another Dataset for the named environment", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations[2];
-            Assert.AreEqual(nameof(AddDatasetRequestModel.CategoryName), fieldValidation.Field);
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryName));
+            Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", categories.Select(x => x.Name))}", fieldValidation.ValidationMessages.First());
 
@@ -537,22 +556,25 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.AlternateContactEmail), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Must be valid sentry.com email address", fieldValidation.ValidationMessages.First());
@@ -601,22 +623,25 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(() => null);
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.PrimaryContactId), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Not an active associate", fieldValidation.ValidationMessages.First());
@@ -665,27 +690,25 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
-            Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
-            ValidationResults validationResults = new ValidationResults();
-            validationResults.Add(ValidationErrors.SAID_ASSET_NOT_FOUND, "SAID asset not found in Quartermaster");
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(validationResults);
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ThrowsAsync(new ApiException("NotFound", 404, null, null, null));
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, null, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.SaidAssetCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("SAID asset not found in Quartermaster", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual("Not a valid SAID asset code", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -731,24 +754,27 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             ValidationResults validationResults = new ValidationResults();
             validationResults.Add(ValidationErrors.NAMED_ENVIRONMENT_INVALID, $"Named Environment provided (\"DEV\") doesn't match a Quartermaster Named Environment for asset SAID");
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(validationResults);
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(validationResults);
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.NamedEnvironment), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Named Environment provided (\"DEV\") doesn't match a Quartermaster Named Environment for asset SAID", fieldValidation.ValidationMessages.First());
@@ -797,24 +823,27 @@ namespace Sentry.data.Web.Tests
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
+            Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
+            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             ValidationResults validationResults = new ValidationResults();
             validationResults.Add(ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"NonProd\") doesn't match Quartermaster (\"DEV\") for asset SAID");
-            quartermasterService.Setup(x => x.ValidateNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(validationResults);
+            quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(validationResults);
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
 
-            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, quartermasterService.Object, associateInfoProvider.Object);
+            AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ValidationResponseModel validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.Validate(model);
 
             Assert.IsFalse(validationResponse.IsValid());
 
-            List<FieldValidationResponseModel> fieldValidations = validationResponse.FieldValidations;
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
             Assert.AreEqual(1, fieldValidations.Count);
 
-            FieldValidationResponseModel fieldValidation = fieldValidations.First();
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Named Environment Type provided (\"NonProd\") doesn't match Quartermaster (\"DEV\") for asset SAID", fieldValidation.ValidationMessages.First());
