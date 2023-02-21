@@ -37,6 +37,7 @@ namespace Sentry.data.Infrastructure
         {
             var motiveCompaniesUrl = Config.GetHostSetting("MotiveCompaniesUrl");
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, token)}");
+            Sentry.Common.Logging.Logger.Info($"Attempting to grab companies from {motiveCompaniesUrl}");
 
             using (HttpResponseMessage response = await client.GetAsync(motiveCompaniesUrl, HttpCompletionOption.ResponseHeadersRead))
             {
@@ -44,18 +45,28 @@ namespace Sentry.data.Infrastructure
                 using (StreamReader streamReader = new StreamReader(contentStream))
                 using (JsonReader jsonReader = new JsonTextReader(streamReader))
                 {
-                    JObject responseObject = JObject.Load(jsonReader);
-                    if (string.IsNullOrEmpty(responseObject.Value<string>("error")))
+                    Sentry.Common.Logging.Logger.Info($"Companies request result message: {response.Content.ReadAsStreamAsync()}");
+
+                    try
                     {
-                        JArray companies = (JArray)responseObject["companies"];
-                        JObject firstCompany = (JObject)companies[0];
-                        token.TokenName = firstCompany.GetValue("company").Value<string>("name");
-                        if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
+                        JObject responseObject = JObject.Load(jsonReader);
+                        if (string.IsNullOrEmpty(responseObject.Value<string>("error")))
                         {
-                            var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
-                            _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                            JArray companies = (JArray)responseObject["companies"];
+                            JObject firstCompany = (JObject)companies[0];
+                            token.TokenName = firstCompany.GetValue("company").Value<string>("name");
+                            if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
+                            {
+                                var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
+                                _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                            }
                         }
                     }
+                    catch (Exception e)
+                    {
+                        Sentry.Common.Logging.Logger.Error($"Parsing companies response failed: {e.Message}");
+                    }
+
                 }
                 _datasetContext.SaveChanges();
             }

@@ -128,8 +128,17 @@ namespace Sentry.data.Core
                     };
 
                     ((HTTPSSource)dataSource).Tokens.Add(newToken);
+                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
                     _datasetContext.SaveChanges();
-                    _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                    try
+                    {
+                        Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                    }
+                    catch (Exception e)
+                    {
+                        Sentry.Common.Logging.Logger.Error($"Onboarding new token failed with message: {e.Message}");
+                    }
                 }
             }
             catch (Exception e)
