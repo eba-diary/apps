@@ -20,18 +20,23 @@ namespace Sentry.data.Core
         private readonly IEncryptionService _encryptionService;
         private readonly IMotiveProvider _motiveProvider;
         private readonly HttpClient client;
+        private readonly IEmailService _emailService;
+        private readonly IDataFeatures _featureFlags;
         #endregion
 
         #region Constructor
         public DataSourceService(IDatasetContext datasetContext,
                             IEncryptionService encryptionService,
                             HttpClient httpClient,
-                            IMotiveProvider motiveProvider)
+                            IMotiveProvider motiveProvider,
+                            IEmailService emailService, IDataFeatures featureFlags)
         {
             _datasetContext = datasetContext;
             _encryptionService = encryptionService;
             client = httpClient;
             _motiveProvider = motiveProvider;
+            _emailService = emailService;
+            _featureFlags = featureFlags;
         }
         #endregion
 
@@ -129,6 +134,10 @@ namespace Sentry.data.Core
 
                     ((HTTPSSource)dataSource).Tokens.Add(newToken);
                     _datasetContext.SaveChanges();
+                    if (_featureFlags.CLA4931_SendMotiveEmail.GetValue())
+                    {
+                        _emailService.SendNewMotiveTokenAddedEmail(newToken);
+                    }
                     _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
                 }
             }
