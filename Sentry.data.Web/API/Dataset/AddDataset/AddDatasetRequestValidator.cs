@@ -40,7 +40,7 @@ namespace Sentry.data.Web.API
                 .Validate(x => x.NamedEnvironmentTypeCode).EnumValue(typeof(NamedEnvironmentType))
                 .Validate(x => x.PrimaryContactId).Required()
                 .Validate(x => x.UsageInformation).MaxLength(4096)
-                .ValidationResponse;
+                .ToValidationResponse();
 
             bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
@@ -81,7 +81,7 @@ namespace Sentry.data.Web.API
             //category exists
             if (validationResponse.HasValidationsFor(nameof(requestModel.CategoryName)) || !_datasetContext.Categories.Any(x => x.Name.ToLower() == requestModel.CategoryName.ToLower()))
             {
-                List<string> categoryNames = _datasetContext.Categories.Select(x => x.Name).ToList();
+                List<string> categoryNames = _datasetContext.Categories.Where(x => x.ObjectType == DataEntityCodes.DATASET).Select(x => x.Name).ToList();
                 validationResponse.AddFieldValidation(nameof(requestModel.CategoryName), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");
             }
 

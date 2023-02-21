@@ -351,15 +351,25 @@ namespace Sentry.data.Core
 
         public async Task<DatasetResultDto> AddDatasetAsync(DatasetDto datasetDto)
         {
-            datasetDto.UploadUserId = _userService.GetCurrentUser().AssociateId;
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity security = _securityService.GetUserSecurity(null, user);
 
-            Dataset dataset = CreateDataset(datasetDto);
+            if (security.CanCreateDataset)
+            {
+                datasetDto.UploadUserId = user.AssociateId;
 
-            await _datasetContext.AddAsync(dataset);
-            await _datasetContext.SaveChangesAsync();
+                Dataset dataset = CreateDataset(datasetDto);
 
-            DatasetResultDto resultDto = dataset.ToDatasetResultDto();
-            return resultDto;
+                await _datasetContext.AddAsync(dataset);
+                await _datasetContext.SaveChangesAsync();
+
+                DatasetResultDto resultDto = dataset.ToDatasetResultDto();
+                return resultDto;
+            }
+            else
+            {
+                throw new ResourceForbiddenException();
+            }
         }
 
         public int Create(DatasetDto dto)
@@ -842,6 +852,7 @@ namespace Sentry.data.Core
 
             return ds;
         }
+
         private Dataset CreateDataset(DatasetSchemaDto dto)
         {
             Dataset newDS = CreateDataset((DatasetDto)dto);            

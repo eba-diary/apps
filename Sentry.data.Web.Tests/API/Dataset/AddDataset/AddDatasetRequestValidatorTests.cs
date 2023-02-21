@@ -225,9 +225,8 @@ namespace Sentry.data.Web.Tests
 
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginationCode));
             Assert.IsNotNull(fieldValidation);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.Last());
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.First());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DataClassificationTypeCode));
             Assert.IsNotNull(fieldValidation);
@@ -236,9 +235,8 @@ namespace Sentry.data.Web.Tests
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode));
             Assert.IsNotNull(fieldValidation);    
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.Last());
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }

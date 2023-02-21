@@ -24,13 +24,10 @@ namespace Sentry.data.Web.API
         {
             MemberExpression memberExp = propertyValueExpression.Body as MemberExpression;
 
-            return new FluentValidationResponse<TModel, TProperty>
-            {
-                ValidationResponse = fluentResponse.ValidationResponse,
-                PropertyName = memberExp.Member.Name,
-                PropertyValue = propertyValueExpression.Compile().Invoke(fluentResponse.RequestModel),
-                RequestModel = fluentResponse.RequestModel
-            };
+            fluentResponse.PropertyName = memberExp.Member.Name;
+            fluentResponse.PropertyValue = propertyValueExpression.Compile().Invoke(fluentResponse.RequestModel);
+
+            return fluentResponse;
         }
 
         public static FluentValidationResponse<TModel, string> Required<TModel>(this FluentValidationResponse<TModel, string> fluentResponse) where TModel : IRequestModel

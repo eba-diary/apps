@@ -1869,8 +1869,15 @@ namespace Sentry.data.Core.Tests
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
+            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            applicationUser.SetupGet(x => x.AssociateId).Returns("000001");
+
             Mock<IUserService> userService = mr.Create<IUserService>();
-            userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000001");
+            userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
+
+            UserSecurity userSecurity = new UserSecurity { CanCreateDataset = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(null, applicationUser.Object)).Returns(userSecurity);
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             Asset asset = new Asset { SaidKeyCode = "SAID" };
@@ -1927,7 +1934,7 @@ namespace Sentry.data.Core.Tests
                 CategoryName = "Category"
             };
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, userService.Object, null, null, null, null, null, null);
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null);
 
             DatasetResultDto resultDto = datasetService.AddDatasetAsync(dto).Result;
 
@@ -1949,6 +1956,27 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), resultDto.CreatedDateTime);
             Assert.AreEqual(new DateTime(2023, 02, 21, 11, 0, 0), resultDto.UpdatedDateTime);
             Assert.AreEqual(ObjectStatusEnum.Active, resultDto.ObjectStatus);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void AddDatasetAsync_Forbidden_ThrowsResourceForbiddenException()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
+
+            UserSecurity userSecurity = new UserSecurity { CanCreateDataset = false };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(null, applicationUser.Object)).Returns(userSecurity);
+
+            DatasetService datasetService = new DatasetService(null, securityService.Object, userService.Object, null, null, null, null, null, null);
+
+            Assert.ThrowsExceptionAsync<ResourceForbiddenException>(() => datasetService.AddDatasetAsync(null));
 
             mr.VerifyAll();
         }
