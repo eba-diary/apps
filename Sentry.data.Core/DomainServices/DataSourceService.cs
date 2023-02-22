@@ -133,11 +133,11 @@ namespace Sentry.data.Core
                     try
                     {
                         Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
-                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken);
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
                     }
                     catch (Exception e)
                     {
-                        Sentry.Common.Logging.Logger.Error("Onboarding new token failed.", e);
+                        Sentry.Common.Logging.Logger.Error("Onboarding new token failed with message.", e);
                     }
                 }
             }

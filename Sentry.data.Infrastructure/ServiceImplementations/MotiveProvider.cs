@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure
             _featureFlags = featureFlags;
         }
 
-        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token)
+        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
         {
             var motiveCompaniesUrl = Config.GetHostSetting("MotiveCompaniesUrl");
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, token)}");
@@ -55,6 +55,11 @@ namespace Sentry.data.Infrastructure
                             JArray companies = (JArray)responseObject["companies"];
                             JObject firstCompany = (JObject)companies[0];
                             token.TokenName = firstCompany.GetValue("company").Value<string>("name");
+                            if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
+                            {
+                                var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
+                                _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
+                            }
                         }
                         _datasetContext.SaveChanges();
                     }

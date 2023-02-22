@@ -8,6 +8,6 @@ namespace Sentry.data.Core
 {
     public interface IMotiveProvider
     {
-        Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token);
+        Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId);
     }
 }
