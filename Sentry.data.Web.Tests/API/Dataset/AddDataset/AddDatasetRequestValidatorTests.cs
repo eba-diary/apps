@@ -3,10 +3,8 @@ using Moq;
 using Sentry.Associates;
 using Sentry.Core;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
-using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Web.API;
 using System;
 using System.Collections.Concurrent;
@@ -56,13 +54,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
@@ -93,7 +91,7 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
@@ -203,13 +201,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
@@ -278,13 +276,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
@@ -334,13 +332,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {       
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
@@ -404,13 +402,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
@@ -471,13 +469,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
@@ -549,13 +547,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
@@ -616,13 +614,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             quartermasterService.Setup(x => x.VerifyNamedEnvironmentAsync("SAID", "DEV", NamedEnvironmentType.NonProd)).ReturnsAsync(new ValidationResults());
@@ -642,7 +640,7 @@ namespace Sentry.data.Web.Tests
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.PrimaryContactId), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Not an active associate", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual("Must be a valid active associate", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -683,13 +681,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ThrowsAsync(new ApiException("NotFound", 404, null, null, null));
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(false);
 
             Mock<IAssociateInfoProvider> associateInfoProvider = mr.Create<IAssociateInfoProvider>();
             associateInfoProvider.Setup(x => x.GetActiveAssociateByIdAsync("000001")).ReturnsAsync(new Associate());
@@ -706,7 +704,7 @@ namespace Sentry.data.Web.Tests
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.First();
             Assert.AreEqual(nameof(AddDatasetRequestModel.SaidAssetCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Not a valid SAID asset code", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual("Must be a valid SAID asset code", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -747,13 +745,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             ValidationResults validationResults = new ValidationResults();
@@ -816,13 +814,13 @@ namespace Sentry.data.Web.Tests
 
             List<Category> categories = new List<Category>
             {
-                new Category { Name = "Category" }
+                new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
             };
 
             datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
             Mock<ISAIDService> saidService = mr.Create<ISAIDService>();
-            saidService.Setup(x => x.GetAssetByKeyCodeAsync("SAID")).ReturnsAsync(new SAIDAsset());
+            saidService.Setup(x => x.VerifyAssetExistsAsync("SAID")).ReturnsAsync(true);
 
             Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
             ValidationResults validationResults = new ValidationResults();

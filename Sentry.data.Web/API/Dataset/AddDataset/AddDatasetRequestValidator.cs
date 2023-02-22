@@ -1,7 +1,6 @@
 ﻿using Sentry.Associates;
 using Sentry.Core;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
@@ -80,7 +79,7 @@ namespace Sentry.data.Web.API
             }
 
             //category exists
-            if (validationResponse.HasValidationsFor(nameof(requestModel.CategoryName)) || !_datasetContext.Categories.Any(x => x.Name.ToLower() == requestModel.CategoryName.ToLower()))
+            if (validationResponse.HasValidationsFor(nameof(requestModel.CategoryName)) || !_datasetContext.Categories.Any(x => x.Name.ToLower() == requestModel.CategoryName.ToLower() && x.ObjectType == DataEntityCodes.DATASET))
             {
                 List<string> categoryNames = _datasetContext.Categories.Where(x => x.ObjectType == DataEntityCodes.DATASET).Select(x => x.Name).ToList();
                 validationResponse.AddFieldValidation(nameof(requestModel.CategoryName), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");
