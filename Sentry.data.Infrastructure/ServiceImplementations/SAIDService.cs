@@ -106,10 +106,23 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             finally
             {
                 SAIDAssetListLock.Release();
-            }
-            
+            }            
         }
 
+        public async Task<bool> VerifyAssetExistsAsync(string keyCode)
+        {
+            try
+            {
+                await _assetClient.GetAssetByKeyCodeAsync(keyCode, false).ConfigureAwait(false);
+                return true;
+            }
+            catch (ApiException)
+            {
+                return false;
+            }
+        }
+
+        #region Private
         private SAIDAsset ToEntity(SlimAssetEntity fromAsset)
         {
             SAIDAsset toAsset = new SAIDAsset()
@@ -147,5 +160,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
 
             return toRole;
         }
+
+        #endregion
     }
 }

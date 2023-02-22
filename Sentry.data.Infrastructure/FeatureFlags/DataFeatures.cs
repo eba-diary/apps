@@ -6,6 +6,7 @@ using Sentry.FeatureFlags.LaunchDarkly;
 using System;
 using System.Linq;
 using LaunchDarkly.Sdk.Server.Interfaces;
+using LaunchDarkly.Sdk;
 
 namespace Sentry.data.Infrastructure.FeatureFlags
 {
@@ -14,7 +15,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
     /// </summary>
     public class DataFeatures : IDataFeatures
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly ILdClient _ldClient;
 
         // LaunchDarkly feature flags - property definitions
@@ -49,10 +50,14 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
         public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
 
-        public DataFeatures(UserService userService, ILdClient ldClient)
+        public DataFeatures(IUserService userService, ILdClient ldClient)
         {
             _userService = userService;
             _ldClient = ldClient;
+
+            var permissionsBuilder = LdValue.BuildArray();
+            _userService.GetCurrentUser().Permissions.ToList().ForEach((p) => permissionsBuilder.Add(p));
+            LdUser = User.Builder(_userService.GetCurrentUser().AssociateId).Custom("Permissions", permissionsBuilder.Build()).Build();
 
             // LaunchDarkly feature flags - property initialization
             CLA1656_DataFlowEdit_ViewEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_ViewEditPage", false, _ldClient, () => LdUser);
@@ -90,15 +95,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /// <summary>
         /// This property builds the LdUser object that LaunchDarkly uses to evaluate feature flags
         /// </summary>
-        private LaunchDarkly.Sdk.User LdUser
-        {
-            get
-            {
-                var permissionsBuilder = LaunchDarkly.Sdk.LdValue.BuildArray();
-                _userService.GetCurrentUser().Permissions.ToList().ForEach((p) => permissionsBuilder.Add(p));
-                return LaunchDarkly.Sdk.User.Builder(_userService.GetCurrentUser().AssociateId).Custom("Permissions", permissionsBuilder.Build()).Build();
-            }
-        }
+        private User LdUser { get; }
 
         #region "Legacy Feature Flags"
 

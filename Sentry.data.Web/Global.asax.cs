@@ -64,12 +64,9 @@ namespace Sentry.data.Web
             //WebApi dependency resolver
             GlobalConfiguration.Configuration.DependencyResolver = new StructureMapWebApiDependencyResolver(Bootstrapper.Container);
 
-            //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-
             //Remove this when CLA3819_EgressEdgeMigration is removed
             //Remove implemenation 
-            SentryProxy.UseEdgeProxy = _structureMapDependencyResolver.CurrentNestedContainer.GetInstance<IDataFeatures>().CLA3819_EgressEdgeMigration.GetValue();
-            //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
+            SentryProxy.UseEdgeProxy = true;
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using Sentry.Associates;
 using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
@@ -100,37 +101,34 @@ namespace Sentry.data.Web.API
         {
             if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)))
             {
-                try
+                if (await _saidService.VerifyAssetExistsAsync(requestModel.SaidAssetCode).ConfigureAwait(false))
                 {
-                    await _saidService.GetAssetByKeyCodeAsync(requestModel.SaidAssetCode);
-                }
-                catch (Exception)
-                {
-                    validationResponse.AddFieldValidation(nameof(requestModel.SaidAssetCode), "Not a valid SAID asset code");
-                    return;
-                }
-
-                if (!validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment)) && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, out NamedEnvironmentType namedEnvironmentType))
-                {
-                    ValidationResults validationResults = await _quartermasterService.VerifyNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
-
-                    if (!validationResults.IsValid())
+                    if (!validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment)) && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, true, out NamedEnvironmentType namedEnvironmentType))
                     {
-                        //loop over results and align properties with the validation error returned
-                        foreach (ValidationResult result in validationResults.GetAll())
+                        ValidationResults validationResults = await _quartermasterService.VerifyNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
+
+                        if (!validationResults.IsValid())
                         {
-                            switch (result.Id)
+                            //loop over results and align properties with the validation error returned
+                            foreach (ValidationResult result in validationResults.GetAll())
                             {
-                                case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
-                                    validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironment), result.Description);
-                                    break;
-                                case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
-                                    validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironmentTypeCode), result.Description);
-                                    break;
+                                switch (result.Id)
+                                {
+                                    case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
+                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironment), result.Description);
+                                        break;
+                                    case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
+                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironmentTypeCode), result.Description);
+                                        break;
+                                }
                             }
                         }
                     }
                 }
+                else
+                {
+                    validationResponse.AddFieldValidation(nameof(requestModel.SaidAssetCode), "Must be a valid SAID asset code");
+                }                
             }
         }
 
@@ -142,7 +140,7 @@ namespace Sentry.data.Web.API
 
                 if (associate == null)
                 {
-                    validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.PrimaryContactId), "Not an active associate");
+                    validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.PrimaryContactId), "Must be a valid active associate");
                 }
             }
         }

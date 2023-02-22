@@ -20,8 +20,9 @@ namespace Sentry.data.Web.API
                 .IncludeAllDerived();
 
             CreateMap<ImmutableDatasetModel, DatasetDto>(MemberList.Source)
-                .ForMember(dest => dest.SAIDAssetKeyCode, x => x.MapFrom(src => src.SaidAssetCode))
+                .ForMember(dest => dest.SAIDAssetKeyCode, x => x.MapFrom(src => src.SaidAssetCode.ToUpper()))
                 .ForMember(dest => dest.NamedEnvironmentType, x => x.MapFrom(src => (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), src.NamedEnvironmentTypeCode, true)))
+                .ForMember(dest => dest.NamedEnvironment, x => x.AddTransform(src => src.ToUpper()))
                 .IncludeAllDerived();
 
             CreateMap<AddDatasetRequestModel, DatasetDto>(MemberList.Source);
