@@ -133,17 +133,17 @@ namespace Sentry.data.Core
                     try
                     {
                         Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
-                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken);
                     }
                     catch (Exception e)
                     {
-                        Sentry.Common.Logging.Logger.Error($"Onboarding new token failed with message: {e.Message}");
+                        Sentry.Common.Logging.Logger.Error("Onboarding new token failed.", e);
                     }
                 }
             }
             catch (Exception e)
             {
-                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}. Exception {e.Message}.");
+                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}.", e);
                 return false;
             }
             return true;
