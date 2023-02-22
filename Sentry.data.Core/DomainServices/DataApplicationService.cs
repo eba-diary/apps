@@ -266,6 +266,7 @@ namespace Sentry.data.Core
                     // Rollback newly created objects
                     Logger.Info($"{methodName} - Rollback initiated");
                     RollbackDatasetMigration(response);
+                    _datasetContext.SaveChanges();
                     Logger.Info($"{methodName} - Rollback completed");
                     throw;
                 }
@@ -886,6 +887,7 @@ namespace Sentry.data.Core
                     // Rollback newly created objects
                     Logger.Info($"{methodName} - Rollback initiated");
                     RollbackSchemaMigration(response);
+                    _datasetContext.SaveChanges();
                     Logger.Info($"{methodName} - Rollback completed");
                     throw;
                 }
@@ -939,8 +941,6 @@ namespace Sentry.data.Core
 
         internal virtual void RollbackDatasetMigration(DatasetMigrationRequestResponse response)
         {
-            bool saveChanges = true;
-
             if (response.IsDatasetMigrated)
             {   
                 //Delete dataset
@@ -957,15 +957,6 @@ namespace Sentry.data.Core
                         RollbackSchemaMigration(schemaResponse);
                     }
                 }
-                else
-                {
-                    saveChanges = false;
-                }
-            }
-
-            if (saveChanges)
-            {
-                _datasetContext.SaveChanges();
             }
         }
 
