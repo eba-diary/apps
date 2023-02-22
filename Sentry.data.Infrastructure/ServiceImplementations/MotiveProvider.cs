@@ -55,6 +55,14 @@ namespace Sentry.data.Infrastructure
                             JArray companies = (JArray)responseObject["companies"];
                             JObject firstCompany = (JObject)companies[0];
                             token.TokenName = firstCompany.GetValue("company").Value<string>("name");
+                            token.ForeignId = firstCompany.GetValue("company").Value<string>("company_id");
+                            foreach(var existingToken in ((HTTPSSource)motiveSource).Tokens)
+                            {
+                                if(string.Equals(existingToken.ForeignId, token.ForeignId))
+                                {
+                                    //change status 
+                                }
+                            }
                             if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
                             {
                                 var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
