@@ -937,7 +937,7 @@ namespace Sentry.data.Core
             }
         }
 
-        internal void RollbackDatasetMigration(DatasetMigrationRequestResponse response)
+        internal virtual void RollbackDatasetMigration(DatasetMigrationRequestResponse response)
         {
             bool saveChanges = true;
 

@@ -268,6 +268,62 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public async Task MigrateDataset_Dataset_Exception_Calls_Rollback()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("Me");
+
+            DatasetMigrationRequest request = new DatasetMigrationRequest()
+            {
+                SourceDatasetId = 1,
+                TargetDatasetNamedEnvironment = "QUAL"
+            };
+            Dataset sourceDataset = new Dataset() { DatasetId = 1, DatasetName = "MyDataset", Asset = new Asset() { SaidKeyCode = "ABCD" }, NamedEnvironment = "TEST" };
+            Dataset dataset = MockClasses.MockDataset(user: user.Object);
+            DatasetDto dto = MockClasses.MockDatasetDto(new List<Dataset>() { dataset, sourceDataset }).First();
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { dataset, sourceDataset }.AsQueryable());
+            context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(dataset);
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+            context.Setup(s => s.Clear());
+
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(new UserSecurity() { CanEditDataset = true });
+
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(s => s.GetDatasetDto(It.IsAny<int>())).Returns(dto);
+            datasetService.Setup(s => s.DatasetExistsInTargetNamedEnvironment(sourceDataset.DatasetName, sourceDataset.Asset.SaidKeyCode, request.TargetDatasetNamedEnvironment)).Returns((0, false));
+
+            Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
+            quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(new ValidationResults()));
+
+
+            var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
+            var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
+            var lazyUserService = new Lazy<IUserService>(() => userService.Object);
+            var lazyQuartermasterService = new Lazy<IQuartermasterService>(() => quartermasterService.Object);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, lazyDatasetService, null, null, null, lazyUserService, lazyDataFeatures, lazySecurityService, null, null, lazyQuartermasterService);
+            dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1);
+            dataApplicationService.Setup(s => s.MigrateSchemaWithoutSave_Internal(It.IsAny<List<SchemaMigrationRequest>>())).Returns(new List<SchemaMigrationRequestResponse>());
+            dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Throws<Exception>();
+            dataApplicationService.Setup(s => s.RollbackDatasetMigration(It.IsAny<DatasetMigrationRequestResponse>()));
+
+            //Act\ Assert
+            await Assert.ThrowsExceptionAsync<Exception>(() => dataApplicationService.Object.MigrateDataset(request));
+            mr.VerifyAll();            
+        }
+
+        [TestMethod]
         public void Verify_AddMigrationHistory_Inserted()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
