@@ -113,7 +113,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         {
             try
             {
-                await _assetClient.GetAssetByKeyCodeAsync(keyCode, false).ConfigureAwait(false);
+                await _assetClient.GetAssetByKeyCodeAsync(keyCode, false);
                 return true;
             }
             catch (ApiException)

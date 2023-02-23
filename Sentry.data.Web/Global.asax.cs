@@ -66,7 +66,7 @@ namespace Sentry.data.Web
 
             //Remove this when CLA3819_EgressEdgeMigration is removed
             //Remove implemenation 
-            SentryProxy.UseEdgeProxy = true;
+            SentryProxy.UseEdgeProxy = _structureMapDependencyResolver.CurrentNestedContainer.GetInstance<IDataFeatures>().CLA3819_EgressEdgeMigration.GetValue();
         }
 
 

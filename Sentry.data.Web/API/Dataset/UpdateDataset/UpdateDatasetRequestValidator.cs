@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Web.API
 {
     public class UpdateDatasetRequestValidator : IRequestModelValidator<UpdateDatasetRequestModel>
     {
-        public ConcurrentValidationResponse Validate(UpdateDatasetRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> Validate(UpdateDatasetRequestModel requestModel)
         {
             throw new NotImplementedException();
         }
 
-        public ConcurrentValidationResponse Validate(IRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> Validate(IRequestModel requestModel)
         {
-            return Validate((UpdateDatasetRequestModel)requestModel);
+            return await Validate((UpdateDatasetRequestModel)requestModel);
         }
     }
 }

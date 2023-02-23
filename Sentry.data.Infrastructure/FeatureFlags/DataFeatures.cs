@@ -55,10 +55,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             _userService = userService;
             _ldClient = ldClient;
 
-            var permissionsBuilder = LdValue.BuildArray();
-            _userService.GetCurrentUser().Permissions.ToList().ForEach((p) => permissionsBuilder.Add(p));
-            LdUser = User.Builder(_userService.GetCurrentUser().AssociateId).Custom("Permissions", permissionsBuilder.Build()).Build();
-
             // LaunchDarkly feature flags - property initialization
             CLA1656_DataFlowEdit_ViewEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_ViewEditPage", false, _ldClient, () => LdUser);
             CLA1656_DataFlowEdit_SubmitEditPage = new BooleanFeatureFlagAmbientContext("CLA1656_DataFlowEdit_SubmitEditPage", false, _ldClient, () => LdUser);
@@ -95,7 +91,16 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /// <summary>
         /// This property builds the LdUser object that LaunchDarkly uses to evaluate feature flags
         /// </summary>
-        private User LdUser { get; }
+        //private User LdUser { get; }
+        private User LdUser
+        {
+            get
+            {
+                var permissionsBuilder = LaunchDarkly.Sdk.LdValue.BuildArray();
+                _userService.GetCurrentUser().Permissions.ToList().ForEach((p) => permissionsBuilder.Add(p));
+                return LaunchDarkly.Sdk.User.Builder(_userService.GetCurrentUser().AssociateId).Custom("Permissions", permissionsBuilder.Build()).Build();
+            }
+        }
 
         #region "Legacy Feature Flags"
 

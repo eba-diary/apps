@@ -77,7 +77,7 @@ namespace Sentry.data.Web.API
         {
             return await Catch(async () =>
             {
-                dtoIn dtoInput = MapValidatedViewModel<modelIn, dtoIn>(requestModel);
+                dtoIn dtoInput = await MapValidatedViewModel<modelIn, dtoIn>(requestModel);
                 dtoInput.SetId(id);
                 return await GetResponse<dtoIn, dtoOut, modelOut>(dtoInput, service);
             });
@@ -121,13 +121,13 @@ namespace Sentry.data.Web.API
         {
             return await Catch(async () =>
             {
-                dtoIn dtoInput = MapValidatedViewModel<modelIn, dtoIn>(requestModel);
+                dtoIn dtoInput = await MapValidatedViewModel<modelIn, dtoIn>(requestModel);
                 return await GetResponse<dtoIn, dtoOut, modelOut>(dtoInput, service);
             });
         }
 
         #region Private
-        private dtoIn MapValidatedViewModel<modelIn, dtoIn>(modelIn requestModel) where modelIn : IRequestModel
+        private async Task<dtoIn> MapValidatedViewModel<modelIn, dtoIn>(modelIn requestModel) where modelIn : IRequestModel
         {
             if (requestModel == null)
             {
@@ -136,7 +136,7 @@ namespace Sentry.data.Web.API
 
             if (_validationRegistry.TryGetValidatorFor<modelIn>(out IRequestModelValidator validator))
             {
-                ConcurrentValidationResponse validationResponse = validator.Validate(requestModel);
+                ConcurrentValidationResponse validationResponse = await validator.Validate(requestModel);
 
                 if (!validationResponse.IsValid())
                 {

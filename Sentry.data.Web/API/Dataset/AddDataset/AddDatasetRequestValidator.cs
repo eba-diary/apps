@@ -26,7 +26,7 @@ namespace Sentry.data.Web.API
             _associateInfoProvider = associateInfoProvider;
         }
 
-        public ConcurrentValidationResponse Validate(AddDatasetRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> Validate(AddDatasetRequestModel requestModel)
         {
             ConcurrentValidationResponse validationResponse = requestModel.Validate(x => x.DatasetName).Required().MaxLength(1024)
                 .Validate(x => x.DatasetDescription).Required().MaxLength(4096)
@@ -46,8 +46,9 @@ namespace Sentry.data.Web.API
 
             List<Task> asyncValidations = new List<Task>
             {
+                ValidateSaidAssetCodeNamedEnvironmentAsync(requestModel, validationResponse),
                 ValidatePrimaryContactIdAsync(requestModel.PrimaryContactId, validationResponse),
-                ValidateSaidAssetCodeNamedEnvironmentAsync(requestModel, validationResponse)
+                ValidateAlternateContactEmailAsync(requestModel.AlternateContactEmail, validationResponse)
             };
 
             //dataset name exists
@@ -64,18 +65,11 @@ namespace Sentry.data.Web.API
                 {
                     validationResponse.AddFieldValidation(nameof(requestModel.ShortName), $"Short name cannot be '{SecurityConstants.ASSET_LEVEL_GROUP_NAME}'");
                 }
-
                 //short name exists
-                if (isValidNamedEnvironment && _datasetContext.Datasets.Any(d => d.ShortName.ToLower() == requestModel.ShortName.ToLower() && d.DatasetType == DataEntityCodes.DATASET && d.NamedEnvironment == requestModel.NamedEnvironment))
+                else if (isValidNamedEnvironment && _datasetContext.Datasets.Any(d => d.ShortName.ToLower() == requestModel.ShortName.ToLower() && d.DatasetType == DataEntityCodes.DATASET && d.NamedEnvironment == requestModel.NamedEnvironment))
                 {
                     validationResponse.AddFieldValidation(nameof(requestModel.ShortName), "Short name is already in use by another Dataset for the named environment");
                 }
-            }
-
-            //validate alternate email is sentry email
-            if (!ValidationHelper.IsDSCEmailValid(requestModel.AlternateContactEmail))
-            {
-                validationResponse.AddFieldValidation(nameof(requestModel.AlternateContactEmail), "Must be valid sentry.com email address");
             }
 
             //category exists
@@ -85,14 +79,14 @@ namespace Sentry.data.Web.API
                 validationResponse.AddFieldValidation(nameof(requestModel.CategoryName), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");
             }
 
-            Task.WaitAll(asyncValidations.ToArray());
+            await Task.WhenAll(asyncValidations.ToArray());
 
             return validationResponse;
         }
 
-        public ConcurrentValidationResponse Validate(IRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> Validate(IRequestModel requestModel)
         {
-            return Validate((AddDatasetRequestModel)requestModel);
+            return await Validate((AddDatasetRequestModel)requestModel);
         }
 
         #region Private
@@ -100,7 +94,7 @@ namespace Sentry.data.Web.API
         {
             if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)))
             {
-                if (await _saidService.VerifyAssetExistsAsync(requestModel.SaidAssetCode).ConfigureAwait(false))
+                if (await _saidService.VerifyAssetExistsAsync(requestModel.SaidAssetCode))
                 {
                     if (!validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment)) && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, true, out NamedEnvironmentType namedEnvironmentType))
                     {
@@ -142,6 +136,18 @@ namespace Sentry.data.Web.API
                     validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.PrimaryContactId), "Must be a valid active associate");
                 }
             }
+        }
+
+        private async Task ValidateAlternateContactEmailAsync(string alternateContactEmail, ConcurrentValidationResponse validationResponse)
+        {
+            await Task.Run(() =>
+            {
+                //validate alternate email is sentry email
+                if (!ValidationHelper.IsDSCEmailValid(alternateContactEmail))
+                {
+                    validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.AlternateContactEmail), "Must be valid sentry.com email address");
+                }
+            });
         }
 	    #endregion
     }
