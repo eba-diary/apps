@@ -136,7 +136,7 @@ namespace Sentry.data.Web.API
 
             if (_validationRegistry.TryGetValidatorFor<modelIn>(out IRequestModelValidator validator))
             {
-                ConcurrentValidationResponse validationResponse = await validator.Validate(requestModel);
+                ConcurrentValidationResponse validationResponse = await validator.ValidateAsync(requestModel);
 
                 if (!validationResponse.IsValid())
                 {

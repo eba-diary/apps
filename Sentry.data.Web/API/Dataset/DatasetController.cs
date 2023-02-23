@@ -28,10 +28,27 @@ namespace Sentry.data.Web.API
         [ApiVersionBegin(WebAPI.Version.v20230223)]
         [SwaggerResponse(HttpStatusCode.Created, null, typeof(AddDatasetResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> AddDataset(AddDatasetRequestModel model)
         {
             return await ProcessRequestAsync<AddDatasetRequestModel, DatasetDto, DatasetResultDto, AddDatasetResponseModel>(model, _datasetService.AddDatasetAsync);
+        }
+
+        /// <summary>
+        /// Update existing dataset
+        /// </summary>
+        [HttpPut]
+        [Route("{id}")]
+        [ApiVersionBegin(WebAPI.Version.v20230223)]
+        [SwaggerResponse(HttpStatusCode.OK, null, typeof(UpdateDatasetResponseModel))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        public async Task<IHttpActionResult> UpdateDataset(int id, UpdateDatasetRequestModel model)
+        {
+            return await ProcessRequestAsync<UpdateDatasetRequestModel, DatasetDto, DatasetResultDto, UpdateDatasetResponseModel>(id, model, _datasetService.UpdateDatasetAsync);
         }
     }
 }

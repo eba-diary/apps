@@ -26,7 +26,7 @@ namespace Sentry.data.Web.API
             _associateInfoProvider = associateInfoProvider;
         }
 
-        public async Task<ConcurrentValidationResponse> Validate(AddDatasetRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> ValidateAsync(AddDatasetRequestModel requestModel)
         {
             ConcurrentValidationResponse validationResponse = requestModel.Validate(x => x.DatasetName).Required().MaxLength(1024)
                 .Validate(x => x.DatasetDescription).Required().MaxLength(4096)
@@ -84,9 +84,9 @@ namespace Sentry.data.Web.API
             return validationResponse;
         }
 
-        public async Task<ConcurrentValidationResponse> Validate(IRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> ValidateAsync(IRequestModel requestModel)
         {
-            return await Validate((AddDatasetRequestModel)requestModel);
+            return await ValidateAsync((AddDatasetRequestModel)requestModel);
         }
 
         #region Private

@@ -15,7 +15,6 @@ namespace Sentry.data.Web.API
                 .ForMember(dest => dest.DataClassification, x => x.MapFrom(src => (DataClassificationType)Enum.Parse(typeof(DataClassificationType), src.DataClassificationTypeCode, true)))
                 .ForMember(dest => dest.OriginationId, x => x.MapFrom(src => (int)Enum.Parse(typeof(DatasetOriginationCode), src.OriginationCode, true)))
                 .ForMember(dest => dest.CreationUserId, x => x.MapFrom(src => src.OriginalCreator))
-                .ForMember(dest => dest.DatasetDtm, x => x.MapFrom(src => DateTime.Now))
                 .ForMember(dest => dest.ChangedDtm, x => x.MapFrom(src => DateTime.Now))
                 .IncludeAllDerived();
 
@@ -24,7 +23,8 @@ namespace Sentry.data.Web.API
                 .ForMember(dest => dest.NamedEnvironmentType, x => x.MapFrom(src => (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), src.NamedEnvironmentTypeCode, true)))
                 .IncludeAllDerived();
 
-            CreateMap<AddDatasetRequestModel, DatasetDto>(MemberList.Source);
+            CreateMap<AddDatasetRequestModel, DatasetDto>(MemberList.Source)
+                .ForMember(dest => dest.DatasetDtm, x => x.MapFrom(src => DateTime.Now));
 
             CreateMap<UpdateDatasetRequestModel, DatasetDto>(MemberList.Source);
 

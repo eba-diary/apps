@@ -18,7 +18,7 @@ namespace Sentry.data.Web.Tests.API
                 DatasetName = "Name",
                 CategoryName = "Category",
                 ShortName = "Short",
-                SaidAssetCode = "SAID",
+                SaidAssetCode = "said",
                 NamedEnvironment = "DEV",
                 NamedEnvironmentTypeCode = NamedEnvironmentType.NonProd.ToString(),
                 DatasetDescription = "Description",
@@ -47,6 +47,8 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual("me@sentry.com", dto.AlternateContactEmail);
             Assert.AreEqual((int)DatasetOriginationCode.External, dto.OriginationId);
             Assert.AreEqual("Creator", dto.CreationUserId);
+            Assert.IsTrue(dto.DatasetDtm >= DateTime.Now);
+            Assert.IsTrue(dto.ChangedDtm >= DateTime.Now);
         }
 
         [TestMethod]

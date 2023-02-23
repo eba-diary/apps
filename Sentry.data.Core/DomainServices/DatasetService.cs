@@ -411,6 +411,41 @@ namespace Sentry.data.Core
             return ds.DatasetId;
         }
 
+        public async Task<DatasetResultDto> UpdateDatasetAsync(DatasetDto dto)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
+
+            if (ds != null)
+            {
+                //check permissions
+                IApplicationUser user = _userService.GetCurrentUser();
+                UserSecurity security = _securityService.GetUserSecurity(null, user);
+
+                if (security.CanEditDataset)
+                {
+                    //update
+                    UpdateDataset(dto, ds);
+
+                    //save
+                    await _datasetContext.SaveChangesAsync();
+
+                    //map to result
+                    DatasetResultDto resultDto = ds.ToDatasetResultDto();
+
+                    //return
+                    return resultDto;
+                }
+                else
+                {
+                    throw new ResourceForbiddenException();
+                }
+            }
+            else
+            {
+                throw new ResourceNotFoundException();
+            }
+        }
+
         public void UpdateAndSaveDataset(DatasetSchemaDto dto)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
@@ -418,70 +453,7 @@ namespace Sentry.data.Core
             //Verify that certain idempotent fields have not been changed
             ValidateIdempotentFields(dto, ds);
 
-            ds.DatasetInformation = dto.DatasetInformation;
-            ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId);
-            ds.ChangedDtm = DateTime.Now;
-
-            if (dto.DatasetCategoryIds?.Count() > 0)
-            {
-                ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
-            }
-            if (null != dto.CreationUserId && dto.CreationUserId.Length > 0)
-            {
-                ds.CreationUserName = dto.CreationUserId;
-            }
-            if (null != dto.DatasetDesc && dto.DatasetDesc.Length > 0)
-            {
-                ds.DatasetDesc = dto.DatasetDesc;
-            }
-            if (dto.DatasetDtm > DateTime.MinValue)
-            {
-                ds.DatasetDtm = dto.DatasetDtm;
-            }
-            if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
-            {
-                ds.PrimaryContactId = dto.PrimaryContactId;
-            }
-            if (dto.DataClassification > 0)
-            {
-                ds.DataClassification = dto.DataClassification;
-            }
-            if (ds.Security == null)
-            {
-                ds.Security = new Security(SecurableEntityName.DATASET)
-                {
-                    CreatedById = _userService.GetCurrentUser().AssociateId
-                };
-            }
-
-            //override the Dto.IsSecured for certain classifications.
-            switch (dto.DataClassification)
-            {
-                case GlobalEnums.DataClassificationType.HighlySensitive:
-                    dto.IsSecured = true;
-                    break;
-                case GlobalEnums.DataClassificationType.InternalUseOnly:
-                    //don't override as it should flow from the form.
-                    break;
-                default:
-                    dto.IsSecured = false;
-                    break;
-            }
-
-            if (!ds.IsSecured && dto.IsSecured)
-            {
-                ds.Security.EnabledDate = DateTime.Now;
-                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
-            }
-            else if (ds.IsSecured && !dto.IsSecured)
-            {
-                ds.Security.RemovedDate = DateTime.Now;
-                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
-            }
-
-            ds.IsSecured = dto.IsSecured;
-
-            ds.AlternateContactEmail = dto.AlternateContactEmail;
+            UpdateDataset(dto, ds);
 
             _datasetContext.SaveChanges();
         }
@@ -511,6 +483,87 @@ namespace Sentry.data.Core
             {
                 throw new ValidationException(ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
             }
+        }
+
+        private void UpdateDataset(DatasetDto dto, Dataset ds)
+        {
+            ds.DatasetInformation = dto.DatasetInformation;
+            ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId);
+            ds.ChangedDtm = DateTime.Now;
+
+            if (dto.DatasetCategoryIds?.Count() > 0)
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+            }
+
+            else if (!string.IsNullOrEmpty(dto.CategoryName))
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
+            }
+
+            if (null != dto.CreationUserId && dto.CreationUserId.Length > 0)
+            {
+                ds.CreationUserName = dto.CreationUserId;
+            }
+
+            if (null != dto.DatasetDesc && dto.DatasetDesc.Length > 0)
+            {
+                ds.DatasetDesc = dto.DatasetDesc;
+            }
+
+            if (dto.DatasetDtm > DateTime.MinValue)
+            {
+                ds.DatasetDtm = dto.DatasetDtm;
+            }
+
+            if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
+            {
+                ds.PrimaryContactId = dto.PrimaryContactId;
+            }
+
+            if (dto.DataClassification > 0)
+            {
+                ds.DataClassification = dto.DataClassification;
+            }
+
+            string userId = _userService.GetCurrentUser().AssociateId;
+
+            if (ds.Security == null)
+            {
+                ds.Security = new Security(SecurableEntityName.DATASET)
+                {
+                    CreatedById = userId
+                };
+            }
+
+            //override the Dto.IsSecured for certain classifications.
+            switch (dto.DataClassification)
+            {
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    dto.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:
+                    //don't override as it should flow from the form.
+                    break;
+                default:
+                    dto.IsSecured = false;
+                    break;
+            }
+
+            if (!ds.IsSecured && dto.IsSecured)
+            {
+                ds.Security.EnabledDate = DateTime.Now;
+                ds.Security.UpdatedById = userId;
+            }
+            else if (ds.IsSecured && !dto.IsSecured)
+            {
+                ds.Security.RemovedDate = DateTime.Now;
+                ds.Security.UpdatedById = userId;
+            }
+
+            ds.IsSecured = dto.IsSecured;
+
+            ds.AlternateContactEmail = dto.AlternateContactEmail;
         }
 
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)

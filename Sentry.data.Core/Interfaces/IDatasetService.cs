@@ -31,6 +31,7 @@ namespace Sentry.data.Core
         List<DatasetSchemaDto> GetAllActiveDatasetDto();
         DatasetDetailDto GetDatasetDetailDto(int id);
         IDictionary<int, string> GetDatasetList();
+        Task<DatasetResultDto> UpdateDatasetAsync(DatasetDto dto);
         void UpdateAndSaveDataset(DatasetSchemaDto dto);
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);

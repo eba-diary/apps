@@ -70,7 +70,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsTrue(validationResponse.IsValid());
 
@@ -98,7 +98,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, null, null, null);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -214,7 +214,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, null, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -292,7 +292,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -345,7 +345,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, null, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -418,7 +418,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -485,7 +485,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -563,7 +563,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -630,7 +630,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -694,7 +694,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, null, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -763,7 +763,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 
@@ -832,7 +832,7 @@ namespace Sentry.data.Web.Tests
 
             AddDatasetRequestValidator validator = new AddDatasetRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
 
-            ConcurrentValidationResponse validationResponse = validator.Validate(model);
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(model).Result;
 
             Assert.IsFalse(validationResponse.IsValid());
 

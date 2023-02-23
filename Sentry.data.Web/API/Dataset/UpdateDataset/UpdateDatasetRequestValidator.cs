@@ -5,14 +5,14 @@ namespace Sentry.data.Web.API
 {
     public class UpdateDatasetRequestValidator : IRequestModelValidator<UpdateDatasetRequestModel>
     {
-        public async Task<ConcurrentValidationResponse> Validate(UpdateDatasetRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> ValidateAsync(UpdateDatasetRequestModel requestModel)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ConcurrentValidationResponse> Validate(IRequestModel requestModel)
+        public async Task<ConcurrentValidationResponse> ValidateAsync(IRequestModel requestModel)
         {
-            return await Validate((UpdateDatasetRequestModel)requestModel);
+            return await ValidateAsync((UpdateDatasetRequestModel)requestModel);
         }
     }
 }
