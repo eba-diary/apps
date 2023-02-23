@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Web.API
 {
-    public class AddDatasetRequestModel : ImmutableDatasetModel, IRequestModel
+    public class AddDatasetRequestModel : BaseImmutableDatasetModel, IRequestModel
     {
 
     }

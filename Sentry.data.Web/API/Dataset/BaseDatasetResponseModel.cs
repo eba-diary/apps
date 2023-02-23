@@ -2,7 +2,7 @@
 
 namespace Sentry.data.Web.API
 {
-    public abstract class DatasetResponseModel : ImmutableDatasetModel, IResponseModel
+    public abstract class BaseDatasetResponseModel : BaseImmutableDatasetModel, IResponseModel
     {
         public int DatasetId { get; set; }
         public DateTime CreatedDateTime { get; set; }

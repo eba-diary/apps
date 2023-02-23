@@ -8,15 +8,17 @@ using System;
 namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
-    public class AddDatasetModelMappingTests : BaseModelMappingsTests
+    public class AddDatasetModelMappingTests : BaseModelMappingTests
     {
         [TestMethod]
         public void Map_AddDatasetRequestModel_To_DatasetDto()
         {
+            DateTime now = DateTime.Now;
+
             AddDatasetRequestModel model = new AddDatasetRequestModel
             {
                 DatasetName = "Name",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 ShortName = "Short",
                 SaidAssetCode = "said",
                 NamedEnvironment = "DEV",
@@ -47,8 +49,8 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual("me@sentry.com", dto.AlternateContactEmail);
             Assert.AreEqual((int)DatasetOriginationCode.External, dto.OriginationId);
             Assert.AreEqual("Creator", dto.CreationUserId);
-            Assert.IsTrue(dto.DatasetDtm >= DateTime.Now);
-            Assert.IsTrue(dto.ChangedDtm >= DateTime.Now);
+            Assert.IsTrue(dto.DatasetDtm >= now);
+            Assert.IsTrue(dto.ChangedDtm >= now);
         }
 
         [TestMethod]
@@ -85,7 +87,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(now, model.UpdatedDateTime);
             Assert.AreEqual(ObjectStatusEnum.Disabled.ToString(), model.ObjectStatusCode);
             Assert.AreEqual("Name", model.DatasetName);
-            Assert.AreEqual("Category", model.CategoryName);
+            Assert.AreEqual("Category", model.CategoryCode);
             Assert.AreEqual("Short", model.ShortName);
             Assert.AreEqual("SAID", model.SaidAssetCode);
             Assert.AreEqual("DEV", model.NamedEnvironment);

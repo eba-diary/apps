@@ -32,12 +32,12 @@ namespace Sentry.data.Web.API
                 .Validate(x => x.DatasetDescription).Required().MaxLength(4096)
                 .Validate(x => x.ShortName).Required().MaxLength(12).RegularExpression("^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed")
                 .Validate(x => x.SaidAssetCode).Required()
-                .Validate(x => x.CategoryName).Required()
-                .Validate(x => x.OriginationCode).EnumValue(typeof(DatasetOriginationCode))
-                .Validate(x => x.DataClassificationTypeCode).EnumValue(typeof(DataClassificationType))
+                .Validate(x => x.CategoryCode).Required()
+                .Validate(x => x.OriginationCode).Required().EnumValue(typeof(DatasetOriginationCode))
+                .Validate(x => x.DataClassificationTypeCode).Required().EnumValue(typeof(DataClassificationType), DataClassificationType.None.ToString())
                 .Validate(x => x.OriginalCreator).Required().MaxLength(128)
                 .Validate(x => x.NamedEnvironment).Required().RegularExpression("^[A-Z0-9]{1,10}$", "Must be alphanumeric, all caps, and less than 10 characters")
-                .Validate(x => x.NamedEnvironmentTypeCode).EnumValue(typeof(NamedEnvironmentType))
+                .Validate(x => x.NamedEnvironmentTypeCode).Required().EnumValue(typeof(NamedEnvironmentType))
                 .Validate(x => x.PrimaryContactId).Required()
                 .Validate(x => x.UsageInformation).MaxLength(4096)
                 .ValidationResponse;
@@ -47,8 +47,8 @@ namespace Sentry.data.Web.API
             List<Task> asyncValidations = new List<Task>
             {
                 ValidateSaidAssetCodeNamedEnvironmentAsync(requestModel, validationResponse),
-                ValidatePrimaryContactIdAsync(requestModel.PrimaryContactId, validationResponse),
-                ValidateAlternateContactEmailAsync(requestModel.AlternateContactEmail, validationResponse)
+                requestModel.ValidatePrimaryContactIdAsync(_associateInfoProvider, validationResponse),
+                requestModel.ValidateAlternateContactEmailAsync(validationResponse)
             };
 
             //dataset name exists
@@ -73,11 +73,7 @@ namespace Sentry.data.Web.API
             }
 
             //category exists
-            if (validationResponse.HasValidationsFor(nameof(requestModel.CategoryName)) || !_datasetContext.Categories.Any(x => x.Name.ToLower() == requestModel.CategoryName.ToLower() && x.ObjectType == DataEntityCodes.DATASET))
-            {
-                List<string> categoryNames = _datasetContext.Categories.Where(x => x.ObjectType == DataEntityCodes.DATASET).Select(x => x.Name).ToList();
-                validationResponse.AddFieldValidation(nameof(requestModel.CategoryName), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");
-            }
+            requestModel.ValidateCategoryCode(_datasetContext, validationResponse);
 
             await Task.WhenAll(asyncValidations.ToArray());
 
@@ -123,31 +119,6 @@ namespace Sentry.data.Web.API
                     validationResponse.AddFieldValidation(nameof(requestModel.SaidAssetCode), "Must be a valid SAID asset code");
                 }                
             }
-        }
-
-        private async Task ValidatePrimaryContactIdAsync(string contactId, ConcurrentValidationResponse validationResponse)
-        {
-            if (!validationResponse.HasValidationsFor(nameof(AddDatasetRequestModel.PrimaryContactId)))
-            {
-                Associate associate = await _associateInfoProvider.GetActiveAssociateByIdAsync(contactId);
-
-                if (associate == null)
-                {
-                    validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.PrimaryContactId), "Must be a valid active associate");
-                }
-            }
-        }
-
-        private async Task ValidateAlternateContactEmailAsync(string alternateContactEmail, ConcurrentValidationResponse validationResponse)
-        {
-            await Task.Run(() =>
-            {
-                //validate alternate email is sentry email
-                if (!ValidationHelper.IsDSCEmailValid(alternateContactEmail))
-                {
-                    validationResponse.AddFieldValidation(nameof(AddDatasetRequestModel.AlternateContactEmail), "Must be valid sentry.com email address");
-                }
-            });
         }
 	    #endregion
     }

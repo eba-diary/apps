@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace Sentry.data.Web.API
 {
-    public static class ValidationExtensions
+    public static class FluentValidationExtensions
     {
         public static FluentValidationResponse<TModel, TProperty> Validate<TModel, TProperty>(this TModel requestModel, Expression<Func<TModel, TProperty>> propertyValueExpression) where TModel : IRequestModel
         {
@@ -25,12 +26,15 @@ namespace Sentry.data.Web.API
 
             fluentResponse.PropertyName = memberExp.Member.Name;
             fluentResponse.PropertyValue = propertyValueExpression.Compile().Invoke(fluentResponse.RequestModel);
+            fluentResponse.IsRequiredProperty = false;
 
             return fluentResponse;
         }
 
         public static FluentValidationResponse<TModel, string> Required<TModel>(this FluentValidationResponse<TModel, string> fluentResponse) where TModel : IRequestModel
         {
+            fluentResponse.IsRequiredProperty = true;
+
             if (string.IsNullOrWhiteSpace(fluentResponse.PropertyValue))
             {
                 fluentResponse.ValidationResponse.AddFieldValidation(fluentResponse.PropertyName, $"Required field");
@@ -59,16 +63,35 @@ namespace Sentry.data.Web.API
             return fluentResponse;
         }
 
-        public static FluentValidationResponse<TModel, string> EnumValue<TModel>(this FluentValidationResponse<TModel, string> fluentResponse, Type enumType) where TModel : IRequestModel
+        public static FluentValidationResponse<TModel, string> EnumValue<TModel>(this FluentValidationResponse<TModel, string> fluentResponse, Type enumType, string invalidOption = null) where TModel : IRequestModel
         {
-            try
+            if (fluentResponse.IsRequiredProperty || !string.IsNullOrWhiteSpace(fluentResponse.PropertyValue))
             {
-                Enum.Parse(enumType, fluentResponse.PropertyValue, true);
-            }
-            catch (ArgumentException)
-            {
-                string[] values = Enum.GetNames(enumType);
-                fluentResponse.ValidationResponse.AddFieldValidation(fluentResponse.PropertyName, $"Must provide a valid value - {string.Join(" | ", values)}");
+                bool invalid = !string.IsNullOrEmpty(invalidOption) && string.Equals(fluentResponse.PropertyValue, invalidOption, StringComparison.OrdinalIgnoreCase);
+
+                if (!invalid)
+                {
+                    try
+                    {
+                        Enum.Parse(enumType, fluentResponse.PropertyValue, true);
+                    }
+                    catch (ArgumentException)
+                    {
+                        invalid = true;
+                    }
+                }
+
+                if (invalid)
+                {
+                    string[] values = Enum.GetNames(enumType);
+
+                    if (!string.IsNullOrEmpty(invalidOption))
+                    {
+                        values = values.Where(x => x != invalidOption).ToArray();
+                    }
+
+                    fluentResponse.ValidationResponse.AddFieldValidation(fluentResponse.PropertyName, $"Must provide a valid value - {string.Join(" | ", values)}");
+                }
             }
 
             return fluentResponse;

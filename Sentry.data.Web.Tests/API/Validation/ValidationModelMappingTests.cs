@@ -5,7 +5,7 @@ using System.Linq;
 namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
-    public class ValidationModelMappingTests : BaseModelMappingsTests
+    public class ValidationModelMappingTests : BaseModelMappingTests
     {
         [TestMethod]
         public void Map_ConcurrentFieldValidationResponse_FieldValidationResponseModel()

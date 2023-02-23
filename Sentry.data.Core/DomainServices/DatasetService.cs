@@ -415,6 +415,7 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
 
+            //check exists
             if (ds != null)
             {
                 //check permissions
@@ -495,7 +496,6 @@ namespace Sentry.data.Core
             {
                 ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
             }
-
             else if (!string.IsNullOrEmpty(dto.CategoryName))
             {
                 ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
@@ -536,19 +536,9 @@ namespace Sentry.data.Core
                 };
             }
 
-            //override the Dto.IsSecured for certain classifications.
-            switch (dto.DataClassification)
-            {
-                case GlobalEnums.DataClassificationType.HighlySensitive:
-                    dto.IsSecured = true;
-                    break;
-                case GlobalEnums.DataClassificationType.InternalUseOnly:
-                    //don't override as it should flow from the form.
-                    break;
-                default:
-                    dto.IsSecured = false;
-                    break;
-            }
+            ds.IsSecured = dto.IsSecured;
+
+            SetIsSecuredByDataClassification(dto, ds);
 
             if (!ds.IsSecured && dto.IsSecured)
             {
@@ -560,8 +550,6 @@ namespace Sentry.data.Core
                 ds.Security.RemovedDate = DateTime.Now;
                 ds.Security.UpdatedById = userId;
             }
-
-            ds.IsSecured = dto.IsSecured;
 
             ds.AlternateContactEmail = dto.AlternateContactEmail;
         }
@@ -882,18 +870,7 @@ namespace Sentry.data.Core
                 ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
             }
 
-            switch (dto.DataClassification)
-            {
-                case GlobalEnums.DataClassificationType.HighlySensitive:
-                    ds.IsSecured = true;
-                    break;
-                case GlobalEnums.DataClassificationType.InternalUseOnly:
-                    ds.IsSecured = dto.IsSecured;
-                    break;
-                default:
-                    ds.IsSecured = false;
-                    break;
-            }
+            SetIsSecuredByDataClassification(dto, ds);
 
             //All datasets get a Security entry regardless if restricted
             //  this allows security process for internally managed permissions
@@ -904,6 +881,21 @@ namespace Sentry.data.Core
             };
 
             return ds;
+        }
+
+        private void SetIsSecuredByDataClassification(DatasetDto dto, Dataset ds)
+        {
+            switch (dto.DataClassification)
+            {
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    ds.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:                    
+                    break;
+                default:
+                    ds.IsSecured = false;
+                    break;
+            }
         }
 
         private Dataset CreateDataset(DatasetSchemaDto dto)

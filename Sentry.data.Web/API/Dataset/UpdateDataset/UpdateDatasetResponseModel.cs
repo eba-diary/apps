@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Web.API
 {
-    public class UpdateDatasetResponseModel : DatasetResponseModel
+    public class UpdateDatasetResponseModel : BaseDatasetResponseModel
     {
 
     }

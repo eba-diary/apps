@@ -5,7 +5,7 @@ using Sentry.data.Web.API;
 namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
-    public abstract class BaseModelMappingsTests
+    public abstract class BaseModelMappingTests
     {
         protected IMapper _mapper;
 

@@ -2,6 +2,8 @@
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.API;
 using System;
+using System.Linq;
+using System.Linq.Dynamic;
 
 namespace Sentry.data.Web.Tests.API
 {
@@ -298,7 +300,7 @@ namespace Sentry.data.Web.Tests.API
         }
 
         [TestMethod]
-        public void EnumValue_Null_Fail_FluentValidationResponse()
+        public void EnumValue_NotRequired_Null_Success_FluentValidationResponse()
         {
             ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
 
@@ -313,6 +315,27 @@ namespace Sentry.data.Web.Tests.API
 
             Assert.AreEqual(validationResponse, fluent.ValidationResponse);
             Assert.IsNull(fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName);
+            Assert.IsNull(fluent.ValidationResponse.FieldValidations);
+        }
+
+        [TestMethod]
+        public void EnumValue_Required_Null_Fail_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            FluentValidationResponse<AddDatasetRequestModel, string> fluent = new FluentValidationResponse<AddDatasetRequestModel, string>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = null,
+                IsRequiredProperty = true
+            };
+
+            fluent = fluent.EnumValue(typeof(NamedEnvironmentType));
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.IsNull(fluent.PropertyValue);
             Assert.AreEqual(1, fluent.ValidationResponse.FieldValidations.Count);
 
             Assert.IsTrue(fluent.ValidationResponse.FieldValidations.TryDequeue(out ConcurrentFieldValidationResponse fieldValidation));
@@ -321,6 +344,52 @@ namespace Sentry.data.Web.Tests.API
 
             Assert.IsTrue(fieldValidation.ValidationMessages.TryDequeue(out string message));
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", message);
+        }
+
+        [TestMethod]
+        public void EnumValue_InvalidOption_Fail_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            FluentValidationResponse<AddDatasetRequestModel, string> fluent = new FluentValidationResponse<AddDatasetRequestModel, string>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = "none"
+            };
+
+            fluent = fluent.EnumValue(typeof(DataClassificationType), DataClassificationType.None.ToString());
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual("none", fluent.PropertyValue);
+            Assert.AreEqual(1, fluent.ValidationResponse.FieldValidations.Count);
+
+            Assert.IsTrue(fluent.ValidationResponse.FieldValidations.TryDequeue(out ConcurrentFieldValidationResponse fieldValidation));
+            Assert.AreEqual("Field", fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+
+            Assert.IsTrue(fieldValidation.ValidationMessages.TryDequeue(out string message));
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)).Where(x => x != DataClassificationType.None.ToString()))}", message);
+        }
+
+        [TestMethod]
+        public void EnumValue_InvalidOption_Success_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            FluentValidationResponse<AddDatasetRequestModel, string> fluent = new FluentValidationResponse<AddDatasetRequestModel, string>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = "public"
+            };
+
+            fluent = fluent.EnumValue(typeof(DataClassificationType), DataClassificationType.None.ToString());
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual("public", fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName);
+            Assert.IsNull(fluent.ValidationResponse.FieldValidations);
         }
     }
 }

@@ -11,16 +11,34 @@ namespace Sentry.data.Web.API
         {
             CreateMap<BaseDatasetModel, DatasetDto>(MemberList.Source)
                 .ForMember(dest => dest.DatasetDesc, x => x.MapFrom(src => src.DatasetDescription))
+                .ForMember(dest => dest.CategoryName, x => x.MapFrom(src => src.CategoryCode))
                 .ForMember(dest => dest.DatasetInformation, x => x.MapFrom(src => src.UsageInformation))
-                .ForMember(dest => dest.DataClassification, x => x.MapFrom(src => (DataClassificationType)Enum.Parse(typeof(DataClassificationType), src.DataClassificationTypeCode, true)))
-                .ForMember(dest => dest.OriginationId, x => x.MapFrom(src => (int)Enum.Parse(typeof(DatasetOriginationCode), src.OriginationCode, true)))
+                .ForMember(dest => dest.DataClassification, x =>
+                {
+                    x.PreCondition(src => !string.IsNullOrWhiteSpace(src.DataClassificationTypeCode));
+                    x.MapFrom(src => (DataClassificationType)Enum.Parse(typeof(DataClassificationType), src.DataClassificationTypeCode, true));
+                })
+                .ForMember(dest => dest.OriginationId, x =>                
+                {
+                    x.PreCondition(src => !string.IsNullOrWhiteSpace(src.OriginationCode));
+                    x.MapFrom(src => (int)Enum.Parse(typeof(DatasetOriginationCode), src.OriginationCode, true));
+                })
                 .ForMember(dest => dest.CreationUserId, x => x.MapFrom(src => src.OriginalCreator))
                 .ForMember(dest => dest.ChangedDtm, x => x.MapFrom(src => DateTime.Now))
                 .IncludeAllDerived();
 
-            CreateMap<ImmutableDatasetModel, DatasetDto>(MemberList.Source)
-                .ForMember(dest => dest.SAIDAssetKeyCode, x => x.MapFrom(src => src.SaidAssetCode.ToUpper()))
-                .ForMember(dest => dest.NamedEnvironmentType, x => x.MapFrom(src => (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), src.NamedEnvironmentTypeCode, true)))
+            CreateMap<BaseImmutableDatasetModel, DatasetDto>(MemberList.Source)
+                .ForMember(dest => dest.SAIDAssetKeyCode, x =>
+                {
+                    x.PreCondition(src => !string.IsNullOrWhiteSpace(src.SaidAssetCode));
+                    x.MapFrom(src => src.SaidAssetCode);
+                    x.AddTransform(value => value.ToUpper());
+                })
+                .ForMember(dest => dest.NamedEnvironmentType, x =>
+                {
+                    x.PreCondition(src => !string.IsNullOrWhiteSpace(src.NamedEnvironmentTypeCode));
+                    x.MapFrom(src => (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), src.NamedEnvironmentTypeCode, true));
+                })
                 .IncludeAllDerived();
 
             CreateMap<AddDatasetRequestModel, DatasetDto>(MemberList.Source)
@@ -29,15 +47,16 @@ namespace Sentry.data.Web.API
             CreateMap<UpdateDatasetRequestModel, DatasetDto>(MemberList.Source);
 
             CreateMap<DatasetResultDto, BaseDatasetModel>(MemberList.Destination)
+                .ForMember(dest => dest.CategoryCode, x => x.MapFrom(src => src.CategoryName))
                 .ForMember(dest => dest.DataClassificationTypeCode, x => x.MapFrom(src => src.DataClassificationType.ToString()))
                 .ForMember(dest => dest.OriginationCode, x => x.MapFrom(src => src.OriginationCode.ToString()))
                 .IncludeAllDerived();
 
-            CreateMap<DatasetResultDto, ImmutableDatasetModel>(MemberList.Destination)
+            CreateMap<DatasetResultDto, BaseImmutableDatasetModel>(MemberList.Destination)
                 .ForMember(dest => dest.NamedEnvironmentTypeCode, x => x.MapFrom(src => src.NamedEnvironmentType.ToString()))
                 .IncludeAllDerived();
 
-            CreateMap<DatasetResultDto, DatasetResponseModel>(MemberList.Destination)
+            CreateMap<DatasetResultDto, BaseDatasetResponseModel>(MemberList.Destination)
                 .ForMember(dest => dest.ObjectStatusCode, x => x.MapFrom(src => src.ObjectStatus.ToString()))
                 .IncludeAllDerived();
 

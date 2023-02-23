@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
 
-namespace Sentry.data.Web.Tests
+namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
     public class AddDatasetRequestValidatorTests
@@ -26,7 +26,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -125,7 +125,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryName));
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryCode));
             Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
@@ -133,13 +133,15 @@ namespace Sentry.data.Web.Tests
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginationCode));
             Assert.IsNotNull(fieldValidation);
-            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.Last());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DataClassificationTypeCode));
             Assert.IsNotNull(fieldValidation);
-            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)))}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)).Where(x => x != DataClassificationType.None.ToString()))}", fieldValidation.ValidationMessages.Last());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginalCreator));
             Assert.IsNotNull(fieldValidation);
@@ -153,8 +155,9 @@ namespace Sentry.data.Web.Tests
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode));
             Assert.IsNotNull(fieldValidation);
-            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.Last());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.PrimaryContactId));
             Assert.IsNotNull(fieldValidation);
@@ -173,7 +176,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = null,
                 DataClassificationTypeCode = "invalid",
                 OriginalCreator = "Creator",
@@ -223,18 +226,20 @@ namespace Sentry.data.Web.Tests
 
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginationCode));
             Assert.IsNotNull(fieldValidation);
-            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DatasetOriginationCode)))}", fieldValidation.ValidationMessages.Last());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DataClassificationTypeCode));
             Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)))}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(DataClassificationType)).Where(x => x != DataClassificationType.None.ToString()))}", fieldValidation.ValidationMessages.First());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.NamedEnvironmentTypeCode));
-            Assert.IsNotNull(fieldValidation);    
-            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.First());
+            Assert.IsNotNull(fieldValidation);
+            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(NamedEnvironmentType)))}", fieldValidation.ValidationMessages.Last());
 
             mr.VerifyAll();
         }
@@ -248,7 +253,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "TooLongOfAShortName",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -316,7 +321,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short Name",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -374,7 +379,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = SecurityConstants.ASSET_LEVEL_GROUP_NAME,
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -442,7 +447,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "NotCategory",
+                CategoryCode = "NotCategory",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -502,7 +507,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual("Short name is already in use by another Dataset for the named environment", fieldValidation.ValidationMessages.First());
 
-            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryName));
+            fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryCode));
             Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", categories.Select(x => x.Name))}", fieldValidation.ValidationMessages.First());
@@ -519,7 +524,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -587,7 +592,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -654,7 +659,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -718,7 +723,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",
@@ -787,7 +792,7 @@ namespace Sentry.data.Web.Tests
                 DatasetDescription = "Description",
                 ShortName = "Short",
                 SaidAssetCode = "SAID",
-                CategoryName = "Category",
+                CategoryCode = "Category",
                 OriginationCode = DatasetOriginationCode.Internal.ToString(),
                 DataClassificationTypeCode = DataClassificationType.Public.ToString(),
                 OriginalCreator = "Creator",

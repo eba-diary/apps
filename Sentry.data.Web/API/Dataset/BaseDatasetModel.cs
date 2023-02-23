@@ -3,6 +3,7 @@
     public abstract class BaseDatasetModel
     {
         public string DatasetDescription { get; set; }
+        public string CategoryCode { get; set; }
         public string UsageInformation { get; set; }
         public string DataClassificationTypeCode { get; set; }
         public bool IsSecured { get; set; }
