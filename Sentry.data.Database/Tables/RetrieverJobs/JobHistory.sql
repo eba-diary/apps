@@ -14,8 +14,12 @@
     [Job_Guid] UNIQUEIDENTIFIER NULL, 
     [Submission] INT NULL, 
     [ClusterUrl] VARCHAR(100) NULL, 
-    CONSTRAINT [FK_JobHistory_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID])
+    CONSTRAINT [FK_JobHistory_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID]), 
+    CONSTRAINT [FK_JobHistory_Submission] FOREIGN KEY ([Submission]) REFERENCES [Submission]([Submission_ID])
 )
 GO
 
 create index IDX_JobHistoryNeedsValidation on JobHistory(ActiveInd) include (BatchId) with(online =on)
+GO
+
+CREATE INDEX [IDX_JobHistory_Job_ID_BatchID_ActiveInd] ON [dbo].[JobHistory] ([Job_ID],[BatchId],[ActiveInd])
