@@ -313,7 +313,7 @@ namespace Sentry.data.Web.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             DatasetFileConfig config = MockClasses.MockDatasetFileConfig();
-            config.Schema = new FileSchema() { SchemaId = 11, Name = "My Schema" };
+            config.Schema = new FileSchema() { SchemaId = 11, Name = "My Schema", ObjectStatus = ObjectStatusEnum.Active };
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { config }.AsQueryable());
