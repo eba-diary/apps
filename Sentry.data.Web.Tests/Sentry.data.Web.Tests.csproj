@@ -185,7 +185,7 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
     <Compile Include="API\Validation\ConcurrentFieldValidationResponseTests.cs" />
     <Compile Include="API\Validation\ValidationModelMappingTests.cs" />
-    <Compile Include="API\Validation\ValidationExtensionsTests.cs" />
+    <Compile Include="API\Validation\FluentValidationExtensionsTests.cs" />
     <Compile Include="API\Validation\ConcurrentValidationResponseTests.cs" />
     <Compile Include="BaseWebUnitTests.cs" />
     <Compile Include="CategoryTests.cs" />

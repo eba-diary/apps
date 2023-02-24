@@ -8,7 +8,7 @@ using System.Linq.Dynamic;
 namespace Sentry.data.Web.Tests.API
 {
     [TestClass]
-    public class ValidationExtensionsTests
+    public class FluentValidationExtensionsTests
     {
         [TestMethod]
         public void Validate_FromValidationResponseModel_FluentValidationResponse()

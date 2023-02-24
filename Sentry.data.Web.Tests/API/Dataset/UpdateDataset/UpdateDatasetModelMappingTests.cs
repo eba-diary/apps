@@ -72,5 +72,54 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(dto.DatasetDtm, DateTime.MinValue);
             Assert.IsTrue(dto.ChangedDtm >= now);
         }
+
+        [TestMethod]
+        public void Map_DatasetResultDto_To_UpdateDatasetResponseModel()
+        {
+            DateTime now = DateTime.Now;
+
+            DatasetResultDto dto = new DatasetResultDto
+            {
+                DatasetId = 1,
+                CreatedDateTime = now.AddDays(-1),
+                UpdatedDateTime = now,
+                ObjectStatus = ObjectStatusEnum.Disabled,
+                DatasetName = "Name",
+                CategoryName = "Category",
+                ShortName = "Short",
+                SaidAssetCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                DatasetDescription = "Description",
+                UsageInformation = "Usage",
+                DataClassificationType = DataClassificationType.Public,
+                IsSecured = true,
+                PrimaryContactId = "000001",
+                AlternateContactEmail = "me@sentry.com",
+                OriginationCode = DatasetOriginationCode.External,
+                OriginalCreator = "Creator"
+            };
+
+            UpdateDatasetResponseModel model = _mapper.Map<UpdateDatasetResponseModel>(dto);
+
+            Assert.AreEqual(1, model.DatasetId);
+            Assert.AreEqual(now.AddDays(-1), model.CreatedDateTime);
+            Assert.AreEqual(now, model.UpdatedDateTime);
+            Assert.AreEqual(ObjectStatusEnum.Disabled.ToString(), model.ObjectStatusCode);
+            Assert.AreEqual("Name", model.DatasetName);
+            Assert.AreEqual("Category", model.CategoryCode);
+            Assert.AreEqual("Short", model.ShortName);
+            Assert.AreEqual("SAID", model.SaidAssetCode);
+            Assert.AreEqual("DEV", model.NamedEnvironment);
+            Assert.AreEqual(NamedEnvironmentType.NonProd.ToString(), model.NamedEnvironmentTypeCode);
+            Assert.AreEqual("Description", model.DatasetDescription);
+            Assert.AreEqual("Usage", model.UsageInformation);
+            Assert.AreEqual(DataClassificationType.Public.ToString(), model.DataClassificationTypeCode);
+            Assert.IsTrue(model.IsSecured);
+            Assert.AreEqual("000001", model.PrimaryContactId);
+            Assert.AreEqual("me@sentry.com", model.AlternateContactEmail);
+            Assert.AreEqual(DatasetOriginationCode.External.ToString(), model.OriginationCode);
+            Assert.AreEqual("Creator", model.OriginalCreator);
+        }
     }
 }

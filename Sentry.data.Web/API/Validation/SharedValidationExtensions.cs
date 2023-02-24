@@ -37,7 +37,7 @@ namespace Sentry.data.Web.API
         public static void ValidateCategoryCode(this BaseDatasetModel model, IDatasetContext datasetContext, ConcurrentValidationResponse validationResponse)
         {
             if (validationResponse.HasValidationsFor(nameof(model.CategoryCode)) || 
-               (!string.IsNullOrEmpty(model.PrimaryContactId) && !datasetContext.Categories.Any(x => x.Name.ToLower() == model.CategoryCode.ToLower() && x.ObjectType == DataEntityCodes.DATASET)))
+               (!string.IsNullOrEmpty(model.CategoryCode) && !datasetContext.Categories.Any(x => x.Name.ToLower() == model.CategoryCode.ToLower() && x.ObjectType == DataEntityCodes.DATASET)))
             {
                 List<string> categoryNames = datasetContext.Categories.Where(x => x.ObjectType == DataEntityCodes.DATASET).Select(x => x.Name).ToList();
                 validationResponse.AddFieldValidation(nameof(model.CategoryCode), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");

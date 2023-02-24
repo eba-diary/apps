@@ -32,7 +32,6 @@ namespace Sentry.data.Web.API
                 requestModel.ValidateAlternateContactEmailAsync(validationResponse)
             };
 
-            //category
             requestModel.ValidateCategoryCode(_datasetContext, validationResponse);
 
             await Task.WhenAll(asyncValidations.ToArray());

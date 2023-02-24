@@ -420,7 +420,7 @@ namespace Sentry.data.Core
             {
                 //check permissions
                 IApplicationUser user = _userService.GetCurrentUser();
-                UserSecurity security = _securityService.GetUserSecurity(null, user);
+                UserSecurity security = _securityService.GetUserSecurity(ds, user);
 
                 if (security.CanEditDataset)
                 {
@@ -536,9 +536,7 @@ namespace Sentry.data.Core
                 };
             }
 
-            ds.IsSecured = dto.IsSecured;
-
-            SetIsSecuredByDataClassification(dto, ds);
+            SetIsSecuredByDataClassification(dto);
 
             if (!ds.IsSecured && dto.IsSecured)
             {
@@ -551,6 +549,7 @@ namespace Sentry.data.Core
                 ds.Security.UpdatedById = userId;
             }
 
+            ds.IsSecured = dto.IsSecured;
             ds.AlternateContactEmail = dto.AlternateContactEmail;
         }
 
@@ -848,7 +847,6 @@ namespace Sentry.data.Core
                 ChangedDtm = dto.ChangedDtm,
                 DatasetType = DataEntityCodes.DATASET,
                 DataClassification = dto.DataClassification,
-                IsSecured = dto.IsSecured,
                 CanDisplay = true,
                 DatasetFiles = null,
                 DatasetFileConfigs = null,
@@ -870,7 +868,8 @@ namespace Sentry.data.Core
                 ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
             }
 
-            SetIsSecuredByDataClassification(dto, ds);
+            SetIsSecuredByDataClassification(dto);
+            ds.IsSecured = dto.IsSecured;
 
             //All datasets get a Security entry regardless if restricted
             //  this allows security process for internally managed permissions
@@ -883,17 +882,17 @@ namespace Sentry.data.Core
             return ds;
         }
 
-        private void SetIsSecuredByDataClassification(DatasetDto dto, Dataset ds)
+        private void SetIsSecuredByDataClassification(DatasetDto dto)
         {
             switch (dto.DataClassification)
             {
                 case GlobalEnums.DataClassificationType.HighlySensitive:
-                    ds.IsSecured = true;
+                    dto.IsSecured = true;
                     break;
                 case GlobalEnums.DataClassificationType.InternalUseOnly:                    
                     break;
                 default:
-                    ds.IsSecured = false;
+                    dto.IsSecured = false;
                     break;
             }
         }

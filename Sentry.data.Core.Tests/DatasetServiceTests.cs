@@ -1,13 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.Core;
-using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1977,6 +1975,189 @@ namespace Sentry.data.Core.Tests
             DatasetService datasetService = new DatasetService(null, securityService.Object, userService.Object, null, null, null, null, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceForbiddenException>(() => datasetService.AddDatasetAsync(null));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateDatasetAsync_DatasetDto_DatasetResultDto()
+        {
+            DateTime now = DateTime.Now;
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            applicationUser.SetupGet(x => x.AssociateId).Returns("000003");
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
+
+            Category category = new Category { Name = "Category" };
+            Asset asset = new Asset { SaidKeyCode = "SAID" };
+            Security security = new Security { CreatedById = "000001" };
+            Dataset ds = new Dataset
+            {
+                DatasetId = 1,
+                DatasetName = "Name",
+                ShortName = "Short",
+                DatasetDesc = "Description",
+                DatasetInformation = "Information",
+                CreationUserName = "Creator",
+                PrimaryContactId = "000002",
+                UploadUserName = "000001",
+                OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                DatasetDtm = new DateTime(2023, 02, 21, 10, 0, 0),
+                ChangedDtm = new DateTime(2023, 02, 21, 11, 0, 0),
+                DatasetType = DataEntityCodes.DATASET,
+                DataClassification = DataClassificationType.InternalUseOnly,
+                IsSecured = true,
+                DeleteIssueDTM = DateTime.MaxValue,
+                Asset = asset,
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                AlternateContactEmail = "me@sentry.com",
+                DatasetCategories = new List<Category> { category },
+                Security = security,
+                ObjectStatus = ObjectStatusEnum.Active
+            };
+
+            UserSecurity userSecurity = new UserSecurity { CanEditDataset = true };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, applicationUser.Object)).Returns(userSecurity);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+
+            Category other = new Category { Name = "Other" };
+            List<Category> categories = new List<Category>
+            {
+                category,
+                other
+            };
+            datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
+
+            datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() =>
+            {
+                Assert.AreEqual(1, ds.DatasetId);
+                Assert.AreEqual("Name", ds.DatasetName);
+                Assert.AreEqual("Short", ds.ShortName);
+                Assert.AreEqual("Description New", ds.DatasetDesc);
+                Assert.AreEqual("Information New", ds.DatasetInformation);
+                Assert.AreEqual("Creator New", ds.CreationUserName);
+                Assert.AreEqual("000003", ds.PrimaryContactId);
+                Assert.AreEqual("000001", ds.UploadUserName);
+                Assert.AreEqual(DatasetOriginationCode.External.ToString(), ds.OriginationCode);
+                Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), ds.DatasetDtm);
+                Assert.IsTrue(ds.ChangedDtm >= now);
+                Assert.AreEqual(DataEntityCodes.DATASET, ds.DatasetType);
+                Assert.AreEqual(DataClassificationType.Public, ds.DataClassification);
+                Assert.IsFalse(ds.IsSecured);
+                Assert.IsFalse(ds.DeleteInd);
+                Assert.AreEqual(DateTime.MaxValue, ds.DeleteIssueDTM);
+                Assert.AreEqual(ObjectStatusEnum.Active, ds.ObjectStatus);
+                Assert.AreEqual(asset, ds.Asset);
+                Assert.AreEqual("DEV", ds.NamedEnvironment);
+                Assert.AreEqual(NamedEnvironmentType.NonProd, ds.NamedEnvironmentType);
+                Assert.AreEqual("you@sentry.com", ds.AlternateContactEmail);
+                Assert.AreEqual(other, ds.DatasetCategories.First());
+                Assert.AreEqual(security, ds.Security);
+                Assert.AreEqual("000001", ds.Security.CreatedById);
+                Assert.IsTrue(ds.Security.RemovedDate >= now);
+                Assert.AreEqual("000003", ds.Security.UpdatedById);
+            });
+
+            DatasetDto dto = new DatasetDto
+            {
+                DatasetId = 1,
+                DatasetDesc = "Description New",
+                DatasetInformation = "Information New",
+                CreationUserId = "Creator New",
+                PrimaryContactId = "000003",
+                OriginationId = (int)DatasetOriginationCode.External,
+                DataClassification = DataClassificationType.Public,
+                IsSecured = true,
+                AlternateContactEmail = "you@sentry.com",
+                CategoryName = "Other"
+            };
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null);
+
+            DatasetResultDto resultDto = datasetService.UpdateDatasetAsync(dto).Result;
+
+            Assert.AreEqual(1, resultDto.DatasetId);
+            Assert.AreEqual("Name", resultDto.DatasetName);
+            Assert.AreEqual("Description New", resultDto.DatasetDescription);
+            Assert.AreEqual("Other", resultDto.CategoryName);
+            Assert.AreEqual("Short", resultDto.ShortName);
+            Assert.AreEqual("SAID", resultDto.SaidAssetCode);
+            Assert.AreEqual("DEV", resultDto.NamedEnvironment);
+            Assert.AreEqual(NamedEnvironmentType.NonProd, resultDto.NamedEnvironmentType);
+            Assert.AreEqual("Information New", resultDto.UsageInformation);
+            Assert.AreEqual(DataClassificationType.Public, resultDto.DataClassificationType);
+            Assert.IsFalse(resultDto.IsSecured);
+            Assert.AreEqual("000003", resultDto.PrimaryContactId);
+            Assert.AreEqual("you@sentry.com", resultDto.AlternateContactEmail);
+            Assert.AreEqual(DatasetOriginationCode.External, resultDto.OriginationCode);
+            Assert.AreEqual("Creator New", resultDto.OriginalCreator);
+            Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), resultDto.CreatedDateTime);
+            Assert.IsTrue(resultDto.UpdatedDateTime >= now);
+            Assert.AreEqual(ObjectStatusEnum.Active, resultDto.ObjectStatus);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateDatasetAsync_Forbidden_ThrowsResourceForbiddenException()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
+
+            Dataset ds = new Dataset();
+
+            UserSecurity userSecurity = new UserSecurity { CanEditDataset = false };
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.GetUserSecurity(ds, applicationUser.Object)).Returns(userSecurity);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+
+            DatasetDto dto = new DatasetDto
+            {
+                DatasetId = 1
+            };
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null);
+
+            Assert.ThrowsExceptionAsync<ResourceForbiddenException>(() => datasetService.UpdateDatasetAsync(dto));
+
+            mr.VerifyAll();
+        }
+
+
+
+        [TestMethod]
+        public void UpdateDatasetAsync_NotFound_ThrowsResourceNotFoundException()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            Dataset ds = null;
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+
+            DatasetDto dto = new DatasetDto
+            {
+                DatasetId = 1
+            };
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null);
+
+            Assert.ThrowsExceptionAsync<ResourceNotFoundException>(() => datasetService.UpdateDatasetAsync(dto));
 
             mr.VerifyAll();
         }
