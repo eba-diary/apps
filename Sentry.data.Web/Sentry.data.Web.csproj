@@ -537,6 +537,13 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidator.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
+    <Compile Include="API\Schema\AddSchema\AddSchemaRequestModel.cs" />
+    <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidator.cs" />
+    <Compile Include="API\Schema\AddSchema\AddSchemaResponseModel.cs" />
+    <Compile Include="API\Schema\SchemaController.cs" />
+    <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />
+    <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidator.cs" />
+    <Compile Include="API\Schema\UpdateSchema\UpdateSchemaResponseModel.cs" />
     <Compile Include="API\Validation\Models\ConcurrentFieldValidationResponse.cs" />
     <Compile Include="API\Validation\Models\ConcurrentValidationResponse.cs" />
     <Compile Include="API\Validation\Fluent\FluentValidationResponse.cs" />

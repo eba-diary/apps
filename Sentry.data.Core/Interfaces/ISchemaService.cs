@@ -3,6 +3,7 @@ using Sentry.Core;
 using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -44,6 +45,13 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to schema</exception>
         /// <returns></returns>
         SchemaRevisionFieldStructureDto GetLatestSchemaRevisionFieldStructureBySchemaId(int datasetId, int schemaId);
+
+        /// <summary>
+        /// Create new FileSchema entity and it to context. Context add is awaited.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto);
 
         /// <summary>
         /// Create new FileSchema entity and add it to context.  Does not save changes.

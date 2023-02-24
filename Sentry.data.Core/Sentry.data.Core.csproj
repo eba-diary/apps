@@ -182,6 +182,7 @@
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
+    <Compile Include="DomainServices\SchemaFlowService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\AuditDto.cs" />
     <Compile Include="DTO\BaseAuditDto.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\Schema\AddSchemaDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
@@ -246,9 +248,11 @@
     <Compile Include="DTO\Schema\SchemaConsumptionDtoTransformer.cs" />
     <Compile Include="DTO\Schema\SchemaConsumptionSnowflakeDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaResultDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
+    <Compile Include="DTO\Schema\UpdateSchemaDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
@@ -517,6 +521,7 @@
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISchemaFlowService.cs" />
     <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />

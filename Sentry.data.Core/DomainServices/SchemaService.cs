@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -68,9 +69,16 @@ namespace Sentry.data.Core
             }
         }
 
+        public async Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto)
+        {
+            FileSchema schema = await MapToFileSchemaAsync(dto);
+            FileSchemaDto resultDto = MapToDto(schema);
+            return resultDto;
+        }
+
         public int Create(FileSchemaDto dto)
         {
-            FileSchema newSchema = MapToFileSchema(dto);
+            FileSchema newSchema = MapToFileSchemaAsync(dto).Result;
             return newSchema.SchemaId;
         }
 
@@ -79,7 +87,7 @@ namespace Sentry.data.Core
             FileSchema newSchema;
             try
             {
-                newSchema = MapToFileSchema(schemaDto);
+                newSchema = MapToFileSchemaAsync(schemaDto).Result;
 
                 _datasetContext.SaveChanges();
             }
@@ -1088,7 +1096,7 @@ namespace Sentry.data.Core
             file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
         }        
 
-        private FileSchema MapToFileSchema(FileSchemaDto dto)
+        private async Task<FileSchema> MapToFileSchemaAsync(FileSchemaDto dto)
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString().PadLeft(7, '0');
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
@@ -1127,7 +1135,7 @@ namespace Sentry.data.Core
             
             schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);           
 
-            _datasetContext.Add(schema);
+            await _datasetContext.AddAsync(schema);
 
             return schema;
         }
@@ -1184,7 +1192,6 @@ namespace Sentry.data.Core
                 ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
                 ControlMTriggerName = scm.ControlMTriggerName
             };
-
         }
 
         private string FormatHiveTableNamePart(string part)
