@@ -541,6 +541,7 @@
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaResponseModel.cs" />
     <Compile Include="API\Schema\SchemaController.cs" />
+    <Compile Include="API\Schema\SchemaProfile.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidator.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaResponseModel.cs" />
