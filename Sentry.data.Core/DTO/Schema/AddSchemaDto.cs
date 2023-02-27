@@ -8,6 +8,8 @@ namespace Sentry.data.Core
 {
     public class AddSchemaDto
     {
-        public int DatasetId { get; set; }
+        public FileSchemaDto SchemaDto { get; set; }
+        public DataFlowDto DataFlowDto { get; set; }
+        public DatasetFileConfigDto DatasetFileConfigDto { get; set; }
     }
 }

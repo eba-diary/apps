@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Net;
@@ -194,6 +195,7 @@ namespace Sentry.data.Web.API
             }
             catch (Exception e)
             {
+                Logger.Error($"Unexpected error occurred during API request", e);
                 return InternalServerError(e);
             }
         }

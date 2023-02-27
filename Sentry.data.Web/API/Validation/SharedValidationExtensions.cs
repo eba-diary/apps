@@ -1,5 +1,9 @@
 ﻿using Sentry.Associates;
+using Sentry.Core;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +45,41 @@ namespace Sentry.data.Web.API
             {
                 List<string> categoryNames = datasetContext.Categories.Where(x => x.ObjectType == DataEntityCodes.DATASET).Select(x => x.Name).ToList();
                 validationResponse.AddFieldValidation(nameof(model.CategoryCode), $"Must provide a valid value - {string.Join(" | ", categoryNames)}");
+            }
+        }
+
+        public static async Task ValidateSaidEnvironmentAsync(this ISaidEnvironmentModel requestModel, ISAIDService saidService, IQuartermasterService quartermasterService, ConcurrentValidationResponse validationResponse)
+        {
+            if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)))
+            {
+                if (await saidService.VerifyAssetExistsAsync(requestModel.SaidAssetCode))
+                {
+                    if (!validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment)) && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, true, out NamedEnvironmentType namedEnvironmentType))
+                    {
+                        ValidationResults validationResults = await quartermasterService.VerifyNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
+
+                        if (!validationResults.IsValid())
+                        {
+                            //loop over results and align properties with the validation error returned
+                            foreach (ValidationResult result in validationResults.GetAll())
+                            {
+                                switch (result.Id)
+                                {
+                                    case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
+                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironment), result.Description);
+                                        break;
+                                    case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
+                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironmentTypeCode), result.Description);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    validationResponse.AddFieldValidation(nameof(requestModel.SaidAssetCode), "Must be a valid SAID asset code");
+                }
             }
         }
     }

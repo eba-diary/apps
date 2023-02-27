@@ -537,9 +537,13 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestModel.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidator.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
+    <Compile Include="API\ISaidEnvironmentModel.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaResponseModel.cs" />
+    <Compile Include="API\Schema\BaseImmutableSchemaModel.cs" />
+    <Compile Include="API\Schema\BaseSchemaModel.cs" />
+    <Compile Include="API\Schema\BaseSchemaResponseModel.cs" />
     <Compile Include="API\Schema\SchemaController.cs" />
     <Compile Include="API\Schema\SchemaProfile.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />

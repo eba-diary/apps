@@ -33,7 +33,6 @@ namespace Sentry.data.Web.API
         [SwaggerResponse(HttpStatusCode.Created, null, typeof(AddSchemaResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> AddSchema(AddSchemaRequestModel model)
         {

@@ -44,9 +44,9 @@ namespace Sentry.data.Web.API
 
             bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
-            List<Task> asyncValidations = new List<Task>
+            Task[] asyncValidations = new Task[]
             {
-                ValidateSaidAssetCodeNamedEnvironmentAsync(requestModel, validationResponse),
+                requestModel.ValidateSaidEnvironmentAsync(_saidService, _quartermasterService, validationResponse),
                 requestModel.ValidatePrimaryContactIdAsync(_associateInfoProvider, validationResponse),
                 requestModel.ValidateAlternateContactEmailAsync(validationResponse)
             };
@@ -75,7 +75,7 @@ namespace Sentry.data.Web.API
             //category exists
             requestModel.ValidateCategoryCode(_datasetContext, validationResponse);
 
-            await Task.WhenAll(asyncValidations.ToArray());
+            await Task.WhenAll(asyncValidations);
 
             return validationResponse;
         }
@@ -84,42 +84,5 @@ namespace Sentry.data.Web.API
         {
             return await ValidateAsync((AddDatasetRequestModel)requestModel);
         }
-
-        #region Private
-        private async Task ValidateSaidAssetCodeNamedEnvironmentAsync(AddDatasetRequestModel requestModel, ConcurrentValidationResponse validationResponse)
-        {
-            if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)))
-            {
-                if (await _saidService.VerifyAssetExistsAsync(requestModel.SaidAssetCode))
-                {
-                    if (!validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment)) && Enum.TryParse(requestModel.NamedEnvironmentTypeCode, true, out NamedEnvironmentType namedEnvironmentType))
-                    {
-                        ValidationResults validationResults = await _quartermasterService.VerifyNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
-
-                        if (!validationResults.IsValid())
-                        {
-                            //loop over results and align properties with the validation error returned
-                            foreach (ValidationResult result in validationResults.GetAll())
-                            {
-                                switch (result.Id)
-                                {
-                                    case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
-                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironment), result.Description);
-                                        break;
-                                    case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
-                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironmentTypeCode), result.Description);
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    validationResponse.AddFieldValidation(nameof(requestModel.SaidAssetCode), "Must be a valid SAID asset code");
-                }                
-            }
-        }
-	    #endregion
     }
 }

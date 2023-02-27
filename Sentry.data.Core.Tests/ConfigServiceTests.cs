@@ -6,6 +6,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 using static System.Net.WebRequestMethods;
@@ -257,7 +258,7 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
             context.Setup(s => s.Add(It.IsAny<DatasetFileConfig>()));
-            context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(mockDataset);
+            context.Setup(s => s.GetByIdAsync<Dataset>(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockDataset);
 
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 

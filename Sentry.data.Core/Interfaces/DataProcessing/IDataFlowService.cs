@@ -26,6 +26,7 @@ namespace Sentry.data.Core
         List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName);
 
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
+        Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto);
         /// <summary>
         /// Creates a Dataflow Entity object and adds it to domain context.
         /// <para>Domain context changes are not saved.</para>
