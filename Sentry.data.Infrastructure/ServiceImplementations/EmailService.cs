@@ -283,7 +283,7 @@ namespace Sentry.data.Infrastructure
                 From = mailAddress,
                 Subject = $"New Motive Token Added: {token.TokenName ?? "Company Name Pending"}",
                 IsBodyHtml = true,
-                Body = "<p>New OAuth Token Received</p>"
+                Body = "<p>New OAuth Token Received, Contact <a href='mailto:DSCSupport@sentry.com'>DSC Support</a> with any questions.</p>"
             };
 
             foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
