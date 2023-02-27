@@ -133,17 +133,26 @@ namespace Sentry.data.Core
                     };
 
                     ((HTTPSSource)dataSource).Tokens.Add(newToken);
+                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
                     _datasetContext.SaveChanges();
+                    try
+                    {
+                        Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                    }
+                    catch (Exception e)
+                    {
+                        Sentry.Common.Logging.Logger.Error("Onboarding new token failed with message.", e);
+                    }
                     if (_featureFlags.CLA4931_SendMotiveEmail.GetValue())
                     {
                         _emailService.SendNewMotiveTokenAddedEmail(newToken);
                     }
-                    _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
                 }
             }
             catch (Exception e)
             {
-                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}. Exception {e.Message}.");
+                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}.", e);
                 return false;
             }
             return true;
