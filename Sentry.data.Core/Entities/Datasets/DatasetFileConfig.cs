@@ -25,7 +25,7 @@ namespace Sentry.data.Core
         public virtual DateTime DeleteIssueDTM { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
-        public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
+        public virtual IList<RetrieverJob> RetrieverJobs { get; set; } = new List<RetrieverJob>();
         public virtual FileExtension FileExtension { get; set; }
 
         /* ITrackableSchema implementation */
