@@ -1433,7 +1433,7 @@ namespace Sentry.data.Core.Tests
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null);
 
             //Act
-            DataFlow flow = dataflowService.MapToDataFlowAsync(flowDto).Result;
+            DataFlow flow = dataflowService.MapToDataFlow(flowDto);
 
             //Assert
 
@@ -1485,7 +1485,7 @@ namespace Sentry.data.Core.Tests
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null);
 
             //Act
-            DataFlow flow = dataflowService.MapToDataFlowAsync(flowDto).Result;
+            DataFlow flow = dataflowService.MapToDataFlow(flowDto);
 
             //Assert
 
@@ -1584,7 +1584,7 @@ namespace Sentry.data.Core.Tests
             var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null);
 
             //Act
-            DataFlow flow = dataflowService.MapToDataFlowAsync(flowDto).Result;
+            DataFlow flow = dataflowService.MapToDataFlow(flowDto);
 
             //Assert
             Assert.AreEqual("S3_TOPIC_NAME_TEST_001", flow.S3ConnectorName, $"{nameof(DataFlow.S3ConnectorName)} mappping failed");

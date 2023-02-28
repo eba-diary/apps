@@ -294,14 +294,14 @@ namespace Sentry.data.Core
             return jobIdList;
         }
 
-        public async Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
+        public Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
         {
-            DataFlow dataFlow = await CreateAndSaveDataFlowAsync(dto);
+            DataFlow dataFlow = CreateAndSaveDataFlow(dto);
 
             DataFlowDto resultDto = new DataFlowDto();
             MapToDto(dataFlow, resultDto);
 
-            return resultDto;
+            return Task.FromResult(resultDto);
         }
 
         public DataFlow Create(DataFlowDto dto)
@@ -318,15 +318,8 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} - Failed to create dataflow", ex); 
-                if (ex is AggregateException)
-                {
-                    throw ex.GetBaseException();
-                }
-                else
-                {
-                    throw;
-                }
+                Logger.Error($"{methodName} - Failed to create dataflow", ex);
+                throw;
             }
 
             Logger.Info($"{methodName} Method End");
@@ -335,7 +328,7 @@ namespace Sentry.data.Core
 
         private DataFlow CreateDataflow_Internal(DataFlowDto dto)
         {
-            DataFlow newDataFlow = MapToDataFlowAsync(dto).Result;
+            DataFlow newDataFlow = MapToDataFlow(dto);
             MapDataFlowSteps(dto, newDataFlow);
 
             return newDataFlow;
@@ -366,7 +359,7 @@ namespace Sentry.data.Core
 
             try
             {
-                DataFlow df = CreateAndSaveDataFlowAsync(dto).Result;
+                DataFlow df = CreateAndSaveDataFlow(dto);
 
                 if (_dataFeatures.CLA3718_Authorization.GetValue())
                 {
@@ -379,14 +372,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
-                if (ex is AggregateException)
-                {
-                    throw ex.GetBaseException();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
         }
 
@@ -412,23 +398,9 @@ namespace Sentry.data.Core
              *  - The incoming dto will have flowstoragecode and will
              *     be used by new dataflow as well  
             */
-            try
-            {
-                DataFlow newDataFlow = CreateAndSaveDataFlowAsync(dfDto).Result;
+            DataFlow newDataFlow = CreateAndSaveDataFlow(dfDto);
 
-                return newDataFlow.Id;
-            }
-            catch (Exception ex)
-            {
-                if (ex is AggregateException)
-                {
-                    throw ex.GetBaseException();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return newDataFlow.Id;
         }
 
         public void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status)
@@ -909,13 +881,13 @@ namespace Sentry.data.Core
             return request;
         }
 
-        private async Task<DataFlow> CreateAndSaveDataFlowAsync(DataFlowDto dto)
+        private DataFlow CreateAndSaveDataFlow(DataFlowDto dto)
         {
             try 
             { 
                 Logger.Info($"DataFlowService_CreateAndSaveDataFlow Method Start");
 
-                DataFlow df = await MapToDataFlowAsync(dto);
+                DataFlow df = MapToDataFlow(dto);
 
                 switch (dto.IngestionType)
                 {
@@ -933,7 +905,7 @@ namespace Sentry.data.Core
 
                 MapDataFlowSteps(dto, df);
 
-                await _datasetContext.SaveChangesAsync();
+                _datasetContext.SaveChanges();
 
                 CreateS3SinkConnector(df);
 
@@ -949,7 +921,7 @@ namespace Sentry.data.Core
             }
         }
 
-        internal async Task<DataFlow> MapToDataFlowAsync(DataFlowDto dto)
+        internal DataFlow MapToDataFlow(DataFlowDto dto)
         {
             Logger.Info($"MapToDataFlow Method Start");
 
@@ -988,7 +960,7 @@ namespace Sentry.data.Core
                             : _datasetContext.GetById<DataFlow>(dto.Id).Security
             };
 
-            await _datasetContext.AddAsync(df);
+            _datasetContext.Add(df);
 
             Logger.Info($"MapToDataFlow Method End");
             return df;

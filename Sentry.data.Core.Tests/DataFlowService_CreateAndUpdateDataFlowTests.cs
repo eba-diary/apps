@@ -220,13 +220,13 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(fileSchema);
 
             DataFlow resultDataFlow = null;
-            datasetContext.Setup(x => x.AddAsync(It.IsAny<DataFlow>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback<DataFlow, CancellationToken>((x, token) => 
+            datasetContext.Setup(x => x.Add(It.IsAny<DataFlow>())).Callback<DataFlow>(x => 
             {
                 x.Id = 3;
                 resultDataFlow = x;
             });
 
-            datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            datasetContext.Setup(x => x.SaveChanges(true));
 
             datasetContext.SetupGet(x => x.ProducerS3DropAction).Returns(new List<ProducerS3DropAction>() { new ProducerS3DropAction() { Id = 15 } }.AsQueryable());
             datasetContext.SetupGet(x => x.RawStorageAction).Returns(new List<RawStorageAction>() { new RawStorageAction() { Id = 22 } }.AsQueryable());
@@ -509,7 +509,7 @@ namespace Sentry.data.Core.Tests
             };
             datasetContext.SetupGet(x => x.FileSchema).Returns(new List<FileSchema>() { fileSchema }.AsQueryable());
 
-            datasetContext.Setup(x => x.AddAsync(It.IsAny<DataFlow>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback<DataFlow, CancellationToken>((x, token) => x.Id = 3);
+            datasetContext.Setup(x => x.Add(It.IsAny<DataFlow>())).Callback<DataFlow>(x => x.Id = 3);
 
             datasetContext.Setup(x => x.Clear());
 
@@ -626,9 +626,9 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.FileSchema).Returns(new List<FileSchema>() { fileSchema }.AsQueryable());
             datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(fileSchema);
 
-            datasetContext.Setup(x => x.AddAsync(It.IsAny<DataFlow>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback<DataFlow, CancellationToken>((x, token) => x.Id = 3);
+            datasetContext.Setup(x => x.Add(It.IsAny<DataFlow>())).Callback<DataFlow>(x => x.Id = 3);
 
-            datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            datasetContext.Setup(x => x.SaveChanges(true));
 
             datasetContext.SetupGet(x => x.ProducerS3DropAction).Returns(new List<ProducerS3DropAction>() { new ProducerS3DropAction() { Id = 15 } }.AsQueryable());
             datasetContext.SetupGet(x => x.RawStorageAction).Returns(new List<RawStorageAction>() { new RawStorageAction() { Id = 22 } }.AsQueryable());

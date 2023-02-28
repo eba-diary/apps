@@ -258,7 +258,7 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
             context.Setup(s => s.Add(It.IsAny<DatasetFileConfig>()));
-            context.Setup(s => s.GetByIdAsync<Dataset>(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(mockDataset);
+            context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(mockDataset);
 
             ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 

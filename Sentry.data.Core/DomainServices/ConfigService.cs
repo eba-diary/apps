@@ -325,11 +325,11 @@ namespace Sentry.data.Core
             }
         }
 
-        public async Task<DatasetFileConfigDto> AddDatasetFileConfigAsync(DatasetFileConfigDto dto)
+        public Task<DatasetFileConfigDto> AddDatasetFileConfigAsync(DatasetFileConfigDto dto)
         {
-            DatasetFileConfig datasetFileConfig = await CreateDatasetFileConfigAsync(dto);
+            DatasetFileConfig datasetFileConfig = CreateDatasetFileConfig(dto);
             DatasetFileConfigDto resultDto = MapToDatasetFileConfigDto(datasetFileConfig);
-            return resultDto;
+            return Task.FromResult(resultDto);
         }
 
         public int Create(DatasetFileConfigDto dto)
@@ -337,7 +337,7 @@ namespace Sentry.data.Core
             DatasetFileConfig datasetFileConfig;
             try
             {
-                datasetFileConfig = CreateDatasetFileConfigAsync(dto).Result;
+                datasetFileConfig = CreateDatasetFileConfig(dto);
             }
             catch (Exception ex)
             {
@@ -352,7 +352,7 @@ namespace Sentry.data.Core
         {
             try
             {
-                CreateDatasetFileConfigAsync(dto).Wait();
+                CreateDatasetFileConfig(dto);
                 _datasetContext.SaveChanges();
 
                 return true;
@@ -451,26 +451,26 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        private async Task<DatasetFileConfig> CreateDatasetFileConfigAsync(DatasetFileConfigDto dto)
+        private DatasetFileConfig CreateDatasetFileConfig(DatasetFileConfigDto dto)
         {
             DatasetFileConfig dfc = new DatasetFileConfig
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 FileTypeId = dto.FileTypeId,
-                ParentDataset = await _datasetContext.GetByIdAsync<Dataset>(dto.ParentDatasetId),
-                FileExtension = await _datasetContext.GetByIdAsync<FileExtension>(dto.FileExtensionId),
-                DatasetScopeType = await _datasetContext.GetByIdAsync<DatasetScopeType>(dto.DatasetScopeTypeId),
+                ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
+                FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
+                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 ObjectStatus = dto.ObjectStatus,
                 DeleteIssuer = null,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IsSchemaTracked = true,
-                Schema = await _datasetContext.GetByIdAsync<FileSchema>(dto.SchemaId)
+                Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId)
             };
 
             List<DatasetFileConfig> datasetFileConfigList = (dfc.ParentDataset.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : dfc.ParentDataset.DatasetFileConfigs.ToList();
             datasetFileConfigList.Add(dfc);
-            await _datasetContext.AddAsync(dfc);
+            _datasetContext.Add(dfc);
             dfc.ParentDataset.DatasetFileConfigs = datasetFileConfigList;
 
             return dfc;

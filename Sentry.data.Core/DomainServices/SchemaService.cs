@@ -69,16 +69,16 @@ namespace Sentry.data.Core
             }
         }
 
-        public async Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto)
+        public Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto)
         {
-            FileSchema schema = await MapToFileSchemaAsync(dto);
+            FileSchema schema = MapToFileSchema(dto);
             FileSchemaDto resultDto = MapToDto(schema);
-            return resultDto;
+            return Task.FromResult(resultDto);
         }
 
         public int Create(FileSchemaDto dto)
         {
-            FileSchema newSchema = MapToFileSchemaAsync(dto).Result;
+            FileSchema newSchema = MapToFileSchema(dto);
             return newSchema.SchemaId;
         }
 
@@ -87,7 +87,7 @@ namespace Sentry.data.Core
             FileSchema newSchema;
             try
             {
-                newSchema = MapToFileSchemaAsync(schemaDto).Result;
+                newSchema = MapToFileSchema(schemaDto);
 
                 _datasetContext.SaveChanges();
             }
@@ -1096,7 +1096,7 @@ namespace Sentry.data.Core
             file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
         }        
 
-        private async Task<FileSchema> MapToFileSchemaAsync(FileSchemaDto dto)
+        private FileSchema MapToFileSchema(FileSchemaDto dto)
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString().PadLeft(7, '0');
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
@@ -1135,7 +1135,7 @@ namespace Sentry.data.Core
             
             schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);           
 
-            await _datasetContext.AddAsync(schema);
+            _datasetContext.Add(schema);
 
             return schema;
         }
