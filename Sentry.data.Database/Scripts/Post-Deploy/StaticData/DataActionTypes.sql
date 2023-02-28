@@ -17,7 +17,8 @@
 		  (13,	'XML'),
 		  (14,	'JSONFlattening'),
 		  (15,	'Google BigQuery API'),
-		  (16,	'Google Search Console API')
+		  (16,	'Google Search Console API'),
+		  (17,	'Copy To Parquet')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

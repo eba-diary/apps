@@ -23,7 +23,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3329_Expose_HR_Category { get; }
         public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
         public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
-        public IFeatureFlag<bool> CLA3541_Dataset_Details_Tabs { get; }
         public IFeatureFlag<bool> CLA3497_UniqueLivySessionName { get; }
         public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
@@ -48,7 +47,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
         public IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
         public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
-
+        public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
 
         public DataFeatures(UserService userService, ILdClient ldClient)
         {
@@ -62,7 +61,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA2838_DSC_ANOUNCEMENTS = new BooleanFeatureFlagAmbientContext("CLA2838_DSC_ANOUNCEMENTS", false, _ldClient, () => LdUser);
             CLA3497_UniqueLivySessionName = new BooleanFeatureFlagAmbientContext("CLA3497_UniqueLivySessionName", false, _ldClient, () => LdUser);
             CLA3550_DATA_INVENTORY_NEW_COLUMNS = new BooleanFeatureFlagAmbientContext("CLA3550_DATA_INVENTORY_NEW_COLUMNS", false, _ldClient, () => LdUser);
-            CLA3541_Dataset_Details_Tabs = new BooleanFeatureFlagAmbientContext("CLA3541_DatasetDetailsTabs", false, _ldClient, () => LdUser);
             CLA3605_AllowSchemaParquetUpdate = new BooleanFeatureFlagAmbientContext("CLA3605_AllowSchemaParquetUpdate", false, _ldClient, () => LdUser);
             CLA3637_EXPOSE_INV_CATEGORY = new BooleanFeatureFlagAmbientContext("CLA3637_EXPOSE_INV_CATEGORY", false, _ldClient, () => LdUser);
             CLA3553_SchemaSearch = new BooleanFeatureFlagAmbientContext("CLA3553_SchemaSearch", false, _ldClient, () => LdUser);
@@ -86,6 +84,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
             CLA4485_DropCompaniesFile = new BooleanFeatureFlagAmbientContext("CLA4485_DropCompaniesFile", false, _ldClient, () => LdUser);
             CLA2869_AllowMotiveJobs = new BooleanFeatureFlagAmbientContext("CLA2869_AllowMotiveJobs", false, _ldClient, () => LdUser);
+            CLA4925_ParquetFileType = new BooleanFeatureFlagAmbientContext("CLA4925_ParquetFileType", false, _ldClient, () => LdUser);
         }
 
         /// <summary>

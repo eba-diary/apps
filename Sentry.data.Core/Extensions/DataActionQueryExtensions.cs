@@ -70,6 +70,10 @@ namespace Sentry.data.Core
             {
                 actionId = 38;
             }
+            else if (query is IQueryable<CopyToParquetAction>)
+            {
+                actionId = 57;
+            }
             else
             {
                 actionId = 0;
@@ -122,6 +126,10 @@ namespace Sentry.data.Core
             else if (query is IQueryable<SchemaLoadAction>)
             {
                 actionId = 18;
+            }
+            else if (query is IQueryable<CopyToParquetAction>)
+            {
+                actionId = 55;
             }
             else
             {
@@ -209,6 +217,10 @@ namespace Sentry.data.Core
             {
                 actionId = 54;
             }
+            else if (query is IQueryable<CopyToParquetAction>)
+            {
+                actionId = 58;
+            }
             else
             {
                 actionId = 0;
@@ -290,6 +302,10 @@ namespace Sentry.data.Core
             else if (query is IQueryable<GoogleSearchConsoleApiAction>)
             {
                 actionId = 34;
+            }
+            else if (query is IQueryable<CopyToParquetAction>)
+            {
+                actionId = 56;
             }
             else
             {

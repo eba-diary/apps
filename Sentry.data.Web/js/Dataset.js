@@ -1253,11 +1253,6 @@ data.Dataset = {
             $("#tab-spinner").hide();
         });
 
-        //Don't init dataset file data table until the file tab is selected when tab feature is on
-        if (!datasetDetailModel.DisplayTabSections) {
-            data.Dataset.DatasetFileTableInit(datasetDetailModel);
-        }
-
         //Hook up handlers for tabbed sections
 
         $('#detailTabSchemaColumns').click(function (e) {

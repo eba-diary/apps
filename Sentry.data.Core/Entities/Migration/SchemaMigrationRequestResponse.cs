@@ -8,6 +8,8 @@ namespace Sentry.data.Core
 {
     public class SchemaMigrationRequestResponse
     {
+        public int SourceSchemaId { get; set; }
+
         public bool MigratedSchema { get; set; }
         public int TargetSchemaId { get; set; }
         public string SchemaName { get; set; }

@@ -262,6 +262,7 @@
     <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\CopyToParquetAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\FixedWidthAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleSearchConsoleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleBigQueryApiAction.cs" />
@@ -336,10 +337,12 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
+    <Compile Include="Entities\Migration\MigrationHistory.cs" />
     <Compile Include="Entities\Migration\DatasetMigrationRequest.cs" />
     <Compile Include="Entities\Migration\DatasetMigrationRequestResponse.cs" />
     <Compile Include="Entities\Migration\MigrationRequest.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
+    <Compile Include="Entities\Migration\MigrationHistoryDetail.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequestResponse.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Schema\SchemaConsumption.cs" />

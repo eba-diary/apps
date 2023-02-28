@@ -65,6 +65,7 @@ namespace Sentry.data.Core
         IQueryable<RawStorageAction> RawStorageAction { get; }
         IQueryable<QueryStorageAction> QueryStorageAction { get; }
         IQueryable<ConvertToParquetAction> ConvertToParquetAction { get; }
+        IQueryable<CopyToParquetAction> CopyToParquetAction { get; }
         IQueryable<UncompressZipAction> UncompressZipAction { get; }
         IQueryable<UncompressGzipAction> UncompressGzipAction { get; }
         IQueryable<SchemaMapAction> SchemaMapAction { get; }
@@ -77,6 +78,9 @@ namespace Sentry.data.Core
         IQueryable<SchemaMap> SchemaMap { get; }
         IQueryable<ClaimIQAction> ClaimIQAction { get; }
         IQueryable<SavedSearch> SavedSearches { get; }
+        IQueryable<MigrationHistory> MigrationHistory { get; }
+        IQueryable<MigrationHistoryDetail> MigrationHistoryDetail { get; }
+
         /** Datasets **/
 
         Dataset GetById(int id);

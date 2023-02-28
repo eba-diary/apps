@@ -181,6 +181,124 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void CreateDataFlow_S3Drop_ParquetSchema_Id()
+        {
+            MockRepository mockRepository = new MockRepository(MockBehavior.Strict);
+
+            Dataset dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Dataset Name",
+                DatasetCategories = new List<Category>(),
+                Asset = new Asset() { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            Mock<IApplicationUser> appUser = GetApplicationUser(mockRepository);
+            Mock<IUserService> userService = GetUserService(mockRepository, appUser.Object);
+            Mock<ISecurityService> securityService = GetSecurityService(mockRepository, dataset, appUser.Object);
+            securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataFlow(3));
+
+            Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset>() { dataset }.AsQueryable());
+
+            DataFlow dataFlow = new DataFlow() { Id = 3, DatasetId = 1 };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>() { dataFlow }.AsQueryable());
+
+            FileSchema fileSchema = new FileSchema()
+            {
+                SchemaId = 2,
+                StorageCode = "000001",
+                Extension = new FileExtension() { Name = GlobalConstants.ExtensionNames.PARQUET }
+            };
+            datasetContext.SetupGet(x => x.FileSchema).Returns(new List<FileSchema>() { fileSchema }.AsQueryable());
+            datasetContext.Setup(x => x.GetById<FileSchema>(2)).Returns(fileSchema);
+
+            DataFlow resultDataFlow = null;
+            datasetContext.Setup(x => x.Add(It.IsAny<DataFlow>())).Callback<DataFlow>(x => 
+            {
+                x.Id = 3;
+                resultDataFlow = x;
+            });
+
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            datasetContext.SetupGet(x => x.ProducerS3DropAction).Returns(new List<ProducerS3DropAction>() { new ProducerS3DropAction() { Id = 15 } }.AsQueryable());
+            datasetContext.SetupGet(x => x.RawStorageAction).Returns(new List<RawStorageAction>() { new RawStorageAction() { Id = 22 } }.AsQueryable());
+            datasetContext.SetupGet(x => x.SchemaLoadAction).Returns(new List<SchemaLoadAction>() { new SchemaLoadAction() { Id = 32 } }.AsQueryable());
+            datasetContext.SetupGet(x => x.QueryStorageAction).Returns(new List<QueryStorageAction>() { new QueryStorageAction() { Id = 23 } }.AsQueryable());
+            datasetContext.SetupGet(x => x.CopyToParquetAction).Returns(new List<CopyToParquetAction>() { new CopyToParquetAction() { Id = 56, TriggerPrefix = "copytoparquet/", TargetStoragePrefix = "parquet/" } }.AsQueryable());
+
+            datasetContext.Setup(x => x.Add(It.IsAny<DataFlowStep>()));
+
+            DatasetFileConfig datasetFileConfig = new DatasetFileConfig()
+            {
+                ParentDataset = dataset,
+                Schema = fileSchema
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { datasetFileConfig }.AsQueryable());
+
+            datasetContext.Setup(x => x.Add(It.IsAny<SchemaMap>()));
+
+            DataFlowStep dataFlowStep = new DataFlowStep()
+            {
+                DataFlow = dataFlow,
+                DataAction_Type_Id = DataActionType.QueryStorage
+            };
+            List<SchemaMap> schemaMaps = new List<SchemaMap>() { new SchemaMap() { MappedSchema = fileSchema } };
+            DataFlowStep dataFlowStep2 = new DataFlowStep()
+            {
+                DataFlow = dataFlow,
+                DataAction_Type_Id = DataActionType.SchemaLoad,
+                SchemaMappings = schemaMaps
+            };
+            DataFlowStep dataFlowStep3 = new DataFlowStep()
+            {
+                DataFlow = dataFlow,
+                DataAction_Type_Id = DataActionType.CopyToParquet,
+                SchemaMappings = schemaMaps                
+            };
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(new List<DataFlowStep>() { dataFlowStep, dataFlowStep2, dataFlowStep3 }.AsQueryable());
+
+            Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+
+            DataFlowDto dto = new DataFlowDto()
+            {
+                SchemaMap = new List<SchemaMapDto>()
+                {
+                    new SchemaMapDto() { DatasetId = 1, SchemaId = 2 }
+                },
+                IngestionType = 3,
+                PreProcessingOption = 0,
+                DatasetId = 1,
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            int result = service.CreateDataFlow(dto);
+
+            Assert.AreEqual(3, result);
+            Assert.AreEqual(5, resultDataFlow.Steps.Count);
+
+            DataFlowStep copyToParquet = resultDataFlow.Steps.Last();
+            Assert.AreEqual(DataActionType.CopyToParquet, copyToParquet.DataAction_Type_Id);
+            Assert.AreEqual("temp-file/copytoparquet/SAID/DEV/000001/", copyToParquet.TriggerKey);
+            Assert.AreEqual("parquet/SAID/DEV/000001/", copyToParquet.TargetPrefix);
+
+            mockRepository.VerifyAll();
+        }
+
+        [TestMethod]
         public void CreateDataFlow_Topic_Id()
         {
             MockRepository mockRepository = new MockRepository(MockBehavior.Strict);

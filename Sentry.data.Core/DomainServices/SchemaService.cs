@@ -361,27 +361,24 @@ namespace Sentry.data.Core
             return 0;
         }
 
-        public void CreateConsumptionLayersForSchemaList(int[] schemaIdList)
+        public void CreateOrUpdateConsumptionLayersForSchema(int[] schemaIdList)
         {
             foreach(int schemaId in schemaIdList)
             {
                 FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
                 Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
                 FileSchemaDto dto = MapToDto(schema);
-                CreateConsumptionLayersForSchema(schema, dto, ds);
+
+                CreateOrUpdateConsumptionLayersForSchema(schema, dto, ds);
             }
         }
 
-        public void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
+        public void CreateOrUpdateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
         {
-            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
 
-            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds).Cast<SchemaConsumptionSnowflake>().ToList())
             {
-                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
-                {
-                    schema.ConsumptionDetails.Add(snowflakeConsumption);
-                }
+                schema.AddOrUpdateSnowflakeConsumptionLayer(snowflakeConsumption);
             }
 
             _datasetContext.SaveChanges();
@@ -1089,9 +1086,7 @@ namespace Sentry.data.Core
             file.DatasetFileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == stepEvent.SchemaId).FirstOrDefault();
             file.FlowExecutionGuid = stepEvent.FlowExecutionGuid;
             file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
-        }
-
-        
+        }        
 
         private FileSchema MapToFileSchema(FileSchemaDto dto)
         {
@@ -1265,16 +1260,10 @@ namespace Sentry.data.Core
 
             if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                 && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && dscNamedEnvironment == "QUAL")
+                && (dscNamedEnvironment == "QUAL" || dscNamedEnvironment == "PROD"))
             {
                 dbName += dscNamedEnvironment;
                 dbName += "NP";
-            }
-            else if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
-                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && dscNamedEnvironment == "PROD")
-            {
-                dbName += "NONPROD";
             }
             else
             {
