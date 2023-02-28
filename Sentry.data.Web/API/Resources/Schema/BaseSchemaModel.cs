@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Web.API
 {
-    public abstract class BaseSchemaModel
+    public abstract class BaseSchemaModel : IPrimaryContactModel
     {
         public string SchemaDescription { get; set; }
         public string Delimiter { get; set; }
@@ -13,7 +13,8 @@
         public bool IsCompressed { get; set; }
         public string CompressionTypeCode { get; set; }
         public bool IsPreprocessingRequired { get; set; }
-        public string PreprocessingCode { get; set; }
+        public string PreprocessingTypeCode { get; set; }
         public string KafkaTopicName { get; set; }
+        public string PrimaryContactId { get; set; }
     }
 }

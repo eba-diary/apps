@@ -13,7 +13,7 @@ namespace Sentry.data.Web.API
 {
     public static class SharedValidationExtensions
     {
-        public static async Task ValidatePrimaryContactIdAsync(this BaseDatasetModel model, IAssociateInfoProvider associateInfoProvider, ConcurrentValidationResponse validationResponse)
+        public static async Task ValidatePrimaryContactIdAsync(this IPrimaryContactModel model, IAssociateInfoProvider associateInfoProvider, ConcurrentValidationResponse validationResponse)
         {
             if (!string.IsNullOrEmpty(model.PrimaryContactId))
             {
@@ -48,8 +48,13 @@ namespace Sentry.data.Web.API
             }
         }
 
-        public static async Task ValidateSaidEnvironmentAsync(this ISaidEnvironmentModel requestModel, ISAIDService saidService, IQuartermasterService quartermasterService, ConcurrentValidationResponse validationResponse)
+        public static async Task ValidateSaidEnvironmentAsync<T>(this T requestModel, ISAIDService saidService, IQuartermasterService quartermasterService, ConcurrentValidationResponse validationResponse) where T : ISaidEnvironmentModel, IRequestModel
         {
+            validationResponse.AddValidationsFrom(requestModel.Validate(x => x.SaidAssetCode).Required()
+                .Validate(x => x.NamedEnvironment).Required().RegularExpression("^[A-Z0-9]{1,10}$", "Must be alphanumeric, all caps, and less than 10 characters")
+                .Validate(x => x.NamedEnvironmentTypeCode).Required().EnumValue(typeof(NamedEnvironmentType))
+                .ValidationResponse);
+
             if (!validationResponse.HasValidationsFor(nameof(requestModel.SaidAssetCode)))
             {
                 if (await saidService.VerifyAssetExistsAsync(requestModel.SaidAssetCode))

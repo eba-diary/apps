@@ -98,8 +98,8 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("me@sentry.com", dto.AlternateContactEmail);
             Assert.AreEqual(DatasetOriginationCode.External, dto.OriginationCode);
             Assert.AreEqual("Creator", dto.OriginalCreator);
-            Assert.AreEqual(new DateTime(2022, 8, 19, 8, 0, 0), dto.CreatedDateTime);
-            Assert.AreEqual(new DateTime(2022, 8, 20, 8, 0, 0), dto.UpdatedDateTime);
+            Assert.AreEqual(new DateTime(2022, 8, 19, 8, 0, 0), dto.CreateDateTime);
+            Assert.AreEqual(new DateTime(2022, 8, 20, 8, 0, 0), dto.UpdateDateTime);
             Assert.AreEqual(ObjectStatusEnum.Active, dto.ObjectStatus);
         }
     }

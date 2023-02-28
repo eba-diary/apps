@@ -746,8 +746,6 @@ namespace Sentry.data.Web.Tests.API
             };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
-
             List<Category> categories = new List<Category>
             {
                 new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }

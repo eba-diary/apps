@@ -1,6 +1,6 @@
 ﻿namespace Sentry.data.Web.API
 {
-    public abstract class BaseDatasetModel
+    public abstract class BaseDatasetModel : IPrimaryContactModel
     {
         public string DatasetDescription { get; set; }
         public string CategoryCode { get; set; }

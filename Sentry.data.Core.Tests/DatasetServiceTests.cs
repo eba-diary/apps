@@ -1951,8 +1951,8 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("me@sentry.com", resultDto.AlternateContactEmail);
             Assert.AreEqual(DatasetOriginationCode.Internal, resultDto.OriginationCode);
             Assert.AreEqual("Creator", resultDto.OriginalCreator);
-            Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), resultDto.CreatedDateTime);
-            Assert.AreEqual(new DateTime(2023, 02, 21, 11, 0, 0), resultDto.UpdatedDateTime);
+            Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), resultDto.CreateDateTime);
+            Assert.AreEqual(new DateTime(2023, 02, 21, 11, 0, 0), resultDto.UpdateDateTime);
             Assert.AreEqual(ObjectStatusEnum.Active, resultDto.ObjectStatus);
 
             mr.VerifyAll();
@@ -2100,8 +2100,8 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("you@sentry.com", resultDto.AlternateContactEmail);
             Assert.AreEqual(DatasetOriginationCode.External, resultDto.OriginationCode);
             Assert.AreEqual("Creator New", resultDto.OriginalCreator);
-            Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), resultDto.CreatedDateTime);
-            Assert.IsTrue(resultDto.UpdatedDateTime >= now);
+            Assert.AreEqual(new DateTime(2023, 02, 21, 10, 0, 0), resultDto.CreateDateTime);
+            Assert.IsTrue(resultDto.UpdateDateTime >= now);
             Assert.AreEqual(ObjectStatusEnum.Active, resultDto.ObjectStatus);
 
             mr.VerifyAll();

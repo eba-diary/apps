@@ -3,7 +3,7 @@ using System;
 
 namespace Sentry.data.Core
 {
-    public class DatasetResultDto
+    public class DatasetResultDto : BaseResultDto
     {
         public int DatasetId { get; set; }
         public string DatasetName { get; set; }
@@ -20,8 +20,5 @@ namespace Sentry.data.Core
         public string AlternateContactEmail { get; set; }
         public DatasetOriginationCode OriginationCode { get; set; }
         public string OriginalCreator { get; set; }
-        public DateTime CreatedDateTime { get; set; }
-        public DateTime UpdatedDateTime { get; set; }
-        public ObjectStatusEnum ObjectStatus { get; set; }
     }
 }

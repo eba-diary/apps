@@ -296,6 +296,8 @@ namespace Sentry.data.Core
 
         public Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
         {
+            dto.CreatedBy = _userService.GetCurrentUser().AssociateId;
+
             DataFlow dataFlow = CreateAndSaveDataFlow(dto);
 
             DataFlowDto resultDto = new DataFlowDto();

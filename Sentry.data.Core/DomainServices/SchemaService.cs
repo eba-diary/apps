@@ -1110,7 +1110,7 @@ namespace Sentry.data.Core
                 Extension = GetSchemaFileExtension(dto),
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
+                SasLibrary = CommonExtensions.GenerateSASLibaryName(parentDataset),
                 Description = dto.Description,
                 StorageCode = storageCode,
                 HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
@@ -1130,7 +1130,7 @@ namespace Sentry.data.Core
                 SchemaRootPath = dto.SchemaRootPath,
                 ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
                 ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
-                ControlMTriggerName = GetControlMTrigger(dto),
+                ControlMTriggerName = GetControlMTrigger(dto)
             };
             
             schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);           

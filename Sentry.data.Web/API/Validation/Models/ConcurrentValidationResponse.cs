@@ -43,5 +43,19 @@ namespace Sentry.data.Web.API
         {
             return FieldValidations?.Any(x => x.Field == field) == true;
         }
+
+        public void AddValidationsFrom(ConcurrentValidationResponse fromValidationResponse)
+        {
+            if (fromValidationResponse != null && fromValidationResponse.FieldValidations?.Any() == true)
+            {
+                foreach (ConcurrentFieldValidationResponse fromFieldValidation in fromValidationResponse.FieldValidations)
+                {
+                    foreach (string fromMessage in fromFieldValidation.ValidationMessages)
+                    {
+                        AddFieldValidation(fromFieldValidation.Field, fromMessage);
+                    }
+                }
+            }
+        }
     }
 }

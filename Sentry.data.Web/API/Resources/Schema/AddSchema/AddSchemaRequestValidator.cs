@@ -1,6 +1,7 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
+using Sentry.data.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +15,14 @@ namespace Sentry.data.Web.API
         private readonly IDatasetContext _datasetContext;
         private readonly ISAIDService _saidService;
         private readonly IQuartermasterService _quartermasterService;
+        private readonly IAssociateInfoProvider _associateInfoProvider;
 
-        public AddSchemaRequestValidator(IDatasetContext datasetContext, ISAIDService saidService, IQuartermasterService quartermasterService)
+        public AddSchemaRequestValidator(IDatasetContext datasetContext, ISAIDService saidService, IQuartermasterService quartermasterService, IAssociateInfoProvider associateInfoProvider)
         {
             _datasetContext = datasetContext;
             _saidService = saidService;
             _quartermasterService = quartermasterService;
+            _associateInfoProvider = associateInfoProvider;
         }
 
         public async Task<ConcurrentValidationResponse> ValidateAsync(AddSchemaRequestModel requestModel)
@@ -28,16 +31,16 @@ namespace Sentry.data.Web.API
                 .Validate(x => x.SchemaDescription).Required()
                 .Validate(x => x.FileTypeCode).Required()
                 .Validate(x => x.IngestionTypeCode).Required().EnumValue(typeof(IngestionType), IngestionType.DSC_Pull.ToString())
-                .Validate(x => x.SaidAssetCode).Required()
-                .Validate(x => x.NamedEnvironment).Required().RegularExpression("^[A-Z0-9]{1,10}$", "Must be alphanumeric, all caps, and less than 10 characters")
-                .Validate(x => x.NamedEnvironmentTypeCode).Required().EnumValue(typeof(NamedEnvironmentType))
                 .Validate(x => x.CompressionTypeCode).EnumValue(typeof(CompressionTypes))
-                .Validate(x => x.PreprocessingCode).EnumValue(typeof(DataFlowPreProcessingTypes))
+                .Validate(x => x.PreprocessingTypeCode).EnumValue(typeof(DataFlowPreProcessingTypes))
+                .Validate(x => x.PrimaryContactId).Required()
+                .Validate(x => x.ScopeTypeCode).Required()
                 .ValidationResponse;
 
             Task[] asyncValidations = new Task[] 
             { 
-                requestModel.ValidateSaidEnvironmentAsync(_saidService, _quartermasterService, validationResponse) 
+                requestModel.ValidateSaidEnvironmentAsync(_saidService, _quartermasterService, validationResponse),
+                requestModel.ValidatePrimaryContactIdAsync(_associateInfoProvider, validationResponse)
             };
 
             Dataset dataset = _datasetContext.GetById<Dataset>(requestModel.DatasetId);
@@ -75,7 +78,7 @@ namespace Sentry.data.Web.API
             }
 
             //don't require datasetscopetype and see what happens
-            if (!string.IsNullOrWhiteSpace(requestModel.ScopeTypeCode) && _datasetContext.DatasetScopeTypes.Any(x => x.Name.ToLower() == requestModel.ScopeTypeCode.ToLower()))
+            if (validationResponse.HasValidationsFor(nameof(requestModel.ScopeTypeCode)) || !_datasetContext.DatasetScopeTypes.Any(x => x.Name.ToLower() == requestModel.ScopeTypeCode.ToLower()))
             {
                 List<string> scopeTypes = _datasetContext.DatasetScopeTypes.Select(x => x.Name).ToList();
                 validationResponse.AddFieldValidation(nameof(requestModel.ScopeTypeCode), $"Must provide a valid value - {string.Join(" | ", scopeTypes)}");
@@ -92,23 +95,30 @@ namespace Sentry.data.Web.API
             }
 
             //PreprocessingCode required when IsPreprocessingRequired is true
-            if (!requestModel.IsPreprocessingRequired && !string.IsNullOrWhiteSpace(requestModel.PreprocessingCode))
+            if (!requestModel.IsPreprocessingRequired && !string.IsNullOrWhiteSpace(requestModel.PreprocessingTypeCode))
             {
-                validationResponse.AddFieldValidation(nameof(requestModel.IsPreprocessingRequired), $"{requestModel.PreprocessingCode} is not used when {requestModel.IsPreprocessingRequired} is false");
+                validationResponse.AddFieldValidation(nameof(requestModel.IsPreprocessingRequired), $"{requestModel.PreprocessingTypeCode} is not used when {requestModel.IsPreprocessingRequired} is false");
             }
-            else if (requestModel.IsPreprocessingRequired && string.IsNullOrWhiteSpace(requestModel.PreprocessingCode))
+            else if (requestModel.IsPreprocessingRequired && string.IsNullOrWhiteSpace(requestModel.PreprocessingTypeCode))
             {
-                validationResponse.AddFieldValidation(nameof(requestModel.PreprocessingCode), $"Must provide a valid value when {nameof(requestModel.IsPreprocessingRequired)} is true - {string.Join(" | ", Enum.GetNames(typeof(DataFlowPreProcessingTypes)))}");
+                validationResponse.AddFieldValidation(nameof(requestModel.PreprocessingTypeCode), $"Must provide a valid value when {nameof(requestModel.IsPreprocessingRequired)} is true - {string.Join(" | ", Enum.GetNames(typeof(DataFlowPreProcessingTypes)))}");
             }
 
             //KafkaTopicName required when IngestionTypeCode is Topic
             if (!validationResponse.HasValidationsFor(nameof(requestModel.IngestionTypeCode)) && Enum.TryParse(requestModel.IngestionTypeCode, true, out IngestionType ingestionType))
             {
-                if (ingestionType == IngestionType.Topic && string.IsNullOrWhiteSpace(requestModel.KafkaTopicName))
+                if (ingestionType == IngestionType.Topic)
                 {
-                    validationResponse.AddFieldValidation(nameof(requestModel.KafkaTopicName), $"Required field when {nameof(requestModel.IngestionTypeCode)} is {IngestionType.Topic}");
+                    if (string.IsNullOrWhiteSpace(requestModel.KafkaTopicName))
+                    {
+                        validationResponse.AddFieldValidation(nameof(requestModel.KafkaTopicName), $"Required field when {nameof(requestModel.IngestionTypeCode)} is {IngestionType.Topic}");
+                    }
+                    else if (_datasetContext.DataFlow.Any(x => x.TopicName == requestModel.KafkaTopicName))
+                    {
+                        validationResponse.AddFieldValidation(nameof(requestModel.KafkaTopicName), "Kafka topic name already exists");
+                    }
                 }
-                else if (ingestionType != IngestionType.Topic && !string.IsNullOrWhiteSpace(requestModel.KafkaTopicName))
+                else if (!string.IsNullOrWhiteSpace(requestModel.KafkaTopicName))
                 {
                     validationResponse.AddFieldValidation(nameof(requestModel.IngestionTypeCode), $"Value must be {IngestionType.Topic} to use {nameof(requestModel.KafkaTopicName)}");
                 }

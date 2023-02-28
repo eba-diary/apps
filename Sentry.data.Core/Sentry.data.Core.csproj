@@ -188,6 +188,7 @@
     <Compile Include="DTO\BaseAuditDto.cs" />
     <Compile Include="DTO\Admin\SupportLinkDto.cs" />
     <Compile Include="DomainServices\TileSearchService.cs" />
+    <Compile Include="DTO\BaseResultDto.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceTileDto.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />

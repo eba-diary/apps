@@ -31,18 +31,13 @@ namespace Sentry.data.Web.API
             ConcurrentValidationResponse validationResponse = requestModel.Validate(x => x.DatasetName).Required().MaxLength(1024)
                 .Validate(x => x.DatasetDescription).Required().MaxLength(4096)
                 .Validate(x => x.ShortName).Required().MaxLength(12).RegularExpression("^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed")
-                .Validate(x => x.SaidAssetCode).Required()
                 .Validate(x => x.CategoryCode).Required()
                 .Validate(x => x.OriginationCode).Required().EnumValue(typeof(DatasetOriginationCode))
                 .Validate(x => x.DataClassificationTypeCode).Required().EnumValue(typeof(DataClassificationType), DataClassificationType.None.ToString())
                 .Validate(x => x.OriginalCreator).Required().MaxLength(128)
-                .Validate(x => x.NamedEnvironment).Required().RegularExpression("^[A-Z0-9]{1,10}$", "Must be alphanumeric, all caps, and less than 10 characters")
-                .Validate(x => x.NamedEnvironmentTypeCode).Required().EnumValue(typeof(NamedEnvironmentType))
                 .Validate(x => x.PrimaryContactId).Required()
                 .Validate(x => x.UsageInformation).MaxLength(4096)
                 .ValidationResponse;
-
-            bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
             Task[] asyncValidations = new Task[]
             {
@@ -50,6 +45,8 @@ namespace Sentry.data.Web.API
                 requestModel.ValidatePrimaryContactIdAsync(_associateInfoProvider, validationResponse),
                 requestModel.ValidateAlternateContactEmailAsync(validationResponse)
             };
+
+            bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
             //dataset name exists
             if (!validationResponse.HasValidationsFor(nameof(requestModel.DatasetName)) && isValidNamedEnvironment &&

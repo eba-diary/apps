@@ -14,7 +14,6 @@ namespace Sentry.data.Core
         bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime);
         bool CreateAndSaveNewDataSource(DataSourceDto dto);
         bool UpdateAndSaveDataSource(DataSourceDto dto);
-        Task<DatasetFileConfigDto> AddDatasetFileConfigAsync(DatasetFileConfigDto dto);
         /// <summary>
         /// Creates a new DatasetFileConfig entity object and adds it to domain context.
         /// <para>Domain context changes are not saved.</para>

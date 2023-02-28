@@ -71,8 +71,8 @@ namespace Sentry.data.Core
                 AlternateContactEmail = dataset.AlternateContactEmail,
                 OriginationCode = (DatasetOriginationCode)Enum.Parse(typeof(DatasetOriginationCode), dataset.OriginationCode, true),
                 OriginalCreator = dataset.CreationUserName,
-                CreatedDateTime = dataset.DatasetDtm,
-                UpdatedDateTime = dataset.ChangedDtm,
+                CreateDateTime = dataset.DatasetDtm,
+                UpdateDateTime = dataset.ChangedDtm,
                 ObjectStatus = dataset.ObjectStatus
             };
         }

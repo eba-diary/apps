@@ -81,8 +81,8 @@ namespace Sentry.data.Web.Tests.API
             DatasetResultDto dto = new DatasetResultDto
             {
                 DatasetId = 1,
-                CreatedDateTime = now.AddDays(-1),
-                UpdatedDateTime = now,
+                CreateDateTime = now.AddDays(-1),
+                UpdateDateTime = now,
                 ObjectStatus = ObjectStatusEnum.Disabled,
                 DatasetName = "Name",
                 CategoryName = "Category",
@@ -103,8 +103,8 @@ namespace Sentry.data.Web.Tests.API
             UpdateDatasetResponseModel model = _mapper.Map<UpdateDatasetResponseModel>(dto);
 
             Assert.AreEqual(1, model.DatasetId);
-            Assert.AreEqual(now.AddDays(-1), model.CreatedDateTime);
-            Assert.AreEqual(now, model.UpdatedDateTime);
+            Assert.AreEqual(now.AddDays(-1), model.CreateDateTime);
+            Assert.AreEqual(now, model.UpdateDateTime);
             Assert.AreEqual(ObjectStatusEnum.Disabled.ToString(), model.ObjectStatusCode);
             Assert.AreEqual("Name", model.DatasetName);
             Assert.AreEqual("Category", model.CategoryCode);

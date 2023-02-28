@@ -325,13 +325,6 @@ namespace Sentry.data.Core
             }
         }
 
-        public Task<DatasetFileConfigDto> AddDatasetFileConfigAsync(DatasetFileConfigDto dto)
-        {
-            DatasetFileConfig datasetFileConfig = CreateDatasetFileConfig(dto);
-            DatasetFileConfigDto resultDto = MapToDatasetFileConfigDto(datasetFileConfig);
-            return Task.FromResult(resultDto);
-        }
-
         public int Create(DatasetFileConfigDto dto)
         {
             DatasetFileConfig datasetFileConfig;
@@ -460,13 +453,21 @@ namespace Sentry.data.Core
                 FileTypeId = dto.FileTypeId,
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
-                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 ObjectStatus = dto.ObjectStatus,
                 DeleteIssuer = null,
                 DeleteIssueDTM = DateTime.MaxValue,
                 IsSchemaTracked = true,
                 Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId)
             };
+
+            if (!string.IsNullOrEmpty(dto.DatasetScopeTypeName))
+            {
+                dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.FirstOrDefault(x => x.Name.ToLower() == dto.DatasetScopeTypeName.ToLower());
+            }
+            else
+            {
+                dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+            } 
 
             List<DatasetFileConfig> datasetFileConfigList = (dfc.ParentDataset.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : dfc.ParentDataset.DatasetFileConfigs.ToList();
             datasetFileConfigList.Add(dfc);
