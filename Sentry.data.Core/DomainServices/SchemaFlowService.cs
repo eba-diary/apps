@@ -127,7 +127,7 @@ namespace Sentry.data.Core
                 DataFlowStep s3DropStep = _datasetContext.DataFlowStep.FirstOrDefault(x => x.DataFlow.Id == dataFlowId && x.DataAction_Type_Id == DataActionType.ProducerS3Drop);
                 if (s3DropStep != null)
                 {
-                    return Path.Combine(s3DropStep.TriggerBucket, s3DropStep.TriggerKey);
+                    return s3DropStep.TriggerBucket + "/" + s3DropStep.TriggerKey;
                 }
             }
 

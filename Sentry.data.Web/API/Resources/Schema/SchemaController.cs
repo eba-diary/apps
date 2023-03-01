@@ -3,12 +3,8 @@ using Sentry.data.Core;
 using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 
 namespace Sentry.data.Web.API
