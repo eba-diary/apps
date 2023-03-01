@@ -22,19 +22,29 @@ namespace Sentry.data.Web.Extensions
             };
         }
 
+        public static Core.DatasetSchemaMigrationRequest MapToDatasetSchemaMigrationRequest(this DatasetSchemaMigrationRequestModel model)
+        {
+            return new Core.DatasetSchemaMigrationRequest()
+            {
+                SourceSchemaId = model.SourceSchemaId,
+                TargetDataFlowNamedEnvironment = model.TargetDataFlowNamedEnviornment
+            };
+        }
+
         public static Core.DatasetMigrationRequest ToDto(this DatasetMigrationRequestModel model)
         {
             Core.DatasetMigrationRequest request = new Core.DatasetMigrationRequest()
             {
                 SourceDatasetId = model.SourceDatasetId,
                 TargetDatasetNamedEnvironment = model.TargetDatasetNamedEnvironment,
+                TargetDatasetNamedEnvironmentType = model.TargetDatasetNamedEnvironmentType,
                 TargetDatasetId = model.TargetDatasetId,
-                SchemaMigrationRequests = new List<Core.SchemaMigrationRequest>()
+                SchemaMigrationRequests = new List<Core.DatasetSchemaMigrationRequest>()
             };
 
-            foreach (SchemaMigrationRequestModel schemaMigrationRequestModel in model.SchemaMigrationRequests)
+            foreach (DatasetSchemaMigrationRequestModel datasetSchemaMigrationRequestModel in model.SchemaMigrationRequests)
             {
-                request.SchemaMigrationRequests.Add(schemaMigrationRequestModel.ToDto());
+                request.SchemaMigrationRequests.Add(datasetSchemaMigrationRequestModel.MapToDatasetSchemaMigrationRequest());
             }
 
             return request;
