@@ -117,7 +117,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA)]
         public ActionResult Create(int id)
         {
             return View(GetDatasetFileConfigsModel(id));
@@ -135,6 +135,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.CAN_MANAGE_SCHEMA)]
         public PartialViewResult _DatasetFileConfigCreate(int id)
         {
             return PartialView("_DatasetFileConfigCreate", GetDatasetFileConfigsModel(id));
