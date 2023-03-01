@@ -8,5 +8,6 @@
     [FlowExecutionGuid] VARCHAR(17) NULL, 
     [RunInstanceGuid] VARCHAR(17) NULL, 
     [ClusterUrl] VARCHAR(100) NULL, 
-    CONSTRAINT [FK_Submission_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID])
+    CONSTRAINT [FK_Submission_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_ID]), 
+    CONSTRAINT [PK_Submission] PRIMARY KEY ([Submission_ID])
 )
