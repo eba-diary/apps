@@ -606,6 +606,92 @@ namespace Sentry.data.Core.Tests
             mockRepository.VerifyAll();
         }
 
+        [TestMethod]
+        public void AddDataFlowAsync_DataFlowDto_ResultDataFlowDto()
+        {
+            DateTime start = DateTime.Now;
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Dataset dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Dataset Name",
+                DatasetCategories = new List<Category>(),
+                Asset = new Asset() { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            Mock<IApplicationUser> appUser = GetApplicationUser(mr);
+            Mock<IUserService> userService = GetUserService(mr, appUser.Object);
+            
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+
+            UserSecurity userSecurity = new UserSecurity();
+            securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataFlow>(), appUser.Object)).Returns(userSecurity);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr, dataset);
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
+
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+
+            DataFlowDto dto = new DataFlowDto
+            {
+                Name = "Name",
+                SaidKeyCode = "SAID",
+                ObjectStatus = ObjectStatusEnum.Active,
+                IngestionType = (int)IngestionType.S3_Drop,
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                PrimaryContactId = "000000",
+                IsSecured = true,
+                PreProcessingOption = 0,
+                DatasetId = 1,
+                SchemaMap = new List<SchemaMapDto>
+                {
+                    new SchemaMapDto { DatasetId = 1, SchemaId = 2}
+                }
+            };
+
+            DataFlowDto result = dataFlowService.AddDataFlowAsync(dto).Result;
+
+            Assert.AreEqual(3, result.Id);
+            Assert.AreEqual("Name", result.Name);
+            Assert.AreEqual("SAID", result.SaidKeyCode);
+            Assert.IsTrue(result.CreateDTM >= start);
+            Assert.AreEqual("000000", result.CreatedBy);
+            Assert.AreEqual("000001", result.FlowStorageCode);
+            Assert.AreEqual(2, result.MappedSchema.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, result.ObjectStatus);
+            Assert.IsNull(result.DeleteIssuer);
+            Assert.AreEqual(DateTime.MaxValue, result.DeleteIssueDTM);
+            Assert.AreEqual((int)IngestionType.S3_Drop, result.IngestionType);
+            Assert.IsFalse(result.IsCompressed);
+            Assert.IsFalse(result.IsBackFillRequired);
+            Assert.IsNull(result.CompressionType);
+            Assert.IsFalse(result.IsPreProcessingRequired);
+            Assert.AreEqual(0, result.PreProcessingOption);
+            Assert.AreEqual("DEV", result.NamedEnvironment);
+            Assert.AreEqual(NamedEnvironmentType.NonProd, result.NamedEnvironmentType);
+            Assert.AreEqual("000000", result.PrimaryContactId);
+            Assert.IsTrue(result.IsSecured);
+            Assert.AreEqual(userSecurity, result.Security);
+            Assert.IsNull(result.TopicName);
+            Assert.IsNull(result.S3ConnectorName);
+            Assert.AreEqual(1, result.SchemaMap.First().DatasetId);
+            Assert.AreEqual(2, result.SchemaMap.First().SchemaId);
+            Assert.AreEqual(1, result.DatasetId);
+            Assert.AreEqual(2, result.SchemaId);
+
+            mr.VerifyAll();
+        }
+
         #region Helpers
         private Mock<IDatasetContext> GetDatasetContext(MockRepository mockRepository, Dataset dataset)
         {

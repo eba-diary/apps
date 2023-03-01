@@ -127,7 +127,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(NamedEnvironmentType.NonProd, dataFlowDto.NamedEnvironmentType);
             Assert.AreEqual("DEV", dataFlowDto.NamedEnvironment);
             Assert.AreEqual("SAID", dataFlowDto.SaidKeyCode);
-            Assert.IsNull(dataFlowDto.PreProcessingOption);
+            Assert.AreEqual(0, dataFlowDto.PreProcessingOption);
             Assert.IsFalse(dataFlowDto.IsPreProcessingRequired);
             Assert.IsNull(dataFlowDto.CompressionType);
             Assert.IsFalse(dataFlowDto.IsCompressed);

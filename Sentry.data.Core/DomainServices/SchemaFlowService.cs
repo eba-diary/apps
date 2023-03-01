@@ -49,7 +49,7 @@ namespace Sentry.data.Core
                     _configService.Create(dto.DatasetFileConfigDto);
 
                     //create data flow
-                    dto.DataFlowDto.Name = $"{dataset.ShortName}_{addedSchemaDto.Name.Replace(" ", "").Substring(0, 50)}";
+                    dto.DataFlowDto.Name = $"{dataset.ShortName}_{addedSchemaDto.Name.Replace(" ", "")}";
                     dto.DataFlowDto.IsSecured = true;
                     dto.DataFlowDto.SchemaMap = new List<SchemaMapDto>
                     {
@@ -66,8 +66,10 @@ namespace Sentry.data.Core
                     throw;
                 }
             }
-
-            throw new NotImplementedException();
+            else
+            {
+                throw new ResourceForbiddenException();
+            }
         }
 
         public async Task<SchemaResultDto> UpdateSchemaAsync(UpdateSchemaDto dto)
@@ -102,7 +104,10 @@ namespace Sentry.data.Core
                 PrimaryContactId = dataFlowDto.PrimaryContactId,
                 StorageCode = dataFlowDto.FlowStorageCode,
                 DropLocation = GetDropLocation((IngestionType)dataFlowDto.IngestionType, dataFlowDto.Id),
-                ControlMTriggerName = fileSchemaDto.ControlMTriggerName
+                ControlMTriggerName = fileSchemaDto.ControlMTriggerName,
+                ObjectStatus = fileSchemaDto.ObjectStatus,
+                CreateDateTime = fileSchemaDto.CreateDateTime,
+                UpdateDateTime = dataFlowDto.CreateDTM > fileSchemaDto.UpdateDateTime ? dataFlowDto.CreateDTM : fileSchemaDto.UpdateDateTime
             };
         }
 

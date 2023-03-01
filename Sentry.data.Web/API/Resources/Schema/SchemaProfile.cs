@@ -57,8 +57,7 @@ namespace Sentry.data.Web.API
                 .ForMember(dest => dest.IsPreProcessingRequired, x => x.MapFrom(src => src.IsPreprocessingRequired))
                 .ForMember(dest => dest.PreProcessingOption, x =>
                 {
-                    x.PreCondition(src => !string.IsNullOrWhiteSpace(src.PreprocessingTypeCode));
-                    x.MapFrom(src => (int)Enum.Parse(typeof(DataFlowPreProcessingTypes), src.PreprocessingTypeCode, true));
+                    x.MapFrom(src => !string.IsNullOrWhiteSpace(src.PreprocessingTypeCode) ? (int)Enum.Parse(typeof(DataFlowPreProcessingTypes), src.PreprocessingTypeCode, true) : 0);
                 })
                 .ForMember(dest => dest.TopicName, x => x.MapFrom(src => src.KafkaTopicName))
                 .IncludeAllDerived();

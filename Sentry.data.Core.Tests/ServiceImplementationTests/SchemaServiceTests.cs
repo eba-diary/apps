@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema;
 using Sentry.Core;
 using Sentry.data.Core.DTO.Schema.Fields;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Factories.Fields;
 using Sentry.data.Core.GlobalEnums;
@@ -12,6 +12,7 @@ using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
 {
@@ -2301,18 +2302,9 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
-            //datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
-
-            //SchemaRevision revision = new SchemaRevision() 
-            //{ 
-            //    ParentSchema = fileConfig.Schema,
-            //    SchemaRevision_Id = 3 
-            //};
-            //List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
-            //datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
 
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
@@ -2330,35 +2322,6 @@ namespace Sentry.data.Core.Tests
             feature.Setup(x => x.GetValue()).Returns(true);
             Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
             features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
-            //features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
-
-            //Mock<Helpers.DscEventTopicHelper> topicHelper = mr.Create<Helpers.DscEventTopicHelper>();
-            //topicHelper.Setup(s => s.GetDSCNamedEnvironment()).Returns("DEV");
-            //topicHelper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("topicName");
-
-            ////mock publisher
-            //HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
-            //{
-            //    SchemaID = 1,
-            //    RevisionID = 3,
-            //    DatasetID = 2,
-            //    HiveStatus = null,
-            //    InitiatorID = "000000",
-            //    ChangeIND = "{\"createcurrentview\":\"true\"}"
-            //};
-
-            //SnowTableCreateModel snowCreate = new SnowTableCreateModel()
-            //{
-            //    SchemaID = 1,
-            //    RevisionID = 3,
-            //    DatasetID = 2,
-            //    InitiatorID = "000000",
-            //    ChangeIND = "{\"createcurrentview\":\"true\"}"
-            //};
-
-            //Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
-            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
-            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
 
@@ -2561,17 +2524,8 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable()).Verifiable();
-            //datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(ds.DatasetFileConfigs.AsQueryable()).Verifiable();
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
-
-            //SchemaRevision revision = new SchemaRevision()
-            //{
-            //    ParentSchema = fileConfig.Schema,
-            //    SchemaRevision_Id = 3
-            //};
-            //List<SchemaRevision> revisions = new List<SchemaRevision>() { revision };
-            //datasetContext.SetupGet(x => x.SchemaRevision).Returns(revisions.AsQueryable()).Verifiable();
 
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
@@ -2589,35 +2543,6 @@ namespace Sentry.data.Core.Tests
             feature.Setup(x => x.GetValue()).Returns(true);
             Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
             features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
-            //features.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
-
-            //Mock<Helpers.DscEventTopicHelper> topicHelper = mr.Create<Helpers.DscEventTopicHelper>();
-            //topicHelper.Setup(s => s.GetDSCNamedEnvironment()).Returns("DEV");
-            //topicHelper.Setup(s => s.GetDSCEventTopicConfig(It.IsAny<string>())).Returns("topicName");
-
-            ////mock publisher
-            //HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
-            //{
-            //    SchemaID = 1,
-            //    RevisionID = 3,
-            //    DatasetID = 2,
-            //    HiveStatus = null,
-            //    InitiatorID = "000000",
-            //    ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
-            //};
-
-            //SnowTableCreateModel snowCreate = new SnowTableCreateModel()
-            //{
-            //    SchemaID = 1,
-            //    RevisionID = 3,
-            //    DatasetID = 2,
-            //    InitiatorID = "000000",
-            //    ChangeIND = "{\"parquetstoragebucket\":\"newbucket\",\"parquetstorageprefix\":\"newprefix\"}"
-            //};
-
-            //Mock<IMessagePublisher> publisher = mr.Create<IMessagePublisher>();
-            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(hiveCreate))).Verifiable();
-            //publisher.Setup(x => x.Publish(It.IsAny<string>(), "1", JsonConvert.SerializeObject(snowCreate))).Verifiable();
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
 
@@ -3279,6 +3204,83 @@ namespace Sentry.data.Core.Tests
 
             Assert.AreEqual(fieldCreateDTM, newField.CreateDTM, "CreatedDTM validation failed");
             Assert.AreEqual(previousRevisionFieldLastUpdatedDTM, newField.LastUpdateDTM, "LastUpdatedDTM validation failed");
+        }
+
+        [TestMethod]
+        public void AddSchemaAsync_FileSchemaDto_ResultFileSchemaDto()
+        {
+            FileSchemaDto fileSchemaDto = new FileSchemaDto
+            {
+                Name = "SchemaName",
+                FileExtensionName = ExtensionNames.CSV,
+                Delimiter = ",",
+                HasHeader = true,
+                Description = "Description",
+                CreateCurrentView = true,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SchemaRootPath = "root,path",
+                ParentDatasetId = 1
+            };
+
+            Dataset dataset = new Dataset
+            {
+                DatasetCategories = new List<Category>
+                {
+                    new Category { Name = "Category" }
+                },
+                DatasetName = "DatasetName",
+                Asset = new Asset { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                ShortName = "Short"
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            List<SchemaMap> schemaMaps = new List<SchemaMap>();
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.Setup(x => x.GetNextStorageCDE()).Returns(1234567);
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
+            datasetContext.Setup(x => x.Add(It.IsAny<FileSchema>())).Callback<FileSchema>(x =>
+            {
+                x.SchemaId = 2;
+                schemaMaps.Add(new SchemaMap { MappedSchema = x });
+            });
+            datasetContext.SetupGet(x => x.SchemaMap).Returns(() => schemaMaps.AsQueryable());
+
+            List<FileExtension> fileExtensions = new List<FileExtension>
+            {
+                new FileExtension { Id = 3, Name = ExtensionNames.CSV }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileExtensions.AsQueryable());
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000001");
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null);
+
+            FileSchemaDto result = schemaService.AddSchemaAsync(fileSchemaDto).Result;
+
+            Assert.AreEqual("SchemaName", result.Name);
+            Assert.IsTrue(result.CreateCurrentView);
+            Assert.AreEqual(",", result.Delimiter);
+            Assert.AreEqual(3, result.FileExtensionId);
+            Assert.IsTrue(result.HasHeader);
+            Assert.AreEqual(2, result.SchemaId);
+            Assert.AreEqual("Description", result.Description);
+            Assert.AreEqual(ObjectStatusEnum.Active, result.ObjectStatus);
+            Assert.IsFalse(result.DeleteInd);
+            Assert.IsNull(result.DeleteIssuer);
+            Assert.AreEqual(DateTime.MaxValue, result.DeleteIssueDTM);
+            Assert.AreEqual("1234567", result.StorageCode);
+            Assert.AreEqual(ExtensionNames.CSV, result.FileExtensionName);
+            Assert.AreEqual("root,path", result.SchemaRootPath);
+            Assert.AreEqual("DATA_DEV_SHORT_SCHEMANAME_COMPLETED", result.ControlMTriggerName);
         }
 
         #region Private Methods

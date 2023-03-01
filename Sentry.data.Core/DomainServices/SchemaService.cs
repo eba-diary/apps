@@ -1190,7 +1190,9 @@ namespace Sentry.data.Core
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
                 ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
-                ControlMTriggerName = scm.ControlMTriggerName
+                ControlMTriggerName = scm.ControlMTriggerName,
+                CreateDateTime = scm.CreatedDTM,
+                UpdateDateTime = scm.LastUpdatedDTM
             };
         }
 

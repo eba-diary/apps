@@ -1184,7 +1184,6 @@ namespace Sentry.data.Core
             dto.CompressionType = df.CompressionType;
             dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
             dto.PreProcessingOption = df.PreProcessingOption;
-            dto.SaidKeyCode = df.SaidKeyCode;
             dto.NamedEnvironment = df.NamedEnvironment;
             dto.NamedEnvironmentType = df.NamedEnvironmentType;
             dto.PrimaryContactId = df.PrimaryContactId;
