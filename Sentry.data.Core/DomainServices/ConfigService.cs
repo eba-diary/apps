@@ -1160,6 +1160,7 @@ namespace Sentry.data.Core
                     token.TokenExp = dtoToken.TokenExp;
                     token.TokenUrl = dtoToken.TokenUrl;
                     token.Scope = dtoToken.Scope;
+                    token.Enabled = dtoToken.Enabled;
 
                     if (update)
                     {

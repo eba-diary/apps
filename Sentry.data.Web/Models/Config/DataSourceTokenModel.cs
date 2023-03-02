@@ -34,5 +34,7 @@ namespace Sentry.data.Web.Models.Config
         public virtual string Scope { get; set; }
 
         public bool ToDelete { get; set; }
+
+        public bool Enabled { get; set; }
     }
 }
