@@ -183,13 +183,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken() { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -280,13 +280,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_SingleToken_MultipleIncrements_DataGap()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -401,13 +401,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_FailInProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -504,14 +504,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_StartFromSavedProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -602,14 +602,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_StartFromSavedProgress_NoRequestVariables()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -701,14 +701,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_MultipleTokens()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -952,14 +952,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_MultipleTokens_MultipleVariableIncrements()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1104,13 +1104,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_NoRequestVariables()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1202,14 +1202,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_MultipleTokens_NoRequestVariables()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1339,14 +1339,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeNone_OAuth_MultipleTokens_MultipleVariableIncrements()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true};
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1480,13 +1480,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_MultiplePages()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 RequestHeaders = new List<RequestHeader>()
             };
 
@@ -1578,13 +1578,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_MultiplePages_FailInProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 RequestHeaders = new List<RequestHeader>()
             };
 
@@ -1681,14 +1681,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_StartFromSavedProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
+                AllTokens = new List<DataSourceToken> { token, token2 },
                 RequestHeaders = new List<RequestHeader>(),
                 Name = "UnitTestDataSource"
             };
@@ -1781,14 +1781,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_MultipleTokens_MultipleVariableIncrements()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1929,13 +1929,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 Name = "UnitTestDataSource"
             };
 
@@ -2047,13 +2047,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement_SimpleNestedData()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 Name = "UnitTestSouce"
             };
 
@@ -2165,14 +2165,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_StartFromSavedProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3 , Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
+                AllTokens = new List<DataSourceToken> { token, token2 },
                 Name = "UnitTestDataSource"
             };
 
@@ -2282,13 +2282,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -2399,13 +2399,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_SingleToken_NoResultsOnFirstRequest()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 Name = "UnitTestDataSource"
             };
 

@@ -124,10 +124,11 @@ namespace Sentry.data.Core
                         RefreshToken = _encryptionService.EncryptString(refreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey).Item1,
                         ParentDataSource = ((HTTPSSource)dataSource),
                         TokenExp = 7200,
-                        TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret"
+                        TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret",
+                        Enabled = false
                     };
 
-                    ((HTTPSSource)dataSource).Tokens.Add(newToken);
+                    ((HTTPSSource)dataSource).AllTokens.Add(newToken);
                     Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
                     _datasetContext.SaveChanges();
                     try
