@@ -4,7 +4,7 @@ namespace Sentry.data.Core
 {
     public interface ISchemaFlowService
     {
-        Task<SchemaResultDto> AddSchemaAsync(AddSchemaDto dto);
-        Task<SchemaResultDto> UpdateSchemaAsync(UpdateSchemaDto dto);
+        Task<SchemaResultDto> AddSchemaAsync(SchemaFlowDto dto);
+        Task<SchemaResultDto> UpdateSchemaAsync(SchemaFlowDto dto);
     }
 }

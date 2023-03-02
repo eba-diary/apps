@@ -29,10 +29,13 @@ namespace Sentry.data.Web.API
             CreateMap<AddSchemaRequestModel, FileSchemaDto>(MemberList.None)
                 .ForMember(dest => dest.ObjectStatus, x => x.MapFrom(src => ObjectStatusEnum.Active));
 
+            CreateMap<UpdateSchemaRequestModel, FileSchemaDto>(MemberList.None);
+
             //DatasetFileConfigDto
             CreateMap<BaseSchemaModel, DatasetFileConfigDto>(MemberList.None)
                 .ForMember(dest => dest.Description, x => x.MapFrom(src => src.SchemaDescription))
                 .ForMember(dest => dest.DatasetScopeTypeName, x => x.MapFrom(src => src.ScopeTypeCode))
+                .ForMember(dest => dest.FileTypeId, x => x.MapFrom(src => (int)FileType.DataFile))
                 .IncludeAllDerived();
 
             CreateMap<BaseImmutableSchemaModel, DatasetFileConfigDto>(MemberList.None)
@@ -41,6 +44,8 @@ namespace Sentry.data.Web.API
 
             CreateMap<AddSchemaRequestModel, DatasetFileConfigDto>(MemberList.None)
                 .ForMember(dest => dest.ObjectStatus, x => x.MapFrom(src => ObjectStatusEnum.Active));
+
+            CreateMap<UpdateSchemaRequestModel, DatasetFileConfigDto>(MemberList.None);
 
             //DataFlowDto
             CreateMap<BaseSchemaModel, DataFlowDto>(MemberList.None)
@@ -79,8 +84,16 @@ namespace Sentry.data.Web.API
             CreateMap<AddSchemaRequestModel, DataFlowDto>(MemberList.None)
                 .ForMember(dest => dest.ObjectStatus, x => x.MapFrom(src => ObjectStatusEnum.Active));
 
+            CreateMap<UpdateSchemaRequestModel, DataFlowDto>(MemberList.None);
+
             //AddSchemaDto
-            CreateMap<AddSchemaRequestModel, AddSchemaDto>(MemberList.None)
+            CreateMap<AddSchemaRequestModel, SchemaFlowDto>(MemberList.None)
+                .ForMember(dest => dest.SchemaDto, x => x.MapFrom(src => src))
+                .ForMember(dest => dest.DatasetFileConfigDto, x => x.MapFrom(src => src))
+                .ForMember(dest => dest.DataFlowDto, x => x.MapFrom(src => src));
+
+            //UpdateSchemaDto
+            CreateMap<UpdateSchemaRequestModel, SchemaFlowDto>(MemberList.None)
                 .ForMember(dest => dest.SchemaDto, x => x.MapFrom(src => src))
                 .ForMember(dest => dest.DatasetFileConfigDto, x => x.MapFrom(src => src))
                 .ForMember(dest => dest.DataFlowDto, x => x.MapFrom(src => src));

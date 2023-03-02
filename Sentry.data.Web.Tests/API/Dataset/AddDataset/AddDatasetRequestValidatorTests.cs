@@ -127,9 +127,8 @@ namespace Sentry.data.Web.Tests.API
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.CategoryCode));
             Assert.IsNotNull(fieldValidation);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", categories.Select(x => x.Name))}", fieldValidation.ValidationMessages.Last());
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", categories.Select(x => x.Name))}", fieldValidation.ValidationMessages.First());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.OriginationCode));
             Assert.IsNotNull(fieldValidation);

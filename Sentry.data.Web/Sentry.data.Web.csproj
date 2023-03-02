@@ -528,6 +528,7 @@
   <ItemGroup>
     <Compile Include="API\AutoMapperHelper.cs" />
     <Compile Include="API\Resources\Dataset\AddDataset\AddDatasetRequestModel.cs" />
+    <Compile Include="API\Resources\Dataset\BaseDatasetRequestValidator.cs" />
     <Compile Include="API\Resources\Dataset\DatasetProfile.cs" />
     <Compile Include="API\Resources\Dataset\BaseImmutableDatasetModel.cs" />
     <Compile Include="API\Resources\Dataset\AddDataset\AddDatasetResponseModel.cs" />
@@ -544,6 +545,7 @@
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />
     <Compile Include="API\Resources\Schema\BaseImmutableSchemaModel.cs" />
     <Compile Include="API\Resources\Schema\BaseSchemaModel.cs" />
+    <Compile Include="API\Resources\Schema\BaseSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\BaseSchemaResponseModel.cs" />
     <Compile Include="API\Resources\Schema\SchemaController.cs" />
     <Compile Include="API\Resources\Schema\SchemaProfile.cs" />

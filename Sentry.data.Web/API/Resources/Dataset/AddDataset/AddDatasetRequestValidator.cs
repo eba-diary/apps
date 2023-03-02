@@ -1,6 +1,4 @@
-﻿using Sentry.Associates;
-using Sentry.Core;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
@@ -11,40 +9,42 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.API
 {
-    public class AddDatasetRequestValidator : IRequestModelValidator<AddDatasetRequestModel>
+    public class AddDatasetRequestValidator : BaseDatasetRequestValidator<AddDatasetRequestModel>
     {
-        private readonly IDatasetContext _datasetContext;
         private readonly ISAIDService _saidService;
         private readonly IQuartermasterService _quartermasterService;
         private readonly IAssociateInfoProvider _associateInfoProvider;
 
-        public AddDatasetRequestValidator(IDatasetContext datasetContext, ISAIDService saidService, IQuartermasterService quartermasterService, IAssociateInfoProvider associateInfoProvider)
+        public AddDatasetRequestValidator(IDatasetContext datasetContext, ISAIDService saidService, IQuartermasterService quartermasterService, IAssociateInfoProvider associateInfoProvider) : base(datasetContext)
         {
-            _datasetContext = datasetContext;
             _saidService = saidService;
             _quartermasterService = quartermasterService;
             _associateInfoProvider = associateInfoProvider;
         }
 
-        public async Task<ConcurrentValidationResponse> ValidateAsync(AddDatasetRequestModel requestModel)
+        public override async Task<ConcurrentValidationResponse> ValidateAsync(AddDatasetRequestModel requestModel)
         {
             ConcurrentValidationResponse validationResponse = requestModel.Validate(x => x.DatasetName).Required().MaxLength(1024)
-                .Validate(x => x.DatasetDescription).Required().MaxLength(4096)
+                .Validate(x => x.DatasetDescription).Required()
                 .Validate(x => x.ShortName).Required().MaxLength(12).RegularExpression("^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed")
-                .Validate(x => x.CategoryCode).Required()
-                .Validate(x => x.OriginationCode).Required().EnumValue(typeof(DatasetOriginationCode))
                 .Validate(x => x.DataClassificationTypeCode).Required().EnumValue(typeof(DataClassificationType), DataClassificationType.None.ToString())
-                .Validate(x => x.OriginalCreator).Required().MaxLength(128)
+                .Validate(x => x.OriginalCreator).Required()
                 .Validate(x => x.PrimaryContactId).Required()
-                .Validate(x => x.UsageInformation).MaxLength(4096)
                 .ValidationResponse;
 
             Task[] asyncValidations = new Task[]
             {
                 requestModel.ValidateSaidEnvironmentAsync(_saidService, _quartermasterService, validationResponse),
-                requestModel.ValidatePrimaryContactIdAsync(_associateInfoProvider, validationResponse),
-                requestModel.ValidateAlternateContactEmailAsync(validationResponse)
+                requestModel.ValidatePrimaryContactIdAsync(_associateInfoProvider, validationResponse)
             };
+
+            Task<ConcurrentValidationResponse> baseValidations = base.ValidateAsync(requestModel);
+
+            //category required and exists
+            if (string.IsNullOrWhiteSpace(requestModel.CategoryCode) || !_datasetContext.Categories.Any(x => x.Name.ToLower() == requestModel.CategoryCode.ToLower() && x.ObjectType == DataEntityCodes.DATASET))
+            {
+                AddCategoryCodeValidationMessage(validationResponse);
+            }
 
             bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
@@ -69,15 +69,13 @@ namespace Sentry.data.Web.API
                 }
             }
 
-            //category exists
-            requestModel.ValidateCategoryCode(_datasetContext, validationResponse);
-
+            validationResponse.AddValidationsFrom(await baseValidations);
             await Task.WhenAll(asyncValidations);
 
             return validationResponse;
         }
 
-        public async Task<ConcurrentValidationResponse> ValidateAsync(IRequestModel requestModel)
+        public override async Task<ConcurrentValidationResponse> ValidateAsync(IRequestModel requestModel)
         {
             return await ValidateAsync((AddDatasetRequestModel)requestModel);
         }

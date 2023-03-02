@@ -27,7 +27,7 @@ namespace Sentry.data.Core
             _securityService = securityService;
         }
 
-        public async Task<SchemaResultDto> AddSchemaAsync(AddSchemaDto dto)
+        public async Task<SchemaResultDto> AddSchemaAsync(SchemaFlowDto dto)
         {
             //get dataset
             Dataset dataset = _datasetContext.GetById(dto.SchemaDto.ParentDatasetId);
@@ -72,8 +72,10 @@ namespace Sentry.data.Core
             }
         }
 
-        public async Task<SchemaResultDto> UpdateSchemaAsync(UpdateSchemaDto dto)
+        public async Task<SchemaResultDto> UpdateSchemaAsync(SchemaFlowDto dto)
         {
+            //only update data flow if any of the data flow properties are different
+
             throw new NotImplementedException();
         }
 

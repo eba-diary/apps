@@ -15,7 +15,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void AddSchemaAsync_AddSchemaDto_SchemaResultDto()
         {
-            AddSchemaDto addDto = new AddSchemaDto
+            SchemaFlowDto addDto = new SchemaFlowDto
             {
                 SchemaDto = new FileSchemaDto
                 {
@@ -128,7 +128,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsNull(result.KafkaTopicName);
             Assert.AreEqual("000001", result.PrimaryContactId);
             Assert.AreEqual("1234567", result.StorageCode);
-            Assert.AreEqual("Bucket\\Key", result.DropLocation);
+            Assert.AreEqual("Bucket/Key", result.DropLocation);
             Assert.AreEqual("DATA_DEV_SHORT_SCHEMANAME_COMPLETED", result.ControlMTriggerName);
             Assert.AreEqual(ObjectStatusEnum.Active, result.ObjectStatus);
             Assert.AreEqual(new DateTime(2023, 3, 1), result.CreateDateTime);
@@ -140,7 +140,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void AddSchemaAsync_AddSchemaDto_ClearContext_ThrowException()
         {
-            AddSchemaDto addDto = new AddSchemaDto
+            SchemaFlowDto addDto = new SchemaFlowDto
             {
                 SchemaDto = new FileSchemaDto { ParentDatasetId = 1 }
             };
@@ -176,7 +176,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void AddSchemaAsync_AddSchemaDto_FailPermission_ThrowResourceForbidden()
         {
-            AddSchemaDto addDto = new AddSchemaDto
+            SchemaFlowDto addDto = new SchemaFlowDto
             {
                 SchemaDto = new FileSchemaDto { ParentDatasetId = 1 }
             };

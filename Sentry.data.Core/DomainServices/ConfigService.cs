@@ -357,12 +357,17 @@ namespace Sentry.data.Core
             }            
         }
 
+        public void UpdateDatasetFileConfig(DatasetFileConfigDto dto)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(dto.ConfigId);
+            UpdateDatasetFileConfig(dto, dfc);
+        }
+
         public bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)
         {
             try
             {
-                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(dto.ConfigId);
-                UpdateDatasetFileConfig(dto, dfc);
+                UpdateDatasetFileConfig(dto);
                 _datasetContext.SaveChanges();
                 return true;
             }

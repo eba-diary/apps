@@ -37,7 +37,7 @@ namespace Sentry.data.Web.Tests.API
                 PrimaryContactId = "000001"
             };
 
-            AddSchemaDto dto = _mapper.Map<AddSchemaDto>(model);
+            SchemaFlowDto dto = _mapper.Map<SchemaFlowDto>(model);
 
             Assert.IsNotNull(dto.SchemaDto);
             Assert.IsNotNull(dto.DatasetFileConfigDto);
@@ -61,6 +61,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(ObjectStatusEnum.Active, fileConfigDto.ObjectStatus);
             Assert.AreEqual("Appending", fileConfigDto.DatasetScopeTypeName);
             Assert.AreEqual("Description", fileConfigDto.Description);
+            Assert.AreEqual((int)FileType.DataFile, fileConfigDto.FileTypeId);
 
             DataFlowDto dataFlowDto = dto.DataFlowDto;
             Assert.AreEqual(ObjectStatusEnum.Active, dataFlowDto.ObjectStatus);
@@ -97,7 +98,7 @@ namespace Sentry.data.Web.Tests.API
                 PrimaryContactId = "000001"
             };
 
-            AddSchemaDto dto = _mapper.Map<AddSchemaDto>(model);
+            SchemaFlowDto dto = _mapper.Map<SchemaFlowDto>(model);
 
             Assert.IsNotNull(dto.SchemaDto);
             Assert.IsNotNull(dto.DatasetFileConfigDto);

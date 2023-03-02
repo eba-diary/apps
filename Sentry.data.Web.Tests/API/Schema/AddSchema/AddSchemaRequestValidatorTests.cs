@@ -274,9 +274,8 @@ namespace Sentry.data.Web.Tests.API
 
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(requestModel.FileTypeCode), fieldValidation.Field);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - JSON | CSV | DELIMITED", fieldValidation.ValidationMessages.Last());
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - JSON | CSV | DELIMITED", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -810,9 +809,8 @@ namespace Sentry.data.Web.Tests.API
 
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(requestModel.ScopeTypeCode), fieldValidation.Field);
-            Assert.AreEqual(2, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Required field", fieldValidation.ValidationMessages.First());
-            Assert.AreEqual($"Must provide a valid value - Appending", fieldValidation.ValidationMessages.Last());
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must provide a valid value - Appending", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }

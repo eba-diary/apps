@@ -32,7 +32,7 @@ namespace Sentry.data.Web.API
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> AddSchema(AddSchemaRequestModel model)
         {
-            return await ProcessRequestAsync<AddSchemaRequestModel, AddSchemaDto, SchemaResultDto, AddSchemaResponseModel>(model, _schemaFlowService.AddSchemaAsync);
+            return await ProcessRequestAsync<AddSchemaRequestModel, SchemaFlowDto, SchemaResultDto, AddSchemaResponseModel>(model, _schemaFlowService.AddSchemaAsync);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Sentry.data.Web.API
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> UpdateSchema(int id, UpdateSchemaRequestModel model)
         {
-            return await ProcessRequestAsync<UpdateSchemaRequestModel, UpdateSchemaDto, SchemaResultDto, UpdateSchemaResponseModel>(id, model, _schemaFlowService.UpdateSchemaAsync);
+            return await ProcessRequestAsync<UpdateSchemaRequestModel, SchemaFlowDto, SchemaResultDto, UpdateSchemaResponseModel>(id, model, _schemaFlowService.UpdateSchemaAsync);
         }
     }
 }
