@@ -54,39 +54,21 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_MigrationRequest", model);
         }
 
-        #region Private Methods
+        [HttpGet]
+        [Route("Migration/NamedEnvironment")]
+        public async Task<PartialViewResult> _NamedEnvironment(string assetKeyCode, string namedEnvironment, int datasetId)
+        {
+            var model = new MigrationRequestModel()
+            {
+                DatasetId = datasetId,
+                SAIDAssetKeyCode = assetKeyCode,
+                DatasetNamedEnvironment = namedEnvironment
+            };
 
-        //private async Task SetNamedEnvironmentProperties(MigrationRequestModel model)
-        //{
-        //    var sourceNamedEnvironment = _datasetContext.Datasets
-        //        .Where(w => w.DatasetId == model.DatasetId && w.ObjectStatus == ObjectStatusEnum.Active)
-        //        .Select(s => s.NamedEnvironment)
-        //        .FirstOrDefault();
-        //    var (namedEnvironmentList, namedEnvironmentTypeList) = await _namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, sourceNamedEnvironment);
+            await model.SetNamedEnvironmentProperties(_datasetContext, _namedEnvironmentBuilder);
 
-        //    if (namedEnvironmentList == null || !namedEnvironmentList.Any())
-        //    {
-        //        var datasetName = _datasetContext.Datasets.Where(w => w.DatasetId == model.DatasetId).Select(s => s.DatasetName).FirstOrDefault();
-        //        List<NamedEnvironmentDto> datasetNamedEnvironmentDtoList = _datasetContext.Datasets
-        //            .Where(w => w.Asset.SaidKeyCode == model.SAIDAssetKeyCode && w.DatasetName == datasetName && w.ObjectStatus == ObjectStatusEnum.Active)
-        //            .Select(s => new NamedEnvironmentDto() { NamedEnvironment = s.NamedEnvironment, NamedEnvironmentType = s.NamedEnvironmentType })
-        //            .ToList();
-        //        model.DatasetNamedEnvironmentDropDown = NamedEnvironmentBuilder.BuildNamedEnvironmentDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList)
-        //                                                                            .Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
-        //        model.DatasetNamedEnvironmentTypeDropDown = _namedEnvironmentBuilder.BuildNamedEnvironmentTypeDropDown(sourceNamedEnvironment, datasetNamedEnvironmentDtoList);
-        //        model.QuartermasterManagedNamedEnvironments = false;
-        //    }
-        //    else
-        //    {
-        //        //Filter out the source dataset named environment from list and order
-        //        model.DatasetNamedEnvironmentDropDown = namedEnvironmentList.Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
-        //        model.DatasetNamedEnvironmentTypeDropDown = namedEnvironmentTypeList;
-        //        model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironmentTypeList.First(l => l.Selected).Value);
-        //        model.QuartermasterManagedNamedEnvironments = true;
-        //    }
-        //}
-
-        #endregion
+            return PartialView(model);
+        }
 
     }
 }
