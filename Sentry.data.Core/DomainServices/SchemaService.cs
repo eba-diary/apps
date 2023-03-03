@@ -347,6 +347,13 @@ namespace Sentry.data.Core
             return true;
         }
 
+        public Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema)
+        {
+            UpdateSchema(dto, schema);
+            FileSchemaDto resultDto = MapToDto(schema);
+            return Task.FromResult(resultDto);
+        }
+
         private string GetDSCEventTopic(int datasetId)
         {
             string topicName;
@@ -408,14 +415,14 @@ namespace Sentry.data.Core
             return (schemaId, (schemaId != 0));
         }
 
-        private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
+        public void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
             /*Generate *-CREATE-TABLE-REQUESTED event when:
             *  - CreateCurrentView changes
             */
             if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
-                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).Take(1).FirstOrDefault();
+                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
                 GenerateConsumptionLayerCreateEvent(latestRevision, propertyDeltaList);
             }
         }
@@ -546,7 +553,14 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
 
-            changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+            if (dto.FileExtensionId > 0)
+            {
+                changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.FileExtensionName))
+            {
+                changes.Add(TryUpdate(() => schema.Extension.Name, () => dto.FileExtensionName, (x) => schema.Extension = _datasetContext.FileExtensions.First(f => f.Name.ToLower() == dto.FileExtensionName.ToLower())));
+            }
 
             changes.Add(TryUpdate(() => schema.HasHeader, () => dto.HasHeader, (x) => schema.HasHeader = x));
 
@@ -564,7 +578,6 @@ namespace Sentry.data.Core
 
             //schema=EXISTING; dto=NEW; SETTER
             changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
-
 
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {

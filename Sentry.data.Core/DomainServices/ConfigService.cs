@@ -380,10 +380,26 @@ namespace Sentry.data.Core
 
         private void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig dfc)
         {
-            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+            if (dto.DatasetScopeTypeId > 0)
+            {
+                dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.DatasetScopeTypeName))
+            {
+                dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.FirstOrDefault(x => x.Name.ToLower() == dto.DatasetScopeTypeName.ToLower());
+            }
+
             dfc.FileTypeId = dto.FileTypeId;
             dfc.Description = dto.Description;
-            dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+
+            if (dto.FileExtensionId > 0)
+            {
+                dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.FileExtensionName))
+            {
+                dfc.FileExtension = _datasetContext.FileExtensions.FirstOrDefault(f => f.Name.ToLower() == dto.FileExtensionName.ToLower());
+            }
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)

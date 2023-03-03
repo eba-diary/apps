@@ -188,6 +188,7 @@
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidatorTests.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaModelMappingTests.cs" />
     <Compile Include="API\Validation\ConcurrentFieldValidationResponseTests.cs" />
+    <Compile Include="API\Validation\ValidationRegistryTests.cs" />
     <Compile Include="API\Validation\ValidationModelMappingTests.cs" />
     <Compile Include="API\Validation\FluentValidationExtensionsTests.cs" />
     <Compile Include="API\Validation\ConcurrentValidationResponseTests.cs" />

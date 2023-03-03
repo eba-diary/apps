@@ -1,8 +1,10 @@
-﻿using Sentry.data.Core.Entities.DataProcessing;
+﻿using Newtonsoft.Json.Linq;
+using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,12 +51,7 @@ namespace Sentry.data.Core
                     _configService.Create(dto.DatasetFileConfigDto);
 
                     //create data flow
-                    dto.DataFlowDto.Name = $"{dataset.ShortName}_{addedSchemaDto.Name.Replace(" ", "")}";
-                    dto.DataFlowDto.IsSecured = true;
-                    dto.DataFlowDto.SchemaMap = new List<SchemaMapDto>
-                    {
-                        new SchemaMapDto { DatasetId = dto.DataFlowDto.DatasetId, SchemaId = addedSchemaDto.SchemaId }
-                    };
+                    PrepDataFlowDto(dto, dataset, addedSchemaDto);
                     DataFlowDto addedDataFlowDto = await _dataFlowService.AddDataFlowAsync(dto.DataFlowDto);
 
                     SchemaResultDto resultDto = CreateSchemaResultDto(addedSchemaDto, dto.DatasetFileConfigDto, addedDataFlowDto);
@@ -68,15 +65,79 @@ namespace Sentry.data.Core
             }
             else
             {
-                throw new ResourceForbiddenException();
+                throw new ResourceForbiddenException(user.AssociateId, nameof(security.CanManageSchema), "AddSchema");
             }
         }
 
         public async Task<SchemaResultDto> UpdateSchemaAsync(SchemaFlowDto dto)
         {
-            //only update data flow if any of the data flow properties are different
+            //get schema
+            FileSchema schema = _datasetContext.FileSchema.FirstOrDefault(x => x.SchemaId == dto.SchemaDto.SchemaId && x.ObjectStatus == ObjectStatusEnum.Active);
+            DatasetFileConfig fileConfig = _datasetContext.DatasetFileConfigs.FirstOrDefault(x => x.Schema.SchemaId == dto.SchemaDto.SchemaId && !x.DeleteInd);
+            DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.SchemaId == schema.SchemaId && x.ObjectStatus == ObjectStatusEnum.Active);
 
-            throw new NotImplementedException();
+            if (schema != null && fileConfig != null && dataFlow != null)
+            {
+                //check permission to dataset
+                IApplicationUser user = _userService.GetCurrentUser();
+                UserSecurity security = _securityService.GetUserSecurity(fileConfig.ParentDataset, user);
+
+                if (security.CanManageSchema)
+                {
+                    try
+                    {
+                        //keep values that are not available to edit from API
+                        dto.SchemaDto.ParquetStorageBucket = schema.ParquetStorageBucket;
+                        dto.SchemaDto.ParquetStoragePrefix = schema.ParquetStoragePrefix;
+                        if (dto.DataFlowDto.IngestionType == 0)
+                        {
+                            dto.SchemaDto.CLA1286_KafkaFlag = schema.CLA1286_KafkaFlag;
+                        }
+
+                        bool currentViewChanged = dto.SchemaDto.CreateCurrentView != schema.CreateCurrentView;
+
+                        //if schema root path went from null to value or value to null need to update dataflow
+                        dto.DataFlowDto.DataFlowStepUpdateRequired = (string.IsNullOrWhiteSpace(dto.SchemaDto.SchemaRootPath) && !string.IsNullOrWhiteSpace(schema.SchemaRootPath)) ||
+                            (!string.IsNullOrWhiteSpace(dto.SchemaDto.SchemaRootPath) && string.IsNullOrWhiteSpace(schema.SchemaRootPath));
+
+                        FileSchemaDto updatedSchemaDto = await _schemaService.UpdateSchemaAsync(dto.SchemaDto, schema);
+
+                        //update file config
+                        dto.DatasetFileConfigDto.ConfigId = fileConfig.ConfigId;
+                        _configService.UpdateDatasetFileConfig(dto.DatasetFileConfigDto);
+
+                        PrepDataFlowDto(dto, fileConfig.ParentDataset, updatedSchemaDto);
+                        DataFlowDto updatedDataFlowDto = await _dataFlowService.UpdateDataFlowAsync(dto.DataFlowDto, dataFlow);
+
+                        await _datasetContext.SaveChangesAsync();
+
+                        //if create current view changed, call schema service GenerateConsumptionLayerEvents after changes are saved
+                        if (currentViewChanged)
+                        {
+                            JObject changedProperty = new JObject { { "createcurrentview", schema.CreateCurrentView } };
+                            _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
+                        }
+
+                        SchemaResultDto resultDto = CreateSchemaResultDto(updatedSchemaDto, dto.DatasetFileConfigDto, updatedDataFlowDto);
+                        return resultDto;
+
+                    }
+                    catch (Exception)
+                    {
+                        _datasetContext.Clear();
+                        throw;
+                    }
+                }
+                else
+                {
+                    throw new ResourceForbiddenException(user.AssociateId, nameof(security.CanManageSchema), "UpdateSchema", dto.SchemaDto.SchemaId);
+                }
+            }
+            else
+            {
+                LogResourceNotFound(schema, fileConfig, dataFlow, dto.SchemaDto.SchemaId);
+                throw new ResourceNotFoundException("UpdateSchema", dto.SchemaDto.SchemaId);
+            }
         }
 
         #region Private
@@ -134,6 +195,36 @@ namespace Sentry.data.Core
             }
 
             return null;
+        }
+
+        private void PrepDataFlowDto(SchemaFlowDto dto, Dataset dataset, FileSchemaDto addedSchemaDto)
+        {
+            dto.DataFlowDto.Name = $"{dataset.ShortName}_{addedSchemaDto.Name.Replace(" ", "")}";
+            dto.DataFlowDto.IsSecured = true;
+            dto.DataFlowDto.SchemaMap = new List<SchemaMapDto>
+            {
+                new SchemaMapDto { DatasetId = dto.DataFlowDto.DatasetId, SchemaId = addedSchemaDto.SchemaId }
+            };
+        }
+
+        private void LogResourceNotFound(FileSchema schema, DatasetFileConfig config, DataFlow dataFlow, int schemaId)
+        {
+            if (schema == null)
+            {
+                Logger.Warn($"No active Schema with Id {schemaId} to update");
+            }
+            else
+            {
+                if (config == null)
+                {
+                    Logger.Warn($"No active DatasetFileConfig exists for SchemaId {schemaId}");
+                }
+
+                if (dataFlow == null)
+                {
+                    Logger.Warn($"No active DataFlow exists for SchemaId {schemaId}");
+                }
+            }
         }
         #endregion
     }

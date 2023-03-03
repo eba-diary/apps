@@ -185,17 +185,19 @@ namespace Sentry.data.Web.API
 
                 return StatusCode(HttpStatusCode.BadRequest);
             }
-            catch (ResourceNotFoundException)
+            catch (ResourceNotFoundException notFound)
             {
+                Logger.Info($"API - Resource Id {notFound.ResourceId} not found for {notFound.ResourceAction}");
                 return NotFound();
             }
-            catch (ResourceForbiddenException)
+            catch (ResourceForbiddenException forbidden)
             {
+                Logger.Info($"API - {forbidden.UserId} does not have {forbidden.Permission} permission to {forbidden.ResourceAction} | Resource Id: {forbidden.ResourceId}");
                 return StatusCode(HttpStatusCode.Forbidden);
             }
             catch (Exception e)
             {
-                Logger.Error($"Unexpected error occurred during API request", e);
+                Logger.Error($"API - Unexpected error occurred during API request", e);
                 return InternalServerError(e);
             }
         }

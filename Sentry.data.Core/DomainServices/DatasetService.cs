@@ -368,7 +368,7 @@ namespace Sentry.data.Core
             }
             else
             {
-                throw new ResourceForbiddenException();
+                throw new ResourceForbiddenException(user.AssociateId, nameof(security.CanCreateDataset), "AddDataset");
             }
         }
 
@@ -438,12 +438,12 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    throw new ResourceForbiddenException();
+                    throw new ResourceForbiddenException(user.AssociateId, nameof(security.CanEditDataset), "UpdateDataset", dto.DatasetId);
                 }
             }
             else
             {
-                throw new ResourceNotFoundException();
+                throw new ResourceNotFoundException("UpdateDataset", dto.DatasetId);
             }
         }
 

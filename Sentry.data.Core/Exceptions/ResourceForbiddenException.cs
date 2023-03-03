@@ -1,24 +1,17 @@
-﻿using System;
-using System.Runtime.Serialization;
-
-namespace Sentry.data.Core
+﻿namespace Sentry.data.Core
 {
-    [Serializable]
-    public class ResourceForbiddenException : Exception
+    public class ResourceForbiddenException : BaseResourceException
     {
-        public ResourceForbiddenException()
+        public string UserId { get; }
+        public string Permission { get; }
+
+        public ResourceForbiddenException(string userId, string permission, string resourceAction, int resourceId) : base(resourceAction, resourceId)
         {
+            UserId = userId;
+            Permission = permission;
         }
 
-        public ResourceForbiddenException(string message) : base(message)
-        {
-        }
-
-        public ResourceForbiddenException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected ResourceForbiddenException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public ResourceForbiddenException(string userId, string permission, string resourceAction) : this(userId, permission, resourceAction, 0)
         {
         }
     }

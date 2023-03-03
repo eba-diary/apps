@@ -78,14 +78,21 @@ namespace Sentry.data.Web.API
         protected void ValidateDelimiter(string delimiter, FileExtension fileType, ConcurrentValidationResponse validationResponse)
         {
             //delimited requires a delimiter
-            if (fileType.Name == ExtensionNames.DELIMITED && string.IsNullOrWhiteSpace(delimiter))
+            if (fileType.Name == ExtensionNames.DELIMITED)
             {
-                validationResponse.AddFieldValidation(nameof(BaseSchemaModel.Delimiter), $"Required field when {nameof(BaseSchemaModel.FileTypeCode)} is {fileType.Name}");
+                if (string.IsNullOrWhiteSpace(delimiter))
+                {
+                    validationResponse.AddFieldValidation(nameof(BaseSchemaModel.Delimiter), $"Required field when {nameof(BaseSchemaModel.FileTypeCode)} is {ExtensionNames.DELIMITED}");
+                }
+                else if (delimiter == ",")
+                {
+                    validationResponse.AddFieldValidation(nameof(BaseSchemaModel.FileTypeCode), $"Value should be {ExtensionNames.CSV} if {nameof(BaseSchemaModel.Delimiter)} is a comma (,)");
+                }
             }
             //csv requires the delimiter to be a comma
             else if (fileType.Name == ExtensionNames.CSV && (string.IsNullOrWhiteSpace(delimiter) || delimiter != ","))
             {
-                validationResponse.AddFieldValidation(nameof(BaseSchemaModel.Delimiter), $"Value must be a comma (,) when {nameof(BaseSchemaModel.FileTypeCode)} is {fileType.Name}");
+                validationResponse.AddFieldValidation(nameof(BaseSchemaModel.Delimiter), $"Value must be a comma (,) when {nameof(BaseSchemaModel.FileTypeCode)} is {ExtensionNames.CSV}");
             }
         }
 

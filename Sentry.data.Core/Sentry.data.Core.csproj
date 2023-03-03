@@ -360,6 +360,7 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Exceptions\BaseResourceException.cs" />
     <Compile Include="Exceptions\DataApplicationServiceException.cs" />
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\FeatureNotEnabledException.cs" />

@@ -134,10 +134,8 @@ namespace Sentry.data.Core
         /// <param name="dataflowId"></param>
         /// <returns></returns>
         string GetSecurityGroup(int dataflowId);
-
-
+        Task<DataFlowDto> UpdateDataFlowAsync(DataFlowDto dto, DataFlow dataFlow);
         int UpdateDataFlow(DataFlowDto dfDto);
-
         void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status);
     }
 }

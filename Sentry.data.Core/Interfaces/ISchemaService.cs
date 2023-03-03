@@ -105,6 +105,7 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to manage schema</exception>
         /// <returns></returns>
         bool UpdateAndSaveSchema(FileSchemaDto schemaDto);
+        Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema);
         void PublishSchemaEvent(int datasetId, int schemaId);
 
         /// <summary>
@@ -176,5 +177,6 @@ namespace Sentry.data.Core
         void CreateOrUpdateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
 
         (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName);
+        void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList);
     }
 }

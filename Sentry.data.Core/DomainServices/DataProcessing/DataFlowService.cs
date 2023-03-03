@@ -1,12 +1,15 @@
 ﻿using Hangfire;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -375,6 +378,101 @@ namespace Sentry.data.Core
             {
                 Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
                 throw;
+            }
+        }
+
+        public async Task<DataFlowDto> UpdateDataFlowAsync(DataFlowDto dto, DataFlow dataFlow)
+        {
+            dto.Id = dataFlow.Id;
+            dto.SaidKeyCode = dataFlow.SaidKeyCode;
+            dto.NamedEnvironment = dataFlow.NamedEnvironment;
+            dto.NamedEnvironmentType = dataFlow.NamedEnvironmentType;
+            dto.ObjectStatus = dataFlow.ObjectStatus;
+
+            //only update data flow if any of the data flow properties are different or data flow steps need to be updated
+            if (DataFlowHasUpdates(dto, dataFlow) || dto.DataFlowStepUpdateRequired)
+            {
+                //make sure dto properties are set with updated properties
+                //in some cases a null value means not to update the property
+                if (dto.DataFlowStepUpdateRequired)
+                {
+                    SetChangedProperties(dto, dataFlow);
+                }
+
+                //delete and create new dataflow
+                Delete(dto.Id, _userService.GetCurrentUser(), false);
+                return await AddDataFlowAsync(dto);
+            }
+            else
+            {
+                //return data flow as is
+                DataFlowDto resultDto = new DataFlowDto();
+                MapToDto(dataFlow, resultDto);
+
+                return resultDto;
+            }
+        }
+
+        private bool DataFlowHasUpdates(DataFlowDto dto, DataFlow dataFlow)
+        {
+            //broken out into individual IF statement for readability
+            if (dto.IngestionType > 0)
+            {
+                //ingestion type is populated and different
+                if (dto.IngestionType != dataFlow.IngestionType)
+                {
+                    return true;
+                }
+                //ingestion type is topic and topic name is different
+                else if (dto.IngestionType == (int)IngestionType.Topic && dto.TopicName != dataFlow.TopicName)
+                {
+                    return true;
+                }
+            }
+
+            //contact id is populated and different
+            if (!string.IsNullOrWhiteSpace(dto.PrimaryContactId) && dto.PrimaryContactId != dataFlow.PrimaryContactId)
+            {
+                return true;
+            }
+
+            //is compressed is different
+            if (dto.IsCompressed != dataFlow.IsDecompressionRequired)
+            {
+                return true;
+            }
+            //different compression option
+            else if (dto.IsCompressed && dto.CompressionType != dataFlow.CompressionType)
+            {
+                return true;
+            }
+
+            //is preprocessing different
+            if (dto.IsPreProcessingRequired != dataFlow.IsPreProcessingRequired)
+            {
+                return true;
+            }
+            //different preprocessing option
+            else if (dto.IsPreProcessingRequired && dto.PreProcessingOption != dataFlow.PreProcessingOption)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void SetChangedProperties(DataFlowDto dto, DataFlow dataFlow)
+        {
+            //keep original ingestion type because no new value was provided
+            if (dto.IngestionType == 0)
+            {
+                dto.IngestionType = dataFlow.IngestionType;
+            }
+
+            //keep original contact because no new value was provided
+            if (string.IsNullOrWhiteSpace(dto.PrimaryContactId) && dto.PrimaryContactId != dataFlow.PrimaryContactId)
+            {
+                dto.PrimaryContactId = dataFlow.PrimaryContactId;
             }
         }
 
