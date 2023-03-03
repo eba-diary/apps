@@ -83,6 +83,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3945_Telematics = new BooleanFeatureFlagAmbientContext("CLA3945_Telematics", false, _ldClient, () => LdUser);
             CLA2868_APIPaginationSupport = new BooleanFeatureFlagAmbientContext("CLA2868_APIPaginationSupport", false, _ldClient, () => LdUser);
             CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
+            CLA4553_PlatformActivity = new BooleanFeatureFlagAmbientContext("CLA4553_PlatformActivity", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
