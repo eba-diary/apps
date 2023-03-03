@@ -44,6 +44,7 @@
                 </div>
             </div>
         </div>
+        <!--
         <div class="partialContainer">
             <div id="failedFiles" class="MainButton">
                 @Html.Partial("_FailedFilesDetails")
@@ -55,6 +56,7 @@
                 @Html.Partial("_InFlightFilesDetails")
             </div>
         </div>
+            -->
     }
     else{
         <h1>You do not have the right permissions to see this page</h1>
@@ -63,61 +65,8 @@
 </body>
 </html>
 
-<style>
-    /*
-    .column {
-        text-align: center;
-        width: 20%;
-    }
-
-    .row:after {
-        content: "";
-        display: table;
-        clear: both;
-    }
-
-    .failure_style {
-        color: red;
-        font-size: 45px;
-    }
-
-    .num_style {
-        font-size: 45px;
-    }
-
-    .container {
-        width: 200px;
-    }
-
-    .processingActivityDiv {
-        padding: 40px;
-        width: 90%;
-        right: auto;
-        padding-right: 25px;
-    }
-
-    .partialContainer {
-        margin: auto;
-        text-align: center;
-        width: 50%;
-    }
-
-    #failedFiles, #completedFiles, #inFlightFiles {
-        display: none;
-        margin: auto;
-    }
-
-    #buttonCompletedFiles, #buttonFailedFiles, #buttonInFlightFiles {
-        
-        border: none;
-        background-color: none!important; 
-        background: unset !important;
-    }
-        */
-</style>
-
 <script>
-
+    /*
     // Elements of div to be hidden and displayed
     dashboardDiv = document.getElementById("dashboard");
     failedFileDiv = document.getElementById("failedFiles");
@@ -201,4 +150,5 @@
             dashboardDiv.style.display = "block";
         });
     });
+    */
 </script>

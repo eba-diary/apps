@@ -221,8 +221,8 @@ namespace Sentry.data.Web.Controllers
             int totalFailedFiles = 2;
 
             // boolean variable that captures feature flag
-            //bool featureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue();
-            bool featureFlag = true;
+            bool featureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue();
+            //bool featureFlag = true;
             //bool featureFlag = false;
 
             AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
