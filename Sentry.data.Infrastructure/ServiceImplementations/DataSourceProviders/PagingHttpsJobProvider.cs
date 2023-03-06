@@ -535,7 +535,7 @@ namespace Sentry.data.Infrastructure
 
         private DataSourceToken GetNextEnabledToken(PagingHttpsConfiguration config)
         {
-            var orderedAllDataSourceTokens = config.Source.AllTokens?.OrderBy(x => x.Id).ToList();
+            var orderedAllDataSourceTokens = config.Source.AllTokens.OrderBy(x => x.Id).ToList();
             var nextIndex = orderedAllDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
             for(int i = nextIndex; i < orderedAllDataSourceTokens.Count; i++)
             {
