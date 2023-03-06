@@ -76,6 +76,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_AuthenticationClaims_DataSourceTokens");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(OAuthClaim))));
+
+            Property(x => x.Enabled, m =>
+            {
+                m.Column("Enabled");
+                m.NotNullable(false);
+            });
         }
     }
 }

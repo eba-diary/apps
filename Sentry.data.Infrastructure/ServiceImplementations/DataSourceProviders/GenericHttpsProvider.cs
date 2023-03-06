@@ -46,7 +46,7 @@ namespace Sentry.data.Infrastructure
             FindTargetJob();
             if(job.DataSource.SourceAuthType.Is<OAuthAuthentication>())
             {
-                foreach(var token in ((HTTPSSource)job.DataSource).Tokens)
+                foreach(var token in ((HTTPSSource)job.DataSource).GetActiveTokens())
                 {
                     _httpClient.BaseAddress = job.DataSource.BaseUri;
                     _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)job.DataSource, token)}");

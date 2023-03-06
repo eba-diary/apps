@@ -489,8 +489,8 @@ namespace Sentry.data.Core
             {
                 HTTPSSource updatedSource = (HTTPSSource)_datasetContext.GetById<DataSource>(source.Id);
 
-                updatedSource.Tokens.FirstOrDefault().CurrentToken = _encryptService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
-                updatedSource.Tokens.FirstOrDefault().CurrentTokenExp = tokenExpTime;
+                updatedSource.GetActiveTokens().FirstOrDefault().CurrentToken = _encryptService.EncryptString(newToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey).Item1;
+                updatedSource.GetActiveTokens().FirstOrDefault().CurrentTokenExp = tokenExpTime;
 
                 _datasetContext.SaveChanges();
 
@@ -1123,7 +1123,7 @@ namespace Sentry.data.Core
                 dto.ClientId = ((HTTPSSource)dsrc).ClientId;
                 dto.ClientPrivateId = _encryptService.PrepEncryptedForDisplay(((HTTPSSource)dsrc).ClientPrivateId);
                 dto.Tokens = new List<DataSourceTokenDto>();
-                MapDataSourceTokensToDtoTokens(((HTTPSSource)dsrc).Tokens, dto.Tokens);
+                MapDataSourceTokensToDtoTokens(((HTTPSSource)dsrc).AllTokens, dto.Tokens);
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
                 dto.SupportsPaging = ((HTTPSSource)dsrc).SupportsPaging;
@@ -1138,17 +1138,17 @@ namespace Sentry.data.Core
                 if (dtoToken.ToDelete)
                 {
                     _datasetContext.RemoveById<DataSourceToken>(dtoToken.Id);
-                    var toRemove = httpsSource.Tokens.First(t => t.Id == dtoToken.Id);
-                    httpsSource.Tokens.Remove(toRemove);
+                    var toRemove = httpsSource.AllTokens.First(t => t.Id == dtoToken.Id);
+                    httpsSource.AllTokens.Remove(toRemove);
                 }
                 else
                 {
                     bool update = false;
                     DataSourceToken token = new DataSourceToken();
 
-                    if (dtoToken.Id != 0 && httpsSource.Tokens.Any(dsToken => dsToken.Id == dtoToken.Id))
+                    if (dtoToken.Id != 0 && httpsSource.AllTokens.Any(dsToken => dsToken.Id == dtoToken.Id))
                     {
-                        token = httpsSource.Tokens.First(dsToken => dsToken.Id == dtoToken.Id);
+                        token = httpsSource.AllTokens.First(dsToken => dsToken.Id == dtoToken.Id);
                         update = true;
                     }
 
@@ -1160,6 +1160,7 @@ namespace Sentry.data.Core
                     token.TokenExp = dtoToken.TokenExp;
                     token.TokenUrl = dtoToken.TokenUrl;
                     token.Scope = dtoToken.Scope;
+                    token.Enabled = dtoToken.Enabled;
 
                     if (update)
                     {
@@ -1168,7 +1169,7 @@ namespace Sentry.data.Core
                     else
                     {
                         CreateClaimsForToken(token, dataSourceDto, httpsSource);
-                        httpsSource.Tokens.Add(token);
+                        httpsSource.AllTokens.Add(token);
                     }
                 }
             }
@@ -1203,7 +1204,8 @@ namespace Sentry.data.Core
                     TokenExp = dataSourceToken.TokenExp,
                     TokenName = dataSourceToken.TokenName,
                     TokenUrl = dataSourceToken.TokenUrl,
-                    Scope = dataSourceToken.Scope
+                    Scope = dataSourceToken.Scope,
+                    Enabled = dataSourceToken.Enabled
                 });
             }
         }
@@ -1293,6 +1295,7 @@ namespace Sentry.data.Core
             dto.TokenUrl = token.TokenUrl;
             dto.TokenExp = token.TokenExp;
             dto.Scope = token.Scope;
+            dto.Enabled = token.Enabled;
         }
 
         internal void MapToDataSourceToken(DataSourceTokenDto dto, DataSourceToken token)
@@ -1305,6 +1308,7 @@ namespace Sentry.data.Core
             token.TokenUrl = dto.TokenUrl;
             token.TokenExp = dto.TokenExp;
             token.Scope = dto.Scope;
+            token.Enabled = dto.Enabled;
         }
 
         private DataSource CreateDataSource(DataSourceDto dto)
@@ -1326,7 +1330,7 @@ namespace Sentry.data.Core
 
             if (auth.Is<OAuthAuthentication>())
             {
-                ((HTTPSSource)source).Tokens = new List<DataSourceToken>();
+                ((HTTPSSource)source).AllTokens = new List<DataSourceToken>();
                 MapDtoTokensToDataSourceTokens(dto, (HTTPSSource)source);
             }
 
