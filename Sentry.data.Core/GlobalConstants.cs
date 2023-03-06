@@ -568,6 +568,7 @@ namespace Sentry.data.Core
             public const string SMTPCLIENT = "SmtpClient";
             public const string DATASETEMAIL = "DatasetMgmtEmail";
             public const string S3SINKEMAILTO = "S3SinkEmailRequestTO";
+            public const string MOTIVEEMAILTO = "MotiveEmailTo";
             public const string MAIN_WEB_URL = "SentryDataBaseUrl";
             public const string CONFLUENT_CONNECTOR_API = "ConfluentConnectorApi";
             public const string CONFLUENT_CONNECTOR_USERNAME = "ConfluentConnectorUserName";

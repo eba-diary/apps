@@ -47,6 +47,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
         public IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
         public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
+        public IFeatureFlag<bool> CLA4931_SendMotiveEmail { get; }
         public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
 
         public DataFeatures(UserService userService, ILdClient ldClient)
@@ -84,6 +85,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
             CLA4485_DropCompaniesFile = new BooleanFeatureFlagAmbientContext("CLA4485_DropCompaniesFile", false, _ldClient, () => LdUser);
             CLA2869_AllowMotiveJobs = new BooleanFeatureFlagAmbientContext("CLA2869_AllowMotiveJobs", false, _ldClient, () => LdUser);
+            CLA4931_SendMotiveEmail = new BooleanFeatureFlagAmbientContext("CLA4931_SendMotiveEmail", false, _ldClient, () => LdUser);
             CLA4925_ParquetFileType = new BooleanFeatureFlagAmbientContext("CLA4925_ParquetFileType", false, _ldClient, () => LdUser);
         }
 

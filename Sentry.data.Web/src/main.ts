@@ -21,6 +21,7 @@ import '@sentry-insurance/mdbootstrap/src/js/pro/buttons.js';
 import '@sentry-insurance/mdbootstrap/src/js/pro/collapsible.js';
 import '@sentry-insurance/mdbootstrap/src/js/pro/dropdown/dropdown.js';
 import '@sentry-insurance/mdbootstrap/src/js/pro/dropdown/dropdown-searchable.js';
+import '@sentry-insurance/mdbootstrap/src/js/pro/file-input.js';
 import '@sentry-insurance/mdbootstrap/src/js/pro/material-select/material-select.js';
 import '@sentry-insurance/mdbootstrap/src/js/pro/material-select/material-select-view.js';
 import '@sentry-insurance/mdbootstrap/src/js/pro/material-select/material-select-view-renderer.js';

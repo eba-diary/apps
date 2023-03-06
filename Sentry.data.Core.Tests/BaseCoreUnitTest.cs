@@ -97,6 +97,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4485_DropCompaniesFile => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA2869_AllowMotiveJobs => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4931_SendMotiveEmail => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4925_ParquetFileType => new MockBooleanFeatureFlag(true);
         }
     }

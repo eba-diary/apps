@@ -9,5 +9,6 @@ namespace Sentry.data.Core
         void SendInvalidReportLocationEmail(BusinessIntelligenceDto report, string userName);
         void SendGenericEmail(string emailAddress, string subject, string body, string cc);
         void SendS3SinkConnectorRequestEmail(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto);
+        void SendNewMotiveTokenAddedEmail(DataSourceToken token);
     }
 }
