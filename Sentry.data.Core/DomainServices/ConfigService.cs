@@ -357,17 +357,12 @@ namespace Sentry.data.Core
             }            
         }
 
-        public void UpdateDatasetFileConfig(DatasetFileConfigDto dto)
-        {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(dto.ConfigId);
-            UpdateDatasetFileConfig(dto, dfc);
-        }
-
         public bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)
         {
             try
             {
-                UpdateDatasetFileConfig(dto);
+                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(dto.ConfigId);
+                UpdateDatasetFileConfig(dto, dfc);
                 _datasetContext.SaveChanges();
                 return true;
             }
@@ -378,7 +373,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig dfc)
+        public void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig dfc)
         {
             if (dto.DatasetScopeTypeId > 0)
             {

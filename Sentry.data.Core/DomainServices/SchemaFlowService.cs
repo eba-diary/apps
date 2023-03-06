@@ -51,7 +51,13 @@ namespace Sentry.data.Core
                     _configService.Create(dto.DatasetFileConfigDto);
 
                     //create data flow
-                    PrepDataFlowDto(dto, dataset, addedSchemaDto);
+                    dto.DataFlowDto.Name = $"{dataset.ShortName}_{addedSchemaDto.Name.Replace(" ", "")}";
+                    dto.DataFlowDto.IsSecured = true;
+                    dto.DataFlowDto.DatasetId = dataset.DatasetId;
+                    dto.DataFlowDto.SchemaMap = new List<SchemaMapDto>
+                    {
+                        new SchemaMapDto { DatasetId = dataset.DatasetId, SchemaId = addedSchemaDto.SchemaId }
+                    };
                     DataFlowDto addedDataFlowDto = await _dataFlowService.AddDataFlowAsync(dto.DataFlowDto);
 
                     SchemaResultDto resultDto = CreateSchemaResultDto(addedSchemaDto, dto.DatasetFileConfigDto, addedDataFlowDto);
@@ -87,6 +93,7 @@ namespace Sentry.data.Core
                     try
                     {
                         //keep values that are not available to edit from API
+                        dto.SchemaDto.ParentDatasetId = fileConfig.ParentDataset.DatasetId;
                         dto.SchemaDto.ParquetStorageBucket = schema.ParquetStorageBucket;
                         dto.SchemaDto.ParquetStoragePrefix = schema.ParquetStoragePrefix;
                         if (dto.DataFlowDto.IngestionType == 0)
@@ -100,13 +107,13 @@ namespace Sentry.data.Core
                         dto.DataFlowDto.DataFlowStepUpdateRequired = (string.IsNullOrWhiteSpace(dto.SchemaDto.SchemaRootPath) && !string.IsNullOrWhiteSpace(schema.SchemaRootPath)) ||
                             (!string.IsNullOrWhiteSpace(dto.SchemaDto.SchemaRootPath) && string.IsNullOrWhiteSpace(schema.SchemaRootPath));
 
+                        //update schema
                         FileSchemaDto updatedSchemaDto = await _schemaService.UpdateSchemaAsync(dto.SchemaDto, schema);
 
                         //update file config
-                        dto.DatasetFileConfigDto.ConfigId = fileConfig.ConfigId;
-                        _configService.UpdateDatasetFileConfig(dto.DatasetFileConfigDto);
+                        _configService.UpdateDatasetFileConfig(dto.DatasetFileConfigDto, fileConfig);
 
-                        PrepDataFlowDto(dto, fileConfig.ParentDataset, updatedSchemaDto);
+                        //update data flow
                         DataFlowDto updatedDataFlowDto = await _dataFlowService.UpdateDataFlowAsync(dto.DataFlowDto, dataFlow);
 
                         await _datasetContext.SaveChangesAsync();
@@ -195,16 +202,6 @@ namespace Sentry.data.Core
             }
 
             return null;
-        }
-
-        private void PrepDataFlowDto(SchemaFlowDto dto, Dataset dataset, FileSchemaDto addedSchemaDto)
-        {
-            dto.DataFlowDto.Name = $"{dataset.ShortName}_{addedSchemaDto.Name.Replace(" ", "")}";
-            dto.DataFlowDto.IsSecured = true;
-            dto.DataFlowDto.SchemaMap = new List<SchemaMapDto>
-            {
-                new SchemaMapDto { DatasetId = dto.DataFlowDto.DatasetId, SchemaId = addedSchemaDto.SchemaId }
-            };
         }
 
         private void LogResourceNotFound(FileSchema schema, DatasetFileConfig config, DataFlow dataFlow, int schemaId)

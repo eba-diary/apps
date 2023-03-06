@@ -59,6 +59,11 @@ namespace Sentry.data.Web.API
                     x.PreCondition(src => !string.IsNullOrWhiteSpace(src.CompressionTypeCode));
                     x.MapFrom(src => (int)Enum.Parse(typeof(CompressionTypes), src.CompressionTypeCode, true));
                 })
+                .ForMember(dest => dest.CompressionJob, x =>
+                {
+                    x.PreCondition(src => !string.IsNullOrWhiteSpace(src.CompressionTypeCode));
+                    x.MapFrom(src => new CompressionJobDto { CompressionType = (CompressionTypes)Enum.Parse(typeof(CompressionTypes), src.CompressionTypeCode, true) });
+                })
                 .ForMember(dest => dest.IsPreProcessingRequired, x => x.MapFrom(src => src.IsPreprocessingRequired))
                 .ForMember(dest => dest.PreProcessingOption, x =>
                 {

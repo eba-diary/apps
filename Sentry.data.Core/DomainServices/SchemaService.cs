@@ -23,28 +23,24 @@ namespace Sentry.data.Core
         public readonly IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
-        private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly Helpers.DscEventTopicHelper _dscEventTopicHelper;
+        private readonly IDscEventTopicHelper _dscEventTopicHelper;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
-        public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
+        public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
             IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient,
-            Helpers.DscEventTopicHelper dscEventTopicHelper)
+            IEventService eventService, IElasticContext elasticContext, IDscEventTopicHelper dscEventTopicHelper)
         {
             _datasetContext = dsContext;
             _userService = userService;
-            _emailService = emailService;
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
@@ -53,7 +49,6 @@ namespace Sentry.data.Core
             _snowProvider = snowProvider;
             _eventService = eventService;
             _elasticContext = elasticContext;
-            _backgroundJobClient = backgroundJobClient;
             _dscEventTopicHelper = dscEventTopicHelper;
         }
 
@@ -349,6 +344,9 @@ namespace Sentry.data.Core
 
         public Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema)
         {
+            //immutable properties that must be keep original value
+            dto.Name = schema.Name;
+
             UpdateSchema(dto, schema);
             FileSchemaDto resultDto = MapToDto(schema);
             return Task.FromResult(resultDto);
@@ -632,9 +630,9 @@ namespace Sentry.data.Core
                 Regex reg = new Regex("[^a-zA-Z0-9]");
                 string namedEnvironmentCleaned = reg.Replace((ds.NamedEnvironment != null)? ds.NamedEnvironment.ToUpper() : String.Empty,String.Empty);
                 string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
-                string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
+                string schemaNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
 
-                                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
+                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{schemaNameCleaned}_COMPLETED";
             }
             
             return controlMTriggerName;

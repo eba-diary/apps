@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.API;
-using System;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Tests.API
@@ -75,6 +73,8 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual((int)IngestionType.Topic, dataFlowDto.IngestionType);
             Assert.AreEqual("000001", dataFlowDto.PrimaryContactId);
             Assert.AreEqual("TopicName", dataFlowDto.TopicName);
+            Assert.IsNotNull(dataFlowDto.CompressionJob);
+            Assert.AreEqual(CompressionTypes.ZIP, dataFlowDto.CompressionJob.CompressionType);
         }
 
         [TestMethod]
@@ -135,6 +135,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual((int)IngestionType.S3_Drop, dataFlowDto.IngestionType);
             Assert.AreEqual("000001", dataFlowDto.PrimaryContactId);
             Assert.IsNull(dataFlowDto.TopicName);
+            Assert.IsNull(dataFlowDto.CompressionJob);
         }
 
         [TestMethod]

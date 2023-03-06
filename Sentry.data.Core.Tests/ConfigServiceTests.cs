@@ -778,5 +778,49 @@ namespace Sentry.data.Core.Tests
 
             mock.VerifyAll();
         }
+
+        [TestMethod]
+        public void UpdateDatasetFileConfig_DatasetFileConfigDto_Update()
+        {
+            DatasetFileConfigDto dto = new DatasetFileConfigDto
+            {
+                DatasetScopeTypeName = "Appending",
+                Description = "Description 2",
+                FileExtensionName = ExtensionNames.CSV
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                DatasetScopeType = new DatasetScopeType { Name = "Floating" },
+                Description = "Description",
+                FileExtension = new FileExtension { Name = ExtensionNames.JSON }
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            List<DatasetScopeType> scopes = new List<DatasetScopeType>
+            {
+                new DatasetScopeType { Name = "Appending" }
+            };
+            datasetContext.SetupGet(x => x.DatasetScopeTypes).Returns(scopes.AsQueryable());
+
+            List<FileExtension> fileTypes = new List<FileExtension>
+            {
+                new FileExtension { Name = ExtensionNames.CSV }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileTypes.AsQueryable());
+
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null);
+
+            configService.UpdateDatasetFileConfig(dto, fileConfig);
+
+            Assert.AreEqual(scopes.First(), fileConfig.DatasetScopeType);
+            Assert.AreEqual(0, fileConfig.FileTypeId);
+            Assert.AreEqual("Description 2", fileConfig.Description);
+            Assert.AreEqual(fileTypes.First(), fileConfig.FileExtension);
+
+            mr.VerifyAll();
+        }
     }
 }

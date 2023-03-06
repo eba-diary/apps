@@ -383,21 +383,26 @@ namespace Sentry.data.Core
 
         public async Task<DataFlowDto> UpdateDataFlowAsync(DataFlowDto dto, DataFlow dataFlow)
         {
+            //immutable properties that must keep original value
             dto.Id = dataFlow.Id;
             dto.SaidKeyCode = dataFlow.SaidKeyCode;
             dto.NamedEnvironment = dataFlow.NamedEnvironment;
             dto.NamedEnvironmentType = dataFlow.NamedEnvironmentType;
             dto.ObjectStatus = dataFlow.ObjectStatus;
+            dto.DatasetId = dataFlow.DatasetId;
+            dto.Name = dataFlow.Name;
+            dto.IsSecured = dataFlow.IsSecured;
+            dto.SchemaMap = new List<SchemaMapDto>
+            {
+                new SchemaMapDto { DatasetId = dataFlow.DatasetId, SchemaId = dataFlow.SchemaId }
+            };
 
             //only update data flow if any of the data flow properties are different or data flow steps need to be updated
             if (DataFlowHasUpdates(dto, dataFlow) || dto.DataFlowStepUpdateRequired)
             {
                 //make sure dto properties are set with updated properties
                 //in some cases a null value means not to update the property
-                if (dto.DataFlowStepUpdateRequired)
-                {
-                    SetChangedProperties(dto, dataFlow);
-                }
+                SetUnchangedProperties(dto, dataFlow);
 
                 //delete and create new dataflow
                 Delete(dto.Id, _userService.GetCurrentUser(), false);
@@ -461,7 +466,7 @@ namespace Sentry.data.Core
             return false;
         }
 
-        private void SetChangedProperties(DataFlowDto dto, DataFlow dataFlow)
+        private void SetUnchangedProperties(DataFlowDto dto, DataFlow dataFlow)
         {
             //keep original ingestion type because no new value was provided
             if (dto.IngestionType == 0)

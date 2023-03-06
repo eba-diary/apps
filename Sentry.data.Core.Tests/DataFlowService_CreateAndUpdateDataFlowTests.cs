@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Nest;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
@@ -690,6 +691,276 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(2, result.SchemaId);
 
             mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateDataFlowAsync_HasUpdates_DataFlowDto()
+        {
+            DateTime start = DateTime.Now;
+
+            DataFlowDto dto = new DataFlowDto
+            {
+                IngestionType = (int)IngestionType.S3_Drop,
+                PrimaryContactId = "100000",
+                IsPreProcessingRequired = true,
+                PreProcessingOption = (int)DataFlowPreProcessingTypes.googleapi,
+                IsCompressed = true,
+                CompressionType = (int)CompressionTypes.ZIP,
+                CompressionJob = new CompressionJobDto { CompressionType = CompressionTypes.ZIP },
+            };
+
+            DataFlow dataFlow = new DataFlow
+            {
+                Id = 2,
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetId = 1,
+                Name = "Name",
+                IsSecured = true,
+                SchemaId = 2,
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)IngestionType.Topic,
+                TopicName = "TopicName",
+                PrimaryContactId = "000000",
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> appUser = GetApplicationUser(mr);
+            Mock<IUserService> userService = GetUserService(mr, appUser.Object);
+
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+
+            UserSecurity userSecurity = new UserSecurity();
+            securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataFlow>(), appUser.Object)).Returns(userSecurity);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(x => x.Delete(It.Is<List<int>>(l => !l.Any()), appUser.Object, false)).Returns(true);
+
+            Dataset dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Dataset Name",
+                DatasetCategories = new List<Category>(),
+                Asset = new Asset() { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr, dataset);
+            datasetContext.Setup(x => x.GetById<DataFlow>(2)).Returns(dataFlow);
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
+            datasetContext.SetupGet(x => x.UncompressZipAction).Returns(new List<UncompressZipAction>() { new UncompressZipAction() { Id = 25 } }.AsQueryable());
+            datasetContext.SetupGet(x => x.GoogleApiAction).Returns(new List<GoogleApiAction>() { new GoogleApiAction() { Id = 26 } }.AsQueryable());
+
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowDto result = dataFlowService.UpdateDataFlowAsync(dto, dataFlow).Result;
+
+            //deleted old dataflow
+            Assert.AreEqual(ObjectStatusEnum.Deleted, dataFlow.ObjectStatus);
+            Assert.AreEqual("000000", dataFlow.DeleteIssuer);
+            Assert.IsTrue(dataFlow.DeleteIssueDTM >= start);
+
+            //created new dataflow
+            Assert.AreEqual(3, result.Id);
+            Assert.AreEqual("Name", result.Name);
+            Assert.AreEqual("SAID", result.SaidKeyCode);
+            Assert.IsTrue(result.CreateDTM >= start);
+            Assert.AreEqual("000000", result.CreatedBy);
+            Assert.AreEqual("000001", result.FlowStorageCode);
+            Assert.AreEqual(2, result.MappedSchema.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, result.ObjectStatus);
+            Assert.IsNull(result.DeleteIssuer);
+            Assert.AreEqual(DateTime.MaxValue, result.DeleteIssueDTM);
+            Assert.AreEqual((int)IngestionType.S3_Drop, result.IngestionType);
+            Assert.IsTrue(result.IsCompressed);
+            Assert.IsFalse(result.IsBackFillRequired);
+            Assert.AreEqual((int)CompressionTypes.ZIP, result.CompressionType);
+            Assert.IsTrue(result.IsPreProcessingRequired);
+            Assert.AreEqual((int)DataFlowPreProcessingTypes.googleapi, result.PreProcessingOption);
+            Assert.AreEqual("DEV", result.NamedEnvironment);
+            Assert.AreEqual(NamedEnvironmentType.NonProd, result.NamedEnvironmentType);
+            Assert.AreEqual("100000", result.PrimaryContactId);
+            Assert.IsTrue(result.IsSecured);
+            Assert.AreEqual(userSecurity, result.Security);
+            Assert.IsNull(result.TopicName);
+            Assert.IsNull(result.S3ConnectorName);
+            Assert.AreEqual(1, result.SchemaMap.First().DatasetId);
+            Assert.AreEqual(2, result.SchemaMap.First().SchemaId);
+            Assert.AreEqual(1, result.DatasetId);
+            Assert.AreEqual(2, result.SchemaId);
+        }
+
+        [TestMethod]
+        public void UpdateDataFlowAsync_NoUpdates_DataFlowDto()
+        {
+            DataFlowDto dto = new DataFlowDto();
+
+            DataFlow dataFlow = new DataFlow
+            {
+                Id = 3,
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetId = 1,
+                Name = "Name",
+                IsSecured = true,
+                SchemaId = 2,
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)IngestionType.S3_Drop,
+                PrimaryContactId = "000000",
+                CreatedBy = "000000",
+                CreatedDTM = new DateTime(2023, 1, 1),
+                FlowStorageCode = "1234567",
+                Steps = new List<DataFlowStep>(),
+                PreProcessingOption = 0
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            
+            Mock<IApplicationUser> appUser = GetApplicationUser(mr);
+            Mock<IUserService> userService = GetUserService(mr, appUser.Object);
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+
+            UserSecurity userSecurity = new UserSecurity();
+            securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataFlow>(), appUser.Object)).Returns(userSecurity);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
+
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null);
+            DataFlowDto result = dataFlowService.UpdateDataFlowAsync(dto, dataFlow).Result;
+
+            Assert.AreEqual(3, result.Id);
+            Assert.AreEqual("Name", result.Name);
+            Assert.AreEqual("SAID", result.SaidKeyCode);
+            Assert.AreEqual(new DateTime(2023, 1, 1), result.CreateDTM);
+            Assert.AreEqual("000000", result.CreatedBy);
+            Assert.AreEqual("1234567", result.FlowStorageCode);
+            Assert.AreEqual(2, result.MappedSchema.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, result.ObjectStatus);
+            Assert.IsNull(result.DeleteIssuer);
+            Assert.AreEqual(DateTime.MaxValue, result.DeleteIssueDTM);
+            Assert.AreEqual((int)IngestionType.S3_Drop, result.IngestionType);
+            Assert.IsFalse(result.IsCompressed);
+            Assert.IsFalse(result.IsBackFillRequired);
+            Assert.IsNull(result.CompressionType);
+            Assert.IsFalse(result.IsPreProcessingRequired);
+            Assert.AreEqual(0, result.PreProcessingOption);
+            Assert.AreEqual("DEV", result.NamedEnvironment);
+            Assert.AreEqual(NamedEnvironmentType.NonProd, result.NamedEnvironmentType);
+            Assert.AreEqual("000000", result.PrimaryContactId);
+            Assert.IsTrue(result.IsSecured);
+            Assert.AreEqual(userSecurity, result.Security);
+            Assert.IsNull(result.TopicName);
+            Assert.IsNull(result.S3ConnectorName);
+            Assert.AreEqual(1, result.DatasetId);
+            Assert.AreEqual(2, result.SchemaId);
+        }
+
+        [TestMethod]
+        public void UpdateDataFlowAsync_DataFlowStepUpdateRequired_DataFlowDto()
+        {
+            DateTime start = DateTime.Now;
+
+            DataFlowDto dto = new DataFlowDto
+            {
+                DataFlowStepUpdateRequired = true,
+                PreProcessingOption = 0
+            };
+
+            DataFlow dataFlow = new DataFlow
+            {
+                Id = 2,
+                SaidKeyCode = "SAID",
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                ObjectStatus = ObjectStatusEnum.Active,
+                DatasetId = 1,
+                Name = "Name",
+                IsSecured = true,
+                SchemaId = 2,
+                DeleteIssueDTM = DateTime.MaxValue,
+                IngestionType = (int)IngestionType.S3_Drop,
+                PrimaryContactId = "000000",
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> appUser = GetApplicationUser(mr);
+            Mock<IUserService> userService = GetUserService(mr, appUser.Object);
+
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+
+            UserSecurity userSecurity = new UserSecurity();
+            securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataFlow>(), appUser.Object)).Returns(userSecurity);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
+            dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+
+            Mock<IJobService> jobService = mr.Create<IJobService>();
+            jobService.Setup(x => x.Delete(It.Is<List<int>>(l => !l.Any()), appUser.Object, false)).Returns(true);
+
+            Dataset dataset = new Dataset()
+            {
+                DatasetId = 1,
+                DatasetName = "Dataset Name",
+                DatasetCategories = new List<Category>(),
+                Asset = new Asset() { SaidKeyCode = "SAID" },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd
+            };
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr, dataset);
+            datasetContext.Setup(x => x.GetById<DataFlow>(2)).Returns(dataFlow);
+            datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
+
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowDto result = dataFlowService.UpdateDataFlowAsync(dto, dataFlow).Result;
+
+            //deleted old dataflow
+            Assert.AreEqual(ObjectStatusEnum.Deleted, dataFlow.ObjectStatus);
+            Assert.AreEqual("000000", dataFlow.DeleteIssuer);
+            Assert.IsTrue(dataFlow.DeleteIssueDTM >= start);
+
+            //created new dataflow
+            Assert.AreEqual(3, result.Id);
+            Assert.AreEqual("Name", result.Name);
+            Assert.AreEqual("SAID", result.SaidKeyCode);
+            Assert.IsTrue(result.CreateDTM >= start);
+            Assert.AreEqual("000000", result.CreatedBy);
+            Assert.AreEqual("000001", result.FlowStorageCode);
+            Assert.AreEqual(2, result.MappedSchema.First());
+            Assert.AreEqual(ObjectStatusEnum.Active, result.ObjectStatus);
+            Assert.IsNull(result.DeleteIssuer);
+            Assert.AreEqual(DateTime.MaxValue, result.DeleteIssueDTM);
+            Assert.AreEqual((int)IngestionType.S3_Drop, result.IngestionType);
+            Assert.IsFalse(result.IsCompressed);
+            Assert.IsFalse(result.IsBackFillRequired);
+            Assert.IsNull(result.CompressionType);
+            Assert.IsFalse(result.IsPreProcessingRequired);
+            Assert.AreEqual(0, result.PreProcessingOption);
+            Assert.AreEqual("DEV", result.NamedEnvironment);
+            Assert.AreEqual(NamedEnvironmentType.NonProd, result.NamedEnvironmentType);
+            Assert.AreEqual("000000", result.PrimaryContactId);
+            Assert.IsTrue(result.IsSecured);
+            Assert.AreEqual(userSecurity, result.Security);
+            Assert.IsNull(result.TopicName);
+            Assert.IsNull(result.S3ConnectorName);
+            Assert.AreEqual(1, result.SchemaMap.First().DatasetId);
+            Assert.AreEqual(2, result.SchemaMap.First().SchemaId);
+            Assert.AreEqual(1, result.DatasetId);
+            Assert.AreEqual(2, result.SchemaId);
         }
 
         #region Helpers

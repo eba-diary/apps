@@ -493,6 +493,7 @@
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
     <Compile Include="Interfaces\IAuthorizationSigner.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
+    <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
     <Compile Include="Interfaces\IFileProvider.cs" />
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
