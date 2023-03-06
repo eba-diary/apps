@@ -98,12 +98,14 @@ namespace Sentry.data.Core
                         dto.SchemaDto.ParquetStoragePrefix = schema.ParquetStoragePrefix;
                         if (dto.DataFlowDto.IngestionType == 0)
                         {
+                            //no ingestion type was specified which means it will not be changed so keep the existing KafkaFlag
                             dto.SchemaDto.CLA1286_KafkaFlag = schema.CLA1286_KafkaFlag;
                         }
 
+                        //need to trigger consumption layer even if create current view changes after successfully updating
                         bool currentViewChanged = dto.SchemaDto.CreateCurrentView != schema.CreateCurrentView;
 
-                        //if schema root path went from null to value or value to null need to update dataflow
+                        //if schema root path went from null to value or value to null need to update dataflow to catch data flow step update
                         dto.DataFlowDto.DataFlowStepUpdateRequired = (string.IsNullOrWhiteSpace(dto.SchemaDto.SchemaRootPath) && !string.IsNullOrWhiteSpace(schema.SchemaRootPath)) ||
                             (!string.IsNullOrWhiteSpace(dto.SchemaDto.SchemaRootPath) && string.IsNullOrWhiteSpace(schema.SchemaRootPath));
 
@@ -121,7 +123,7 @@ namespace Sentry.data.Core
                         //if create current view changed, call schema service GenerateConsumptionLayerEvents after changes are saved
                         if (currentViewChanged)
                         {
-                            JObject changedProperty = new JObject { { "createcurrentview", schema.CreateCurrentView } };
+                            JObject changedProperty = new JObject { { "createcurrentview", updatedSchemaDto.CreateCurrentView } };
                             _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
                         }
 
