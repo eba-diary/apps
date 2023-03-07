@@ -1260,10 +1260,10 @@ namespace Sentry.data.Core
 
             if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                 && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && (dscNamedEnvironment == "QUAL" || dscNamedEnvironment == "PROD"))
+                && (dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD))
             {
                 dbName += dscNamedEnvironment;
-                dbName += "NP";
+                dbName += GlobalConstants.Environments.NONPROD_SUFFIX.ToUpper();
             }
             else
             {
@@ -1345,15 +1345,15 @@ namespace Sentry.data.Core
                 ? GlobalConstants.AwsBuckets.HR_DATASET_BUCKET_AE2
                 : GlobalConstants.AwsBuckets.BASE_DATASET_BUCKET_AE2;
 
-            string namedEnviornment = dscNamedEnvironment.ToLower();
+            string namedEnvironment = dscNamedEnvironment.ToLower();
             if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                 && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd
-                && (dscNamedEnvironment == "QUAL" || dscNamedEnvironment == "PROD"))
+                && (dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD))
             {
-                namedEnviornment += "np";
+                namedEnvironment += GlobalConstants.Environments.NONPROD_SUFFIX.ToLower();
             }
 
-            string bucketName = baseBucketName.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnviornment.ToLower());
+            string bucketName = baseBucketName.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnvironment.ToLower());
             return bucketName;
         }
 
