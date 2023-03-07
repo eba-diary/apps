@@ -197,7 +197,6 @@
     <Compile Include="MockClasses.cs" />
     <Compile Include="MotiveProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="ElasticDataInventorySearchProviderTests.cs" />
     <Compile Include="EventServiceTests.cs" />
     <Compile Include="SparkConverterStatusEventHandlerTests.cs" />
