@@ -1682,7 +1682,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
@@ -1701,7 +1701,7 @@ namespace Sentry.data.Core.Tests
             var parentSecurable = new Mock<ISecurable>();
             parentSecurable.Setup(s => s.Security).Returns(security);
             securable.Setup(s => s.Parent).Returns(parentSecurable.Object);
-            var securityService = new SecurityService(null, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             // Act
             var actual = securityService.GetSecurablePermissions(securable.Object);
@@ -1736,7 +1736,7 @@ namespace Sentry.data.Core.Tests
                     SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
                 }
             };
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null, null);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
 
             //Act
             await service.ApproveTicket(ticket, "");
@@ -1767,7 +1767,7 @@ namespace Sentry.data.Core.Tests
                     SecurableEntityName = GlobalConstants.SecurableEntityName.DATASET
                 }
             };
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null, null);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
 
             //Act
             await Assert.ThrowsExceptionAsync<DatasetNotFoundException>(() => service.ApproveTicket(ticket, ""));
@@ -1800,7 +1800,7 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(s => s.Datasets).Returns((new List<Dataset>() { dataset }).AsQueryable());
             var inevService = new Mock<IInevService>();
-            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null, null);
+            var service = new SecurityService(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, null, null);
 
             //Act
             await service.ApproveTicket(ticket, "");
@@ -1817,7 +1817,7 @@ namespace Sentry.data.Core.Tests
         {
             //Arrange
             var ds = new Dataset() { NamedEnvironmentType = NamedEnvironmentType.Prod, ShortName = nameof(Dataset.ShortName), Asset = new Asset() { SaidKeyCode = "ABCD" } };
-            var securityService = new SecurityService(null, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(null, null, null, null, null, null, null, null);
 
             //Act
             var groupDtos = securityService.GetDefaultSecurityGroupDtos(ds);
@@ -1854,7 +1854,7 @@ namespace Sentry.data.Core.Tests
             var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Security).Returns(new List<Security>() { security }.AsQueryable());
-            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object, null) 
+            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object, null) 
                 { CallBase = true }; //call the real method for anything not explicitely .Setup()
             securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
@@ -1890,7 +1890,7 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Security).Returns(new List<Security> { security }.AsQueryable());
             context.Setup(c => c.Datasets).Returns(new List<Dataset> { ds }.AsQueryable());
-            var securityService = new Mock<SecurityService>(context.Object, null, new MockDataFeatures(), inevService.Object, null, null, obsidianService.Object, adSecurityAdminProvider.Object, null)
+            var securityService = new Mock<SecurityService>(context.Object, null, new MockDataFeatures(), inevService.Object, null, obsidianService.Object, adSecurityAdminProvider.Object, null)
                 { CallBase = true }; //call the real method for anything not explicitely .Setup()
             securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
@@ -1922,7 +1922,7 @@ namespace Sentry.data.Core.Tests
             var adSecurityAdminProvider = new Mock<IAdSecurityAdminProvider>();
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Security).Returns(new List<Security>() { df_security, ds_security }.AsQueryable());
-            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object, null)
+            var securityService = new Mock<SecurityService>(context.Object, null, null, null, null, obsidianService.Object, adSecurityAdminProvider.Object, null)
             { CallBase = true }; //call the real method for anything not explicitely .Setup()
             securityService.Setup(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
@@ -1949,7 +1949,7 @@ namespace Sentry.data.Core.Tests
             };
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
-            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             var actual = securityService.GetConsumerPermissions();
@@ -1971,7 +1971,7 @@ namespace Sentry.data.Core.Tests
             };
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
-            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             var actual = securityService.GetProducerPermissions();
@@ -1992,7 +1992,7 @@ namespace Sentry.data.Core.Tests
             };
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
-            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             var actual = securityService.GetSnowflakePermissions();
@@ -2012,7 +2012,7 @@ namespace Sentry.data.Core.Tests
             };
             var context = new Mock<IDatasetContext>();
             context.Setup(c => c.Permission).Returns(permissions.AsQueryable());
-            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null, null);
+            var securityService = new SecurityService(context.Object, null, null, null, null, null, null, null);
 
             //Act
             var actual = securityService.GetDataflowPermissions();

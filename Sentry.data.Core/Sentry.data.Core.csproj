@@ -527,7 +527,7 @@
     <Compile Include="Interfaces\ISnowProvider.cs" />
     <Compile Include="Interfaces\IDbExecuter.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
-    <Compile Include="Interfaces\IBaseTicketProvider.cs" />
+    <Compile Include="Interfaces\ITicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
@@ -561,7 +561,7 @@
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
-    <Compile Include="Entities\Security\HpsmTicket.cs" />
+    <Compile Include="Entities\Security\ChangeTicket.cs" />
     <Compile Include="Entities\Security\Permission.cs" />
     <Compile Include="Entities\Security\SecurityTicket.cs" />
     <Compile Include="Entities\Security\SecurityPermission.cs" />

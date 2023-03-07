@@ -19,12 +19,9 @@ namespace Sentry.data.Core
         public DateTime RequestedDate { get; set; }
         public string ApproverId { get; set; }
         public bool IsProd { get; set; }
-
-        public List<Permission> Permissions { get; set; }
-        
+        public List<Permission> Permissions { get; set; }        
         public List<KeyValuePair<string,string>> ApproverList { get; set; }
         public List<DataAsset> DataAssest { get; set; }
-
         public List<string> SelectedPermissionCodes { get; set; }
         public string SelectedApprover { get; set; }
         public string SaidKeyCode { get; set; }
@@ -35,7 +32,6 @@ namespace Sentry.data.Core
         public string TicketId { get; set; }
         public bool IsSystemGenerated { get; set; }
         public string SnowflakeAccount { get; set; }
-
         public string ConsumeDatasetGroupName { get; set; }
         public string ProducerDatasetGroupName { get; set; }
         public string ConsumeAssetGroupName { get; set; }

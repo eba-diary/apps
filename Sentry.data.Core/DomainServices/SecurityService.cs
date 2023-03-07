@@ -17,33 +17,28 @@ namespace Sentry.data.Core
 {
     public class SecurityService : ISecurityService
     {
-
         private readonly IDatasetContext _datasetContext;
-        //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
-        private readonly IBaseTicketProvider _baseTicketProvider;
+        private readonly ITicketProvider _ticketProvider;
         private readonly IDataFeatures _dataFeatures;
         private readonly IInevService _inevService;
-        private readonly IQuartermasterService _quartermasterService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IObsidianService _obsidianService;
         private readonly IAdSecurityAdminProvider _adSecurityAdminProvider;
         private readonly IJiraService _jiraService;
 
         public SecurityService(IDatasetContext datasetContext,
-                               IBaseTicketProvider baseTicketProvider,
+                               ITicketProvider ticketProvider,
                                IDataFeatures dataFeatures,
                                IInevService inevService,
-                               IQuartermasterService quartermasterService,
                                IBackgroundJobClient backgroundJobClient,
                                IObsidianService obsidianService,
                                IAdSecurityAdminProvider adSecurityAdminProvider,
                                IJiraService jiraService)
         {
             _datasetContext = datasetContext;
-            _baseTicketProvider = baseTicketProvider;
+            _ticketProvider = ticketProvider;
             _dataFeatures = dataFeatures;
             _inevService = inevService;
-            _quartermasterService = quartermasterService;
             _backgroundJobClient = backgroundJobClient;
             _obsidianService = obsidianService;
             _adSecurityAdminProvider = adSecurityAdminProvider;
@@ -52,7 +47,7 @@ namespace Sentry.data.Core
 
         public async Task<string> RequestPermission(AccessRequest model)
         {
-            string ticketId = _baseTicketProvider.CreateChangeTicket(model);
+            string ticketId = _ticketProvider.CreateTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
                 Security security = model.Scope.Equals(AccessScope.Asset) ? GetSecurityForAsset(model.SecurableObjectName) : _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);

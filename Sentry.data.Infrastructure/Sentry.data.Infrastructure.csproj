@@ -474,7 +474,6 @@
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
     <Compile Include="ServiceImplementations\SupportLinkService.cs" />
     <Compile Include="ServiceImplementations\ThreadSafeInstanceGenerator.cs" />
-    <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsProvider.cs" />
@@ -509,6 +508,7 @@
     <Compile Include="ServiceImplementations\ExtendedUserInfo.cs" />
     <Compile Include="ServiceImplementations\ExtendedUserInfoProvider.cs" />
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\JsmTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
     <Compile Include="ServiceImplementations\UserFavoriteService.cs" />
     <Compile Include="ServiceImplementations\WallEService.cs" />

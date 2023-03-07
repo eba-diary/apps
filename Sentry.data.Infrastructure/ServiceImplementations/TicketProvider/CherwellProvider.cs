@@ -11,7 +11,7 @@ using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
-    public class CherwellProvider : BaseTicketProvider, IBaseTicketProvider
+    public class CherwellProvider : ITicketProvider
     {
         private BusinessObjectClient _businessObjectClient;
         private ServiceClient _tokenClient;
@@ -33,15 +33,14 @@ namespace Sentry.data.Infrastructure
             _tokenInterval = int.Parse(Config.GetHostSetting("CherwellTokenInterval"));
         }
 
-
         #region Public Methods
-        public override string CreateChangeTicket(AccessRequest model)
+        public string CreateTicket(AccessRequest request)
         {
             try
             {
-                string newBusPublicObId = CreateNewChangeTicket(GlobalConstants.CherwellBusinessObjectNames.CHANGE_REQUEST, model);
+                string newBusPublicObId = CreateNewChangeTicket(GlobalConstants.CherwellBusinessObjectNames.CHANGE_REQUEST, request);
 
-                AddApproversToTicket(newBusPublicObId, model);
+                AddApproversToTicket(newBusPublicObId, request);
 
                 ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.WAITING_FOR_APPROVAL, GlobalConstants.CherwellChangeStatusOrder.WAITING_FOR_APPROVAL);
 
@@ -54,7 +53,7 @@ namespace Sentry.data.Infrastructure
             }            
         }
 
-        public override HpsmTicket RetrieveTicket(string ticketId)
+        public ChangeTicket RetrieveTicket(string ticketId)
         {
             try
             {
@@ -68,9 +67,9 @@ namespace Sentry.data.Infrastructure
             }            
         }
 
-        private HpsmTicket MapToHpsmTicket(ReadResponse response)
+        private ChangeTicket MapToHpsmTicket(ReadResponse response)
         {
-            HpsmTicket ticket = new HpsmTicket()
+            ChangeTicket ticket = new ChangeTicket()
             {
                 PreApproved = false,
                 ApprovedById = null,
@@ -97,7 +96,7 @@ namespace Sentry.data.Infrastructure
         return ticket;
         }
 
-        public override void CloseTicket(string ticketId, bool wasTicketDenied = false)
+        public void CloseTicket(string ticketId)
         {
             ChangeStatus(ticketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
         }

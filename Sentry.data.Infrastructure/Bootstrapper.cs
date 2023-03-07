@@ -133,7 +133,6 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
             registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
             registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
@@ -155,6 +154,10 @@ namespace Sentry.data.Infrastructure
 
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
+
+            ITicketProvider jsmTicketProvider = new JsmTicketProvider();
+            ITicketProvider cherwellTicketProvider = new CherwellProvider();
+            registry.For<ITicketProvider>().Singleton().Use(x => x.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue() ? jsmTicketProvider : cherwellTicketProvider);
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());

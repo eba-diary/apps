@@ -15,7 +15,7 @@ namespace Sentry.data.Infrastructure
         {
             using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
-                IBaseTicketProvider _baseTicketProvider = Container.GetInstance<IBaseTicketProvider>();
+                ITicketProvider _baseTicketProvider = Container.GetInstance<ITicketProvider>();
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
 
@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure
 
                 foreach (SecurityTicket ticket in tickets)
                 {
-                    HpsmTicket st = _baseTicketProvider.RetrieveTicket(ticket.TicketId);
+                    ChangeTicket st = _baseTicketProvider.RetrieveTicket(ticket.TicketId);
                     if(st != null)
                     {
                         switch (st.TicketStatus)
@@ -39,7 +39,7 @@ namespace Sentry.data.Infrastructure
                                 break;
                             case GlobalConstants.HpsmTicketStatus.DENIED: //or Denied?  find out those statuses.
 
-                                _baseTicketProvider.CloseTicket(ticket.TicketId, true);
+                                _baseTicketProvider.CloseTicket(ticket.TicketId);
                                 _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus);
                                 break;
                             case GlobalConstants.HpsmTicketStatus.WITHDRAWN:
