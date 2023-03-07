@@ -15,7 +15,7 @@ namespace Sentry.data.Web.API
     {
         private readonly ISchemaFlowService _schemaFlowService;
 
-        public SchemaController(ISchemaFlowService schemaFlowService, IMapper mapper, IValidationRegistry validationRegistry) : base(mapper, validationRegistry)
+        public SchemaController(ISchemaFlowService schemaFlowService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
         {
             _schemaFlowService = schemaFlowService;
         }
@@ -25,7 +25,7 @@ namespace Sentry.data.Web.API
         /// </summary>
         [HttpPost]
         [Route("")]
-        [ApiVersionBegin(WebAPI.Version.v20230223)]
+        [ApiVersionBegin(WebAPI.Version.v20230315)]
         [SwaggerResponse(HttpStatusCode.Created, null, typeof(AddSchemaResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -40,7 +40,7 @@ namespace Sentry.data.Web.API
         /// </summary>
         [HttpPut]
         [Route("{id}")]
-        [ApiVersionBegin(WebAPI.Version.v20230223)]
+        [ApiVersionBegin(WebAPI.Version.v20230315)]
         [SwaggerResponse(HttpStatusCode.OK, null, typeof(UpdateSchemaResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]

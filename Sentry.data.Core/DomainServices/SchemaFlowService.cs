@@ -60,7 +60,7 @@ namespace Sentry.data.Core
                     };
                     DataFlowDto addedDataFlowDto = await _dataFlowService.AddDataFlowAsync(dto.DataFlowDto);
 
-                    SchemaResultDto resultDto = CreateSchemaResultDto(addedSchemaDto, dto.DatasetFileConfigDto, addedDataFlowDto);
+                    SchemaResultDto resultDto = CreateSchemaResultDto(addedSchemaDto, addedDataFlowDto, dto.DatasetFileConfigDto.DatasetScopeTypeName);
                     return resultDto;
                 }
                 catch (Exception)
@@ -113,11 +113,13 @@ namespace Sentry.data.Core
                         FileSchemaDto updatedSchemaDto = await _schemaService.UpdateSchemaAsync(dto.SchemaDto, schema);
 
                         //update file config
+                        dto.DatasetFileConfigDto.FileExtensionId = updatedSchemaDto.FileExtensionId;
                         _configService.UpdateDatasetFileConfig(dto.DatasetFileConfigDto, fileConfig);
 
                         //update data flow
                         DataFlowDto updatedDataFlowDto = await _dataFlowService.UpdateDataFlowAsync(dto.DataFlowDto, dataFlow);
 
+                        //save changes also gets called in UpdateDataFlowAsync, but only when their is a data flow change
                         await _datasetContext.SaveChangesAsync();
 
                         //if create current view changed, call schema service GenerateConsumptionLayerEvents after changes are saved
@@ -127,7 +129,9 @@ namespace Sentry.data.Core
                             _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
                         }
 
-                        SchemaResultDto resultDto = CreateSchemaResultDto(updatedSchemaDto, dto.DatasetFileConfigDto, updatedDataFlowDto);
+                        string scopeTypeCode = string.IsNullOrWhiteSpace(dto.DatasetFileConfigDto.DatasetScopeTypeName) ? fileConfig.DatasetScopeType.Name : dto.DatasetFileConfigDto.DatasetScopeTypeName;
+
+                        SchemaResultDto resultDto = CreateSchemaResultDto(updatedSchemaDto, updatedDataFlowDto, scopeTypeCode);
                         return resultDto;
 
                     }
@@ -150,7 +154,7 @@ namespace Sentry.data.Core
         }
 
         #region Private
-        private SchemaResultDto CreateSchemaResultDto(FileSchemaDto fileSchemaDto, DatasetFileConfigDto fileConfigDto, DataFlowDto dataFlowDto)
+        private SchemaResultDto CreateSchemaResultDto(FileSchemaDto fileSchemaDto, DataFlowDto dataFlowDto, string scopeTypeCode)
         {
             return new SchemaResultDto
             {
@@ -158,7 +162,7 @@ namespace Sentry.data.Core
                 SchemaDescription = fileSchemaDto.Description,
                 Delimiter = fileSchemaDto.Delimiter,
                 HasHeader = fileSchemaDto.HasHeader,
-                ScopeTypeCode = fileConfigDto.DatasetScopeTypeName,
+                ScopeTypeCode = scopeTypeCode,
                 FileTypeCode = fileSchemaDto.FileExtensionName,
                 SchemaRootPath = fileSchemaDto.SchemaRootPath,
                 CreateCurrentView = fileSchemaDto.CreateCurrentView,

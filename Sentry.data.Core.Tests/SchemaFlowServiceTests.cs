@@ -325,6 +325,7 @@ namespace Sentry.data.Core.Tests
 
             Assert.IsTrue(updateDto.DataFlowDto.DataFlowStepUpdateRequired);
             Assert.IsTrue(updateDto.SchemaDto.CLA1286_KafkaFlag);
+            Assert.AreEqual(3, updateDto.DatasetFileConfigDto.FileExtensionId);
 
             Assert.AreEqual(2, result.SchemaId);
             Assert.AreEqual("Description", result.SchemaDescription);
@@ -476,6 +477,7 @@ namespace Sentry.data.Core.Tests
 
             Assert.IsFalse(updateDto.DataFlowDto.DataFlowStepUpdateRequired);
             Assert.IsFalse(updateDto.SchemaDto.CLA1286_KafkaFlag);
+            Assert.AreEqual(3, updateDto.DatasetFileConfigDto.FileExtensionId);
 
             Assert.AreEqual(2, result.SchemaId);
             Assert.AreEqual("Description", result.SchemaDescription);

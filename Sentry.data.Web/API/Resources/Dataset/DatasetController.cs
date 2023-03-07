@@ -15,7 +15,7 @@ namespace Sentry.data.Web.API
     {
         private readonly IDatasetService _datasetService;
 
-        public DatasetController(IDatasetService datasetService, IMapper mapper, IValidationRegistry validationRegistry) : base(mapper, validationRegistry)
+        public DatasetController(IDatasetService datasetService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
         {
             _datasetService = datasetService;
         }
@@ -25,7 +25,7 @@ namespace Sentry.data.Web.API
         /// </summary>
         [HttpPost]
         [Route("")]
-        [ApiVersionBegin(WebAPI.Version.v20230223)]
+        [ApiVersionBegin(WebAPI.Version.v20230315)]
         [SwaggerResponse(HttpStatusCode.Created, null, typeof(AddDatasetResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -40,7 +40,7 @@ namespace Sentry.data.Web.API
         /// </summary>
         [HttpPut]
         [Route("{id}")]
-        [ApiVersionBegin(WebAPI.Version.v20230223)]
+        [ApiVersionBegin(WebAPI.Version.v20230315)]
         [SwaggerResponse(HttpStatusCode.OK, null, typeof(UpdateDatasetResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]

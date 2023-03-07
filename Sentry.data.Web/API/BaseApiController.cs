@@ -13,11 +13,13 @@ namespace Sentry.data.Web.API
     {
         private readonly IMapper _mapper;
         private readonly IValidationRegistry _validationRegistry;
+        private readonly IDataFeatures _dataFeatures;
 
-        protected BaseApiController(IMapper mapper, IValidationRegistry validationRegistry)
+        protected BaseApiController(IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures)
         {
             _mapper = mapper;
             _validationRegistry = validationRegistry;
+            _dataFeatures = dataFeatures;
         }
 
         /// <summary>
@@ -173,7 +175,14 @@ namespace Sentry.data.Web.API
         {
             try
             {
-                return await getResult();
+                if (_dataFeatures.CLA4912_API.GetValue())
+                {
+                    return await getResult();
+                }
+                else
+                {
+                    return StatusCode(HttpStatusCode.ServiceUnavailable);
+                }
             }
             catch (RequestModelValidationException vmve)
             {

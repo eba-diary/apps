@@ -154,7 +154,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(requestModel.IsCompressed), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"{requestModel.CompressionTypeCode} is not used when {requestModel.IsCompressed} is false", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must set to true to use {nameof(BaseSchemaModel.CompressionTypeCode)}", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -245,7 +245,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(requestModel.IsPreprocessingRequired), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"{requestModel.PreprocessingTypeCode} is not used when {requestModel.IsPreprocessingRequired} is false", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must set to true to use {nameof(BaseSchemaModel.PreprocessingTypeCode)}", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -425,11 +425,43 @@ namespace Sentry.data.Web.Tests.API
         }
 
         [TestMethod]
+        public void Validate_FileTypeCode_FileTypeWithDelimiter_Fail()
+        {
+            AddSchemaRequestModel requestModel = GetBaseSuccessModel();
+            requestModel.FileTypeCode = ExtensionNames.JSON;
+            requestModel.Delimiter = "|";
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr);
+            Mock<ISAIDService> saidService = GetSaidService(mr);
+            Mock<IQuartermasterService> quartermasterService = GetQuartermasterService(mr);
+            Mock<IAssociateInfoProvider> associateInfoProvider = GetAssociateInfoProvider(mr);
+
+            AddSchemaRequestValidator validator = new AddSchemaRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(requestModel.FileTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {ExtensionNames.CSV} or {ExtensionNames.DELIMITED} to set {nameof(BaseSchemaModel.Delimiter)}", fieldValidation.ValidationMessages.First());
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
         public void Validate_FileTypeCode_CSV_Success()
         {
             AddSchemaRequestModel requestModel = GetBaseSuccessModel();
             requestModel.FileTypeCode = ExtensionNames.CSV;
             requestModel.Delimiter = ",";
+            requestModel.HasHeader = true;
 
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
@@ -443,6 +475,37 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
 
             Assert.IsTrue(validationResponse.IsValid());
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Validate_HasHeader_Fail()
+        {
+            AddSchemaRequestModel requestModel = GetBaseSuccessModel();
+            requestModel.FileTypeCode = ExtensionNames.JSON;
+            requestModel.HasHeader = true;
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr);
+            Mock<ISAIDService> saidService = GetSaidService(mr);
+            Mock<IQuartermasterService> quartermasterService = GetQuartermasterService(mr);
+            Mock<IAssociateInfoProvider> associateInfoProvider = GetAssociateInfoProvider(mr);
+
+            AddSchemaRequestValidator validator = new AddSchemaRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(requestModel.HasHeader), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be false when {nameof(BaseSchemaModel.FileTypeCode)} is {ExtensionNames.JSON}", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
@@ -564,7 +627,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(requestModel.IngestionTypeCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Value must be {IngestionType.Topic} to use {nameof(requestModel.KafkaTopicName)}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Value must be {IngestionType.Topic} to set {nameof(requestModel.KafkaTopicName)}", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }

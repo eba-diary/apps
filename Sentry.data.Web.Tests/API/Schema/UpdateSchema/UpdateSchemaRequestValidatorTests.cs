@@ -65,6 +65,42 @@ namespace Sentry.data.Web.Tests.API
         }
 
         [TestMethod]
+        public void Validate_Delimiter_Space_Success()
+        {
+            IRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                SchemaDescription = "Description",
+                Delimiter = " ",
+                HasHeader = true,
+                ScopeTypeCode = "Appending",
+                FileTypeCode = ExtensionNames.DELIMITED,
+                SchemaRootPath = "root,path",
+                CreateCurrentView = true,
+                IngestionTypeCode = IngestionType.Topic.ToString(),
+                IsCompressed = true,
+                CompressionTypeCode = CompressionTypes.ZIP.ToString(),
+                IsPreprocessingRequired = true,
+                PreprocessingTypeCode = DataFlowPreProcessingTypes.googleapi.ToString(),
+                KafkaTopicName = "TopicName",
+                PrimaryContactId = "000001",
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr);
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>().AsQueryable());
+            Mock<IAssociateInfoProvider> associateInfoProvider = GetAssociateInfoProvider(mr);
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(datasetContext.Object, associateInfoProvider.Object);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(requestModel).Result;
+
+            Assert.IsTrue(validationResponse.IsValid());
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
         public void Validate_IngestionTypeCode_Fail()
         {
             IRequestModel requestModel = new UpdateSchemaRequestModel
@@ -85,6 +121,29 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.IngestionTypeCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", Enum.GetNames(typeof(IngestionType)).Where(x => x != IngestionType.DSC_Pull.ToString()))}", fieldValidation.ValidationMessages.First());
+        }
+
+        [TestMethod]
+        public void Validate_IngestionTypeCode_RequiredWhenKafkaTopicName_Fail()
+        {
+            IRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                KafkaTopicName = "TopicName"
+            };
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(null, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.IngestionTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {IngestionType.Topic} to set {nameof(UpdateSchemaRequestModel.KafkaTopicName)}", fieldValidation.ValidationMessages.First());
         }
 
         [TestMethod]
@@ -185,7 +244,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.IsCompressed), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"{requestModel.CompressionTypeCode} is not used when {requestModel.IsCompressed} is false", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must set to true to use {nameof(BaseSchemaModel.CompressionTypeCode)}", fieldValidation.ValidationMessages.First());
         }
 
         [TestMethod]
@@ -256,7 +315,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.IsPreprocessingRequired), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"{requestModel.PreprocessingTypeCode} is not used when {requestModel.IsPreprocessingRequired} is false", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Must set to true to use {nameof(BaseSchemaModel.PreprocessingTypeCode)}", fieldValidation.ValidationMessages.First());
         }
 
         [TestMethod]
@@ -335,7 +394,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.IngestionTypeCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Value must be {IngestionType.Topic} to use {nameof(UpdateSchemaRequestModel.KafkaTopicName)}", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Value must be {IngestionType.Topic} to set {nameof(UpdateSchemaRequestModel.KafkaTopicName)}", fieldValidation.ValidationMessages.First());
         }
 
         [TestMethod]
@@ -437,7 +496,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.FileTypeCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual($"Value should be {ExtensionNames.CSV} if {nameof(BaseSchemaModel.Delimiter)} is a comma (,)", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual($"Value must be {ExtensionNames.CSV} if {nameof(BaseSchemaModel.Delimiter)} is a comma (,)", fieldValidation.ValidationMessages.First());
         }
 
         [TestMethod]
@@ -472,6 +531,107 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.Delimiter), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Value must be a comma (,) when {nameof(BaseSchemaModel.FileTypeCode)} is {ExtensionNames.CSV}", fieldValidation.ValidationMessages.First());
+        }
+
+        [TestMethod]
+        public void Validate_FileTypeCode_FileTypeWithDelimiter_Fail()
+        {
+            IRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                FileTypeCode = ExtensionNames.JSON,
+                Delimiter = "|"
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            List<FileExtension> fileTypes = new List<FileExtension>
+            {
+                new FileExtension { Name = ExtensionNames.JSON },
+                new FileExtension { Name = ExtensionNames.CSV },
+                new FileExtension { Name = ExtensionNames.DELIMITED }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileTypes.AsQueryable());
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(datasetContext.Object, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.FileTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {ExtensionNames.CSV} or {ExtensionNames.DELIMITED} to set {nameof(BaseSchemaModel.Delimiter)}", fieldValidation.ValidationMessages.First());
+        }
+
+        [TestMethod]
+        public void Validate_FileTypeCode_RequiredWithDelimiter_Fail()
+        {
+            IRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                Delimiter = "|"
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            List<FileExtension> fileTypes = new List<FileExtension>
+            {
+                new FileExtension { Name = ExtensionNames.JSON },
+                new FileExtension { Name = ExtensionNames.CSV },
+                new FileExtension { Name = ExtensionNames.DELIMITED }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileTypes.AsQueryable());
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(datasetContext.Object, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.FileTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {ExtensionNames.CSV} or {ExtensionNames.DELIMITED} to set {nameof(BaseSchemaModel.Delimiter)}", fieldValidation.ValidationMessages.First());
+        }
+
+        [TestMethod]
+        public void Validate_HasHeader_Fail()
+        {
+            IRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                FileTypeCode = ExtensionNames.JSON,
+                HasHeader = true
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            List<FileExtension> fileTypes = new List<FileExtension>
+            {
+                new FileExtension { Name = ExtensionNames.JSON },
+                new FileExtension { Name = ExtensionNames.CSV },
+                new FileExtension { Name = ExtensionNames.DELIMITED }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileTypes.AsQueryable());
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(datasetContext.Object, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.HasHeader), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be false when {nameof(BaseSchemaModel.FileTypeCode)} is {ExtensionNames.JSON}", fieldValidation.ValidationMessages.First());
         }
 
         [TestMethod]

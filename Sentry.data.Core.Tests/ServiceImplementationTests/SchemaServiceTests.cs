@@ -3360,6 +3360,79 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void UpdateSchemaAsync_PersistDelimiter_FileSchemaDto()
+        {
+            DateTime start = DateTime.Now;
+
+            FileSchema schema = new FileSchema
+            {
+                Name = "Schema Name",
+                CreateCurrentView = false,
+                Description = "Description",
+                Extension = new FileExtension
+                {
+                    Name = ExtensionNames.CSV
+                },
+                Delimiter = ",",
+                SchemaRootPath = "root,path",
+                LastUpdatedDTM = new DateTime(2023, 1, 1),
+                ControlMTriggerName = "DATA_DEV_SHORT_SCHEMANAME_COMPLETED",
+                StorageCode = "1234567",
+                SchemaId = 2,
+                CreatedDTM = new DateTime(2023, 1, 1)
+            };
+
+            FileSchemaDto fileSchemaDto = new FileSchemaDto
+            {
+                CreateCurrentView = true,
+                Description = "Description 2",
+                HasHeader = true,
+                ParentDatasetId = 1
+            };
+
+            Dataset dataset = new Dataset
+            {
+                DatasetName = "DatasetName",
+                NamedEnvironment = "DEV",
+                ShortName = "Short"
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(false);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
+
+            List<SchemaMap> schemaMaps = new List<SchemaMap>
+            {
+                new SchemaMap { MappedSchema = schema }
+            };
+            datasetContext.SetupGet(x => x.SchemaMap).Returns(schemaMaps.AsQueryable());
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000001");
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, dataFeatures.Object, null, null, null, null, null);
+
+            schemaService.UpdateSchemaAsync(fileSchemaDto, schema);
+
+            Assert.AreEqual(",", schema.Delimiter);
+            Assert.AreEqual("Description 2", schema.Description);
+            Assert.IsTrue(schema.CreateCurrentView);
+            Assert.AreEqual(ExtensionNames.CSV, schema.Extension.Name);
+            Assert.IsTrue(schema.HasHeader);
+            Assert.IsTrue(schema.LastUpdatedDTM >= start);
+            Assert.AreEqual("000001", schema.UpdatedBy);
+            Assert.AreEqual("DATA_DEV_SHORT_SCHEMANAME_COMPLETED", schema.ControlMTriggerName);
+            Assert.AreEqual(new DateTime(2023, 1, 1), schema.CreatedDTM);
+            Assert.IsFalse(schema.CLA1286_KafkaFlag);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
         public void GenerateConsumptionLayerEvents_CreateCurrentView_RaiseEvent()
         {
             FileSchema schema = new FileSchema

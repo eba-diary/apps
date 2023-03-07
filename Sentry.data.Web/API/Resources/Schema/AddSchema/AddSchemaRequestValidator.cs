@@ -58,14 +58,7 @@ namespace Sentry.data.Web.API
 
             //file type exists
             FileExtension fileType = string.IsNullOrWhiteSpace(requestModel.FileTypeCode) ? null : _datasetContext.FileExtensions.FirstOrDefault(x => x.Name.ToLower() == requestModel.FileTypeCode.ToLower());
-            if (fileType == null)
-            {
-                AddFileTypeCodeValidationMessage(validationResponse);
-            }
-            else
-            {
-                ValidateDelimiter(requestModel.Delimiter, fileType, validationResponse);
-            }
+            ValidateFileTypeCode(requestModel, fileType, validationResponse);
 
             //scope type required and exists
             if (string.IsNullOrWhiteSpace(requestModel.ScopeTypeCode) || !_datasetContext.DatasetScopeTypes.Any(x => x.Name.ToLower() == requestModel.ScopeTypeCode.ToLower()))

@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -344,8 +345,14 @@ namespace Sentry.data.Core
 
         public Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema)
         {
-            //immutable properties that must be keep original value
+            //Uses name in ControlMTrigger comparison, name is immutable
             dto.Name = schema.Name;
+
+            //Only change delimiter when file type is changing
+            if (string.IsNullOrWhiteSpace(dto.FileExtensionName) && string.IsNullOrEmpty(dto.Delimiter))
+            {
+                dto.Delimiter = schema.Delimiter;
+            }
 
             UpdateSchema(dto, schema);
             FileSchemaDto resultDto = MapToDto(schema);
@@ -549,7 +556,10 @@ namespace Sentry.data.Core
                             whatPropertiesChanged.Add("createcurrentview", x.ToString().ToLower());
                        }));
 
-            changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+            {
+                changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
+            }
 
             if (dto.FileExtensionId > 0)
             {
@@ -1175,6 +1185,7 @@ namespace Sentry.data.Core
                 CreateCurrentView = scm.CreateCurrentView,
                 Delimiter = scm.Delimiter,
                 FileExtensionId = scm.Extension.Id,
+                FileExtensionName = scm.Extension.Name,
                 HasHeader = scm.HasHeader,
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
@@ -1191,7 +1202,6 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtensionName = scm.Extension.Name,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,

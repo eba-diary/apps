@@ -386,15 +386,7 @@ namespace Sentry.data.Core
 
             dfc.FileTypeId = dto.FileTypeId;
             dfc.Description = dto.Description;
-
-            if (dto.FileExtensionId > 0)
-            {
-                dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
-            }
-            else if (!string.IsNullOrWhiteSpace(dto.FileExtensionName))
-            {
-                dfc.FileExtension = _datasetContext.FileExtensions.FirstOrDefault(f => f.Name.ToLower() == dto.FileExtensionName.ToLower());
-            }
+            dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)

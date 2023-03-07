@@ -2,6 +2,7 @@
 using Sentry.data.Core.GlobalEnums;
 using System.Linq;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.API
 {
@@ -27,19 +28,21 @@ namespace Sentry.data.Web.API
             if (!string.IsNullOrWhiteSpace(requestModel.FileTypeCode))
             {
                 FileExtension fileType = _datasetContext.FileExtensions.FirstOrDefault(x => x.Name.ToLower() == requestModel.FileTypeCode.ToLower());
-                if (fileType == null)
-                {
-                    AddFileTypeCodeValidationMessage(validationResponse);
-                }
-                else
-                {
-                    ValidateDelimiter(requestModel.Delimiter, fileType, validationResponse);
-                }
+                ValidateFileTypeCode(requestModel, fileType, validationResponse);
+            }
+            else if (!string.IsNullOrEmpty(requestModel.Delimiter))
+            {
+                validationResponse.AddFieldValidation(nameof(requestModel.FileTypeCode), $"Value must be {ExtensionNames.CSV} or {ExtensionNames.DELIMITED} to set {nameof(BaseSchemaModel.Delimiter)}");
             }
 
             if (!string.IsNullOrWhiteSpace(requestModel.ScopeTypeCode) && !_datasetContext.DatasetScopeTypes.Any(x => x.Name.ToLower() == requestModel.ScopeTypeCode.ToLower()))
             {
                 AddScopeTypeCodeValidationMessage(validationResponse);
+            }
+
+            if (!string.IsNullOrWhiteSpace(requestModel.KafkaTopicName) && string.IsNullOrWhiteSpace(requestModel.IngestionTypeCode))
+            {
+                validationResponse.AddFieldValidation(nameof(requestModel.IngestionTypeCode), $"Value must be {IngestionType.Topic} to set {nameof(requestModel.KafkaTopicName)}");
             }
 
             validationResponse.AddValidationsFrom(await baseValidations);
