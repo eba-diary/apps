@@ -49,7 +49,6 @@ namespace Sentry.data.Core.DTO.Security
         {
             if (!String.IsNullOrWhiteSpace(Config.GetHostSetting("AdGroupDSCEnvironmentIndicator"))) //if nonprod, return add env to ticket 
             {
-                //return $"DS_{Config.GetDefaultEnvironmentName()}_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
                 return $"DS_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{Config.GetHostSetting("AdGroupDSCEnvironmentIndicator")}";
             }
             return $"DS_{SaidAssetCode}_{DatasetShortName}_{GroupType}_{EnvironmentType}";
