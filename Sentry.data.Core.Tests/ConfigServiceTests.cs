@@ -369,9 +369,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("ClientId", http.ClientId);
             Assert.AreEqual("EncryptedClientPrivateId", http.ClientPrivateId);
             Assert.AreEqual(OAuthGrantType.JwtBearer, http.GrantType);
-            Assert.AreEqual(1, http.Tokens.Count);
+            Assert.AreEqual(1, http.AllTokens.Count);
             
-            DataSourceToken dataSourceToken = http.Tokens.First();
+            DataSourceToken dataSourceToken = http.AllTokens.First();
             Assert.AreEqual("EncryptedCurrentToken", dataSourceToken.CurrentToken);
             Assert.AreEqual("EncryptedRefreshToken", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 18, 8, 0, 0), dataSourceToken.CurrentTokenExp);
@@ -446,7 +446,7 @@ namespace Sentry.data.Core.Tests
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
                 GrantType = OAuthGrantType.RefreshToken,
-                Tokens = new List<DataSourceToken>
+                AllTokens = new List<DataSourceToken>
                 {
                     new DataSourceToken
                     {
@@ -464,7 +464,8 @@ namespace Sentry.data.Core.Tests
                             new OAuthClaim() { Type = OAuthClaims.aud, Value = "https://www.token.com" },
                             new OAuthClaim() { Type = OAuthClaims.exp, Value = "100" },
                             new OAuthClaim() { Type = OAuthClaims.scope, Value = "token.scope" }
-                        }
+                        },
+                        Enabled = true
                     }
                 },
                 PrimaryContactId = "000000",
@@ -579,9 +580,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("ClientIdUpdate", http.ClientId);
             Assert.AreEqual("EncryptedClientPrivateIdUpdate", http.ClientPrivateId);
             Assert.AreEqual(OAuthGrantType.JwtBearer, http.GrantType);
-            Assert.AreEqual(2, http.Tokens.Count);
+            Assert.AreEqual(2, http.AllTokens.Count);
 
-            DataSourceToken dataSourceToken = http.Tokens.First();
+            DataSourceToken dataSourceToken = http.AllTokens.First();
             Assert.AreEqual("EncryptedCurrentTokenUpdate", dataSourceToken.CurrentToken);
             Assert.AreEqual("EncryptedRefreshToken", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 21, 9, 0, 0), dataSourceToken.CurrentTokenExp);
@@ -607,7 +608,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(OAuthClaims.scope, claim.Type);
             Assert.AreEqual("token.scope.update", claim.Value);
 
-            dataSourceToken = http.Tokens.Last();
+            dataSourceToken = http.AllTokens.Last();
             Assert.AreEqual("EncryptedCurrentToken2", dataSourceToken.CurrentToken);
             Assert.AreEqual("EncryptedRefreshToken2", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 22, 12, 0, 0), dataSourceToken.CurrentTokenExp);
@@ -686,7 +687,7 @@ namespace Sentry.data.Core.Tests
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
                 GrantType = OAuthGrantType.JwtBearer,
-                Tokens = new List<DataSourceToken>
+                AllTokens = new List<DataSourceToken>
                 {
                     new DataSourceToken
                     {
@@ -704,7 +705,8 @@ namespace Sentry.data.Core.Tests
                             new OAuthClaim() { Type = OAuthClaims.aud, Value = "https://www.token.com" },
                             new OAuthClaim() { Type = OAuthClaims.exp, Value = "100" },
                             new OAuthClaim() { Type = OAuthClaims.scope, Value = "token.scope" }
-                        }
+                        },
+                        Enabled = true
                     }
                 },
                 PrimaryContactId = "000001",

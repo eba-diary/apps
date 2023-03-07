@@ -224,7 +224,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             Property(x => x.SupportsPaging, m => m.Column("SupportsPaging"));
 
-            Bag(x => x.Tokens, m =>
+            Bag(x => x.AllTokens, m =>
             {
                 m.Inverse(true);
                 m.Table("DataSourceTokens");

@@ -5,6 +5,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -90,7 +91,7 @@ namespace Sentry.data.Core
         public virtual string IVKey { get; set; }
         public virtual HttpMethods RequestMethod { get; set; }
         public virtual HttpDataFormat RequestDataFormat { get; set; }
-        public virtual IList<DataSourceToken> Tokens { get; set; }
+        public virtual IList<DataSourceToken> AllTokens { get; set; }
         public virtual string ClientId { get; set; }
         public virtual string ClientPrivateId { get; set; }
         public virtual OAuthGrantType GrantType { get; set; }
@@ -112,6 +113,11 @@ namespace Sentry.data.Core
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             return new Uri(Path.Combine(BaseUri.ToString(), Job.RelativeUri).ToString());
+        }
+
+        public virtual IList<DataSourceToken> GetActiveTokens() 
+        { 
+            return AllTokens.Where(x => x.Enabled).ToList();
         }
 
         public override string GetDropPrefix(RetrieverJob Job)
