@@ -32,10 +32,10 @@ namespace Sentry.data.Infrastructure.Tests
             /// Setup provider
             ///
 
-            var stubRestClient = MockRepository.GenerateMock<IRestClient>();
-            IRestRequest req = new RestRequest() { Method = Method.GET };
-            IRestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.OK };
-            stubRestClient.Stub(a => a.Execute(Arg<IRestRequest>.Is.Anything))
+            var stubRestClient = MockRepository.GenerateMock<RestClient>();
+            RestRequest req = new RestRequest() { Method = Method.Get };
+            RestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.OK };
+            stubRestClient.Stub(a => a.Execute(Arg<RestRequest>.Is.Anything))
                 .Return(resp);
 
             ////Setup provider
@@ -52,7 +52,7 @@ namespace Sentry.data.Infrastructure.Tests
             ////
             ///Act
             ///
-            IRestResponse x = googleApiProvider.SendRequest();
+            RestResponse x = googleApiProvider.SendRequest();
 
             ///
             /// Assert
@@ -73,14 +73,14 @@ namespace Sentry.data.Infrastructure.Tests
             /// Setup provider
             ///
 
-            var stubRestClient = MockRepository.GenerateMock<IRestClient>();
-            IRestRequest req = new RestRequest() { Method = Method.GET };
-            var mockResp = MockRepository.GenerateMock<IRestResponse>();
+            var stubRestClient = MockRepository.GenerateMock<RestClient>();
+            RestRequest req = new RestRequest() { Method = Method.Get };
+            var mockResp = MockRepository.GenerateMock<RestResponse>();
             mockResp.Stub(s => s.StatusCode).Return(HttpStatusCode.BadRequest);
             mockResp.Stub(s => s.ErrorException).Return(new Exception("Exception message"));
-            IRestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.BadRequest };
+            RestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.BadRequest };
 
-            stubRestClient.Stub(a => a.Execute(Arg<IRestRequest>.Is.Anything))
+            stubRestClient.Stub(a => a.Execute(Arg<RestRequest>.Is.Anything))
                 .Return(mockResp);
 
             ////Setup provider
@@ -97,7 +97,7 @@ namespace Sentry.data.Infrastructure.Tests
             ////
             ///Act
             ///
-            IRestResponse x = googleApiProvider.SendRequest();
+            RestResponse x = googleApiProvider.SendRequest();
 
             ///
             /// Assert
@@ -119,10 +119,10 @@ namespace Sentry.data.Infrastructure.Tests
             /// Setup provider
             ///
 
-            var stubRestClient = MockRepository.GenerateMock<IRestClient>();
-            IRestRequest req = new RestRequest() { Method = Method.GET };
-            IRestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.OK };
-            stubRestClient.Stub(a => a.Execute(Arg<IRestRequest>.Is.Anything))
+            var stubRestClient = MockRepository.GenerateMock<RestClient>();
+            RestRequest req = new RestRequest() { Method = Method.Get };
+            RestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.OK };
+            stubRestClient.Stub(a => a.Execute(Arg<RestRequest>.Is.Anything))
                 .Return(resp);
 
             ////Setup provider
@@ -139,7 +139,7 @@ namespace Sentry.data.Infrastructure.Tests
             ////
             ///Act
             ///
-            IRestResponse x = genericHttpsProvider.SendRequest();
+            RestResponse x = genericHttpsProvider.SendRequest();
 
             ///
             /// Assert
@@ -161,14 +161,14 @@ namespace Sentry.data.Infrastructure.Tests
             /// Setup provider
             ///
 
-            var stubRestClient = MockRepository.GenerateMock<IRestClient>();
-            IRestRequest req = new RestRequest() { Method = Method.GET };
-            var mockResp = MockRepository.GenerateMock<IRestResponse>();
+            var stubRestClient = MockRepository.GenerateMock<RestClient>();
+            RestRequest req = new RestRequest() { Method = Method.Get };
+            var mockResp = MockRepository.GenerateMock<RestResponse>();
             mockResp.Stub(s => s.StatusCode).Return(HttpStatusCode.BadRequest);
             mockResp.Stub(s => s.ErrorException).Return(null);
-            IRestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.BadRequest };
+            RestResponse resp = new RestResponse() { StatusCode = System.Net.HttpStatusCode.BadRequest };
 
-            stubRestClient.Stub(a => a.Execute(Arg<IRestRequest>.Is.Anything))
+            stubRestClient.Stub(a => a.Execute(Arg<RestRequest>.Is.Anything))
                 .Return(mockResp);
 
             ////Setup provider
@@ -201,7 +201,7 @@ namespace Sentry.data.Infrastructure.Tests
             ////
             ///Act
             ///
-            IRestResponse x = genericHttpsProvider.SendRequest();
+            RestResponse x = genericHttpsProvider.SendRequest();
 
             ///
             /// Assert

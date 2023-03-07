@@ -34,7 +34,7 @@ namespace Sentry.data.Core
             return jobs.ToList();
         }
 
-        public static void CopyToStream(this IRestResponse resp, Stream targetStream)
+        public static void CopyToStream(this RestResponse resp, Stream targetStream)
         {
             byte[] byteArray = Encoding.ASCII.GetBytes(resp.Content);
             using(MemoryStream stream = new MemoryStream(byteArray))

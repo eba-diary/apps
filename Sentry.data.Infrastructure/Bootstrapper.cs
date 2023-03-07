@@ -6,10 +6,12 @@ using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
+using RestSharp;
 using RestSharp.Authenticators;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Infrastructure.Mappings.Primary;
@@ -133,7 +135,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-            registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
+            registry.For<RestClient>().Use(() => new RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
             registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
             registry.For<ISupportLinkService>().Singleton().Use<SupportLinkService>();
@@ -232,14 +234,17 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
 
-            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().
-                Ctor<RestSharp.IRestClient>().Is(new RestSharp.RestClient()
-                {
-                    BaseUrl = new Uri(Configuration.Config.GetHostSetting("SecBotUrl")),
-                    Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
-                }).
-                AlwaysUnique();
+            RestClient inevRestClient = new RestClient(Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"))
+            {
+                Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+            };
+            registry.For<IInevService>().Use<InevService>().Ctor<RestClient>().Is(inevRestClient);
+
+            RestClient secBotRestClient = new RestClient(Configuration.Config.GetHostSetting("SecBotUrl"))
+            {
+                Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+            };
+            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().Ctor<RestClient>().Is(secBotRestClient).AlwaysUnique();
 
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();

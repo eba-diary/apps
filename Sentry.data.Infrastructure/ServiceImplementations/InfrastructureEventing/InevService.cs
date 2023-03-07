@@ -6,11 +6,9 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.data.Infrastructure.Exceptions;
 using Sentry.data.Infrastructure.InfrastructureEvents;
-using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -21,7 +19,7 @@ namespace Sentry.data.Infrastructure
     /// </summary>
     public class InevService : IInevService
     {
-        private readonly IRestClient _restClient;
+        private readonly RestClient _restClient;
         private readonly IClient _inevClient;
         private readonly IDatasetContext _datasetContext;
 
@@ -37,7 +35,7 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext)
+        public InevService(RestClient restClient, IClient inevClient, IDatasetContext datasetContext)
         {
             _restClient = restClient;
             _inevClient = inevClient;
@@ -254,9 +252,6 @@ namespace Sentry.data.Infrastructure
             // The NSwag client chokes on this non-JSON value, requiring us to use this method
             // We still use the type ("Message") from the NSwag-generated code
             // See https://github.com/RicoSuter/NSwag/issues/2384
-            _restClient.BaseUrl = new Uri(Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
-            _restClient.Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             var request = new RestRequest() { Resource = "/api/topics/" };
 
             //serialize the request body ourselves, so we can specify the JsonSerializationOptions
@@ -271,7 +266,7 @@ namespace Sentry.data.Infrastructure
             request.AddJsonBody(jsonBody);
 
             //execute the POST request
-            var response = await _restClient.ExecuteTaskAsync(request, CancellationToken.None, Method.POST);
+            var response = await _restClient.ExecutePostAsync(request);
 
             //throw exception if there were errors executing the request
             if (response.ResponseStatus != ResponseStatus.Completed ||
