@@ -135,7 +135,7 @@ table#metricGroupsTable td.metric-detail-control {
     text-align: center;
     width: 50%;
 }
-
+/*
 #failedFiles, #completedFiles, #inFlightFiles {
     display: none;
     margin: auto;
@@ -146,3 +146,4 @@ table#metricGroupsTable td.metric-detail-control {
     background-color: none !important;
     background: unset !important;
 }
+    */
