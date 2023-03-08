@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sentry.data.Core
+﻿namespace Sentry.data.Core
 {
-    public class SchemaMigrationRequest : BaseMigrationRequest
+    public class DatasetSchemaMigrationRequest
     {
         public int SourceSchemaId { get; set; }
         public string TargetDataFlowNamedEnvironment { get; set; }
@@ -18,5 +12,5 @@ namespace Sentry.data.Core
             public const string TargetDataFlowNamedEnvironmentIsInvalid = "TargetDataFlowNamedEnvironment is invalid";
             public const string DatasetsAreNotRelated = "Target datasets are not related";
         }
-    }    
+    }
 }

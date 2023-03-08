@@ -164,6 +164,7 @@
     <Compile Include="HelperTests\DSCEventTopicHelperTests.cs" />
     <Compile Include="JobServiceTests.cs" />
     <Compile Include="ConnectorServiceTests.cs" />
+    <Compile Include="MigrationTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
     <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />

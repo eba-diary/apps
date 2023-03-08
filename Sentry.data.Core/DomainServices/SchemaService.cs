@@ -1149,7 +1149,7 @@ namespace Sentry.data.Core
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus,
                 SchemaRootPath = dto.SchemaRootPath,
-                ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
+                ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName(), parentDataset.NamedEnvironmentType),
                 ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
                 ControlMTriggerName = GetControlMTrigger(dto)
             };
@@ -1290,10 +1290,10 @@ namespace Sentry.data.Core
 
             if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                 && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && (dscNamedEnvironment == "QUAL" || dscNamedEnvironment == "PROD"))
+                && (dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD))
             {
                 dbName += dscNamedEnvironment;
-                dbName += "NP";
+                dbName += GlobalConstants.Environments.NONPROD_SUFFIX.ToUpper();
             }
             else
             {
@@ -1363,16 +1363,28 @@ namespace Sentry.data.Core
         /// Generates appropriate bucket after evaluating various variables
         /// </summary>
         /// <param name="isHumanResources"></param>
+        /// <param name="saidKeyCode">Data storage layer SAID asset</param>
+        /// <param name="dscNamedEnvironment">DSC physical named environment</param>
+        /// <param name="datasetNamedEnvironment">Dataset named environment</param>
         /// <remarks> This method is only used by this class, therefore, setting to 
         /// internal for exposure to Sentry.data.Core.Tests project for unit testing. </remarks>
         /// <returns></returns>
-        internal string GenerateParquetStorageBucket(bool isHumanResources, string saidKeyCode, string namedEnvironment)
+        internal string GenerateParquetStorageBucket(bool isHumanResources, string saidKeyCode, string dscNamedEnvironment, GlobalEnums.NamedEnvironmentType datasetNamedEnvironmentType)
         {
-            string bucket = (isHumanResources) 
-                ? GlobalConstants.AwsBuckets.HR_DATASET_BUCKET_AE2.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>",namedEnvironment.ToLower())
-                : GlobalConstants.AwsBuckets.BASE_DATASET_BUCKET_AE2.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnvironment.ToLower());
+            string baseBucketName = (isHumanResources)
+                ? GlobalConstants.AwsBuckets.HR_DATASET_BUCKET_AE2
+                : GlobalConstants.AwsBuckets.BASE_DATASET_BUCKET_AE2;
 
-            return bucket;
+            string namedEnvironment = dscNamedEnvironment.ToLower();
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd
+                && (dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD))
+            {
+                namedEnvironment += GlobalConstants.Environments.NONPROD_SUFFIX.ToLower();
+            }
+
+            string bucketName = baseBucketName.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnvironment.ToLower());
+            return bucketName;
         }
 
         internal string GenerateParquetStoragePrefix(string saidKeyCode, string namedEnvironment, string storageCode)
