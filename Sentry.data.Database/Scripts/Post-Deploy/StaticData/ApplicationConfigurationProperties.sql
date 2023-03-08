@@ -327,7 +327,7 @@ BEGIN TRAN
 			( 'SNDQUALBATCHHANDLER', 'QUALNP', 'target.file.key', 'users/cla4137/sndbatchhandler/target.txt' ),
 		
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.server', 'dlpp-qualnp-plur.dbal.sentry.local' ),
-			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.name', 'QUAL_PLUR' ),
+			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.name', 'INTRADAY_PLUR' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.authentication', 'Windows' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.secure.file.path', '' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'QUALNP', 'support.database.failover', '' ),
@@ -499,7 +499,7 @@ BEGIN TRAN
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'folder.queries', 'PROD/DATABASELOADERPLURBATCHHANDLER/dataproducer/' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.server', 'sentry.us-east-2.aws.snowflakecomputing.com/' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.warehouse', 'DATA_WH' ),
-			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.role', 'BATCH_PLUR_TEST' ),
+			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.role', 'BATCH_PLUR_PROD' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.useProxy', 'true' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.proxyHost', 'app-proxy-prod.sentry.com' ),
 			( 'DATABASELOADERPLURBATCHHANDLER', 'PROD', 'snowflake.proxyPort', '8080' ),

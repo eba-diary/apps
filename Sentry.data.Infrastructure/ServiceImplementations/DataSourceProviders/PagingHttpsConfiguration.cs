@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
         public RetrieverJob Job { get; set; }
         public HttpsOptions Options { get; set; }
         public DataSourceToken CurrentDataSourceToken { get; set; }
-        public List<DataSourceToken> OrderedDataSourceTokens { get; set; }
+        public List<DataSourceToken> OrderedActiveDataSourceTokens { get; set; }
         public List<RequestVariable> MostRecentVariablesWithCollectedData { get; set; }
         public List<RequestVariable> InitialRequestVariables { get; set; }
     }

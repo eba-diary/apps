@@ -9,6 +9,7 @@
     [TokenUrl] VARCHAR(300) NULL, 
     [Scope] VARCHAR(500) NULL, 
     [TokenExp] VARCHAR(50) NULL, 
+    [Enabled] BIT NULL DEFAULT 1, 
     PRIMARY KEY ([Id]), 
     CONSTRAINT [FK_DataSourceTokens_DataSource] FOREIGN KEY ([ParentDataSource_Id]) REFERENCES [DataSource]([DataSource_Id]) 
 )

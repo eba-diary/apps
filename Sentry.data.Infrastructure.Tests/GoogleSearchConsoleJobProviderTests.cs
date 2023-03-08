@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_NoVariableIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             RetrieverJob job = GetBaseRetrieverJob(1, token);
 
@@ -122,7 +122,7 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_WithVariableIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             RetrieverJob job = GetBaseRetrieverJob(2, token);
 
@@ -247,7 +247,7 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_EndBeforeMaxIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             RetrieverJob job = GetBaseRetrieverJob(3, token);
 
@@ -389,7 +389,7 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     BaseUri = new Uri("https://www.googleapis.com/webmasters/v3/"),
                     SourceAuthType = new OAuthAuthentication(),
-                    Tokens = new List<DataSourceToken> { token }
+                    AllTokens = new List<DataSourceToken> { token }
                 },
                 JobOptions = new RetrieverJobOptions
                 {

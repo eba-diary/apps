@@ -268,6 +268,62 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public async Task MigrateDataset_Dataset_Exception_Calls_Rollback()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(s => s.DisplayName).Returns("Me");
+
+            DatasetMigrationRequest request = new DatasetMigrationRequest()
+            {
+                SourceDatasetId = 1,
+                TargetDatasetNamedEnvironment = "QUAL"
+            };
+            Dataset sourceDataset = new Dataset() { DatasetId = 1, DatasetName = "MyDataset", Asset = new Asset() { SaidKeyCode = "ABCD" }, NamedEnvironment = "TEST" };
+            Dataset dataset = MockClasses.MockDataset(user: user.Object);
+            DatasetDto dto = MockClasses.MockDatasetDto(new List<Dataset>() { dataset, sourceDataset }).First();
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { dataset, sourceDataset }.AsQueryable());
+            context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(dataset);
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+            context.Setup(s => s.Clear());
+
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(new UserSecurity() { CanEditDataset = true });
+
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(s => s.GetDatasetDto(It.IsAny<int>())).Returns(dto);
+            datasetService.Setup(s => s.DatasetExistsInTargetNamedEnvironment(sourceDataset.DatasetName, sourceDataset.Asset.SaidKeyCode, request.TargetDatasetNamedEnvironment)).Returns((0, false));
+
+            Mock<IQuartermasterService> quartermasterService = mr.Create<IQuartermasterService>();
+            quartermasterService.Setup(s => s.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>())).Returns(Task.FromResult(new ValidationResults()));
+
+
+            var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
+            var lazySecurityService = new Lazy<ISecurityService>(() => securityService.Object);
+            var lazyUserService = new Lazy<IUserService>(() => userService.Object);
+            var lazyQuartermasterService = new Lazy<IQuartermasterService>(() => quartermasterService.Object);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, lazyDatasetService, null, null, null, lazyUserService, lazyDataFeatures, lazySecurityService, null, null, lazyQuartermasterService);
+            dataApplicationService.Setup(s => s.CreateWithoutSave(dto)).Returns(1);
+            dataApplicationService.Setup(s => s.MigrateSchemaWithoutSave_Internal(It.IsAny<List<SchemaMigrationRequest>>())).Returns(new List<SchemaMigrationRequestResponse>());
+            dataApplicationService.Setup(s => s.CreateExternalDependenciesForDataset(It.IsAny<List<int>>())).Throws<Exception>();
+            dataApplicationService.Setup(s => s.RollbackDatasetMigration(It.IsAny<DatasetMigrationRequestResponse>()));
+
+            //Act\ Assert
+            await Assert.ThrowsExceptionAsync<Exception>(() => dataApplicationService.Object.MigrateDataset(request));
+            mr.VerifyAll();            
+        }
+
+        [TestMethod]
         public void Verify_AddMigrationHistory_Inserted()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
@@ -419,7 +475,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void MigrateScheam__NoPermissions_To_Migrate()
+        public void MigrateSchema__NoPermissions_To_Migrate()
         {
             //Arrange
             MockRepository mr = new MockRepository(MockBehavior.Strict);
@@ -441,6 +497,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, targetDataset }.AsQueryable());
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { sourceDatasetFileConfig }.AsQueryable());
             context.Setup(s => s.DataFlow).Returns(new List<DataFlow>().AsQueryable());
+            context.Setup(s => s.Clear());
 
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
 
@@ -539,6 +596,61 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Source schema is not associated with dataflow", response.DataFlowMigrationReason);
             Assert.AreEqual(0, response.TargetDataFlowId);
 
+            //Assert.AreEqual()
+
+        }
+
+        [TestMethod]
+        public void MigrateSchema__ExternalDependencyException__Calls_RollbackSchemaMigration()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            FileSchema sourceSchema = new FileSchema() { SchemaId = 99, Name = "MySchema_AA" };
+            Asset datasetAsset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            Dataset sourceDataset = new Dataset() { DatasetId = 1, Asset = datasetAsset };
+            DatasetFileConfig sourceDatasetFileConfig = new DatasetFileConfig() { ConfigId = 1, ParentDataset = sourceDataset, Schema = sourceSchema };
+
+            FileSchema targetSchema = new FileSchema() { SchemaId = 888, Name = "MySchema_AA" };
+            Dataset targetDataset = new Dataset() { DatasetId = 2, Asset = datasetAsset, NamedEnvironment = "TEST", ObjectStatus = ObjectStatusEnum.Active };
+            DatasetFileConfig targetDatasetFileConfig = new DatasetFileConfig() { ConfigId = 1, ParentDataset = targetDataset, Schema = targetSchema };
+
+            SchemaMigrationRequest request = new SchemaMigrationRequest();
+            request.SourceSchemaId = sourceSchema.SchemaId;
+            request.TargetDatasetNamedEnvironment = "TEST";
+            request.TargetDatasetId = targetDataset.DatasetId;
+
+            SchemaRevisionFieldStructureDto schemaRevisionDto = new SchemaRevisionFieldStructureDto() { Revision = new SchemaRevisionDto() };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.FileSchema).Returns(new List<FileSchema>() { sourceSchema, targetSchema }.AsQueryable());
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { sourceDataset, targetDataset }.AsQueryable());
+            context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { sourceDatasetFileConfig, targetDatasetFileConfig }.AsQueryable());
+            context.Setup(s => s.DataFlow).Returns(new List<DataFlow>().AsQueryable());
+            context.Setup(s => s.SchemaRevision).Returns(new List<SchemaRevision>() { new SchemaRevision() { SchemaRevision_Name = "My_New_Revision", SchemaRevision_Id = 1 } }.AsQueryable());
+            context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
+            context.Setup(s => s.Clear());
+
+            Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
+            schemaService.Setup(s => s.SchemaExistsInTargetDataset(It.IsAny<int>(), It.IsAny<string>())).Returns((targetSchema.SchemaId, true));
+            schemaService.Setup(s => s.GetLatestSchemaRevisionFieldStructureBySchemaId(It.IsAny<int>(), It.IsAny<int>())).Returns(schemaRevisionDto);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+
+            var lazySchemaService = new Lazy<ISchemaService>(() => schemaService.Object);
+            var lazyDataFeatures = new Lazy<IDataFeatures>(() => dataFeatures.Object);
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(context.Object, null, null, null, null, null, lazyDataFeatures, null, lazySchemaService, null, null);
+            dataApplicationService.Setup(s => s.CheckPermissionToMigrateSchema(targetSchema.SchemaId));
+            dataApplicationService.Setup(s => s.CreateWithoutSave(It.IsAny<SchemaRevisionFieldStructureDto>())).Returns(777);
+            dataApplicationService.Setup(s => s.CreateExternalDependenciesForSchemaRevision(It.IsAny<List<(int, int)>>())).Throws<Exception>();
+            dataApplicationService.Setup(s => s.RollbackDatasetMigration(It.IsAny<DatasetMigrationRequestResponse>()));
+
+            //Act
+            Assert.ThrowsException<Exception>(() => dataApplicationService.Object.MigrateSchema(request));
+            mr.VerifyAll();
+
+            //Assert
             //Assert.AreEqual()
 
         }
@@ -1199,8 +1311,8 @@ namespace Sentry.data.Core.Tests
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, lazyQuartermasterService);
 
             //Act
-            bool relatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset(1, "QUAL");
-            bool notRelatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset(1, "PROD");
+            bool relatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset("ABCD", "QUAL", NamedEnvironmentType.NonProd);
+            bool notRelatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset("ABCD", "PROD", NamedEnvironmentType.NonProd);
 
             //Assert
             Assert.IsTrue(relatedRequest);
@@ -1262,6 +1374,201 @@ namespace Sentry.data.Core.Tests
             //Assert
             Assert.IsTrue(errors.Any());
             Assert.IsTrue(errors.Contains("Named environment must be alphanumeric, all caps, and less than 10 characters"));
+        }
+
+        [TestMethod]
+        public async Task ValidationMigraqtionRequest_NonProd_Migrate_To_Prod()
+        {
+            //Arrange
+            DatasetMigrationRequest request = new DatasetMigrationRequest() { TargetDatasetNamedEnvironment = "string" };
+
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            List<string> errors = await dataApplicationService.ValidateMigrationRequest(request);
+
+            //Assert
+            Assert.IsTrue(errors.Any());
+            Assert.IsTrue(errors.Contains("Named environment must be alphanumeric, all caps, and less than 10 characters"));
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DatasetMigrated_Issues_Delete_Dataset()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                IsDatasetMigrated = true,
+                DatasetId = 1
+            };
+
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(d => d.Delete(response.DatasetId, null, true)).Returns(true);
+
+            var lazyDatasetService = new Lazy<IDatasetService>(() => datasetService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, lazyDatasetService, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackDatasetMigration(response);
+
+            //Assert
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DatasetNotMigrated_With_No_SchemaResponses()
+        {
+            //Arrange
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                IsDatasetMigrated = false,
+                DatasetId = 1
+            };
+
+            Mock<DataApplicationService> dataApplicationService = new Mock<DataApplicationService>(null,null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.Object.RollbackDatasetMigration(response);
+
+            //Assert
+            dataApplicationService.Verify(v => v.RollbackSchemaMigration(It.IsAny<SchemaMigrationRequestResponse>()), Times.Never);
+        }
+
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DatasetNotMigrated_With_SchemaResponses()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                IsDatasetMigrated = false,
+                DatasetId = 1,
+                SchemaMigrationResponses = new List<SchemaMigrationRequestResponse>()
+                {
+                    new SchemaMigrationRequestResponse()
+                    {
+                        MigratedSchema = false,
+                        MigratedSchemaRevision = false,
+                        MigratedDataFlow = true,
+                        TargetDataFlowId = 1
+                    }
+                }
+            };
+
+            Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
+            dataFlowService.Setup(s => s.Delete(1, null, true)).Returns(true);
+
+            var lazyDatasetService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, lazyDatasetService, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackDatasetMigration(response);
+
+            //Assert
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_SchemaMigrated_Calls_SchemaDelete()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse()
+            {
+                MigratedSchema = true,
+                TargetSchemaId = 2
+            };
+
+            DatasetFileConfig config = MockClasses.MockDatasetFileConfig();
+            config.Schema = new FileSchema() { SchemaId = 2 };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { config }.AsQueryable());
+
+            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            configService.Setup(s => s.Delete(config.ConfigId, null, true)).Returns(true);
+
+            var lazyConfigService = new Lazy<IConfigService>(() => configService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, lazyConfigService, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackSchemaMigration(response);
+
+            //Assert
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_DataFlowMigrated_Calls_DataFlowDelete()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse()
+            {
+                MigratedSchema = false,
+                MigratedSchemaRevision = false,
+                MigratedDataFlow = true,
+                TargetDataFlowId = 3
+            };
+
+            Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
+            dataFlowService.Setup(s => s.Delete(response.TargetDataFlowId, null, true)).Returns(true);
+
+            var lazyDataFlowService = new Lazy<IDataFlowService>(() => dataFlowService.Object);
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, lazyDataFlowService, null, null, null, null, null, null, null);
+
+            //Act\
+            dataApplicationService.RollbackSchemaMigration(response);
+
+            //Assert
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void RollbackDatasetMigration_SchemaRevisionMigrated_Calls_RollbackSchemaRevision()
+        {
+            //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            SchemaMigrationRequestResponse response = new SchemaMigrationRequestResponse()
+            {
+                MigratedSchema = false,
+                MigratedSchemaRevision = true,
+                TargetSchemaRevisionId = 3,
+                MigratedDataFlow = false
+            };
+
+            BaseField field1 = new VarcharField()
+            {
+                FieldId = 9,
+                ParentSchemaRevision = new SchemaRevision() { SchemaRevision_Id = 3 }
+            };
+
+            BaseField field2 = new VarcharField()
+            {
+                FieldId = 20,
+                ParentSchemaRevision = new SchemaRevision() { SchemaRevision_Id = 3 }
+            };
+
+            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            context.Setup(s => s.BaseFields).Returns(new List<BaseField> { field1, field2 }.AsQueryable());
+            context.Setup(s => s.RemoveById<BaseField>(field1.FieldId));
+            context.Setup(s => s.RemoveById<BaseField>(field2.FieldId));
+            context.Setup(s => s.RemoveById<SchemaRevision>(response.TargetSchemaRevisionId));
+
+            DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            dataApplicationService.RollbackSchemaMigration(response);
+
+            //Assert
+            mr.VerifyAll();
         }
     }
 }

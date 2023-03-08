@@ -69,14 +69,14 @@ namespace Sentry.data.Infrastructure
                                 _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
                             }
                         }
+                        _datasetContext.SaveChanges();
                     }
                     catch (Exception e)
                     {
-                        Sentry.Common.Logging.Logger.Error($"Parsing companies response failed: {e.Message}");
+                        Sentry.Common.Logging.Logger.Error("Parsing companies response failed.", e);
                     }
 
                 }
-                _datasetContext.SaveChanges();
             }
         }
     }
