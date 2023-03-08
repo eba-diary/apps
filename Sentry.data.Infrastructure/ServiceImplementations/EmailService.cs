@@ -293,6 +293,33 @@ namespace Sentry.data.Infrastructure
 
             _emailClient.Send(myMail);
         }
+        
+        public void SendMotiveDuplicateTokenEmail(DataSourceToken newToken, DataSourceToken oldToken)
+        {
+            string toString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.MOTIVEEMAILTO);
+            string fromString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.DATASETEMAIL);
+            if (String.IsNullOrWhiteSpace(toString) || String.IsNullOrWhiteSpace(fromString))
+            {
+                Logger.Error("Tried to send Motive Duplicate Token email with incomplete sender/recipient.");
+                return;
+            }
+
+            MailAddress mailAddress = new MailAddress(fromString);
+            MailMessage myMail = new MailMessage()
+            {
+                From = mailAddress,
+                Subject = $"Duplicate Motive Token Received",
+                IsBodyHtml = true,
+                Body = $"<p>Token {oldToken.TokenName} {oldToken.Id} has same ID ({oldToken.ForeignId}) as {newToken.TokenName} {newToken.Id}. Review both tokens and verify the correct one is enabled, and the other is deleted. Contact <a href='mailto:DSCSupport@sentry.com'>DSC Support</a> with any questions.</p>"
+            };
+
+            foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }
+
+            _emailClient.Send(myMail);
+        }
 
         //GET BODY OF S3 SINK EMAIL
         private string GetS3SinkConnectorEmailBody(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto)
