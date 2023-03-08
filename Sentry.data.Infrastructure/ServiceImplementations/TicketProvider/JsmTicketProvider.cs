@@ -1,4 +1,5 @@
 ﻿using Sentry.ChangeManagement;
+using Sentry.ChangeManagement.Sentry;
 using Sentry.data.Core;
 using System;
 using System.Threading.Tasks;
@@ -21,12 +22,17 @@ namespace Sentry.data.Infrastructure
 
         public async Task<ChangeTicket> RetrieveTicketAsync(string ticketId)
         {
-            throw new NotImplementedException();
+            SentryChange change = _changeManagementClient.GetChange(ticketId);
+
         }
 
         public async Task CloseTicketAsync(string ticketId)
         {
             throw new NotImplementedException();
         }
+
+        #region Private
+        
+        #endregion
     }
 }
