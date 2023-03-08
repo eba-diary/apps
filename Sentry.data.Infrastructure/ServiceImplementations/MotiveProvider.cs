@@ -58,12 +58,15 @@ namespace Sentry.data.Infrastructure
                             JObject firstCompany = (JObject)companies[0];
                             token.TokenName = firstCompany.GetValue("company").Value<string>("name");
                             token.ForeignId = firstCompany.GetValue("company").Value<string>("company_id");
-                            foreach(var existingToken in ((HTTPSSource)motiveSource).AllTokens)
+                            if(((HTTPSSource)motiveSource).AllTokens != null)
                             {
-                                if(!string.IsNullOrEmpty(existingToken.ForeignId) && string.Equals(existingToken.ForeignId, token.ForeignId))
+                                foreach (var existingToken in ((HTTPSSource)motiveSource).AllTokens)
                                 {
-                                    existingToken.Enabled = false;
-                                    _emailService.SendMotiveDuplicateTokenEmail(token, existingToken);
+                                    if (!string.IsNullOrEmpty(existingToken.ForeignId) && string.Equals(existingToken.ForeignId, token.ForeignId))
+                                    {
+                                        existingToken.Enabled = false;
+                                        _emailService.SendMotiveDuplicateTokenEmail(token, existingToken);
+                                    }
                                 }
                             }
                             if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())

@@ -133,9 +133,6 @@ namespace Sentry.data.Core
                         Enabled = false
                     };
 
-                    ((HTTPSSource)dataSource).AllTokens.Add(newToken);
-                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
-                    _datasetContext.SaveChanges();
                     try
                     {
                         Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
@@ -145,6 +142,11 @@ namespace Sentry.data.Core
                     {
                         Sentry.Common.Logging.Logger.Error("Onboarding new token failed with message.", e);
                     }
+
+                    ((HTTPSSource)dataSource).AllTokens.Add(newToken);
+                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
+                    _datasetContext.SaveChanges();
+
                     if (_featureFlags.CLA4931_SendMotiveEmail.GetValue())
                     {
                         _emailService.SendNewMotiveTokenAddedEmail(newToken);
