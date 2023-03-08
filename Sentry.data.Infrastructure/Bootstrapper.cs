@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using LaunchDarkly.Sdk.Server.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using NHibernate;
 using NHibernate.Cfg;
@@ -8,6 +9,7 @@ using NHibernate.Mapping.ByCode;
 using Polly.Registry;
 using RestSharp;
 using RestSharp.Authenticators;
+using Sentry.ChangeManagement;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
@@ -137,7 +139,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             registry.For<RestClient>().Use(() => new RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
-            registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
+            registry.For<IJobScheduler>().Singleton().Use<HangfireJobScheduler>();
             registry.For<ISupportLinkService>().Singleton().Use<SupportLinkService>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
@@ -157,9 +159,19 @@ namespace Sentry.data.Infrastructure
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
 
-            ITicketProvider jsmTicketProvider = new JsmTicketProvider();
-            ITicketProvider cherwellTicketProvider = new CherwellProvider();
-            registry.For<ITicketProvider>().Singleton().Use(x => x.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue() ? jsmTicketProvider : cherwellTicketProvider);
+            ChangeManagementClient changeManagementClient = new ChangeManagementClient(Configuration.Config.GetHostSetting("JSMApiUrl"),
+                Configuration.Config.GetHostSetting("JSMApiUser"),
+                Configuration.Config.GetHostSetting("JSMApiToken"),
+                NullLogger.Instance, ChangeManagementSystem.JSM,
+                bool.Parse(Configuration.Config.GetHostSetting("UseProxy")) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : null);
+
+            registry.For<ChangeManagementClient>().Use(changeManagementClient);
+
+            registry.For<ITicketProvider>().Singleton().Use<JsmTicketProvider>().Named("JSM");
+            registry.For<ITicketProvider>().Singleton().Use<CherwellProvider>().Named("Cherwell");
+            registry.For<ITicketProvider>().Use(x => x.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue()
+                ? x.GetInstance<ITicketProvider>("JSM")
+                : x.GetInstance<ITicketProvider>("Cherwell"));
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());

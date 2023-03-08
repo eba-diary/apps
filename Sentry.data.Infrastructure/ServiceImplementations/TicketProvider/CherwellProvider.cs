@@ -34,7 +34,7 @@ namespace Sentry.data.Infrastructure
         }
 
         #region Public Methods
-        public string CreateTicket(AccessRequest request)
+        public Task<string> CreateTicketAsync(AccessRequest request)
         {
             try
             {
@@ -44,27 +44,29 @@ namespace Sentry.data.Infrastructure
 
                 ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.WAITING_FOR_APPROVAL, GlobalConstants.CherwellChangeStatusOrder.WAITING_FOR_APPROVAL);
 
-                return newBusPublicObId;
+                return Task.FromResult(newBusPublicObId);
             }
             catch (Exception ex)
             {
                 Logger.Error("Could not submit access request to Cherwell", ex);
-                return string.Empty;
+                return Task.FromResult(string.Empty);
             }            
         }
 
-        public ChangeTicket RetrieveTicket(string ticketId)
+        public Task<ChangeTicket> RetrieveTicketAsync(string ticketId)
         {
+            ChangeTicket ticket = null;
             try
             {
                 ReadResponse response = GetBusinessObjectByPublicId(ticketId);
-                return MapToHpsmTicket(response);
+                ticket = MapToHpsmTicket(response);
             }
             catch (Exception ex)
             {
                 Logger.Error($"cherwell_retrieveTicket_failed {ticketId}", ex);
-                return null;
-            }            
+            }
+
+            return Task.FromResult(ticket);
         }
 
         private ChangeTicket MapToHpsmTicket(ReadResponse response)
@@ -93,12 +95,13 @@ namespace Sentry.data.Infrastructure
             }
             else { return null; }
 
-        return ticket;
+            return ticket;
         }
 
-        public void CloseTicket(string ticketId)
+        public Task CloseTicketAsync(string ticketId)
         {
             ChangeStatus(ticketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
+            return Task.CompletedTask;
         }
         #endregion
 

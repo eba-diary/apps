@@ -1,24 +1,30 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.ChangeManagement;
+using Sentry.data.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
     public class JsmTicketProvider : ITicketProvider
     {
-        public string CreateTicket(AccessRequest request)
+        private readonly ChangeManagementClient _changeManagementClient;
+
+        public JsmTicketProvider(ChangeManagementClient changeManagementClient)
+        {
+            _changeManagementClient = changeManagementClient;
+        }
+
+        public async Task<string> CreateTicketAsync(AccessRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public ChangeTicket RetrieveTicket(string ticketId)
+        public async Task<ChangeTicket> RetrieveTicketAsync(string ticketId)
         {
             throw new NotImplementedException();
         }
-        public void CloseTicket(string ticketId)
+
+        public async Task CloseTicketAsync(string ticketId)
         {
             throw new NotImplementedException();
         }

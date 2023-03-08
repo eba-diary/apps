@@ -47,7 +47,7 @@ namespace Sentry.data.Core
 
         public async Task<string> RequestPermission(AccessRequest model)
         {
-            string ticketId = _ticketProvider.CreateTicket(model);
+            string ticketId = await _ticketProvider.CreateTicketAsync(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
                 Security security = model.Scope.Equals(AccessScope.Asset) ? GetSecurityForAsset(model.SecurableObjectName) : _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);

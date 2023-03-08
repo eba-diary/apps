@@ -1,11 +1,8 @@
-﻿using System;
+﻿using Sentry.data.Core;
+using StructureMap;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Sentry.data.Core;
-using Sentry.Common;
-using StructureMap;
 
 namespace Sentry.data.Infrastructure
 {
@@ -23,7 +20,7 @@ namespace Sentry.data.Infrastructure
 
                 foreach (SecurityTicket ticket in tickets)
                 {
-                    ChangeTicket st = _baseTicketProvider.RetrieveTicket(ticket.TicketId);
+                    ChangeTicket st = await _baseTicketProvider.RetrieveTicketAsync(ticket.TicketId);
                     if(st != null)
                     {
                         switch (st.TicketStatus)
@@ -35,11 +32,11 @@ namespace Sentry.data.Infrastructure
                                     st.ApprovedById = ticket.RequestedById;
                                 }
                                 await _SecurityService.ApproveTicket(ticket, st.ApprovedById);
-                                _baseTicketProvider.CloseTicket(ticket.TicketId);
+                                await _baseTicketProvider.CloseTicketAsync(ticket.TicketId);
                                 break;
                             case GlobalConstants.HpsmTicketStatus.DENIED: //or Denied?  find out those statuses.
 
-                                _baseTicketProvider.CloseTicket(ticket.TicketId);
+                                await _baseTicketProvider.CloseTicketAsync(ticket.TicketId);
                                 _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus);
                                 break;
                             case GlobalConstants.HpsmTicketStatus.WITHDRAWN:
