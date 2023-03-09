@@ -62,7 +62,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 foreach (var existingToken in ((HTTPSSource)motiveSource).AllTokens)
                                 {
-                                    if (!string.IsNullOrEmpty(existingToken.ForeignId) && string.Equals(existingToken.ForeignId, token.ForeignId))
+                                    if (!string.IsNullOrEmpty(existingToken.ForeignId) && string.Equals(existingToken.ForeignId, token.ForeignId) && existingToken.Id != token.Id)
                                     {
                                         existingToken.Enabled = false;
                                         _emailService.SendMotiveDuplicateTokenEmail(token, existingToken);

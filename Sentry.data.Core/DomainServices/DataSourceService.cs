@@ -168,6 +168,23 @@ namespace Sentry.data.Core
             return authenticationTypeDtos;
         }
 
+        public async Task<bool> KickOffMotiveOnboarding(int tokenId)
+        {
+            try
+            {
+                Sentry.Common.Logging.Logger.Info("Attempting to onboard token.");
+                var dataSource = _datasetContext.DataSources.FirstOrDefault(ds => ds.Id == int.Parse(Configuration.Config.GetHostSetting("MotiveDataSourceId")));
+                var token = ((HTTPSSource)dataSource).AllTokens.First(t => t.Id == tokenId);
+                await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, token, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Sentry.Common.Logging.Logger.Error("Onboarding token failed with message.", e);
+                return false;
+            }
+        }
+
         #endregion
     }
 }
