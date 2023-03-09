@@ -342,6 +342,37 @@ namespace Sentry.data.Web.Tests.API
         }
 
         [TestMethod]
+        public void Validate_FileTypeCode_Delimited_MultiCharacterDelimiter_Fail()
+        {
+            AddSchemaRequestModel requestModel = GetBaseSuccessModel();
+            requestModel.FileTypeCode = ExtensionNames.DELIMITED;
+            requestModel.Delimiter = "~~";
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr);
+            Mock<ISAIDService> saidService = GetSaidService(mr);
+            Mock<IQuartermasterService> quartermasterService = GetQuartermasterService(mr);
+            Mock<IAssociateInfoProvider> associateInfoProvider = GetAssociateInfoProvider(mr);
+
+            AddSchemaRequestValidator validator = new AddSchemaRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(requestModel.Delimiter), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must be a single character", fieldValidation.ValidationMessages.First());
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
         public void Validate_FileTypeCode_Delimited_Success()
         {
             AddSchemaRequestModel requestModel = GetBaseSuccessModel();

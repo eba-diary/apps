@@ -522,6 +522,40 @@ namespace Sentry.data.Web.Tests.API
         }
 
         [TestMethod]
+        public void Validate_Delimiter_MultiCharacter_Fail()
+        {
+            IRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                FileTypeCode = ExtensionNames.DELIMITED,
+                Delimiter = "~~"
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            List<FileExtension> fileTypes = new List<FileExtension>
+            {
+                new FileExtension { Name = ExtensionNames.JSON },
+                new FileExtension { Name = ExtensionNames.CSV },
+                new FileExtension { Name = ExtensionNames.DELIMITED }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileTypes.AsQueryable());
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(datasetContext.Object, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync(requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.Delimiter), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Must be a single character", fieldValidation.ValidationMessages.First());
+        }
+
+        [TestMethod]
         public void Validate_FileTypeCode_DelimitedComma_Fail()
         {
             IRequestModel requestModel = new UpdateSchemaRequestModel

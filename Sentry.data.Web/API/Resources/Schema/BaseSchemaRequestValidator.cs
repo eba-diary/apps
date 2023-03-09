@@ -110,6 +110,10 @@ namespace Sentry.data.Web.API
                 {
                     validationResponse.AddFieldValidation(nameof(BaseSchemaModel.FileTypeCode), $"Value must be {ExtensionNames.CSV} if {nameof(BaseSchemaModel.Delimiter)} is a comma (,)");
                 }
+                else if (delimiter.Length > 1)
+                {
+                    validationResponse.AddFieldValidation(nameof(BaseSchemaModel.Delimiter), $"Must be a single character");
+                }
             }
             //csv requires the delimiter to be a comma
             else if (fileType.Name == ExtensionNames.CSV)
