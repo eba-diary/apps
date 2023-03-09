@@ -79,6 +79,17 @@ namespace Sentry.data.Web.Controllers
             return View("_MigrationHistory", pageModel);
         }
 
+        //CONTROLLER ACTION called from JS to return the Migration History JSON
+        [HttpPost]
+        public ActionResult MagicModalMigrationHistory(int migrationHistoryId)
+        {
+            MigrationHistory migrationHistory = _datasetContext.MigrationHistory.FirstOrDefault(w => w.MigrationHistoryId == migrationHistoryId);
+            string migrationHistoryJson = JsonConvert.SerializeObject(migrationHistory);
+            return Json(new { migrationHistoryJson = migrationHistoryJson });
+        }
+
+
+
         [HttpGet]
         [Route("Migration/NamedEnvironment")]
         public async Task<PartialViewResult> _NamedEnvironment(string assetKeyCode, string namedEnvironment, int datasetId)
