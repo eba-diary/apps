@@ -144,8 +144,8 @@ namespace Sentry.data.Core
                     }
 
                     ((HTTPSSource)dataSource).AllTokens.Add(newToken);
-                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
                     _datasetContext.SaveChanges();
+                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
 
                     if (_featureFlags.CLA4931_SendMotiveEmail.GetValue())
                     {
