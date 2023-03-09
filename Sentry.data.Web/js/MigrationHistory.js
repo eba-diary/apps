@@ -4,7 +4,6 @@
 
         $("[id^='viewMigrationHistoryJSON']").off('click').on('click', function (e) {
             data.MigrationHistory.MagicModalMigrationHistory($(this).data("id"));
-            //alert($(this).data("id"));
         });
     },
 
