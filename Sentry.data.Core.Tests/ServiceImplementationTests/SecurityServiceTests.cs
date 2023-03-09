@@ -379,7 +379,7 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             //Security security = BuildBaseSecurity();
             //ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-            //securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            //securable.Stub(x => x.IsSecuredDataFlow).Return(false).Repeat.Any();
             //securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
             //securable.Stub(x => x.PrimaryContactId).Return("123456").Repeat.Any();
             //securable.Stub(x => x.Security).Return(security).Repeat.Any();
