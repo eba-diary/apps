@@ -196,7 +196,7 @@ namespace Sentry.data.Infrastructure
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.Tokens.FirstOrDefault().TokenExp)).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.GetActiveTokens().FirstOrDefault().TokenExp)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);
