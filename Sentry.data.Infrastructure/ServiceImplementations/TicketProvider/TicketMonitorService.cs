@@ -16,7 +16,7 @@ namespace Sentry.data.Infrastructure
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
 
-                List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING && x.TicketId != null && !x.TicketId.Equals("DEFAULT_SECURITY") && !x.TicketId.Equals("DEFAULT_SECURITY_INHERITANCE")).ToList();
+                List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.ChangeTicketStatus.PENDING && x.TicketId != null && !x.TicketId.Equals("DEFAULT_SECURITY") && !x.TicketId.Equals("DEFAULT_SECURITY_INHERITANCE")).ToList();
 
                 foreach (SecurityTicket ticket in tickets)
                 {
@@ -25,21 +25,21 @@ namespace Sentry.data.Infrastructure
                     {
                         switch (st.TicketStatus)
                         {
-                            case GlobalConstants.HpsmTicketStatus.APPROVED:
+                            case GlobalConstants.ChangeTicketStatus.APPROVED:
 
                                 if (st.PreApproved)
                                 {
                                     st.ApprovedById = ticket.RequestedById;
                                 }
                                 await _SecurityService.ApproveTicket(ticket, st.ApprovedById);
-                                await _baseTicketProvider.CloseTicketAsync(ticket.TicketId);
+                                await _baseTicketProvider.CloseTicketAsync(st);
                                 break;
-                            case GlobalConstants.HpsmTicketStatus.DENIED: //or Denied?  find out those statuses.
+                            case GlobalConstants.ChangeTicketStatus.DENIED: //or Denied?  find out those statuses.
 
-                                await _baseTicketProvider.CloseTicketAsync(ticket.TicketId);
+                                await _baseTicketProvider.CloseTicketAsync(st);
                                 _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus);
                                 break;
-                            case GlobalConstants.HpsmTicketStatus.WITHDRAWN:
+                            case GlobalConstants.ChangeTicketStatus.WITHDRAWN:
 
                                 _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus); //Check if the ticket was closed without approval.
                                 break;

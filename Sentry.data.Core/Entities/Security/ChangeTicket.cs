@@ -2,6 +2,7 @@
 {
     public class ChangeTicket
     {
+        public string TicketId { get; set; }
         public string TicketStatus { get; set; }
         public bool PreApproved { get; set; }
         public string ApprovedById { get; set; }

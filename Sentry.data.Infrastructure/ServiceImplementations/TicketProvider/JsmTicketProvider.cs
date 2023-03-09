@@ -8,26 +8,38 @@ namespace Sentry.data.Infrastructure
 {
     public class JsmTicketProvider : ITicketProvider
     {
-        private readonly ChangeManagementClient _changeManagementClient;
+        private readonly ISentryChangeManagementClient _changeManagementClient;
 
-        public JsmTicketProvider(ChangeManagementClient changeManagementClient)
+        public JsmTicketProvider(ISentryChangeManagementClient changeManagementClient)
         {
             _changeManagementClient = changeManagementClient;
         }
 
         public async Task<string> CreateTicketAsync(AccessRequest request)
         {
+            //create ticket
+
+            //move phase
+
+            //return ticket id
             throw new NotImplementedException();
         }
 
         public async Task<ChangeTicket> RetrieveTicketAsync(string ticketId)
         {
-            SentryChange change = _changeManagementClient.GetChange(ticketId);
+            //get ticket
+            SentryChange change = await _changeManagementClient.GetChange(ticketId);
+
+            //translate to ChangeTicket
+
+            //return ChangeTicket
+            throw new NotImplementedException();
 
         }
 
-        public async Task CloseTicketAsync(string ticketId)
+        public async Task CloseTicketAsync(ChangeTicket ticket)
         {
+            //move phase to closed
             throw new NotImplementedException();
         }
 

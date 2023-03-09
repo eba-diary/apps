@@ -6,6 +6,6 @@ namespace Sentry.data.Core
     {
         Task<string> CreateTicketAsync(AccessRequest request);
         Task<ChangeTicket> RetrieveTicketAsync(string ticketId);
-        Task CloseTicketAsync(string ticketId);
+        Task CloseTicketAsync(ChangeTicket ticket);
     }
 }

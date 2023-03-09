@@ -580,7 +580,7 @@
     <Compile Include="Entities\Security\Permission.cs" />
     <Compile Include="Entities\Security\SecurityTicket.cs" />
     <Compile Include="Entities\Security\SecurityPermission.cs" />
-    <Compile Include="Entities\Security\RequestAccess.cs" />
+    <Compile Include="Entities\Security\AccessRequest.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />

@@ -72,7 +72,7 @@ namespace Sentry.data.Core
                 TicketId = ticketId,
                 AdGroupName = model.AdGroupName,
                 GrantPermissionToUserId = model.PermissionForUserId,
-                TicketStatus = HpsmTicketStatus.PENDING,
+                TicketStatus = ChangeTicketStatus.PENDING,
                 RequestedById = model.RequestorsId,
                 RequestedDate = model.RequestedDate,
                 IsAddingPermission = model.IsAddingPermission,
@@ -105,7 +105,7 @@ namespace Sentry.data.Core
                 TicketId = ticketId,
                 AdGroupName = model.AdGroupName,
                 GrantPermissionToUserId = model.PermissionForUserId,
-                TicketStatus = HpsmTicketStatus.PENDING,
+                TicketStatus = ChangeTicketStatus.PENDING,
                 RequestedById = model.RequestorsId,
                 RequestedDate = model.RequestedDate,
                 IsAddingPermission = model.IsAddingPermission,
@@ -291,7 +291,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
         {
-            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(HpsmTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
+            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(ChangeTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
             if (inheritanceTicket != null && inheritanceTicket.TicketId != null)
             {
                 return inheritanceTicket;
@@ -505,7 +505,7 @@ namespace Sentry.data.Core
         {
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
-            ticket.TicketStatus = HpsmTicketStatus.COMPLETED;
+            ticket.TicketStatus = ChangeTicketStatus.COMPLETED;
             if (ticket.IsAddingPermission)
             {
                 ticket.AddedPermissions.ToList().ForEach(x =>

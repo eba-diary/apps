@@ -165,7 +165,7 @@ namespace Sentry.data.Infrastructure
                 NullLogger.Instance, ChangeManagementSystem.JSM,
                 bool.Parse(Configuration.Config.GetHostSetting("UseProxy")) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : null);
 
-            registry.For<ChangeManagementClient>().Use(changeManagementClient);
+            registry.For<ISentryChangeManagementClient>().Use(changeManagementClient);
 
             registry.For<ITicketProvider>().Singleton().Use<JsmTicketProvider>().Named("JSM");
             registry.For<ITicketProvider>().Singleton().Use<CherwellProvider>().Named("Cherwell");

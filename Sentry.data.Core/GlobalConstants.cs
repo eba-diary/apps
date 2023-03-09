@@ -178,7 +178,7 @@ namespace Sentry.data.Core
             public const string GET_LATEST_URL_PARAMETER = "&sInstance=Last";
         }
 
-        public static class HpsmTicketStatus
+        public static class ChangeTicketStatus
         {
             //DSC
             public const string PENDING = "Pending";

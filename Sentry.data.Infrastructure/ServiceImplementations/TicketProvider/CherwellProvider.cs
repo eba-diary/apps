@@ -60,6 +60,7 @@ namespace Sentry.data.Infrastructure
             {
                 ReadResponse response = GetBusinessObjectByPublicId(ticketId);
                 ticket = MapToHpsmTicket(response);
+                ticket.TicketId = ticketId;
             }
             catch (Exception ex)
             {
@@ -83,24 +84,24 @@ namespace Sentry.data.Infrastructure
             //If ticket is not approved, it will be moved back to Logging and Prep
             if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.LOGGING_AND_PREP)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.DENIED;
+                ticket.TicketStatus = GlobalConstants.ChangeTicketStatus.DENIED;
             }
             else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.APPROVED;
+                ticket.TicketStatus = GlobalConstants.ChangeTicketStatus.APPROVED;
             }
             else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.CLOSED)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WITHDRAWN;
+                ticket.TicketStatus = GlobalConstants.ChangeTicketStatus.WITHDRAWN;
             }
             else { return null; }
 
             return ticket;
         }
 
-        public Task CloseTicketAsync(string ticketId)
+        public Task CloseTicketAsync(ChangeTicket ticket)
         {
-            ChangeStatus(ticketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
+            ChangeStatus(ticket.TicketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
             return Task.CompletedTask;
         }
         #endregion

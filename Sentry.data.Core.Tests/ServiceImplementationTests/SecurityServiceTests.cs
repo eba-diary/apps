@@ -2049,7 +2049,7 @@ namespace Sentry.data.Core.Tests
                 ParentSecurity = security,
                 RequestedById = "078193",
                 SecurityTicketId = Guid.NewGuid(),
-                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
                 TicketId = "C00123456",
                 AddedPermissions = new List<SecurityPermission>()
             };
