@@ -95,7 +95,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         /// <summary>
         /// This property builds the LdUser object that LaunchDarkly uses to evaluate feature flags
         /// </summary>
-        //private User LdUser { get; }
         private User LdUser
         {
             get

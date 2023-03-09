@@ -373,20 +373,20 @@ namespace Sentry.data.Core
             }
         }
 
-        public void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig dfc)
+        public void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig fileConfig)
         {
             if (dto.DatasetScopeTypeId > 0)
             {
-                dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+                fileConfig.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
             }
             else if (!string.IsNullOrWhiteSpace(dto.DatasetScopeTypeName))
             {
-                dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.FirstOrDefault(x => x.Name.ToLower() == dto.DatasetScopeTypeName.ToLower());
+                fileConfig.DatasetScopeType = _datasetContext.DatasetScopeTypes.FirstOrDefault(x => x.Name.ToLower() == dto.DatasetScopeTypeName.ToLower());
             }
 
-            dfc.FileTypeId = dto.FileTypeId;
-            dfc.Description = dto.Description;
-            dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+            fileConfig.FileTypeId = dto.FileTypeId;
+            fileConfig.Description = dto.Description;
+            fileConfig.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
@@ -1492,9 +1492,9 @@ namespace Sentry.data.Core
                 StorageCode = dfc.Schema.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\",
                 Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser()),
-                CreateCurrentView = (dfc.Schema != null) ? dfc.Schema.CreateCurrentView : false,
+                CreateCurrentView = dfc.Schema != null && dfc.Schema.CreateCurrentView,
                 Delimiter = dfc.Schema?.Delimiter,
-                HasHeader = (dfc.Schema != null) ? dfc.Schema.HasHeader : false,
+                HasHeader = dfc.Schema != null && dfc.Schema.HasHeader,
                 IsTrackableSchema = dfc.IsSchemaTracked,
                 HiveTable = dfc.Schema?.HiveTable,
                 HiveDatabase = dfc.Schema?.HiveDatabase,

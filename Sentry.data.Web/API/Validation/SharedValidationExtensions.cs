@@ -39,22 +39,7 @@ namespace Sentry.data.Web.API
                     {
                         ValidationResults validationResults = await quartermasterService.VerifyNamedEnvironmentAsync(requestModel.SaidAssetCode, requestModel.NamedEnvironment, namedEnvironmentType);
 
-                        if (!validationResults.IsValid())
-                        {
-                            //loop over results and align properties with the validation error returned
-                            foreach (ValidationResult result in validationResults.GetAll())
-                            {
-                                switch (result.Id)
-                                {
-                                    case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
-                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironment), result.Description);
-                                        break;
-                                    case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
-                                        validationResponse.AddFieldValidation(nameof(requestModel.NamedEnvironmentTypeCode), result.Description);
-                                        break;
-                                }
-                            }
-                        }
+                        TranslateNamedEnvironmentValidationResults(validationResults, validationResponse);
                     }
                 }
                 else
@@ -63,5 +48,27 @@ namespace Sentry.data.Web.API
                 }
             }
         }
+
+        #region Private
+        private static void TranslateNamedEnvironmentValidationResults(ValidationResults validationResults, ConcurrentValidationResponse validationResponse)
+        {
+            if (!validationResults.IsValid())
+            {
+                //loop over results and align properties with the validation error returned
+                foreach (ValidationResult result in validationResults.GetAll())
+                {
+                    switch (result.Id)
+                    {
+                        case ValidationErrors.NAMED_ENVIRONMENT_INVALID:
+                            validationResponse.AddFieldValidation(nameof(ISaidEnvironmentModel.NamedEnvironment), result.Description);
+                            break;
+                        case ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID:
+                            validationResponse.AddFieldValidation(nameof(ISaidEnvironmentModel.NamedEnvironmentTypeCode), result.Description);
+                            break;
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }

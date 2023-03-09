@@ -545,7 +545,7 @@ namespace Sentry.data.Core
         /// <returns> Returns list of properties that have changed.</returns>
         internal JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
-            IList<bool> changes = new List<bool>();
+            List<bool> changes = new List<bool>();
             JObject whatPropertiesChanged = new JObject();
 
             changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
@@ -585,11 +585,22 @@ namespace Sentry.data.Core
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
             //schema=EXISTING; dto=NEW; SETTER
-            changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
+            SchemaParquetUpdate(schema, dto, changes, whatPropertiesChanged);
 
+            if (changes.Any(x => x))
+            {
+                schema.LastUpdatedDTM = DateTime.Now;
+                schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
+            }
+
+            return whatPropertiesChanged;
+        }
+
+        private void SchemaParquetUpdate(FileSchema schema, FileSchemaDto dto, List<bool> changes, JObject whatPropertiesChanged)
+        {
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
-                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
                     (x) =>
                     {
                         schema.ParquetStorageBucket = x;
@@ -621,14 +632,6 @@ namespace Sentry.data.Core
                     }
                 }
             }
-
-            if (changes.Any(x => x))
-            {
-                schema.LastUpdatedDTM = DateTime.Now;
-                schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
-            }
-
-            return whatPropertiesChanged;
         }
 
         private string GetControlMTrigger(FileSchemaDto dto)

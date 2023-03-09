@@ -47,21 +47,7 @@ namespace Sentry.data.Web.API
             //KafkaTopicName required when IngestionTypeCode is Topic
             if (!string.IsNullOrWhiteSpace(requestModel.IngestionTypeCode) && Enum.TryParse(requestModel.IngestionTypeCode, true, out IngestionType ingestionType))
             {
-                if (ingestionType == IngestionType.Topic)
-                {
-                    if (string.IsNullOrWhiteSpace(requestModel.KafkaTopicName))
-                    {
-                        validationResponse.AddFieldValidation(nameof(BaseSchemaModel.KafkaTopicName), $"Required field when {nameof(BaseSchemaModel.IngestionTypeCode)} is {IngestionType.Topic}");
-                    }
-                    else if (_datasetContext.DataFlow.Any(x => x.TopicName == requestModel.KafkaTopicName))
-                    {
-                        validationResponse.AddFieldValidation(nameof(BaseSchemaModel.KafkaTopicName), "Kafka topic name already exists");
-                    }
-                }
-                else if (!string.IsNullOrWhiteSpace(requestModel.KafkaTopicName))
-                {
-                    validationResponse.AddFieldValidation(nameof(BaseSchemaModel.IngestionTypeCode), $"Value must be {IngestionType.Topic} to set {nameof(BaseSchemaModel.KafkaTopicName)}");
-                }
+                ValidateKafkaTopicName(requestModel.KafkaTopicName, ingestionType, validationResponse);
             }
 
             return Task.FromResult(validationResponse);
@@ -143,6 +129,25 @@ namespace Sentry.data.Web.API
             if (!string.IsNullOrWhiteSpace(schemaRootPath) && fileType.Name != ExtensionNames.JSON && fileType.Name != ExtensionNames.XML)
             {
                 validationResponse.AddFieldValidation(nameof(BaseSchemaModel.FileTypeCode), $"Value must be {ExtensionNames.JSON} or {ExtensionNames.XML} to set {nameof(BaseSchemaModel.SchemaRootPath)}");
+            }
+        }
+
+        private void ValidateKafkaTopicName(string kafkaTopicName, IngestionType ingestionType, ConcurrentValidationResponse validationResponse)
+        {
+            if (ingestionType == IngestionType.Topic)
+            {
+                if (string.IsNullOrWhiteSpace(kafkaTopicName))
+                {
+                    validationResponse.AddFieldValidation(nameof(BaseSchemaModel.KafkaTopicName), $"Required field when {nameof(BaseSchemaModel.IngestionTypeCode)} is {IngestionType.Topic}");
+                }
+                else if (_datasetContext.DataFlow.Any(x => x.TopicName == kafkaTopicName))
+                {
+                    validationResponse.AddFieldValidation(nameof(BaseSchemaModel.KafkaTopicName), "Kafka topic name already exists");
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(kafkaTopicName))
+            {
+                validationResponse.AddFieldValidation(nameof(BaseSchemaModel.IngestionTypeCode), $"Value must be {IngestionType.Topic} to set {nameof(BaseSchemaModel.KafkaTopicName)}");
             }
         }
     }
