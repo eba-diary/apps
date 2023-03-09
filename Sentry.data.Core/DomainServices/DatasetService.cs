@@ -511,11 +511,6 @@ namespace Sentry.data.Core
                 ds.DatasetDesc = dto.DatasetDesc;
             }
 
-            if (dto.DatasetDtm > DateTime.MinValue)
-            {
-                ds.DatasetDtm = dto.DatasetDtm;
-            }
-
             if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
             {
                 ds.PrimaryContactId = dto.PrimaryContactId;

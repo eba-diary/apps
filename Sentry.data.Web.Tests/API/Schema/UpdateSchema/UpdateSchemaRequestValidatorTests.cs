@@ -4,6 +4,7 @@ using Sentry.Associates;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Infrastructure;
 using Sentry.data.Web.API;
 using System;
 using System.Collections.Concurrent;
@@ -38,7 +39,6 @@ namespace Sentry.data.Web.Tests.API
                 HasHeader = true,
                 ScopeTypeCode = "Appending",
                 FileTypeCode = ExtensionNames.CSV,
-                SchemaRootPath = "root,path",
                 CreateCurrentView = true,
                 IngestionTypeCode = IngestionType.Topic.ToString(),
                 IsCompressed = true,
@@ -74,7 +74,6 @@ namespace Sentry.data.Web.Tests.API
                 HasHeader = true,
                 ScopeTypeCode = "Appending",
                 FileTypeCode = ExtensionNames.DELIMITED,
-                SchemaRootPath = "root,path",
                 CreateCurrentView = true,
                 IngestionTypeCode = IngestionType.Topic.ToString(),
                 IsCompressed = true,
@@ -428,6 +427,63 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(nameof(UpdateSchemaRequestModel.FileTypeCode), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Must provide a valid value - {string.Join(" | ", fileTypes.Select(x => x.Name))}", fieldValidation.ValidationMessages.First());
+
+            datasetContext.Verify();
+        }
+
+        [TestMethod]
+        public void Validate_FileTypeCode_Null_WithSchemaRootPath_Fail()
+        {
+            UpdateSchemaRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                SchemaRootPath = "root"
+            };
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(null, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.FileTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {ExtensionNames.JSON} or {ExtensionNames.XML} to set {nameof(BaseSchemaModel.SchemaRootPath)}", fieldValidation.ValidationMessages.First());
+        }
+
+        [TestMethod]
+        public void Validate_FileTypeCode_InvalidWithSchemaRootPath_Fail()
+        {
+            UpdateSchemaRequestModel requestModel = new UpdateSchemaRequestModel
+            {
+                FileTypeCode = ExtensionNames.TXT,
+                SchemaRootPath = "root"
+            };
+
+            Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
+
+            List<FileExtension> fileTypes = new List<FileExtension>
+            {
+                new FileExtension { Name = ExtensionNames.TXT }
+            };
+            datasetContext.SetupGet(x => x.FileExtensions).Returns(fileTypes.AsQueryable());
+
+            UpdateSchemaRequestValidator validator = new UpdateSchemaRequestValidator(datasetContext.Object, null);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(UpdateSchemaRequestModel.FileTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {ExtensionNames.JSON} or {ExtensionNames.XML} to set {nameof(BaseSchemaModel.SchemaRootPath)}", fieldValidation.ValidationMessages.First());
 
             datasetContext.Verify();
         }

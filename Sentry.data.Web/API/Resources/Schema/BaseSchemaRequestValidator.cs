@@ -81,6 +81,7 @@ namespace Sentry.data.Web.API
             {
                 ValidateDelimiter(requestModel.Delimiter, fileType, validationResponse);
                 ValidateHasHeader(requestModel.HasHeader, fileType, validationResponse);
+                ValidateSchemaRootPath(requestModel.SchemaRootPath, fileType, validationResponse);
             }
         }
 
@@ -130,6 +131,14 @@ namespace Sentry.data.Web.API
             if (hasHeader && fileType.Name != ExtensionNames.DELIMITED && fileType.Name != ExtensionNames.CSV)
             {
                 validationResponse.AddFieldValidation(nameof(BaseSchemaModel.HasHeader), $"Value must be false when {nameof(BaseSchemaModel.FileTypeCode)} is {fileType.Name}");
+            }
+        }
+
+        private void ValidateSchemaRootPath(string schemaRootPath, FileExtension fileType, ConcurrentValidationResponse validationResponse)
+        {
+            if (!string.IsNullOrWhiteSpace(schemaRootPath) && fileType.Name != ExtensionNames.JSON && fileType.Name != ExtensionNames.XML)
+            {
+                validationResponse.AddFieldValidation(nameof(BaseSchemaModel.FileTypeCode), $"Value must be {ExtensionNames.JSON} or {ExtensionNames.XML} to set {nameof(BaseSchemaModel.SchemaRootPath)}");
             }
         }
     }

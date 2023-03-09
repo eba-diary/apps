@@ -7,7 +7,8 @@ namespace Sentry.data.Web.API
     {
         public DefaultProfile()
         {
-            CreateMap<DateTime, DateTime>().ConvertUsing(x => x.ToLocalTime());
+            //setting to unspecified kind for dates to return as they are saved in the DB
+            CreateMap<DateTime, DateTime>().ConvertUsing(x => DateTime.SpecifyKind(x, DateTimeKind.Unspecified));
         }
     }
 }

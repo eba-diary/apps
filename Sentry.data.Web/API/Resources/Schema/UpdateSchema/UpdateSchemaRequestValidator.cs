@@ -45,6 +45,11 @@ namespace Sentry.data.Web.API
                 validationResponse.AddFieldValidation(nameof(requestModel.IngestionTypeCode), $"Value must be {IngestionType.Topic} to set {nameof(requestModel.KafkaTopicName)}");
             }
 
+            if (!string.IsNullOrWhiteSpace(requestModel.SchemaRootPath) && string.IsNullOrWhiteSpace(requestModel.FileTypeCode))
+            {
+                validationResponse.AddFieldValidation(nameof(requestModel.FileTypeCode), $"Value must be {ExtensionNames.JSON} or {ExtensionNames.XML} to set {nameof(BaseSchemaModel.SchemaRootPath)}");
+            }
+
             validationResponse.AddValidationsFrom(await baseValidations);
             await primaryContactValidation;
 

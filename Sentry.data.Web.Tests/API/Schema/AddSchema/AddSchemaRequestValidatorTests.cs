@@ -49,6 +49,7 @@ namespace Sentry.data.Web.Tests.API
             requestModel.IsPreprocessingRequired = true;
             requestModel.PreprocessingTypeCode = DataFlowPreProcessingTypes.googleapi.ToString();
             requestModel.KafkaTopicName = "TopicName";
+            requestModel.SchemaRootPath = "root";
 
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
@@ -506,6 +507,38 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual(nameof(requestModel.HasHeader), fieldValidation.Field);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
             Assert.AreEqual($"Value must be false when {nameof(BaseSchemaModel.FileTypeCode)} is {ExtensionNames.JSON}", fieldValidation.ValidationMessages.First());
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Validate_FileTypeCode_WithSchemaRootPath_Fail()
+        {
+            AddSchemaRequestModel requestModel = GetBaseSuccessModel();
+            requestModel.FileTypeCode = ExtensionNames.CSV;
+            requestModel.Delimiter = ",";
+            requestModel.SchemaRootPath = "root";
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = GetDatasetContext(mr);
+            Mock<ISAIDService> saidService = GetSaidService(mr);
+            Mock<IQuartermasterService> quartermasterService = GetQuartermasterService(mr);
+            Mock<IAssociateInfoProvider> associateInfoProvider = GetAssociateInfoProvider(mr);
+
+            AddSchemaRequestValidator validator = new AddSchemaRequestValidator(datasetContext.Object, saidService.Object, quartermasterService.Object, associateInfoProvider.Object);
+
+            ConcurrentValidationResponse validationResponse = validator.ValidateAsync((IRequestModel)requestModel).Result;
+
+            Assert.IsFalse(validationResponse.IsValid());
+
+            ConcurrentQueue<ConcurrentFieldValidationResponse> fieldValidations = validationResponse.FieldValidations;
+            Assert.AreEqual(1, fieldValidations.Count);
+
+            ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault();
+            Assert.AreEqual(nameof(requestModel.FileTypeCode), fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+            Assert.AreEqual($"Value must be {ExtensionNames.JSON} or {ExtensionNames.XML} to set {nameof(BaseSchemaModel.SchemaRootPath)}", fieldValidation.ValidationMessages.First());
 
             mr.VerifyAll();
         }
