@@ -112,5 +112,67 @@ namespace Sentry.data.Web.Extensions
                 model.QuartermasterManagedNamedEnvironments = true;
             }
         }
+
+        public static List<MigrationHistoryModel> ToMigrationHistoryModels(this List<Core.MigrationHistory> migrationHistories)
+        {
+            List<MigrationHistoryModel> historyModels = new List<MigrationHistoryModel>();
+
+            foreach (Core.MigrationHistory detail in migrationHistories)
+            {
+                historyModels.Add(detail.ToMigrationHistoryModel());
+            }
+            return historyModels;
+        }
+
+        public static MigrationHistoryModel ToMigrationHistoryModel(this Core.MigrationHistory migrationHistory)
+        {
+            MigrationHistoryModel model = new MigrationHistoryModel()
+            {
+                MigrationHistoryId = migrationHistory.MigrationHistoryId,
+                CreateDateTime = migrationHistory.CreateDateTime,
+                SourceNamedEnvironment = migrationHistory.SourceNamedEnvironment,
+                TargetNamedEnvironment = migrationHistory.TargetNamedEnvironment,
+                SourceDatasetId = migrationHistory.SourceDatasetId,
+                TargetDatasetId = migrationHistory.TargetDatasetId,
+                MigrationHistoryDetailModels = new List<MigrationHistoryDetailModel>()
+            };
+            
+            foreach (Core.MigrationHistoryDetail detail in migrationHistory.MigrationHistoryDetails)
+            {
+                model.MigrationHistoryDetailModels.Add(detail.ToMigrationHistoryDetailModel());
+            }
+            return model;
+        }
+
+        public static MigrationHistoryDetailModel ToMigrationHistoryDetailModel(this Core.MigrationHistoryDetail detail)
+        {
+            return new MigrationHistoryDetailModel()
+            {
+                MigrationHistoryDetailId = detail.MigrationHistoryDetailId,
+                MigrationHistoryId = detail.MigrationHistoryId,
+                SourceDatasetId = detail.SourceDatasetId,
+
+                IsDatasetMigrated = detail.IsDatasetMigrated,
+                DatasetId = detail.DatasetId,
+                DatasetName = detail.DatasetName,
+                DatasetMigrationMessage = detail.DatasetMigrationMessage,
+
+                SourceSchemaId = detail.SourceSchemaId,
+                IsSchemaMigrated = detail.IsSchemaMigrated,
+                SchemaId = detail.SchemaId,
+                SchemaName = detail.SchemaName,
+                SchemaMigrationMessage = detail.SchemaMigrationMessage,
+
+                IsDataFlowMigrated = detail.IsDataFlowMigrated,
+                DataFlowId = detail.DataFlowId,
+                DataFlowName = detail.DataFlowName,
+                DataFlowMigrationMessage = detail.DataFlowMigrationMessage,
+
+                IsSchemaRevisionMigrated = detail.IsSchemaRevisionMigrated,
+                SchemaRevisionId = detail.SchemaRevisionId,
+                SchemaRevisionName = detail.SchemaRevisionName,
+                SchemaRevisionMigrationMessage = detail.SchemaRevisionMigrationMessage
+            };
+        }
     }
 }

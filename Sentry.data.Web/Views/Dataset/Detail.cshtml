@@ -100,6 +100,12 @@
                                 {
                                     <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
                                 }
+
+                                @if (Model.Security.CanManageSchema)
+                                {
+                                    <a class="dropdown-item" href="/Migration/Dataset/@Model.DatasetId">Migration History </a>
+                                }
+
                                 @if (Model.Security.CanManageSchema && Model.Security.CanEditDataset)
                                 {
                                     <a class="dropdown-item" id="btnMigrationRqeuest" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Migration Request</a>

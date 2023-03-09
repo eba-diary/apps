@@ -598,5 +598,12 @@ namespace Sentry.data.Core
             public const string ENCRYPTIONINDICATOR = "<--!-->";
             public const string REQUESTVARIABLEINDICATOR = "~[{0}]~";
         }
+
+
+        public static class MigrationHistory
+        {
+            public const string TYPE_DATASET = "Dataset";
+            public const string TYPE_SCHEMA = "Schema";
+        }
     }
 }
