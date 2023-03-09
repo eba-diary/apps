@@ -573,7 +573,8 @@
     <Compile Include="Models\ApiModels\Job\JavaOptionsOverride.cs" />
     <Compile Include="Models\ApiModels\Migration\DatasetMigrationRequestModel.cs" />
     <Compile Include="Models\ApiModels\Migration\DatasetMigrationResponseModel.cs" />
-    <Compile Include="Models\ApiModels\Migration\MigrationRequestModel.cs" />
+    <Compile Include="Models\ApiModels\Migration\BaseMigrationRequestModel.cs" />
+    <Compile Include="Models\ApiModels\Migration\DatasetSchemaMigrationRequestModel.cs" />
     <Compile Include="Models\ApiModels\Migration\SchemaMigrationRequestModel.cs" />
     <Compile Include="Models\ApiModels\Migration\SchemaMigrationResponseModel.cs" />
     <Compile Include="Models\ApiModels\PagedResponseMetadata.cs" />
@@ -1158,6 +1159,7 @@
     <Content Include="Views\Search\FilterCategories.cshtml" />
     <Content Include="Views\Search\FilterShowAll.cshtml" />
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
+    <Content Include="Views\Migration\_NamedEnvironment.cshtml" />
     <Content Include="Views\Migration\_MigrationHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>

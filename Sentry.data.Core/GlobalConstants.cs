@@ -16,6 +16,7 @@ namespace Sentry.data.Core
             public const string TEST = "TEST";
             public const string QUAL = "QUAL";
             public const string PROD = "PROD";
+            public const string NONPROD_SUFFIX = "NP";
         }
 
         public static class ValidationErrors

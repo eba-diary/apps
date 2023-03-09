@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Sentry.data.Web.Models.ApiModels.Migration
 {
-    public class SchemaMigrationRequestModel : MigrationRequestModel
+    public class SchemaMigrationRequestModel : BaseMigrationRequestModel
     {
         public int SourceSchemaId { get; set; }
         public string TargetDataFlowNamedEnviornment { get; set; }

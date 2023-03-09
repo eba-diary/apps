@@ -1679,29 +1679,66 @@ namespace Sentry.data.Core.Tests
 
         #region GenerateParquetStorageBucket Tests
         [TestMethod]
-        public void SchemaService_GenerateParquetStorageBucket_HRBucket()
+        [DataRow("")]
+        [DataRow("PROD")]
+        public void SchemaService_GenerateParquetStorageBucket(string featureFlagValue)
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(featureFlagValue);
+
             // Arrange
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null,null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, null, dataFeatures.Object, null, null,null, null, null, null);
 
             // Act
-            var result = schemaService.GenerateParquetStorageBucket(true, "DATA", "DEV");
+            string dbName_TESTNP = schemaService.GenerateParquetStorageBucket(      false,  "DLST", "TEST", NamedEnvironmentType.NonProd);
+            string dbName_QUALNP = schemaService.GenerateParquetStorageBucket(      false,  "DLST", "QUAL", NamedEnvironmentType.NonProd);
+            string dbName_QUALPROD = schemaService.GenerateParquetStorageBucket(    false,  "DLST", "QUAL", NamedEnvironmentType.Prod);
+            string dbName_PRODNP = schemaService.GenerateParquetStorageBucket(      false,  "DLST", "PROD", NamedEnvironmentType.NonProd);
+            string dbName_PRODPROD = schemaService.GenerateParquetStorageBucket(    false,  "DLST", "PROD", NamedEnvironmentType.Prod);
+            string dbName_PRODNP_HR = schemaService.GenerateParquetStorageBucket(   true,   "DLST", "PROD", NamedEnvironmentType.NonProd);
+            string dbName_PRODPROD_HR = schemaService.GenerateParquetStorageBucket( true,   "DLST", "PROD", NamedEnvironmentType.Prod);
+
+
+
+            string expected_TESTNP;
+            string expected_QUALNP;
+            string expected_QUALPROD;
+            string expected_PRODNP;
+            string expected_PRODPROD;
+            string expected_PRODNP_HR;
+            string expected_PROD_PROD_HR;
+
+            if (featureFlagValue == "")
+            {
+                expected_TESTNP = "sentry-dlst-test-dataset-ae2";
+                expected_QUALNP = "sentry-dlst-qualnp-dataset-ae2";
+                expected_QUALPROD = "sentry-dlst-qual-dataset-ae2";
+                expected_PRODNP = "sentry-dlst-prodnp-dataset-ae2";
+                expected_PRODPROD = "sentry-dlst-prod-dataset-ae2";
+                expected_PRODNP_HR = "sentry-dlst-prodnp-hrdataset-ae2";
+                expected_PROD_PROD_HR = "sentry-dlst-prod-hrdataset-ae2";
+            }
+            else
+            {
+                expected_TESTNP = "sentry-dlst-test-dataset-ae2";
+                expected_QUALNP = "sentry-dlst-qual-dataset-ae2";
+                expected_QUALPROD = "sentry-dlst-qual-dataset-ae2";
+                expected_PRODNP = "sentry-dlst-prod-dataset-ae2";
+                expected_PRODPROD = "sentry-dlst-prod-dataset-ae2";
+                expected_PRODNP_HR = "sentry-dlst-prod-hrdataset-ae2";
+                expected_PROD_PROD_HR = "sentry-dlst-prod-hrdataset-ae2";
+            }
 
             // Assert
-            Assert.AreEqual("sentry-data-dev-hrdataset-ae2", result, false);
-        }
-
-        [TestMethod]
-        public void SchemaService_GenerateParquetStorageBucket_BaseBucket()
-        {
-            // Arrange
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null, null, null);
-
-            // Act
-            var result = schemaService.GenerateParquetStorageBucket(false, "DATA", "DEV");
-
-            // Assert
-            Assert.AreEqual("sentry-data-dev-dataset-ae2", result, false);
+            Assert.AreEqual(expected_TESTNP,        dbName_TESTNP);
+            Assert.AreEqual(expected_QUALNP,        dbName_QUALNP);
+            Assert.AreEqual(expected_QUALPROD,      dbName_QUALPROD);
+            Assert.AreEqual(expected_PRODNP,        dbName_PRODNP);
+            Assert.AreEqual(expected_PRODPROD,      dbName_PRODPROD);
+            Assert.AreEqual(expected_PRODNP_HR,     dbName_PRODNP_HR);
+            Assert.AreEqual(expected_PROD_PROD_HR,  dbName_PRODPROD_HR);
         }
 
         #endregion

@@ -44,7 +44,7 @@ namespace Sentry.data.Infrastructure
             {
                 //get Google token
                 HTTPSSource source = (HTTPSSource)job.DataSource;
-                string accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.Tokens.FirstOrDefault());
+                string accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.GetActiveTokens().FirstOrDefault());
                 Logger.Info($"Google BigQuery Retriever Job access token retrieved - Job: {job.Id}");
 
                 using (HttpClient httpClient = _httpClientGenerator.GenerateHttpClient(job.DataSource.BaseUri.ToString()))
@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
                             }
 
                             //refresh token if expired
-                            accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.Tokens.FirstOrDefault());
+                            accessToken = _authorizationProvider.GetOAuthAccessToken(source, source.GetActiveTokens().FirstOrDefault());
                             httpClient.DefaultRequestHeaders.Clear();
                             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
                         }

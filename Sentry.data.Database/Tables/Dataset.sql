@@ -21,7 +21,6 @@
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
-    [SaidKeyCode] VARCHAR(10) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
     [Asset_ID] INT NULL, 
