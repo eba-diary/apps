@@ -584,7 +584,8 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
-            //schema=EXISTING; dto=NEW; SETTER
+            changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
+
             SchemaParquetUpdate(schema, dto, changes, whatPropertiesChanged);
 
             if (changes.Any(x => x))

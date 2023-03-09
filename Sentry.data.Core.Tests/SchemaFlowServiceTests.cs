@@ -259,7 +259,7 @@ namespace Sentry.data.Core.Tests
                 CreateDateTime = new DateTime(2023, 3, 1),
                 UpdateDateTime = new DateTime(2023, 3, 3)
             };
-            schemaService.Setup(x => x.UpdateSchemaAsync(updateDto.SchemaDto, schema)).ReturnsAsync(resultFileSchemaDto);
+            schemaService.Setup(x => x.UpdateSchemaAsync(updateDto.SchemaDto, schema)).ReturnsAsync(resultFileSchemaDto).Callback(() => schema.CreateCurrentView = updateDto.SchemaDto.CreateCurrentView);
             schemaService.Setup(x => x.GenerateConsumptionLayerEvents(schema, It.Is<JObject>(j => j["createcurrentview"].Value<bool>())));
 
             DatasetFileConfig fileConfig = new DatasetFileConfig
