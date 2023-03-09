@@ -592,6 +592,9 @@
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\Migration\MigrationHistoryDetailModel.cs" />
+    <Compile Include="Models\Migration\MigrationHistoryPageModel.cs" />
+    <Compile Include="Models\Migration\MigrationHistoryModel.cs" />
     <Compile Include="Models\Migration\MigrationRequestModel.cs" />
     <Compile Include="Models\Migration\MigrationResponseModel.cs" />
     <Compile Include="Models\Search\TileSearchModel.cs" />
@@ -814,6 +817,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\MigrationHistory.js" />
     <Content Include="js\Shared\Images.js" />
     <Content Include="js\Shared\Tags.js" />
     <Content Include="js\MigrationRequest.js" />
@@ -1156,6 +1160,7 @@
     <Content Include="Views\Search\FilterShowAll.cshtml" />
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
     <Content Include="Views\Migration\_NamedEnvironment.cshtml" />
+    <Content Include="Views\Migration\_MigrationHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
