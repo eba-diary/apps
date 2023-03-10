@@ -9,7 +9,7 @@ BEGIN TRY
 
     -- get list if unique said key codes already being used
     IF OBJECT_ID('tempdb..#UniqueSaidKeys') IS NOT NULL DROP TABLE #UniqueSaidKeys
-    select distinct SaidKeyCode into #UniqueSaidKeys from Dataset
+    -- select distinct SaidKeyCode into #UniqueSaidKeys from Dataset
     -- generate a new GUID for each SAID key code
     IF OBJECT_ID('tempdb..#SecurityEntries') IS NOT NULL DROP TABLE #SecurityEntries
     select SaidKeyCode, NEWID() AS Security_ID into #SecurityEntries from #UniqueSaidKeys
@@ -28,12 +28,6 @@ BEGIN TRY
                ([SaidKey_CDE]
                ,[Security_ID])
     SELECT SaidKeyCode, Security_ID FROM #SecurityEntries
-
-    -- UPDATE the FK on the Dataset table
-    UPDATE d
-    SET Asset_ID = da.Asset_ID
-    FROM Dataset d
-    join Asset da on d.SaidKeyCode = da.SaidKey_CDE
 
     -- END POST-DEPLOY SCRIPT --
     INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 

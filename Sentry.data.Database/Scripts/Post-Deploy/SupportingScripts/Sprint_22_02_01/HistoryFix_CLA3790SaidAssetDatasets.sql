@@ -31,12 +31,6 @@ BEGIN TRY
 	insert into #DatasetsFromSpreadsheet select 116,	'NAME'
 
 
-
-	Update Dataset
-	SET SaidKeyCode = x.SaidAsset
-	from #DatasetsFromSpreadsheet x
-	where Dataset_ID = x.DatasetID
-
     END
 
 
