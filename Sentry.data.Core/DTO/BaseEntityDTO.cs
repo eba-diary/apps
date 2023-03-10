@@ -4,9 +4,8 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
-    public class BaseEntityDto
+    public class BaseEntityDto : IIdentifiableDto
     {
-
         public int DatasetId { get; set; }
         public string DatasetName { get; set; }
         public string DatasetDesc { get; set; }
@@ -29,7 +28,6 @@ namespace Sentry.data.Core
         public List<ImageDto> Images { get; set; }
         public string AlternateContactEmail { get; set; }
 
-
         //shared details
         public string ObjectType { get; set; } //probably not needed now that everything is split.
         public bool IsSubscribed { get; set; }
@@ -43,5 +41,9 @@ namespace Sentry.data.Core
         public UserSecurity Security { get; set; }
         public ObjectStatusEnum ObjectStatus { get; set; }
 
+        public void SetId(int id)
+        {
+            DatasetId = id;
+        }
     }
 }

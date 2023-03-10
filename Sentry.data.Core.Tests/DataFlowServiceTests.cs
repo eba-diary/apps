@@ -1772,8 +1772,6 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(1, testFlow.Count);
         }
 
-
-
         [TestCategory("Core DataFlowService")]
         [TestMethod]
         public void Get_DataFlowDetailDto_Where_Status_is_Disabled()
@@ -1863,9 +1861,6 @@ namespace Sentry.data.Core.Tests
             // DataFlowDetailDto object mapped from the active object status DataFlow
             Assert.AreEqual(1, testFlow.Count);
         }
-
-
-
 
         [TestMethod]
         public void GetDataFlowByTopicNameOnlyOneMatches()

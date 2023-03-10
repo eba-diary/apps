@@ -13,6 +13,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -22,28 +24,24 @@ namespace Sentry.data.Core
         public readonly IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
-        private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly Helpers.DscEventTopicHelper _dscEventTopicHelper;
+        private readonly IDscEventTopicHelper _dscEventTopicHelper;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
-        public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
+        public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
             IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient,
-            Helpers.DscEventTopicHelper dscEventTopicHelper)
+            IEventService eventService, IElasticContext elasticContext, IDscEventTopicHelper dscEventTopicHelper)
         {
             _datasetContext = dsContext;
             _userService = userService;
-            _emailService = emailService;
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
@@ -52,7 +50,6 @@ namespace Sentry.data.Core
             _snowProvider = snowProvider;
             _eventService = eventService;
             _elasticContext = elasticContext;
-            _backgroundJobClient = backgroundJobClient;
             _dscEventTopicHelper = dscEventTopicHelper;
         }
 
@@ -66,6 +63,13 @@ namespace Sentry.data.Core
                 }
                 return _bucket;
             }
+        }
+
+        public Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto)
+        {
+            FileSchema schema = MapToFileSchema(dto);
+            FileSchemaDto resultDto = MapToDto(schema);
+            return Task.FromResult(resultDto);
         }
 
         public int Create(FileSchemaDto dto)
@@ -339,6 +343,22 @@ namespace Sentry.data.Core
             return true;
         }
 
+        public Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema)
+        {
+            //Uses name in ControlMTrigger comparison, name is immutable
+            dto.Name = schema.Name;
+
+            //Only change delimiter when file type is changing
+            if (string.IsNullOrWhiteSpace(dto.FileExtensionName) && string.IsNullOrEmpty(dto.Delimiter))
+            {
+                dto.Delimiter = schema.Delimiter;
+            }
+
+            UpdateSchema(dto, schema);
+            FileSchemaDto resultDto = MapToDto(schema);
+            return Task.FromResult(resultDto);
+        }
+
         private string GetDSCEventTopic(int datasetId)
         {
             string topicName;
@@ -400,14 +420,14 @@ namespace Sentry.data.Core
             return (schemaId, (schemaId != 0));
         }
 
-        private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
+        public void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
             /*Generate *-CREATE-TABLE-REQUESTED event when:
             *  - CreateCurrentView changes
             */
             if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
-                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).Take(1).FirstOrDefault();
+                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
                 GenerateConsumptionLayerCreateEvent(latestRevision, propertyDeltaList);
             }
         }
@@ -525,7 +545,7 @@ namespace Sentry.data.Core
         /// <returns> Returns list of properties that have changed.</returns>
         internal JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
-            IList<bool> changes = new List<bool>();
+            List<bool> changes = new List<bool>();
             JObject whatPropertiesChanged = new JObject();
 
             changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
@@ -536,9 +556,19 @@ namespace Sentry.data.Core
                             whatPropertiesChanged.Add("createcurrentview", x.ToString().ToLower());
                        }));
 
-            changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+            {
+                changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
+            }
 
-            changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+            if (dto.FileExtensionId > 0)
+            {
+                changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.FileExtensionName))
+            {
+                changes.Add(TryUpdate(() => schema.Extension.Name, () => dto.FileExtensionName, (x) => schema.Extension = _datasetContext.FileExtensions.First(f => f.Name.ToLower() == dto.FileExtensionName.ToLower())));
+            }
 
             changes.Add(TryUpdate(() => schema.HasHeader, () => dto.HasHeader, (x) => schema.HasHeader = x));
 
@@ -554,13 +584,24 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
-            //schema=EXISTING; dto=NEW; SETTER
             changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
 
+            SchemaParquetUpdate(schema, dto, changes, whatPropertiesChanged);
 
+            if (changes.Any(x => x))
+            {
+                schema.LastUpdatedDTM = DateTime.Now;
+                schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
+            }
+
+            return whatPropertiesChanged;
+        }
+
+        private void SchemaParquetUpdate(FileSchema schema, FileSchemaDto dto, List<bool> changes, JObject whatPropertiesChanged)
+        {
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
-                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
                     (x) =>
                     {
                         schema.ParquetStorageBucket = x;
@@ -592,14 +633,6 @@ namespace Sentry.data.Core
                     }
                 }
             }
-
-            if (changes.Any(x => x))
-            {
-                schema.LastUpdatedDTM = DateTime.Now;
-                schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
-            }
-
-            return whatPropertiesChanged;
         }
 
         private string GetControlMTrigger(FileSchemaDto dto)
@@ -611,9 +644,9 @@ namespace Sentry.data.Core
                 Regex reg = new Regex("[^a-zA-Z0-9]");
                 string namedEnvironmentCleaned = reg.Replace((ds.NamedEnvironment != null)? ds.NamedEnvironment.ToUpper() : String.Empty,String.Empty);
                 string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
-                string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
+                string schemaNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
 
-                                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
+                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{schemaNameCleaned}_COMPLETED";
             }
             
             return controlMTriggerName;
@@ -1102,7 +1135,7 @@ namespace Sentry.data.Core
                 Extension = GetSchemaFileExtension(dto),
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
+                SasLibrary = CommonExtensions.GenerateSASLibaryName(parentDataset),
                 Description = dto.Description,
                 StorageCode = storageCode,
                 HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
@@ -1122,7 +1155,7 @@ namespace Sentry.data.Core
                 SchemaRootPath = dto.SchemaRootPath,
                 ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName(), parentDataset.NamedEnvironmentType),
                 ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
-                ControlMTriggerName = GetControlMTrigger(dto),
+                ControlMTriggerName = GetControlMTrigger(dto)
             };
             
             schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);           
@@ -1156,6 +1189,7 @@ namespace Sentry.data.Core
                 CreateCurrentView = scm.CreateCurrentView,
                 Delimiter = scm.Delimiter,
                 FileExtensionId = scm.Extension.Id,
+                FileExtensionName = scm.Extension.Name,
                 HasHeader = scm.HasHeader,
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
@@ -1172,7 +1206,6 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtensionName = scm.Extension.Name,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
@@ -1182,9 +1215,10 @@ namespace Sentry.data.Core
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
                 ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
-                ControlMTriggerName = scm.ControlMTriggerName
+                ControlMTriggerName = scm.ControlMTriggerName,
+                CreateDateTime = scm.CreatedDTM,
+                UpdateDateTime = scm.LastUpdatedDTM
             };
-
         }
 
         private string FormatHiveTableNamePart(string part)

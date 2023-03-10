@@ -9,5 +9,6 @@ namespace Sentry.data.Core.Interfaces
         Task<SAIDAsset> GetAssetByKeyCodeAsync(string keyCode);
         Task<List<SAIDAsset>> GetAllAssetsAsync();
         Task<List<SAIDRole>> GetAllProdCustByKeyCodeAsync(string keyCode);
+        Task<bool> VerifyAssetExistsAsync(string keyCode);
     }
 }
