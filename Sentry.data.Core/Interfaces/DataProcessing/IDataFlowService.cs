@@ -26,6 +26,7 @@ namespace Sentry.data.Core
         List<DataFlowDetailDto> GetDataFlowDetailDtoByTopicName(string topicName);
 
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
+        Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto);
         /// <summary>
         /// Creates a Dataflow Entity object and adds it to domain context.
         /// <para>Domain context changes are not saved.</para>
@@ -133,10 +134,8 @@ namespace Sentry.data.Core
         /// <param name="dataflowId"></param>
         /// <returns></returns>
         string GetSecurityGroup(int dataflowId);
-
-
+        Task<DataFlowDto> UpdateDataFlowAsync(DataFlowDto dto, DataFlow dataFlow);
         int UpdateDataFlow(DataFlowDto dfDto);
-
         void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status);
     }
 }

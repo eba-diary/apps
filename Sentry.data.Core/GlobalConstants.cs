@@ -16,6 +16,7 @@ namespace Sentry.data.Core
             public const string TEST = "TEST";
             public const string QUAL = "QUAL";
             public const string PROD = "PROD";
+            public const string NONPROD_SUFFIX = "NP";
         }
 
         public static class ValidationErrors
@@ -597,6 +598,13 @@ namespace Sentry.data.Core
         {
             public const string ENCRYPTIONINDICATOR = "<--!-->";
             public const string REQUESTVARIABLEINDICATOR = "~[{0}]~";
+        }
+
+
+        public static class MigrationHistory
+        {
+            public const string TYPE_DATASET = "Dataset";
+            public const string TYPE_SCHEMA = "Schema";
         }
     }
 }

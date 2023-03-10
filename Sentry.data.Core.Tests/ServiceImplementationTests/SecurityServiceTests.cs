@@ -2024,8 +2024,21 @@ namespace Sentry.data.Core.Tests
 
         #endregion
 
+        #region AdSecurityGroupDto
+
+        [TestMethod]
+        public void GetGroupName()
+        {
+            AdSecurityGroupDto adDto = AdSecurityGroupDto.NewDatasetGroup("DATA", "SHORTDSNAME", AdSecurityGroupType.Cnsmr, AdSecurityGroupEnvironmentType.P);
+
+            string groupName = adDto.GetGroupName();
+
+            Assert.AreEqual("DS_DATA_SHORTDSNAME_Cnsmr_D", groupName);
+        }
+        #endregion
+
         #region "Private helpers"
-        
+
 
         private Security BuildBaseSecurity(string CreateById = null, string securableEntityName = SecurableEntityName.DATASET)
         {

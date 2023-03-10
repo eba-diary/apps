@@ -331,12 +331,6 @@ namespace Sentry.data.Core
             try
             {
                 datasetFileConfig = CreateDatasetFileConfig(dto);
-
-                Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-                List<DatasetFileConfig> datasetFileConfigList = (parentDataset.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parentDataset.DatasetFileConfigs.ToList();
-                datasetFileConfigList.Add(datasetFileConfig);
-                _datasetContext.Add(datasetFileConfig);
-                parentDataset.DatasetFileConfigs = datasetFileConfigList;
             }
             catch (Exception ex)
             {
@@ -351,15 +345,7 @@ namespace Sentry.data.Core
         {
             try
             {
-                DatasetFileConfig dfc = CreateDatasetFileConfig(dto);
-
-                Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-                List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
-                dfcList.Add(dfc);
-                _datasetContext.Add(dfc);
-                parent.DatasetFileConfigs = dfcList;
-
-                //_datasetContext.Merge(parent);
+                CreateDatasetFileConfig(dto);
                 _datasetContext.SaveChanges();
 
                 return true;
@@ -387,12 +373,20 @@ namespace Sentry.data.Core
             }
         }
 
-        private void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig dfc)
+        public void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig fileConfig)
         {
-            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
-            dfc.FileTypeId = dto.FileTypeId;
-            dfc.Description = dto.Description;
-            dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+            if (dto.DatasetScopeTypeId > 0)
+            {
+                fileConfig.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.DatasetScopeTypeName))
+            {
+                fileConfig.DatasetScopeType = _datasetContext.DatasetScopeTypes.FirstOrDefault(x => x.Name.ToLower() == dto.DatasetScopeTypeName.ToLower());
+            }
+
+            fileConfig.FileTypeId = dto.FileTypeId;
+            fileConfig.Description = dto.Description;
+            fileConfig.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
@@ -403,11 +397,7 @@ namespace Sentry.data.Core
 
             if (us.CanPreviewDataset || us.CanViewFullDataset)
             {
-                DatasetFileConfigDto dto = new DatasetFileConfigDto();
-                MapToDatasetFileConfigDto(dfc, dto);
-                dto.HasDataFlow = _datasetContext.DataFlow.Any(df => df.DatasetId == dfc.ParentDataset.DatasetId && 
-                                                                     df.SchemaId == dfc.Schema.SchemaId && 
-                                                                     df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+                DatasetFileConfigDto dto = MapToDatasetFileConfigDto(dfc);
                 return dto;
             }
 
@@ -464,21 +454,33 @@ namespace Sentry.data.Core
 
         private DatasetFileConfig CreateDatasetFileConfig(DatasetFileConfigDto dto)
         {
-            DatasetFileConfig dfc = new DatasetFileConfig()
+            DatasetFileConfig dfc = new DatasetFileConfig
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 FileTypeId = dto.FileTypeId,
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
-                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                //Schemas = deList,
                 ObjectStatus = dto.ObjectStatus,
                 DeleteIssuer = null,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                IsSchemaTracked = true,
+                Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId)
             };
-            dfc.IsSchemaTracked = true;
-            dfc.Schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
+
+            if (!string.IsNullOrEmpty(dto.DatasetScopeTypeName))
+            {
+                dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.FirstOrDefault(x => x.Name.ToLower() == dto.DatasetScopeTypeName.ToLower());
+            }
+            else
+            {
+                dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+            } 
+
+            List<DatasetFileConfig> datasetFileConfigList = (dfc.ParentDataset.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : dfc.ParentDataset.DatasetFileConfigs.ToList();
+            datasetFileConfigList.Add(dfc);
+            _datasetContext.Add(dfc);
+            dfc.ParentDataset.DatasetFileConfigs = datasetFileConfigList;
 
             return dfc;
         }
@@ -1476,36 +1478,42 @@ namespace Sentry.data.Core
             }
         }
 
-        private void MapToDatasetFileConfigDto(DatasetFileConfig dfc, DatasetFileConfigDto dto)
+        private DatasetFileConfigDto MapToDatasetFileConfigDto(DatasetFileConfig dfc)
         {
-            dto.ConfigId = dfc.ConfigId;
-            dto.Name = dfc.Schema.Name;
-            dto.Description = dfc.Schema.Description;
-            dto.DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId;
-            dto.FileExtensionId = dfc.Schema.Extension.Id;
-            dto.FileExtensionName = dfc.Schema.Extension.Name;
-            dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
-            dto.StorageCode = dfc.Schema.StorageCode;
-            dto.StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
-            dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-            dto.CreateCurrentView = (dfc.Schema != null) ? dfc.Schema.CreateCurrentView : false;
-            dto.Delimiter = dfc.Schema?.Delimiter;
-            dto.HasHeader = (dfc.Schema != null) ? dfc.Schema.HasHeader : false;
-            dto.IsTrackableSchema = dfc.IsSchemaTracked;
-            dto.HiveTable = dfc.Schema?.HiveTable;
-            dto.HiveDatabase = dfc.Schema?.HiveDatabase;
-            dto.HiveLocation = dfc.Schema?.HiveLocation;
-            dto.HiveTableStatus = dfc.Schema?.HiveTableStatus;
-            dto.Schema = (dfc.Schema != null) ? _schemaService.GetFileSchemaDto(dfc.Schema.SchemaId) : null;
-            dto.DeleteInd = dfc.DeleteInd;
-            dto.DeleteIssuer = dfc.DeleteIssuer;
-            dto.DeleteIssueDTM = dfc.DeleteIssueDTM;
-            dto.ObjectStatus = dfc.ObjectStatus;
-            dto.SchemaRootPath = dfc.Schema?.SchemaRootPath;
-            dto.ParquetStorageBucket = dfc.Schema?.ParquetStorageBucket;
-            dto.ParquetStoragePrefix = dfc.Schema?.ParquetStoragePrefix;
-            dto.ConsumptionDetails = dfc.Schema?.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList();
-            dto.ControlMTriggerName = dfc.Schema?.ControlMTriggerName;
+            return new DatasetFileConfigDto
+            {
+                ConfigId = dfc.ConfigId,
+                Name = dfc.Schema.Name,
+                Description = dfc.Schema.Description,
+                DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId,
+                FileExtensionId = dfc.Schema.Extension.Id,
+                FileExtensionName = dfc.Schema.Extension.Name,
+                ParentDatasetId = dfc.ParentDataset.DatasetId,
+                StorageCode = dfc.Schema.StorageCode,
+                StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\",
+                Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser()),
+                CreateCurrentView = dfc.Schema != null && dfc.Schema.CreateCurrentView,
+                Delimiter = dfc.Schema?.Delimiter,
+                HasHeader = dfc.Schema != null && dfc.Schema.HasHeader,
+                IsTrackableSchema = dfc.IsSchemaTracked,
+                HiveTable = dfc.Schema?.HiveTable,
+                HiveDatabase = dfc.Schema?.HiveDatabase,
+                HiveLocation = dfc.Schema?.HiveLocation,
+                HiveTableStatus = dfc.Schema?.HiveTableStatus,
+                Schema = (dfc.Schema != null) ? _schemaService.GetFileSchemaDto(dfc.Schema.SchemaId) : null,
+                DeleteInd = dfc.DeleteInd,
+                DeleteIssuer = dfc.DeleteIssuer,
+                DeleteIssueDTM = dfc.DeleteIssueDTM,
+                ObjectStatus = dfc.ObjectStatus,
+                SchemaRootPath = dfc.Schema?.SchemaRootPath,
+                ParquetStorageBucket = dfc.Schema?.ParquetStorageBucket,
+                ParquetStoragePrefix = dfc.Schema?.ParquetStoragePrefix,
+                ConsumptionDetails = dfc.Schema?.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
+                ControlMTriggerName = dfc.Schema?.ControlMTriggerName,
+                HasDataFlow = _datasetContext.DataFlow.Any(df => df.DatasetId == dfc.ParentDataset.DatasetId &&
+                                                                     df.SchemaId == dfc.Schema.SchemaId &&
+                                                                     df.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active)
+            };
         }
 
         public Tuple<List<RetrieverJob>, List<DataFlowStepDto>> GetDataFlowDropLocationJobs(DatasetFileConfig config)

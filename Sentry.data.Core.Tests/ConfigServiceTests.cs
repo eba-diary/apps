@@ -6,6 +6,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 using static System.Net.WebRequestMethods;
@@ -778,6 +779,47 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("token.scope", dataSourceToken.Scope);
 
             mock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateDatasetFileConfig_DatasetFileConfigDto_Update()
+        {
+            DatasetFileConfigDto dto = new DatasetFileConfigDto
+            {
+                DatasetScopeTypeName = "Appending",
+                Description = "Description 2",
+                FileExtensionId = 2
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                DatasetScopeType = new DatasetScopeType { Name = "Floating" },
+                Description = "Description",
+                FileExtension = new FileExtension { Id = 1 }
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            List<DatasetScopeType> scopes = new List<DatasetScopeType>
+            {
+                new DatasetScopeType { Name = "Appending" }
+            };
+            datasetContext.SetupGet(x => x.DatasetScopeTypes).Returns(scopes.AsQueryable());
+
+            FileExtension fileType = new FileExtension { Id = 2 };
+            datasetContext.Setup(x => x.GetById<FileExtension>(2)).Returns(fileType);
+
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null);
+
+            configService.UpdateDatasetFileConfig(dto, fileConfig);
+
+            Assert.AreEqual(scopes.First(), fileConfig.DatasetScopeType);
+            Assert.AreEqual(0, fileConfig.FileTypeId);
+            Assert.AreEqual("Description 2", fileConfig.Description);
+            Assert.AreEqual(fileType, fileConfig.FileExtension);
+
+            mr.VerifyAll();
         }
     }
 }

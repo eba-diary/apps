@@ -1,8 +1,12 @@
-﻿using Sentry.Common.Logging;
+﻿using AutoMapper;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
+using Sentry.data.Web.API;
 using StackExchange.Profiling;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -26,7 +30,6 @@ namespace Sentry.data.Web
             AreaRegistration.RegisterAllAreas();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            //WebApiConfig.Register(GlobalConfiguration.Configuration);
 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -39,17 +42,20 @@ namespace Sentry.data.Web
             //MVC dependency resolver
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);
 
+            //register all mapping profiles
+            IMapper mapper = AutoMapperHelper.InitMapper();
 
-            var registry = new StructureMap.Registry();
-            registry.Scan((scanner) =>
-            {
-                scanner.TheCallingAssembly();
-                scanner.WithDefaultConventions();
-                scanner.With(new ControllerConvention());
-            });
             Bootstrapper.Container.Configure((x) =>
             {
-                x.AddRegistry(registry);
+                x.Scan((s) =>
+                {
+                    s.TheCallingAssembly();
+                    s.WithDefaultConventions();
+                    s.With(new ControllerConvention());
+                    s.AddAllTypesOf<IRequestModelValidator>(); //register all validators
+                });
+
+                x.For<IMapper>().Use(mapper);
                 x.For<ICurrentUserIdProvider>().Use<WebCurrentUserIdProvider>();
             });
 
@@ -58,12 +64,9 @@ namespace Sentry.data.Web
             //WebApi dependency resolver
             GlobalConfiguration.Configuration.DependencyResolver = new StructureMapWebApiDependencyResolver(Bootstrapper.Container);
 
-            //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-
             //Remove this when CLA3819_EgressEdgeMigration is removed
             //Remove implemenation 
             SentryProxy.UseEdgeProxy = _structureMapDependencyResolver.CurrentNestedContainer.GetInstance<IDataFeatures>().CLA3819_EgressEdgeMigration.GetValue();
-            //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
         }
 
 

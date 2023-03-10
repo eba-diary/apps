@@ -8,7 +8,8 @@
 									(3, 'Deleted', 'Not visible in UI, all jobs and dataflows are disabled'),
 									(4, 'Disabled', 'Temporarily disabled, no activity will occur for object, disabled in UI'),
 									(5, 'Pending Delete Failure', 'Pending delete failure awaiting resolution, not editiable, no activity will occur for object, disabled in UI'),
-									(6, 'Pending Copy', 'Pending copy of the source object to either Raw or Raw Query location')
+									(6, 'Pending Copy', 'Pending copy of the source object to either Raw or Raw Query location'),
+									(7, 'Pending Copy Faulure', 'Pending copy failure awaiting for resolution, not downloadable')
 								)
 								AS Source ([ObjectStatus_Id], [ObjectStatus_CDE], [ObjectStatus_DSC]) 
 

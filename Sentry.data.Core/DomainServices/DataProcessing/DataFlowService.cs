@@ -1,12 +1,15 @@
 ﻿using Hangfire;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -294,6 +297,18 @@ namespace Sentry.data.Core
             return jobIdList;
         }
 
+        public Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
+        {
+            dto.CreatedBy = _userService.GetCurrentUser().AssociateId;
+
+            DataFlow dataFlow = CreateAndSaveDataFlow(dto);
+
+            DataFlowDto resultDto = new DataFlowDto();
+            MapToDto(dataFlow, resultDto);
+
+            return Task.FromResult(resultDto);
+        }
+
         public DataFlow Create(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Create).ToLower()}";
@@ -366,6 +381,106 @@ namespace Sentry.data.Core
             }
         }
 
+        public async Task<DataFlowDto> UpdateDataFlowAsync(DataFlowDto dto, DataFlow dataFlow)
+        {
+            //immutable properties that must keep original value
+            dto.Id = dataFlow.Id;
+            dto.SaidKeyCode = dataFlow.SaidKeyCode;
+            dto.NamedEnvironment = dataFlow.NamedEnvironment;
+            dto.NamedEnvironmentType = dataFlow.NamedEnvironmentType;
+            dto.ObjectStatus = dataFlow.ObjectStatus;
+            dto.DatasetId = dataFlow.DatasetId;
+            dto.Name = dataFlow.Name;
+            dto.IsSecured = dataFlow.IsSecured;
+            dto.SchemaMap = new List<SchemaMapDto>
+            {
+                new SchemaMapDto { DatasetId = dataFlow.DatasetId, SchemaId = dataFlow.SchemaId }
+            };
+
+            //only update data flow if any of the data flow properties are different or data flow steps need to be updated
+            if (DataFlowHasUpdates(dto, dataFlow) || dto.DataFlowStepUpdateRequired)
+            {
+                //make sure dto properties are set with updated properties
+                //in some cases a null value means not to update the property
+                SetUnchangedProperties(dto, dataFlow);
+
+                //delete and create new dataflow
+                Delete(dto.Id, _userService.GetCurrentUser(), false);
+                return await AddDataFlowAsync(dto);
+            }
+            else
+            {
+                //return data flow as is
+                DataFlowDto resultDto = new DataFlowDto();
+                MapToDto(dataFlow, resultDto);
+
+                return resultDto;
+            }
+        }
+
+        private bool DataFlowHasUpdates(DataFlowDto dto, DataFlow dataFlow)
+        {
+            //broken out into individual IF statement for readability
+            if (dto.IngestionType > 0)
+            {
+                //ingestion type is populated and different
+                if (dto.IngestionType != dataFlow.IngestionType)
+                {
+                    return true;
+                }
+                //ingestion type is topic and topic name is different
+                else if (dto.IngestionType == (int)IngestionType.Topic && dto.TopicName != dataFlow.TopicName)
+                {
+                    return true;
+                }
+            }
+
+            //contact id is populated and different
+            if (!string.IsNullOrWhiteSpace(dto.PrimaryContactId) && dto.PrimaryContactId != dataFlow.PrimaryContactId)
+            {
+                return true;
+            }
+
+            //is compressed is different
+            if (dto.IsCompressed != dataFlow.IsDecompressionRequired)
+            {
+                return true;
+            }
+            //different compression option
+            else if (dto.IsCompressed && dto.CompressionType != dataFlow.CompressionType)
+            {
+                return true;
+            }
+
+            //is preprocessing different
+            if (dto.IsPreProcessingRequired != dataFlow.IsPreProcessingRequired)
+            {
+                return true;
+            }
+            //different preprocessing option
+            else if (dto.IsPreProcessingRequired && dto.PreProcessingOption != dataFlow.PreProcessingOption)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void SetUnchangedProperties(DataFlowDto dto, DataFlow dataFlow)
+        {
+            //keep original ingestion type because no new value was provided
+            if (dto.IngestionType == 0)
+            {
+                dto.IngestionType = dataFlow.IngestionType;
+            }
+
+            //keep original contact because no new value was provided
+            if (string.IsNullOrWhiteSpace(dto.PrimaryContactId) && dto.PrimaryContactId != dataFlow.PrimaryContactId)
+            {
+                dto.PrimaryContactId = dataFlow.PrimaryContactId;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -392,7 +507,6 @@ namespace Sentry.data.Core
 
             return newDataFlow.Id;
         }
-
 
         public void EnableOrDisableDataFlow(int dataFlowId, ObjectStatusEnum status)
         {
@@ -940,17 +1054,17 @@ namespace Sentry.data.Core
                 SchemaId = dto.SchemaMap.First().SchemaId,
 
                 //ONLY SET IF IngestionType.Topic
-                TopicName =         (dto.IngestionType == (int)IngestionType.Topic) ? dto.TopicName             : null,
-                S3ConnectorName =   (dto.IngestionType == (int)IngestionType.Topic) ? GetS3ConnectorName(dto)   : null
+                TopicName = (dto.IngestionType == (int)IngestionType.Topic) ? dto.TopicName : null,
+                S3ConnectorName = (dto.IngestionType == (int)IngestionType.Topic) ? GetS3ConnectorName(dto) : null,
+                FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault(),
+                //All dataflows get a Security entry regardless
+                //  this allows security process for internally managed permissions
+                //  (i.e. CanManageDataflow)
+                Security = (dto.Id == 0)
+                            ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
+                            : _datasetContext.GetById<DataFlow>(dto.Id).Security
             };
 
-            df.FlowStorageCode = _datasetContext.FileSchema.Where(x => x.SchemaId == dto.SchemaMap.First().SchemaId).Select(s => s.StorageCode).FirstOrDefault();
-            //All dataflows get a Security entry regardless
-            //  this allows security process for internally managed permissions
-            //  (i.e. CanManageDataflow)
-            df.Security = (dto.Id == 0)
-                            ? new Security(GlobalConstants.SecurableEntityName.DATAFLOW) { CreatedById = _userService.GetCurrentUser().AssociateId }
-                            : _datasetContext.GetById<DataFlow>(dto.Id).Security;
             _datasetContext.Add(df);
 
             Logger.Info($"MapToDataFlow Method End");
@@ -1173,7 +1287,6 @@ namespace Sentry.data.Core
             dto.CompressionType = df.CompressionType;
             dto.IsPreProcessingRequired = df.IsPreProcessingRequired;
             dto.PreProcessingOption = df.PreProcessingOption;
-            dto.SaidKeyCode = df.SaidKeyCode;
             dto.NamedEnvironment = df.NamedEnvironment;
             dto.NamedEnvironmentType = df.NamedEnvironmentType;
             dto.PrimaryContactId = df.PrimaryContactId;

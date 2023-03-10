@@ -1277,7 +1277,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { datasetFileConfig_1, datasetFileConfig_2 }.AsQueryable());
 
-            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             (int, bool) result_Exists = schemaService.SchemaExistsInTargetDataset(1, "MySchema");
@@ -1311,8 +1311,8 @@ namespace Sentry.data.Core.Tests
             DataApplicationService dataApplicationService = new DataApplicationService(context.Object, null, null, null, null, null, null, null, null, null, lazyQuartermasterService);
 
             //Act
-            bool relatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset(1, "QUAL");
-            bool notRelatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset(1, "PROD");
+            bool relatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset("ABCD", "QUAL", NamedEnvironmentType.NonProd);
+            bool notRelatedRequest = await dataApplicationService.IsNamedEnvironmentRelatedToSaidAsset("ABCD", "PROD", NamedEnvironmentType.NonProd);
 
             //Assert
             Assert.IsTrue(relatedRequest);
@@ -1365,6 +1365,22 @@ namespace Sentry.data.Core.Tests
         {
             //Arrange
             DatasetMigrationRequest request = new DatasetMigrationRequest() { TargetDatasetNamedEnvironment = "string"};
+
+            DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
+
+            //Act
+            List<string> errors = await dataApplicationService.ValidateMigrationRequest(request);
+
+            //Assert
+            Assert.IsTrue(errors.Any());
+            Assert.IsTrue(errors.Contains("Named environment must be alphanumeric, all caps, and less than 10 characters"));
+        }
+
+        [TestMethod]
+        public async Task ValidationMigraqtionRequest_NonProd_Migrate_To_Prod()
+        {
+            //Arrange
+            DatasetMigrationRequest request = new DatasetMigrationRequest() { TargetDatasetNamedEnvironment = "string" };
 
             DataApplicationService dataApplicationService = new DataApplicationService(null, null, null, null, null, null, null, null, null, null, null);
 

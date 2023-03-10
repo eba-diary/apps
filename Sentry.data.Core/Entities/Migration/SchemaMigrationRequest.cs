@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class SchemaMigrationRequest : MigrationRequest
+    public class SchemaMigrationRequest : BaseMigrationRequest
     {
         public int SourceSchemaId { get; set; }
         public string TargetDataFlowNamedEnvironment { get; set; }

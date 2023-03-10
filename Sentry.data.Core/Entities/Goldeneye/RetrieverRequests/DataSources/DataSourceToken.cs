@@ -30,6 +30,8 @@ namespace Sentry.data.Core
 
         public virtual string Scope { get; set; }
 
+        public virtual string ForeignId { get; set; }
+
         public virtual IList<OAuthClaim> Claims { get; set; }
 
         public virtual bool Enabled { get; set; }
