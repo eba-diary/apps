@@ -186,11 +186,25 @@ namespace Sentry.data.Core
             public const string COMPLETED = "Completed";
             public const string DENIED = "Denied";
             public const string WITHDRAWN = "Withdrawn";
-            //hpsm
             public const string APPROVED = "approved";
-            public const string CLOSED = "closed";
-            public const string IMPLEMENTATION = "SI:STD:Implementation";
-            public const string LOG_AND_PREP = "SI:STD:Log and Prep";
+        }
+
+        public static class JsmAssignmentGroup
+        {
+            public const string BI_PORTAL_ADMIN = "BI Portal Administration";
+        }
+
+        public static class JsmChangeStatus
+        {
+            public const string REVIEW = "Review";
+            public const string INDIVIDUAL_AUTHORIZE = "Individual Authorize";
+            public const string GROUP_AUTHORIZE = "Group Authorize";
+            public const string AWAITING_IMPLEMENTATION = "Awaiting Implementation";
+            public const string IMPLEMENTING = "Implementing";
+            public const string COMPLETED = "Completed";
+            public const string CANCELED = "Canceled";
+            public const string DECLINED = "Declined";
+            public const string FAILED = "Failed";
         }
 
         public static class SecurableEntityName
