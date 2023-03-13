@@ -62,5 +62,18 @@ namespace Sentry.data.Core
 
             return dto;
         }
+
+        /// <summary>
+        /// Gets a list of DatasetFileDrop Ids associated with the DatasetFile object
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="context"></param>
+        /// <returns>
+        /// May return 1 to many id's for a given DatasetFile object
+        /// </returns>
+        public static List<int> GetDatasetFileDropIdListByDatasetFile(this DatasetFile file, IDatasetContext context)
+        {
+            return context.DatasetFileQuery.Where(w => w.DatasetID == file.Dataset.DatasetId && w.SchemaId == file.Schema.SchemaId && w.FileNME == file.OriginalFileName).Select(s => s.DatasetFileDrop).ToList();
+        }
     }
 }
