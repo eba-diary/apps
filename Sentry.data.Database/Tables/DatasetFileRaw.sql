@@ -14,5 +14,8 @@ CREATE TABLE [dbo].[DatasetFileRaw]
 	[DatasetID] [int] NULL,
 	[SchemaID] [int] NULL,
 	[UpdateDTM] [datetime] NULL,
-	[CreateDTM] [datetime] NULL
+	[CreateDTM] [datetime] NULL, 
+    CONSTRAINT [PK_DatasetFileRaw] PRIMARY KEY ([DatasetFileRawID]), 
+    CONSTRAINT [FK_DatasetFileRaw_DatasetFileDrop] FOREIGN KEY ([DatasetFileDropID]) REFERENCES [DatasetFileDrop]([DatasetFileDropId])
 )
+GO
