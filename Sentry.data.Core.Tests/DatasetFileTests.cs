@@ -39,6 +39,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_1 = new DatasetFileQuery()
             {
+                DatasetFileDrop = 33,
                 DatasetID = 99,
                 SchemaId = 222,
                 FileNME = "abc.txt"
@@ -59,7 +60,7 @@ namespace Sentry.data.Core.Tests
 
             //Assert
             Assert.AreEqual(1, fileIds.Count);
-            Assert.AreEqual(11, fileIds[0]);
+            Assert.AreEqual(33, fileIds[0]);
         }
 
         [TestMethod]
