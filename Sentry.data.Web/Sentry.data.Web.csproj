@@ -294,7 +294,7 @@
       <HintPath>..\packages\Sentry.Associates.Abstractions.2.0.2\lib\netstandard2.0\Sentry.Associates.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.ChangeManagement, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.ChangeManagement.1.0.4\lib\netstandard2.0\Sentry.ChangeManagement.dll</HintPath>
+      <HintPath>..\packages\Sentry.ChangeManagement.1.0.5\lib\netstandard2.0\Sentry.ChangeManagement.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Common.1.6.0\lib\net452\Sentry.Common.dll</HintPath>

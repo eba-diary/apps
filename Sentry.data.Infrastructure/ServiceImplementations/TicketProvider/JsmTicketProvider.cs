@@ -72,19 +72,15 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                //move ticket to a closed state depending on what the status is
-                //if pending, goes to cancelled
-                //if approved, goes to completed
-                //if denied or withdrawn, do nothing because these are "closed" statuses
-
-                //CloseChange takes care of phase being available
+                //if closing a ticket that is still pending, it's being cancelled
                 if (ticket.TicketStatus == ChangeTicketStatus.PENDING)
                 {
-                    await _changeManagementClient.CloseChange(ticket.TicketId, "Request cancelled", "cancelled");
+                    await _changeManagementClient.CloseChange(ticket.TicketId, "Request cancelled", CloseStatus.CANCELLED);
                 }
+                //if closeing a ticket that is approved, it's completed
                 else if (ticket.TicketStatus == ChangeTicketStatus.APPROVED)
                 {
-                    await _changeManagementClient.CloseChange(ticket.TicketId, "Request approved", "completed");
+                    await _changeManagementClient.CloseChange(ticket.TicketId, "Request approved", CloseStatus.COMPLETED);
                 }
             }
             catch (Exception ex)
@@ -96,27 +92,48 @@ namespace Sentry.data.Infrastructure
         #region Private
         private ChangeTicket MapToChangeTicketFrom(SentryChange sentryChange)
         {
-            return new ChangeTicket
+            switch (sentryChange.Status)
             {
-                ApprovedById = sentryChange.Approvers?.Any() == true ? sentryChange.Approvers.First().ApproverID : null,
-                TicketStatus = TranslateStatus(sentryChange.Status)
-            };
+                case JsmChangeStatus.AWAITING_IMPLEMENTATION:
+                case JsmChangeStatus.IMPLEMENTING:
+                case JsmChangeStatus.COMPLETED:
+
+                    return new ChangeTicket
+                    {
+                        ApprovedById = GetApprover(sentryChange),
+                        TicketStatus = ChangeTicketStatus.APPROVED
+                    };
+
+                case JsmChangeStatus.DECLINED:
+
+                    return new ChangeTicket
+                    {
+                        RejectedById = GetApprover(sentryChange),
+                        RejectedReason = "Approver declined",
+                        TicketStatus = ChangeTicketStatus.DENIED
+                    };
+
+                case JsmChangeStatus.CANCELED:
+                case JsmChangeStatus.FAILED:
+
+                    return new ChangeTicket
+                    {
+                        RejectedReason = "Ticket cancelled",
+                        TicketStatus = ChangeTicketStatus.DENIED
+                    };
+
+                default:
+
+                    return new ChangeTicket
+                    {
+                        TicketStatus = ChangeTicketStatus.PENDING
+                    };
+            }            
         }
 
-        private string TranslateStatus(string jsmStatus)
+        private string GetApprover(SentryChange sentryChange)
         {
-            switch (jsmStatus)
-            {
-                case JsmChangeStatus.REVIEW:
-                case JsmChangeStatus.INDIVIDUAL_AUTHORIZE:
-                    return ChangeTicketStatus.PENDING;
-                case JsmChangeStatus.DECLINED:
-                    return ChangeTicketStatus.DENIED;
-                case JsmChangeStatus.CANCELED:
-                    return ChangeTicketStatus.WITHDRAWN;
-                default:
-                    return ChangeTicketStatus.APPROVED;
-            }
+            return sentryChange.Approvers?.Any() == true ? sentryChange.Approvers.First().ApproverID : null;
         }
 
         private string GetChangeTitle(AccessRequest request)
