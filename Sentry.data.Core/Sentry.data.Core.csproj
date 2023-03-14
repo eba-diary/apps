@@ -405,6 +405,7 @@
     <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\DSCEventTopicHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
+    <Compile Include="Helpers\Markdown.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />
     <Compile Include="Helpers\Paginate\PageParameters.cs" />

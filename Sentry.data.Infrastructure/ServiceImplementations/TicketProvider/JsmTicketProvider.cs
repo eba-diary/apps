@@ -1,6 +1,7 @@
 ﻿using Sentry.ChangeManagement;
 using Sentry.ChangeManagement.Sentry;
 using Sentry.Common.Logging;
+using Sentry.Configuration;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace Sentry.data.Infrastructure
                 {
                     await _changeManagementClient.CloseChange(ticket.TicketId, "Request cancelled", CloseStatus.CANCELLED);
                 }
-                //if closeing a ticket that is approved, it's completed
+                //if closing a ticket that is approved, it's completed
                 else if (ticket.TicketStatus == ChangeTicketStatus.APPROVED)
                 {
                     await _changeManagementClient.CloseChange(ticket.TicketId, "Request approved", CloseStatus.COMPLETED);
@@ -92,43 +93,41 @@ namespace Sentry.data.Infrastructure
         #region Private
         private ChangeTicket MapToChangeTicketFrom(SentryChange sentryChange)
         {
+            ChangeTicket changeTicket = new ChangeTicket 
+            { 
+                TicketId = sentryChange.ChangeID
+            };
+
             switch (sentryChange.Status)
             {
                 case JsmChangeStatus.AWAITING_IMPLEMENTATION:
                 case JsmChangeStatus.IMPLEMENTING:
                 case JsmChangeStatus.COMPLETED:
 
-                    return new ChangeTicket
-                    {
-                        ApprovedById = GetApprover(sentryChange),
-                        TicketStatus = ChangeTicketStatus.APPROVED
-                    };
+                    changeTicket.ApprovedById = GetApprover(sentryChange);
+                    changeTicket.TicketStatus = ChangeTicketStatus.APPROVED;
+                    break;
 
                 case JsmChangeStatus.DECLINED:
 
-                    return new ChangeTicket
-                    {
-                        RejectedById = GetApprover(sentryChange),
-                        RejectedReason = "Approver declined",
-                        TicketStatus = ChangeTicketStatus.DENIED
-                    };
+                    changeTicket.RejectedById = GetApprover(sentryChange);
+                    changeTicket.RejectedReason = "Approver declined";
+                    changeTicket.TicketStatus = ChangeTicketStatus.DENIED;
+                    break;
 
                 case JsmChangeStatus.CANCELED:
                 case JsmChangeStatus.FAILED:
 
-                    return new ChangeTicket
-                    {
-                        RejectedReason = "Ticket cancelled",
-                        TicketStatus = ChangeTicketStatus.DENIED
-                    };
+                    changeTicket.RejectedReason = "Ticket cancelled";
+                    changeTicket.TicketStatus = ChangeTicketStatus.WITHDRAWN;
+                    break;
 
                 default:
-
-                    return new ChangeTicket
-                    {
-                        TicketStatus = ChangeTicketStatus.PENDING
-                    };
-            }            
+                    changeTicket.TicketStatus = ChangeTicketStatus.PENDING;
+                    break;
+            } 
+            
+            return changeTicket;
         }
 
         private string GetApprover(SentryChange sentryChange)
@@ -141,27 +140,113 @@ namespace Sentry.data.Infrastructure
             switch (request.Type)
             {
                 case AccessRequestType.AwsArn:
-                    return $"Access {(request.IsAddingPermission ? "" : "Removal")} Request for AWS ARN {request.AwsArn}";
+                    return $"Access {(request.IsAddingPermission ? "" : "Removal ")}request for AWS ARN {request.AwsArn}";
                 case AccessRequestType.SnowflakeAccount:
-                    return $"Access {(request.IsAddingPermission ? "" : "Removal")} Request for Snowflake Account {request.SnowflakeAccount}";
+                    return $"Access {(request.IsAddingPermission ? "" : "Removal ")}request for Snowflake Account {request.SnowflakeAccount}";
                 case AccessRequestType.Inheritance:
                     return $"Inheritance {(request.IsAddingPermission ? "enable" : "disable")} request for {request.SecurableObjectName}";
                 default:
                     if (request.AdGroupName != null)
                     {
-                        return $"Access Request for AD Group {request.AdGroupName}";
+                        return $"Access request for AD Group {request.AdGroupName}";
                     }
                     else
                     {
-                        return $"Access Request for user {request.PermissionForUserName}";
+                        return $"Access request for user {request.PermissionForUserName}";
                     }
             }
         }
 
         private string GetChangeDescription(AccessRequest request)
         {
-            //copy what is being created in CherwellProvider.BuildBodyByTemplate
-            throw new NotImplementedException();
+            Markdown markdown = new Markdown();
+
+            switch (request.Type)
+            {
+                case AccessRequestType.AwsArn:
+                    BuildAwsArnDescription(request, markdown);
+                    break;
+                case AccessRequestType.Inheritance:
+                    BuildInheritanceDescription(request, markdown);
+                    break;
+                case AccessRequestType.SnowflakeAccount:
+                    BuildSnowflakeAccountDescription(request, markdown);
+                    break;
+                default:
+                    BuildDefaultDescription(request, markdown);
+                    break;
+            }
+
+            markdown.AddList(request.Permissions);
+            markdown.AddBreak();
+            markdown.AddLine($"Business Reason: {request.BusinessReason}");
+            markdown.AddLine($"Requestor: {request.RequestorsId} - {request.RequestorsName}");
+            markdown.AddLine($"DSC Environment: {Config.GetHostSetting("WebApiUrl").Replace("http://", "")}");
+
+            return markdown.ToString();
+        }
+
+        private void BuildAwsArnDescription(AccessRequest request, Markdown markdown)
+        {
+            if (request.IsAddingPermission)
+            {
+                markdown.AddLine($"Please grant the AWS ARN {request.AwsArn} the following permissions to {GetAccessor(request)} data.");
+            }
+            else
+            {
+                markdown.AddLine($"Please remove the following permissions for the AWS ARN {request.AwsArn} from {GetAccessor(request)} data.");
+            }
+        }
+
+        private void BuildSnowflakeAccountDescription(AccessRequest request, Markdown markdown)
+        {
+            if (request.IsAddingPermission)
+            {
+                markdown.AddLine($"Please grant the Snowflake Account {request.SnowflakeAccount} the following permissions to {GetAccessor(request)} data.");
+            }
+            else
+            {
+                markdown.AddLine($"Please remove the following permissions for the Snowflake Account {request.SnowflakeAccount} from {GetAccessor(request)} data.");
+            }
+        }
+
+        private void BuildInheritanceDescription(AccessRequest request, Markdown markdown)
+        {
+            markdown.AddLine($"Please {(request.IsAddingPermission ? "enable" : "disable")} inheritance for dataset {request.SecurableObjectName} from Data.Sentry.com. {(request.IsAddingPermission ? "Enabling" : "Disabling")} inheritance will {(request.IsAddingPermission ? "allow" : "prevent")} the dataset {(request.IsAddingPermission ? "to" : "from")} {(request.IsAddingPermission ? "inherit" : "inheriting")} permissions from its parent asset {request.SaidKeyCode}. When approved, users with access to {request.SaidKeyCode} in Data.Sentry.com {(request.IsAddingPermission ? "will" : "will not")} have access to {request.SecurableObjectName} data.");
+            markdown.AddBreak();
+            markdown.Add($"For more information on Authorization in DSC - ");
+            markdown.AddLink("Auth Guide", "https://confluence.sentry.com/pages/viewpage.action?pageId=361734893");
+            markdown.AddBreak();
+            markdown.AddBreak();
+            markdown.AddLine($"Said Asset: {request.SaidKeyCode}");
+            markdown.AddBreak();
+        }
+
+        private void BuildDefaultDescription(AccessRequest request, Markdown markdown)
+        {
+            if (request.IsAddingPermission)
+            {
+                markdown.AddLine($"Please grant {request.AdGroupName ?? request.PermissionForUserName} the following permissions to {GetAccessor(request)} in Data.sentry.com.");
+            }
+            else
+            {
+                markdown.AddLine($"Please remove the following permissions to {request.SecurableObjectName} in Data.sentry.com.");
+            }
+            markdown.AddBreak();
+            markdown.AddLine($"Said Asset: {request.SaidKeyCode}");
+            markdown.AddBreak();
+        }
+
+        private string GetAccessor(AccessRequest request)
+        {
+            if (request.Scope == AccessScope.Asset)
+            {
+                return request.SaidKeyCode;
+            }
+            else 
+            {
+                return $"{request.SecurableObjectName} ({request.SecurableObjectNamedEnvironment})";
+            }
         }
         #endregion
     }

@@ -21,6 +21,7 @@ using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
 using Sentry.data.Infrastructure.ServiceImplementations;
 using Sentry.Messaging.Common;
+using StructureMap;
 using System;
 using System.Linq;
 using System.Net;
@@ -323,6 +324,11 @@ namespace Sentry.data.Infrastructure
             _container.GetAllInstances<IPollyPolicy>().ToList().ForEach(p => p.Register());
 
 
+        }
+
+        public static void InitForUnitTest(IContainer mockContainer)
+        {
+            _container = mockContainer;
         }
 
         /// <summary>
