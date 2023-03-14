@@ -340,7 +340,7 @@ namespace Sentry.data.Web.Controllers
                 DataFlowNamedEnvironment = dto.NamedEnvironment,
                 DataFlowNamedEnvironmentType = dto.NamedEnvironmentType,
                 PrimaryContactId = dto.PrimaryContactId,
-                IsSecured = dto.IsSecured,
+                IsSecuredDataFlow = dto.IsSecured,
                 TopicName = dto.TopicName,
                 S3ConnectorName = dto.S3ConnectorName
             };
