@@ -334,6 +334,7 @@
     <Compile Include="Entities\Jira\JiraTicket.cs" />
     <Compile Include="Entities\Livy\LivyBatch.cs" />
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
+    <Compile Include="Entities\MessageFormats\ReprocessFilesRequestModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseDeletedFileModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseSingleStatusModel.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
