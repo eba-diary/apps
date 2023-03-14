@@ -2430,6 +2430,68 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     manageInheritanceInit() {
+
+        $("#DSCPermissions").DataTable({
+            orderCellsTop: true,
+            width: "100%",
+            iDisplayLength: 10,
+            language: {
+                emptyTable: 'No Permissions Found'
+            },
+            columns: [
+                { data: "Scope", className: "", orderable: true},
+                { data: "Identity", className: "", orderable: true},
+                { data: "Permission", className: "", orderable: true},
+                { data: "Status", className: "", orderable: true},
+                { data: "Code", className: "", orderable: true},
+                { data: "ApprovalTicket", className: "", orderable: true},
+                { data: "ExternalTicket", className: "d-none", orderable: true},
+                { data: "Actions", className: "", orderable: false}
+            ],
+            order: [1, 'asc']
+        });
+
+        $("#SnowflakePermissions").DataTable({
+            orderCellsTop: true,
+            width: "100%",
+            iDisplayLength: 10,
+            language: {
+                emptyTable: 'No Permissions Found'
+            },
+            columns: [
+                { data: "Scope", className: "", orderable: true },
+                { data: "Identity", className: "", orderable: true },
+                { data: "Permission", className: "", orderable: true },
+                { data: "Status", className: "", orderable: true },
+                { data: "Code", className: "", orderable: true },
+                { data: "ApprovalTicket", className: "", orderable: true },
+                { data: "ExternalTicket", className: "", orderable: true },
+                { data: "Actions", className: "", orderable: false }
+            ],
+            order: [1, 'asc']
+        });
+
+        $("#S3Permissions").DataTable({
+            orderCellsTop: true,
+            width: "100%",
+            iDisplayLength: 10,
+            language: {
+                emptyTable: 'No Permissions Found'
+            },
+            columns: [
+                { data: "Scope", className: "", orderable: true },
+                { data: "Identity", className: "", orderable: true },
+                { data: "Permission", className: "", orderable: true },
+                { data: "Status", className: "", orderable: true },
+                { data: "Code", className: "", orderable: true },
+                { data: "ApprovalTicket", className: "", orderable: true },
+                { data: "ExternalTicket", className: "", orderable: true },
+                { data: "Actions", className: "", orderable: false }
+            ],
+            order: [1, 'asc']
+        });
+
+
         $("#Inheritance_SelectedApprover").materialSelect();
         $("#inheritanceSwitch label").click(function () {
             $("#inheritanceModal").modal('show');

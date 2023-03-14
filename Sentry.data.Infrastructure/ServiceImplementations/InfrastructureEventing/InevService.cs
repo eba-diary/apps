@@ -25,7 +25,7 @@ namespace Sentry.data.Infrastructure
         private readonly IClient _inevClient;
         private readonly IDatasetContext _datasetContext;
 
-        public const string INEV_TOPIC = "INEV-DataLake";
+        public const string INEV_TOPIC = "INEV-DataLake"; //DSC-Debug is a listener on it 
         public const string INEV_TOPIC_DBA_PORTAL_COMPLETE = "INEV-DBAPortalRequestComplete";
         public const string INEV_TOPIC_DBA_PORTAL_APPROVED = "INEV-DBAPortalRequestApproved";
         public const string INEV_TOPIC_DBA_PORTAL_ADDED = "INEV-DBAPortalTicketAdded";
@@ -56,6 +56,22 @@ namespace Sentry.data.Infrastructure
             var datasetId = dataset.DatasetId.ToString();
             var payload = details.ToDictionary();
             await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, payload, datasetId);
+            //if snowflake permissions were just requested from DBA, set ticket to pending DBA to be tracked through INEV
+            //Need these to be toggled on and off so we sent the request to DBA in correct state
+            if(ticket.TicketStatus == HpsmTicketStatus.COMPLETED && ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS))
+            {
+                ticket.TicketStatus = DbaFlowTicketStatus.DbaTicketPending;
+                ticket.AddedPermissions?.Where(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS).ToList().ForEach(x =>
+                {
+                    x.IsEnabled = false;
+                    x.EnabledDate = null;
+                });
+                ticket.RemovedPermissions?.Where(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS).ToList().ForEach(x =>
+                {
+                    x.IsEnabled = true;
+                    x.RemovedDate = null;
+                });   
+            }
         }
 
         /// <summary>
@@ -63,32 +79,98 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         public async Task CheckDbaPortalEvents()
         {
+            //Only is relevant to snowflake permissions right now
+            //Grab events for ticket added topic - 
+            
+            //  Grab events where SourceRequestId is not null
+            //    Match Source Request ID with SecurityTicketId
+            //      Add DBA Request ID to SecurityTicket row
+            //        Ticket is still pending
+
+            //Grab events for ticket approved
+            //  Match events to tickets in pending based on DBA Request ID
+            //    Update ticket to approved pending processing
+
+            //Grab events for ticket complete
+            //  Match ticket complete events based on DBA Request ID
+            //    Mark ticket and perms active 
+
+
+
+
+
             try
             {
                 Sentry.Common.Logging.Logger.Info("Checking for Infrastructure Events to Consume: ");
 
-                List<Message> messages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_COMPLETE, INEV_GROUP_DSC_CONSUMER, 25).Result.Messages.ToList();
-                messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
-                messages = messages.Concat(_inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 1).Result.Messages.ToList()).ToList();
+                var addedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info("Found " + messages.Count + " Events to Consume");
+                Sentry.Common.Logging.Logger.Info($"Found {addedMessages.Count()} DBA Portal Added Events to Consume");
 
-                foreach (Message message in messages)
+                foreach (var message in addedMessages)
                 {
-                    Console.WriteLine("Consuming " + message.EventType + " event from " + message.MessageSource);
-                    Sentry.Common.Logging.Logger.Info("Consuming " + message.EventType + " event from " + message.MessageSource);
-
-                    SecurityTicket sourceTicket;
-                    message.Details.TryGetValue("sourceRequestId", out string messageTicketId);
-                    message.Details.TryGetValue("cherwellTicketId", out string cherwellTicketId);
-                    Guid toCompare = new Guid(messageTicketId);
-                    if (!string.IsNullOrEmpty(messageTicketId))
+                    if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
                     {
-                        sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(toCompare)).FirstOrDefault();
-                        sourceTicket.TicketId = cherwellTicketId;
-                        _datasetContext.Merge(sourceTicket);
+                        Guid sourceGuid = new Guid(sourceRequestID);
+                        var sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).First();
+                        if (sourceTicket != null)
+                        {
+                            var requestId = message.Details.TryGetValue("RequestID", out string dbaRequestId);
+                            sourceTicket.ExternalRequestId = dbaRequestId;
+                            sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketAdded;
+                        }
                     }
                 }
+
+                var approvedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
+
+                Sentry.Common.Logging.Logger.Info($"Found {approvedMessages.Count()} DBA Portal Approved Events to Consume");
+
+                foreach (var message in approvedMessages)
+                {
+                    if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
+                    {
+                        var sourceTicket = _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+                        if (sourceTicket != null)
+                        {
+                            sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketApproved;
+                        }
+                    }
+                }
+
+                var completedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_COMPLETE, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
+
+                Sentry.Common.Logging.Logger.Info($"Found {completedMessages.Count()} DBA Portal Completed Events to Consume");
+
+                foreach (var message in completedMessages)
+                {
+                    if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
+                    {
+                        var sourceTicket = _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+                        if (sourceTicket != null)
+                        {
+                            sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketComplete;
+                            if (sourceTicket.IsAddingPermission)
+                            {
+                                sourceTicket.AddedPermissions.ToList().ForEach(x =>
+                                {
+                                    x.IsEnabled = true;
+                                    x.EnabledDate = DateTime.Now;
+                                });
+                            }
+                            else
+                            {
+                                List<SecurityPermission> toRemove = _datasetContext.SecurityPermission.Where(p => p.RemovedFromTicket == sourceTicket).ToList();
+                                toRemove.ForEach(x =>
+                                {
+                                    x.IsEnabled = false;
+                                    x.RemovedDate = DateTime.Now;
+                                });
+                            }
+                        }
+                    }
+                }
+
                 _datasetContext.SaveChanges();
             }
             catch (Exception e)
@@ -141,6 +223,7 @@ namespace Sentry.data.Infrastructure
                 RequestId = ticket.SecurityTicketId.ToString(),
                 DatasetId = dataset.DatasetId.ToString(),
                 DatasetName = dataset.DatasetName,
+                ApprovalTicket = ticket.TicketId,
                 DatasetSaidKey = dataset.Asset.SaidKeyCode,
                 DatasetNamedEnvironment = dataset.NamedEnvironment,
                 DatasetNamedEnvironmentType = Enum.GetName(typeof(NamedEnvironmentType), dataset.NamedEnvironmentType),

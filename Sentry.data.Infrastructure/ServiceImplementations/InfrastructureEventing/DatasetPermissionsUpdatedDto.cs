@@ -15,6 +15,10 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
         /// </summary>
         public string RequestId { get; set; }
         /// <summary>
+        /// The Approval Ticket ID that DSC obtained to make this change
+        /// </summary>
+        public string ApprovalTicket { get; set; }
+        /// <summary>
         /// The Dataset ID
         /// </summary>
         public string DatasetId { get; set; }

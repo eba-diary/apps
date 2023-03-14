@@ -193,6 +193,14 @@ namespace Sentry.data.Core
             public const string LOG_AND_PREP = "SI:STD:Log and Prep";
         }
 
+        public static class DbaFlowTicketStatus
+        {
+            public const string DbaTicketPending = "DbaTicketPending";
+            public const string DbaTicketAdded = "DbaTicketAdded";
+            public const string DbaTicketApproved = "DbaTicketApproved";
+            public const string DbaTicketComplete = "DbaTicketComplete";
+        }
+
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";

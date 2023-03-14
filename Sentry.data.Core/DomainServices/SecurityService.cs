@@ -359,6 +359,8 @@ namespace Sentry.data.Core
                         IdentityType = t.IdentityType,
                         SecurityPermission = p,
                         TicketId = t.TicketId,
+                        ExternalRequestId = t.ExternalRequestId,
+                        TicketStatus = t.TicketStatus,
                         IsSystemGenerated = t.IsSystemGenerated
                     }))
                 );
@@ -373,6 +375,8 @@ namespace Sentry.data.Core
                         IdentityType = s.IdentityType,
                         SecurityPermission = s.SecurityPermission,
                         TicketId = s.TicketId,
+                        ExternalRequestId = s.ExternalRequestId,
+                        TicketStatus = s.TicketStatus,
                         IsSystemGenerated = s.IsSystemGenerated
                     })
                 );
@@ -511,6 +515,7 @@ namespace Sentry.data.Core
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
             ticket.TicketStatus = HpsmTicketStatus.COMPLETED;
+
             if (ticket.IsAddingPermission)
             {
                 ticket.AddedPermissions.ToList().ForEach(x =>
