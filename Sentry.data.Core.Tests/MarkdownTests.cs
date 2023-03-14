@@ -84,5 +84,43 @@ namespace Sentry.data.Core.Tests
 
             Assert.AreEqual(@"Text \- has special characters \(\-\{\}\*\`\#\\\!\|\[\]\<\>\)", result);
         }
+
+        [TestMethod]
+        public void AddLine_EscapeCharacters()
+        {
+            Markdown markdown = new Markdown();
+
+            markdown.AddLine(@"Text -");
+            markdown.AddLine(@"has special characters (-{}*`#\!|[]<>)");
+
+            string result = markdown.ToString();
+
+            Assert.AreEqual("Text \\-\r\nhas special characters \\(\\-\\{\\}\\*\\`\\#\\\\\\!\\|\\[\\]\\<\\>\\)\r\n", result);
+        }
+
+        [TestMethod]
+        public void AddLine_SkipEscapeCharacters()
+        {
+            Markdown markdown = new Markdown();
+
+            markdown.AddLine(@"Text -", false);
+            markdown.AddLine(@"has special characters (-{}*`#\!|[]<>)", false);
+
+            string result = markdown.ToString();
+
+            Assert.AreEqual("Text -\r\nhas special characters (-{}*`#\\!|[]<>)\r\n", result);
+        }
+
+        [TestMethod]
+        public void AddBold_Basic()
+        {
+            Markdown markdown = new Markdown();
+
+            markdown.AddBold(@"bold me");
+
+            string result = markdown.ToString();
+
+            Assert.AreEqual("*bold me*", result);
+        }
     }
 }
