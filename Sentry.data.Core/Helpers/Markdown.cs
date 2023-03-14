@@ -8,9 +8,14 @@ namespace Sentry.data.Core
     {
         private readonly StringBuilder _builder = new StringBuilder();
 
-        public void AddLine(string text)
+        public void AddLine(string text, bool escapeSpecialCharacters = true)
         {
-            _builder.AppendLine(Escape(text));
+            if (escapeSpecialCharacters)
+            {
+                text = Escape(text);
+            }
+
+            _builder.AppendLine(text);
         }
 
         public void Add(string text)
@@ -24,6 +29,13 @@ namespace Sentry.data.Core
             {
                 _builder.AppendLine($"- {Escape(item.ToString())}");
             }
+        }
+
+        public void AddBold(string text)
+        {
+            _builder.Append("*");
+            Add(text);
+            _builder.Append("*");
         }
 
         public void AddBreak()

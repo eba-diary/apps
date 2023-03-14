@@ -177,11 +177,12 @@ namespace Sentry.data.Infrastructure
                     break;
             }
 
-            markdown.AddList(request.Permissions);
-            markdown.AddBreak();
-            markdown.AddLine($"Business Reason: {request.BusinessReason}");
-            markdown.AddLine($"Requestor: {request.RequestorsId} - {request.RequestorsName}");
-            markdown.AddLine($"DSC Environment: {Config.GetHostSetting("WebApiUrl").Replace("http://", "")}");
+            markdown.AddBold("Business Reason:");
+            markdown.AddLine(" " + request.BusinessReason);
+            markdown.AddBold("Requestor:");
+            markdown.AddLine($" {request.RequestorsId} - {request.RequestorsName}");
+            markdown.AddBold($"DSC Environment:");
+            markdown.Add(" " + Config.GetHostSetting("WebApiUrl").Replace("http://", ""));
 
             return markdown.ToString();
         }
@@ -190,51 +191,59 @@ namespace Sentry.data.Infrastructure
         {
             if (request.IsAddingPermission)
             {
-                markdown.AddLine($"Please grant the AWS ARN {request.AwsArn} the following permissions to {GetAccessor(request)} data.");
+                markdown.AddLine($"Please grant the AWS ARN *{request.AwsArn}* the following permissions to {GetAccessor(request)} data.", false);
             }
             else
             {
-                markdown.AddLine($"Please remove the following permissions for the AWS ARN {request.AwsArn} from {GetAccessor(request)} data.");
+                markdown.AddLine($"Please remove the following permissions for the AWS ARN *{request.AwsArn}* from {GetAccessor(request)} data.", false);
             }
+
+            markdown.AddList(request.Permissions);
+            markdown.AddBreak();
         }
 
         private void BuildSnowflakeAccountDescription(AccessRequest request, Markdown markdown)
         {
             if (request.IsAddingPermission)
             {
-                markdown.AddLine($"Please grant the Snowflake Account {request.SnowflakeAccount} the following permissions to {GetAccessor(request)} data.");
+                markdown.AddLine($"Please grant the Snowflake Account *{request.SnowflakeAccount}* the following permissions to {GetAccessor(request)} data.", false);
             }
             else
             {
-                markdown.AddLine($"Please remove the following permissions for the Snowflake Account {request.SnowflakeAccount} from {GetAccessor(request)} data.");
+                markdown.AddLine($"Please remove the following permissions for the Snowflake Account *{request.SnowflakeAccount}* from {GetAccessor(request)} data.", false);
             }
+
+            markdown.AddList(request.Permissions);
+            markdown.AddBreak();
         }
 
         private void BuildInheritanceDescription(AccessRequest request, Markdown markdown)
         {
-            markdown.AddLine($"Please {(request.IsAddingPermission ? "enable" : "disable")} inheritance for dataset {request.SecurableObjectName} from Data.Sentry.com. {(request.IsAddingPermission ? "Enabling" : "Disabling")} inheritance will {(request.IsAddingPermission ? "allow" : "prevent")} the dataset {(request.IsAddingPermission ? "to" : "from")} {(request.IsAddingPermission ? "inherit" : "inheriting")} permissions from its parent asset {request.SaidKeyCode}. When approved, users with access to {request.SaidKeyCode} in Data.Sentry.com {(request.IsAddingPermission ? "will" : "will not")} have access to {request.SecurableObjectName} data.");
+            markdown.AddLine($"Please {(request.IsAddingPermission ? "enable" : "disable")} inheritance for dataset *{request.SecurableObjectName}* from Data.Sentry.com. {(request.IsAddingPermission ? "Enabling" : "Disabling")} inheritance will {(request.IsAddingPermission ? "allow" : "prevent")} the dataset {(request.IsAddingPermission ? "to" : "from")} {(request.IsAddingPermission ? "inherit" : "inheriting")} permissions from its parent asset {request.SaidKeyCode}. When approved, users with access to {request.SaidKeyCode} in Data.Sentry.com {(request.IsAddingPermission ? "will" : "will not")} have access to {request.SecurableObjectName} data.", false);
+            markdown.AddList(request.Permissions);
             markdown.AddBreak();
             markdown.Add($"For more information on Authorization in DSC - ");
             markdown.AddLink("Auth Guide", "https://confluence.sentry.com/pages/viewpage.action?pageId=361734893");
             markdown.AddBreak();
             markdown.AddBreak();
-            markdown.AddLine($"Said Asset: {request.SaidKeyCode}");
-            markdown.AddBreak();
+            markdown.AddBold("Said Asset:");
+            markdown.AddLine(" " + request.SaidKeyCode);
         }
 
         private void BuildDefaultDescription(AccessRequest request, Markdown markdown)
         {
             if (request.IsAddingPermission)
             {
-                markdown.AddLine($"Please grant {request.AdGroupName ?? request.PermissionForUserName} the following permissions to {GetAccessor(request)} in Data.sentry.com.");
+                markdown.AddLine($"Please grant *{request.AdGroupName ?? request.PermissionForUserName}* the following permissions to {GetAccessor(request)} in Data.sentry.com.", false);
             }
             else
             {
-                markdown.AddLine($"Please remove the following permissions to {request.SecurableObjectName} in Data.sentry.com.");
+                markdown.AddLine($"Please remove the following permissions to *{request.SecurableObjectName}* in Data.sentry.com.", false);
             }
+            markdown.AddList(request.Permissions);
             markdown.AddBreak();
-            markdown.AddLine($"Said Asset: {request.SaidKeyCode}");
-            markdown.AddBreak();
+            markdown.AddBold("Said Asset:");
+            markdown.AddLine(" " + request.SaidKeyCode);
         }
 
         private string GetAccessor(AccessRequest request)
