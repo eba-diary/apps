@@ -76,7 +76,7 @@
                                 <td class="approvalTicket">@(permission.TicketId == "DEFAULT_SECURITY" || permission.TicketId == "DEFAULT_SECURITY_INHERITANCE" ? "Default Security" : permission.TicketId)</td>
                                 <td class="externalTicket">@(string.IsNullOrEmpty(permission.ExternalRequestId) ? "No External Request Found" : permission.ExternalRequestId)</td>
                                 <td>
-                                    @if (!permission.IsSystemGenerated && !(permission.PermissionStatus != "Active"))
+                                    @if (!permission.IsSystemGenerated && (permission.PermissionStatus == "Active" || permission.PermissionStatus == "DBA Ticket Complete"))
                                     {<em class="far fa-trash-alt removePermissionIcon"></em>}
                                 </td>
                             </tr>
