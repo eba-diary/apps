@@ -23,7 +23,6 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IRestClient _restClient;
         private readonly IClient _inevClient;
-        private readonly ISecurityService _securityService;
 
         private readonly IDatasetContext _datasetContext;
 
@@ -39,12 +38,11 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext, ISecurityService securityService)
+        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext)
         {
             _restClient = restClient;
             _inevClient = inevClient;
             _datasetContext = datasetContext;
-            _securityService = securityService;
         }
 
         /// <summary>
@@ -94,7 +92,7 @@ namespace Sentry.data.Infrastructure
                 {
                     if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
                     {
-                        var sourceTicket = _securityService.GetSecurityTicketForSourceRequestId(sourceRequestID);
+                        var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
                         if (sourceTicket != null)
                         {
                             var requestId = message.Details.TryGetValue("RequestID", out string dbaRequestId);
@@ -112,7 +110,7 @@ namespace Sentry.data.Infrastructure
                 {
                     if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
                     {
-                        var sourceTicket = _securityService.GetSecurityTicketForDbaRequestId(dbaRequestId);
+                        var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
                         if (sourceTicket != null)
                         {
                             sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketApproved;
@@ -128,7 +126,7 @@ namespace Sentry.data.Infrastructure
                 {
                     if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
                     {
-                        var sourceTicket = _securityService.GetSecurityTicketForDbaRequestId(dbaRequestId);
+                        var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
                         if (sourceTicket != null)
                         {
                             sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketComplete;
@@ -161,6 +159,17 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public SecurityTicket GetSecurityTicketForSourceRequestId(string sourceRequestId)
+        {
+            Guid sourceGuid = new Guid(sourceRequestId);
+            return _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).First();
+        }
+
+        public SecurityTicket GetSecurityTicketForDbaRequestId(string dbaRequestId)
+        {
+            return _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+        }
+
         /// <summary>
         /// Builds the DatasetPermissionsUpdated details object
         /// </summary>
@@ -182,7 +191,7 @@ namespace Sentry.data.Infrastructure
                             Database = s.SnowflakeDatabase,
                             Schema = s.SnowflakeSchema,
                             Account = Configuration.Config.GetHostSetting("SnowAccount"),
-                            SnowflakeType = s.SnowflakeType
+                            SnowflakeType = s.SnowflakeType,
                         }).ToList());
             }
 

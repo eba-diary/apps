@@ -112,6 +112,8 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
             {
                 { nameof(RequestId).ToLowerFirstChar(), RequestId },
                 { nameof(DatasetId).ToLowerFirstChar(), DatasetId },
+                { nameof(ApprovalTicket).ToLowerFirstChar(), ApprovalTicket },
+                { nameof(SupportEmail).ToLowerFirstChar(), SupportEmail },
                 { nameof(DatasetName).ToLowerFirstChar(), DatasetName },
                 { nameof(DatasetSaidKey).ToLowerFirstChar(), DatasetSaidKey },
                 { nameof(DatasetNamedEnvironment).ToLowerFirstChar(), DatasetNamedEnvironment },

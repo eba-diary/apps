@@ -294,11 +294,9 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
+            mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
 
-            Mock<ISecurityService> mockSecurityService = new Mock<ISecurityService>();
-            mockSecurityService.Setup(m => m.GetSecurityTicketForSourceRequestId("79CAE2AB-6044-47A2-8072-AFA100FC26A3")).Returns(mockTicket);
-
-            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object, mockSecurityService.Object);
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
 
             inevService.CheckDbaPortalEvents();
 
@@ -336,11 +334,9 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
+            mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
 
-            Mock<ISecurityService> mockSecurityService = new Mock<ISecurityService>();
-            mockSecurityService.Setup(m => m.GetSecurityTicketForDbaRequestId("1001")).Returns(mockTicket);
-
-            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object, mockSecurityService.Object);
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
 
             inevService.CheckDbaPortalEvents();
 
@@ -385,11 +381,9 @@ namespace Sentry.data.Infrastructure.Tests
             });
 
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
+            mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
 
-            Mock<ISecurityService> mockSecurityService = new Mock<ISecurityService>();
-            mockSecurityService.Setup(m => m.GetSecurityTicketForDbaRequestId("1002")).Returns(mockTicket);
-
-            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object, mockSecurityService.Object);
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
 
             inevService.CheckDbaPortalEvents();
 

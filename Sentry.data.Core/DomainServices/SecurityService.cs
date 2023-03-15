@@ -133,17 +133,6 @@ namespace Sentry.data.Core
             return ticket;
         }
 
-        public SecurityTicket GetSecurityTicketForSourceRequestId(string sourceRequestId)
-        {
-            Guid sourceGuid = new Guid(sourceRequestId);
-            return _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).First();
-        }
-
-        public SecurityTicket GetSecurityTicketForDbaRequestId(string dbaRequestId)
-        {
-            return _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
-        }
-
         public Security GetSecurityForAsset(string keycode)
         {
             return _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(keycode)).Security;
