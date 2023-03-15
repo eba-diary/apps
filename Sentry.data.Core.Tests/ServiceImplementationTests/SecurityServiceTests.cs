@@ -1900,7 +1900,7 @@ namespace Sentry.data.Core.Tests
             //Assert
             adSecurityAdminProvider.Verify(a => a.CreateAdSecurityGroupAsync(groups[0]), Times.AtMost(1)); //verify the AD group attempted to be created
             securityService.Verify(s => s.BuildAddingPermissionTicket(It.IsAny<string>(), It.IsAny<AccessRequest>(), security), Times.AtMost(1)); //verify a ticket was built
-            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.Never); //verify the ticket was NOT approved
+            securityService.Verify(s => s.ApproveTicket(It.IsAny<SecurityTicket>(), It.IsAny<string>()), Times.Once); //verify the ticket was approved
             context.Verify(c => c.SaveChanges(It.IsAny<bool>()), Times.Exactly(2));
         }
 

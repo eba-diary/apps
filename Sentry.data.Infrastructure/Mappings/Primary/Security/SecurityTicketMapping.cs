@@ -36,6 +36,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.AwsArn);
             this.Property((x) => x.SnowflakeAccount);
             this.Property((x) => x.IsSystemGenerated);
+            this.Property((x) => x.ExternalRequestId);
 
             this.Bag(x => x.AddedPermissions, (m) =>
             {

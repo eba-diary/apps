@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure
 
                 foreach (SecurityTicket ticket in tickets)
                 {
-                    HpsmTicket st = _baseTicketProvider.RetrieveTicket(ticket.TicketId);
+                  HpsmTicket st = _baseTicketProvider.RetrieveTicket(ticket.TicketId);
                     if(st != null)
                     {
                         switch (st.TicketStatus)
