@@ -206,6 +206,7 @@ namespace Sentry.data.Infrastructure
                 DatasetId = dataset.DatasetId.ToString(),
                 DatasetName = dataset.DatasetName,
                 ApprovalTicket = ticket.TicketId,
+                SupportEmail = "DSCSupport@sentry.com",
                 DatasetSaidKey = dataset.Asset.SaidKeyCode,
                 DatasetNamedEnvironment = dataset.NamedEnvironment,
                 DatasetNamedEnvironmentType = Enum.GetName(typeof(NamedEnvironmentType), dataset.NamedEnvironmentType),

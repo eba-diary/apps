@@ -19,6 +19,10 @@ namespace Sentry.data.Infrastructure.InfrastructureEvents
         /// </summary>
         public string ApprovalTicket { get; set; }
         /// <summary>
+        /// The Support Email for permission issues
+        /// </summary>
+        public string SupportEmail { get; set; }
+        /// <summary>
         /// The Dataset ID
         /// </summary>
         public string DatasetId { get; set; }
