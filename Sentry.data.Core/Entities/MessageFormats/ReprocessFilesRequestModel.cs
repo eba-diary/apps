@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         }
         public int SchemaID { get; set; }
 
-        public string RequestGUID { get; set; }
+        public string RequestGUID { get; set; } = System.DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
 
         public int[] DatasetFileIdList { get; set; }
         public int[] DatasetFileDropIdList { get; set; }
