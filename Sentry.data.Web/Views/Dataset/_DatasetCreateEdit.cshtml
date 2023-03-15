@@ -40,6 +40,7 @@
                 @Html.HiddenFor(model => model.HrempServiceEnv)
                 @Html.HiddenFor(model => model.ObjectStatus)
 
+
                 @* Category *@
                 <div class="md-form">
                     @* Ensures Category cannot be changed on edit *@
@@ -197,8 +198,8 @@
                 </div>
 
                 @************************************************************************************************************************************
-                 AlternateContactEmail
-                *************************************************************************************************************************************@
+         AlternateContactEmail
+        *************************************************************************************************************************************@
                 @if (Model.CLA1130_SHOW_ALTERNATE_EMAIL)        //JUST REMOVE THIS LINE WHEN FEATURE GOES LIVE
                 {
                     <div class="md-form">
