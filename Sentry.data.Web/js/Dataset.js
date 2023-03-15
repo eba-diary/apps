@@ -2485,8 +2485,8 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
                 { data: "Status", className: "", orderable: true },
                 { data: "Code", className: "", orderable: true },
                 { data: "ApprovalTicket", className: "", orderable: true },
-                { data: "ExternalTicket", className: "", orderable: true },
-                { data: "Actions", className: "", orderable: false }
+                { data: "JiraTicket", className: "", orderable: true },
+                { data: "Actions", className: "", orderable: false },
             ],
             order: [1, 'asc']
         });

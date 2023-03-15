@@ -133,6 +133,17 @@ namespace Sentry.data.Core
             return ticket;
         }
 
+        public SecurityTicket GetSecurityTicketForSourceRequestId(string sourceRequestId)
+        {
+            Guid sourceGuid = new Guid(sourceRequestId);
+            return _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).First();
+        }
+
+        public SecurityTicket GetSecurityTicketForDbaRequestId(string dbaRequestId)
+        {
+            return _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+        }
+
         public Security GetSecurityForAsset(string keycode)
         {
             return _datasetContext.Assets.FirstOrDefault(a => a.SaidKeyCode.Equals(keycode)).Security;
@@ -863,9 +874,7 @@ namespace Sentry.data.Core
                         IsSystemGenerated = true
                     };
                     var securityTicket = BuildAndAddPermissionTicket(accessRequest, group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security, "DEFAULT_SECURITY");
-                    //don't auto-approve Snowflake permissions - they will be approved when the Cherwell ticket that the DBA portal creates is approved
-                    //ApproveTicket() would call PublishDatasetPermissionsUpdatedInfrastructureEvent() - so we call it explicitely here
-                    await PublishDatasetPermissionsUpdatedInfrastructureEvent(securityTicket);
+                    await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }
             }

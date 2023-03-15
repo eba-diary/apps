@@ -37,6 +37,10 @@ namespace Sentry.data.Web
                         break;
                 }
             }
+            else if (securablePermission.SecurityPermission.IsEnabled)
+            {
+                PermissionStatus = "Active";
+            }
             else
             {
                 PermissionStatus = "Pending";

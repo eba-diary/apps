@@ -23,6 +23,8 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IRestClient _restClient;
         private readonly IClient _inevClient;
+        private readonly ISecurityService _securityService;
+
         private readonly IDatasetContext _datasetContext;
 
         public const string INEV_TOPIC = "INEV-DataLake"; //DSC-Debug is a listener on it 
@@ -37,11 +39,12 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext)
+        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext, ISecurityService securityService)
         {
             _restClient = restClient;
             _inevClient = inevClient;
             _datasetContext = datasetContext;
+            _securityService = securityService;
         }
 
         /// <summary>
@@ -77,28 +80,8 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Check Infrastructure Eventing topics for notification that the DBA Portal created a Cherwell ticket for a Snowflake access request
         /// </summary>
-        public async Task CheckDbaPortalEvents()
+        public void CheckDbaPortalEvents()
         {
-            //Only is relevant to snowflake permissions right now
-            //Grab events for ticket added topic - 
-            
-            //  Grab events where SourceRequestId is not null
-            //    Match Source Request ID with SecurityTicketId
-            //      Add DBA Request ID to SecurityTicket row
-            //        Ticket is still pending
-
-            //Grab events for ticket approved
-            //  Match events to tickets in pending based on DBA Request ID
-            //    Update ticket to approved pending processing
-
-            //Grab events for ticket complete
-            //  Match ticket complete events based on DBA Request ID
-            //    Mark ticket and perms active 
-
-
-
-
-
             try
             {
                 Sentry.Common.Logging.Logger.Info("Checking for Infrastructure Events to Consume: ");
@@ -111,8 +94,7 @@ namespace Sentry.data.Infrastructure
                 {
                     if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
                     {
-                        Guid sourceGuid = new Guid(sourceRequestID);
-                        var sourceTicket = _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).First();
+                        var sourceTicket = _securityService.GetSecurityTicketForSourceRequestId(sourceRequestID);
                         if (sourceTicket != null)
                         {
                             var requestId = message.Details.TryGetValue("RequestID", out string dbaRequestId);
@@ -130,7 +112,7 @@ namespace Sentry.data.Infrastructure
                 {
                     if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
                     {
-                        var sourceTicket = _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+                        var sourceTicket = _securityService.GetSecurityTicketForDbaRequestId(dbaRequestId);
                         if (sourceTicket != null)
                         {
                             sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketApproved;
@@ -146,7 +128,7 @@ namespace Sentry.data.Infrastructure
                 {
                     if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
                     {
-                        var sourceTicket = _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+                        var sourceTicket = _securityService.GetSecurityTicketForDbaRequestId(dbaRequestId);
                         if (sourceTicket != null)
                         {
                             sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketComplete;
@@ -365,6 +347,5 @@ namespace Sentry.data.Infrastructure
             }
             Common.Logging.Logger.Debug($"'{eventType}' Infrastructure Event published for ID '{id}'. Response: {response.Content}");
         }
-
     }
 }
