@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
             //Need these to be toggled on and off so we sent the request to DBA in correct state
             if(ticket.TicketStatus == HpsmTicketStatus.COMPLETED && ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS))
             {
-                ticket.TicketStatus = DbaFlowTicketStatus.DbaTicketPending;
+                ticket.TicketStatus = HpsmTicketStatus.DbaTicketPending;
                 ticket.AddedPermissions?.Where(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS).ToList().ForEach(x =>
                 {
                     x.IsEnabled = false;
@@ -97,7 +97,7 @@ namespace Sentry.data.Infrastructure
                         {
                             var requestId = message.Details.TryGetValue("RequestID", out string dbaRequestId);
                             sourceTicket.ExternalRequestId = dbaRequestId;
-                            sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketAdded;
+                            sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketAdded;
                         }
                     }
                 }
@@ -113,7 +113,7 @@ namespace Sentry.data.Infrastructure
                         var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
                         if (sourceTicket != null)
                         {
-                            sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketApproved;
+                            sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketApproved;
                         }
                     }
                 }
@@ -129,7 +129,7 @@ namespace Sentry.data.Infrastructure
                         var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
                         if (sourceTicket != null)
                         {
-                            sourceTicket.TicketStatus = GlobalConstants.DbaFlowTicketStatus.DbaTicketComplete;
+                            sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketComplete;
                             if (sourceTicket.IsAddingPermission)
                             {
                                 sourceTicket.AddedPermissions.ToList().ForEach(x =>

@@ -300,7 +300,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             inevService.CheckDbaPortalEvents();
 
-            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.DbaFlowTicketStatus.DbaTicketAdded);
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketAdded);
             Assert.IsTrue(mockTicket.ExternalRequestId == "1000");
         }
 
@@ -340,7 +340,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             inevService.CheckDbaPortalEvents();
 
-            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.DbaFlowTicketStatus.DbaTicketApproved);
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketApproved);
         }
 
         [TestMethod]
@@ -387,7 +387,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             inevService.CheckDbaPortalEvents();
 
-            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.DbaFlowTicketStatus.DbaTicketComplete);
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketComplete);
             Assert.IsTrue(mockTicket.AddedPermissions.First().IsEnabled);
         }
 
