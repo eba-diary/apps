@@ -302,6 +302,8 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketAdded);
             Assert.IsTrue(mockTicket.ExternalRequestId == "1000");
+
+            repository.VerifyAll();
         }
 
         [TestMethod]
@@ -341,6 +343,8 @@ namespace Sentry.data.Infrastructure.Tests
             inevService.CheckDbaPortalEvents();
 
             Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketApproved);
+
+            repository.VerifyAll();
         }
 
         [TestMethod]
@@ -389,6 +393,8 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketComplete);
             Assert.IsTrue(mockTicket.AddedPermissions.First().IsEnabled);
+
+            repository.VerifyAll();
         }
 
         private static SecurityTicket GetInheritanceSecurityTicket(bool enabled)
