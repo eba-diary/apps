@@ -86,69 +86,29 @@ namespace Sentry.data.Infrastructure
 
                 var addedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info($"Found {addedMessages.Count()} DBA Portal Added Events to Consume");
+                Sentry.Common.Logging.Logger.Info($"Found {addedMessages.Count} DBA Portal Added Events to Consume");
 
                 foreach (var message in addedMessages)
                 {
-                    if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
-                    {
-                        var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
-                        if (sourceTicket != null)
-                        {
-                            var requestId = message.Details.TryGetValue("RequestID", out string dbaRequestId);
-                            sourceTicket.ExternalRequestId = dbaRequestId;
-                            sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketAdded;
-                        }
-                    }
+                    ProcessDbaAddedEvent(message);
                 }
 
                 var approvedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info($"Found {approvedMessages.Count()} DBA Portal Approved Events to Consume");
+                Sentry.Common.Logging.Logger.Info($"Found {approvedMessages.Count} DBA Portal Approved Events to Consume");
 
                 foreach (var message in approvedMessages)
                 {
-                    if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
-                    {
-                        var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
-                        if (sourceTicket != null)
-                        {
-                            sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketApproved;
-                        }
-                    }
+                    ProcessDbaApprovedEvent(message);
                 }
 
                 var completedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_COMPLETE, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info($"Found {completedMessages.Count()} DBA Portal Completed Events to Consume");
+                Sentry.Common.Logging.Logger.Info($"Found {completedMessages.Count} DBA Portal Completed Events to Consume");
 
                 foreach (var message in completedMessages)
                 {
-                    if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
-                    {
-                        var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
-                        if (sourceTicket != null)
-                        {
-                            sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketComplete;
-                            if (sourceTicket.IsAddingPermission)
-                            {
-                                sourceTicket.AddedPermissions.ToList().ForEach(x =>
-                                {
-                                    x.IsEnabled = true;
-                                    x.EnabledDate = DateTime.Now;
-                                });
-                            }
-                            else
-                            {
-                                List<SecurityPermission> toRemove = _datasetContext.SecurityPermission.Where(p => p.RemovedFromTicket == sourceTicket).ToList();
-                                toRemove.ForEach(x =>
-                                {
-                                    x.IsEnabled = false;
-                                    x.RemovedDate = DateTime.Now;
-                                });
-                            }
-                        }
-                    }
+                    ProcessDbaCompletedEvent(message);
                 }
 
                 _datasetContext.SaveChanges();
@@ -168,6 +128,61 @@ namespace Sentry.data.Infrastructure
         public SecurityTicket GetSecurityTicketForDbaRequestId(string dbaRequestId)
         {
             return _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+        }
+
+        private void ProcessDbaAddedEvent(Message message)
+        {
+            if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
+            {
+                var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
+                if (sourceTicket != null)
+                {
+                    message.Details.TryGetValue("RequestID", out string dbaRequestId);
+                    sourceTicket.ExternalRequestId = dbaRequestId;
+                    sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketAdded;
+                }
+            }
+        }
+        
+        private void ProcessDbaApprovedEvent(Message message)
+        {
+            if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
+            {
+                var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
+                if (sourceTicket != null)
+                {
+                    sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketApproved;
+                }
+            }
+        }
+        
+        private void ProcessDbaCompletedEvent(Message message)
+        {
+            if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
+            {
+                var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
+                if (sourceTicket != null)
+                {
+                    sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketComplete;
+                    if (sourceTicket.IsAddingPermission)
+                    {
+                        sourceTicket.AddedPermissions.ToList().ForEach(x =>
+                        {
+                            x.IsEnabled = true;
+                            x.EnabledDate = DateTime.Now;
+                        });
+                    }
+                    else
+                    {
+                        List<SecurityPermission> toRemove = _datasetContext.SecurityPermission.Where(p => p.RemovedFromTicket == sourceTicket).ToList();
+                        toRemove.ForEach(x =>
+                        {
+                            x.IsEnabled = false;
+                            x.RemovedDate = DateTime.Now;
+                        });
+                    }
+                }
+            }
         }
 
         /// <summary>
