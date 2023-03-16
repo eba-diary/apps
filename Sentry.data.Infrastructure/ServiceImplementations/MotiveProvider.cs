@@ -84,6 +84,7 @@ namespace Sentry.data.Infrastructure
 
                 }
             }
+            client.DefaultRequestHeaders.Remove("Authorization"); //Clean the Auth Header out 
         }
     }
 }
