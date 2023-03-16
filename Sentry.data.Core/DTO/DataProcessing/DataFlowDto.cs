@@ -40,5 +40,6 @@ namespace Sentry.data.Core
         public UserSecurity Security { get; set; }
         public string TopicName { get; set; }
         public string S3ConnectorName { get; set; }
+        public bool DataFlowStepUpdateRequired { get; set; }
     }
 }

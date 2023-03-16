@@ -21,9 +21,10 @@ namespace Sentry.data.Infrastructure
         private readonly IDataFlowService _dataFlowService;
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IDataFeatures _featureFlags;
+        private readonly IEmailService _emailService;
 
 
-        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider, IDataFeatures featureFlags)
+        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider, IDataFeatures featureFlags, IEmailService emailService)
         {
             client = httpClient;
             _s3ServiceProvider = s3ServiceProvider;
@@ -31,6 +32,7 @@ namespace Sentry.data.Infrastructure
             _dataFlowService = dataFlowService;
             _authorizationProvider = authorizationProvider;
             _featureFlags = featureFlags;
+            _emailService = emailService;
         }
 
         public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
@@ -55,6 +57,18 @@ namespace Sentry.data.Infrastructure
                             JArray companies = (JArray)responseObject["companies"];
                             JObject firstCompany = (JObject)companies[0];
                             token.TokenName = firstCompany.GetValue("company").Value<string>("name");
+                            token.ForeignId = firstCompany.GetValue("company").Value<string>("company_id");
+                            if(((HTTPSSource)motiveSource).AllTokens != null)
+                            {
+                                foreach (var existingToken in ((HTTPSSource)motiveSource).AllTokens)
+                                {
+                                    if (!string.IsNullOrEmpty(existingToken.ForeignId) && string.Equals(existingToken.ForeignId, token.ForeignId) && existingToken.Id != token.Id)
+                                    {
+                                        existingToken.Enabled = false;
+                                        _emailService.SendMotiveDuplicateTokenEmail(token, existingToken);
+                                    }
+                                }
+                            }
                             if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
                             {
                                 var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);

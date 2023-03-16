@@ -349,6 +349,29 @@ namespace Sentry.data.Core
             return request;
         }
 
+        public async Task<DatasetResultDto> AddDatasetAsync(DatasetDto datasetDto)
+        {
+            IApplicationUser user = _userService.GetCurrentUser();
+            UserSecurity security = _securityService.GetUserSecurity(null, user);
+
+            if (security.CanCreateDataset)
+            {
+                datasetDto.UploadUserId = user.AssociateId;
+
+                Dataset dataset = CreateDataset(datasetDto);
+
+                await _datasetContext.AddAsync(dataset);
+                await _datasetContext.SaveChangesAsync();
+
+                DatasetResultDto resultDto = dataset.ToDatasetResultDto();
+                return resultDto;
+            }
+            else
+            {
+                throw new ResourceForbiddenException(user.AssociateId, nameof(security.CanCreateDataset), "AddDataset");
+            }
+        }
+
         public int Create(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
@@ -388,6 +411,42 @@ namespace Sentry.data.Core
             return ds.DatasetId;
         }
 
+        public async Task<DatasetResultDto> UpdateDatasetAsync(DatasetDto dto)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
+
+            //check exists
+            if (ds != null)
+            {
+                //check permissions
+                IApplicationUser user = _userService.GetCurrentUser();
+                UserSecurity security = _securityService.GetUserSecurity(ds, user);
+
+                if (security.CanEditDataset)
+                {
+                    //update
+                    UpdateDataset(dto, ds);
+
+                    //save
+                    await _datasetContext.SaveChangesAsync();
+
+                    //map to result
+                    DatasetResultDto resultDto = ds.ToDatasetResultDto();
+
+                    //return
+                    return resultDto;
+                }
+                else
+                {
+                    throw new ResourceForbiddenException(user.AssociateId, nameof(security.CanEditDataset), "UpdateDataset", dto.DatasetId);
+                }
+            }
+            else
+            {
+                throw new ResourceNotFoundException("UpdateDataset", dto.DatasetId);
+            }
+        }
+
         public void UpdateAndSaveDataset(DatasetSchemaDto dto)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
@@ -395,70 +454,7 @@ namespace Sentry.data.Core
             //Verify that certain idempotent fields have not been changed
             ValidateIdempotentFields(dto, ds);
 
-            ds.DatasetInformation = dto.DatasetInformation;
-            ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId);
-            ds.ChangedDtm = DateTime.Now;
-
-            if (dto.DatasetCategoryIds?.Count() > 0)
-            {
-                ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
-            }
-            if (null != dto.CreationUserId && dto.CreationUserId.Length > 0)
-            {
-                ds.CreationUserName = dto.CreationUserId;
-            }
-            if (null != dto.DatasetDesc && dto.DatasetDesc.Length > 0)
-            {
-                ds.DatasetDesc = dto.DatasetDesc;
-            }
-            if (dto.DatasetDtm > DateTime.MinValue)
-            {
-                ds.DatasetDtm = dto.DatasetDtm;
-            }
-            if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
-            {
-                ds.PrimaryContactId = dto.PrimaryContactId;
-            }
-            if (dto.DataClassification > 0)
-            {
-                ds.DataClassification = dto.DataClassification;
-            }
-            if (ds.Security == null)
-            {
-                ds.Security = new Security(SecurableEntityName.DATASET)
-                {
-                    CreatedById = _userService.GetCurrentUser().AssociateId
-                };
-            }
-
-            //override the Dto.IsSecured for certain classifications.
-            switch (dto.DataClassification)
-            {
-                case GlobalEnums.DataClassificationType.HighlySensitive:
-                    dto.IsSecured = true;
-                    break;
-                case GlobalEnums.DataClassificationType.InternalUseOnly:
-                    //don't override as it should flow from the form.
-                    break;
-                default:
-                    dto.IsSecured = false;
-                    break;
-            }
-
-            if (!ds.IsSecured && dto.IsSecured)
-            {
-                ds.Security.EnabledDate = DateTime.Now;
-                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
-            }
-            else if (ds.IsSecured && !dto.IsSecured)
-            {
-                ds.Security.RemovedDate = DateTime.Now;
-                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
-            }
-
-            ds.IsSecured = dto.IsSecured;
-
-            ds.AlternateContactEmail = dto.AlternateContactEmail;
+            UpdateDataset(dto, ds);
 
             _datasetContext.SaveChanges();
         }
@@ -488,6 +484,68 @@ namespace Sentry.data.Core
             {
                 throw new ValidationException(ValidationErrors.NAMED_ENVIRONMENT_TYPE_IDEMPOTENT, "Dataset Named Environment Type cannot be changed");
             }
+        }
+
+        private void UpdateDataset(DatasetDto dto, Dataset ds)
+        {
+            ds.DatasetInformation = dto.DatasetInformation;
+            ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId);
+            ds.ChangedDtm = DateTime.Now;
+
+            if (dto.DatasetCategoryIds?.Count() > 0)
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+            }
+            else if (!string.IsNullOrEmpty(dto.CategoryName))
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
+            }
+
+            if (null != dto.CreationUserId && dto.CreationUserId.Length > 0)
+            {
+                ds.CreationUserName = dto.CreationUserId;
+            }
+
+            if (null != dto.DatasetDesc && dto.DatasetDesc.Length > 0)
+            {
+                ds.DatasetDesc = dto.DatasetDesc;
+            }
+
+            if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
+            {
+                ds.PrimaryContactId = dto.PrimaryContactId;
+            }
+
+            if (dto.DataClassification > 0)
+            {
+                ds.DataClassification = dto.DataClassification;
+            }
+
+            string userId = _userService.GetCurrentUser().AssociateId;
+
+            if (ds.Security == null)
+            {
+                ds.Security = new Security(SecurableEntityName.DATASET)
+                {
+                    CreatedById = userId
+                };
+            }
+
+            SetIsSecuredByDataClassification(dto);
+
+            if (!ds.IsSecured && dto.IsSecured)
+            {
+                ds.Security.EnabledDate = DateTime.Now;
+                ds.Security.UpdatedById = userId;
+            }
+            else if (ds.IsSecured && !dto.IsSecured)
+            {
+                ds.Security.RemovedDate = DateTime.Now;
+                ds.Security.UpdatedById = userId;
+            }
+
+            ds.IsSecured = dto.IsSecured;
+            ds.AlternateContactEmail = dto.AlternateContactEmail;
         }
 
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)
@@ -772,7 +830,6 @@ namespace Sentry.data.Core
             Dataset ds = new Dataset()
             {
                 DatasetId = dto.DatasetId,
-                DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList(),
                 DatasetName = dto.DatasetName,
                 ShortName = dto.ShortName,
                 DatasetDesc = dto.DatasetDesc,
@@ -785,7 +842,6 @@ namespace Sentry.data.Core
                 ChangedDtm = dto.ChangedDtm,
                 DatasetType = DataEntityCodes.DATASET,
                 DataClassification = dto.DataClassification,
-                IsSecured = dto.IsSecured,
                 CanDisplay = true,
                 DatasetFiles = null,
                 DatasetFileConfigs = null,
@@ -798,18 +854,17 @@ namespace Sentry.data.Core
                 AlternateContactEmail = dto.AlternateContactEmail
             };
 
-            switch (dto.DataClassification)
+            if (dto.DatasetCategoryIds?.Any() == true)
             {
-                case GlobalEnums.DataClassificationType.HighlySensitive:
-                    ds.IsSecured = true;
-                    break;
-                case GlobalEnums.DataClassificationType.InternalUseOnly:
-                    ds.IsSecured = dto.IsSecured;
-                    break;
-                default:
-                    ds.IsSecured = false;
-                    break;
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList();
             }
+            else if (!string.IsNullOrEmpty(dto.CategoryName))
+            {
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => x.Name.ToLower() == dto.CategoryName.ToLower()).ToList();
+            }
+
+            SetIsSecuredByDataClassification(dto);
+            ds.IsSecured = dto.IsSecured;
 
             //All datasets get a Security entry regardless if restricted
             //  this allows security process for internally managed permissions
@@ -821,6 +876,22 @@ namespace Sentry.data.Core
 
             return ds;
         }
+
+        private void SetIsSecuredByDataClassification(DatasetDto dto)
+        {
+            switch (dto.DataClassification)
+            {
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    dto.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:                    
+                    break;
+                default:
+                    dto.IsSecured = false;
+                    break;
+            }
+        }
+
         private Dataset CreateDataset(DatasetSchemaDto dto)
         {
             Dataset newDS = CreateDataset((DatasetDto)dto);            

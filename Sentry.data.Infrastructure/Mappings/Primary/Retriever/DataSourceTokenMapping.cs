@@ -65,6 +65,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("CurrentTokenExp");
                 m.NotNullable(false);
             });
+            
+            Property(x => x.ForeignId, m =>
+            {
+                m.Column("ForeignId");
+                m.NotNullable(false);
+            });
 
             this.Bag(x => x.Claims, (m) =>
             {

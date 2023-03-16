@@ -6,6 +6,7 @@ using Sentry.FeatureFlags.LaunchDarkly;
 using System;
 using System.Linq;
 using LaunchDarkly.Sdk.Server.Interfaces;
+using LaunchDarkly.Sdk;
 
 namespace Sentry.data.Infrastructure.FeatureFlags
 {
@@ -14,7 +15,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
     /// </summary>
     public class DataFeatures : IDataFeatures
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly ILdClient _ldClient;
 
         // LaunchDarkly feature flags - property definitions
@@ -49,8 +50,9 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
         public IFeatureFlag<bool> CLA4931_SendMotiveEmail { get; }
         public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
+        public IFeatureFlag<bool> CLA4912_API { get; }
 
-        public DataFeatures(UserService userService, ILdClient ldClient)
+        public DataFeatures(IUserService userService, ILdClient ldClient)
         {
             _userService = userService;
             _ldClient = ldClient;
@@ -87,12 +89,13 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA2869_AllowMotiveJobs = new BooleanFeatureFlagAmbientContext("CLA2869_AllowMotiveJobs", false, _ldClient, () => LdUser);
             CLA4931_SendMotiveEmail = new BooleanFeatureFlagAmbientContext("CLA4931_SendMotiveEmail", false, _ldClient, () => LdUser);
             CLA4925_ParquetFileType = new BooleanFeatureFlagAmbientContext("CLA4925_ParquetFileType", false, _ldClient, () => LdUser);
+            CLA4912_API = new BooleanFeatureFlagAmbientContext("CLA4912_API", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
         /// This property builds the LdUser object that LaunchDarkly uses to evaluate feature flags
         /// </summary>
-        private LaunchDarkly.Sdk.User LdUser
+        private User LdUser
         {
             get
             {

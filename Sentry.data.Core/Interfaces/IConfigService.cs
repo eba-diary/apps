@@ -22,6 +22,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         int Create(DatasetFileConfigDto dto);
         bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
+        void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig fileConfig);
         bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
         DataSourceDto GetDataSourceDto(int Id);
         UserSecurity GetUserSecurityForDataSource(int id);

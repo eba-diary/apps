@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         List<AuthenticationTypeDto> GetValidAuthenticationTypeDtosByType(string sourceType);
         List<AuthenticationTypeDto> GetAuthenticationTypeDtos();
         Task<bool> ExchangeAuthToken(DataSource dataSource, string authToken);
+        Task<bool> KickOffMotiveOnboarding(int tokenId);
     }
 }

@@ -50,3 +50,16 @@
 #RequestMigrationFormSection .search-wrap .select-add-option {
     margin-top: -12px; /* default was not set */
 }
+
+#MigrationHistoryDetailTable .fa-check-circle {
+    color: green;
+}
+
+.migration-history-card-header:hover {
+    background-color: #f7f5f5 !important;
+}
+
+.migration-history-modify-icons {
+    font-size: 1.75rem;
+    display: flex;
+}

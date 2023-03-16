@@ -7,6 +7,7 @@ using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
 using RestSharp.Authenticators;
+using Sentry.Associates;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
@@ -127,8 +128,23 @@ namespace Sentry.data.Infrastructure
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
 
+            IAssociatesServiceClient associateService = AssociatesService.Create(Sentry.Configuration.Config.GetHostSetting("HrServiceUrl"));
+            AssociatesCacheOptions associateCacheOptions = new AssociatesCacheOptions
+            {
+                SuccessCallback = () =>
+                {
+                    Sentry.Common.Logging.Logger.Info("Associate Cache has been loaded");
+                },
+                ExceptionCallback = (ex, retryCount) =>
+                {
+                    Sentry.Common.Logging.Logger.Error($"There was an error loading the associate cache. Retry count: {retryCount}", ex);
+                },
+                IncludeInactive = true
+            };
+            associateService.LoadLocalCacheWithRetry(associateCacheOptions);
+
+            registry.For<IAssociatesServiceClient>().Singleton().Use(associateService);
             registry.For<ILdClient>().Singleton().Use(LdClientFactory.BuildLdClient());
-            registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.Configuration;
+﻿using Sentry.Configuration;
 
 namespace Sentry.data.Core.Helpers
 {
-    public class DscEventTopicHelper
+    public class DscEventTopicHelper : IDscEventTopicHelper
     {
         public string GetDSCTopic(DatasetFileConfig config)
         {

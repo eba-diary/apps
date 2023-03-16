@@ -12,16 +12,18 @@ namespace Sentry.data.Web
         [DisplayName("Dataset Name")]
         public string DatasetName { get; set; }
         [DisplayName("Target Named Environment")]
-        public string TargetNamedEnvironment { get; set; }
+        public string DatasetNamedEnvironment { get; set; }
+        [DisplayName("Target Named Environment Type")]
+        public NamedEnvironmentType DatasetNamedEnvironmentType { get; set; }
         public List<string> AllAssetNamedEnvironments { get; set; } = new List<string>();
-        [DisplayName("Schema ")]
+        [DisplayName("Schema")]
         public List<int> SelectedSchema { get; set; } = new List<int>();
         public bool QuartermasterManagedNamedEnvironments { get; set; }
+        public bool NewNonQManagedNamedEnvironment { get; set; }
 
         public string SAIDAssetKeyCode { get; set; }
         public IEnumerable<SelectListItem> DatasetNamedEnvironmentDropDown { get; set; }
         public IEnumerable<SelectListItem> DatasetNamedEnvironmentTypeDropDown { get; set; }
-        public NamedEnvironmentType DatasetNamedEnvironmentType { get; set; }
         public IEnumerable<SelectListItem> SchemaList { get; set; }
     }
 }
