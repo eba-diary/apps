@@ -42,6 +42,8 @@ namespace Sentry.data.Infrastructure
                 };
 
                 SentryChange sentryChange = await _changeManagementClient.NewSentryChange(newChange);
+                await _changeManagementClient.MovePhase(sentryChange.ChangeID, JsmChangePhase.READY_APPROVAL);
+
                 return sentryChange.ChangeID;
             }
             catch (Exception ex)

@@ -207,6 +207,11 @@ namespace Sentry.data.Core
             public const string FAILED = "Failed";
         }
 
+        public static class JsmChangePhase
+        {
+            public const string READY_APPROVAL = "Ready for Individual Approval";
+        }
+
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";

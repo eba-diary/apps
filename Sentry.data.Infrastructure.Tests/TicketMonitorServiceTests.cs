@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using NHibernate.Mapping;
 using Sentry.data.Core;
 using StructureMap;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +28,9 @@ namespace Sentry.data.Infrastructure.Tests
             ticketProvider.Setup(x => x.RetrieveTicketAsync("ID")).ReturnsAsync(changeTicket);
             ticketProvider.Setup(x => x.CloseTicketAsync(changeTicket)).Returns(Task.CompletedTask);
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4993_JSMTicketProvider.GetValue()).Returns(true);
+
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             List<SecurityTicket> securityTickets = new List<SecurityTicket>
             {
@@ -42,7 +43,8 @@ namespace Sentry.data.Infrastructure.Tests
             securityService.Setup(x => x.ApproveTicket(securityTickets.First(), "000001")).Returns(Task.CompletedTask);
 
             Mock<IContainer> nestedContainer = mr.Create<IContainer>();
-            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>()).Returns(ticketProvider.Object);
+            nestedContainer.Setup(x => x.GetInstance<IDataFeatures>()).Returns(dataFeatures.Object);
+            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>("JSM")).Returns(ticketProvider.Object);
             nestedContainer.Setup(x => x.GetInstance<IDatasetContext>()).Returns(datasetContext.Object);
             nestedContainer.Setup(x => x.GetInstance<ISecurityService>()).Returns(securityService.Object);
             nestedContainer.Setup(x => x.Dispose());
@@ -76,6 +78,9 @@ namespace Sentry.data.Infrastructure.Tests
             ticketProvider.Setup(x => x.RetrieveTicketAsync("ID")).ReturnsAsync(changeTicket);
             ticketProvider.Setup(x => x.CloseTicketAsync(changeTicket)).Returns(Task.CompletedTask);
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4993_JSMTicketProvider.GetValue()).Returns(true);
+
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             List<SecurityTicket> securityTickets = new List<SecurityTicket>
             {
@@ -88,7 +93,8 @@ namespace Sentry.data.Infrastructure.Tests
             securityService.Setup(x => x.CloseTicket(securityTickets.First(), "000001", "Denied", ChangeTicketStatus.DENIED));
 
             Mock<IContainer> nestedContainer = mr.Create<IContainer>();
-            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>()).Returns(ticketProvider.Object);
+            nestedContainer.Setup(x => x.GetInstance<IDataFeatures>()).Returns(dataFeatures.Object);
+            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>("JSM")).Returns(ticketProvider.Object);
             nestedContainer.Setup(x => x.GetInstance<IDatasetContext>()).Returns(datasetContext.Object);
             nestedContainer.Setup(x => x.GetInstance<ISecurityService>()).Returns(securityService.Object);
             nestedContainer.Setup(x => x.Dispose());
@@ -121,6 +127,9 @@ namespace Sentry.data.Infrastructure.Tests
 
             ticketProvider.Setup(x => x.RetrieveTicketAsync("ID")).ReturnsAsync(changeTicket);
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4993_JSMTicketProvider.GetValue()).Returns(true);
+
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             List<SecurityTicket> securityTickets = new List<SecurityTicket>
             {
@@ -133,7 +142,8 @@ namespace Sentry.data.Infrastructure.Tests
             securityService.Setup(x => x.CloseTicket(securityTickets.First(), "000001", "Withdrawn", ChangeTicketStatus.WITHDRAWN));
 
             Mock<IContainer> nestedContainer = mr.Create<IContainer>();
-            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>()).Returns(ticketProvider.Object);
+            nestedContainer.Setup(x => x.GetInstance<IDataFeatures>()).Returns(dataFeatures.Object);
+            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>("JSM")).Returns(ticketProvider.Object);
             nestedContainer.Setup(x => x.GetInstance<IDatasetContext>()).Returns(datasetContext.Object);
             nestedContainer.Setup(x => x.GetInstance<ISecurityService>()).Returns(securityService.Object);
             nestedContainer.Setup(x => x.Dispose());
@@ -164,6 +174,9 @@ namespace Sentry.data.Infrastructure.Tests
 
             ticketProvider.Setup(x => x.RetrieveTicketAsync("ID")).ReturnsAsync(changeTicket);
 
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4993_JSMTicketProvider.GetValue()).Returns(true);
+
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             List<SecurityTicket> securityTickets = new List<SecurityTicket>
             {
@@ -175,7 +188,8 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
 
             Mock<IContainer> nestedContainer = mr.Create<IContainer>();
-            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>()).Returns(ticketProvider.Object);
+            nestedContainer.Setup(x => x.GetInstance<IDataFeatures>()).Returns(dataFeatures.Object);
+            nestedContainer.Setup(x => x.GetInstance<ITicketProvider>("JSM")).Returns(ticketProvider.Object);
             nestedContainer.Setup(x => x.GetInstance<IDatasetContext>()).Returns(datasetContext.Object);
             nestedContainer.Setup(x => x.GetInstance<ISecurityService>()).Returns(securityService.Object);
             nestedContainer.Setup(x => x.Dispose());

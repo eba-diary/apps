@@ -54,6 +54,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(1, x.Approvers.Count);
                 Assert.AreEqual("000001", x.Approvers.First().ApproverID);
             });
+            client.Setup(x => x.MovePhase("ITCM-001", JsmChangePhase.READY_APPROVAL)).Returns(Task.CompletedTask);
 
             JsmTicketProvider ticketProvider = new JsmTicketProvider(client.Object);
 
@@ -104,6 +105,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(1, x.Approvers.Count);
                 Assert.AreEqual("000001", x.Approvers.First().ApproverID);
             });
+            client.Setup(x => x.MovePhase("ITCM-001", JsmChangePhase.READY_APPROVAL)).Returns(Task.CompletedTask);
 
             JsmTicketProvider ticketProvider = new JsmTicketProvider(client.Object);
 
@@ -155,6 +157,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(1, x.Approvers.Count);
                 Assert.AreEqual("000001", x.Approvers.First().ApproverID);
             });
+            client.Setup(x => x.MovePhase("ITCM-001", JsmChangePhase.READY_APPROVAL)).Returns(Task.CompletedTask);
 
             JsmTicketProvider ticketProvider = new JsmTicketProvider(client.Object);
 
@@ -204,6 +207,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(1, x.Approvers.Count);
                 Assert.AreEqual("000001", x.Approvers.First().ApproverID);
             });
+            client.Setup(x => x.MovePhase("ITCM-001", JsmChangePhase.READY_APPROVAL)).Returns(Task.CompletedTask);
 
             JsmTicketProvider ticketProvider = new JsmTicketProvider(client.Object);
 

@@ -176,19 +176,17 @@ namespace Sentry.data.Infrastructure
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
 
-            ChangeManagementClient changeManagementClient = new ChangeManagementClient(Configuration.Config.GetHostSetting("JSMApiUrl"),
+            registry.For<ISentryChangeManagementClient>().Singleton().Use(new ChangeManagementClient(Configuration.Config.GetHostSetting("JSMApiUrl"),
                 Configuration.Config.GetHostSetting("JSMApiUser"),
                 Configuration.Config.GetHostSetting("JSMApiToken"),
                 NullLogger.Instance, ChangeManagementSystem.JSM,
-                bool.Parse(Configuration.Config.GetHostSetting("UseProxy")) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : null);
+                bool.Parse(Configuration.Config.GetHostSetting("UseProxy")) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : null));
 
-            registry.For<ISentryChangeManagementClient>().Use(changeManagementClient);
-
-            registry.For<ITicketProvider>().Singleton().Use<JsmTicketProvider>().Named("JSM");
-            registry.For<ITicketProvider>().Singleton().Use<CherwellProvider>().Named("Cherwell");
             registry.For<ITicketProvider>().Use(x => x.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue()
                 ? x.GetInstance<ITicketProvider>("JSM")
                 : x.GetInstance<ITicketProvider>("Cherwell"));
+            registry.For<ITicketProvider>().Add<JsmTicketProvider>().Named("JSM");
+            registry.For<ITicketProvider>().Add<CherwellProvider>().Singleton().Named("Cherwell");
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());

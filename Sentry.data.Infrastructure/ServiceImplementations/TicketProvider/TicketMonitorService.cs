@@ -12,7 +12,12 @@ namespace Sentry.data.Infrastructure
         {
             using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
-                ITicketProvider _baseTicketProvider = Container.GetInstance<ITicketProvider>();
+                string ticketProviderName = "Cherwell";
+                if (Container.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue())
+                {
+                    ticketProviderName = "JSM";
+                }
+                ITicketProvider _baseTicketProvider = Container.GetInstance<ITicketProvider>(ticketProviderName);
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
 
