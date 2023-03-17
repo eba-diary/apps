@@ -290,7 +290,7 @@ namespace Sentry.data.Infrastructure.Tests
             SecurityTicket mockTicket = new SecurityTicket
             {
                 SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A3"),
-                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
             };
 
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
@@ -300,7 +300,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             inevService.CheckDbaPortalEvents();
 
-            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketAdded);
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketAdded);
             Assert.IsTrue(mockTicket.ExternalRequestId == "1000");
 
             repository.VerifyAll();
@@ -331,7 +331,7 @@ namespace Sentry.data.Infrastructure.Tests
             SecurityTicket mockTicket = new SecurityTicket
             {
                 SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A4"),
-                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
                 ExternalRequestId = "1001"
             };
 
@@ -342,7 +342,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             inevService.CheckDbaPortalEvents();
 
-            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketApproved);
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketApproved);
 
             repository.VerifyAll();
         }
@@ -372,7 +372,7 @@ namespace Sentry.data.Infrastructure.Tests
             SecurityTicket mockTicket = new SecurityTicket
             {
                 SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A5"),
-                TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
                 IsAddingPermission = true,
                 ExternalRequestId = "1002",
                 AddedPermissions = new List<SecurityPermission>()
@@ -391,7 +391,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             inevService.CheckDbaPortalEvents();
 
-            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.HpsmTicketStatus.DbaTicketComplete);
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketComplete);
             Assert.IsTrue(mockTicket.AddedPermissions.First().IsEnabled);
 
             repository.VerifyAll();

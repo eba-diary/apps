@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Sentry.Common.Logging;
+using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.DataTables.QueryableAdapter;
+using Sentry.DataTables.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Sentry.data.Core;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.DataTables.Mvc;
-using Sentry.DataTables.QueryableAdapter;
-using Sentry.DataTables.Shared;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -122,7 +122,16 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitAccessRequest(NotificationAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = await _notificationService.RequestAccess(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _notificationService.RequestAccess(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit notification access request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
