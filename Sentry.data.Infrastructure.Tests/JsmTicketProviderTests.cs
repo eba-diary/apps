@@ -358,6 +358,23 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
+        public async Task RetrieveTicketAsync_Id_Deleted_ChangeTicket()
+        {
+            Mock<ISentryChangeManagementClient> client = new Mock<ISentryChangeManagementClient>(MockBehavior.Strict);
+            client.Setup(x => x.GetChange("ITCM-001")).ThrowsAsync(new Exception("Issue does not exist or you do not have permission to see it."));
+
+            JsmTicketProvider ticketProvider = new JsmTicketProvider(client.Object);
+
+            ChangeTicket result = await ticketProvider.RetrieveTicketAsync("ITCM-001");
+
+            Assert.AreEqual("ITCM-001", result.TicketId);
+            Assert.AreEqual(ChangeTicketStatus.WITHDRAWN, result.TicketStatus);
+            Assert.AreEqual("Issue does not exist or you do not have permission to see it.", result.RejectedReason);
+
+            client.VerifyAll();
+        }
+
+        [TestMethod]
         public async Task RetrieveTicketAsync_CatchException()
         {
             Mock<ISentryChangeManagementClient> client = new Mock<ISentryChangeManagementClient>(MockBehavior.Strict);

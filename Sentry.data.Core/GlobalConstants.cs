@@ -199,7 +199,7 @@ namespace Sentry.data.Core
             public const string REVIEW = "Review";
             public const string INDIVIDUAL_AUTHORIZE = "Individual Authorize";
             public const string GROUP_AUTHORIZE = "Group Authorize";
-            public const string AWAITING_IMPLEMENTATION = "Awaiting Implementation";
+            public const string AWAITING_IMPLEMENTATION = "Awaiting implementation";
             public const string IMPLEMENTING = "Implementing";
             public const string COMPLETED = "Completed";
             public const string CANCELED = "Canceled";

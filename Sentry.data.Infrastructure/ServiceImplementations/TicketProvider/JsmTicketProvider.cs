@@ -59,13 +59,26 @@ namespace Sentry.data.Infrastructure
             ChangeTicket changeTicket = null;
 
             try
-            {
+            {                
                 SentryChange sentryChange = await _changeManagementClient.GetChange(ticketId);
                 changeTicket = MapToChangeTicketFrom(sentryChange);
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error attempting to get change {ticketId} from JSM", ex);
+                if (ex.Message.Contains("Issue does not exist or you do not have permission to see it"))
+                {
+                    Logger.Info($"JSM ticket {ticketId} was deleted and cannot be found");
+                    return new ChangeTicket
+                    {
+                        TicketId = ticketId,
+                        TicketStatus = ChangeTicketStatus.WITHDRAWN,
+                        RejectedReason = ex.Message
+                    };
+                }
+                else
+                {
+                    Logger.Error($"Error attempting to get change {ticketId} from JSM", ex);
+                }
             }
 
             return changeTicket;
@@ -244,8 +257,12 @@ namespace Sentry.data.Infrastructure
             }
             markdown.AddList(request.Permissions);
             markdown.AddBreak();
-            markdown.AddBold("Said Asset:");
-            markdown.AddLine(" " + request.SaidKeyCode);
+
+            if (!string.IsNullOrEmpty(request.SaidKeyCode))
+            {
+                markdown.AddBold("Said Asset:");
+                markdown.AddLine(" " + request.SaidKeyCode);
+            }
         }
 
         private string GetAccessor(AccessRequest request)
@@ -256,7 +273,8 @@ namespace Sentry.data.Infrastructure
             }
             else 
             {
-                return $"{request.SecurableObjectName} ({request.SecurableObjectNamedEnvironment})";
+                string objNamedEnv = string.IsNullOrEmpty(request.SecurableObjectNamedEnvironment) ? "" : $" ({request.SecurableObjectNamedEnvironment})";
+                return request.SecurableObjectName + objNamedEnv;
             }
         }
         #endregion
