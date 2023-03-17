@@ -6,11 +6,9 @@ using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.data.Infrastructure.Exceptions;
 using Sentry.data.Infrastructure.InfrastructureEvents;
-using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -21,7 +19,7 @@ namespace Sentry.data.Infrastructure
     /// </summary>
     public class InevService : IInevService
     {
-        private readonly IRestClient _restClient;
+        private readonly RestClient _restClient;
         private readonly IClient _inevClient;
 
         private readonly IDatasetContext _datasetContext;
@@ -38,7 +36,7 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(IRestClient restClient, IClient inevClient, IDatasetContext datasetContext)
+        public InevService(RestClient restClient, IClient inevClient, IDatasetContext datasetContext)
         {
             _restClient = restClient;
             _inevClient = inevClient;
@@ -59,9 +57,9 @@ namespace Sentry.data.Infrastructure
             await PublishInfrastructureEvent(INEV_EVENTTYPE_PERMSUPDATED, payload, datasetId);
             //if snowflake permissions were just requested from DBA, set ticket to pending DBA to be tracked through INEV
             //Need these to be toggled on and off so we sent the request to DBA in correct state
-            if(ticket.TicketStatus == HpsmTicketStatus.COMPLETED && ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS))
+            if(ticket.TicketStatus == ChangeTicketStatus.COMPLETED && ticket.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS) || ticket.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS))
             {
-                ticket.TicketStatus = HpsmTicketStatus.DbaTicketPending;
+                ticket.TicketStatus = ChangeTicketStatus.DbaTicketPending;
                 ticket.AddedPermissions?.Where(p => p.Permission.PermissionCode == PermissionCodes.SNOWFLAKE_ACCESS).ToList().ForEach(x =>
                 {
                     x.IsEnabled = false;
@@ -139,7 +137,7 @@ namespace Sentry.data.Infrastructure
                 {
                     message.Details.TryGetValue("RequestID", out string dbaRequestId);
                     sourceTicket.ExternalRequestId = dbaRequestId;
-                    sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketAdded;
+                    sourceTicket.TicketStatus = GlobalConstants.ChangeTicketStatus.DbaTicketAdded;
                 }
             }
         }
@@ -151,7 +149,7 @@ namespace Sentry.data.Infrastructure
                 var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
                 if (sourceTicket != null)
                 {
-                    sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketApproved;
+                    sourceTicket.TicketStatus = GlobalConstants.ChangeTicketStatus.DbaTicketApproved;
                 }
             }
         }
@@ -163,7 +161,7 @@ namespace Sentry.data.Infrastructure
                 var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
                 if (sourceTicket != null)
                 {
-                    sourceTicket.TicketStatus = GlobalConstants.HpsmTicketStatus.DbaTicketComplete;
+                    sourceTicket.TicketStatus = GlobalConstants.ChangeTicketStatus.DbaTicketComplete;
                     if (sourceTicket.IsAddingPermission)
                     {
                         sourceTicket.AddedPermissions.ToList().ForEach(x =>
@@ -344,9 +342,6 @@ namespace Sentry.data.Infrastructure
             // The NSwag client chokes on this non-JSON value, requiring us to use this method
             // We still use the type ("Message") from the NSwag-generated code
             // See https://github.com/RicoSuter/NSwag/issues/2384
-            _restClient.BaseUrl = new Uri(Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
-            _restClient.Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             var request = new RestRequest() { Resource = "/api/topics/" };
 
             //serialize the request body ourselves, so we can specify the JsonSerializationOptions
@@ -361,7 +356,7 @@ namespace Sentry.data.Infrastructure
             request.AddJsonBody(jsonBody);
 
             //execute the POST request
-            var response = await _restClient.ExecuteTaskAsync(request, CancellationToken.None, Method.POST);
+            var response = await _restClient.ExecutePostAsync(request);
 
             //throw exception if there were errors executing the request
             if (response.ResponseStatus != ResponseStatus.Completed ||

@@ -1,22 +1,27 @@
 ﻿using Hangfire;
 using LaunchDarkly.Sdk.Server.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
+using RestSharp;
 using RestSharp.Authenticators;
 using Sentry.Associates;
+using Sentry.ChangeManagement;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.data.Core.Interfaces.SAIDRestClient;
 using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Infrastructure.Mappings.Primary;
 using Sentry.data.Infrastructure.PollyPolicies;
 using Sentry.data.Infrastructure.ServiceImplementations;
 using Sentry.Messaging.Common;
+using StructureMap;
 using System;
 using System.Linq;
 using System.Net;
@@ -149,10 +154,9 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-            registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
-            registry.For<RestSharp.IRestClient>().Use(() => new RestSharp.RestClient()).AlwaysUnique();
+            registry.For<RestClient>().Use(() => new RestClient()).AlwaysUnique();
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
-            registry.For<IJobScheduler>().Singleton().Use<Sentry.data.Infrastructure.ServiceImplementations.HangfireJobScheduler>();
+            registry.For<IJobScheduler>().Singleton().Use<HangfireJobScheduler>();
             registry.For<ISupportLinkService>().Singleton().Use<SupportLinkService>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
@@ -171,6 +175,18 @@ namespace Sentry.data.Infrastructure
 
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
+
+            registry.For<ISentryChangeManagementClient>().Singleton().Use(new ChangeManagementClient(Configuration.Config.GetHostSetting("JSMApiUrl"),
+                Configuration.Config.GetHostSetting("JSMApiUser"),
+                Configuration.Config.GetHostSetting("JSMApiToken"),
+                NullLogger.Instance, ChangeManagementSystem.JSM,
+                bool.Parse(Configuration.Config.GetHostSetting("UseProxy")) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : null));
+
+            registry.For<ITicketProvider>().Use(x => x.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue()
+                ? x.GetInstance<ITicketProvider>("JSM")
+                : x.GetInstance<ITicketProvider>("Cherwell"));
+            registry.For<ITicketProvider>().Add<JsmTicketProvider>().Named("JSM");
+            registry.For<ITicketProvider>().Add<CherwellProvider>().Singleton().Named("Cherwell");
 
             // Choose the parameterless constructor.
             registry.For<IBackgroundJobClient>().Singleton().Use<BackgroundJobClient>().SelectConstructor(() => new BackgroundJobClient());
@@ -245,14 +261,17 @@ namespace Sentry.data.Infrastructure
                 Ctor<HttpClient>().Is(inevClient).
                 SetProperty((c) => c.BaseUrl = Sentry.Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"));
 
-            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().
-                Ctor<RestSharp.IRestClient>().Is(new RestSharp.RestClient()
-                {
-                    BaseUrl = new Uri(Configuration.Config.GetHostSetting("SecBotUrl")),
-                    Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"),
-                                                    Configuration.Config.GetHostSetting("ServiceAccountPassword"))
-                }).
-                AlwaysUnique();
+            RestClient inevRestClient = new RestClient(Configuration.Config.GetHostSetting("InfrastructureEventingServiceBaseUrl"))
+            {
+                Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+            };
+            registry.For<IInevService>().Use<InevService>().Ctor<RestClient>().Is(inevRestClient);
+
+            RestClient secBotRestClient = new RestClient(Configuration.Config.GetHostSetting("SecBotUrl"))
+            {
+                Authenticator = new HttpBasicAuthenticator(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"))
+            };
+            registry.For<IAdSecurityAdminProvider>().Use<SecBotProvider>().Ctor<RestClient>().Is(secBotRestClient).AlwaysUnique();
 
             //establish Polly Policy registry
             PolicyRegistry pollyRegistry = new PolicyRegistry();
@@ -303,6 +322,11 @@ namespace Sentry.data.Infrastructure
             _container.GetAllInstances<IPollyPolicy>().ToList().ForEach(p => p.Register());
 
 
+        }
+
+        public static void InitForUnitTest(IContainer mockContainer)
+        {
+            _container = mockContainer;
         }
 
         /// <summary>

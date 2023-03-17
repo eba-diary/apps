@@ -43,5 +43,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA4931_SendMotiveEmail { get; }
         IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
         IFeatureFlag<bool> CLA4912_API { get; }
+        IFeatureFlag<bool> CLA4993_JSMTicketProvider { get; }
     }
 }

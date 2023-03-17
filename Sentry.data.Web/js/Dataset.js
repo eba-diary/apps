@@ -2770,12 +2770,14 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     setupFormAwsIam() {
+        $("#SnowflakeAccountForm").addClass("d-none");
         $("#AwsArnForm").removeClass("d-none");
         $("#RequestAccess_Type").val("1")
         data.Dataset.requestAccessShowSaveChanges();
     },
 
     setupFormSnowflakeAccount() {
+        $("#AwsArnForm").addClass("d-none");
         $("#SnowflakeAccountForm").removeClass("d-none");
         $("#RequestAccess_Type").val("4")
         data.Dataset.requestAccessShowSaveChanges();

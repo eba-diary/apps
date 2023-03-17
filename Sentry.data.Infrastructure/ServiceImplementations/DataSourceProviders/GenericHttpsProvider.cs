@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -26,7 +25,7 @@ namespace Sentry.data.Infrastructure
         public GenericHttpsProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry, 
-            IRestClient restClient, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            RestClient restClient, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GenericHttpProviderPolicy);
@@ -158,7 +157,7 @@ namespace Sentry.data.Infrastructure
                 ConfigureClient();
                 ConfigureRequest();
 
-                IRestResponse resp = SendRequest();
+                RestResponse resp = SendRequest();
 
                 FindTargetJob();
 
@@ -283,18 +282,18 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        public override List<IRestResponse> SendPagingRequest()
+        public override List<RestResponse> SendPagingRequest()
         {
             throw new NotImplementedException();
         }
 
-        public override IRestResponse SendRequest()
+        public override RestResponse SendRequest()
         {
-            IRestResponse resp;
+            RestResponse resp;
 
             resp = _providerPolicy.Execute(() =>
             {
-                IRestResponse response = _client.Execute(Request);
+                RestResponse response = _client.Execute(Request);
 
                 if (response.ErrorException != null)
                 {
@@ -325,17 +324,14 @@ namespace Sentry.data.Infrastructure
             string methodName = $"{nameof(GenericHttpsDataFlowProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
             Logger.Debug($"{methodName} Method Start");
 
-            string baseUri = _job.DataSource.BaseUri.ToString();
-
-            _client = new RestClient
-            {
-                BaseUrl = new Uri(baseUri)
-            };
+            RestClientOptions clientOptions = new RestClientOptions(_job.DataSource.BaseUri.ToString());
 
             if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                _client.Proxy = webProxy;
+                clientOptions.Proxy = webProxy;
             }
+
+            _client = new RestClient(clientOptions);
 
             Logger.Debug($"{methodName} Method End");
         }
@@ -357,7 +353,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
+        protected override void ConfigureOAuth(RestRequest req, RetrieverJob job)
         {
             throw new NotImplementedException();
         }
@@ -367,7 +363,7 @@ namespace Sentry.data.Infrastructure
 #pragma warning disable IDE0017 // Simplify object initialization
             _request = new RestRequest();
 #pragma warning restore IDE0017 // Simplify object initialization
-            _request.Method = Method.GET;
+            _request.Method = Method.Get;
             _request.Resource = _job.GetUri().ToString();
 
             //Add datasource specific headers to request

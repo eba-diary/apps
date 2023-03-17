@@ -17,19 +17,19 @@ namespace Sentry.data.Web
             {
                 switch (securablePermission.TicketStatus) 
                 {
-                    case GlobalConstants.HpsmTicketStatus.PENDING:
+                    case GlobalConstants.ChangeTicketStatus.PENDING:
                         PermissionStatus = "Pending Approval";
                         break;
-                    case GlobalConstants.HpsmTicketStatus.DbaTicketPending:
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketPending:
                         PermissionStatus = "DBA Ticket Pending Creation";
                         break;
-                    case GlobalConstants.HpsmTicketStatus.DbaTicketAdded:
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketAdded:
                         PermissionStatus = "DBA Ticket Created";
                         break;
-                    case GlobalConstants.HpsmTicketStatus.DbaTicketApproved:
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketApproved:
                         PermissionStatus = "DBA Ticket Approved";
                         break;
-                    case GlobalConstants.HpsmTicketStatus.DbaTicketComplete:
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketComplete:
                         PermissionStatus = "DBA Ticket Complete";
                         break;
                     default:
