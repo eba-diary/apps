@@ -30,6 +30,7 @@ namespace Sentry.data.Core
         public virtual string AwsArn { get; set; }
         public virtual string SnowflakeAccount { get; set; }
         public virtual Security ParentSecurity { get; set; }
+        public virtual string ExternalRequestId { get; set; }
 
         public virtual IList<SecurityPermission> AddedPermissions { get; set; }
         public virtual IList<SecurityPermission> RemovedPermissions { get; set; }

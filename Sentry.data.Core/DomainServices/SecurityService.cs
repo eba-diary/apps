@@ -354,6 +354,8 @@ namespace Sentry.data.Core
                         IdentityType = t.IdentityType,
                         SecurityPermission = p,
                         TicketId = t.TicketId,
+                        ExternalRequestId = t.ExternalRequestId,
+                        TicketStatus = t.TicketStatus,
                         IsSystemGenerated = t.IsSystemGenerated
                     }))
                 );
@@ -368,6 +370,8 @@ namespace Sentry.data.Core
                         IdentityType = s.IdentityType,
                         SecurityPermission = s.SecurityPermission,
                         TicketId = s.TicketId,
+                        ExternalRequestId = s.ExternalRequestId,
+                        TicketStatus = s.TicketStatus,
                         IsSystemGenerated = s.IsSystemGenerated
                     })
                 );
@@ -506,6 +510,7 @@ namespace Sentry.data.Core
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
             ticket.TicketStatus = ChangeTicketStatus.COMPLETED;
+
             if (ticket.IsAddingPermission)
             {
                 ticket.AddedPermissions.ToList().ForEach(x =>
@@ -853,9 +858,7 @@ namespace Sentry.data.Core
                         IsSystemGenerated = true
                     };
                     var securityTicket = BuildAndAddPermissionTicket(accessRequest, group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security, "DEFAULT_SECURITY");
-                    //don't auto-approve Snowflake permissions - they will be approved when the Cherwell ticket that the DBA portal creates is approved
-                    //ApproveTicket() would call PublishDatasetPermissionsUpdatedInfrastructureEvent() - so we call it explicitely here
-                    await PublishDatasetPermissionsUpdatedInfrastructureEvent(securityTicket);
+                    await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }
             }

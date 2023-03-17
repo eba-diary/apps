@@ -187,6 +187,11 @@ namespace Sentry.data.Core
             public const string DENIED = "Denied";
             public const string WITHDRAWN = "Withdrawn";
             public const string APPROVED = "approved";
+            //dba
+            public const string DbaTicketPending = "DbaTicketPending";
+            public const string DbaTicketAdded = "DbaTicketAdded";
+            public const string DbaTicketApproved = "DbaTicketApproved";
+            public const string DbaTicketComplete = "DbaTicketComplete";
         }
 
         public static class JsmAssignmentGroup
