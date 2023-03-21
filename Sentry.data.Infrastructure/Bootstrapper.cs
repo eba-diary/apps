@@ -3,7 +3,6 @@ using LaunchDarkly.Sdk.Server.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using NHibernate;
-using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Mapping.ByCode;
 using Polly.Registry;
@@ -27,7 +26,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Caching;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
@@ -176,11 +174,13 @@ namespace Sentry.data.Infrastructure
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
 
+            WebHelper.TryGetWebProxy(true, out WebProxy changeManagementProxy);
+
             registry.For<ISentryChangeManagementClient>().Singleton().Use(new ChangeManagementClient(Configuration.Config.GetHostSetting("JSMApiUrl"),
                 Configuration.Config.GetHostSetting("JSMApiUser"),
                 Configuration.Config.GetHostSetting("JSMApiToken"),
                 NullLogger.Instance, ChangeManagementSystem.JSM,
-                bool.Parse(Configuration.Config.GetHostSetting("UseProxy")) ? Configuration.Config.GetHostSetting("EdgeWebProxyUrl") : null));
+                changeManagementProxy));
 
             registry.For<ITicketProvider>().Use(x => x.GetInstance<IDataFeatures>().CLA4993_JSMTicketProvider.GetValue()
                 ? x.GetInstance<ITicketProvider>("JSM")
