@@ -5,7 +5,7 @@
     string color = "plum";
     List<Sentry.data.Web.Models.AssetUIModel> assets = ViewBag.DataAssets;
     string disabled;
-    string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
+    string arch = "https://sentryinsurance.sharepoint.com/sites/29737/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink + "?web=1";
     Model.Components = Model.Components.OrderBy(x => x.Type.Name).ToList();
 }
 
