@@ -58,7 +58,17 @@ data.DatasetsSearch = {
                 //load result view
                 $(".filter-search-results-container").load("/DatasetSearch/TileResults/", tileResultsModel, function () {
                     data.DatasetsSearch.initUI();
-                    data.FilterSearch.completeSearch(tileResultsModel.TotalResults, request.PageSize, tileResultsModel.TotalResults);
+                    let pageSize = parseInt(request.PageSize);
+                    data.FilterSearch.completeSearch(tileResultsModel.TotalResults, pageSize, tileResultsModel.TotalResults);
+
+                    if (tileResultsModel.TotalResults > 0) {
+                        let pageStart = 1;
+                        if (pageNumber > 1) {
+                            pageStart = ((pageNumber - 1) * pageSize) + 1;
+                        }
+
+                        data.FilterSearch.setPageInfo(pageStart, tileResultsModel.Tiles.length < pageSize ? tileResultsModel.TotalResults : pageSize);
+                    }
 
                     if (updateFilters) {
                         data.FilterSearch.completeFilterRetrieval(tileResultsModel.FilterCategories);
