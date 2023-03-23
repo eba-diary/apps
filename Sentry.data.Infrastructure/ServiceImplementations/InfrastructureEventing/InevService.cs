@@ -120,12 +120,12 @@ namespace Sentry.data.Infrastructure
         public SecurityTicket GetSecurityTicketForSourceRequestId(string sourceRequestId)
         {
             Guid sourceGuid = new Guid(sourceRequestId);
-            return _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).First();
+            return _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).FirstOrDefault();
         }
 
         public SecurityTicket GetSecurityTicketForDbaRequestId(string dbaRequestId)
         {
-            return _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).First();
+            return _datasetContext.SecurityTicket.Where(t => t.ExternalRequestId.Equals(dbaRequestId)).FirstOrDefault();
         }
 
         private void ProcessDbaAddedEvent(Message message)
