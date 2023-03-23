@@ -126,14 +126,9 @@ namespace Sentry.data.Infrastructure
 
             Guid sourceGuid = new Guid(sourceRequestId);
 
-            if (sourceGuid == null)
-            {
-                return null;
-            }
-
             return _datasetContext.SecurityTicket.Where(t => t.SecurityTicketId.Equals(sourceGuid)).FirstOrDefault();
         }
-
+        
         public SecurityTicket GetSecurityTicketForDbaRequestId(string dbaRequestId)
         {
             if(dbaRequestId == null)
