@@ -63,11 +63,13 @@ data.DatasetsSearch = {
 
                     if (tileResultsModel.TotalResults > 0) {
                         let pageStart = 1;
+                        let pageEnd = pageSize;
                         if (pageNumber > 1) {
                             pageStart = ((pageNumber - 1) * pageSize) + 1;
+                            pageEnd = pageNumber * pageSize;
                         }
 
-                        data.FilterSearch.setPageInfo(pageStart, tileResultsModel.Tiles.length < pageSize ? tileResultsModel.TotalResults : pageSize);
+                        data.FilterSearch.setPageInfo(pageStart, tileResultsModel.Tiles.length < pageSize ? tileResultsModel.TotalResults : pageEnd);
                     }
 
                     if (updateFilters) {
