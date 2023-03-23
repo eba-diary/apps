@@ -11,7 +11,7 @@ using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
-    public class CherwellProvider : BaseTicketProvider, IBaseTicketProvider
+    public class CherwellProvider : ITicketProvider
     {
         private readonly IBusinessObjectClient _businessObjectClient;
         private readonly IServiceClient _tokenClient;
@@ -37,44 +37,46 @@ namespace Sentry.data.Infrastructure
             _tokenClient = InitServiceClient();
         }
 
-
         #region Public Methods
-        public override string CreateChangeTicket(AccessRequest model)
+        public Task<string> CreateTicketAsync(AccessRequest request)
         {
             try
             {
-                string newBusPublicObId = CreateNewChangeTicket(GlobalConstants.CherwellBusinessObjectNames.CHANGE_REQUEST, model);
+                string newBusPublicObId = CreateNewChangeTicket(GlobalConstants.CherwellBusinessObjectNames.CHANGE_REQUEST, request);
 
-                AddApproversToTicket(newBusPublicObId, model);
+                AddApproversToTicket(newBusPublicObId, request);
 
                 ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.WAITING_FOR_APPROVAL, GlobalConstants.CherwellChangeStatusOrder.WAITING_FOR_APPROVAL);
 
-                return newBusPublicObId;
+                return Task.FromResult(newBusPublicObId);
             }
             catch (Exception ex)
             {
                 Logger.Error("Could not submit access request to Cherwell", ex);
-                return string.Empty;
+                return Task.FromResult(string.Empty);
             }            
         }
 
-        public override HpsmTicket RetrieveTicket(string ticketId)
+        public Task<ChangeTicket> RetrieveTicketAsync(string ticketId)
         {
+            ChangeTicket ticket = null;
             try
             {
                 ReadResponse response = GetBusinessObjectByPublicId(ticketId);
-                return MapToHpsmTicket(response);
+                ticket = MapToHpsmTicket(response);
+                ticket.TicketId = ticketId;
             }
             catch (Exception ex)
             {
                 Logger.Error($"cherwell_retrieveTicket_failed {ticketId}", ex);
-                return null;
-            }            
+            }
+
+            return Task.FromResult(ticket);
         }
 
-        private HpsmTicket MapToHpsmTicket(ReadResponse response)
+        private ChangeTicket MapToHpsmTicket(ReadResponse response)
         {
-            HpsmTicket ticket = new HpsmTicket()
+            ChangeTicket ticket = new ChangeTicket()
             {
                 PreApproved = false,
                 ApprovedById = null,
@@ -86,24 +88,25 @@ namespace Sentry.data.Infrastructure
             //If ticket is not approved, it will be moved back to Logging and Prep
             if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.LOGGING_AND_PREP)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.DENIED;
+                ticket.TicketStatus = GlobalConstants.ChangeTicketStatus.DENIED;
             }
             else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.APPROVED;
+                ticket.TicketStatus = GlobalConstants.ChangeTicketStatus.APPROVED;
             }
             else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.CLOSED)
             {
-                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WITHDRAWN;
+                ticket.TicketStatus = GlobalConstants.ChangeTicketStatus.WITHDRAWN;
             }
             else { return null; }
 
-        return ticket;
+            return ticket;
         }
 
-        public override void CloseTicket(string ticketId, bool wasTicketDenied = false)
+        public Task CloseTicketAsync(ChangeTicket ticket)
         {
-            ChangeStatus(ticketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
+            ChangeStatus(ticket.TicketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
+            return Task.CompletedTask;
         }
         #endregion
 
