@@ -297,6 +297,11 @@
     <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnectorTask.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnector.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileDrop.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileQuery.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileRaw.cs" />
+    <Compile Include="Entities\DataProcessing\BaseDatasetFileV2.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileV2.cs" />
     <Compile Include="Entities\DataProcessing\DeadSparkJob.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />

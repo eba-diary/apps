@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace Sentry.data.Infrastructure
 {
@@ -92,6 +93,30 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<DatasetFile>();
+            }
+        }
+
+        public IQueryable<DatasetFileDrop> DatasetFileDrop
+        {
+            get
+            {
+                return Query<DatasetFileDrop>();
+            }
+        }
+
+        public IQueryable<DatasetFileRaw> DatasetFileRaw
+        {
+            get
+            {
+                return Query<DatasetFileRaw>();
+            }
+        }
+
+        public IQueryable<DatasetFileQuery> DatasetFileQuery
+        {
+            get
+            {
+                return Query<DatasetFileQuery>();
             }
         }
 

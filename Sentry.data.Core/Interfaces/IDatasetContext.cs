@@ -30,6 +30,9 @@ namespace Sentry.data.Core
         IQueryable<Status> EventStatus { get; }
         IQueryable<DatasetFile> DatasetFileStatusActive { get; }
         IQueryable<DatasetFile> DatasetFileStatusAll { get; }
+        IQueryable<DatasetFileDrop> DatasetFileDrop { get; }
+        IQueryable<DatasetFileRaw> DatasetFileRaw { get; }
+        IQueryable<DatasetFileQuery> DatasetFileQuery { get; }
 
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
