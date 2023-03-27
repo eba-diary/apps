@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_1 = new DatasetFileQuery()
             {
-                DatasetFileDrop = 33,
+                DatasetFileDropID = 33,
                 DatasetID = 99,
                 SchemaId = 222,
                 FileNME = "abc.txt"
@@ -47,7 +47,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_2 = new DatasetFileQuery()
             {
-                DatasetFileDrop = 11,
+                DatasetFileDropID = 11,
                 DatasetID = 66,
                 SchemaId = 222,
                 FileNME = "abc.txt"
@@ -84,7 +84,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_1 = new DatasetFileQuery()
             {
-                DatasetFileDrop = 11,
+                DatasetFileDropID = 11,
                 DatasetID = 66,
                 SchemaId = 222,
                 FileNME = "abc.txt"

@@ -78,8 +78,7 @@ namespace Sentry.data.Core
             return context.DatasetFileQuery
                 .Where(w => w.DatasetID == file.Dataset.DatasetId && w.SchemaId == file.Schema.SchemaId && w.FileNME == file.OriginalFileName)
                 .OrderByDescending(o => o.DatasetFileQueryID)
-                .Take(1)
-                .Select(s => s.DatasetFileDrop)
+                .Select(s => s.DatasetFileDropID)
                 .FirstOrDefault();
         }
     }

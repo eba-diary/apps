@@ -1256,7 +1256,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = new FileSchema() { SchemaId = schemaId };
             DatasetFile datasetFile_1 = new DatasetFile() { DatasetFileId = 1, Dataset = dataset, Schema = schema, OriginalFileName = fileName_1 };
             DatasetFile datasetFile_2 = new DatasetFile() { DatasetFileId = 1, Dataset = dataset, Schema = schema, OriginalFileName = fileName_2 };
-            DatasetFileQuery datasetFileQuery = new DatasetFileQuery() { DatasetFileDrop = 100, DatasetID = datasetId, SchemaId = schemaId, FileNME = fileName_1 };
+            DatasetFileQuery datasetFileQuery = new DatasetFileQuery() { DatasetFileDropID = 100, DatasetID = datasetId, SchemaId = schemaId, FileNME = fileName_1 };
 
             DataFlowStep step = new DataFlowStep()
             {
@@ -1315,7 +1315,7 @@ namespace Sentry.data.Core.Tests
 
                 DatasetFile datasetFile = new DatasetFile() { DatasetFileId = i, Dataset = dataset, Schema = schema, OriginalFileName = $"{i}_{fileName_1}" };
                 datasetFileList.Add(datasetFile);
-                DatasetFileQuery datasetFileQuery = new DatasetFileQuery() { DatasetFileDrop = 100, DatasetID = datasetId, SchemaId = schemaId, FileNME = $"{i}_{fileName_1}" };
+                DatasetFileQuery datasetFileQuery = new DatasetFileQuery() { DatasetFileDropID = 100, DatasetID = datasetId, SchemaId = schemaId, FileNME = $"{i}_{fileName_1}" };
                 datasetFileQueryList.Add(datasetFileQuery);
             }
 
