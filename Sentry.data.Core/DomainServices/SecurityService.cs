@@ -17,33 +17,28 @@ namespace Sentry.data.Core
 {
     public class SecurityService : ISecurityService
     {
-
         private readonly IDatasetContext _datasetContext;
-        //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
-        private readonly IBaseTicketProvider _baseTicketProvider;
+        private readonly ITicketProvider _ticketProvider;
         private readonly IDataFeatures _dataFeatures;
         private readonly IInevService _inevService;
-        private readonly IQuartermasterService _quartermasterService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IObsidianService _obsidianService;
         private readonly IAdSecurityAdminProvider _adSecurityAdminProvider;
         private readonly IJiraService _jiraService;
 
         public SecurityService(IDatasetContext datasetContext,
-                               IBaseTicketProvider baseTicketProvider,
+                               ITicketProvider ticketProvider,
                                IDataFeatures dataFeatures,
                                IInevService inevService,
-                               IQuartermasterService quartermasterService,
                                IBackgroundJobClient backgroundJobClient,
                                IObsidianService obsidianService,
                                IAdSecurityAdminProvider adSecurityAdminProvider,
                                IJiraService jiraService)
         {
             _datasetContext = datasetContext;
-            _baseTicketProvider = baseTicketProvider;
+            _ticketProvider = ticketProvider;
             _dataFeatures = dataFeatures;
             _inevService = inevService;
-            _quartermasterService = quartermasterService;
             _backgroundJobClient = backgroundJobClient;
             _obsidianService = obsidianService;
             _adSecurityAdminProvider = adSecurityAdminProvider;
@@ -52,7 +47,7 @@ namespace Sentry.data.Core
 
         public async Task<string> RequestPermission(AccessRequest model)
         {
-            string ticketId = _baseTicketProvider.CreateChangeTicket(model);
+            string ticketId = await _ticketProvider.CreateTicketAsync(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
                 Security security = model.Scope.Equals(AccessScope.Asset) ? GetSecurityForAsset(model.SecurableObjectName) : _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
@@ -77,7 +72,7 @@ namespace Sentry.data.Core
                 TicketId = ticketId,
                 AdGroupName = model.AdGroupName,
                 GrantPermissionToUserId = model.PermissionForUserId,
-                TicketStatus = HpsmTicketStatus.PENDING,
+                TicketStatus = ChangeTicketStatus.PENDING,
                 RequestedById = model.RequestorsId,
                 RequestedDate = model.RequestedDate,
                 IsAddingPermission = model.IsAddingPermission,
@@ -110,7 +105,7 @@ namespace Sentry.data.Core
                 TicketId = ticketId,
                 AdGroupName = model.AdGroupName,
                 GrantPermissionToUserId = model.PermissionForUserId,
-                TicketStatus = HpsmTicketStatus.PENDING,
+                TicketStatus = ChangeTicketStatus.PENDING,
                 RequestedById = model.RequestorsId,
                 RequestedDate = model.RequestedDate,
                 IsAddingPermission = model.IsAddingPermission,
@@ -296,7 +291,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
         {
-            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(HpsmTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
+            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(ChangeTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
             if (inheritanceTicket != null && inheritanceTicket.TicketId != null)
             {
                 return inheritanceTicket;
@@ -359,6 +354,8 @@ namespace Sentry.data.Core
                         IdentityType = t.IdentityType,
                         SecurityPermission = p,
                         TicketId = t.TicketId,
+                        ExternalRequestId = t.ExternalRequestId,
+                        TicketStatus = t.TicketStatus,
                         IsSystemGenerated = t.IsSystemGenerated
                     }))
                 );
@@ -373,6 +370,8 @@ namespace Sentry.data.Core
                         IdentityType = s.IdentityType,
                         SecurityPermission = s.SecurityPermission,
                         TicketId = s.TicketId,
+                        ExternalRequestId = s.ExternalRequestId,
+                        TicketStatus = s.TicketStatus,
                         IsSystemGenerated = s.IsSystemGenerated
                     })
                 );
@@ -510,7 +509,8 @@ namespace Sentry.data.Core
         {
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
-            ticket.TicketStatus = HpsmTicketStatus.COMPLETED;
+            ticket.TicketStatus = ChangeTicketStatus.COMPLETED;
+
             if (ticket.IsAddingPermission)
             {
                 ticket.AddedPermissions.ToList().ForEach(x =>
@@ -858,9 +858,7 @@ namespace Sentry.data.Core
                         IsSystemGenerated = true
                     };
                     var securityTicket = BuildAndAddPermissionTicket(accessRequest, group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security, "DEFAULT_SECURITY");
-                    //don't auto-approve Snowflake permissions - they will be approved when the Cherwell ticket that the DBA portal creates is approved
-                    //ApproveTicket() would call PublishDatasetPermissionsUpdatedInfrastructureEvent() - so we call it explicitely here
-                    await PublishDatasetPermissionsUpdatedInfrastructureEvent(securityTicket);
+                    await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }
             }

@@ -999,7 +999,16 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitAccessRequest(DataSourceAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = await _configService.RequestAccessToDataSource(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _configService.RequestAccessToDataSource(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit data source access request", ex);
+            }
 
             return string.IsNullOrEmpty(ticketId) 
                 ? PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false)) 

@@ -15,12 +15,12 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
     /// </summary>
     public class SecBotProvider : IAdSecurityAdminProvider
     {
-        private readonly IRestClient restClient;
+        private readonly RestClient restClient;
 
         /// <summary>
         /// Public constructor
         /// </summary>
-        public SecBotProvider(IRestClient restClient)
+        public SecBotProvider(RestClient restClient)
         {
             this.restClient = restClient;
         }
@@ -35,10 +35,10 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         {
             //Attempt to get an authentication "crumb" from SecBot Jenkins cluster
             var cookieJar = new CookieContainer();
-            restClient.CookieContainer = cookieJar;
-            restClient.PreAuthenticate = true;
-            var authRequest = new RestRequest("crumbIssuer/api/json", Method.GET);
-            var authResponse = await restClient.ExecuteGetTaskAsync<JenkinsCrumbResponse>(authRequest);
+            restClient.Options.CookieContainer = cookieJar;
+            restClient.Options.PreAuthenticate = true;
+            var authRequest = new RestRequest("crumbIssuer/api/json", Method.Get);
+            var authResponse = await restClient.ExecuteGetAsync<JenkinsCrumbResponse>(authRequest);
             if (!authResponse.IsSuccessful || authResponse.StatusCode != HttpStatusCode.OK)
             {
                 Logger.Error("Could not retrieve an Authentication crumb from SecBot. See custom fields for additional details.", authResponse.ErrorException, new TextVariable("http_response_content", authResponse.Content), new TextVariable("http_status_code", authResponse.StatusCode.ToString()));
@@ -46,7 +46,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
             }
 
             //create a request with all the parameters needed for the SecBot Jenkins job
-            var request = new RestRequest("job/ActiveDirectory/job/Invoke-CreateDSCGroup/buildWithParameters", Method.POST)
+            var request = new RestRequest("job/ActiveDirectory/job/Invoke-CreateDSCGroup/buildWithParameters", Method.Post)
                 .AddParameter("SAIDAssetKey", adSecurityGroupDto.SaidAssetCode)
                 .AddParameter("DSCName", adSecurityGroupDto.DatasetShortName)
                 .AddParameter("DSCRole", adSecurityGroupDto.GroupType)
@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
                 .AddHeader("Jenkins-Crumb", authResponse.Data.crumb);
 
             //execute the POST
-            var response = await restClient.ExecutePostTaskAsync(request);
+            var response = await restClient.ExecutePostAsync(request);
 
             //throw exception if not successful
             if (!response.IsSuccessful || response.StatusCode != HttpStatusCode.Created)
@@ -95,10 +95,10 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         /// <exception cref="Exceptions.SecBotProviderException"></exception>
         internal async Task<string> PollForSecBotQueueStatus(string jenkinsAuthCrumb, string secBotQueueUrl)
         {
-            var queueRequest = new RestRequest(new Uri(new Uri(secBotQueueUrl), "api/json"), Method.GET)
+            var queueRequest = new RestRequest(new Uri(new Uri(secBotQueueUrl), "api/json"), Method.Get)
                                 .AddHeader("Jenkins-Crumb", jenkinsAuthCrumb);
 
-            IRestResponse<JenkinsQueueResponse> queueResponse;
+            RestResponse<JenkinsQueueResponse> queueResponse;
             var jenkinsJobUrl = "";
             await Policy
                 .Handle<Exceptions.SecBotProviderException>(e => e.Message.Contains("pending"))
@@ -109,7 +109,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
                 })
                 .ExecuteAsync(async () =>
                 {
-                    queueResponse = await restClient.ExecuteGetTaskAsync<JenkinsQueueResponse>(queueRequest);
+                    queueResponse = await restClient.ExecuteGetAsync<JenkinsQueueResponse>(queueRequest);
                     if (queueResponse.IsSuccessful && queueResponse.StatusCode == HttpStatusCode.OK)
                     {
                         if (queueResponse.Data.executable != null && queueResponse.Data.executable.url != null)
@@ -146,7 +146,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         /// <exception cref="Exceptions.SecBotProviderException"></exception>
         internal async Task PollForSecBotJobStatus(string jenkinsAuthCrumb, string secBotJobUrl)
         {
-            var statusRequest = new RestRequest(new Uri(new Uri(secBotJobUrl), "api/json"), Method.GET)
+            var statusRequest = new RestRequest(new Uri(new Uri(secBotJobUrl), "api/json"), Method.Get)
                                             .AddHeader("Jenkins-Crumb", jenkinsAuthCrumb);
 
             //It always takes the SecBot job a while to run; so pause for a few seconds before requesting the status
@@ -162,7 +162,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
                 })
                 .ExecuteAsync(async () =>
                 {
-                    var statusResponse = await restClient.ExecuteGetTaskAsync<JenkinsJobStatusResponse>(statusRequest);
+                    var statusResponse = await restClient.ExecuteGetAsync<JenkinsJobStatusResponse>(statusRequest);
                     if (statusResponse.IsSuccessful && statusResponse.StatusCode == HttpStatusCode.OK)
                     {
                         if (statusResponse.Data.result == "SUCCESS")

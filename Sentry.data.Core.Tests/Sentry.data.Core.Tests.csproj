@@ -201,6 +201,7 @@
     <Compile Include="RequestVariableTests.cs" />
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="SchemaFlowServiceTests.cs" />
+    <Compile Include="MarkdownTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

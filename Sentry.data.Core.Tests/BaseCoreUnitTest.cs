@@ -30,7 +30,7 @@ namespace Sentry.data.Core.Tests
 
             //add in the infrastructure implementations using MockRepository so we don't actually initalize contexts or services.
             registry.For<IDatasetContext>().Use(() => new Mock<IDatasetContext>().Object);
-            registry.For<IBaseTicketProvider>().Use(() => new Mock<ICherwellProvider>().Object);
+            registry.For<ITicketProvider>().Use(() => new Mock<ICherwellProvider>().Object);
             registry.For<IDataFeatures>().Use(new MockDataFeatures());
             registry.For<IInevService>().Use(() => new Mock<IInevService>().Object);
             registry.For<IQuartermasterService>().Use(() => new Mock<IQuartermasterService>().Object);
@@ -101,6 +101,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA4925_ParquetFileType => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4912_API => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4993_JSMTicketProvider => new MockBooleanFeatureFlag(true);
         }
     }
 }
