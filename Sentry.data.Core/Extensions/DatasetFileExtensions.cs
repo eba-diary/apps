@@ -69,11 +69,17 @@ namespace Sentry.data.Core
         /// <param name="file"></param>
         /// <param name="context"></param>
         /// <returns>
-        /// May return 1 to many id's for a given DatasetFile object
+        /// May return 0 to many id's for a given DatasetFile object
         /// </returns>
-        public static List<int> GetDatasetFileDropIdListByDatasetFile(this DatasetFile file, IDatasetContext context)
+        public static int GetDatasetFileDropIdListByDatasetFile(this DatasetFile file, IDatasetContext context)
         {
-            return context.DatasetFileQuery.Where(w => w.DatasetID == file.Dataset.DatasetId && w.SchemaId == file.Schema.SchemaId && w.FileNME == file.OriginalFileName).Select(s => s.DatasetFileDrop).ToList();
+            //As files are reprocessed, there will be many DatasetFileQuery rows associated with single DatasetFileDrop row.
+            //We are only pulling the DatasetFileDropId once, therefore, we are ordering and taking the top 1
+            return context.DatasetFileQuery
+                .Where(w => w.DatasetID == file.Dataset.DatasetId && w.SchemaId == file.Schema.SchemaId && w.FileNME == file.OriginalFileName)
+                .OrderByDescending(o => o.DatasetFileQueryID)
+                .Select(s => s.DatasetFileDropID)
+                .FirstOrDefault();
         }
     }
 }

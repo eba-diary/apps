@@ -100,6 +100,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA4931_SendMotiveEmail => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4925_ParquetFileType => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4912_API => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4993_JSMTicketProvider => new MockBooleanFeatureFlag(true);
         }
     }

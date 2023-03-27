@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.CreateDTM);
 
             ///Add properties specific to this class
-            this.Property(x => x.DatasetFileDrop);
+            this.Property(x => x.DatasetFileDropID);
             this.Property(x => x.ObjectStatus);
             this.Property(x => x.RunInstanceGUID);
             this.Property(x => x.UpdateDTM);

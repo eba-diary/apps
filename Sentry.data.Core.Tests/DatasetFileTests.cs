@@ -39,7 +39,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_1 = new DatasetFileQuery()
             {
-                DatasetFileDrop = 33,
+                DatasetFileDropID = 33,
                 DatasetID = 99,
                 SchemaId = 222,
                 FileNME = "abc.txt"
@@ -47,7 +47,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_2 = new DatasetFileQuery()
             {
-                DatasetFileDrop = 11,
+                DatasetFileDropID = 11,
                 DatasetID = 66,
                 SchemaId = 222,
                 FileNME = "abc.txt"
@@ -56,11 +56,10 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.DatasetFileQuery).Returns(new List<DatasetFileQuery>() { datasetFileQuery_1, datasetFileQuery_2 }.AsQueryable());
 
             //Act
-            List<int> fileIds = datasetFile.GetDatasetFileDropIdListByDatasetFile(context.Object);
+            int fileIds = datasetFile.GetDatasetFileDropIdListByDatasetFile(context.Object);
 
             //Assert
-            Assert.AreEqual(1, fileIds.Count);
-            Assert.AreEqual(33, fileIds[0]);
+            Assert.AreEqual(33, fileIds);
         }
 
         [TestMethod]
@@ -85,7 +84,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetFileQuery datasetFileQuery_1 = new DatasetFileQuery()
             {
-                DatasetFileDrop = 11,
+                DatasetFileDropID = 11,
                 DatasetID = 66,
                 SchemaId = 222,
                 FileNME = "abc.txt"
@@ -94,11 +93,10 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.DatasetFileQuery).Returns(new List<DatasetFileQuery>() { datasetFileQuery_1 }.AsQueryable());
 
             //Act
-            List<int> fileIds = datasetFile.GetDatasetFileDropIdListByDatasetFile(context.Object);
+            int fileIds = datasetFile.GetDatasetFileDropIdListByDatasetFile(context.Object);
 
             //Assert
-            Assert.IsFalse(fileIds.Any());
+            Assert.IsTrue(fileIds == 0);
         }
-
     }
 }
