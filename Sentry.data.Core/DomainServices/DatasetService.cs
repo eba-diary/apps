@@ -188,7 +188,7 @@ namespace Sentry.data.Core
             result.DatasetName = ds.DatasetName;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
-            result.Approvers = _saidService.GetAllProdApproversByKeyCodeAsync(ds.Asset.SaidKeyCode).Result;
+            result.Approvers = _saidService.GetApproversByKeyCodeAsync(ds.Asset.SaidKeyCode).Result;
             result.InheritanceTicket = _securityService.GetSecurableInheritanceTicket(ds);
             return result;
         }
@@ -271,7 +271,7 @@ namespace Sentry.data.Core
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET && x.PermissionCode == PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
                 : _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdApproversByKeyCodeAsync(ds.Asset.SaidKeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetApproversByKeyCodeAsync(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));

@@ -36,20 +36,20 @@ namespace Sentry.data.Infrastructure.ServiceImplementations
         /// </summary>
         /// <param name="keyCode">SAID Asset Keycode</param>
         /// <returns></returns>
-        public async Task<List<SAIDRole>> GetAllProdApproversByKeyCodeAsync(string keyCode)
+        public async Task<List<SAIDRole>> GetApproversByKeyCodeAsync(string keyCode)
         {
             SAIDAsset asset = await GetAssetByKeyCodeAsync(keyCode).ConfigureAwait(false);
 
             //STEP 1: FIND ALL CUSTODIAN_CERTIFIER
-            List<SAIDRole> prodApprovers = asset.Roles.Where(w => w.Role.Equals(Sentry.data.Core.GlobalConstants.SAIDRoles.CUSTODIAN_CERTIFIER)).ToList();
+            List<SAIDRole> approvers = asset.Roles.Where(w => w.Role.Equals(Sentry.data.Core.GlobalConstants.SAIDRoles.CUSTODIAN_CERTIFIER)).ToList();
 
             //STEP 2: IF NO CUSTODIAN_CERTIFIER FOUND, THEN BACKUP IS CUSTODIAN_PRODUCTION
-            if (prodApprovers.Count == 0)
+            if (approvers.Count == 0)
             {
-                prodApprovers.AddRange(asset.Roles.Where(w => w.Role.Equals(Sentry.data.Core.GlobalConstants.SAIDRoles.CUSTODIAN_PRODUCTION)).ToList());
+                approvers.AddRange(asset.Roles.Where(w => w.Role.Equals(Sentry.data.Core.GlobalConstants.SAIDRoles.CUSTODIAN_PRODUCTION)).ToList());
             }
             
-            return prodApprovers;
+            return approvers;
         }
 
         public async Task<List<SAIDAsset>> GetAllAssetsAsync()
