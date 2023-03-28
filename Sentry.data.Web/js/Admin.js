@@ -351,15 +351,27 @@ data.Admin = {
             $("#tab-spinner").show();
 
             // Retrieve seleced date
-            var selectedDate = $('#datetime-picker').val();
+            var selectedDateString = $('#datetime-picker').val();
 
-            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            // Convert date string to date object
+            var convertedDateValue = new Date(selectedDateString);
+
+            // Remove GMT standard and apply UTC standard
+            var unformattedDateString = convertedDateValue.toString().split('GMT')[0] + ' UTC';
+
+            // The reason for the GMT/UTC swap is due to the fact that toISOString() converts dates to the
+            // desired format, but will convert to the UTC primary time standard. If we manipulate our selected
+            // time to be seen as UTC, it will not convert it upon calling the toISOString().
+            var formattedDateString = new Date(unformattedDateString).toISOString().split('.')[0];
+
+            // Determine if the time is within 30 day (720 hrs)
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(formattedDateString, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {
                 $.ajax({
                     type: "GET",
-                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
+                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(formattedDateString),
                     dataType: "html",
                     success: function (msg) {
                         // Append table to parent div
