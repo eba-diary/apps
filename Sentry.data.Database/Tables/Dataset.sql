@@ -26,7 +26,7 @@
     [Asset_ID] INT NULL, 
     [Short_NME] VARCHAR(12) NULL, 
     [AlternateContactEmail] VARCHAR(256) NULL,
-    [GlobalDatasetId] INT NOT NULL DEFAULT NEXT VALUE FOR seq_GlobalDatasetId, 
+    [GlobalDatasetId] INT NULL , 
     --256 based on RFC Internet Standard
     PRIMARY KEY CLUSTERED 
 (
