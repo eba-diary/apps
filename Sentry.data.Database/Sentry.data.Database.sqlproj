@@ -173,6 +173,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_08" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_20" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_24" />
+    <Folder Include="Sequence" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -335,6 +336,7 @@
     <Build Include="Tables\MigrationHistoryDetail.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\ApplicationConfigurationProperties.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_24\CLA-4975_Enable_Existing_Tokens.sql" />
+    <Build Include="Sequence\seq_GlobalDatasetId.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
