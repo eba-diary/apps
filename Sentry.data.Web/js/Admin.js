@@ -39,6 +39,23 @@ data.Admin = {
         
     },
 
+    // Format datatime string to readable parseable valuable.
+    DateTimeFormat: function (selectedDateString)
+    {
+        // Convert date string to date object
+        var convertedDateValue = new Date(selectedDateString);
+
+        // Remove GMT standard and apply UTC standard
+        var unformattedDateString = convertedDateValue.toString().split('GMT')[0] + ' UTC';
+
+        // The reason for the GMT/UTC swap is due to the fact that toISOString() converts dates to the
+        // desired format, but will convert to the UTC primary time standard. If we manipulate our selected
+        // time to be seen as UTC, it will not convert it upon calling the toISOString().
+        var formattedDateString = new Date(unformattedDateString).toISOString().split('.')[0];
+
+        return formattedDateString;
+    },
+
     // Reduce and group json fields by the specified key
     JsonReduce: function (jsonObject, groupKey, itemsKey) {    
         
@@ -353,16 +370,7 @@ data.Admin = {
             // Retrieve seleced date
             var selectedDateString = $('#datetime-picker').val();
 
-            // Convert date string to date object
-            var convertedDateValue = new Date(selectedDateString);
-
-            // Remove GMT standard and apply UTC standard
-            var unformattedDateString = convertedDateValue.toString().split('GMT')[0] + ' UTC';
-
-            // The reason for the GMT/UTC swap is due to the fact that toISOString() converts dates to the
-            // desired format, but will convert to the UTC primary time standard. If we manipulate our selected
-            // time to be seen as UTC, it will not convert it upon calling the toISOString().
-            var formattedDateString = new Date(unformattedDateString).toISOString().split('.')[0];
+            var formattedDateString = data.Admin.DateTimeFormat(selectedDateString);
 
             // Determine if the time is within 30 day (720 hrs)
             var timeCheck = data.Admin.ReprocessJobDateRangeCheck(formattedDateString, 720);
