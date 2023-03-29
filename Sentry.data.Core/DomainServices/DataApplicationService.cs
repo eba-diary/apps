@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Extensions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;
 using System;
@@ -227,10 +228,9 @@ namespace Sentry.data.Core
                 }
 
                 migrationRequest.TargetDatasetId = newDatasetId;
-                migrationRequest.SchemaMigrationRequests.ForEach(i => i.TargetDatasetId = newDatasetId);
 
                 //If user has permissions to migrate dataset, they automatically have permissions to migrate schema
-                List<SchemaMigrationRequestResponse> schemaMigrationResponses = MigrateSchemaWithoutSave_Internal(migrationRequest.SchemaMigrationRequests);
+                List<SchemaMigrationRequestResponse> schemaMigrationResponses = MigrateSchemaWithoutSave_Internal(migrationRequest);
 
                 //All entity objects have been created, therefore, save changes
                 _datasetContext.SaveChanges();
@@ -660,7 +660,11 @@ namespace Sentry.data.Core
             _ = JobService.CreateRetrieverJob(retrieverJobDto);
         }
 
-
+        public List<SchemaMigrationRequestResponse> MigrateSchemaWithoutSave_Internal(DatasetMigrationRequest request)
+        {
+            List<SchemaMigrationRequest> schemaRequests = request.MapToSchemaMigrationRequest();
+            return MigrateSchemaWithoutSave_Internal(schemaRequests);
+        }
 
         /// <summary>
         /// Migrates list of schema without saving.
@@ -1036,7 +1040,7 @@ namespace Sentry.data.Core
                 }
             }
 
-            ValidateMigrationRequest((MigrationRequest)request).ForEach(i => errors.Add(i));
+            ValidateMigrationRequest((BaseMigrationRequest)request).ForEach(i => errors.Add(i));
 
             return errors;            
         }
@@ -1064,7 +1068,7 @@ namespace Sentry.data.Core
                 errors.Add("Source and target datasets are not related");                
             }
 
-            ValidateMigrationRequest((MigrationRequest)request).ForEach(i => errors.Add(i));
+            ValidateMigrationRequest((BaseMigrationRequest)request).ForEach(i => errors.Add(i));
 
             //Do not proceed on as next validation requires values, so return with error list
             if (errors.Any())
@@ -1077,7 +1081,8 @@ namespace Sentry.data.Core
             return ValidateMigrationRequestAsync();            
             async Task<List<string>> ValidateMigrationRequestAsync()
             {
-                if (request.TargetDatasetId == 0 && !await IsNamedEnvironmentRelatedToSaidAsset(request.SourceDatasetId, request.TargetDatasetNamedEnvironment))
+                string saidKeyCode = _datasetContext.GetById<Dataset>(request.SourceDatasetId).Asset.SaidKeyCode;
+                if (request.TargetDatasetId == 0 && !await IsNamedEnvironmentRelatedToSaidAsset(saidKeyCode, request.TargetDatasetNamedEnvironment, request.TargetDatasetNamedEnvironmentType))
                 {
                     errors.Add("Target named environment is not related to SAID asset associated with target dataset");
                 }
@@ -1086,7 +1091,7 @@ namespace Sentry.data.Core
             }            
         }
 
-        private List<string> ValidateMigrationRequest(MigrationRequest request)
+        private List<string> ValidateMigrationRequest(BaseMigrationRequest request)
         {
             List<string> errors = new List<string>();
             if (request == null)
@@ -1120,13 +1125,11 @@ namespace Sentry.data.Core
             return errors;
         }
 
-        internal async Task<bool> IsNamedEnvironmentRelatedToSaidAsset(int datasetId, string namedEnvironment)
+        internal async Task<bool> IsNamedEnvironmentRelatedToSaidAsset(string saidKeyCode, string targetNamedEnvironment, NamedEnvironmentType targetNamedEnvironmentType)
         {
             bool IsRelated = true;
 
-            (string datasetSaidAssetKeyCode, NamedEnvironmentType datasetNamedEnvironmentType) = _datasetContext.Datasets.Where(w => w.DatasetId == datasetId).Select(s => new Tuple<string, NamedEnvironmentType>(s.Asset.SaidKeyCode, s.NamedEnvironmentType)).FirstOrDefault();
-            
-            var results = await QuartermasterService.VerifyNamedEnvironmentAsync(datasetSaidAssetKeyCode, namedEnvironment, datasetNamedEnvironmentType);
+            var results = await QuartermasterService.VerifyNamedEnvironmentAsync(saidKeyCode, targetNamedEnvironment, targetNamedEnvironmentType);
 
             if (results != null && !results.IsValid())
             {
@@ -1134,7 +1137,6 @@ namespace Sentry.data.Core
             }
 
             return IsRelated;
-
         }
 
         internal bool AreDatasetsRelated(int firstDatasetId, int secondDatasetId)

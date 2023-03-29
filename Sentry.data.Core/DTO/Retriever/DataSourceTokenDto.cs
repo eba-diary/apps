@@ -17,5 +17,6 @@ namespace Sentry.data.Core.DTO.Retriever
         public int TokenExp { get; set; }
         public string Scope { get; set; }
         public bool ToDelete { get; set; }
+        public bool Enabled { get; set; }
     }
 }

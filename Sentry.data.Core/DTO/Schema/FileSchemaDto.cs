@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -22,5 +23,7 @@ namespace Sentry.data.Core
         public string ParquetStorageBucket { get; set; }
         public string ParquetStoragePrefix { get; set; }
         public IList<SchemaConsumptionDto> ConsumptionDetails { get; set; }
+        public DateTime CreateDateTime { get; set; }
+        public DateTime UpdateDateTime { get; set; }
     }
 }

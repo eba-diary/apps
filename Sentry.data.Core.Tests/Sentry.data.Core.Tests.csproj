@@ -156,6 +156,7 @@
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="ConfigServiceTests.cs" />
+    <Compile Include="DatasetFileTests.cs" />
     <Compile Include="DataSourceTests.cs" />
     <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="HelperTests\DSCEventTopicHelperTests.cs" />
     <Compile Include="JobServiceTests.cs" />
     <Compile Include="ConnectorServiceTests.cs" />
+    <Compile Include="MigrationTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
     <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />
@@ -198,6 +200,8 @@
     <Compile Include="JobExtensionsTests.cs" />
     <Compile Include="RequestVariableTests.cs" />
     <Compile Include="RetrieverJobTests.cs" />
+    <Compile Include="SchemaFlowServiceTests.cs" />
+    <Compile Include="MarkdownTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

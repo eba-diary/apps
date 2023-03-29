@@ -1,9 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Sentry.data.Core;
+using Sentry.data.Core.Interfaces.InfrastructureEventing;
 using Sentry.data.Infrastructure.InfrastructureEvents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -261,7 +264,138 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsTrue(changes.Permissions.All(p => p.Status == DatasetPermissionsUpdatedDto.PermissionDto.STATUS_DISABLED));
         }
 
+        [TestMethod]
+        public void CheckDbaPortalEvents_DbaTicketAdded_Match_Test()
+        {
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
 
+            Mock<IClient> mockInevClient = repository.Create<IClient>();
+
+            var messageAddedNoMatch = new Message { };
+            messageAddedNoMatch.Details = new Dictionary<string, string>();
+            messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("SourceRequest_ID", "79CAE2AB-6044-47A2-8072-AFA100FC26A3"));
+            messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("RequestID", "1000"));
+
+            var messagesResponse = new MessageResponse();
+            messagesResponse.Messages = new List<Message>();
+            messagesResponse.Messages.Add(messageAddedNoMatch);
+
+            var messagesResponseEmpty = new MessageResponse();
+            messagesResponseEmpty.Messages = new List<Message>();
+
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalTicketAdded", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponse);
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalRequestApproved", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponseEmpty);
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalRequestComplete", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponseEmpty);
+
+            SecurityTicket mockTicket = new SecurityTicket
+            {
+                SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A3"),
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
+            };
+
+            Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
+            mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
+
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
+
+            inevService.CheckDbaPortalEvents();
+
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketAdded);
+            Assert.IsTrue(mockTicket.ExternalRequestId == "1000");
+
+            repository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CheckDbaPortalEvents_DbaTicketApproved_Match_Test()
+        {
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IClient> mockInevClient = repository.Create<IClient>();
+
+            var messageAddedNoMatch = new Message { };
+            messageAddedNoMatch.Details = new Dictionary<string, string>();
+            messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("RequestID", "1001"));
+
+            var messagesResponse = new MessageResponse();
+            messagesResponse.Messages = new List<Message>();
+            messagesResponse.Messages.Add(messageAddedNoMatch);
+
+            var messagesResponseEmpty = new MessageResponse();
+            messagesResponseEmpty.Messages = new List<Message>();
+
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalTicketAdded", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponseEmpty);
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalRequestApproved", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponse);
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalRequestComplete", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponseEmpty);
+
+            SecurityTicket mockTicket = new SecurityTicket
+            {
+                SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A4"),
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
+                ExternalRequestId = "1001"
+            };
+
+            Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
+            mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
+
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
+
+            inevService.CheckDbaPortalEvents();
+
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketApproved);
+
+            repository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CheckDbaPortalEvents_DbaTicketComplete_Match_Test()
+        {
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IClient> mockInevClient = repository.Create<IClient>();
+
+            var messageAddedNoMatch = new Message { };
+            messageAddedNoMatch.Details = new Dictionary<string, string>();
+            messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("RequestID", "1002"));
+
+            var messagesResponse = new MessageResponse();
+            messagesResponse.Messages = new List<Message>();
+            messagesResponse.Messages.Add(messageAddedNoMatch);
+
+            var messagesResponseEmpty = new MessageResponse();
+            messagesResponseEmpty.Messages = new List<Message>();
+
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalTicketAdded", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponseEmpty);
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalRequestApproved", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponseEmpty);
+            mockInevClient.Setup(m => m.ConsumeGroupUsingGETAsync("INEV-DBAPortalRequestComplete", It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(messagesResponse);
+
+            SecurityTicket mockTicket = new SecurityTicket
+            {
+                SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A5"),
+                TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
+                IsAddingPermission = true,
+                ExternalRequestId = "1002",
+                AddedPermissions = new List<SecurityPermission>()
+            };
+
+            mockTicket.AddedPermissions.Add(new SecurityPermission()
+            {
+                AddedFromTicket = mockTicket,
+                IsEnabled = false,
+            });
+
+            Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
+            mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
+
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
+
+            inevService.CheckDbaPortalEvents();
+
+            Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketComplete);
+            Assert.IsTrue(mockTicket.AddedPermissions.First().IsEnabled);
+
+            repository.VerifyAll();
+        }
 
         private static SecurityTicket GetInheritanceSecurityTicket(bool enabled)
         {

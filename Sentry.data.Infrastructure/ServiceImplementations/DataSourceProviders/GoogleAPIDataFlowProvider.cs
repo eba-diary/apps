@@ -12,7 +12,7 @@ namespace Sentry.data.Infrastructure
 
         public GoogleAPIDataFlowProvider(Lazy<IDatasetContext> datasetContext, Lazy<IConfigService> configService, 
                 Lazy<IEncryptionService> encryptionService, Lazy<IJobService> jobService, IDataFlowService dataFlowService,
-                IReadOnlyPolicyRegistry<string> policyRegistry ,IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures)
+                IReadOnlyPolicyRegistry<string> policyRegistry, RestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures)
         {
             _dataFlowService = dataFlowService;
         }

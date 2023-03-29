@@ -10,6 +10,8 @@ using System.Linq;
 using Sentry.data.Core.Interfaces;
 using System.Linq.Expressions;
 using System.Text;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Tests
 {
@@ -1079,8 +1081,9 @@ namespace Sentry.data.Core.Tests
             // Arrange
             MockRepository mr = new MockRepository(MockBehavior.Loose);
 
-            Mock<IUserService> userService = mr.Create<IUserService>();
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA5024_PublishReprocessingEvents.GetValue()).Returns(false);
 
             List<DatasetFile> datasetFileList = new List<DatasetFile>();
             List<DataFlowStep> dataFlowStepList = new List<DataFlowStep>();
@@ -1127,7 +1130,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(d => d.DatasetFileStatusActive).Returns(datasetFileList.AsQueryable());
             context.Setup(d => d.DataFlowStep).Returns(dataFlowStepList.AsQueryable());
 
-            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, null, scheduler.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, null, scheduler.Object, features.Object);
 
             scheduler.Setup(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.Is<TimeSpan>((q) => q.Seconds == 30))).Returns(" ").Callback<Expression<Action<DatasetFileService>>, TimeSpan>(
                 (w, t) =>
@@ -1158,6 +1161,8 @@ namespace Sentry.data.Core.Tests
 
             Mock<IUserService> userService = mr.Create<IUserService>();
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
+            features.Setup(s => s.CLA5024_PublishReprocessingEvents.GetValue()).Returns(false);
 
             List<DatasetFile> datasetFileList = new List<DatasetFile>();
             List<DataFlowStep> dataFlowStepList = new List<DataFlowStep>();
@@ -1202,7 +1207,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(d => d.DatasetFileStatusActive).Returns(datasetFileList.AsQueryable());
             context.Setup(d => d.DataFlowStep).Returns(dataFlowStepList.AsQueryable());
 
-            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, null, scheduler.Object, null);
+            var datasetFileService = new DatasetFileService(context.Object, null, null, null, s3serviceprovider.Object, null, scheduler.Object, features.Object);
             
             scheduler.Setup(d => d.Schedule<DatasetFileService>(It.IsAny<Expression<Action<DatasetFileService>>>(), It.IsAny<TimeSpan>())).Returns(" ").Callback<Expression<Action<DatasetFileService>>, TimeSpan>(
                 (w, t) =>
@@ -1222,7 +1227,128 @@ namespace Sentry.data.Core.Tests
             
             Assert.IsTrue(result);
         }
-        
-        
+
+        [TestMethod]
+        public void ScheduleReprocess_Publish_Event()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA5024_PublishReprocessingEvents.GetValue()).Returns(true);
+
+            Mock<IMessagePublisher> messagePublisher = mr.Create<IMessagePublisher>();
+            messagePublisher.Setup(p => p.PublishDSCEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult("")).Callback<string, string, string>((key, value, topic) =>
+             {
+                 var requestModel = JsonConvert.DeserializeObject<ReprocessFilesRequestModel>(value);
+                 Assert.AreEqual(22, requestModel.DatasetID);
+                 Assert.AreEqual(44, requestModel.SchemaID);
+                 Assert.AreEqual(1, requestModel.DatasetFileDropIdList.Count());
+                 Assert.AreEqual(100, requestModel.DatasetFileDropIdList[0]);
+                 Assert.AreEqual(1, requestModel.DatasetFileIdList.Count());
+                 Assert.AreEqual(1, requestModel.DatasetFileIdList[0]);
+             });
+
+            int datasetId = 22;
+            int schemaId = 44;
+            string fileName_1 = "DATA\\07\\2022\\abc.txt";
+            string fileName_2 = "DATA\\07\\2022\\xyz.csv";
+            Dataset dataset = new Dataset() { DatasetId = datasetId };
+            FileSchema schema = new FileSchema() { SchemaId = schemaId };
+            DatasetFile datasetFile_1 = new DatasetFile() { DatasetFileId = 1, Dataset = dataset, Schema = schema, OriginalFileName = fileName_1 };
+            DatasetFile datasetFile_2 = new DatasetFile() { DatasetFileId = 1, Dataset = dataset, Schema = schema, OriginalFileName = fileName_2 };
+            DatasetFileQuery datasetFileQuery = new DatasetFileQuery() { DatasetFileDropID = 100, DatasetID = datasetId, SchemaId = schemaId, FileNME = fileName_1 };
+
+            DataFlowStep step = new DataFlowStep()
+            {
+                Id = 99,
+                DataFlow = new DataFlow() { DatasetId = datasetId, SchemaId = schemaId }
+            };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.DatasetFileStatusAll).Returns(new List<DatasetFile>() { datasetFile_1, datasetFile_2}.AsQueryable());
+            context.Setup(s => s.DatasetFileQuery).Returns(new List<DatasetFileQuery>() { datasetFileQuery }.AsQueryable());
+            context.Setup(s => s.DataFlowStep).Returns(new List<DataFlowStep>() { step }.AsQueryable());
+
+            Mock<IJobScheduler> jobScheduler = mr.Create<IJobScheduler>();
+
+            DatasetFileService datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null, jobScheduler.Object, dataFeatures.Object);
+
+            jobScheduler.Setup(d => d.Schedule<IMessagePublisher>(It.IsAny<Expression<Action<IMessagePublisher>>>(), It.IsAny<TimeSpan>())).Returns(" ").Callback<Expression<Action<IMessagePublisher>>, TimeSpan>(
+                (w, t) =>
+                {
+                    Action<IMessagePublisher> action = w.Compile();
+                    action.Invoke(messagePublisher.Object);
+                });
+
+            //Act
+            bool result = datasetFileService.ScheduleReprocessing(step.Id, new List<int>() { datasetFile_1.DatasetFileId, datasetFile_2.DatasetFileId });
+
+            //Assert
+            mr.VerifyAll();
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void ScheduleReprocess_Publishes_Correct_Number_of_Events()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA5024_PublishReprocessingEvents.GetValue()).Returns(true);
+
+            Mock<IMessagePublisher> messagePublisher = mr.Create<IMessagePublisher>();
+            messagePublisher.Setup(p => p.PublishDSCEventAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(""));
+
+            int datasetId = 22;
+            int schemaId = 44;
+            string fileName_1 = "abc.txt";
+            Dataset dataset = new Dataset() { DatasetId = datasetId };
+            FileSchema schema = new FileSchema() { SchemaId = schemaId };
+
+            // list of 101 datasetFileIds to test batch logic in schedule reprocessing
+            List<int> datasetFileIds = new List<int>();
+            List<DatasetFile> datasetFileList = new List<DatasetFile>();
+            List<DatasetFileQuery> datasetFileQueryList = new List<DatasetFileQuery>();
+            for (int i = 3000; i <= 3100; i++)
+            {
+                datasetFileIds.Add(i);
+
+                DatasetFile datasetFile = new DatasetFile() { DatasetFileId = i, Dataset = dataset, Schema = schema, OriginalFileName = $"{i}_{fileName_1}" };
+                datasetFileList.Add(datasetFile);
+                DatasetFileQuery datasetFileQuery = new DatasetFileQuery() { DatasetFileDropID = 100, DatasetID = datasetId, SchemaId = schemaId, FileNME = $"{i}_{fileName_1}" };
+                datasetFileQueryList.Add(datasetFileQuery);
+            }
+
+            DataFlowStep step = new DataFlowStep()
+            {
+                Id = 99,
+                DataFlow = new DataFlow() { DatasetId = datasetId, SchemaId = schemaId }
+            };
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.DatasetFileStatusAll).Returns(datasetFileList.AsQueryable());
+            context.Setup(s => s.DatasetFileQuery).Returns(datasetFileQueryList.AsQueryable());
+            context.Setup(s => s.DataFlowStep).Returns(new List<DataFlowStep>() { step }.AsQueryable());
+
+            Mock<IJobScheduler> jobScheduler = mr.Create<IJobScheduler>();
+
+            DatasetFileService datasetFileService = new DatasetFileService(context.Object, null, null, messagePublisher.Object, null, null, jobScheduler.Object, dataFeatures.Object);
+
+            jobScheduler.Setup(d => d.Schedule<IMessagePublisher>(It.IsAny<Expression<Action<IMessagePublisher>>>(), It.IsAny<TimeSpan>())).Returns(" ").Callback<Expression<Action<IMessagePublisher>>, TimeSpan>(
+                (w, t) =>
+                {
+                    Action<IMessagePublisher> action = w.Compile();
+                    action.Invoke(messagePublisher.Object);
+                });
+
+            //Act
+            bool result = datasetFileService.ScheduleReprocessing(step.Id, datasetFileIds);
+
+            //Assert
+            mr.VerifyAll();
+            jobScheduler.Verify(d => d.Schedule<IMessagePublisher>(It.IsAny<Expression<Action<IMessagePublisher>>>(), It.Is<TimeSpan>((q) => q.TotalSeconds == 30)), Times.Once());
+            jobScheduler.Verify(d => d.Schedule<IMessagePublisher>(It.IsAny<Expression<Action<IMessagePublisher>>>(), It.Is<TimeSpan>((q) => q.TotalSeconds == 60)), Times.Once());
+            Assert.IsTrue(result);
+        }
     }
 }

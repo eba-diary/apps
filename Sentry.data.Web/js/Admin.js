@@ -351,15 +351,16 @@ data.Admin = {
             $("#tab-spinner").show();
 
             // Retrieve seleced date
-            var selectedDate = $('#datetime-picker').val();
+            var formattedDateString = moment(new Date($('#datetime-picker').val())).format("YYYY-MM-DDThh:mm:ss");
 
-            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            // Determine if the time is within 30 day (720 hrs)
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(formattedDateString, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {
                 $.ajax({
                     type: "GET",
-                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(selectedDate),
+                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(formattedDateString),
                     dataType: "html",
                     success: function (msg) {
                         // Append table to parent div

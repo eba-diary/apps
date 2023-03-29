@@ -4,7 +4,7 @@
     <div class="card mb-3">
         @if (Model != null)
         {
-            @Html.HiddenFor(model => model.Id, new { @class="tokenId"})
+            @Html.HiddenFor(model => model.Id, new { @class = "tokenId"})
             @Html.HiddenFor(model => model.ToDelete, new { @class = "toDeleteMarker"})
         }
         <div class="card-body">
@@ -52,6 +52,10 @@
             </div>
         </div>
         <div class="card-footer">
+            <div class="mt-3 d-inline-block">
+                @Html.CheckBoxSimpleFor(m => m.Enabled, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.Enabled, new { @class = "form-check-label" })
+            </div>
             <button type="button" class="btn d-none btn-warning waves-effect waves-light float-r cancelDelete">Cancel Delete</button>
             <button type="button" class="btn btn-danger waves-effect waves-light float-r removeToken">Remove</button>
         </div>

@@ -42,5 +42,8 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
         IFeatureFlag<bool> CLA4931_SendMotiveEmail { get; }
         IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
+        IFeatureFlag<bool> CLA4912_API { get; }
+        IFeatureFlag<bool> CLA5024_PublishReprocessingEvents { get; }
+        IFeatureFlag<bool> CLA4993_JSMTicketProvider { get; }
     }
 }

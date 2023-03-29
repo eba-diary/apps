@@ -24,6 +24,7 @@
     <div class="d-none" id="RequestMigrationFormSection">
         @Html.HiddenFor(x => x.DatasetId)
         @Html.HiddenFor(x => x.QuartermasterManagedNamedEnvironments)
+        @Html.HiddenFor(x => x.SAIDAssetKeyCode)
         <div class="md-form">
             @Html.LabelFor(x => x.DatasetName, new {@class = "active"})
             @Html.TextBoxFor(x => x.DatasetName, new { @readonly = "readonly", @disabled = "disabled", @class = "form-control"})
@@ -34,21 +35,15 @@
         </div>
 
         <div class="d-none" id="MigrationFormSection">
-            <div class="md-form">
-                @*<label class="active" for="">Target Dataset Named Environment</label>*@
-                <div class="dropdown-container">
-                    @Html.LabelFor(x => x.TargetNamedEnvironment)
-                    @if (Model.DatasetNamedEnvironmentDropDown.Any())
-                    {
-                    @Html.DropDownListFor(x => x.TargetNamedEnvironment, Model.DatasetNamedEnvironmentDropDown, new { @class = "mdb-select", searchable = "Search here..."})
-                    }
-                    else
-                    {
-                    @Html.TextBoxFor(x => x.TargetNamedEnvironment, new { @class = "form-control" })
-                    }
-                    @Html.ValidationMessageFor(model => Model.TargetNamedEnvironment, "", new { @class = "text-danger" })
-                </div>
+
+            @************************************************************************************************************************************
+            NAMED ENVIRONMENT
+            *************************************************************************************************************************************@
+            <div id="DatasetNamedEnvironmentPartial">
+                @Html.Partial("_NamedEnvironment", Model)
             </div>
+
+
             <div class="md-form">
                 @*<label class="active" for="">Schema <em>(Optional)</em></label>*@
                 @Html.LabelFor(x => x.SelectedSchema, new { @class = Model.SelectedSchema.Any() ? "active" : "" })

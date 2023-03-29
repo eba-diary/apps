@@ -13,8 +13,40 @@ namespace Sentry.data.Web
             Scope = securablePermission.Scope == SecurablePermissionScope.Self ? datasetName : datasetSaidKeyCode.ToUpper() + " (inherited)";
             Identity = securablePermission.Identity;
             PermissionDescription = securablePermission.SecurityPermission.Permission.PermissionDescription;
-            PermissionStatus = securablePermission.SecurityPermission.IsEnabled ? "Active" : "Pending";
+            if (!securablePermission.SecurityPermission.IsEnabled && !string.IsNullOrEmpty(securablePermission.TicketStatus))
+            {
+                switch (securablePermission.TicketStatus) 
+                {
+                    case GlobalConstants.ChangeTicketStatus.PENDING:
+                        PermissionStatus = "Pending Approval";
+                        break;
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketPending:
+                        PermissionStatus = "DBA Ticket Pending Creation";
+                        break;
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketAdded:
+                        PermissionStatus = "DBA Ticket Created";
+                        break;
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketApproved:
+                        PermissionStatus = "DBA Ticket Approved";
+                        break;
+                    case GlobalConstants.ChangeTicketStatus.DbaTicketComplete:
+                        PermissionStatus = "DBA Ticket Complete";
+                        break;
+                    default:
+                        PermissionStatus = "Pending";
+                        break;
+                }
+            }
+            else if (securablePermission.SecurityPermission.IsEnabled)
+            {
+                PermissionStatus = "Active";
+            }
+            else
+            {
+                PermissionStatus = "Pending";
+            }
             TicketId = securablePermission.TicketId;
+            ExternalRequestId = securablePermission.ExternalRequestId;
             Code = securablePermission.SecurityPermission.Permission.PermissionCode;
             IsSystemGenerated = securablePermission.IsSystemGenerated;
         }
@@ -26,6 +58,8 @@ namespace Sentry.data.Web
         public string PermissionDescription { get; set; }
         public string PermissionStatus { get; set; }
         public string TicketId { get; set; }
+        public string ExternalRequestId { get; set; }
+        public string TicketStatus { get; set; }
         public string Code { get; set; }
         public bool IsSystemGenerated { get; set; }
     }

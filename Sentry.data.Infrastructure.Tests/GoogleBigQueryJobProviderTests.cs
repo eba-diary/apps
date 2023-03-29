@@ -27,11 +27,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource() 
             { 
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -90,11 +90,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource()
             {
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -181,11 +181,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource()
             {
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -302,11 +302,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource()
             {
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -423,11 +423,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource()
             {
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -559,11 +559,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource()
             {
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();
@@ -655,11 +655,11 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource httpsSource = new HTTPSSource()
             {
                 BaseUri = new Uri("https://bigquery.googleapis.com/bigquery/v2/"),
-                Tokens = new List<DataSourceToken> { new DataSourceToken() }
+                AllTokens = new List<DataSourceToken> { new DataSourceToken { Enabled = true } }
             };
 
             Mock<IAuthorizationProvider> authorizationProvider = repository.Create<IAuthorizationProvider>();
-            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.Tokens.First())).Returns("token");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(httpsSource, httpsSource.AllTokens.First())).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<HttpMessageHandler> httpMessageHandler = repository.Create<HttpMessageHandler>();

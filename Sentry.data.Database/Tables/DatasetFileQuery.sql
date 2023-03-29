@@ -14,5 +14,10 @@ CREATE TABLE [dbo].[DatasetFileQuery]
 	[DatasetID] [int] NULL,
 	[SchemaID] [int] NULL,
 	[UpdateDTM] [datetime] NULL,
-	[CreateDTM] [datetime] NULL
+	[CreateDTM] [datetime] NULL, 
+    CONSTRAINT [PK_DatasetFileQuery] PRIMARY KEY ([DatasetFileQueryID]), 
+    CONSTRAINT [FK_DatasetFileQuery_DatasetFileDrop] FOREIGN KEY ([DatasetFileDropID]) REFERENCES [DatasetFileDrop]([DatasetFileDropID])
 )
+GO
+
+CREATE INDEX [IX_DatasetFileQuery_DatasetID_SchemaID_FileNME] ON [dbo].[DatasetFileQuery] ([DatasetID],[SchemaID],[FileNME])

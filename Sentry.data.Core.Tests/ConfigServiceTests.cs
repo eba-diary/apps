@@ -6,6 +6,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 using static System.Net.WebRequestMethods;
@@ -368,9 +369,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("ClientId", http.ClientId);
             Assert.AreEqual("EncryptedClientPrivateId", http.ClientPrivateId);
             Assert.AreEqual(OAuthGrantType.JwtBearer, http.GrantType);
-            Assert.AreEqual(1, http.Tokens.Count);
+            Assert.AreEqual(1, http.AllTokens.Count);
             
-            DataSourceToken dataSourceToken = http.Tokens.First();
+            DataSourceToken dataSourceToken = http.AllTokens.First();
             Assert.AreEqual("EncryptedCurrentToken", dataSourceToken.CurrentToken);
             Assert.AreEqual("EncryptedRefreshToken", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 18, 8, 0, 0), dataSourceToken.CurrentTokenExp);
@@ -445,7 +446,7 @@ namespace Sentry.data.Core.Tests
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
                 GrantType = OAuthGrantType.RefreshToken,
-                Tokens = new List<DataSourceToken>
+                AllTokens = new List<DataSourceToken>
                 {
                     new DataSourceToken
                     {
@@ -463,7 +464,8 @@ namespace Sentry.data.Core.Tests
                             new OAuthClaim() { Type = OAuthClaims.aud, Value = "https://www.token.com" },
                             new OAuthClaim() { Type = OAuthClaims.exp, Value = "100" },
                             new OAuthClaim() { Type = OAuthClaims.scope, Value = "token.scope" }
-                        }
+                        },
+                        Enabled = true
                     }
                 },
                 PrimaryContactId = "000000",
@@ -578,9 +580,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("ClientIdUpdate", http.ClientId);
             Assert.AreEqual("EncryptedClientPrivateIdUpdate", http.ClientPrivateId);
             Assert.AreEqual(OAuthGrantType.JwtBearer, http.GrantType);
-            Assert.AreEqual(2, http.Tokens.Count);
+            Assert.AreEqual(2, http.AllTokens.Count);
 
-            DataSourceToken dataSourceToken = http.Tokens.First();
+            DataSourceToken dataSourceToken = http.AllTokens.First();
             Assert.AreEqual("EncryptedCurrentTokenUpdate", dataSourceToken.CurrentToken);
             Assert.AreEqual("EncryptedRefreshToken", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 21, 9, 0, 0), dataSourceToken.CurrentTokenExp);
@@ -606,7 +608,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(OAuthClaims.scope, claim.Type);
             Assert.AreEqual("token.scope.update", claim.Value);
 
-            dataSourceToken = http.Tokens.Last();
+            dataSourceToken = http.AllTokens.Last();
             Assert.AreEqual("EncryptedCurrentToken2", dataSourceToken.CurrentToken);
             Assert.AreEqual("EncryptedRefreshToken2", dataSourceToken.RefreshToken);
             Assert.AreEqual(new DateTime(2022, 11, 22, 12, 0, 0), dataSourceToken.CurrentTokenExp);
@@ -685,7 +687,7 @@ namespace Sentry.data.Core.Tests
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
                 GrantType = OAuthGrantType.JwtBearer,
-                Tokens = new List<DataSourceToken>
+                AllTokens = new List<DataSourceToken>
                 {
                     new DataSourceToken
                     {
@@ -703,7 +705,8 @@ namespace Sentry.data.Core.Tests
                             new OAuthClaim() { Type = OAuthClaims.aud, Value = "https://www.token.com" },
                             new OAuthClaim() { Type = OAuthClaims.exp, Value = "100" },
                             new OAuthClaim() { Type = OAuthClaims.scope, Value = "token.scope" }
-                        }
+                        },
+                        Enabled = true
                     }
                 },
                 PrimaryContactId = "000001",
@@ -776,6 +779,47 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("token.scope", dataSourceToken.Scope);
 
             mock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void UpdateDatasetFileConfig_DatasetFileConfigDto_Update()
+        {
+            DatasetFileConfigDto dto = new DatasetFileConfigDto
+            {
+                DatasetScopeTypeName = "Appending",
+                Description = "Description 2",
+                FileExtensionId = 2
+            };
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                DatasetScopeType = new DatasetScopeType { Name = "Floating" },
+                Description = "Description",
+                FileExtension = new FileExtension { Id = 1 }
+            };
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            List<DatasetScopeType> scopes = new List<DatasetScopeType>
+            {
+                new DatasetScopeType { Name = "Appending" }
+            };
+            datasetContext.SetupGet(x => x.DatasetScopeTypes).Returns(scopes.AsQueryable());
+
+            FileExtension fileType = new FileExtension { Id = 2 };
+            datasetContext.Setup(x => x.GetById<FileExtension>(2)).Returns(fileType);
+
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null);
+
+            configService.UpdateDatasetFileConfig(dto, fileConfig);
+
+            Assert.AreEqual(scopes.First(), fileConfig.DatasetScopeType);
+            Assert.AreEqual(0, fileConfig.FileTypeId);
+            Assert.AreEqual("Description 2", fileConfig.Description);
+            Assert.AreEqual(fileType, fileConfig.FileExtension);
+
+            mr.VerifyAll();
         }
     }
 }

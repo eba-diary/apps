@@ -45,6 +45,9 @@
     <CodeAnalysisRuleSet />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.5.1.0\lib\net462\Castle.Core.dll</HintPath>
     </Reference>
@@ -79,9 +82,6 @@
     <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Sentry.Associates, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Associates.3.0.3\lib\netstandard2.0\Sentry.Associates.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Associates.Abstractions, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.Abstractions.2.0.2\lib\netstandard2.0\Sentry.Associates.Abstractions.dll</HintPath>
@@ -176,6 +176,19 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AccessControlTests.cs" />
+    <Compile Include="API\Dataset\AddDataset\AddDatasetModelMappingTests.cs" />
+    <Compile Include="API\BaseModelMappingTests.cs" />
+    <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidatorTests.cs" />
+    <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
+    <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidatorTests.cs" />
+    <Compile Include="API\Schema\AddSchema\AddSchemaModelMappingTests.cs" />
+    <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidatorTests.cs" />
+    <Compile Include="API\Schema\UpdateSchema\UpdateSchemaModelMappingTests.cs" />
+    <Compile Include="API\Validation\ConcurrentFieldValidationResponseTests.cs" />
+    <Compile Include="API\Validation\ValidationRegistryTests.cs" />
+    <Compile Include="API\Validation\ValidationModelMappingTests.cs" />
+    <Compile Include="API\Validation\FluentValidationExtensionsTests.cs" />
+    <Compile Include="API\Validation\ConcurrentValidationResponseTests.cs" />
     <Compile Include="BaseWebUnitTests.cs" />
     <Compile Include="CategoryTests.cs" />
     <Compile Include="ConfigTests.cs" />
@@ -209,6 +222,7 @@
     <Compile Include="SchemaConsumptionModelTransformerTests.cs" />
     <Compile Include="Extensions\DatasetExtensionsTests.cs" />
     <Compile Include="ModelTests.cs" />
+    <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidatorTests.cs" />
     <Compile Include="UtilityTests.cs" />
     <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
@@ -257,6 +271,7 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

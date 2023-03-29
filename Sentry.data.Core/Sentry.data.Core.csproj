@@ -26,7 +26,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\.sonarlint\data_data.sentry.comcsharp.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +36,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>..\.sonarlint\data_data.sentry.comcsharp.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Elasticsearch.Net, Version=7.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
@@ -49,6 +51,9 @@
     </Reference>
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=4.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.4.2.2\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -71,8 +76,8 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.106.6.9\lib\net452\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=108.0.3.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.108.0.3\lib\netstandard2.0\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Associates, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.3.0.3\lib\netstandard2.0\Sentry.Associates.dll</HintPath>
@@ -145,8 +150,20 @@
       <HintPath>..\packages\System.ServiceModel.Security.4.10.0\lib\net461\System.ServiceModel.Security.dll</HintPath>
     </Reference>
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.5.0.1\lib\net461\System.Text.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
@@ -180,11 +197,13 @@
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
+    <Compile Include="DomainServices\SchemaFlowService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\AuditDto.cs" />
     <Compile Include="DTO\BaseAuditDto.cs" />
     <Compile Include="DTO\Admin\SupportLinkDto.cs" />
     <Compile Include="DomainServices\TileSearchService.cs" />
+    <Compile Include="DTO\BaseResultDto.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceTileDto.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
@@ -216,6 +235,7 @@
     <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
     <Compile Include="DTO\Dataset\DatasetPermissionsDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetResultDto.cs" />
     <Compile Include="DTO\Dataset\DatasetSummaryMetadataDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetTileDto.cs" />
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
@@ -227,6 +247,7 @@
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\Schema\SchemaFlowDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
@@ -243,6 +264,7 @@
     <Compile Include="DTO\Schema\SchemaConsumptionDtoTransformer.cs" />
     <Compile Include="DTO\Schema\SchemaConsumptionSnowflakeDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaResultDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
@@ -275,6 +297,11 @@
     <Compile Include="Entities\DataProcessing\Actions\XMLAction.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnectorTask.cs" />
     <Compile Include="Entities\DataProcessing\ConfluentConnector.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileDrop.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileQuery.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileRaw.cs" />
+    <Compile Include="Entities\DataProcessing\BaseDatasetFileV2.cs" />
+    <Compile Include="Entities\DataProcessing\DatasetFileV2.cs" />
     <Compile Include="Entities\DataProcessing\DeadSparkJob.cs" />
     <Compile Include="Entities\DataProcessing\EventMetric.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
@@ -327,6 +354,7 @@
     <Compile Include="Entities\Jira\JiraTicket.cs" />
     <Compile Include="Entities\Livy\LivyBatch.cs" />
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
+    <Compile Include="Entities\MessageFormats\ReprocessFilesRequestModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseDeletedFileModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseSingleStatusModel.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
@@ -337,10 +365,11 @@
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
     <Compile Include="Entities\MessageFormats\SparkConverterModel.cs" />
+    <Compile Include="Entities\Migration\DatasetSchemaMigrationRequest.cs" />
     <Compile Include="Entities\Migration\MigrationHistory.cs" />
     <Compile Include="Entities\Migration\DatasetMigrationRequest.cs" />
     <Compile Include="Entities\Migration\DatasetMigrationRequestResponse.cs" />
-    <Compile Include="Entities\Migration\MigrationRequest.cs" />
+    <Compile Include="Entities\Migration\BaseMigrationRequest.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
     <Compile Include="Entities\Migration\MigrationHistoryDetail.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequestResponse.cs" />
@@ -353,14 +382,18 @@
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
     <Compile Include="Entities\Security\SecurityTicketSimple.cs" />
+    <Compile Include="Exceptions\BaseResourceException.cs" />
     <Compile Include="Exceptions\DataApplicationServiceException.cs" />
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\FeatureNotEnabledException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
+    <Compile Include="Exceptions\ResourceForbiddenException.cs" />
+    <Compile Include="Exceptions\ResourceNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DataSourceExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="Extensions\MigrationExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
     <Compile Include="GlobalEnums\AuditSearchType.cs" />
@@ -378,6 +411,7 @@
     <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\DSCEventTopicHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
+    <Compile Include="Helpers\Markdown.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />
     <Compile Include="Helpers\Paginate\PageParameters.cs" />
@@ -483,6 +517,7 @@
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
     <Compile Include="Interfaces\IAuthorizationSigner.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
+    <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
     <Compile Include="Interfaces\IFileProvider.cs" />
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
@@ -512,6 +547,7 @@
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISchemaFlowService.cs" />
     <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />
     <Compile Include="Interfaces\IQuartermasterRestClient.cs" />
@@ -527,7 +563,7 @@
     <Compile Include="Interfaces\ISnowProvider.cs" />
     <Compile Include="Interfaces\IDbExecuter.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
-    <Compile Include="Interfaces\IBaseTicketProvider.cs" />
+    <Compile Include="Interfaces\ITicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
@@ -561,11 +597,11 @@
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
-    <Compile Include="Entities\Security\HpsmTicket.cs" />
+    <Compile Include="Entities\Security\ChangeTicket.cs" />
     <Compile Include="Entities\Security\Permission.cs" />
     <Compile Include="Entities\Security\SecurityTicket.cs" />
     <Compile Include="Entities\Security\SecurityPermission.cs" />
-    <Compile Include="Entities\Security\RequestAccess.cs" />
+    <Compile Include="Entities\Security\AccessRequest.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />
@@ -573,7 +609,6 @@
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
-    <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IBusinessAreaService.cs" />
@@ -708,6 +743,7 @@
     <Compile Include="Interfaces\IJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />
     <Compile Include="Interfaces\IUserFavoriteService.cs" />
+    <Compile Include="DTO\IIdentifiableDto.cs" />
     <Compile Include="PollyPolicyKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />
@@ -720,19 +756,12 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram3.cd" />
-    <None Include="ClassDiagram4.cd" />
-    <None Include="ClassDiagram5.cd" />
-    <None Include="ClassDiagram6.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Sentry.data.Core.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
