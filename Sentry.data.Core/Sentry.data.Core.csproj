@@ -373,6 +373,7 @@
     <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
     <Compile Include="Entities\Migration\MigrationHistoryDetail.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequestResponse.cs" />
+    <Compile Include="Entities\S3\S3AccessPointPolicy\S3AccessPointPolicy.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Schema\SchemaConsumption.cs" />
     <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
@@ -411,6 +412,7 @@
     <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\DSCEventTopicHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
+    <Compile Include="Helpers\JiraHelper.cs" />
     <Compile Include="Helpers\Markdown.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />

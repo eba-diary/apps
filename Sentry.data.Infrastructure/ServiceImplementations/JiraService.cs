@@ -71,7 +71,7 @@ namespace Sentry.data.Infrastructure
                     }
                 }
                 jiraIssue.JiraFields.fields = fields;
-                ticketIds.Add($"Ticket ID - {CreateAndValidateJiraIssue(jiraIssue)}");
+                ticketIds.Add(CreateAndValidateJiraIssue(jiraIssue));
             }
 
             return ticketIds;
@@ -91,6 +91,13 @@ namespace Sentry.data.Infrastructure
                 throw new JiraServiceException($"Unable to search for issues with following JQL: {jql}. Status code: {response.StatusCode}.");
             }
             return JsonConvert.DeserializeObject<dynamic>(response.Content.ToString());
+        }
+
+        private string GetJiraTicketBrowseUrl()
+        {
+            Uri jiraUri = new Uri(JiraBaseUrl);
+            string jiraBaseTicketBrowseUrl = jiraUri.Scheme + "://" + jiraUri.Host + "/browse/";
+            return jiraBaseTicketBrowseUrl;
         }
 
         /// <summary>
