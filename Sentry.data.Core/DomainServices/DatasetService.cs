@@ -1,6 +1,7 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -758,10 +759,21 @@ namespace Sentry.data.Core
             }
             else //if name, make sure it is not duplicate
             {
-                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetType == DataEntityCodes.DATASET && w.NamedEnvironment == dto.NamedEnvironment))
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null)
                 {
-                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists for that named environment");
+                    Dataset existing = _datasetContext.Datasets.FirstOrDefault(w => w.DatasetName == dto.DatasetName && w.DatasetType == DataEntityCodes.DATASET);
+
+                    if (existing != null)
+                    {
+                        if (_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
+                        {
+                            results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists. If attempting to create a copy of an existing dataset in a different named environment, please use dataset migration.");
+                        }
+                        else if (existing.NamedEnvironment == dto.NamedEnvironment)
+                        {
+                            results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists for that named environment");
+                        }
+                    }
                 }
             }
         }

@@ -41,13 +41,13 @@ namespace Sentry.data.Web.Controllers
                 return Json(new { Success = false, Message = "Unauthorized access" });
             }
 
-            (string datasetName, string saidAssetKeyCode) = _datasetContext.Datasets.Where(w => w.DatasetId == datasetId).Select(s => new Tuple<string, string>(s.DatasetName, s.Asset.SaidKeyCode)).FirstOrDefault();
+            DatasetDto dataset = _datasetService.GetDatasetDto(datasetId);
 
             MigrationRequestModel model = new MigrationRequestModel()
             {
                 DatasetId = datasetId,
-                DatasetName = datasetName,
-                SAIDAssetKeyCode = saidAssetKeyCode
+                DatasetName = dataset.DatasetName,
+                SAIDAssetKeyCode = dataset.SAIDAssetKeyCode
             };
 
             await model.SetNamedEnvironmentProperties(_datasetContext, _namedEnvironmentBuilder);
@@ -87,8 +87,6 @@ namespace Sentry.data.Web.Controllers
             string migrationHistoryJson = JsonConvert.SerializeObject(migrationHistory);
             return Json(new { migrationHistoryJson = migrationHistoryJson });
         }
-
-
 
         [HttpGet]
         [Route("Migration/NamedEnvironment")]
