@@ -835,10 +835,9 @@ namespace Sentry.data.Core
         {
             Asset asset = GetAsset(dto.SAIDAssetKeyCode);
 
-            int? globalDatasetId = null;
             if (!dto.GlobalDatasetId.HasValue || dto.GlobalDatasetId == 0)
             {
-                globalDatasetId = _datasetContext.GetNextGlobalDatasetId();
+                dto.GlobalDatasetId = _datasetContext.GetNextGlobalDatasetId();
             }
 
             Dataset ds = new Dataset()
@@ -866,7 +865,7 @@ namespace Sentry.data.Core
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType,
                 AlternateContactEmail = dto.AlternateContactEmail,
-                GlobalDatasetId = globalDatasetId
+                GlobalDatasetId = dto.GlobalDatasetId
             };
 
             if (dto.DatasetCategoryIds?.Any() == true)

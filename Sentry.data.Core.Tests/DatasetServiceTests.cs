@@ -1853,7 +1853,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetDto dto = MockClasses.MockDatasetDto(new List<Dataset>() { MockClasses.MockDataset() }).First();
 
-            Mock<IDatasetContext> context = new Mock<IDatasetContext>();
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.Add(It.IsAny<Dataset>())).Callback<Dataset>(x => Assert.AreEqual(1, x.GlobalDatasetId));
             context.SetupGet(s => s.Assets).Returns(new List<Asset>() { new Asset() { AssetId = 1, SaidKeyCode = "ABCD" } }.AsQueryable());
             context.Setup(x => x.GetNextGlobalDatasetId()).Returns(1);
@@ -1869,6 +1869,31 @@ namespace Sentry.data.Core.Tests
             //Assert
             mr.VerifyAll();
             context.Verify(v => v.SaveChanges(It.IsAny<bool>()),Times.Never);
+        }
+
+        [TestMethod]
+        public void Create_For_Dataset_KeepGlobalDatasetId()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            DatasetDto dto = MockClasses.MockDatasetDto(new List<Dataset>() { MockClasses.MockDataset() }).First();
+            dto.GlobalDatasetId = 2;
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Add(It.IsAny<Dataset>())).Callback<Dataset>(x => Assert.AreEqual(2, x.GlobalDatasetId));
+            context.SetupGet(s => s.Assets).Returns(new List<Asset>() { new Asset() { AssetId = 1, SaidKeyCode = "ABCD" } }.AsQueryable());
+
+            Mock<IUserService> userService = mr.Create<IUserService>();
+            userService.Setup(s => s.GetCurrentUser().AssociateId).Returns("123456");
+
+            var datasetService = new DatasetService(context.Object, null, userService.Object, null, null, null, null, null, null);
+
+            //Act
+            _ = datasetService.Create(dto);
+
+            //Assert
+            mr.VerifyAll();
+            context.Verify(v => v.SaveChanges(It.IsAny<bool>()), Times.Never);
         }
 
         [TestMethod]
