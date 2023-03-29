@@ -12,9 +12,9 @@ namespace Sentry.data.Core.Helpers
         public static string Format_PreFormatted(string text)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("{{noformat}}");
+            sb.AppendLine("{noformat}");
             sb.AppendLine(text);
-            sb.AppendLine("{{noformat}}");
+            sb.Append("{noformat}");
             return sb.ToString();
         }
 
@@ -23,7 +23,7 @@ namespace Sentry.data.Core.Helpers
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("{code:json}");
             sb.AppendLine(jsonstring);
-            sb.AppendLine("{code}");
+            sb.Append("{code}");
             return sb.ToString();
         }
 

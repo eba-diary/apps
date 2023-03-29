@@ -6,7 +6,7 @@ namespace Sentry.data.Web.Helpers
 {
     public static class JSMHelper
     {
-        public static string GetJiraTicketUrl(string jsmTicketId)
+        public static string GetJsmTicketUrl(string jsmTicketId)
         {
             string ticketUrl = string.Empty;
             if (!string.IsNullOrWhiteSpace(jsmTicketId) && jsmTicketId.Contains('-'))

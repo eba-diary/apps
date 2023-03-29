@@ -46,7 +46,7 @@ namespace Sentry.data.Web
                 PermissionStatus = "Pending";
             }
             TicketId = securablePermission.TicketId;
-            TicketIdUrl = Helpers.JSMHelper.GetJiraTicketUrl(securablePermission.TicketId);
+            TicketIdUrl = Helpers.JSMHelper.GetJsmTicketUrl(securablePermission.TicketId);
             ExternalRequestId = securablePermission.ExternalRequestId;
             ExternalRequestIdUrl = Helpers.JiraHelper.GetJiraTicketUrl(securablePermission.ExternalRequestId);
             Code = securablePermission.SecurityPermission.Permission.PermissionCode;
