@@ -908,6 +908,7 @@ namespace Sentry.data.Infrastructure
              *****************************/
             return result.ToString().PadLeft(7, '0');
         }
+
         public int GetNextGlobalDatasetId()
         {
             string sqlConnString = Configuration.Config.GetHostSetting("DatabaseConnectionString");
