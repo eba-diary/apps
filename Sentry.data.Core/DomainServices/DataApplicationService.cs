@@ -194,8 +194,7 @@ namespace Sentry.data.Core
             DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse();
             try
             {
-                Dataset sourceDatasetMetadata = _datasetContext.Datasets.Where(w => w.DatasetId == migrationRequest.SourceDatasetId).FirstOrDefault();
-
+                Tuple<string, string, string> sourceDatasetMetadata = _datasetContext.Datasets.Where(w => w.DatasetId == migrationRequest.SourceDatasetId).Select(s => new Tuple<string, string, string>(s.DatasetName, s.Asset.SaidKeyCode, s.NamedEnvironment)).FirstOrDefault();
                 if (sourceDatasetMetadata == null)
                 {
                     throw new DatasetNotFoundException("Source dataset not found");
@@ -203,7 +202,7 @@ namespace Sentry.data.Core
 
                 //Do not perform dataset metadata migration if it already exists in target environment,
                 //  instead grab datasetId of existing target dataset.
-                (int targetDatasetId, bool datasetExistsInTarget) = DatasetService.DatasetExistsInTargetNamedEnvironment(sourceDatasetMetadata.DatasetName, sourceDatasetMetadata.Asset.SaidKeyCode, migrationRequest.TargetDatasetNamedEnvironment);
+                (int targetDatasetId, bool datasetExistsInTarget) = DatasetService.DatasetExistsInTargetNamedEnvironment(sourceDatasetMetadata.Item1, sourceDatasetMetadata.Item2, migrationRequest.TargetDatasetNamedEnvironment);
 
                 //Check user permisions against target if it exists else check against source
                 CheckPermissionToMigrateDataset(datasetExistsInTarget ? targetDatasetId : migrationRequest.SourceDatasetId);
@@ -214,7 +213,6 @@ namespace Sentry.data.Core
                     DatasetDto dto = DatasetService.GetDatasetDto(migrationRequest.SourceDatasetId);
 
                     dto.DatasetId = 0;
-                    dto.GlobalDatasetId = sourceDatasetMetadata.GlobalDatasetId;
                     dto.NamedEnvironment = migrationRequest.TargetDatasetNamedEnvironment;
 
                     newDatasetId = CreateWithoutSave(dto);
@@ -240,7 +238,7 @@ namespace Sentry.data.Core
                 response.IsDatasetMigrated = !datasetExistsInTarget;
                 response.DatasetMigrationReason = datasetExistsInTarget ? "Dataset already exists in target named environment" : "Success";
                 response.DatasetId = newDatasetId;
-                response.DatasetName = sourceDatasetMetadata.DatasetName;
+                response.DatasetName = sourceDatasetMetadata.Item1;
                 response.SchemaMigrationResponses = schemaMigrationResponses;
 
                 try

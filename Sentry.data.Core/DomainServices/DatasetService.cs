@@ -364,6 +364,8 @@ namespace Sentry.data.Core
                 await _datasetContext.AddAsync(dataset);
                 await _datasetContext.SaveChangesAsync();
 
+                CreateExternalDependencies(dataset.DatasetId);
+
                 DatasetResultDto resultDto = dataset.ToDatasetResultDto();
                 return resultDto;
             }
@@ -403,11 +405,7 @@ namespace Sentry.data.Core
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
-            if (_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                // Create a Hangfire job that will setup the default security groups for this new dataset
-                _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
-            }
+            CreateExternalDependencies(ds.DatasetId);
 
             return ds.DatasetId;
         }
@@ -621,9 +619,7 @@ namespace Sentry.data.Core
             Logger.Debug($"{methodName} Method End");
 
             return result;
-        }
-
-       
+        }       
 
         public async Task<ValidationException> ValidateAsync(DatasetSchemaDto dto)
         {
@@ -952,6 +948,7 @@ namespace Sentry.data.Core
             dto.IsSecured = ds.IsSecured;
 
             dto.DatasetId = ds.DatasetId;
+            dto.GlobalDatasetId = ds.GlobalDatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.ShortName = ds.ShortName;
