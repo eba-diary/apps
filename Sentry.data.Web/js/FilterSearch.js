@@ -318,6 +318,8 @@
         else {
             $(".filter-search-results-none").removeClass("display-none");
             $(".filter-search-results-container").hide();
+            data.FilterSearch.setPageInfo(0, 0);
+            $("#filter-search-total").text('0');
         }
     },
 
