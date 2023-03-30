@@ -59,6 +59,14 @@ BEGIN
         INCREMENT BY 1
 END;
 
+IF NOT EXISTS(SELECT * FROM sys.sequences WHERE name='seq_GlobalDatasetId')
+BEGIN
+    SELECT 'Creating Sequence seq_GlobalDatasetId...'
+    CREATE SEQUENCE [dbo].[seq_GlobalDatasetId]
+        START WITH 1
+        INCREMENT BY 1
+END;
+
 --Execute scripts to do history fixes / bulk updates
 DECLARE @ScriptVersion AS VARCHAR(50); 
 DECLARE @ErrorMessage NVARCHAR(4000); 
@@ -98,3 +106,4 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_08\CLA-4479-MigrateTokensFromDataSourceToTokenTable.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_20\CLA-4921-RemoveStandardizeOnUTCTime.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_24\CLA-4975_Enable_Existing_Tokens.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_02_29\CLA-5076_SetGlobalDatasetId.sql

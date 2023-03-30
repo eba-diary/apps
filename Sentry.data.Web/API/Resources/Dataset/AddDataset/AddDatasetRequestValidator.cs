@@ -48,10 +48,9 @@ namespace Sentry.data.Web.API
             bool isValidNamedEnvironment = !validationResponse.HasValidationsFor(nameof(requestModel.NamedEnvironment));
 
             //dataset name exists
-            if (!validationResponse.HasValidationsFor(nameof(requestModel.DatasetName)) && isValidNamedEnvironment &&
-                _datasetContext.Datasets.Any(w => w.DatasetName.ToLower() == requestModel.DatasetName.ToLower() && w.DatasetType == DataEntityCodes.DATASET && w.NamedEnvironment == requestModel.NamedEnvironment))
+            if (!validationResponse.HasValidationsFor(nameof(requestModel.DatasetName)) && _datasetContext.Datasets.Any(w => w.DatasetName.ToLower() == requestModel.DatasetName.ToLower() && w.DatasetType == DataEntityCodes.DATASET))
             {
-                validationResponse.AddFieldValidation(nameof(requestModel.DatasetName), "Dataset name already exists for the named environment");
+                validationResponse.AddFieldValidation(nameof(requestModel.DatasetName), "Dataset name already exists. If attempting to create a copy of an existing dataset in a different named environment, please use dataset migration.");
             }
 
             if (!validationResponse.HasValidationsFor(nameof(requestModel.ShortName)))

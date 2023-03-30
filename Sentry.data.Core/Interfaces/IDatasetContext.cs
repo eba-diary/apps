@@ -129,13 +129,11 @@ namespace Sentry.data.Core
         int GetNextStorageCDE();
         string GetNextDataFlowStorageCDE();
         int GetReportCount();
-
+        int GetNextGlobalDatasetId();
 
         /** Favorites **/
-
         Favorite GetFavorite(int favoriteId);
-        List<Favorite> GetFavorites(List<int> favoriteIds);
-        
+        List<Favorite> GetFavorites(List<int> favoriteIds);        
     }
 
 }
