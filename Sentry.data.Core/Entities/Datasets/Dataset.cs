@@ -16,6 +16,7 @@ namespace Sentry.data.Core
         public Dataset() { }
 
         public virtual int DatasetId { get; set; }
+        public virtual int? GlobalDatasetId { get; set; }
 
         public virtual string S3Key { get; set; }
 
