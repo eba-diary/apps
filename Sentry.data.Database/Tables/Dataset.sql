@@ -25,9 +25,8 @@
     [NamedEnvironmentType] VARCHAR(25) NULL, 
     [Asset_ID] INT NULL, 
     [Short_NME] VARCHAR(12) NULL, 
-    [AlternateContactEmail] VARCHAR(256) NULL,
-    [GlobalDatasetId] INT NULL , 
-    --256 based on RFC Internet Standard
+    [AlternateContactEmail] VARCHAR(256) NULL, --256 based on RFC Internet Standard
+    [GlobalDatasetId] INT NULL,    
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

@@ -41,13 +41,13 @@ namespace Sentry.data.Web.Controllers
                 return Json(new { Success = false, Message = "Unauthorized access" });
             }
 
-            DatasetDto dataset = _datasetService.GetDatasetDto(datasetId);
+            DatasetDto datasetDto = _datasetService.GetDatasetDto(datasetId);
 
             MigrationRequestModel model = new MigrationRequestModel()
             {
                 DatasetId = datasetId,
-                DatasetName = dataset.DatasetName,
-                SAIDAssetKeyCode = dataset.SAIDAssetKeyCode
+                DatasetName = datasetDto.DatasetName,
+                SAIDAssetKeyCode = datasetDto.SAIDAssetKeyCode
             };
 
             await model.SetNamedEnvironmentProperties(_datasetContext, _namedEnvironmentBuilder);
