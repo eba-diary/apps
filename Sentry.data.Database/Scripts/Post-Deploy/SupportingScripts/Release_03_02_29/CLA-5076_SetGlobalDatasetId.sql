@@ -7,23 +7,26 @@ BEGIN TRY
     PRINT 'Running script "' + @ScriptVersion + '"...'
     -- BEGIN POST-DEPLOY SCRIPT --
 
+    DECLARE @type AS VARCHAR(2) = 'DS'
+
     UPDATE Dataset
     SET GlobalDatasetId = NEXT VALUE FOR seq_GlobalDatasetId
     WHERE ObjectStatus = 1
-    AND Dataset_TYP = 'DS'
+    AND Dataset_TYP = @type
 
     SELECT Dataset_ID, MIN(GlobalDatasetId) OVER (PARTITION BY Dataset_NME) as MinGlobalDatasetId
     INTO #globalids
     FROM Dataset
     WHERE ObjectStatus = 1
-    AND Dataset_TYP = 'DS'
+    AND Dataset_TYP = @type
 
-    UPDATE Dataset
-    SET GlobalDatasetId = (SELECT TOP 1 MinGlobalDatasetId
-					       FROM #globalids gids
-					       WHERE Dataset.Dataset_ID = gids.Dataset_ID)
-    WHERE ObjectStatus = 1
-    AND Dataset_TYP = 'DS'
+    UPDATE d
+    SET d.GlobalDatasetId = gids.MinGlobalDatasetId
+    FROM Dataset d
+    JOIN #globalids gids
+    ON d.Dataset_ID = gids.Dataset_ID
+    WHERE d.ObjectStatus = 1
+    AND d.Dataset_TYP = @type
 
     DROP TABLE #globalids
 
