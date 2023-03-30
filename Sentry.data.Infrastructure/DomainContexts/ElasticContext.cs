@@ -2,7 +2,9 @@
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -36,6 +38,12 @@ namespace Sentry.data.Infrastructure
 
         public async Task<ElasticResult<T>> SearchAsync<T>(SearchRequest<T> searchRequest) where T : class
         {
+            using (MemoryStream mStream = new MemoryStream())
+            {
+                _client.RequestResponseSerializer.Serialize(searchRequest, mStream, Elasticsearch.Net.SerializationFormatting.Indented);
+                string serialized = Encoding.UTF8.GetString(mStream.ToArray());
+            }
+            
             return await GetResponse(() => _client.SearchAsync<T>(searchRequest)).ConfigureAwait(false);
         }
 

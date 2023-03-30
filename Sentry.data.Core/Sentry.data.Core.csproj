@@ -320,6 +320,7 @@
     <Compile Include="Entities\DataProcessing\Log_Level.cs" />
     <Compile Include="Entities\DataProcessing\RunInstance.cs" />
     <Compile Include="Entities\Datasets\Asset.cs" />
+    <Compile Include="Entities\SearchableDataset\SearchableDataset.cs" />
     <Compile Include="Entities\Datasets\SnowCompareConfig.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
@@ -378,6 +379,8 @@
     <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
     <Compile Include="Entities\Schema\ISchemaConsumptionVisitor.cs" />
     <Compile Include="Entities\Schema\SnowflakeConsumptionType.cs" />
+    <Compile Include="Entities\SearchableDataset\SearchableEnvironmentDataset.cs" />
+    <Compile Include="Entities\SearchableDataset\SearchableSchema.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
@@ -744,6 +747,8 @@
     <Compile Include="DTO\TagGroupDto.cs" />
     <Compile Include="Interfaces\IUserFavoriteService.cs" />
     <Compile Include="DTO\IIdentifiableDto.cs" />
+    <Compile Include="Interfaces\SearchableDataset\ISearchableDatasetProvider.cs" />
+    <Compile Include="Interfaces\SearchableDataset\ISearchableDatasetService.cs" />
     <Compile Include="PollyPolicyKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />

@@ -161,6 +161,7 @@ namespace Sentry.data.Infrastructure
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
             settings.DefaultMappingFor<DataFlowMetric>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexFlowMetricSearch")).IdProperty(p=>p.EventMetricId));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
+            settings.DefaultMappingFor<SearchableDataset>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexDataset")).IdProperty(p => p.GlobalDatasetId));
             settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.ThrowExceptions();
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
