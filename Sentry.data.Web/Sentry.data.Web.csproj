@@ -773,11 +773,9 @@
     <Compile Include="Models\BusinessArea\BusinessAreaLandingPageModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
-    <Compile Include="Models\Config\CreateSourceModel.cs" />
-    <Compile Include="Models\Config\DataSourceModel.cs" />
+    <Compile Include="Models\Config\DataSource\DataSourceModel.cs" />
     <Compile Include="Models\Config\EditJobModel.cs" />
     <Compile Include="Models\Config\EditSchemaModel.cs" />
-    <Compile Include="Models\Config\EditSourceModel.cs" />
     <Compile Include="Models\Config\FieldModel.cs" />
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
@@ -1216,6 +1214,8 @@
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
     <Content Include="Views\Migration\_NamedEnvironment.cshtml" />
     <Content Include="Views\Migration\_MigrationHistory.cshtml" />
+    <Content Include="Views\Config\DataSource\_DataSourceToken.cshtml" />
+    <Content Include="Views\Config\DataSource\_AcceptableError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

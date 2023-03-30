@@ -180,13 +180,29 @@
                             <h4 class="pt-3">Request Headers</h4>
                         </div>
                         <div class="col">
-                            <button id="AddHeader" type="button" class="btn btn-success waves-effect waves-light float-r">Add Header</button>
+                            <button id="AddHeader" type="button" class="btn btn-success waves-effect waves-light float-r">Add</button>
                         </div>
                     </div>
                     <div id="RequestContainer">
                         @foreach (RequestHeader header in Model.Headers)
                         {
                             Html.RenderPartial("_Headers", header);
+                        }
+                    </div>
+                </div>
+                <div id="AcceptableErrorPanel">
+                    <div class="row">
+                        <div class="col align-self-end">
+                            <h4 class="pt-3">Acceptable Errors</h4>
+                        </div>
+                        <div class="col">
+                            <button id="AddAcceptableError" type="button" class="btn btn-success waves-effect waves-light float-r">Add</button>
+                        </div>
+                    </div>
+                    <div id="AcceptableErrorContainer">
+                        @foreach (var acceptableError in Model.AcceptableErrors)
+                        {
+                            Html.RenderPartial("DataSource/_AcceptableError", acceptableError);
                         }
                     </div>
                 </div>
@@ -245,6 +261,7 @@
             function setSourceTypeDefaults(sourceType) {
                 var authtxt = $('#AuthID').find(":selected").text()
                 $('#requestHeaderPanel').hide();
+                $('#AcceptableErrorPanel').hide();
                 $('#pagingPanel').hide();
 
                 setAuthTypePanels(authtxt)
@@ -289,6 +306,7 @@
 
                     if (sourceType == "HTTPS") {
                         $('#pagingPanel').show();
+                        $('#AcceptableErrorPanel').show();
                         $('#requestHeaderPanel').show();
                     }
                     else if (sourceType == "GOOGLEAPI") {

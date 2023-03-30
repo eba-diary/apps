@@ -17,6 +17,7 @@ namespace Sentry.data.Web
         public DataSourceModel()
         {
             Headers = new List<RequestHeader>();
+            AcceptableErrors = new List<AcceptableErrorModel>();
             ContactIds = new List<string>();
             Tokens = new List<DataSourceTokenModel>();
 
@@ -34,9 +35,9 @@ namespace Sentry.data.Web
             IsUserPassRequired = dto.IsUserPassRequired;
             BaseUri = dto.BaseUri;
             PortNumber = dto.PortNumber;
-            Headers = new List<RequestHeader>();
             SourceType = dto.SourceType;
             Headers = dto.RequestHeaders ?? new List<RequestHeader>();
+            AcceptableErrors = dto.AcceptableErrors.Select(e => new AcceptableErrorModel { ErrorMessageKey = e.Key, ErrorMessageValue = e.Value }).ToList();
             Tokens = dto.Tokens.Select(t => t.ToModel()).ToList() ?? new List<DataSourceTokenModel>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;

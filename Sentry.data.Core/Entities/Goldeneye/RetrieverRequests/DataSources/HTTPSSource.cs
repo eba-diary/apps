@@ -14,6 +14,7 @@ namespace Sentry.data.Core
         #region Fields
         private Uri _baseUri;
         private string _requestHeaders;
+        private string _acceptableErrors;
         #endregion
 
         #region Constructor
@@ -105,6 +106,18 @@ namespace Sentry.data.Core
             set
             {
                 _requestHeaders = JsonConvert.SerializeObject(value);
+            }
+        }
+
+        public virtual Dictionary<string,string> AcceptableErrors
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_acceptableErrors) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string,string>>(_acceptableErrors);
+            }
+            set
+            {
+                _acceptableErrors = JsonConvert.SerializeObject(value);
             }
         }
         #endregion

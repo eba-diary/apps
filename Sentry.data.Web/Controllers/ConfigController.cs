@@ -536,6 +536,12 @@ namespace Sentry.data.Web.Controllers
         {
             return PartialView("_Headers");
         }
+        
+        [Route("Config/AddAcceptableError")]
+        public ActionResult AddAcceptableError()
+        {
+            return PartialView("DataSource/_AcceptableError");
+        }
 
         [Route("Config/AddToken")]
         public ActionResult AddToken()
