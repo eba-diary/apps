@@ -634,7 +634,8 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="API\Interfaces\IResponseModel.cs" />
-    <Compile Include="Models\Config\DataSourceTokenModel.cs" />
+    <Compile Include="Models\Config\DataSource\AcceptableErrorModel.cs" />
+    <Compile Include="Models\Config\DataSource\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />

@@ -528,13 +528,13 @@ namespace Sentry.data.Web.Controllers
             dsm.ReturnUrl = "/";
             dsm.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
             CreateEvent("Viewed Data Source Creation Page");
-            return View("CreateDataSource", dsm);
+            return View("DataSource/CreateDataSource", dsm);
         }
 
         [Route("Config/HeaderEntryRow")]
         public ActionResult HeaderEntryRow()
         {
-            return PartialView("_Headers");
+            return PartialView("DataSource/_Headers");
         }
         
         [Route("Config/AddAcceptableError")]
@@ -546,7 +546,7 @@ namespace Sentry.data.Web.Controllers
         [Route("Config/AddToken")]
         public ActionResult AddToken()
         {
-            return PartialView("_DataSourceToken");
+            return PartialView("DataSource/_DataSourceToken");
         }
 
         public ActionResult FieldEntryRow()
@@ -590,12 +590,12 @@ namespace Sentry.data.Web.Controllers
             if (model.Id == 0)
             {
                 model = CreateSourceDropDown(model);
-                return View("CreateDataSource", model);
+                return View("DataSource/CreateDataSource", model);
             }
             else
             {
                 EditSourceDropDown(model);
-                return View("EditDataSource", model);
+                return View("DataSource/EditDataSource", model);
             }
         }
 
@@ -616,7 +616,7 @@ namespace Sentry.data.Web.Controllers
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
 
-                return View("EditDataSource", model);
+                return View("DataSource/EditDataSource", model);
             }
 
             return View("Forbidden");
