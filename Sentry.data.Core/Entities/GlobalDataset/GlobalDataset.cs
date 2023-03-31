@@ -9,8 +9,8 @@ namespace Sentry.data.Core
         public int GlobalDatasetId { get; set; }
         [PropertyName("datasetname")]
         public string DatasetName { get; set; }
-        [PropertyName("datasetasset")]
-        public string DatasetAsset { get; set; }
+        [PropertyName("saidassetcode")]
+        public string SaidAssetCode { get; set; }
         [PropertyName("datasets")]
         public List<EnvironmentDataset> Datasets { get; set; }
     }

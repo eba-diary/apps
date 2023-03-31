@@ -1,4 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Exceptions;
@@ -406,6 +407,27 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
 
             CreateExternalDependencies(ds.DatasetId);
+
+            //add environment schema to global dataset
+            //GlobalDataset globalDataset = new GlobalDataset
+            //{
+            //    GlobalDatasetId = datasetDto.GlobalDatasetId.Value,
+            //    DatasetName = datasetDto.DatasetName,
+            //    SaidAssetCode = datasetDto.SAIDAssetKeyCode,
+            //    Datasets = new List<EnvironmentDataset>
+            //    {
+            //        new EnvironmentDataset
+            //        {
+            //            DatasetId = datasetDto.DatasetId,
+            //            DatasetDescription = datasetDto.DatasetDesc,
+            //            CategoryCode = datasetDto.CategoryName,
+            //            NamedEnvironment = datasetDto.NamedEnvironment,
+            //            NamedEnvironmentType = datasetDto.NamedEnvironmentType.ToString(),
+            //            OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), datasetDto.OriginationId),
+            //            IsSecured = datasetDto.IsSecured
+            //        }
+            //    }
+            //};
 
             return ds.DatasetId;
         }

@@ -1,6 +1,5 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
