@@ -2384,7 +2384,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     InitSchemaSearchTab() {
-        var datasetId = $('#RequestAccessButton').attr("data-id");
+        var datasetId = $('#RequestAcce ssButton').attr("data-id");
 
         $("#schemaSearchTable").DataTable({
             "ajax": {

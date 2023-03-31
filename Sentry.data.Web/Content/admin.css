@@ -140,10 +140,10 @@ table#metricGroupsTable td.metric-detail-control {
     display: none;
     margin: auto;
 }
-
+    */
 #buttonCompletedFiles, #buttonFailedFiles, #buttonInFlightFiles {
     border: none;
     background-color: none !important;
     background: unset !important;
 }
-    */
+    

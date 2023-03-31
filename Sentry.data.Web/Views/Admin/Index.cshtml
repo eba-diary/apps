@@ -45,22 +45,9 @@
             </div>
         </div>
         
-        <div id="partialViewGenerator">
-
-        </div>
-
-        <div class="partialContainer">
-            <div id="failedFiles" class="MainButton">
-                @Html.Partial("_FailedFilesDetails")
-            </div>
-            <div id="completedFiles" class="MainButton">
-                @Html.Partial("_CompletedFilesDetails")
-            </div>
-            <div id="inFlightFiles" class="MainButton">
-                @Html.Partial("_InFlightFilesDetails")
-            </div>
-        </div>
-            
+  
+        
+        
     }
     else{
         <h1>You do not have the right permissions to see this page</h1>
@@ -70,6 +57,8 @@
 </html>
 
 <script>
+
+
     /*
     // Elements of div to be hidden and displayed
     dashboardDiv = document.getElementById("dashboard");
@@ -93,11 +82,11 @@
                     inFlightFilesDiv.style.display = "none";
                     failedFileDiv.style.display = "none";
                     partialViewCompletedFilesDiv.style.display = "block";
-                } 
+                }
             });
         });
     });
-    
+
     // JQuery for toggling Failed File details
     $(document).ready(function () {
         $("#buttonFailedFiles").click(function () {
@@ -155,5 +144,5 @@
         });
     });
     */
-    
+
 </script>
