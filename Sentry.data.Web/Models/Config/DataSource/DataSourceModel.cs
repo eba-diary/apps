@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
 using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.Config.DataSource;
 
 namespace Sentry.data.Web
 {
@@ -118,6 +119,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
+
+        public List<AcceptableErrorModel> AcceptableErrors { get; set; }
 
         [DisplayName("Enable Paging Support For Source")]
         public bool SupportsPaging { get; set; }
