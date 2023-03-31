@@ -2,7 +2,7 @@
 
 namespace Sentry.data.Core
 {
-    public class SearchableSchema
+    public class EnvironmentSchema
     {
         [PropertyName("schemaid")]
         public int SchemaId { get; set; }

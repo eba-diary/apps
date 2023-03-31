@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
-    public class SearchableEnvironmentDataset
+    public class EnvironmentDataset
     {
         [PropertyName("datasetid")]
         public int DatasetId { get; set; }
@@ -22,6 +22,6 @@ namespace Sentry.data.Core
         [PropertyName("favoriteuserids")]
         public List<string> FavoriteUserIds { get; set; }
         [PropertyName("schemas")]
-        public List<SearchableSchema> Schemas { get; set; }
+        public List<EnvironmentSchema> Schemas { get; set; }
     }
 }

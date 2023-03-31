@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
-    public class SearchableDataset
+    public class GlobalDataset
     {
         [PropertyName("globaldatasetid")]
         public int GlobalDatasetId { get; set; }
@@ -12,6 +12,6 @@ namespace Sentry.data.Core
         [PropertyName("datasetasset")]
         public string DatasetAsset { get; set; }
         [PropertyName("datasets")]
-        public List<SearchableEnvironmentDataset> Datasets { get; set; }
+        public List<EnvironmentDataset> Datasets { get; set; }
     }
 }

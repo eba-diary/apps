@@ -498,7 +498,7 @@
     <Compile Include="ServiceImplementations\RetrieverJobProviders\AllDfsRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
-    <Compile Include="ServiceImplementations\SearchableDataset\SearchableDatasetProvider.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GlobalDatasetProvider.cs" />
     <Compile Include="ServiceImplementations\SecBotProvider.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
     <Compile Include="ServiceImplementations\SupportLinkService.cs" />

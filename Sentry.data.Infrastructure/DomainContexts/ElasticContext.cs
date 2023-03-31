@@ -23,12 +23,23 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region IElasticContext Implementation
-        public void Index<T>(T document) where T : class
+        public async Task IndexAsync<T>(T document) where T : class
         {
-            //Commenting out to not allow indexing to Elastic via app at this time
-            //GetResponse(() => _client.IndexDocument(document));
+            await _client.IndexDocumentAsync(document);
+        }
 
-            throw new NotImplementedException();
+        public async Task<T> GetDocumentAsync<T>(DocumentPath<T> id) where T : class
+        {
+            var response = await _client.GetAsync(id);
+
+            if (response.IsValid && response.Found)
+            {
+                return response.Source;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<ElasticResult<T>> SearchAsync<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
@@ -37,13 +48,7 @@ namespace Sentry.data.Infrastructure
         }
 
         public async Task<ElasticResult<T>> SearchAsync<T>(SearchRequest<T> searchRequest) where T : class
-        {
-            using (MemoryStream mStream = new MemoryStream())
-            {
-                _client.RequestResponseSerializer.Serialize(searchRequest, mStream, Elasticsearch.Net.SerializationFormatting.Indented);
-                string serialized = Encoding.UTF8.GetString(mStream.ToArray());
-            }
-            
+        {            
             return await GetResponse(() => _client.SearchAsync<T>(searchRequest)).ConfigureAwait(false);
         }
 

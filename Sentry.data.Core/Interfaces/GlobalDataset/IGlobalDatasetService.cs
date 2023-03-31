@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public interface ISearchableDatasetService
+    public interface IGlobalDatasetService
     {
     }
 }

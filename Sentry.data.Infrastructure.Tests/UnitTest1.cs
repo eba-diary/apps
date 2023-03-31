@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure.Tests
             IDatasetContext context = Bootstrapper.Container.GetInstance<IDatasetContext>();
 
             ConnectionSettings settings = new ConnectionSettings(new Uri("http://fit-d-elases-01.sentry.com:9200"));
-            settings.DefaultMappingFor<SearchableDataset>(x => x.IndexName("data-dataset-082116").IdProperty(i => i.GlobalDatasetId));
+            settings.DefaultMappingFor<GlobalDataset>(x => x.IndexName("data-dataset-082116").IdProperty(i => i.GlobalDatasetId));
             settings.ThrowExceptions();
 
             ElasticClient client = new ElasticClient(settings);
@@ -28,11 +28,11 @@ namespace Sentry.data.Infrastructure.Tests
                 var fileConfigs = context.DatasetFileConfigs.Where(x => x.ParentDataset.DatasetId == dataset.DatasetId && x.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Active).ToList();
                 var flows = context.DataFlow.Where(x => x.DatasetId == dataset.DatasetId && x.ObjectStatus == Core.GlobalEnums.ObjectStatusEnum.Active).ToList();
 
-                List<SearchableSchema> schemas = new List<SearchableSchema>();
+                List<EnvironmentSchema> schemas = new List<EnvironmentSchema>();
 
                 foreach (var schema in fileConfigs.Select(x => x.Schema).ToList())
                 {
-                    schemas.Add(new SearchableSchema
+                    schemas.Add(new EnvironmentSchema
                     {
                         SchemaId = schema.SchemaId,
                         SchemaName = schema.Name,
@@ -41,14 +41,14 @@ namespace Sentry.data.Infrastructure.Tests
                     });
                 }
 
-                SearchableDataset fullNested = new SearchableDataset
+                GlobalDataset fullNested = new GlobalDataset
                 {
                     GlobalDatasetId = dataset.GlobalDatasetId.Value,
                     DatasetName = dataset.DatasetName,
                     DatasetAsset = dataset.Asset.SaidKeyCode,
-                    Datasets = new List<SearchableEnvironmentDataset>
+                    Datasets = new List<EnvironmentDataset>
                     {
-                        new SearchableEnvironmentDataset
+                        new EnvironmentDataset
                         {
                             DatasetId = dataset.DatasetId,
                             DatasetDescription = dataset.DatasetDesc,
