@@ -949,7 +949,6 @@
     <Content Include="Views\Search\TileResults.cshtml" />
     <Content Include="Views\Config\Index.cshtml" />
     <Content Include="Views\Config\_DataFlowStepAccordion.cshtml" />
-    <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
     <Content Include="Views\Migration\_MigrationResponse.cshtml" />
     <Content Include="Views\Migration\_MigrationRequest.cshtml" />
@@ -1147,8 +1146,6 @@
     <Content Include="Views\Config\CreateRetrievalJob.cshtml" />
     <Content Include="Views\Config\Edit.cshtml" />
     <Content Include="Views\Config\EditRetrievalJob.cshtml" />
-    <Content Include="Views\Config\CreateDataSource.cshtml" />
-    <Content Include="Views\Config\EditDataSource.cshtml" />
     <Content Include="Views\DataAsset\Test.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Config\_Headers.cshtml" />
@@ -1217,6 +1214,8 @@
     <Content Include="Views\Migration\_MigrationHistory.cshtml" />
     <Content Include="Views\Config\DataSource\_DataSourceToken.cshtml" />
     <Content Include="Views\Config\DataSource\_AcceptableError.cshtml" />
+    <Content Include="Views\Config\DataSource\CreateDataSource.cshtml" />
+    <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
