@@ -70,3 +70,6 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level1name = N'Dataset',
     @level2type = N'COLUMN',
     @level2name = N'Short_NME'
+GO
+
+CREATE INDEX [IX_Dataset_GlobalDatasetId] ON [dbo].[Dataset] ([GlobalDatasetId])
