@@ -405,8 +405,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(OAuthClaims.scope, claim.Type);
             Assert.AreEqual("token.scope", claim.Value);
 
-            Assert.AreEqual(http.AcceptableErrors["error"], "this error is ok");
-
+            Assert.AreEqual("this error is ok", http.AcceptableErrors["error"]);
 
             mock.VerifyAll();
         }
@@ -590,9 +589,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("HeaderValue", header.Value);
 
             var acceptableError = http.AcceptableErrors.First();
-            Assert.AreEqual(http.AcceptableErrors.Count, 1);
-            Assert.AreEqual(acceptableError.Key, "error");
-            Assert.AreEqual(acceptableError.Value, "this error is ok");
+            Assert.AreEqual(1, http.AcceptableErrors.Count);
+            Assert.AreEqual("error", acceptableError.Key);
+            Assert.AreEqual("this error is ok", acceptableError.Value);
 
             Assert.AreEqual("ClientIdUpdate", http.ClientId);
             Assert.AreEqual("EncryptedClientPrivateIdUpdate", http.ClientPrivateId);
