@@ -1148,7 +1148,7 @@
     <Content Include="Views\Config\EditRetrievalJob.cshtml" />
     <Content Include="Views\DataAsset\Test.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
-    <Content Include="Views\Config\_Headers.cshtml" />
+    <Content Include="Views\Config\DataSource\_Headers.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Collection.cshtml" />
     <Content Include="Views\Config\Fields.cshtml" />
     <Content Include="Views\Config\_Fields.cshtml" />
