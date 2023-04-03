@@ -37,7 +37,7 @@ namespace Sentry.data.Infrastructure.Tests
                         SchemaId = schema.SchemaId,
                         SchemaName = schema.Name,
                         SchemaDescription = schema.Description,
-                        SaidAssetCode = flows.FirstOrDefault(x => x.SchemaId == schema.SchemaId)?.SaidKeyCode
+                        SchemaSaidAssetCode = flows.FirstOrDefault(x => x.SchemaId == schema.SchemaId)?.SaidKeyCode
                     });
                 }
 
@@ -45,8 +45,8 @@ namespace Sentry.data.Infrastructure.Tests
                 {
                     GlobalDatasetId = dataset.GlobalDatasetId.Value,
                     DatasetName = dataset.DatasetName,
-                    SaidAssetCode = dataset.Asset.SaidKeyCode,
-                    Datasets = new List<EnvironmentDataset>
+                    DatasetSaidAssetCode = dataset.Asset.SaidKeyCode,
+                    EnvironmentDatasets = new List<EnvironmentDataset>
                     {
                         new EnvironmentDataset
                         {
@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure.Tests
                             OriginationCode = dataset.OriginationCode,
                             IsSecured = dataset.IsSecured,
                             FavoriteUserIds = dataset.Favorities.Select(x => x.UserId).ToList(),
-                            Schemas = schemas
+                            EnvironmentSchemas = schemas
                         }
                     }
                 };

@@ -1277,7 +1277,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { datasetFileConfig_1, datasetFileConfig_2 }.AsQueryable());
 
-            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null);
+            SchemaService schemaService = new SchemaService(context.Object, null, null, null, null, null, null, null, null, null, null, null);
 
             //Act
             (int, bool) result_Exists = schemaService.SchemaExistsInTargetDataset(1, "MySchema");

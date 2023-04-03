@@ -17,8 +17,17 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly ISecurityService _securityService;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
+        private readonly IDataFeatures _dataFeatures;
 
-        public SchemaFlowService(IConfigService configService, ISchemaService schemaService, IDataFlowService dataFlowService, IDatasetContext datasetContext, IUserService userService, ISecurityService securityService)
+        public SchemaFlowService(IConfigService configService,
+            ISchemaService schemaService,
+            IDataFlowService dataFlowService,
+            IDatasetContext datasetContext,
+            IUserService userService,
+            ISecurityService securityService,
+            IGlobalDatasetProvider globalDatasetProvider,
+            IDataFeatures dataFeatures)
         {
             _configService = configService;
             _schemaService = schemaService;
@@ -26,6 +35,8 @@ namespace Sentry.data.Core
             _datasetContext = datasetContext;
             _userService = userService;
             _securityService = securityService;
+            _globalDatasetProvider = globalDatasetProvider;
+            _dataFeatures = dataFeatures;
         }
 
         public async Task<SchemaResultDto> AddSchemaAsync(SchemaFlowDto dto)
@@ -57,6 +68,8 @@ namespace Sentry.data.Core
                 DataFlowDto addedDataFlowDto = await _dataFlowService.AddDataFlowAsync(dto.DataFlowDto);
 
                 SchemaResultDto resultDto = CreateSchemaResultDto(addedSchemaDto, addedDataFlowDto, dto.DatasetFileConfigDto.DatasetScopeTypeName);
+                await AddUpdateEnvironmentSchemaAsync(resultDto);
+
                 return resultDto;
             }
             catch (Exception)
@@ -110,6 +123,8 @@ namespace Sentry.data.Core
                 RaiseConsumptionLayerEvent(currentViewChanged, schema);
 
                 SchemaResultDto resultDto = CreateSchemaResultDto(updatedSchemaDto, updatedDataFlowDto, GetScopeType(dto, fileConfig));
+                await AddUpdateEnvironmentSchemaAsync(resultDto);
+
                 return resultDto;
 
             }
@@ -174,7 +189,7 @@ namespace Sentry.data.Core
 
         private SchemaResultDto CreateSchemaResultDto(FileSchemaDto fileSchemaDto, DataFlowDto dataFlowDto, string scopeTypeCode)
         {
-            return new SchemaResultDto
+            SchemaResultDto resultDto = new SchemaResultDto
             {
                 SchemaId = fileSchemaDto.SchemaId,
                 SchemaDescription = fileSchemaDto.Description,
@@ -203,6 +218,17 @@ namespace Sentry.data.Core
                 CreateDateTime = fileSchemaDto.CreateDateTime,
                 UpdateDateTime = dataFlowDto.CreateDTM > fileSchemaDto.UpdateDateTime ? dataFlowDto.CreateDTM : fileSchemaDto.UpdateDateTime
             };
+
+            return resultDto;
+        }
+
+        private async Task AddUpdateEnvironmentSchemaAsync(SchemaResultDto resultDto)
+        {
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                EnvironmentSchema environmentSchema = resultDto.ToEnvironmentSchema();
+                await _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(resultDto.DatasetId, environmentSchema);
+            }
         }
 
         private string GetDropLocation(IngestionType ingestionType, int dataFlowId)

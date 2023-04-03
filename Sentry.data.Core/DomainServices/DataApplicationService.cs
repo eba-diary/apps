@@ -250,6 +250,9 @@ namespace Sentry.data.Core
                         CreateExternalDependenciesForDataset(new List<int>() { newDatasetId });
                     }
 
+                    var migratedSchemaIds = schemaMigrationResponses.Where(x => x.MigratedSchema).Select(x => x.TargetSchemaId).ToList();
+                    CreateExternalDependenciesForSchemas(migratedSchemaIds);
+
                     //Only kick off dataflow external dependencies if the dataflow metadata was migrated
                     var schemaWithMigratedDataflows = schemaMigrationResponses.Where(w => w.MigratedDataFlow).ToList();
                     List<int> newSchemaIds = Enumerable.Range(0, schemaWithMigratedDataflows.Count).Select(i => schemaMigrationResponses[i].TargetSchemaId).ToList();
@@ -874,6 +877,11 @@ namespace Sentry.data.Core
 
                 try
                 {
+                    if (response.MigratedSchema)
+                    {
+                        CreateExternalDependenciesForSchemas(new List<int> { response.TargetSchemaId });
+                    }
+
                     if (response.MigratedDataFlow)
                     {
                         CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { response.TargetSchemaId });
@@ -906,13 +914,24 @@ namespace Sentry.data.Core
             }
         }
 
-
         internal virtual void CreateExternalDependenciesForDataset(List<int> datasetIdList)
         {
             foreach (int datasetId in datasetIdList)
             {
                 DatasetService.CreateExternalDependencies(datasetId);
             }
+        }
+
+        internal virtual void CreateExternalDependenciesForSchemas(List<int> schemaIdList)
+        {
+            List<Task> tasks = new List<Task>();
+
+            foreach (int schemaId in schemaIdList)
+            {
+                tasks.Add(SchemaService.CreateExternalDependenciesAsync(schemaId));
+            }
+
+            Task.WaitAll(tasks.ToArray());
         }
 
         internal virtual void CreateExternalDependenciesForSchemaRevision(List<(int schemaId, int schemaRevisionId)> schemaAndSchemaRevisionIdList)
@@ -922,6 +941,7 @@ namespace Sentry.data.Core
                 CreateExternalDependenciesForSchemaRevision(schemaId, schemaRevisionId);
             }
         }
+
         private void CreateExternalDependenciesForSchemaRevision(int schemaId, int schemaRevisionId)
         {
             SchemaService.CreateSchemaRevisionExternalDependencies(schemaId, schemaRevisionId);
@@ -934,11 +954,12 @@ namespace Sentry.data.Core
                 DataFlowService.CreateExternalDependencies(dataFlowId);
             }
         }
+
         internal virtual void CreateExternalDependenciesForDataFlowBySchemaId(List<int> schemaIdList)
         {
             foreach (int schemaId in schemaIdList)
             {
-                int dataFlowId = _datasetContext.DataFlow.FirstOrDefault(w => w.SchemaId == schemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Id;
+                int dataFlowId = _datasetContext.DataFlow.First(w => w.SchemaId == schemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Id;
                 DataFlowService.CreateExternalDependencies(dataFlowId);
             }
         }

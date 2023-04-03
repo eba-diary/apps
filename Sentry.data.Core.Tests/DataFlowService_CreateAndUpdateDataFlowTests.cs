@@ -30,7 +30,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity() { CanCreateDataFlow = false };
             securityService.Setup(x => x.GetUserSecurity(null, appUser.Object)).Returns(userSecurity);
 
-            DataFlowService service = new DataFlowService(null, userService.Object, null, securityService.Object, null, null, null, null, null);
+            DataFlowService service = new DataFlowService(null, userService.Object, null, securityService.Object, null, null, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto();
 
@@ -59,7 +59,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity2 = new UserSecurity() { CanManageSchema = false, CanEditDataset = false };
             securityService.Setup(x => x.GetUserSecurity(dataset, appUser.Object)).Returns(userSecurity2);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -96,7 +96,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity2 = new UserSecurity() { CanManageSchema = true, CanEditDataset = true };
             securityService.Setup(x => x.GetUserSecurity(dataset, appUser.Object)).Returns(userSecurity2);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -160,7 +160,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -272,7 +272,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -336,7 +336,7 @@ namespace Sentry.data.Core.Tests
             Mock<IEmailService> emailService = mockRepository.Create<IEmailService>();
             emailService.Setup(x => x.SendS3SinkConnectorRequestEmail(It.IsAny<DataFlow>(), It.IsAny<ConnectorCreateRequestDto>(), connectorCreateResponseDto));
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, emailService.Object, connectorService.Object);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, emailService.Object, connectorService.Object, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -395,7 +395,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("NonProd");
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
 
             //create a dataflow with a topicname=Fred which should NOT create a S3SinkConnector if code is working properly
             DataFlowDto dto = new DataFlowDto()
@@ -453,7 +453,7 @@ namespace Sentry.data.Core.Tests
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
             jobService.Setup(x => x.CreateRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Returns(new RetrieverJob());
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -517,7 +517,7 @@ namespace Sentry.data.Core.Tests
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
             jobService.Setup(x => x.CreateRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Throws(new ValidationException("invalid"));
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, null, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, null, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -582,7 +582,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, null, null, dataFeatures.Object, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, null, null, dataFeatures.Object, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -642,7 +642,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = GetDatasetContext(mr, dataset);
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
 
-            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto
             {
@@ -762,7 +762,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.UncompressZipAction).Returns(new List<UncompressZipAction>() { new UncompressZipAction() { Id = 25 } }.AsQueryable());
             datasetContext.SetupGet(x => x.GoogleApiAction).Returns(new List<GoogleApiAction>() { new GoogleApiAction() { Id = 26 } }.AsQueryable());
 
-            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, null);
             DataFlowDto result = dataFlowService.UpdateDataFlowAsync(dto, dataFlow).Result;
 
             //deleted old dataflow
@@ -838,7 +838,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
 
-            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null);
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, null, null, null, null, null);
             DataFlowDto result = dataFlowService.UpdateDataFlowAsync(dto, dataFlow).Result;
 
             Assert.AreEqual(3, result.Id);
@@ -927,7 +927,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<DataFlow>(2)).Returns(dataFlow);
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
 
-            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService dataFlowService = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, null);
             DataFlowDto result = dataFlowService.UpdateDataFlowAsync(dto, dataFlow).Result;
 
             //deleted old dataflow
@@ -1096,7 +1096,7 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, null);
 
             DataFlowDto dto = new DataFlowDto()
             {

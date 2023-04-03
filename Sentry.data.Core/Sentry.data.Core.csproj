@@ -396,6 +396,7 @@
     <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DataSourceExtensions.cs" />
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
+    <Compile Include="Extensions\GlobalDatasetExtensions.cs" />
     <Compile Include="Extensions\MigrationExtensions.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />

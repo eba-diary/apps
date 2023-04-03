@@ -24,17 +24,17 @@ namespace Sentry.data.Infrastructure
         #region Environment Dataset
         public async Task AddUpdateEnvironmentDatasetAsync(int globalDatasetId, EnvironmentDataset environmentDataset)
         {
-            GlobalDataset globalDataset = await _elasticContext.GetDocumentAsync<GlobalDataset>(globalDatasetId);
+            GlobalDataset globalDataset = await _elasticContext.GetByIdAsync<GlobalDataset>(globalDatasetId);
 
             if (globalDataset != null)
             {
-                EnvironmentDataset existingDataset = globalDataset.Datasets.FirstOrDefault(x => x.DatasetId == environmentDataset.DatasetId);
+                EnvironmentDataset existingDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.DatasetId == environmentDataset.DatasetId);
                 if (existingDataset != null)
                 {
-                    globalDataset.Datasets.Remove(existingDataset);
+                    globalDataset.EnvironmentDatasets.Remove(existingDataset);
                 }
 
-                globalDataset.Datasets.Add(environmentDataset);
+                globalDataset.EnvironmentDatasets.Add(environmentDataset);
 
                 await _elasticContext.IndexAsync(globalDataset);
             }
@@ -50,10 +50,50 @@ namespace Sentry.data.Infrastructure
 
             if (globalDataset != null)
             {
-                EnvironmentDataset existingDataset = globalDataset.Datasets.First(x => x.DatasetId == environmentDatasetId);
-                globalDataset.Datasets.Remove(existingDataset);
+                EnvironmentDataset existingDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
+                globalDataset.EnvironmentDatasets.Remove(existingDataset);
 
-                await _elasticContext.IndexAsync(globalDataset);
+                if (!globalDataset.EnvironmentDatasets.Any())
+                {
+                    //delete whole global dataset if no environmnet datasets left
+                    await _elasticContext.DeleteByIdAsync<GlobalDataset>(globalDataset.GlobalDatasetId);
+                }
+                else
+                {
+                    await _elasticContext.IndexAsync(globalDataset);
+                }
+            }
+        }
+
+        public async Task AddEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
+        {
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetId(environmentDatasetId);
+
+            if (globalDataset != null)
+            {
+                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
+                if (!environmentDataset.FavoriteUserIds.Contains(favoriteUserId))
+                {
+                    environmentDataset.FavoriteUserIds.Add(favoriteUserId);
+
+                    await _elasticContext.IndexAsync(globalDataset);
+                }
+            }
+        }
+
+        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
+        {
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetId(environmentDatasetId);
+
+            if (globalDataset != null)
+            {
+                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
+                if (environmentDataset.FavoriteUserIds.Contains(favoriteUserId))
+                {
+                    environmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+
+                    await _elasticContext.IndexAsync(globalDataset);
+                }
             }
         }
         #endregion
@@ -65,15 +105,15 @@ namespace Sentry.data.Infrastructure
 
             if (globalDataset != null)
             {
-                EnvironmentDataset environmentDataset = globalDataset.Datasets.First(x => x.DatasetId == environmentDatasetId);
+                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
 
-                EnvironmentSchema existingSchema = environmentDataset.Schemas.FirstOrDefault(x => x.SchemaId == environmentSchema.SchemaId);
+                EnvironmentSchema existingSchema = environmentDataset.EnvironmentSchemas.FirstOrDefault(x => x.SchemaId == environmentSchema.SchemaId);
                 if (existingSchema != null)
                 {
-                    environmentDataset.Schemas.Remove(existingSchema);
+                    environmentDataset.EnvironmentSchemas.Remove(existingSchema);
                 }
 
-                environmentDataset.Schemas.Add(environmentSchema);
+                environmentDataset.EnvironmentSchemas.Add(environmentSchema);
 
                 await _elasticContext.IndexAsync(globalDataset);
             }
@@ -89,11 +129,31 @@ namespace Sentry.data.Infrastructure
 
             if (globalDataset != null)
             {
-                EnvironmentDataset environmentDataset = globalDataset.Datasets.First(x => x.Schemas.Any(s => s.SchemaId == environmentSchemaId));
-                EnvironmentSchema existingSchema = environmentDataset.Schemas.First(x => x.SchemaId == environmentSchemaId);
-                environmentDataset.Schemas.Remove(existingSchema);
+                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.EnvironmentSchemas.Any(s => s.SchemaId == environmentSchemaId));
+                EnvironmentSchema existingSchema = environmentDataset.EnvironmentSchemas.First(x => x.SchemaId == environmentSchemaId);
+
+                environmentDataset.EnvironmentSchemas.Remove(existingSchema);
 
                 await _elasticContext.IndexAsync(globalDataset);
+            }
+        }
+
+        public async Task AddUpdateEnvironmentSchemaSaidAssetCodeAsync(int environmentSchemaId, string saidAssetCode)
+        {
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaId(environmentSchemaId);
+
+            if (globalDataset != null)
+            {
+                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.EnvironmentSchemas.Any(s => s.SchemaId == environmentSchemaId));
+                EnvironmentSchema existingSchema = environmentDataset.EnvironmentSchemas.First(x => x.SchemaId == environmentSchemaId);
+
+                existingSchema.SchemaSaidAssetCode = saidAssetCode;
+
+                await _elasticContext.IndexAsync(globalDataset);
+            }
+            else
+            {
+                Logger.Warn($"Global dataset was not found for environment schema {environmentSchemaId}");
             }
         }
         #endregion
@@ -104,9 +164,9 @@ namespace Sentry.data.Infrastructure
             ElasticResult<GlobalDataset> elasticResult = await _elasticContext.SearchAsync<GlobalDataset>(x => x
                 .Query(q => q
                     .Nested(n => n
-                        .Path(p => p.Datasets)
+                        .Path(p => p.EnvironmentDatasets)
                         .Query(nq => nq
-                            .Term(t => t.Datasets.First().DatasetId, environmentDatasetId)
+                            .Term(t => t.EnvironmentDatasets.First().DatasetId, environmentDatasetId)
                          )
                     )
                 )
@@ -121,12 +181,12 @@ namespace Sentry.data.Infrastructure
             ElasticResult<GlobalDataset> elasticResult = await _elasticContext.SearchAsync<GlobalDataset>(x => x
                 .Query(q => q
                     .Nested(n => n
-                        .Path(p => p.Datasets)
+                        .Path(p => p.EnvironmentDatasets)
                         .Query(nq => nq
                             .Nested(dn => dn
-                                .Path(p => p.Datasets.First().Schemas)
+                                .Path(p => p.EnvironmentDatasets.First().EnvironmentSchemas)
                                 .Query(dnq => dnq
-                                    .Term(t => t.Datasets.First().Schemas.First().SchemaId, environmentSchemaId)
+                                    .Term(t => t.EnvironmentDatasets.First().EnvironmentSchemas.First().SchemaId, environmentSchemaId)
                                  )
                             )
                          )

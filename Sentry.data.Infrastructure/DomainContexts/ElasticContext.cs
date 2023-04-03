@@ -28,7 +28,7 @@ namespace Sentry.data.Infrastructure
             await _client.IndexDocumentAsync(document);
         }
 
-        public async Task<T> GetDocumentAsync<T>(DocumentPath<T> id) where T : class
+        public async Task<T> GetByIdAsync<T>(DocumentPath<T> id) where T : class
         {
             var response = await _client.GetAsync(id);
 
@@ -58,20 +58,20 @@ namespace Sentry.data.Infrastructure
             return response.IsValid;
         }
 
-        public void DeleteMany<T>(List<T> toDelete) where T : class
-        {
-            _client.DeleteMany(toDelete);
-        }
-
         public void IndexMany<T>(List<T> toIndex) where T : class
         {
             _client.IndexMany(toIndex);
         }
 
-        public void  DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
+        public void DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
         {
            _client.DeleteByQuery(query);
-        }    
+        }
+
+        public async Task DeleteByIdAsync<T>(DocumentPath<T> id) where T : class
+        {
+            await _client.DeleteAsync(id);
+        }
         #endregion
 
         #region Methods

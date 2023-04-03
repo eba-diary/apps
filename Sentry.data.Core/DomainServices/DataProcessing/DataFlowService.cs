@@ -10,8 +10,10 @@ using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.QuartermasterRestClient;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -30,6 +32,7 @@ namespace Sentry.data.Core
         private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
         private readonly IEmailService _emailService;
         private readonly IKafkaConnectorService _connectorService;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         public DataFlowService(
                 IDatasetContext datasetContext, 
@@ -40,7 +43,8 @@ namespace Sentry.data.Core
                 IDataFeatures dataFeatures, 
                 IBackgroundJobClient backgroundJobClient,
                 IEmailService emailService,
-                IKafkaConnectorService connectorService)
+                IKafkaConnectorService connectorService,
+                IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -51,6 +55,7 @@ namespace Sentry.data.Core
             _hangfireBackgroundJobClient = backgroundJobClient;
             _emailService = emailService;
             _connectorService = connectorService;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -249,6 +254,8 @@ namespace Sentry.data.Core
 
             if (logicalDelete)
             {
+                Task removeSaidAssetCodeTask = _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(flow.SchemaId, null);
+
                 //Mark dataflow deleted
                 flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
                 flow.DeleteIssuer = flow.DeleteIssuer ?? user.AssociateId.ToString();
@@ -267,6 +274,7 @@ namespace Sentry.data.Core
                     _jobService.Delete(jobList, user, true);
                 }
 
+                removeSaidAssetCodeTask.Wait();
             }
             else
             {
@@ -369,6 +377,11 @@ namespace Sentry.data.Core
             CreateS3SinkConnector(dataFlow);
             //Create DFS Drop locations
             CreateDataFlowDfsDropLocation(dataFlow);
+
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(dataFlow.SchemaId, dataFlow.SaidKeyCode).Wait();
+            }
         }
 
         public int CreateDataFlow(DataFlowDto dto)
@@ -383,6 +396,11 @@ namespace Sentry.data.Core
                 {
                     // Create a Hangfire job that will setup the default security groups for this new dataset
                     _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
+                }
+
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+                {
+                    _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(df.SchemaId, df.SaidKeyCode).Wait();
                 }
 
                 return df.Id;
@@ -519,6 +537,11 @@ namespace Sentry.data.Core
             */
             DataFlow newDataFlow = CreateAndSaveDataFlow(dfDto);
 
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(newDataFlow.SchemaId, newDataFlow.SaidKeyCode).Wait();
+            }
+
             return newDataFlow.Id;
         }
 
@@ -542,7 +565,6 @@ namespace Sentry.data.Core
                 throw;
             }
         }
-
 
         public void CreateDataFlowForSchema(FileSchema scm)
         {

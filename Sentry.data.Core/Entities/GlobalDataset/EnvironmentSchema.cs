@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         public string SchemaName { get; set; }
         [PropertyName("schemadescription")]
         public string SchemaDescription { get; set; }
-        [PropertyName("saidassetcode")]
-        public string SaidAssetCode { get; set; }
+        [PropertyName("schemasaidassetcode")]
+        public string SchemaSaidAssetCode { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace Sentry.data.Core
         public bool IsSecured { get; set; }
         [PropertyName("favoriteuserids")]
         public List<string> FavoriteUserIds { get; set; }
-        [PropertyName("schemas")]
-        public List<EnvironmentSchema> Schemas { get; set; }
+        [PropertyName("environmentschemas")]
+        public List<EnvironmentSchema> EnvironmentSchemas { get; set; }
     }
 }
