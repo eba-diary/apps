@@ -254,7 +254,11 @@ namespace Sentry.data.Core
 
             if (logicalDelete)
             {
-                Task removeSaidAssetCodeTask = _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(flow.SchemaId, null);
+                Task removeSaidAssetCodeTask = Task.CompletedTask;
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue()) 
+                {
+                    removeSaidAssetCodeTask = _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(flow.SchemaId, null);
+                }
 
                 //Mark dataflow deleted
                 flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;

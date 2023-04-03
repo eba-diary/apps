@@ -620,7 +620,11 @@ namespace Sentry.data.Core
                     Logger.Info($"{methodName} logical - configid:{id} configname:{dfc.Name}");
 
                     //Remove environment schema from dataset search index
-                    Task deleteEnvironmentSchemaTask = _globalDatasetProvider.DeleteEnvironmentSchemaAsync(scm.SchemaId);
+                    Task deleteEnvironmentSchemaTask = Task.CompletedTask;
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        deleteEnvironmentSchemaTask = _globalDatasetProvider.DeleteEnvironmentSchemaAsync(scm.SchemaId);
+                    }
 
                     /*************************
                     * Legacy processing platform jobs where associated directly to datasetfileconfig object

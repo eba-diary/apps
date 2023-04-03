@@ -630,7 +630,10 @@ namespace Sentry.data.Core
                     //Mark dataset for soft delete
                     MarkForDelete(ds, user);
 
-                    _globalDatasetProvider.DeleteEnvironmentDatasetAsync(ds.DatasetId).Wait();
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        _globalDatasetProvider.DeleteEnvironmentDatasetAsync(ds.DatasetId).Wait();
+                    }
 
                     ////Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
@@ -734,7 +737,11 @@ namespace Sentry.data.Core
                     };
 
                     _datasetContext.Merge(f);
-                    _globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                    
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        _globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                    }
 
                     _datasetContext.SaveChanges();
 
@@ -743,7 +750,11 @@ namespace Sentry.data.Core
                 else
                 {
                     _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
-                    _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                    }
 
                     _datasetContext.SaveChanges();
 
