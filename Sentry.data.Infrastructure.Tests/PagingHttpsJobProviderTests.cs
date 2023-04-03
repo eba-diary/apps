@@ -609,7 +609,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void Execute_PagingTypePageNumber_OAuth_MultiplePages_AcceptableError()
+        public void Execute_PagingTypePageNumber_OAuth_MultiplePages_AcceptableError_Handled()
         {
             DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
@@ -693,6 +693,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
             Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
             Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsTrue(token.AcceptableErrorNeedsReview);
 
             Assert.IsFalse(job.ExecutionParameters.Any());
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);

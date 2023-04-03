@@ -154,7 +154,11 @@ namespace Sentry.data.Infrastructure
                         }
                         catch(AcceptableErrorException ex)
                         {
-                            config.CurrentDataSourceToken.AcceptableErrorNeedsReview = true;
+                            if (!config.CurrentDataSourceToken.AcceptableErrorNeedsReview)
+                            {
+                                config.CurrentDataSourceToken.AcceptableErrorNeedsReview = true;
+                                Logger.Error($"New notifiable AcceptableError hit for {config.CurrentDataSourceToken.TokenName}."); //log when a flag is flipped, so we can capture just these to avoid alert spam.
+                            }
                             resultCount = 0; //continue
                             Logger.Error($"Acceptable Error detected for {config.CurrentDataSourceToken.TokenName}.", ex);
                         }

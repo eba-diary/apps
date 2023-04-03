@@ -1164,6 +1164,7 @@ namespace Sentry.data.Core
                     token.TokenUrl = dtoToken.TokenUrl;
                     token.Scope = dtoToken.Scope;
                     token.Enabled = dtoToken.Enabled;
+                    token.AcceptableErrorNeedsReview = dtoToken.AcceptableErrorNeedsReview;
 
                     if (update)
                     {
@@ -1208,7 +1209,8 @@ namespace Sentry.data.Core
                     TokenName = dataSourceToken.TokenName,
                     TokenUrl = dataSourceToken.TokenUrl,
                     Scope = dataSourceToken.Scope,
-                    Enabled = dataSourceToken.Enabled
+                    Enabled = dataSourceToken.Enabled,
+                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview
                 });
             }
         }
@@ -1304,6 +1306,7 @@ namespace Sentry.data.Core
             dto.TokenExp = token.TokenExp;
             dto.Scope = token.Scope;
             dto.Enabled = token.Enabled;
+            dto.AcceptableErrorNeedsReview = token.AcceptableErrorNeedsReview;
         }
 
         internal void MapToDataSourceToken(DataSourceTokenDto dto, DataSourceToken token)
@@ -1317,6 +1320,7 @@ namespace Sentry.data.Core
             token.TokenExp = dto.TokenExp;
             token.Scope = dto.Scope;
             token.Enabled = dto.Enabled;
+            token.AcceptableErrorNeedsReview = dto.AcceptableErrorNeedsReview;
         }
 
         private DataSource CreateDataSource(DataSourceDto dto)
