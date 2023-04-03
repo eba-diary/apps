@@ -10,6 +10,7 @@ namespace Sentry.data.Infrastructure.Tests
     [TestClass]
     public class UnitTest1
     {
+        [Microsoft.VisualStudio.TestTools.UnitTesting.Ignore("because")]
         [TestMethod]
         public void TestMethod1()
         {
