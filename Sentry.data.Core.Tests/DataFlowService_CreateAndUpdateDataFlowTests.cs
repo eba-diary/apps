@@ -159,8 +159,12 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -271,8 +275,12 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -328,6 +336,10 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
 
             Mock<IKafkaConnectorService> connectorService = mockRepository.Create<IKafkaConnectorService>();
             ConnectorCreateResponseDto connectorCreateResponseDto = new ConnectorCreateResponseDto();
@@ -336,7 +348,7 @@ namespace Sentry.data.Core.Tests
             Mock<IEmailService> emailService = mockRepository.Create<IEmailService>();
             emailService.Setup(x => x.SendS3SinkConnectorRequestEmail(It.IsAny<DataFlow>(), It.IsAny<ConnectorCreateRequestDto>(), connectorCreateResponseDto));
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, emailService.Object, connectorService.Object, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, emailService.Object, connectorService.Object, globalDatasetProvider.Object);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -394,8 +406,12 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("NonProd");
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, null, securityService.Object, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
 
             //create a dataflow with a topicname=Fred which should NOT create a S3SinkConnector if code is working properly
             DataFlowDto dto = new DataFlowDto()
@@ -449,11 +465,15 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
 
             Mock<IJobService> jobService = mockRepository.Create<IJobService>();
             jobService.Setup(x => x.CreateRetrieverJob(It.Is<RetrieverJobDto>(j => j.DataFlow == 3 && j.FileSchema == 2))).Returns(new RetrieverJob());
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, null);
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -581,8 +601,12 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, null, null, dataFeatures.Object, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, null, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
 
             DataFlowDto dto = new DataFlowDto()
             {
@@ -1095,8 +1119,12 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(CLA4260_QuartermasterNamedEnvironmentTypeFilter);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, "SAID")).Returns(Task.CompletedTask);
+
+            DataFlowService service = new DataFlowService(datasetContext.Object, userService.Object, jobService.Object, securityService.Object, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
 
             DataFlowDto dto = new DataFlowDto()
             {

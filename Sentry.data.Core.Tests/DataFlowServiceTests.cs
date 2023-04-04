@@ -1298,11 +1298,10 @@ namespace Sentry.data.Core.Tests
             // Arrange
             MockRepository mr = new MockRepository(MockBehavior.Loose);
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
-            user.Setup(s => s.DisplayName).Returns("displayName");
-            user.Setup(s => s.AssociateId).Returns("123456");
-           
+            user.Setup(s => s.AssociateId).Returns("123456");           
 
             DataFlow df = MockClasses.MockDataFlow();
+            df.SchemaId = 2;
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
                                         MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
@@ -1314,15 +1313,23 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
 
             Mock<IJobService> jobService = mr.Create<IJobService>();
-            jobService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+            jobService.Setup(s => s.Delete(It.Is<List<int>>(x => x.Contains(4000)), It.IsAny<IApplicationUser>(), true)).Returns(true);
 
-            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null, null);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, null)).Returns(Task.CompletedTask);
+
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
             
             //Act
             dataFlowService.Delete(df.Id, user.Object, true);
 
             //Assert
             context.Verify(x => x.SaveChanges(true), Times.Never);
+
+            mr.VerifyAll();
         }
 
         [TestCategory("Core DataFlowService")]

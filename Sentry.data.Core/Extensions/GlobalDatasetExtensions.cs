@@ -27,7 +27,7 @@ namespace Sentry.data.Core
                 NamedEnvironmentType = dataset.NamedEnvironmentType.ToString(),
                 OriginationCode = dataset.OriginationCode,
                 IsSecured = dataset.IsSecured,
-                FavoriteUserIds = dataset.Favorities?.Select(x => x.UserId).ToList(),
+                FavoriteUserIds = dataset.Favorities?.Select(x => x.UserId).ToList() ?? new List<string>(),
                 EnvironmentSchemas = new List<EnvironmentSchema>()
             };
         }

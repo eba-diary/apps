@@ -107,7 +107,19 @@ namespace Sentry.data.Core.Tests
             };
             dataFlowService.Setup(x => x.AddDataFlowAsync(addDto.DataFlowDto)).ReturnsAsync(resultDataFlowDto);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, null, null);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(2, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, globalDatasetProvider.Object, dataFeatures.Object);
 
             SchemaResultDto result = schemaFlowService.AddSchemaAsync(addDto).Result;
 
@@ -319,7 +331,19 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = true };
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, null, null);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(2, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, globalDatasetProvider.Object, dataFeatures.Object);
 
             SchemaResultDto result = schemaFlowService.UpdateSchemaAsync(updateDto).Result;
 
@@ -471,7 +495,19 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = true };
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, null, null);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(2, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, globalDatasetProvider.Object, dataFeatures.Object);
 
             SchemaResultDto result = schemaFlowService.UpdateSchemaAsync(updateDto).Result;
 

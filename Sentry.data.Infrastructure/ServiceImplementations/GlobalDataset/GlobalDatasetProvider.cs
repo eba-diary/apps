@@ -31,6 +31,7 @@ namespace Sentry.data.Infrastructure
                 EnvironmentDataset existingDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.DatasetId == environmentDataset.DatasetId);
                 if (existingDataset != null)
                 {
+                    environmentDataset.EnvironmentSchemas = existingDataset.EnvironmentSchemas;
                     globalDataset.EnvironmentDatasets.Remove(existingDataset);
                 }
 

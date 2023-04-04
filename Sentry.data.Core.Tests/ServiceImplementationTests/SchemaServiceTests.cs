@@ -12,6 +12,7 @@ using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Tests
@@ -1817,7 +1818,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = new FileSchema() { SchemaId = 1 };
 
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -1853,7 +1854,7 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
             FileSchema schema = new FileSchema() { SchemaId = 1 };
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -1886,7 +1887,7 @@ namespace Sentry.data.Core.Tests
             FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
             FileSchema schema = new FileSchema() { SchemaId = 1 };
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -2130,7 +2131,7 @@ namespace Sentry.data.Core.Tests
             FileSchema schema = BuildMockFileSchema("csv", true, false, 0, new string[] { "decimal" });
             FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(datasetContext.Object, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(datasetContext.Object, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -2195,7 +2196,7 @@ namespace Sentry.data.Core.Tests
                 SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
             });
 
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(datasetContext.Object, null, null, null, null, dataFeatures.Object, null, null, null, null, null) { CallBase = true };
+            Mock<SchemaService> schemaService = new Mock<SchemaService>(datasetContext.Object, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
             schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
             schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
@@ -2329,7 +2330,7 @@ namespace Sentry.data.Core.Tests
                 { 
                     SchemaId = 1, 
                     CreateCurrentView = false, 
-                    Extension = new FileExtension() { Id = 4 } 
+                    Extension = new FileExtension() { Id = 4 }
                 },
                 ParentDataset = ds
             };
@@ -2343,6 +2344,14 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
+            DataFlow dataFlow = new DataFlow
+            {
+                SchemaId = 1,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SaidKeyCode = "SAID"
+            };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
+
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -2355,19 +2364,28 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
-            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
-            feature.Setup(x => x.GetValue()).Returns(true);
-            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
-            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("SCHEMANAME", x.SchemaName);
+                Assert.IsNull(x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
 
             FileSchemaDto dto = new FileSchemaDto() 
             { 
                 SchemaId = 1, 
                 ParentDatasetId = 2,
                 CreateCurrentView = true, 
-                FileExtensionId = 4 
+                FileExtensionId = 4,
+                Name = "SCHEMANAME"
             };
 
             Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
@@ -2421,6 +2439,14 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
+            DataFlow dataFlow = new DataFlow
+            {
+                SchemaId = 1,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SaidKeyCode = "SAID"
+            };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
+
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -2433,12 +2459,20 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
-            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
-            feature.Setup(x => x.GetValue()).Returns(true);
-            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
-            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("SCHEMANAME", x.SchemaName);
+                Assert.IsNull(x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
 
             FileSchemaDto dto = new FileSchemaDto()
             {
@@ -2494,6 +2528,14 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
 
+            DataFlow dataFlow = new DataFlow
+            {
+                SchemaId = 1,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SaidKeyCode = "SAID"
+            };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
+
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -2506,12 +2548,20 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
-            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
-            feature.Setup(x => x.GetValue()).Returns(true);
-            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
-            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("schema&^Name", x.SchemaName);
+                Assert.IsNull(x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
 
             FileSchemaDto dto = new FileSchemaDto()
             {
@@ -2564,6 +2614,14 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
+            DataFlow dataFlow = new DataFlow
+            {
+                SchemaId = 1,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SaidKeyCode = "SAID"
+            };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
+
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -2576,12 +2634,20 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
-            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
-            feature.Setup(x => x.GetValue()).Returns(true);
-            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
-            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.IsNull(x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
 
             FileSchemaDto dto = new FileSchemaDto()
             {
@@ -2589,7 +2655,8 @@ namespace Sentry.data.Core.Tests
                 ParquetStorageBucket = "NewBucket",
                 ParquetStoragePrefix = "NewPrefix",
                 FileExtensionId = 4,
-                ParentDatasetId = 2
+                ParentDatasetId = 2,
+                Name = "SchemaName"
             };
 
             Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
@@ -2625,7 +2692,7 @@ namespace Sentry.data.Core.Tests
                 Schema = new FileSchema()
                 {
                     SchemaId = 1,
-                    Extension = new FileExtension() { Id = 4,  }
+                    Extension = new FileExtension() { Id = 4 }
                 },
                 ParentDataset = ds
             };
@@ -2639,6 +2706,14 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<FileExtension>(5)).Returns(new FileExtension() { Id = 5 }).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
+            DataFlow dataFlow = new DataFlow
+            {
+                SchemaId = 1,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SaidKeyCode = "SAID"
+            };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
+
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000000");
@@ -2651,18 +2726,27 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
-            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
-            feature.Setup(x => x.GetValue()).Returns(true);
-            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
-            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("SCHEMANAME", x.SchemaName);
+                Assert.IsNull(x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
 
             FileSchemaDto dto = new FileSchemaDto()
             {
                 SchemaId = 1,
                 FileExtensionId = 5,
-                ParentDatasetId = 2
+                ParentDatasetId = 2,
+                Name = "SCHEMANAME"
             };
 
             Assert.IsTrue(schemaService.UpdateAndSaveSchema(dto));
@@ -2709,6 +2793,14 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.SaveChanges(true)).Verifiable();
             datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(ds);
 
+            DataFlow dataFlow = new DataFlow
+            {
+                SchemaId = 1,
+                ObjectStatus = ObjectStatusEnum.Active,
+                SaidKeyCode = "SAID"
+            };
+            datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
+
             //mock user service
             Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             Mock<IUserService> userService = mr.Create<IUserService>();
@@ -2721,12 +2813,20 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetUserSecurity(ds, appUser.Object)).Returns(security).Verifiable();
 
             //mock features
-            Mock<IFeatureFlag<bool>> feature = mr.Create<IFeatureFlag<bool>>();
-            feature.Setup(x => x.GetValue()).Returns(true);
-            Mock<IDataFeatures> features = mr.Create<IDataFeatures>();
-            features.SetupGet(x => x.CLA3605_AllowSchemaParquetUpdate).Returns(feature.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
-            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, features.Object, null, null, null, null, null, null);
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("Name", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, securityService.Object, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
 
             FileSchemaDto dto = new FileSchemaDto()
             {
