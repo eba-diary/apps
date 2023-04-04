@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json.Bson;
 using Rhino.Mocks.Constraints;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
@@ -2537,8 +2538,6 @@ namespace Sentry.data.Core.Tests
             mr.VerifyAll();
         }
 
-
-
         [TestMethod]
         public void UpdateDatasetAsync_NotFound_ThrowsResourceNotFoundException()
         {
@@ -2557,6 +2556,57 @@ namespace Sentry.data.Core.Tests
             DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceNotFoundException>(() => datasetService.UpdateDatasetAsync(dto));
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CreateExternalDependencies_1_Success()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
+            securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
+
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 1,
+                GlobalDatasetId = 2,
+                DatasetDesc = "Description",
+                DatasetCategories = new List<Category>
+                {
+                    new Category { Name = "Category" }
+                },
+                NamedEnvironment = "DEV",
+                NamedEnvironmentType = NamedEnvironmentType.NonProd,
+                OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                IsSecured = false
+            };
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentDatasetAsync(2, It.IsAny<EnvironmentDataset>())).Returns(Task.CompletedTask).Callback<int, EnvironmentDataset>((id, x) =>
+            {
+                Assert.AreEqual(1, x.DatasetId);
+                Assert.AreEqual("Description", x.DatasetDescription);
+                Assert.AreEqual("Category", x.CategoryCode);
+                Assert.AreEqual("DEV", x.NamedEnvironment);
+                Assert.AreEqual(NamedEnvironmentType.NonProd.ToString(), x.NamedEnvironmentType);
+                Assert.AreEqual(DatasetOriginationCode.Internal.ToString(), x.OriginationCode);
+                Assert.IsFalse(x.IsSecured);
+                Assert.IsFalse(x.FavoriteUserIds.Any());
+                Assert.IsFalse(x.EnvironmentSchemas.Any());
+            });
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+
+            datasetService.CreateExternalDependencies(1);
 
             mr.VerifyAll();
         }

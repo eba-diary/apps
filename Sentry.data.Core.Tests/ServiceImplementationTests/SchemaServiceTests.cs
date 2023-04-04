@@ -3623,6 +3623,82 @@ namespace Sentry.data.Core.Tests
             mr.VerifyAll();
         }
 
+        [TestMethod]
+        public async Task CreateExternalDependenciesAsync_1_Create()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("Name", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.IsNull(x.SchemaSaidAssetCode);
+            });
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            FileSchema schema = new FileSchema 
+            { 
+                SchemaId = 1,
+                Name = "Name",
+                Description = "Description",
+                Extension = new FileExtension { Id = 3, Name = ExtensionNames.JSON }
+            };
+            datasetContext.SetupGet(x => x.FileSchema).Returns(new List<FileSchema> { schema }.AsQueryable());
+
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = schema,
+                ObjectStatus = ObjectStatusEnum.Active,
+                ParentDataset = new Dataset { DatasetId = 2 }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+            datasetContext.SetupGet(x => x.SchemaMap).Returns(new List<SchemaMap>().AsQueryable());
+
+            SchemaService schemaService = new SchemaService(datasetContext.Object, null, null, null, null, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
+
+            await schemaService.CreateExternalDependenciesAsync(1);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task CreateExternalDependenciesAsync_FileSchemaDto_Create()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(1, x.SchemaId);
+                Assert.AreEqual("Name", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.IsNull(x.SchemaSaidAssetCode);
+            });
+
+            FileSchemaDto schemaDto = new FileSchemaDto
+            {
+                SchemaId = 1,
+                ParentDatasetId = 2,
+                Name = "Name",
+                Description = "Description"
+            };
+
+            SchemaService schemaService = new SchemaService(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, globalDatasetProvider.Object);
+
+            await schemaService.CreateExternalDependenciesAsync(schemaDto);
+
+            mr.VerifyAll();
+        }
+
         #region Private Methods
         private JsonSchema BuildMockJsonSchemaWithDecimalField()
         {

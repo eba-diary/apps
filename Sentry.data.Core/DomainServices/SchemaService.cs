@@ -103,6 +103,7 @@ namespace Sentry.data.Core
         public async Task CreateExternalDependenciesAsync(int schemaId)
         {
             FileSchemaDto schemaDto = GetFileSchemaDto(schemaId);
+            schemaDto.ParentDatasetId = _datasetContext.DatasetFileConfigs.Where(x => x.Schema.SchemaId == schemaId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(x => x.ParentDataset.DatasetId).FirstOrDefault();
             await CreateExternalDependenciesAsync(schemaDto);
         }
 
