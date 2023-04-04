@@ -130,7 +130,8 @@ namespace Sentry.data.Core
                         ParentDataSource = ((HTTPSSource)dataSource),
                         TokenExp = 7200,
                         TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret",
-                        Enabled = false
+                        Enabled = false,
+                        BackfillComplete = false
                     };
 
                     try
@@ -181,6 +182,20 @@ namespace Sentry.data.Core
             catch (Exception e)
             {
                 Sentry.Common.Logging.Logger.Error("Onboarding token failed with message.", e);
+                return false;
+            }
+        }
+
+        public bool KickOffMotiveBackfill(int tokenId)
+        {
+            try
+            {
+                var token = _datasetContext.GetById<DataSourceToken>(tokenId);
+                return _motiveProvider.MotiveTokenBackfill(token);
+            }
+            catch (Exception e)
+            {
+                Sentry.Common.Logging.Logger.Error($"Backfilling token {tokenId} failed with message.", e);
                 return false;
             }
         }

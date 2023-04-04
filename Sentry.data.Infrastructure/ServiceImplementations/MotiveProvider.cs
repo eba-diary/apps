@@ -22,9 +22,10 @@ namespace Sentry.data.Infrastructure
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IDataFeatures _featureFlags;
         private readonly IEmailService _emailService;
+        private readonly PagingHttpsJobProvider _backfillJobProvider;
 
-
-        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider, IDataFeatures featureFlags, IEmailService emailService)
+        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, 
+                              IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider, IDataFeatures featureFlags, IEmailService emailService, PagingHttpsJobProvider backfillJobProvider)
         {
             client = httpClient;
             _s3ServiceProvider = s3ServiceProvider;
@@ -33,6 +34,7 @@ namespace Sentry.data.Infrastructure
             _authorizationProvider = authorizationProvider;
             _featureFlags = featureFlags;
             _emailService = emailService;
+            _backfillJobProvider = backfillJobProvider;
         }
 
         public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
@@ -69,11 +71,6 @@ namespace Sentry.data.Infrastructure
                                     }
                                 }
                             }
-                            if (_featureFlags.CLA4485_DropCompaniesFile.GetValue())
-                            {
-                                var s3Drop = _dataFlowService.GetDataFlowStepForDataFlowByActionType(companiesDataflowId, DataActionType.S3Drop);
-                                _s3ServiceProvider.UploadDataFile(contentStream, s3Drop.TriggerBucket, s3Drop.TriggerKey);
-                            }
                         }
                         _datasetContext.SaveChanges();
                     }
@@ -85,6 +82,57 @@ namespace Sentry.data.Infrastructure
                 }
             }
             client.DefaultRequestHeaders.Remove("Authorization"); //Clean the Auth Header out 
+        }
+
+        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
+        {
+            try
+            {
+                var motiveDataset = _datasetContext.GetById<Dataset>(int.Parse(Config.GetHostSetting("MotiveDatasetId")));
+                var schemaIdList = _datasetContext.DatasetFileConfigs.Where(dsfc => dsfc.ParentDataset == motiveDataset).Select(df => df.Schema.SchemaId).ToList();
+                var dataflows = _datasetContext.DataFlow.Where(df => schemaIdList.Contains(df.SchemaId)).ToList();
+                //Get all of our jobs for schemas that do not create a current view - current view backfill would lead to duplicate data
+                var jobs = _datasetContext.Jobs.Where(j => schemaIdList.Contains(j.FileSchema.SchemaId) && !j.FileSchema.CreateCurrentView).ToList();
+
+                HTTPSSource source = _datasetContext.GetById<HTTPSSource>(int.Parse(Config.GetHostSetting("MotiveDataSourceId")));
+                
+                //Disable all other tokens and make a list to enable them again later
+                List<int> tokensToEnable = new List<int>();
+                foreach (var token in source.AllTokens.Where(t => t.Enabled))
+                {
+                    tokensToEnable.Add(token.Id);
+                    token.Enabled = false;
+                }
+
+                tokenToBackfill.Enabled = true;
+
+                //change start date
+                foreach (var job in jobs)
+                {
+                    var dateParameter = job.RequestVariables.First(rv => rv.VariableName == "dateValue");
+                    var currentDateValue = dateParameter.VariableValue; //hold onto old value
+                    dateParameter.VariableValue = Config.GetHostSetting("MotiveBackfillDate");
+                    _backfillJobProvider.Execute(job);
+                    dateParameter.VariableValue = currentDateValue;
+                }
+
+                //clean up
+                //reset retriever job params
+                foreach (var token in source.AllTokens.Where(t => tokensToEnable.Contains(t.Id)))
+                {
+                    token.Enabled = true;
+                }
+
+                tokenToBackfill.BackfillComplete = true;
+                _datasetContext.SaveChanges();
+
+                return true;
+            }
+            catch(Exception e)
+            {
+                Common.Logging.Logger.Fatal($"Backfill on token {tokenToBackfill.TokenName} failed.", e);
+                return false;
+            }
         }
     }
 }

@@ -605,7 +605,11 @@ namespace Sentry.data.Web.Controllers
                 DataSourceModel model = new DataSourceModel(dto);
                 model.ReturnUrl = "/DataFlow/Create";
                 model.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
-
+                bool isMotive = int.Parse(Sentry.Configuration.Config.GetHostSetting("MotiveDataSourceId")) == sourceID;
+                foreach(var token in model.Tokens)
+                {
+                    token.ShouldShowBackfillButton = !token.BackFillComplete && isMotive;
+                }
                 EditSourceDropDown(model);
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");

@@ -36,5 +36,9 @@ namespace Sentry.data.Web.Models.Config
         public bool ToDelete { get; set; }
 
         public bool Enabled { get; set; }
+
+        public bool BackFillComplete { get; set; }
+
+        public bool ShouldShowBackfillButton { get; set; }
     }
 }
