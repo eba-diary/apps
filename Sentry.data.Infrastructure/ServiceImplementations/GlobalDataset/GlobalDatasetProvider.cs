@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure
         #region Environment Dataset
         public async Task AddUpdateEnvironmentDatasetAsync(int globalDatasetId, EnvironmentDataset environmentDataset)
         {
-            GlobalDataset globalDataset = await _elasticContext.GetByIdAsync<GlobalDataset>(globalDatasetId);
+            GlobalDataset globalDataset = await _elasticContext.GetByIdAsync<GlobalDataset>(globalDatasetId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task DeleteEnvironmentDatasetAsync(int environmentDatasetId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetId(environmentDatasetId);
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -68,7 +68,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task AddEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetId(environmentDatasetId);
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -84,7 +84,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetId(environmentDatasetId);
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -102,7 +102,7 @@ namespace Sentry.data.Infrastructure
         #region Environment Schema
         public async Task AddUpdateEnvironmentSchemaAsync(int environmentDatasetId, EnvironmentSchema environmentSchema)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetId(environmentDatasetId);
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -126,7 +126,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task DeleteEnvironmentSchemaAsync(int environmentSchemaId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaId(environmentSchemaId);
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaIdAsync(environmentSchemaId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -141,7 +141,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task AddUpdateEnvironmentSchemaSaidAssetCodeAsync(int environmentSchemaId, string saidAssetCode)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaId(environmentSchemaId);
+            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaIdAsync(environmentSchemaId).ConfigureAwait(false);
 
             if (globalDataset != null)
             {
@@ -160,7 +160,7 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region Private
-        private async Task<GlobalDataset> GetGlobalDatasetByEnvironmentDatasetId(int environmentDatasetId)
+        private async Task<GlobalDataset> GetGlobalDatasetByEnvironmentDatasetIdAsync(int environmentDatasetId)
         {
             ElasticResult<GlobalDataset> elasticResult = await _elasticContext.SearchAsync<GlobalDataset>(x => x
                 .Query(q => q
@@ -172,12 +172,12 @@ namespace Sentry.data.Infrastructure
                     )
                 )
                 .Size(1)
-            );
+            ).ConfigureAwait(false);
 
             return elasticResult.Documents.FirstOrDefault();
         }
 
-        private async Task<GlobalDataset> GetGlobalDatasetByEnvironmentSchemaId(int environmentSchemaId)
+        private async Task<GlobalDataset> GetGlobalDatasetByEnvironmentSchemaIdAsync(int environmentSchemaId)
         {
             ElasticResult<GlobalDataset> elasticResult = await _elasticContext.SearchAsync<GlobalDataset>(x => x
                 .Query(q => q
@@ -194,7 +194,7 @@ namespace Sentry.data.Infrastructure
                     )
                 )
                 .Size(1)
-            );
+            ).ConfigureAwait(false);
 
             return elasticResult.Documents.FirstOrDefault();
         }

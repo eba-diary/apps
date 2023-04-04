@@ -1,5 +1,7 @@
-﻿using Sentry.Common.Logging;
+﻿using Sentry.Associates;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +11,14 @@ namespace Sentry.data.Infrastructure
     public class UserFavoriteService : IUserFavoriteService
     {
         private readonly IDatasetContext _datasetContext;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
+        private readonly IDataFeatures _dataFeatures;
 
-        public UserFavoriteService(IDatasetContext datasetContext)
+        public UserFavoriteService(IDatasetContext datasetContext, IGlobalDatasetProvider globalDatasetProvider, IDataFeatures dataFeatures)
         {
             _datasetContext = datasetContext;
+            _globalDatasetProvider = globalDatasetProvider;
+            _dataFeatures = dataFeatures;
         }
         
         public IList<FavoriteItem> GetUserFavoriteItems(string associateId)
@@ -78,6 +84,12 @@ namespace Sentry.data.Infrastructure
                     {
                         Logger.Info($"Found Legacy Favorite {userFavoriteId} to remove");
                         _datasetContext.Remove(legacyFavorite);
+
+                        if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+                        {
+                            _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(legacyFavorite.DatasetId, legacyFavorite.UserId).Wait();
+                        }
+
                         _datasetContext.SaveChanges();
                     }
                 }

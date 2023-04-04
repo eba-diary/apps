@@ -409,7 +409,7 @@ namespace Sentry.data.Core
                 //Coming from migration, only have to add environment dataset (global dataset should exist)
                 Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
                 EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
-                _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset);
+                _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset).Wait();
             }
         }
 

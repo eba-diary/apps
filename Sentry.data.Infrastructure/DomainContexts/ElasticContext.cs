@@ -25,12 +25,12 @@ namespace Sentry.data.Infrastructure
         #region IElasticContext Implementation
         public async Task IndexAsync<T>(T document) where T : class
         {
-            await _client.IndexDocumentAsync(document);
+            await _client.IndexDocumentAsync(document).ConfigureAwait(false);
         }
 
         public async Task<T> GetByIdAsync<T>(DocumentPath<T> id) where T : class
         {
-            var response = await _client.GetAsync(id);
+            var response = await _client.GetAsync(id).ConfigureAwait(false);
 
             if (response.IsValid && response.Found)
             {

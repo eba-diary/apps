@@ -336,7 +336,7 @@ namespace Sentry.data.Core
                         environmentSchema.SchemaSaidAssetCode = dataFlow.SaidKeyCode;
                     }
 
-                    _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(fileConfig.ParentDataset.DatasetId, environmentSchema);
+                    _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(fileConfig.ParentDataset.DatasetId, environmentSchema).Wait();
                 }
             }
             catch (Exception ex)
