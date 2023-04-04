@@ -157,10 +157,10 @@ namespace Sentry.data.Infrastructure
                             if (!config.CurrentDataSourceToken.AcceptableErrorNeedsReview)
                             {
                                 config.CurrentDataSourceToken.AcceptableErrorNeedsReview = true;
-                                Logger.Error($"New notifiable AcceptableError hit for {config.CurrentDataSourceToken.TokenName}."); //log when a flag is flipped, so we can capture just these to avoid alert spam.
+                                Logger.Error($"New notifiable 'Acceptable Error' hit on {config.RequestUri} for {config.CurrentDataSourceToken.TokenName}."); //log when a flag is flipped, so we can capture just these to avoid alert spam.
                             }
                             resultCount = 0; //continue
-                            Logger.Error($"Acceptable Error detected for {config.CurrentDataSourceToken.TokenName}.", ex);
+                            Logger.Error($"'Acceptable Error' detected on {config.RequestUri} for {config.CurrentDataSourceToken.TokenName}.", ex);
                         }
 
                         //get next request to make
