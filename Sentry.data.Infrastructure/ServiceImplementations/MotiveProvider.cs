@@ -16,23 +16,17 @@ namespace Sentry.data.Infrastructure
     public class MotiveProvider : IMotiveProvider
     {
         private readonly HttpClient client;
-        private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDatasetContext _datasetContext;
-        private readonly IDataFlowService _dataFlowService;
         private readonly IAuthorizationProvider _authorizationProvider;
-        private readonly IDataFeatures _featureFlags;
         private readonly IEmailService _emailService;
-        private readonly PagingHttpsJobProvider _backfillJobProvider;
+        private readonly IBaseJobProvider _backfillJobProvider;
 
-        public MotiveProvider(HttpClient httpClient, IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext, 
-                              IDataFlowService dataFlowService, IAuthorizationProvider authorizationProvider, IDataFeatures featureFlags, IEmailService emailService, PagingHttpsJobProvider backfillJobProvider)
+        public MotiveProvider(HttpClient httpClient, IDatasetContext datasetContext, 
+                             IAuthorizationProvider authorizationProvider, IEmailService emailService, IBaseJobProvider backfillJobProvider)
         {
             client = httpClient;
-            _s3ServiceProvider = s3ServiceProvider;
             _datasetContext = datasetContext;
-            _dataFlowService = dataFlowService;
             _authorizationProvider = authorizationProvider;
-            _featureFlags = featureFlags;
             _emailService = emailService;
             _backfillJobProvider = backfillJobProvider;
         }
@@ -84,15 +78,20 @@ namespace Sentry.data.Infrastructure
             client.DefaultRequestHeaders.Remove("Authorization"); //Clean the Auth Header out 
         }
 
+        /// <summary>
+        /// Backfills data for Motive dataset by grabbing all jobs and running with only new token enabled. Config property "MotiveBackfillDate" controls the backfill start date. 
+        /// </summary>
+        /// <param name="tokenToBackfill">Token we want load data for.</param>
+        /// <returns></returns>
         public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
         {
             try
             {
-                var motiveDataset = _datasetContext.GetById<Dataset>(int.Parse(Config.GetHostSetting("MotiveDatasetId")));
-                var schemaIdList = _datasetContext.DatasetFileConfigs.Where(dsfc => dsfc.ParentDataset == motiveDataset).Select(df => df.Schema.SchemaId).ToList();
-                var dataflows = _datasetContext.DataFlow.Where(df => schemaIdList.Contains(df.SchemaId)).ToList();
+                var datasetFileConfigs = _datasetContext.DatasetFileConfigs.Where(dsfc => dsfc.ParentDataset.DatasetId == int.Parse(Config.GetHostSetting("MotiveDatasetId")));
+                var schemaIdList = datasetFileConfigs.Select(df => df.Schema.SchemaId).ToList();
+
                 //Get all of our jobs for schemas that do not create a current view - current view backfill would lead to duplicate data
-                var jobs = _datasetContext.Jobs.Where(j => schemaIdList.Contains(j.FileSchema.SchemaId) && !j.FileSchema.CreateCurrentView).ToList();
+                var jobs = _datasetContext.Jobs.Where(j => schemaIdList.Contains(j.FileSchema.SchemaId) && !j.FileSchema.CreateCurrentView && j.IsEnabled).ToList();
 
                 HTTPSSource source = _datasetContext.GetById<HTTPSSource>(int.Parse(Config.GetHostSetting("MotiveDataSourceId")));
                 
@@ -106,14 +105,24 @@ namespace Sentry.data.Infrastructure
 
                 tokenToBackfill.Enabled = true;
 
-                //change start date
-                foreach (var job in jobs)
+                try
                 {
-                    var dateParameter = job.RequestVariables.First(rv => rv.VariableName == "dateValue");
-                    var currentDateValue = dateParameter.VariableValue; //hold onto old value
-                    dateParameter.VariableValue = Config.GetHostSetting("MotiveBackfillDate");
-                    _backfillJobProvider.Execute(job);
-                    dateParameter.VariableValue = currentDateValue;
+                    //change start date and trigger jobs
+                    foreach (var job in jobs)
+                    {
+                        Common.Logging.Logger.Info($"Attempting backfill of {job.DataFlow.Name} on token {tokenToBackfill}");
+                        var dateParameter = job.RequestVariables.First(rv => rv.VariableName == "dateValue");
+                        var currentDateValue = dateParameter.VariableValue; //hold onto old value
+                        dateParameter.VariableValue = Config.GetHostSetting("MotiveBackfillDate");
+                        _backfillJobProvider.Execute(job);
+                        dateParameter.VariableValue = currentDateValue;
+                    }
+
+                    tokenToBackfill.BackfillComplete = true;
+                }
+                catch (Exception e) //Catch error here so we continue on to restore tokens. 
+                {
+                    Common.Logging.Logger.Error($"Backfill on token {tokenToBackfill.TokenName} failed running the jobs.", e);
                 }
 
                 //clean up
@@ -123,14 +132,13 @@ namespace Sentry.data.Infrastructure
                     token.Enabled = true;
                 }
 
-                tokenToBackfill.BackfillComplete = true;
                 _datasetContext.SaveChanges();
 
                 return true;
             }
             catch(Exception e)
             {
-                Common.Logging.Logger.Fatal($"Backfill on token {tokenToBackfill.TokenName} failed.", e);
+                Common.Logging.Logger.Error($"Backfill on token {tokenToBackfill.TokenName} failed.", e);
                 return false;
             }
         }

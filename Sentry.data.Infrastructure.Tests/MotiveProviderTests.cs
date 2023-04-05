@@ -61,18 +61,9 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IAuthorizationProvider> authProvider = repository.Create<IAuthorizationProvider>();
             authProvider.Setup(x => x.GetOAuthAccessToken(source, token)).Returns("ACCESS_TOKEN");
 
-            Mock<IDataFlowService> dataFlowService = repository.Create<IDataFlowService>();
-            dataFlowService.Setup(x => x.GetDataFlowStepForDataFlowByActionType(999, DataActionType.S3Drop)).Returns(new DataFlowStep() { TriggerBucket = "TestBucket", TriggerKey = "TestKey" });
-
-            Mock<IS3ServiceProvider> s3serviceProvider = repository.Create<IS3ServiceProvider>();
-            s3serviceProvider.Setup(x => x.UploadDataFile(It.IsAny<MemoryStream>(), "TestBucket", "TestKey")).Returns("Uploaded");
-
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IDataFeatures> dataFeatures = repository.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4485_DropCompaniesFile.GetValue()).Returns(true);
-
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, s3serviceProvider.Object, datasetContext.Object, dataFlowService.Object, authProvider.Object, dataFeatures.Object, null);
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
@@ -118,22 +109,167 @@ namespace Sentry.data.Infrastructure.Tests
                 ClientPrivateId = "EncryptedPrivateId"
             };
 
-            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
 
             Mock<IAuthorizationProvider> authProvider = repository.Create<IAuthorizationProvider>();
             authProvider.Setup(x => x.GetOAuthAccessToken(source, token)).Returns("ACCESS_TOKEN");
 
+            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IDataFeatures> dataFeatures = repository.Create<IDataFeatures>();
-
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, null, datasetContext.Object, null, authProvider.Object, dataFeatures.Object, null);
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
             Assert.AreEqual("OriginalName", token.TokenName);
 
             repository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void MotiveTokenBackfill_Expected()
+        {
+            DataSourceToken token0 = new DataSourceToken { Id = 2, Enabled = false };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
+            DataSourceToken token3 = new DataSourceToken { Id = 5, Enabled = false };
+            DataSourceToken token4 = new DataSourceToken { Id = 6, Enabled = true };
+            DataSourceToken token5 = new DataSourceToken { Id = 7, Enabled = true };
+            DataSourceToken token6 = new DataSourceToken { Id = 8, Enabled = false };
+            DataSourceToken backfillToken = new DataSourceToken { Id = 9, Enabled = false, BackfillComplete = false };
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                AllTokens = new List<DataSourceToken> { token0, token, token2, token3, token4, token5, token6, backfillToken }
+            };
+
+            List<DatasetFileConfig> mockFileConfigList = new List<DatasetFileConfig>
+            {
+                new DatasetFileConfig
+                {
+                    Schema = new FileSchema
+                    {
+                        SchemaId = 23
+                    }
+                },
+                new DatasetFileConfig
+                {
+                    Schema = new FileSchema
+                    {
+                        SchemaId = 25
+                    }
+                },
+                new DatasetFileConfig
+                {
+                    Schema = new FileSchema
+                    {
+                        SchemaId = 26
+                    }
+                },
+            };
+
+            List<int> mockSchemaIdList = new List<int> { 23, 25, 26 };
+
+            RetrieverJob job1 = new RetrieverJob
+            {
+                FileSchema = new FileSchema
+                {
+                    SchemaId = 23,
+                    CreateCurrentView = false
+                },
+                IsEnabled = true,
+                RequestVariables =  new List<RequestVariable>
+                {
+                    new RequestVariable
+                    {
+                        VariableName = "dateValue",
+                        VariableValue = "2023-03-04"
+                    }
+                }
+            };
+
+            RetrieverJob job2 = new RetrieverJob
+            {
+                FileSchema = new FileSchema
+                {
+                    SchemaId = 25,
+                    CreateCurrentView = false
+                },
+                IsEnabled = true,
+                RequestVariables = new List<RequestVariable>
+                {
+                    new RequestVariable
+                    {
+                        VariableName = "dateValue",
+                        VariableValue = "2023-03-08"
+                    }
+                }
+            };
+
+            RetrieverJob job3 = new RetrieverJob
+            {
+                FileSchema = new FileSchema
+                {
+                    SchemaId = 26,
+                    CreateCurrentView = false
+                },
+                IsEnabled = true,
+                RequestVariables = new List<RequestVariable>
+                {
+                    new RequestVariable
+                    {
+                        VariableName = "dateValue",
+                        VariableValue = "2023-03-10"
+                    }
+                }
+            };
+
+            MockRepository repository = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
+            datasetContext.Setup(x => x.GetById<HTTPSSource>(It.IsAny<int>())).Returns(dataSource);
+
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(mockFileConfigList.AsQueryable());
+
+            datasetContext.SetupGet(x => x.Jobs).Returns(new List<RetrieverJob> { job1, job2, job3 }.AsQueryable());
+
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IBaseJobProvider> jobProvider = new Mock<IBaseJobProvider>();
+            jobProvider.Setup(x => x.Execute(It.IsAny<RetrieverJob>()));
+
+            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object);
+
+            var result = motiveProvider.MotiveTokenBackfill(backfillToken);
+
+            //backfill marked complete
+            Assert.IsTrue(backfillToken.BackfillComplete);
+
+            //all token state is back  to what it should be
+            Assert.IsFalse(token0.Enabled);
+            Assert.IsTrue(token.Enabled);
+            Assert.IsTrue(token2.Enabled);
+            Assert.IsFalse(token3.Enabled);
+            Assert.IsTrue(token4.Enabled);
+            Assert.IsTrue(token5.Enabled);
+            Assert.IsFalse(token6.Enabled);
+            Assert.IsTrue(backfillToken.Enabled);
+
+            //jobs set back to right place 
+            Assert.AreEqual(job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-04");
+            Assert.AreEqual(job2.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-08");
+            Assert.AreEqual(job3.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-10");
+
+            jobProvider.Verify(jp => jp.Execute(It.IsAny<RetrieverJob>()), Times.Exactly(3));
+
+            repository.VerifyAll();
+        }
+
+        [TestMethod]
+        public void MotiveTokenBackfill_Unexpected()
+        {
+
         }
     }
 }

@@ -84,7 +84,8 @@
         $(".toggleBackfill").on('click', function () {
             let tokenId = $(this).parent().parent().find("input.tokenId").val();
             $.post("/api/v20220609/datasource/RunMotiveBackfill/" + tokenId, null, function () {
-                data.Dataset.makeToast("success","Token backfill triggered successfully.")
+                data.Dataset.makeToast("success", "Token backfill triggered successfully.");
+                $(this).hide();
             }).fail(function (jqxhr, settings, ex) { data.Dataset.makeToast("error", "Token backfill error occurred.") });
         });
     },
