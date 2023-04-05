@@ -272,9 +272,9 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsTrue(backfillToken.Enabled);
 
             //jobs set back to right place 
-            Assert.AreEqual(job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-04");
-            Assert.AreEqual(job2.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-08");
-            Assert.AreEqual(job3.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-10");
+            Assert.AreEqual("2023-03-04", job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
+            Assert.AreEqual("2023-03-08", job2.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
+            Assert.AreEqual("2023-03-10", job3.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
 
             jobProvider.Verify(jp => jp.Execute(It.IsAny<RetrieverJob>()), Times.Exactly(3));
 
@@ -428,9 +428,9 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsTrue(backfillToken.Enabled);
 
             //jobs set back to right place 
-            Assert.AreEqual(job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue, "2023-03-04");
-            Assert.AreEqual(job2.RequestVariables.First(rv => rv.VariableName == "startValue").VariableValue, "2023-03-08");
-            Assert.AreEqual(job3.RequestVariables.First(rv => rv.VariableName == "endValue").VariableValue, "2023-03-10");
+            Assert.AreEqual("2023-03-04", job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
+            Assert.AreEqual("2023-03-08", job2.RequestVariables.First(rv => rv.VariableName == "startValue").VariableValue);
+            Assert.AreEqual("2023-03-10", job3.RequestVariables.First(rv => rv.VariableName == "endValue").VariableValue);
 
             jobProvider.Verify(jp => jp.Execute(It.IsAny<RetrieverJob>()), Times.Exactly(1));
 
