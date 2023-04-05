@@ -14,6 +14,7 @@ using System.Web.Mvc;
 using Sentry.data.Web;
 using Sentry.data.Web.Models.AdminPage;
 
+
 namespace Sentry.data.Web.Controllers
 {
     [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
@@ -284,13 +285,13 @@ namespace Sentry.data.Web.Controllers
         {
             // have some service method that gets the data from elastic 
 
-            FailedFilesDetailsModel model = new FailedFilesDetailsModel()
+            FailedFilesDetailsModel failedModel = new FailedFilesDetailsModel()
             {
                 Dataset = "ZZZ Test Data",
                 FileCount = 5,
                 Schema = "CSV 01",
             };
-            return PartialView(model);
+            return PartialView(failedModel);
         }
 
         /*

@@ -10,7 +10,8 @@
 
 <html>
 <body>
-    @if (Model.FeatureFlag == true) {
+    @if (Model.FeatureFlag == true)
+    {
         <div id="dashboard">
 
             <div>
@@ -44,12 +45,13 @@
                 </div>
             </div>
         </div>
-        
-  
-        
-        
+
+        @Html.Partial("_FailedFilesDetails")
+
+
     }
-    else{
+    else
+    {
         <h1>You do not have the right permissions to see this page</h1>
     }
 
