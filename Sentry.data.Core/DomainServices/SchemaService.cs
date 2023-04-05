@@ -104,7 +104,7 @@ namespace Sentry.data.Core
         {
             FileSchemaDto schemaDto = GetFileSchemaDto(schemaId);
             schemaDto.ParentDatasetId = _datasetContext.DatasetFileConfigs.Where(x => x.Schema.SchemaId == schemaId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(x => x.ParentDataset.DatasetId).FirstOrDefault();
-            await CreateExternalDependenciesAsync(schemaDto);
+            await CreateExternalDependenciesAsync(schemaDto).ConfigureAwait(false);
         }
 
         public async Task CreateExternalDependenciesAsync(FileSchemaDto schemaDto)
@@ -112,7 +112,7 @@ namespace Sentry.data.Core
             if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
             {
                 EnvironmentSchema environmentSchema = schemaDto.ToEnvironmentSchema();
-                await _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(schemaDto.ParentDatasetId, environmentSchema);
+                await _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(schemaDto.ParentDatasetId, environmentSchema).ConfigureAwait(false);
             }
         }
 

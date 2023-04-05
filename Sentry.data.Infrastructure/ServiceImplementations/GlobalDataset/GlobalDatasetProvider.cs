@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure
         #region Global Dataset
         public async Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset)
         {
-            await _elasticContext.IndexAsync(globalDataset);
+            await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
         }
         #endregion
 
@@ -37,7 +37,7 @@ namespace Sentry.data.Infrastructure
 
                 globalDataset.EnvironmentDatasets.Add(environmentDataset);
 
-                await _elasticContext.IndexAsync(globalDataset);
+                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
             }
             else
             {
@@ -57,11 +57,11 @@ namespace Sentry.data.Infrastructure
                 if (!globalDataset.EnvironmentDatasets.Any())
                 {
                     //delete whole global dataset if no environmnet datasets left
-                    await _elasticContext.DeleteByIdAsync<GlobalDataset>(globalDataset.GlobalDatasetId);
+                    await _elasticContext.DeleteByIdAsync<GlobalDataset>(globalDataset.GlobalDatasetId).ConfigureAwait(false);
                 }
                 else
                 {
-                    await _elasticContext.IndexAsync(globalDataset);
+                    await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace Sentry.data.Infrastructure
                 {
                     environmentDataset.FavoriteUserIds.Add(favoriteUserId);
 
-                    await _elasticContext.IndexAsync(globalDataset);
+                    await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace Sentry.data.Infrastructure
                 {
                     environmentDataset.FavoriteUserIds.Remove(favoriteUserId);
 
-                    await _elasticContext.IndexAsync(globalDataset);
+                    await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
                 }
             }
         }
@@ -116,7 +116,7 @@ namespace Sentry.data.Infrastructure
 
                 environmentDataset.EnvironmentSchemas.Add(environmentSchema);
 
-                await _elasticContext.IndexAsync(globalDataset);
+                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
             }
             else
             {
@@ -135,7 +135,7 @@ namespace Sentry.data.Infrastructure
 
                 environmentDataset.EnvironmentSchemas.Remove(existingSchema);
 
-                await _elasticContext.IndexAsync(globalDataset);
+                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
             }
         }
 
@@ -150,7 +150,7 @@ namespace Sentry.data.Infrastructure
 
                 existingSchema.SchemaSaidAssetCode = saidAssetCode;
 
-                await _elasticContext.IndexAsync(globalDataset);
+                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
             }
             else
             {

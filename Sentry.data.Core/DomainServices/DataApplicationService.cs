@@ -254,9 +254,8 @@ namespace Sentry.data.Core
                     CreateExternalDependenciesForSchemas(migratedSchemaIds);
 
                     //Only kick off dataflow external dependencies if the dataflow metadata was migrated
-                    var schemaWithMigratedDataflows = schemaMigrationResponses.Where(w => w.MigratedDataFlow).ToList();
-                    List<int> newSchemaIds = Enumerable.Range(0, schemaWithMigratedDataflows.Count).Select(i => schemaMigrationResponses[i].TargetSchemaId).ToList();
-                    CreateExternalDependenciesForDataFlowBySchemaId(newSchemaIds);
+                    var migratedDataFlowIds = schemaMigrationResponses.Where(w => w.MigratedDataFlow).Select(x => x.TargetDataFlowId).ToList();
+                    CreateExternalDependenciesForDataFlow(migratedDataFlowIds);
                     
                     //Only kick off schema revision external dependecies if the schema revision was migrated
                     var migratedSchemaRevisions = schemaMigrationResponses.Where(w => w.MigratedSchemaRevision).Select(s => (s.TargetSchemaId, s.TargetSchemaRevisionId)).ToList();
@@ -884,7 +883,7 @@ namespace Sentry.data.Core
 
                     if (response.MigratedDataFlow)
                     {
-                        CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { response.TargetSchemaId });
+                        CreateExternalDependenciesForDataFlow(new List<int>() { response.TargetDataFlowId });
                     }
 
                     if (response.MigratedSchemaRevision)
@@ -951,15 +950,6 @@ namespace Sentry.data.Core
         {
             foreach (int dataFlowId in dataFlowIdList)
             {
-                DataFlowService.CreateExternalDependencies(dataFlowId);
-            }
-        }
-
-        internal virtual void CreateExternalDependenciesForDataFlowBySchemaId(List<int> schemaIdList)
-        {
-            foreach (int schemaId in schemaIdList)
-            {
-                int dataFlowId = _datasetContext.DataFlow.First(w => w.SchemaId == schemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Id;
                 DataFlowService.CreateExternalDependencies(dataFlowId);
             }
         }

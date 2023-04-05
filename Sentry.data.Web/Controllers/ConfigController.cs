@@ -168,6 +168,7 @@ namespace Sentry.data.Web.Controllers
                     if (newSchemaId != 0)
                     {
                         dto.SchemaId = newSchemaId;
+                        schemaDto.SchemaId = newSchemaId;
 
                         if (_configService.CreateAndSaveDatasetFileConfig(dto))
                         {

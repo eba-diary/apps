@@ -262,7 +262,11 @@ namespace Sentry.data.Core
 
                 //Mark dataflow deleted
                 flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
-                flow.DeleteIssuer = flow.DeleteIssuer ?? user.AssociateId.ToString();
+
+                if (string.IsNullOrEmpty(flow.DeleteIssuer))
+                {
+                    flow.DeleteIssuer = user != null ? user.AssociateId : "000000";
+                }
 
                 //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
                 //  https://stackoverflow.com/a/44324883

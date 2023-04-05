@@ -503,7 +503,7 @@ namespace Sentry.data.Core
             if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
             {
                 EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
-                await _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset);
+                await _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset).ConfigureAwait(false);
             }
         }
 
