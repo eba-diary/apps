@@ -1127,6 +1127,7 @@ namespace Sentry.data.Core
                 dto.Tokens = new List<DataSourceTokenDto>();
                 MapDataSourceTokensToDtoTokens(((HTTPSSource)dsrc).AllTokens, dto.Tokens);
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
+                dto.AcceptableErrors = ((HTTPSSource)dsrc).AcceptableErrors;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
                 dto.SupportsPaging = ((HTTPSSource)dsrc).SupportsPaging;
                 dto.GrantType = ((HTTPSSource)dsrc).GrantType;
@@ -1163,6 +1164,7 @@ namespace Sentry.data.Core
                     token.TokenUrl = dtoToken.TokenUrl;
                     token.Scope = dtoToken.Scope;
                     token.Enabled = dtoToken.Enabled;
+                    token.AcceptableErrorNeedsReview = dtoToken.AcceptableErrorNeedsReview;
 
                     if (update)
                     {
@@ -1207,7 +1209,8 @@ namespace Sentry.data.Core
                     TokenName = dataSourceToken.TokenName,
                     TokenUrl = dataSourceToken.TokenUrl,
                     Scope = dataSourceToken.Scope,
-                    Enabled = dataSourceToken.Enabled
+                    Enabled = dataSourceToken.Enabled,
+                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview
                 });
             }
         }
@@ -1270,6 +1273,11 @@ namespace Sentry.data.Core
                 {
                     ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders;
                 }
+                
+                if (dto.AcceptableErrors.Any())
+                {
+                    ((HTTPSSource)dsrc).AcceptableErrors = dto.AcceptableErrors;
+                }
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
@@ -1298,6 +1306,7 @@ namespace Sentry.data.Core
             dto.TokenExp = token.TokenExp;
             dto.Scope = token.Scope;
             dto.Enabled = token.Enabled;
+            dto.AcceptableErrorNeedsReview = token.AcceptableErrorNeedsReview;
         }
 
         internal void MapToDataSourceToken(DataSourceTokenDto dto, DataSourceToken token)
@@ -1311,6 +1320,7 @@ namespace Sentry.data.Core
             token.TokenExp = dto.TokenExp;
             token.Scope = dto.Scope;
             token.Enabled = dto.Enabled;
+            token.AcceptableErrorNeedsReview = dto.AcceptableErrorNeedsReview;
         }
 
         private DataSource CreateDataSource(DataSourceDto dto)
@@ -1378,6 +1388,11 @@ namespace Sentry.data.Core
                     if (dto.RequestHeaders.Any())
                     {
                         ((HTTPSSource)source).RequestHeaders = dto.RequestHeaders;
+                    }
+                    
+                    if (dto.AcceptableErrors.Any())
+                    {
+                        ((HTTPSSource)source).AcceptableErrors = dto.AcceptableErrors;
                     }
 
                     if (auth.Is<TokenAuthentication>())

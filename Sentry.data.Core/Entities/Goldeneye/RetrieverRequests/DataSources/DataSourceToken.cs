@@ -35,5 +35,7 @@ namespace Sentry.data.Core
         public virtual IList<OAuthClaim> Claims { get; set; }
 
         public virtual bool Enabled { get; set; }
+
+        public virtual bool AcceptableErrorNeedsReview { get; set; }
     }
 }

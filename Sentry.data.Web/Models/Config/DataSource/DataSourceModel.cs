@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
 using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.Config.DataSource;
 
 namespace Sentry.data.Web
 {
@@ -17,6 +18,7 @@ namespace Sentry.data.Web
         public DataSourceModel()
         {
             Headers = new List<RequestHeader>();
+            AcceptableErrors = new List<AcceptableErrorModel>();
             ContactIds = new List<string>();
             Tokens = new List<DataSourceTokenModel>();
 
@@ -34,9 +36,9 @@ namespace Sentry.data.Web
             IsUserPassRequired = dto.IsUserPassRequired;
             BaseUri = dto.BaseUri;
             PortNumber = dto.PortNumber;
-            Headers = new List<RequestHeader>();
             SourceType = dto.SourceType;
             Headers = dto.RequestHeaders ?? new List<RequestHeader>();
+            AcceptableErrors = dto.AcceptableErrors.Select(e => new AcceptableErrorModel { ErrorMessageKey = e.Key, ErrorMessageValue = e.Value }).ToList();
             Tokens = dto.Tokens.Select(t => t.ToModel()).ToList() ?? new List<DataSourceTokenModel>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
@@ -117,6 +119,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
+
+        public List<AcceptableErrorModel> AcceptableErrors { get; set; }
 
         [DisplayName("Enable Paging Support For Source")]
         public bool SupportsPaging { get; set; }
