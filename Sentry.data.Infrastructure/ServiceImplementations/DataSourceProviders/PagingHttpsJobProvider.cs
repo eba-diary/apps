@@ -147,7 +147,21 @@ namespace Sentry.data.Infrastructure
                         SetAuthorizationHeader(config, httpClient);
 
                         //copy response to file
-                        int resultCount = await CopyResponseToFileAsync(httpClient, fileStream, config);
+                        int resultCount;
+                        try
+                        {
+                            resultCount = await CopyResponseToFileAsync(httpClient, fileStream, config);
+                        }
+                        catch(AcceptableErrorException ex)
+                        {
+                            if (!config.CurrentDataSourceToken.AcceptableErrorNeedsReview)
+                            {
+                                config.CurrentDataSourceToken.AcceptableErrorNeedsReview = true;
+                                Logger.Error($"New notifiable 'Acceptable Error' hit on {config.RequestUri} for {config.CurrentDataSourceToken.TokenName}."); //log when a flag is flipped, so we can capture just these to avoid alert spam.
+                            }
+                            resultCount = 0; //continue
+                            Logger.Error($"'Acceptable Error' detected on {config.RequestUri} for {config.CurrentDataSourceToken.TokenName}.", ex);
+                        }
 
                         //get next request to make
                         SetNextRequest(config, resultCount);
@@ -222,7 +236,20 @@ namespace Sentry.data.Infrastructure
                 }
                 else
                 {
-                    throw new HttpsJobProviderException($"HTTPS request to {RequestLog(config)} failed. {response.Content.ReadAsStringAsync().Result}");
+                    using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                    using (StreamReader streamReader = new StreamReader(contentStream))
+                    using (JsonReader jsonReader = new JsonTextReader(streamReader))
+                    {
+                        JObject responseObject = JObject.Load(jsonReader);
+                        foreach (string key in config.Source.AcceptableErrors.Keys)
+                        {
+                            if(string.Equals(responseObject.Value<string>(key), config.Source.AcceptableErrors[key]))
+                            {
+                                throw new AcceptableErrorException();
+                            }
+                        }
+                        throw new HttpsJobProviderException($"HTTPS request to {RequestLog(config)} failed. {responseObject}");
+                    }
                 }
             }
         }

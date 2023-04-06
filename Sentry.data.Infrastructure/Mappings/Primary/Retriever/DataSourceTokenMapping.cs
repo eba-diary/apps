@@ -89,6 +89,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.NotNullable(false);
             });
             
+            Property(x => x.AcceptableErrorNeedsReview, m =>
+            {
+                m.Column("AcceptableErrorNeedsReview");
+                m.NotNullable(false);
+            });
+            
             Property(x => x.BackfillComplete, m =>
             {
                 m.Column("BackfillComplete");

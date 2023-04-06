@@ -37,6 +37,9 @@ namespace Sentry.data.Web.Models.Config
 
         public bool Enabled { get; set; }
 
+        [DisplayName("Token Response Error Needs Review")]
+        public bool AcceptableErrorNeedsReview { get; set; }
+
         public bool BackFillComplete { get; set; }
 
         public bool ShouldShowBackfillButton { get; set; }

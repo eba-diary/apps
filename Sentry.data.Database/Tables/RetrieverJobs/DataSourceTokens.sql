@@ -11,6 +11,7 @@
     [TokenExp] VARCHAR(50) NULL, 
     [Enabled] BIT NULL DEFAULT 1, 
     [ForeignId] VARCHAR(50) NULL, 
+    [AcceptableErrorNeedsReview] BIT NULL, 
     [BackfillComplete] BIT NULL, 
     PRIMARY KEY ([Id]), 
     CONSTRAINT [FK_DataSourceTokens_DataSource] FOREIGN KEY ([ParentDataSource_Id]) REFERENCES [DataSource]([DataSource_Id]) 

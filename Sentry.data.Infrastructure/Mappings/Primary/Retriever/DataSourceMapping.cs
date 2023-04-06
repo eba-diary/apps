@@ -222,6 +222,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.NotNullable(false);
             });
 
+            Property(x => x.AcceptableErrors, m =>
+            {
+                m.Column("AcceptableErrors");
+                m.Access(Accessor.Field);
+                m.NotNullable(false);
+            });
+
+            
+
             Property(x => x.SupportsPaging, m => m.Column("SupportsPaging"));
 
             Bag(x => x.AllTokens, m =>

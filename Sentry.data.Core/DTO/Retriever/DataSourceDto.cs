@@ -36,6 +36,7 @@ namespace Sentry.data.Core
         #endregion
 
         public List<RequestHeader> RequestHeaders { get; set; }
+        public Dictionary<string, string> AcceptableErrors { get; set; }
         public bool IsSecured { get; set; }
         public string PrimaryContactId { get; set; }
         public string PrimaryContactName { get; set; }
