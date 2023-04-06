@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Extensions
                 TokenExp = dataSourceTokenModel.TokenExp,
                 ToDelete = dataSourceTokenModel.ToDelete,
                 Enabled = dataSourceTokenModel.Enabled,
-                AcceptableErrorNeedsReview = dataSourceTokenModel.AcceptableErrorNeedsReview
+                AcceptableErrorNeedsReview = dataSourceTokenModel.AcceptableErrorNeedsReview,
                 BackfillComplete = dataSourceTokenModel.BackFillComplete
             };
         }

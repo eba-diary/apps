@@ -1211,7 +1211,7 @@ namespace Sentry.data.Core
                     TokenUrl = dataSourceToken.TokenUrl,
                     Scope = dataSourceToken.Scope,
                     Enabled = dataSourceToken.Enabled,
-                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview
+                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview,
                     BackfillComplete = dataSourceToken.BackfillComplete
                 });
             }
