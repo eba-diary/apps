@@ -214,6 +214,7 @@ namespace Sentry.data.Core
 
                     dto.DatasetId = 0;
                     dto.NamedEnvironment = migrationRequest.TargetDatasetNamedEnvironment;
+                    dto.NamedEnvironmentType = migrationRequest.TargetDatasetNamedEnvironmentType;
 
                     newDatasetId = CreateWithoutSave(dto);
 
@@ -923,14 +924,10 @@ namespace Sentry.data.Core
 
         internal virtual void CreateExternalDependenciesForSchemas(List<int> schemaIdList)
         {
-            List<Task> tasks = new List<Task>();
-
             foreach (int schemaId in schemaIdList)
             {
-                tasks.Add(SchemaService.CreateExternalDependenciesAsync(schemaId));
+                SchemaService.CreateExternalDependenciesAsync(schemaId).Wait();
             }
-
-            Task.WaitAll(tasks.ToArray());
         }
 
         internal virtual void CreateExternalDependenciesForSchemaRevision(List<(int schemaId, int schemaRevisionId)> schemaAndSchemaRevisionIdList)
