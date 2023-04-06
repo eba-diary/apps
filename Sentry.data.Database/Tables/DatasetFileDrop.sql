@@ -10,5 +10,7 @@ CREATE TABLE [dbo].[DatasetFileDrop]
 	[ObjectSizeAMT] [bigint] NULL,
 	[DatasetID] [int] NULL,
 	[SchemaID] [int] NULL,
-	[CreateDTM] [datetime] NULL
+	[CreateDTM] [datetime] NULL, 
+    CONSTRAINT [PK_DatasetFileDrop] PRIMARY KEY ([DatasetFileDropId])
 )
+GO

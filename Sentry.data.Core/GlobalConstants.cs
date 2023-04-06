@@ -630,5 +630,11 @@ namespace Sentry.data.Core
             public const string TYPE_DATASET = "Dataset";
             public const string TYPE_SCHEMA = "Schema";
         }
+
+        public static class SAIDRoles
+        {
+            public const string CUSTODIAN_PRODUCTION = "Custodian - Production";
+            public const string CUSTODIAN_CERTIFIER = "Custodian - Certifier";
+        }
     }
 }
