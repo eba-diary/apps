@@ -306,6 +306,7 @@
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\ElasticContext.cs" />
+    <Compile Include="Exceptions\AcceptableErrorException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />

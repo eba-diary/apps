@@ -131,7 +131,8 @@ namespace Sentry.data.Infrastructure
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
 
-            IAssociatesServiceClient associateService = AssociatesService.Create(Sentry.Configuration.Config.GetHostSetting("HrServiceUrl"));
+            IAssociatesServiceClient associateService = AssociatesService.Create(Configuration.Config.GetHostSetting("HrServiceUrl"));
+            associateService.Credentials = new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             AssociatesCacheOptions associateCacheOptions = new AssociatesCacheOptions
             {
                 SuccessCallback = () =>

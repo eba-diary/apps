@@ -1374,8 +1374,19 @@ namespace Sentry.data.Core
             string cleansedDatasetName = dataset.DatasetName.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
             string schemaName = cleansedDatasetName;
 
+            /*********************
+            *  When CLA4260 feature flag is off, system will not allow to datasets with same name.  Therefore, we will not have duplicated snowflake schema.
+            *  
+            *  When CLA4260 feature flag is on, we will have multiple datasets with same name but different named environments.  
+            *  Therefore, we need to ensure snowflake schema is unique.  The check where != "QUAL" is to ensure we generate same
+            *  snowflake schema names between PROD and NonPROD (QUAL) schemas.  This will give users better query experience between QUAL and PROD.
+            *********************/            
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
-            if (alwaysSuffixSchemaNames || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL"))
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && (alwaysSuffixSchemaNames 
+                    || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL")
+                    )
+                )
 #pragma warning restore S2589 // Boolean expressions should not be gratuitous
             {
                 schemaName += "_" + dataset.NamedEnvironment;

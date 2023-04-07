@@ -2036,11 +2036,17 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        [DataRow(true)]
-        [DataRow(false)]
-        public void SchemaService_GenerateDatasetBasedSnowflakeSchemaName(bool alwaysSuffixSchemaNames)
+        [DataRow(true, "NonProd")]
+        [DataRow(true, "")]
+        [DataRow(false, "NonProd")]
+        [DataRow(false, "")]
+        public void SchemaService_GenerateDatasetBasedSnowflakeSchemaName(bool alwaysSuffixSchemaNames, string cla4260Feature)
         {
             //Arrange
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(cla4260Feature);
+
             Dataset dataset_Prod = MockClasses.MockDataset();
             dataset_Prod.DatasetName = "DS With Long Name";
             dataset_Prod.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
@@ -2071,7 +2077,7 @@ namespace Sentry.data.Core.Tests
             dataset_Test.NamedEnvironment = "TEST";
             dataset_Test.NamedEnvironmentType = NamedEnvironmentType.NonProd;
 
-            var schemaService = new SchemaService(null, null, null, null, null, null, null, null, null, null, null, null);
+            var schemaService = new SchemaService(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null);
 
             //Act
             string schemaName_Prod = schemaService.GenerateDatasetBasedSnowflakeSchemaName(dataset_Prod, alwaysSuffixSchemaNames);
@@ -2088,7 +2094,7 @@ namespace Sentry.data.Core.Tests
             string expected_Qual2_SchemaName;
             string expected_Test_SchemaName;
 
-            if (alwaysSuffixSchemaNames)
+            if (alwaysSuffixSchemaNames && string.IsNullOrWhiteSpace(cla4260Feature))
             {
                 expected_Prod_SchemaName = expected_DS_Name + "_PROD";
                 expected_Prod2_SchemaName = expected_DS_Name + "_PROD2";
@@ -2096,13 +2102,29 @@ namespace Sentry.data.Core.Tests
                 expected_Qual2_SchemaName = expected_DS_Name + "_QUAL2";
                 expected_Test_SchemaName = expected_DS_Name + "_TEST";
             }
-            else
+            else if (!alwaysSuffixSchemaNames && string.IsNullOrWhiteSpace(cla4260Feature))
             {
                 expected_Prod_SchemaName = expected_DS_Name;
                 expected_Prod2_SchemaName = expected_DS_Name;
                 expected_Qual_SchemaName = expected_DS_Name;
                 expected_Qual2_SchemaName = expected_DS_Name + "_QUAL2";
                 expected_Test_SchemaName = expected_DS_Name + "_TEST";
+            }
+            else if (alwaysSuffixSchemaNames && !string.IsNullOrWhiteSpace(cla4260Feature))
+            {
+                expected_Prod_SchemaName = expected_DS_Name;
+                expected_Prod2_SchemaName = expected_DS_Name;
+                expected_Qual_SchemaName = expected_DS_Name;
+                expected_Qual2_SchemaName = expected_DS_Name;
+                expected_Test_SchemaName = expected_DS_Name;
+            }
+            else
+            {
+                expected_Prod_SchemaName = expected_DS_Name;
+                expected_Prod2_SchemaName = expected_DS_Name;
+                expected_Qual_SchemaName = expected_DS_Name;
+                expected_Qual2_SchemaName = expected_DS_Name;
+                expected_Test_SchemaName = expected_DS_Name;
             }
 
             Assert.AreEqual(expected_Prod_SchemaName, schemaName_Prod);
