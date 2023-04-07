@@ -241,7 +241,6 @@
     <Compile Include="GoogleSearchConsoleJobProviderTests.cs" />
     <Compile Include="JsmTicketProviderTests.cs" />
     <Compile Include="TicketMonitorServiceTests.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="GlobalDatasetProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>

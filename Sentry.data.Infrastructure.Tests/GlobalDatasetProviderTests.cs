@@ -589,6 +589,11 @@ namespace Sentry.data.Infrastructure.Tests
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
+            EnvironmentSchema environmentSchema = new EnvironmentSchema
+            {
+                SchemaId = 4
+            };
+
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
 
             GlobalDataset globalDataset = null;
@@ -605,7 +610,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
-            await globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(3, null);
+            await globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(3, environmentSchema);
 
             mr.VerifyAll();
         }
