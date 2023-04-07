@@ -1,12 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 using Moq;
-using Sentry.data.Core;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using NHibernate.Util;
-using Nest;
-using System;
+using Sentry.data.Core;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -23,7 +21,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask);
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, null);
 
             await globalDatasetProvider.AddUpdateGlobalDatasetAsync(globalDataset);
 
@@ -53,7 +51,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(environmentDataset, x.EnvironmentDatasets.First());
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, null);
 
             await globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(1, environmentDataset);
 
@@ -98,7 +96,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(environmentSchemas, updatedDataset.EnvironmentSchemas);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, null);
 
             await globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(1, environmentDataset);
 
@@ -110,14 +108,16 @@ namespace Sentry.data.Infrastructure.Tests
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
+            EnvironmentDataset environmentDataset = new EnvironmentDataset();
+
             GlobalDataset globalDataset = null;
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
             elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, null);
 
-            await globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(1, null);
+            await globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(1, environmentDataset);
 
             mr.VerifyAll();
         }
@@ -138,19 +138,22 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 Assert.AreEqual(1, x.EnvironmentDatasets.Count);
                 Assert.AreEqual(3, x.EnvironmentDatasets.First().DatasetId);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.DeleteEnvironmentDatasetAsync(2);
 
@@ -173,15 +176,18 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.DeleteByIdAsync<GlobalDataset>(1)).Returns(Task.CompletedTask);
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.DeleteEnvironmentDatasetAsync(2);
 
@@ -189,19 +195,52 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public async Task DeleteEnvironmentDatasetAsync_2_DeleteWholeDatasetEnvironment_GlobalDatasetNotFound()
+        public async Task DeleteEnvironmentDatasetAsync_2_GlobalDatasetNotFound()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            GlobalDataset globalDataset = null;
+
+            Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
             {
-                Documents = new List<GlobalDataset>()
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
+
+            await globalDatasetProvider.DeleteEnvironmentDatasetAsync(2);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task DeleteEnvironmentDatasetAsync_2_EnvironmentDatasetNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                EnvironmentDatasets = new List<EnvironmentDataset>()
             };
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.DeleteEnvironmentDatasetAsync(2);
 
@@ -228,12 +267,7 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 EnvironmentDataset updatedDataset = x.EnvironmentDatasets.First();
@@ -241,7 +275,15 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("000000", updatedDataset.FavoriteUserIds.First());
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
 
@@ -268,14 +310,17 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
             {
-                Documents = new List<GlobalDataset> { globalDataset }
+                DatasetId = 2,
+                GlobalDatasetId = 1
             };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
 
@@ -289,14 +334,19 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            GlobalDataset globalDataset = null;
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
             {
-                Documents = new List<GlobalDataset>()
+                DatasetId = 2,
+                GlobalDatasetId = 1
             };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
 
@@ -323,19 +373,22 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 EnvironmentDataset updatedDataset = x.EnvironmentDatasets.First();
                 Assert.AreEqual(0, updatedDataset.FavoriteUserIds.Count);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
 
@@ -362,14 +415,17 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
             {
-                Documents = new List<GlobalDataset> { globalDataset }
+                DatasetId = 2,
+                GlobalDatasetId = 1
             };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
 
@@ -383,14 +439,19 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            GlobalDataset globalDataset = null;
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
             {
-                Documents = new List<GlobalDataset>()
+                DatasetId = 2,
+                GlobalDatasetId = 1
             };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
 
@@ -425,13 +486,7 @@ namespace Sentry.data.Infrastructure.Tests
                     }
                 }
             };
-
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 Assert.AreEqual(2, x.EnvironmentDatasets.Count);
@@ -446,7 +501,15 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(environmentSchema, updatedSchema);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 3,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(3, environmentSchema);
 
@@ -490,12 +553,7 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 Assert.AreEqual(2, x.EnvironmentDatasets.Count);
@@ -511,7 +569,15 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("New Name", updatedSchema.SchemaName);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 3,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(3, environmentSchema);
 
@@ -525,14 +591,19 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            GlobalDataset globalDataset = null;
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
             {
-                Documents = new List<GlobalDataset>()
+                DatasetId = 3,
+                GlobalDatasetId = 1
             };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(3, null);
 
@@ -570,12 +641,7 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 Assert.AreEqual(2, x.EnvironmentDatasets.Count);
@@ -587,7 +653,19 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(0, updatedDataset.EnvironmentSchemas.Count);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.DeleteEnvironmentSchemaAsync(4);
 
@@ -601,14 +679,96 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            GlobalDataset globalDataset = null;
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
             {
-                Documents = new List<GlobalDataset>()
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
+
+            await globalDatasetProvider.DeleteEnvironmentSchemaAsync(4);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task DeleteEnvironmentSchemaAsync_4_EnvironmentDatasetNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
+
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                EnvironmentDatasets = new List<EnvironmentDataset>()
             };
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
+
+            await globalDatasetProvider.DeleteEnvironmentSchemaAsync(4);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task DeleteEnvironmentSchemaAsync_4_EnvironmentSchemaNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
+
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                EnvironmentDatasets = new List<EnvironmentDataset>
+                {
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 2,
+                        EnvironmentSchemas = new List<EnvironmentSchema>()
+                    }
+                }
+            };
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.DeleteEnvironmentSchemaAsync(4);
 
@@ -645,12 +805,7 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset> { globalDataset }
-            };
-
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
             elasticContext.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 EnvironmentDataset updatedDataset = x.EnvironmentDatasets.First(f => f.DatasetId == 3);
@@ -660,7 +815,19 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("SAID", updatedSchema.SchemaSaidAssetCode);
             });
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(4, "SAID");
 
@@ -674,14 +841,96 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
 
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            GlobalDataset globalDataset = null;
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
             {
-                Documents = new List<GlobalDataset>()
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
+
+            await globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(4, "SAID");
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task AddUpdateEnvironmentSchemaSaidAssetCodeAsync_EnvironmentDatasetNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
+
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                EnvironmentDatasets = new List<EnvironmentDataset>()
             };
 
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<GlobalDataset>, ISearchRequest>>())).ReturnsAsync(elasticResult);
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
 
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object);
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
+
+            await globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(4, "SAID");
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task AddUpdateEnvironmentSchemaSaidAssetCodeAsync_EnvironmentSchemaNotFound()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticContext> elasticContext = mr.Create<IElasticContext>();
+
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                EnvironmentDatasets = new List<EnvironmentDataset>
+                {
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 2,
+                        EnvironmentSchemas = new List<EnvironmentSchema>()
+                    }
+                }
+            };
+
+            elasticContext.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            DatasetFileConfig fileConfig = new DatasetFileConfig
+            {
+                Schema = new FileSchema { SchemaId = 4 },
+                ParentDataset = new Dataset
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                }
+            };
+            datasetContext.SetupGet(x => x.DatasetFileConfigs).Returns(new List<DatasetFileConfig> { fileConfig }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticContext.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(4, "SAID");
 

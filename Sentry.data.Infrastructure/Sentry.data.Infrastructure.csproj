@@ -439,6 +439,8 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleSearchConsoleJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
     <Compile Include="ServiceImplementations\FileProvider.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentSchemaIdResult.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentDatasetIdResult.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />

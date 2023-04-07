@@ -8,10 +8,12 @@ namespace Sentry.data.Infrastructure
     public class GlobalDatasetProvider : IGlobalDatasetProvider
     {
         private readonly IElasticContext _elasticContext;
+        private readonly IDatasetContext _datasetContext;
 
-        public GlobalDatasetProvider(IElasticContext elasticContext)
+        public GlobalDatasetProvider(IElasticContext elasticContext, IDatasetContext datasetContext)
         {
             _elasticContext = elasticContext;
+            _datasetContext = datasetContext;
         }
 
         #region Global Dataset
@@ -24,77 +26,67 @@ namespace Sentry.data.Infrastructure
         #region Environment Dataset
         public async Task AddUpdateEnvironmentDatasetAsync(int globalDatasetId, EnvironmentDataset environmentDataset)
         {
-            GlobalDataset globalDataset = await _elasticContext.GetByIdAsync<GlobalDataset>(globalDatasetId).ConfigureAwait(false);
+            GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(globalDatasetId, environmentDataset.DatasetId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.GlobalDataset != null)
             {
-                EnvironmentDataset existingDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.DatasetId == environmentDataset.DatasetId);
-                if (existingDataset != null)
+                if (getByResult.WasFound())
                 {
-                    environmentDataset.EnvironmentSchemas = existingDataset.EnvironmentSchemas;
-                    globalDataset.EnvironmentDatasets.Remove(existingDataset);
+                    environmentDataset.EnvironmentSchemas = getByResult.EnvironmentDataset.EnvironmentSchemas;
+                    getByResult.GlobalDataset.EnvironmentDatasets.Remove(getByResult.EnvironmentDataset);
                 }
 
-                globalDataset.EnvironmentDatasets.Add(environmentDataset);
+                getByResult.GlobalDataset.EnvironmentDatasets.Add(environmentDataset);
 
-                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
+                await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
             else
             {
-                Logger.Warn($"Global dataset {globalDatasetId} was not found");
+                Logger.Warn($"Global dataset {globalDatasetId} could not be found for add/update environment dataset {environmentDataset.DatasetId}");
             }
         }
 
         public async Task DeleteEnvironmentDatasetAsync(int environmentDatasetId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
+            GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.WasFound())
             {
-                EnvironmentDataset existingDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
-                globalDataset.EnvironmentDatasets.Remove(existingDataset);
+                getByResult.GlobalDataset.EnvironmentDatasets.Remove(getByResult.EnvironmentDataset);
 
-                if (!globalDataset.EnvironmentDatasets.Any())
+                if (!getByResult.GlobalDataset.EnvironmentDatasets.Any())
                 {
                     //delete whole global dataset if no environmnet datasets left
-                    await _elasticContext.DeleteByIdAsync<GlobalDataset>(globalDataset.GlobalDatasetId).ConfigureAwait(false);
+                    await _elasticContext.DeleteByIdAsync<GlobalDataset>(getByResult.GlobalDataset.GlobalDatasetId).ConfigureAwait(false);
                 }
                 else
                 {
-                    await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
+                    await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
                 }
             }
         }
 
         public async Task AddEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
+            GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.WasFound() && !getByResult.EnvironmentDataset.FavoriteUserIds.Contains(favoriteUserId))
             {
-                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
-                if (!environmentDataset.FavoriteUserIds.Contains(favoriteUserId))
-                {
-                    environmentDataset.FavoriteUserIds.Add(favoriteUserId);
+                getByResult.EnvironmentDataset.FavoriteUserIds.Add(favoriteUserId);
 
-                    await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
-                }
+                await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
         }
 
         public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
+            GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.WasFound() && getByResult.EnvironmentDataset.FavoriteUserIds.Contains(favoriteUserId))
             {
-                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
-                if (environmentDataset.FavoriteUserIds.Contains(favoriteUserId))
-                {
-                    environmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
 
-                    await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
-                }
+                await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
         }
         #endregion
@@ -102,101 +94,98 @@ namespace Sentry.data.Infrastructure
         #region Environment Schema
         public async Task AddUpdateEnvironmentSchemaAsync(int environmentDatasetId, EnvironmentSchema environmentSchema)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
+            GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.WasFound())
             {
-                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.DatasetId == environmentDatasetId);
-
-                EnvironmentSchema existingSchema = environmentDataset.EnvironmentSchemas.FirstOrDefault(x => x.SchemaId == environmentSchema.SchemaId);
+                EnvironmentSchema existingSchema = getByResult.EnvironmentDataset.EnvironmentSchemas.FirstOrDefault(x => x.SchemaId == environmentSchema.SchemaId);
                 if (existingSchema != null)
                 {
-                    environmentDataset.EnvironmentSchemas.Remove(existingSchema);
+                    getByResult.EnvironmentDataset.EnvironmentSchemas.Remove(existingSchema);
                 }
 
-                environmentDataset.EnvironmentSchemas.Add(environmentSchema);
+                getByResult.EnvironmentDataset.EnvironmentSchemas.Add(environmentSchema);
 
-                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
+                await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
             else
             {
-                Logger.Warn($"Global dataset was not found for environment dataset {environmentDatasetId}");
+                Logger.Warn($"Environment dataset {environmentDatasetId} could not be found for add/update environment schema {environmentSchema.SchemaId}");
             }
         }
 
         public async Task DeleteEnvironmentSchemaAsync(int environmentSchemaId)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaIdAsync(environmentSchemaId).ConfigureAwait(false);
+            GetByEnvironmentSchemaIdResult getByResult = await GetGlobalDatasetByEnvironmentSchemaIdAsync(environmentSchemaId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.WasFound())
             {
-                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.EnvironmentSchemas.Any(s => s.SchemaId == environmentSchemaId));
-                EnvironmentSchema existingSchema = environmentDataset.EnvironmentSchemas.First(x => x.SchemaId == environmentSchemaId);
+                getByResult.EnvironmentDataset.EnvironmentSchemas.Remove(getByResult.EnvironmentSchema);
 
-                environmentDataset.EnvironmentSchemas.Remove(existingSchema);
-
-                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
+                await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
         }
 
         public async Task AddUpdateEnvironmentSchemaSaidAssetCodeAsync(int environmentSchemaId, string saidAssetCode)
         {
-            GlobalDataset globalDataset = await GetGlobalDatasetByEnvironmentSchemaIdAsync(environmentSchemaId).ConfigureAwait(false);
+            GetByEnvironmentSchemaIdResult getByResult = await GetGlobalDatasetByEnvironmentSchemaIdAsync(environmentSchemaId).ConfigureAwait(false);
 
-            if (globalDataset != null)
+            if (getByResult.WasFound())
             {
-                EnvironmentDataset environmentDataset = globalDataset.EnvironmentDatasets.First(x => x.EnvironmentSchemas.Any(s => s.SchemaId == environmentSchemaId));
-                EnvironmentSchema existingSchema = environmentDataset.EnvironmentSchemas.First(x => x.SchemaId == environmentSchemaId);
+                getByResult.EnvironmentSchema.SchemaSaidAssetCode = saidAssetCode;
 
-                existingSchema.SchemaSaidAssetCode = saidAssetCode;
-
-                await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
+                await _elasticContext.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
-            else
+            else if (!string.IsNullOrEmpty(saidAssetCode))
             {
-                Logger.Warn($"Global dataset was not found for environment schema {environmentSchemaId}");
+                Logger.Warn($"Environment schema {environmentSchemaId} could not be found for add/update SAID asset");
             }
         }
         #endregion
 
         #region Private
-        private async Task<GlobalDataset> GetGlobalDatasetByEnvironmentDatasetIdAsync(int environmentDatasetId)
+        private async Task<GetByEnvironmentDatasetIdResult> GetGlobalDatasetByEnvironmentDatasetIdAsync(int environmentDatasetId)
         {
-            ElasticResult<GlobalDataset> elasticResult = await _elasticContext.SearchAsync<GlobalDataset>(x => x
-                .Query(q => q
-                    .Nested(n => n
-                        .Path(p => p.EnvironmentDatasets)
-                        .Query(nq => nq
-                            .Term(t => t.EnvironmentDatasets.First().DatasetId, environmentDatasetId)
-                         )
-                    )
-                )
-                .Size(1)
-            ).ConfigureAwait(false);
+            int? globalDatasetId = _datasetContext.Datasets.Where(x => x.DatasetId == environmentDatasetId).Select(x => x.GlobalDatasetId).FirstOrDefault();
 
-            return elasticResult.Documents.FirstOrDefault();
+            return await GetGlobalDatasetByEnvironmentDatasetIdAsync(globalDatasetId.Value, environmentDatasetId).ConfigureAwait(false);
         }
 
-        private async Task<GlobalDataset> GetGlobalDatasetByEnvironmentSchemaIdAsync(int environmentSchemaId)
+        private async Task<GetByEnvironmentDatasetIdResult> GetGlobalDatasetByEnvironmentDatasetIdAsync(int globalDatasetId, int environmentDatasetId)
         {
-            ElasticResult<GlobalDataset> elasticResult = await _elasticContext.SearchAsync<GlobalDataset>(x => x
-                .Query(q => q
-                    .Nested(n => n
-                        .Path(p => p.EnvironmentDatasets)
-                        .Query(nq => nq
-                            .Nested(dn => dn
-                                .Path(p => p.EnvironmentDatasets.First().EnvironmentSchemas)
-                                .Query(dnq => dnq
-                                    .Term(t => t.EnvironmentDatasets.First().EnvironmentSchemas.First().SchemaId, environmentSchemaId)
-                                 )
-                            )
-                         )
-                    )
-                )
-                .Size(1)
-            ).ConfigureAwait(false);
+            GetByEnvironmentDatasetIdResult getByResult = new GetByEnvironmentDatasetIdResult
+            {
+                GlobalDataset = await _elasticContext.GetByIdAsync<GlobalDataset>(globalDatasetId).ConfigureAwait(false)
+            };
 
-            return elasticResult.Documents.FirstOrDefault();
+            if (getByResult.GlobalDataset != null)
+            {
+                getByResult.EnvironmentDataset = getByResult.GlobalDataset.EnvironmentDatasets.FirstOrDefault(x => x.DatasetId == environmentDatasetId);
+            }
+
+            return getByResult;
+        }
+
+        private async Task<GetByEnvironmentSchemaIdResult> GetGlobalDatasetByEnvironmentSchemaIdAsync(int environmentSchemaId)
+        {
+            int? globalDatasetId = _datasetContext.DatasetFileConfigs.Where(x => x.Schema.SchemaId == environmentSchemaId).Select(x => x.ParentDataset.GlobalDatasetId).FirstOrDefault(); 
+            
+            GetByEnvironmentSchemaIdResult getByResult = new GetByEnvironmentSchemaIdResult
+            {
+                GlobalDataset = await _elasticContext.GetByIdAsync<GlobalDataset>(globalDatasetId).ConfigureAwait(false)
+            };
+
+            if (getByResult.GlobalDataset != null)
+            {
+                getByResult.EnvironmentDataset = getByResult.GlobalDataset.EnvironmentDatasets.FirstOrDefault(x => x.EnvironmentSchemas.Any(s => s.SchemaId == environmentSchemaId));
+
+                if (getByResult.EnvironmentDataset != null)
+                {
+                    getByResult.EnvironmentSchema = getByResult.EnvironmentDataset.EnvironmentSchemas.FirstOrDefault(x => x.SchemaId == environmentSchemaId);
+                }
+            }
+
+            return getByResult;
         }
         #endregion
     }
