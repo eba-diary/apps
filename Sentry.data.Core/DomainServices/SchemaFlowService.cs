@@ -189,7 +189,7 @@ namespace Sentry.data.Core
 
         private SchemaResultDto CreateSchemaResultDto(FileSchemaDto fileSchemaDto, DataFlowDto dataFlowDto, string scopeTypeCode)
         {
-            SchemaResultDto resultDto = new SchemaResultDto
+            return new SchemaResultDto
             {
                 SchemaId = fileSchemaDto.SchemaId,
                 SchemaDescription = fileSchemaDto.Description,
@@ -218,8 +218,6 @@ namespace Sentry.data.Core
                 CreateDateTime = fileSchemaDto.CreateDateTime,
                 UpdateDateTime = dataFlowDto.CreateDTM > fileSchemaDto.UpdateDateTime ? dataFlowDto.CreateDTM : fileSchemaDto.UpdateDateTime
             };
-
-            return resultDto;
         }
 
         private async Task AddUpdateEnvironmentSchemaAsync(SchemaResultDto resultDto)
