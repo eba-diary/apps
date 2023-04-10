@@ -636,5 +636,10 @@ namespace Sentry.data.Core
             public const string CUSTODIAN_PRODUCTION = "Custodian - Production";
             public const string CUSTODIAN_CERTIFIER = "Custodian - Certifier";
         }
+
+        public static class MigrationHistoryNamedEnvFilter
+        {
+            public const string ALL_NAMED_ENV = "ALL";
+        }
     }
 }

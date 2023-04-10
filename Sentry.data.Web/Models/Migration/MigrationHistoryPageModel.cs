@@ -1,5 +1,6 @@
 ﻿using Sentry.data.Core;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Web
 {
@@ -7,7 +8,7 @@ namespace Sentry.data.Web
     {
         public int? SourceDatasetId { get; set; }
         public string SourceDatasetName { get; set; }
-        public IList<MigrationHistoryModel> MigrationHistoryModels { get; set; }
-        public UserSecurity Security { get; set; }
+        public bool ShowNamedEnvironmentFilter { get; set; }
+        public List<DatasetRelativeModel> DatasetRelatives { get; set; }
     }
 }
