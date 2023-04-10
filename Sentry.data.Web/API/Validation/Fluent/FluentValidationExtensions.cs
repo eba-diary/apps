@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -43,11 +44,33 @@ namespace Sentry.data.Web.API
             return fluentResponse;
         }
 
+        public static FluentValidationResponse<TModel, List<TList>> Required<TModel, TList>(this FluentValidationResponse<TModel, List<TList>> fluentResponse) where TModel : IRequestModel
+        {
+            fluentResponse.IsRequiredProperty = true;
+
+            if (fluentResponse.PropertyValue?.Any() != true)
+            {
+                fluentResponse.ValidationResponse.AddFieldValidation(fluentResponse.PropertyName, $"Required field");
+            }
+
+            return fluentResponse;
+        }
+
         public static FluentValidationResponse<TModel, string> MaxLength<TModel>(this FluentValidationResponse<TModel, string> fluentResponse, int maxLength) where TModel : IRequestModel
         {
             if (fluentResponse.PropertyValue?.Length > maxLength)
             {
                 fluentResponse.ValidationResponse.AddFieldValidation(fluentResponse.PropertyName, $"Max length of {maxLength} characters");
+            }
+
+            return fluentResponse;
+        }
+
+        public static FluentValidationResponse<TModel, List<TList>> MaxLength<TModel, TList>(this FluentValidationResponse<TModel, List<TList>> fluentResponse, int maxLength) where TModel : IRequestModel
+        {
+            if (fluentResponse.PropertyValue?.Count > maxLength)
+            {
+                fluentResponse.ValidationResponse.AddFieldValidation(fluentResponse.PropertyName, $"Max length of {maxLength} values");
             }
 
             return fluentResponse;

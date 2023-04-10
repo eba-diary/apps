@@ -241,6 +241,8 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
+    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
@@ -497,6 +499,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
+    <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />

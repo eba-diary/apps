@@ -58,9 +58,14 @@ namespace Sentry.data.Infrastructure
             return response.IsValid;
         }
 
-        public void IndexMany<T>(List<T> toIndex) where T : class
+        public async Task IndexManyAsync<T>(List<T> toIndex) where T : class
         {
-            _client.IndexMany(toIndex);
+            await _client.IndexManyAsync(toIndex).ConfigureAwait(false);
+        }
+
+        public async Task DeleteManyAsync<T>(IEnumerable<T> documents) where T : class
+        {
+            await _client.DeleteManyAsync(documents).ConfigureAwait(false);
         }
 
         public void DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class

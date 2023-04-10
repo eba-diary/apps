@@ -1072,7 +1072,7 @@ namespace Sentry.data.Core
         private void IndexElasticFieldsForSchema(int schemaId, int datasetId, IList<BaseField> fields)
         {
             List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList<ElasticSchemaField>();
-            _elasticContext.IndexMany<ElasticSchemaField>(elasticFields);
+            _elasticContext.IndexManyAsync(elasticFields).Wait();
         }
 
         private HashSet<ElasticSchemaField> BaseFieldsFlatten(IList<BaseField> fields, int schemaId, int datasetId)

@@ -180,6 +180,8 @@
     <Compile Include="API\BaseModelMappingTests.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidatorTests.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
+    <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsModelMappingTests.cs" />
+    <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsValidatorTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidatorTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaModelMappingTests.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidatorTests.cs" />

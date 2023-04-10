@@ -1,5 +1,6 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,6 +21,17 @@ namespace Sentry.data.Infrastructure
         public async Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset)
         {
             await _elasticContext.IndexAsync(globalDataset).ConfigureAwait(false);
+        }
+
+        public async Task AddUpdateGlobalDatasetsAsync(List<GlobalDataset> globalDatasets)
+        {
+            await _elasticContext.IndexManyAsync(globalDatasets);
+        }
+
+        public async Task DeleteGlobalDatasetsAsync(List<int> globalDatasetIds)
+        {
+            List<GlobalDataset> globalDatasets = globalDatasetIds.Select(x => new GlobalDataset { GlobalDatasetId = x }).ToList();
+            await _elasticContext.DeleteManyAsync(globalDatasets);
         }
         #endregion
 

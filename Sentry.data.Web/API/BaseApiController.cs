@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -203,6 +204,11 @@ namespace Sentry.data.Web.API
             {
                 Logger.Info($"API - {forbidden.UserId} does not have {forbidden.Permission} permission to {forbidden.ResourceAction} | Resource Id: {forbidden.ResourceId}");
                 return StatusCode(HttpStatusCode.Forbidden);
+            }
+            catch (ResourceFeatureNotEnabledException featureNotEnabled)
+            {
+                Logger.Info($"API - {featureNotEnabled.FeatureFlagName} not enabled to perform {featureNotEnabled.ResourceAction}");
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
