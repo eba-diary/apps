@@ -168,10 +168,13 @@ namespace Sentry.data.Web.Controllers
                     if (newSchemaId != 0)
                     {
                         dto.SchemaId = newSchemaId;
+                        schemaDto.SchemaId = newSchemaId;
 
                         if (_configService.CreateAndSaveDatasetFileConfig(dto))
                         {
                             _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
+                            _schemaService.CreateExternalDependenciesAsync(schemaDto).Wait();
+
                             return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
                         }
                     }

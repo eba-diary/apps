@@ -10,5 +10,6 @@
         public bool HasHeader { get; set; }
         public int DatasetScopeTypeId { get; set; }
         public bool CreateCurrentView { get; set; }
+        public int SchemaId { get; set; }
     }
 }

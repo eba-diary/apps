@@ -107,7 +107,19 @@ namespace Sentry.data.Core.Tests
             };
             dataFlowService.Setup(x => x.AddDataFlowAsync(addDto.DataFlowDto)).ReturnsAsync(resultDataFlowDto);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(2, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, globalDatasetProvider.Object, dataFeatures.Object);
 
             SchemaResultDto result = schemaFlowService.AddSchemaAsync(addDto).Result;
 
@@ -170,7 +182,7 @@ namespace Sentry.data.Core.Tests
             Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
             schemaService.Setup(x => x.AddSchemaAsync(addDto.SchemaDto)).ThrowsAsync(new Exception());
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, schemaService.Object, null, datasetContext.Object, userService.Object, securityService.Object);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, schemaService.Object, null, datasetContext.Object, userService.Object, securityService.Object, null, null);
 
             Assert.ThrowsExceptionAsync<Exception>(() => schemaFlowService.AddSchemaAsync(addDto));
 
@@ -202,7 +214,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = false };
             securityService.Setup(x => x.GetUserSecurity(dataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, userService.Object, securityService.Object);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, userService.Object, securityService.Object, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceNotFoundException>(() => schemaFlowService.AddSchemaAsync(addDto));
 
@@ -319,7 +331,19 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = true };
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(2, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, globalDatasetProvider.Object, dataFeatures.Object);
 
             SchemaResultDto result = schemaFlowService.UpdateSchemaAsync(updateDto).Result;
 
@@ -471,7 +495,19 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = true };
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
+            {
+                Assert.AreEqual(2, x.SchemaId);
+                Assert.AreEqual("SchemaName", x.SchemaName);
+                Assert.AreEqual("Description", x.SchemaDescription);
+                Assert.AreEqual("SAID", x.SchemaSaidAssetCode);
+            });
+
+            SchemaFlowService schemaFlowService = new SchemaFlowService(configService.Object, schemaService.Object, dataFlowService.Object, datasetContext.Object, userService.Object, securityService.Object, globalDatasetProvider.Object, dataFeatures.Object);
 
             SchemaResultDto result = schemaFlowService.UpdateSchemaAsync(updateDto).Result;
 
@@ -557,7 +593,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = false };
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, userService.Object, securityService.Object);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, userService.Object, securityService.Object, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceForbiddenException>(() => schemaFlowService.UpdateSchemaAsync(updateDto));
 
@@ -617,7 +653,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity userSecurity = new UserSecurity { CanManageSchema = true };
             securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, schemaService.Object, null, datasetContext.Object, userService.Object, securityService.Object);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, schemaService.Object, null, datasetContext.Object, userService.Object, securityService.Object, null, null);
 
             Assert.ThrowsExceptionAsync<Exception>(() => schemaFlowService.UpdateSchemaAsync(updateDto));
 
@@ -659,7 +695,7 @@ namespace Sentry.data.Core.Tests
             };
             datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, null, null);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, null, null, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceNotFoundException>(() => schemaFlowService.UpdateSchemaAsync(updateDto));
 
@@ -701,7 +737,7 @@ namespace Sentry.data.Core.Tests
             };
             datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow> { dataFlow }.AsQueryable());
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, null, null);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, null, null, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceNotFoundException>(() => schemaFlowService.UpdateSchemaAsync(updateDto));
 
@@ -743,7 +779,7 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.SetupGet(x => x.DataFlow).Returns(new List<DataFlow>().AsQueryable());
 
-            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, null, null);
+            SchemaFlowService schemaFlowService = new SchemaFlowService(null, null, null, datasetContext.Object, null, null, null, null);
 
             Assert.ThrowsExceptionAsync<ResourceNotFoundException>(() => schemaFlowService.UpdateSchemaAsync(updateDto));
 

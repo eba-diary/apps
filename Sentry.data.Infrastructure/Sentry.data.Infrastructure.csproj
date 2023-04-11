@@ -440,6 +440,8 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleSearchConsoleJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
     <Compile Include="ServiceImplementations\FileProvider.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentSchemaIdResult.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentDatasetIdResult.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />
@@ -499,6 +501,7 @@
     <Compile Include="ServiceImplementations\RetrieverJobProviders\AllDfsRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GlobalDatasetProvider.cs" />
     <Compile Include="ServiceImplementations\SecBotProvider.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
     <Compile Include="ServiceImplementations\SupportLinkService.cs" />
