@@ -1,75 +1,46 @@
-﻿@model List<DeadSparkJobModel>
-@{
-    ViewBag.Title = "_AdminTest";
-}
-
-<script type="text/javascript">
+﻿<script type="text/javascript">
 
     $(document).ready(function () {
-        data.Admin.DeadJobTableInit();
         data.Admin.ReprocessDeadJobs();
     });
 </script>
 
-<table id="deadJobs" aria-label="table of all dead jobs" class="display table nowrap table-striped table-bordered table-hover" style="width:100%">
+<table id="deadJobs" aria-label="table of all dead jobs" class="table table-bordered table-hover table-striped nowrap">
     <thead>
-        <tr>
-            <th scope="col"></th>
-            <th scope="col">
-<input type="checkbox" id="data-file-select-all" class="form-check-input">
-<label for="data-file-select-all" class="form-check-label">Select All Jobs</label></th>
-            <th scope="col">Submission Time</th>
-            <th scope="col">Dataset Name</th>
-            <th scope="col">Reprocessing Required</th>
-            <th scope="col">Schema Name</th>
-            <th scope="col">Source Key</th>
-            <th scope="col">Flow Execution Guid</th>
-            <th scope="col">Run Instance Guid</th>
-            <th scope="col">Submission Id</th>
-            <th scope="col">Batch ID</th>
-            <th scope="col">Livy App Id</th>
-            <th scope="col">Livy Driver Log Url</th>
-            <th scope="col">Livy Spark Ui Url</th>
-            <th scope="col">Dataset File Id</th>
+        <tr class="table-header">
+            <th>Details</th>
+            <th>Actions</th>
+            <th>Submission Time</th>
+            <th>Dataset Name</th>
+            <th>Reprocessing Required</th>
+            <th>Schema Name</th>
+            <th>Source Key</th>
+            <th>Flow Execution Guid</th>
+        </tr>
+        <tr class="filter-row">
+            <th></th>
+            <th class="dead-job-select-all">
+                <fieldset class="form-group">
+                    <input type="checkbox" id="data-file-select-all" class="form-check-input">
+                    <label for="data-file-select-all" class="form-check-label p-0"></label>
+                </fieldset>
+            </th>
+            <th></th>
+            <th></th>
+            <th id="reprocess-filter-th">
+                <select class="mdb-select" name="deadJob-reprocessing-filter" id="deadJob-reprocessing-filter">
+                    <option value="">All</option>
+                    <option class="text-danger" value="True">True</option>
+                    <option class="text-success" value="False">False</option>
+                </select>
+                <label class="mdb-main-label">Reprocess Status</label>
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
-    <tbody>
-        @foreach (DeadSparkJobModel job in Model)
-        {
-        <tr data-file-id=@job.SubmissionID>
-            <td class="dropdown-toggle-col">
-            <em id=@("dropdown-toggle-" + job.SubmissionID) class="fas fa-plus"></em></td>
-            <td>
-            @*
-                Data-Group-Id's purpose to create a (1) unique identifier & (2) act as a string to store the correlated data flow step for each row. 
-
-                The data-group-id utilizes "/" as a delimter in order to extract the DataFlowStepID later when the job is being reprocessed.
-            *@
-            <input data-file-id=@job.DatasetFileID data-group-id="@(String.Format("{0}/{1}/{2}", job.DatasetName, job.SchemaName, job.DataFlowStepID))" type="checkbox" id=@(job.SubmissionID + "-select-input") class="select-all-target form-check-input">
-            <label for=@(job.SubmissionID + "-select-input") class="form-check-label"></label></td>
-            <td>@job.SubmissionTime</td>
-            <td>@job.DatasetName</td>
-
-            @if(job.ReprocessingRequired)
-            {
-                <td class="text-warning">YES</td>
-            } else {
-                <td class="text-success">NO</td>
-            }
-
-            <td>@job.SchemaName</td>
-            <td>@job.SourceKey</td>
-            <td>@job.FlowExecutionGuid</td>
-            <td>@job.RunInstanceGuid</td>
-            <td>@job.SubmissionTime</td>
-            <td>@job.BatchID</td>
-            <td>@job.LivyAppID</td>
-            <td>@job.LivyDriverlogUrl</td>
-            <td>@job.LivySparkUiUrl</td>
-            <td>@job.DatasetFileID</td>
-        </tr>
-            }
-    </tbody>
+    <tbody></tbody>
 </table>
 
 <!--Reprocess button-->
