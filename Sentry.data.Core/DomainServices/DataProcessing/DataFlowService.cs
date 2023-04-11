@@ -10,8 +10,10 @@ using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.QuartermasterRestClient;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -30,6 +32,7 @@ namespace Sentry.data.Core
         private readonly IBackgroundJobClient _hangfireBackgroundJobClient;
         private readonly IEmailService _emailService;
         private readonly IKafkaConnectorService _connectorService;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         public DataFlowService(
                 IDatasetContext datasetContext, 
@@ -40,7 +43,8 @@ namespace Sentry.data.Core
                 IDataFeatures dataFeatures, 
                 IBackgroundJobClient backgroundJobClient,
                 IEmailService emailService,
-                IKafkaConnectorService connectorService)
+                IKafkaConnectorService connectorService,
+                IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -51,6 +55,7 @@ namespace Sentry.data.Core
             _hangfireBackgroundJobClient = backgroundJobClient;
             _emailService = emailService;
             _connectorService = connectorService;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -249,9 +254,19 @@ namespace Sentry.data.Core
 
             if (logicalDelete)
             {
+                Task removeSaidAssetCodeTask = Task.CompletedTask;
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue()) 
+                {
+                    removeSaidAssetCodeTask = _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(flow.SchemaId, null);
+                }
+
                 //Mark dataflow deleted
                 flow.ObjectStatus = GlobalEnums.ObjectStatusEnum.Pending_Delete;
-                flow.DeleteIssuer = flow.DeleteIssuer ?? user.AssociateId.ToString();
+
+                if (string.IsNullOrEmpty(flow.DeleteIssuer))
+                {
+                    flow.DeleteIssuer = user != null ? user.AssociateId : "000000";
+                }
 
                 //Only comparing date since the milliseconds percision are different, therefore, never evaluates true
                 //  https://stackoverflow.com/a/44324883
@@ -267,6 +282,7 @@ namespace Sentry.data.Core
                     _jobService.Delete(jobList, user, true);
                 }
 
+                removeSaidAssetCodeTask.Wait();
             }
             else
             {
@@ -297,7 +313,20 @@ namespace Sentry.data.Core
             return jobIdList;
         }
 
-        public Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
+        public async Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
+        {
+            DataFlowDto resultDto = await AddDataFlowAsync_Internal(dto);
+
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataFlow(resultDto.Id);
+            }
+
+            return resultDto;
+        }
+
+        private Task<DataFlowDto> AddDataFlowAsync_Internal(DataFlowDto dto)
         {
             dto.CreatedBy = _userService.GetCurrentUser().AssociateId;
 
@@ -356,6 +385,11 @@ namespace Sentry.data.Core
             CreateS3SinkConnector(dataFlow);
             //Create DFS Drop locations
             CreateDataFlowDfsDropLocation(dataFlow);
+
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(dataFlow.SchemaId, dataFlow.SaidKeyCode).Wait();
+            }
         }
 
         public int CreateDataFlow(DataFlowDto dto)
@@ -370,6 +404,11 @@ namespace Sentry.data.Core
                 {
                     // Create a Hangfire job that will setup the default security groups for this new dataset
                     _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
+                }
+
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+                {
+                    _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(df.SchemaId, df.SaidKeyCode).Wait();
                 }
 
                 return df.Id;
@@ -397,6 +436,8 @@ namespace Sentry.data.Core
                 new SchemaMapDto { DatasetId = dataFlow.DatasetId, SchemaId = dataFlow.SchemaId }
             };
 
+            DataFlowDto resultDto = new DataFlowDto();
+
             //only update data flow if any of the data flow properties are different or data flow steps need to be updated
             if (DataFlowHasUpdates(dto, dataFlow) || dto.DataFlowStepUpdateRequired)
             {
@@ -406,16 +447,15 @@ namespace Sentry.data.Core
 
                 //delete and create new dataflow
                 Delete(dto.Id, _userService.GetCurrentUser(), false);
-                return await AddDataFlowAsync(dto);
+                resultDto = await AddDataFlowAsync_Internal(dto);
             }
             else
             {
                 //return data flow as is
-                DataFlowDto resultDto = new DataFlowDto();
                 MapToDto(dataFlow, resultDto);
-
-                return resultDto;
             }
+
+            return resultDto;
         }
 
         private bool DataFlowHasUpdates(DataFlowDto dto, DataFlow dataFlow)
@@ -505,6 +545,11 @@ namespace Sentry.data.Core
             */
             DataFlow newDataFlow = CreateAndSaveDataFlow(dfDto);
 
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                _globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(newDataFlow.SchemaId, newDataFlow.SaidKeyCode).Wait();
+            }
+
             return newDataFlow.Id;
         }
 
@@ -528,7 +573,6 @@ namespace Sentry.data.Core
                 throw;
             }
         }
-
 
         public void CreateDataFlowForSchema(FileSchema scm)
         {

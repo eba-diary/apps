@@ -5,8 +5,10 @@ using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Exceptions;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,6 +33,7 @@ namespace Sentry.data.Core
         private readonly IEventService _eventService;
         private readonly IElasticContext _elasticContext;
         private readonly IDscEventTopicHelper _dscEventTopicHelper;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
@@ -38,7 +41,7 @@ namespace Sentry.data.Core
         public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
             IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticContext elasticContext, IDscEventTopicHelper dscEventTopicHelper)
+            IEventService eventService, IElasticContext elasticContext, IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -51,6 +54,7 @@ namespace Sentry.data.Core
             _eventService = eventService;
             _elasticContext = elasticContext;
             _dscEventTopicHelper = dscEventTopicHelper;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         private string RootBucket
@@ -96,13 +100,28 @@ namespace Sentry.data.Core
             return newSchema.SchemaId;
         }
 
+        public async Task CreateExternalDependenciesAsync(int schemaId)
+        {
+            FileSchemaDto schemaDto = GetFileSchemaDto(schemaId);
+            schemaDto.ParentDatasetId = _datasetContext.DatasetFileConfigs.Where(x => x.Schema.SchemaId == schemaId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(x => x.ParentDataset.DatasetId).FirstOrDefault();
+            await CreateExternalDependenciesAsync(schemaDto).ConfigureAwait(false);
+        }
+
+        public async Task CreateExternalDependenciesAsync(FileSchemaDto schemaDto)
+        {
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                EnvironmentSchema environmentSchema = schemaDto.ToEnvironmentSchema();
+                await _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(schemaDto.ParentDatasetId, environmentSchema).ConfigureAwait(false);
+            }
+        }
+
         //SINCE SCHEMA SAVED FROM MULTIPLE PLACES, HAVE ONE METHOD TO TAKE CARE OF PUBLISHING SAVE
         public void PublishSchemaEvent(int datasetId, int schemaId)
         {
             _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
         }
-
-        
+                
         [Obsolete("Use " + nameof(CreateSchemaRevision) + "method excepting " + nameof(SchemaRevisionFieldStructureDto),false)]
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
         {
@@ -306,6 +325,19 @@ namespace Sentry.data.Core
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
                 Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
+
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+                {
+                    EnvironmentSchema environmentSchema = schemaDto.ToEnvironmentSchema();
+
+                    DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.SchemaId == schemaDto.SchemaId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+                    if (dataFlow != null)
+                    {
+                        environmentSchema.SchemaSaidAssetCode = dataFlow.SaidKeyCode;
+                    }
+
+                    _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(fileConfig.ParentDataset.DatasetId, environmentSchema).Wait();
+                }
             }
             catch (Exception ex)
             {
@@ -1342,8 +1374,19 @@ namespace Sentry.data.Core
             string cleansedDatasetName = dataset.DatasetName.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
             string schemaName = cleansedDatasetName;
 
+            /*********************
+            *  When CLA4260 feature flag is off, system will not allow to datasets with same name.  Therefore, we will not have duplicated snowflake schema.
+            *  
+            *  When CLA4260 feature flag is on, we will have multiple datasets with same name but different named environments.  
+            *  Therefore, we need to ensure snowflake schema is unique.  The check where != "QUAL" is to ensure we generate same
+            *  snowflake schema names between PROD and NonPROD (QUAL) schemas.  This will give users better query experience between QUAL and PROD.
+            *********************/            
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
-            if (alwaysSuffixSchemaNames || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL"))
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && (alwaysSuffixSchemaNames 
+                    || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL")
+                    )
+                )
 #pragma warning restore S2589 // Boolean expressions should not be gratuitous
             {
                 schemaName += "_" + dataset.NamedEnvironment;

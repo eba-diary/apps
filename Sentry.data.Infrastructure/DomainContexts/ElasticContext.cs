@@ -2,7 +2,9 @@
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -21,12 +23,23 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region IElasticContext Implementation
-        public void Index<T>(T document) where T : class
+        public async Task IndexAsync<T>(T document) where T : class
         {
-            //Commenting out to not allow indexing to Elastic via app at this time
-            //GetResponse(() => _client.IndexDocument(document));
+            await _client.IndexDocumentAsync(document).ConfigureAwait(false);
+        }
 
-            throw new NotImplementedException();
+        public async Task<T> GetByIdAsync<T>(DocumentPath<T> id) where T : class
+        {
+            var response = await _client.GetAsync(id).ConfigureAwait(false);
+
+            if (response.IsValid && response.Found)
+            {
+                return response.Source;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<ElasticResult<T>> SearchAsync<T>(Func<SearchDescriptor<T>, ISearchRequest> selector) where T : class
@@ -35,7 +48,7 @@ namespace Sentry.data.Infrastructure
         }
 
         public async Task<ElasticResult<T>> SearchAsync<T>(SearchRequest<T> searchRequest) where T : class
-        {
+        {            
             return await GetResponse(() => _client.SearchAsync<T>(searchRequest)).ConfigureAwait(false);
         }
 
@@ -45,20 +58,20 @@ namespace Sentry.data.Infrastructure
             return response.IsValid;
         }
 
-        public void DeleteMany<T>(List<T> toDelete) where T : class
-        {
-            _client.DeleteMany(toDelete);
-        }
-
         public void IndexMany<T>(List<T> toIndex) where T : class
         {
             _client.IndexMany(toIndex);
         }
 
-        public void  DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
+        public void DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class
         {
            _client.DeleteByQuery(query);
-        }    
+        }
+
+        public async Task DeleteByIdAsync<T>(DocumentPath<T> id) where T : class
+        {
+            await _client.DeleteAsync(id);
+        }
         #endregion
 
         #region Methods

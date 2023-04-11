@@ -241,6 +241,7 @@
     <Compile Include="GoogleSearchConsoleJobProviderTests.cs" />
     <Compile Include="JsmTicketProviderTests.cs" />
     <Compile Include="TicketMonitorServiceTests.cs" />
+    <Compile Include="GlobalDatasetProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -318,6 +319,9 @@
     <Content Include="ExpectedJSON\Motive_Companies_Unexpected.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ExpectedJSON\PagingHttps_AcceptableErrorResponse.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

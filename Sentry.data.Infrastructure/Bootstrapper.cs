@@ -131,7 +131,8 @@ namespace Sentry.data.Infrastructure
                 );
             registry.For<Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider>().Singleton().Use(obsidianUserProvider);
 
-            IAssociatesServiceClient associateService = AssociatesService.Create(Sentry.Configuration.Config.GetHostSetting("HrServiceUrl"));
+            IAssociatesServiceClient associateService = AssociatesService.Create(Configuration.Config.GetHostSetting("HrServiceUrl"));
+            associateService.Credentials = new NetworkCredential(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             AssociatesCacheOptions associateCacheOptions = new AssociatesCacheOptions
             {
                 SuccessCallback = () =>
@@ -160,8 +161,9 @@ namespace Sentry.data.Infrastructure
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
             settings.DefaultMappingFor<DataFlowMetric>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexFlowMetricSearch")).IdProperty(p=>p.EventMetricId));
-            settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
+            settings.DefaultMappingFor<GlobalDataset>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexDataset")).IdProperty(p => p.GlobalDatasetId));
+            settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.ThrowExceptions();
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 

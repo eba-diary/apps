@@ -1,6 +1,8 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Sentry.Common.Logging;
 using Sentry.Core;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -25,13 +27,15 @@ namespace Sentry.data.Core
         private readonly ISAIDService _saidService;
         private readonly IDataFeatures _featureFlags;
         private readonly IDatasetFileService _datasetFileService;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
                             IDataFeatures featureFlags,
-                            IDatasetFileService datasetFileService)
+                            IDatasetFileService datasetFileService,
+                            IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -42,6 +46,7 @@ namespace Sentry.data.Core
             _saidService = saidService;
             _featureFlags = featureFlags;
             _datasetFileService = datasetFileService;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         public DatasetSchemaDto GetDatasetSchemaDto(int id)
@@ -363,6 +368,18 @@ namespace Sentry.data.Core
                 await _datasetContext.AddAsync(dataset);
                 await _datasetContext.SaveChangesAsync();
 
+                if (_featureFlags.CLA3718_Authorization.GetValue())
+                {
+                    // Create a Hangfire job that will setup the default security groups for this new dataset
+                    _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
+                }
+
+                if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                {
+                    GlobalDataset globalDataset = dataset.ToGlobalDataset();
+                    await _globalDatasetProvider.AddUpdateGlobalDatasetAsync(globalDataset);
+                }
+
                 DatasetResultDto resultDto = dataset.ToDatasetResultDto();
                 return resultDto;
             }
@@ -386,6 +403,14 @@ namespace Sentry.data.Core
                 // Create a Hangfire job that will setup the default security groups for this new dataset
                 _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
             }
+
+            if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                //Coming from migration, only have to add environment dataset (global dataset should exist)
+                Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
+                EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
+                _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset).Wait();
+            }
         }
 
         public int CreateAndSaveNewDataset(DatasetSchemaDto dto)
@@ -406,6 +431,16 @@ namespace Sentry.data.Core
             {
                 // Create a Hangfire job that will setup the default security groups for this new dataset
                 _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
+            }
+
+            if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                GlobalDataset globalDataset = ds.ToGlobalDataset();
+                fileDto.SchemaId = configDto.SchemaId;
+                EnvironmentSchema environmentSchema = fileDto.ToEnvironmentSchema();
+                globalDataset.EnvironmentDatasets.First().EnvironmentSchemas.Add(environmentSchema);
+
+                _globalDatasetProvider.AddUpdateGlobalDatasetAsync(globalDataset).Wait();
             }
 
             return ds.DatasetId;
@@ -429,6 +464,8 @@ namespace Sentry.data.Core
 
                     //save
                     await _datasetContext.SaveChangesAsync();
+
+                    await UpdateEnvironmentDatasetAsync(ds);
 
                     //map to result
                     DatasetResultDto resultDto = ds.ToDatasetResultDto();
@@ -457,6 +494,17 @@ namespace Sentry.data.Core
             UpdateDataset(dto, ds);
 
             _datasetContext.SaveChanges();
+
+            UpdateEnvironmentDatasetAsync(ds).Wait();
+        }
+
+        private async Task UpdateEnvironmentDatasetAsync(Dataset dataset)
+        {
+            if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
+                await _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -579,10 +627,13 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    _securityService.GetUserSecurity(ds, user?? _userService.GetCurrentUser());
-
                     //Mark dataset for soft delete
                     MarkForDelete(ds, user);
+
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        _globalDatasetProvider.DeleteEnvironmentDatasetAsync(ds.DatasetId).Wait();
+                    }
 
                     ////Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
@@ -620,9 +671,7 @@ namespace Sentry.data.Core
             Logger.Debug($"{methodName} Method End");
 
             return result;
-        }
-
-       
+        }       
 
         public async Task<ValidationException> ValidateAsync(DatasetSchemaDto dto)
         {
@@ -688,6 +737,12 @@ namespace Sentry.data.Core
                     };
 
                     _datasetContext.Merge(f);
+                    
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        _globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                    }
+
                     _datasetContext.SaveChanges();
 
                     return "Successfully added favorite.";
@@ -695,6 +750,12 @@ namespace Sentry.data.Core
                 else
                 {
                     _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                    }
+
                     _datasetContext.SaveChanges();
 
                     return "Successfully removed favorite.";
@@ -758,10 +819,21 @@ namespace Sentry.data.Core
             }
             else //if name, make sure it is not duplicate
             {
-                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null && _datasetContext.Datasets.Any(w => w.DatasetName == dto.DatasetName &&
-                                                             w.DatasetType == DataEntityCodes.DATASET && w.NamedEnvironment == dto.NamedEnvironment))
+                if (dto.DatasetId == 0 && dto.DatasetCategoryIds != null)
                 {
-                    results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists for that named environment");
+                    Dataset existing = _datasetContext.Datasets.FirstOrDefault(w => w.DatasetName == dto.DatasetName && w.DatasetType == DataEntityCodes.DATASET);
+
+                    if (existing != null)
+                    {
+                        if (_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
+                        {
+                            results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists. If attempting to create a copy of an existing dataset in a different named environment, please use dataset migration.");
+                        }
+                        else if (existing.NamedEnvironment == dto.NamedEnvironment)
+                        {
+                            results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists for that named environment");
+                        }
+                    }
                 }
             }
         }
@@ -827,6 +899,11 @@ namespace Sentry.data.Core
         {
             Asset asset = GetAsset(dto.SAIDAssetKeyCode);
 
+            if (!dto.GlobalDatasetId.HasValue || dto.GlobalDatasetId == 0)
+            {
+                dto.GlobalDatasetId = _datasetContext.GetNextGlobalDatasetId();
+            }
+
             Dataset ds = new Dataset()
             {
                 DatasetId = dto.DatasetId,
@@ -851,7 +928,8 @@ namespace Sentry.data.Core
                 Asset = asset,
                 NamedEnvironment = dto.NamedEnvironment,
                 NamedEnvironmentType = dto.NamedEnvironmentType,
-                AlternateContactEmail = dto.AlternateContactEmail
+                AlternateContactEmail = dto.AlternateContactEmail,
+                GlobalDatasetId = dto.GlobalDatasetId
             };
 
             if (dto.DatasetCategoryIds?.Any() == true)
@@ -933,6 +1011,7 @@ namespace Sentry.data.Core
             dto.IsSecured = ds.IsSecured;
 
             dto.DatasetId = ds.DatasetId;
+            dto.GlobalDatasetId = ds.GlobalDatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.ShortName = ds.ShortName;

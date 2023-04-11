@@ -111,16 +111,20 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
         }
 
         [HttpGet]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create(int id)
         {
-            return View(GetDatasetFileConfigsModel(id));
+            var userSecurity = _DatasetService.GetUserSecurityForDataset(id);
+            if (userSecurity.CanManageSchema)
+            {
+                return View(GetDatasetFileConfigsModel(id));
+            }
+            return View("Forbidden");
         }
 
         [Route("Config/Dataset/ShowFileUpload/{configId}")]
@@ -137,7 +141,12 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public PartialViewResult _DatasetFileConfigCreate(int id)
         {
-            return PartialView("_DatasetFileConfigCreate", GetDatasetFileConfigsModel(id));
+            var userSecurity = _DatasetService.GetUserSecurityForDataset(id);
+            if (userSecurity.CanManageSchema)
+            {
+                return PartialView("_DatasetFileConfigCreate", GetDatasetFileConfigsModel(id));
+            }
+            return PartialView("Forbidden");
         }
 
         [HttpPost]
@@ -159,10 +168,13 @@ namespace Sentry.data.Web.Controllers
                     if (newSchemaId != 0)
                     {
                         dto.SchemaId = newSchemaId;
+                        schemaDto.SchemaId = newSchemaId;
 
                         if (_configService.CreateAndSaveDatasetFileConfig(dto))
                         {
                             _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
+                            _schemaService.CreateExternalDependenciesAsync(schemaDto).Wait();
+
                             return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
                         }
                     }
@@ -239,7 +251,7 @@ namespace Sentry.data.Web.Controllers
                 //Users are unable to edit 
                 if (!us.CanManageSchema || dto.DeleteInd)
                 {
-                    return View("Unauthorized");
+                    return View("Forbidden");
                 }
 
                 DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
@@ -519,19 +531,25 @@ namespace Sentry.data.Web.Controllers
             dsm.ReturnUrl = "/";
             dsm.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
             CreateEvent("Viewed Data Source Creation Page");
-            return View("CreateDataSource", dsm);
+            return View("DataSource/CreateDataSource", dsm);
         }
 
         [Route("Config/HeaderEntryRow")]
         public ActionResult HeaderEntryRow()
         {
-            return PartialView("_Headers");
+            return PartialView("DataSource/_Headers");
+        }
+        
+        [Route("Config/AddAcceptableError")]
+        public ActionResult AddAcceptableError()
+        {
+            return PartialView("DataSource/_AcceptableError");
         }
 
         [Route("Config/AddToken")]
         public ActionResult AddToken()
         {
-            return PartialView("_DataSourceToken");
+            return PartialView("DataSource/_DataSourceToken");
         }
 
         public ActionResult FieldEntryRow()
@@ -575,12 +593,12 @@ namespace Sentry.data.Web.Controllers
             if (model.Id == 0)
             {
                 model = CreateSourceDropDown(model);
-                return View("CreateDataSource", model);
+                return View("DataSource/CreateDataSource", model);
             }
             else
             {
                 EditSourceDropDown(model);
-                return View("EditDataSource", model);
+                return View("DataSource/EditDataSource", model);
             }
         }
 
@@ -601,7 +619,7 @@ namespace Sentry.data.Web.Controllers
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
 
-                return View("EditDataSource", model);
+                return View("DataSource/EditDataSource", model);
             }
 
             return View("Forbidden");
@@ -737,7 +755,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (!us.CanManageSchema || configDto.DeleteInd)
                 {
-                    return View("Unauthorized");
+                    return View("Forbidden");
                 }
 
                 if (configDto.Schema.SchemaId == schemaId)
@@ -764,7 +782,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
         }
 
@@ -893,7 +911,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (!us.CanManageSchema || config.DeleteInd)
                 {
-                    return View("Unauthorized");
+                    return View("Forbidden");
                 }
 
                 FileSchemaDto schema = (config.Schema.SchemaId == schemaId) ? config.Schema : null;
@@ -924,7 +942,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
         }
 
@@ -936,7 +954,7 @@ namespace Sentry.data.Web.Controllers
 
             if (!us.CanManageSchema)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
 
             FileSchemaDto fileDto = _schemaService.GetFileSchemaDto(schemaId);
@@ -954,7 +972,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
             catch (Sentry.Core.ValidationException ex)
             {
@@ -1100,13 +1118,13 @@ namespace Sentry.data.Web.Controllers
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
         }
 
-        private DatasetFileConfigsModel GetDatasetFileConfigsModel(int id)
+        private DatasetFileConfigsModel GetDatasetFileConfigsModel(int datasetId)
         {
-            Dataset parent = _datasetContext.GetById<Dataset>(id);
+            Dataset parent = _datasetContext.GetById<Dataset>(datasetId);
 
             DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel
             {
-                DatasetId = id,
+                DatasetId = datasetId,
                 ParentDatasetName = parent.DatasetName,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
