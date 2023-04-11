@@ -297,7 +297,20 @@ namespace Sentry.data.Core
             return jobIdList;
         }
 
-        public Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
+        public async Task<DataFlowDto> AddDataFlowAsync(DataFlowDto dto)
+        {
+            DataFlowDto resultDto = await AddDataFlowAsync_Internal(dto);
+
+            if (_dataFeatures.CLA3718_Authorization.GetValue())
+            {
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataFlow(resultDto.Id);
+            }
+
+            return resultDto;
+        }
+
+        private Task<DataFlowDto> AddDataFlowAsync_Internal(DataFlowDto dto)
         {
             dto.CreatedBy = _userService.GetCurrentUser().AssociateId;
 
@@ -397,6 +410,8 @@ namespace Sentry.data.Core
                 new SchemaMapDto { DatasetId = dataFlow.DatasetId, SchemaId = dataFlow.SchemaId }
             };
 
+            DataFlowDto resultDto = new DataFlowDto();
+
             //only update data flow if any of the data flow properties are different or data flow steps need to be updated
             if (DataFlowHasUpdates(dto, dataFlow) || dto.DataFlowStepUpdateRequired)
             {
@@ -406,16 +421,15 @@ namespace Sentry.data.Core
 
                 //delete and create new dataflow
                 Delete(dto.Id, _userService.GetCurrentUser(), false);
-                return await AddDataFlowAsync(dto);
+                resultDto = await AddDataFlowAsync_Internal(dto);
             }
             else
             {
                 //return data flow as is
-                DataFlowDto resultDto = new DataFlowDto();
                 MapToDto(dataFlow, resultDto);
-
-                return resultDto;
             }
+
+            return resultDto;
         }
 
         private bool DataFlowHasUpdates(DataFlowDto dto, DataFlow dataFlow)

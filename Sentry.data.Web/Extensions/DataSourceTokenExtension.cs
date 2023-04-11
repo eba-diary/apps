@@ -23,6 +23,7 @@ namespace Sentry.data.Web.Extensions
                 TokenExp = dataSourceTokenModel.TokenExp,
                 ToDelete = dataSourceTokenModel.ToDelete,
                 Enabled = dataSourceTokenModel.Enabled,
+                AcceptableErrorNeedsReview = dataSourceTokenModel.AcceptableErrorNeedsReview
             };
         }
         public static DataSourceTokenModel ToModel(this DataSourceTokenDto dataSourceTokenDto)
@@ -37,7 +38,8 @@ namespace Sentry.data.Web.Extensions
                 TokenUrl = dataSourceTokenDto.TokenUrl,
                 Scope = dataSourceTokenDto.Scope,
                 TokenExp = dataSourceTokenDto.TokenExp,
-                Enabled = dataSourceTokenDto.Enabled
+                Enabled = dataSourceTokenDto.Enabled,
+                AcceptableErrorNeedsReview = dataSourceTokenDto.AcceptableErrorNeedsReview,
             };
         }
     }

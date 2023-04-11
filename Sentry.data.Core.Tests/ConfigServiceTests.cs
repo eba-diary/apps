@@ -315,6 +315,10 @@ namespace Sentry.data.Core.Tests
                 {
                     new RequestHeader { Index = "0", Key = "HeaderKey", Value = "HeaderValue" }
                 },
+                AcceptableErrors = new Dictionary<string, string>
+                {
+                    { "error", "this error is ok" }
+                },
                 ClientId = "ClientId",
                 ClientPrivateId = "DecryptedClientPrivateId",
                 Tokens = new List<DataSourceTokenDto>
@@ -401,6 +405,8 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(OAuthClaims.scope, claim.Type);
             Assert.AreEqual("token.scope", claim.Value);
 
+            Assert.AreEqual("this error is ok", http.AcceptableErrors["error"]);
+
             mock.VerifyAll();
         }
 
@@ -442,6 +448,7 @@ namespace Sentry.data.Core.Tests
                 ClientId = "ClientId",
                 AuthenticationHeaderName = "AuthHeaderName",
                 RequestHeaders = new List<RequestHeader>(),
+                AcceptableErrors = new Dictionary<string, string>(),
                 SupportsPaging = false,
                 ClientPrivateId = "EncryptedClientPrivateId",
                 IVKey = "IVKey",
@@ -514,6 +521,10 @@ namespace Sentry.data.Core.Tests
                 {
                     new RequestHeader { Index = "0", Key = "HeaderKey", Value = "HeaderValue" }
                 },
+                AcceptableErrors = new Dictionary<string, string>
+                {
+                    { "error", "this error is ok" }
+                },
                 ClientId = "ClientIdUpdate",
                 ClientPrivateId = "DecryptedClientPrivateId",
                 Tokens = new List<DataSourceTokenDto>
@@ -576,6 +587,11 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("0", header.Index);
             Assert.AreEqual("HeaderKey", header.Key);
             Assert.AreEqual("HeaderValue", header.Value);
+
+            var acceptableError = http.AcceptableErrors.First();
+            Assert.AreEqual(1, http.AcceptableErrors.Count);
+            Assert.AreEqual("error", acceptableError.Key);
+            Assert.AreEqual("this error is ok", acceptableError.Value);
 
             Assert.AreEqual("ClientIdUpdate", http.ClientId);
             Assert.AreEqual("EncryptedClientPrivateIdUpdate", http.ClientPrivateId);

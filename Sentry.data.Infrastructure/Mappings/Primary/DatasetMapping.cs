@@ -21,7 +21,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
-            //this.Property((x) => x.Category, (m) => m.Column("Category_CDE"));
+            this.Property(x => x.GlobalDatasetId, m => m.NotNullable(false));
             this.Property((x) => x.DatasetName, (m) => m.Column("Dataset_NME"));
             this.Property((x) => x.ShortName, (m) => m.Column("Short_NME"));
             this.Property((x) => x.DatasetDesc, (m) => m.Column("Dataset_DSC"));
@@ -42,7 +42,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.NamedEnvironment);
             this.Property(x => x.NamedEnvironmentType, attr => attr.Type<EnumStringType<NamedEnvironmentType>>());
             this.Property((x) => x.AlternateContactEmail);
-
 
             Property(x => x.Metadata, m =>
             {

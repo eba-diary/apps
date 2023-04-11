@@ -1,0 +1,501 @@
+﻿@using Sentry.data.Core;
+@using Sentry.data.Web.Models.Config;
+@model Sentry.data.Web.DataSourceModel
+
+<div id="alertRow" class="row" style="position: relative; z-index: 999">
+    <div class="col-lg-12">
+        <div id="alertContainer" class="bs-component">
+            <div id="configWarningAlert" class="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4 id="configWarningHeader">Warning!</h4>
+                <p id="configWarningText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/"><em class="fas fa-chevron-left pr-3"></em>Back to Previous Page</a>
+    </div>
+
+</div>
+
+
+@using (Html.BeginForm("DataSourceForm", "Config", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.ReturnUrl)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.SourceType)
+    @Html.HiddenFor(model => model.PrimaryContactId)
+    @Html.HiddenFor(model => model.CLA2868_APIPaginationSupport)
+
+    <div class="card pt-3">
+        <div class="card-body pt-0 px-lg-5">
+            <h2 class="card-title pt-4">Edit Data Source</h2>
+
+            <div id="informationPanel" class="form-horizontal">
+                <div class="md-form">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.Name, new { @readonly = "readonly", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="md-form">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="md-form">
+                    @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label active" })
+                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control w-100", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" value="true" class="form-check-input" id="IsSecured" name="IsSecured" checked="@Model.IsSecured">
+                    @Html.LabelFor((model) => model.IsSecured, new { @class = "form-check-label" })
+                </div>
+
+                <div class="md-form">
+                    <label for="SourceTypeReadonly" class="active">Source Type (Readonly)</label>
+                    <input id="SourceTypeReadonly" placeholder="@Model.SourceType" disabled class="disabled form-control" />
+                </div>
+
+                <div class="md-form fieldDescription">
+                    <label class="control-label"></label>
+                    <span class="text-muted">
+                        <em id="sourceDescription"></em>
+                    </span>
+                </div>
+
+                <div class="md-form">
+                    @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @readonly = "readonly", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
+                </div>
+
+                <div id="authPanel">
+                    <div class="md-form">
+                        @Html.LabelFor((model) => model.AuthID, new { @class = "mdb-main-label" })
+                        @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "mdb-select" })
+                        @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="md-form fieldDescription">
+                        <label class="control-label"></label>
+                        <span class="text-muted">
+                            <em id="authDescription"></em>
+                        </span>
+                    </div>
+                </div>
+
+                <div id="pagingPanel" class="form-group">
+                    @if (Model.CLA2868_APIPaginationSupport)
+                    {
+                        <input type="checkbox" value="true" class="form-check-input" id="SupportsPaging" name="SupportsPaging" checked="@Model.SupportsPaging">
+                        Html.LabelFor(m => m.SupportsPaging, htmlAttributes: new { @class = "form-check-label" });
+                    }
+                </div>
+
+                <div id="userPassPanel">
+                    <div class="form-group">
+                        <input type="checkbox" value="true" class="form-check-input" id="IsUserPassRequired" name="IsUserPassRequired" checked="@Model.IsUserPassRequired">
+                        @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "form-check-label" })
+                        <div id="userPassNotificationPanel" class="credentialWarning">
+                            <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
+                        </div>
+                    </div>
+                </div>
+                <div id="tokenAuthPanel">
+                    <div class="md-form">
+                        <div class="headerEntry">
+                            @Html.Label("Token Header Name", new { @class = "headerEntryLabel" })
+                            @Html.TextBoxFor(m => m.TokenAuthHeader, new { @value = "", @class = "form-control" })
+                        </div>
+                        <div class="headerEntry">
+                            @Html.Label("Token Value", new { @class = "headerEntryLabel" })
+                            @Html.PasswordFor(m => m.TokenAuthValue, new { @value = "", @class = "form-control", @placeholder = "Leave blank to retain current token value" })
+                        </div>
+                    </div>
+                </div>
+
+                <div id="OAuthPanel">
+                    <div class="md-form">
+                        @Html.LabelFor(m => m.ClientId, new { @class = "control-label" })
+                        @Html.TextBoxFor((model) => model.ClientId, new { @class = "form-control" })
+                        @Html.ValidationMessageFor((model) => model.ClientId, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="md-form">
+                        @Html.LabelFor(m => m.ClientPrivateId, new { @class = "control-label" })
+                        @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control" })
+                        @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="md-form">
+                        @Html.LabelFor((model) => model.GrantType, new { @class = "mdb-main-label" })
+                        @Html.EnumDropDownListFor((model) => model.GrantType, new { @class = "mdb-select" })
+                        @Html.ValidationMessageFor((model) => model.GrantType, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="row">
+                        <div class="col align-self-end">
+                            <h4 class="pt-3">OAuth Tokens</h4>
+                        </div>
+                        <div class="col">
+                            <button id="AddToken" type="button" class="btn btn-success waves-effect waves-light float-r">Add Token</button>
+                        </div>
+                    </div>
+                    <div id="TokenContainer">
+                        @foreach (DataSourceTokenModel token in Model.Tokens)
+                        {
+                            Html.RenderPartial("DataSource/_DataSourceToken", token);
+                        }
+                    </div>
+                </div>
+                <div id="portNumberPanel">
+                    <div class="md-form">
+                        @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.PortNumber, new { @value = "", @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="md-form fieldDescription">
+                        <label class="control-label"></label>
+                        <div class="text-muted">
+                            <em>Industry statandard default port values:</em>
+                            <ul>
+                                <li><em>FTP : 21</em></li>
+                                <li><em>SSH\SFTP : 22</em></li>
+                                <li><em>HTTPS : 443</em></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="requestHeaderPanel">
+                    <div class="row">
+                        <div class="col align-self-end">
+                            <h4 class="pt-3">Request Headers</h4>
+                        </div>
+                        <div class="col">
+                            <button id="AddHeader" type="button" class="btn btn-success waves-effect waves-light float-r">Add</button>
+                        </div>
+                    </div>
+                    <div id="RequestContainer">
+                        @foreach (RequestHeader header in Model.Headers)
+                        {
+                            Html.RenderPartial("_Headers", header);
+                        }
+                    </div>
+                </div>
+                <div id="AcceptableErrorPanel">
+                    <div class="row">
+                        <div class="col align-self-end">
+                            <h4 class="pt-3">Acceptable Errors</h4>
+                        </div>
+                        <div class="col">
+                            <button id="AddAcceptableError" type="button" class="btn btn-success waves-effect waves-light float-r">Add</button>
+                        </div>
+                    </div>
+                    <div id="AcceptableErrorContainer">
+                        @foreach (var acceptableError in Model.AcceptableErrors)
+                        {
+                            Html.RenderPartial("DataSource/_AcceptableError", acceptableError);
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-footer">
+            <input type="submit" id="btnCreateDataSource" value="Save" class="btn btn-primary" />
+        </div>
+    </div>
+}
+
+<style>
+    .headerEntry, .headerEntryLabel {
+        padding-left: 0px;
+    }
+</style>
+
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+
+            data.DataSource.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
+
+            function setAuthTypePanels(authType) {
+
+                if (authType == 'Anonymous Authentication') {
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
+                }
+                else if (authType == 'Basic Authentication') {
+                    $('#userPassPanel').show();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
+                }
+                else if (authType == 'Token Authentication') {
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').hide();
+                }
+                else if (authType == 'OAuth 2.0 Authentication') {
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').show();
+                }
+                else {
+                    $('#userPassPanel').show();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
+                }
+            }
+
+            function setSourceTypeDefaults(sourceType) {
+                var authtxt = $('#AuthID').find(":selected").text()
+                $('#requestHeaderPanel').hide();
+                $('#AcceptableErrorPanel').hide();
+                $('#pagingPanel').hide();
+
+                setAuthTypePanels(authtxt)
+
+                if (sourceType == "SFTP" || sourceType == "FTP") {
+                    //Assign Default values
+                    if (sourceType == "SFTP") {
+                        //User\Pass is required, so check and disable for changing
+                        $('#IsUserPassRequired').attr('disabled', true);
+
+                        //Set Authentication to Basic and disable as this is the only choice
+                        $('#AuthID').attr('disabled', true);
+                    }
+                    else if (sourceType == "FTP") {
+                        //User\Pass is not required, so uncheck and disable for changing
+                        $('#IsUserPassRequired').attr('disabled', false);
+
+                        //Enable Auth picker and set to default value
+                        $('#AuthID').attr('readonly', false); // enabling picker
+                    }
+                }
+                else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI" || sourceType == "GoogleBigQueryApi") {
+                    $('#IsUserPassRequired').attr('disabled', true);
+                    $('#userPassPanel').hide();
+                    $('#authPanel').show();
+
+                    if (authtxt == 'Token Authentication') {
+                        $('#tokenAuthPanel').show();
+                        $('#userPassPanel').hide();
+                        $('#OAuthPanel').hide();
+                    }
+                    else if (authtxt == 'OAuth 2.0 Authentication') {
+                        $('#tokenAuthPanel').hide();
+                        $('#userPassPanel').hide();
+                        $('#OAuthPanel').show();
+                    }
+                    else {
+                        $('#tokenAuthPanel').hide();
+                        $('#userPassPanel').hide();
+                        $('#OAuthPanel').hide();
+                    }
+
+                    if (sourceType == "HTTPS") {
+                        $('#pagingPanel').show();
+                        $('#AcceptableErrorPanel').show();
+                        $('#requestHeaderPanel').show();
+                    }
+                    else if (sourceType == "GOOGLEAPI") {
+                        $('#requestHeaderPanel').show();
+                    }
+                }
+                else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
+
+                    //User\Pass is not required, so uncheck and disable
+                    $('#IsUserPassRequired').attr('disabled', true);
+
+                    //Default authentication and disable
+                    $('#AuthID').attr('readonly', true);
+
+                    $('#portNumberPanel').hide();
+                    $('#userPassPanel').hide();
+                    $('#authPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                }
+                else {
+                    $('#portNumberPanel').hide();
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.attr('disabled', false);
+                    $('#userPassPanel').show();
+                    $('#authPanel').hide();
+                }
+            }
+
+            $('.backToList').attr("href", document.referrer);
+
+            setSourceTypeDefaults($('#SourceType').val())
+
+            $("#SourceType").change(function () {
+                var val = $(this).val();
+                var subItems = "";
+
+                $.getJSON("@Url.Action("SourceTypeDescription", "Config")", {sourceType:val} ,function (data) {
+
+                    $("#sourceDescription").text(data);
+                });
+            });
+
+            var val = $("#SourceType").val();
+            $.getJSON("@Url.Action("SourceTypeDescription", "Config")", {sourceType:val} ,function (data) {
+                $("#sourceDescription").text(data);
+            });
+
+            var val = $("#AuthID").val();
+            $.getJSON("@Url.Action("AuthTypeDescription", "Config")", {AuthID:val} ,function (data) {
+                $("#authDescription").text(data);
+            });
+
+            $("#AuthID").change(function () {
+                var val = $(this).val();
+                var txt = $(this).find(":selected").text()
+                var subItems = "";
+
+                $.getJSON("@Url.Action("AuthTypeDescription", "Config")", {AuthID:val} ,function (data) {
+
+                    $("#authDescription").text(data);
+                });
+
+                if (txt == 'Anonymous Authentication') {
+                    $('#IsUserPassRequired').prop('checked', false);
+                    $('#IsUserPassRequired').attr('disabled', true);
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
+                }
+                else if (txt == 'Basic Authentication') {
+                    $('#IsUserPassRequired').prop('checked', true);
+                    $('#IsUserPassRequired').attr('disabled', true);
+                    $('#IsUserPassRequired').trigger("change");
+                    $('#userPassPanel').show();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
+                } else if (txt == 'Token Authentication') {
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', true);
+                    userpasschkbx.trigger("change");
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').hide();
+                } else if (txt == 'OAuth 2.0 Authentication') {
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', true);
+                    userpasschkbx.trigger("change");
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').show();
+                } else {
+                    $('#IsUserPassRequired').attr('disabled', false);
+                    $('#userPassPanel').show();
+                    $('#OAuthPanel').hide();
+                }
+            });
+
+            function HideAlert() {
+                $('#configWarningAlert').hide();
+            };
+
+            $('#IsUserPassRequired').change(function () {
+                if ($(this).prop('checked') == false) {
+                    HideAlert();
+                }
+                else {
+                    var text = "<p>Any jobs referencing this data source will fail until data.sentry.com administrators configure the credentials.</p>" +
+                        "<p>Please click <a href= \"mailto:DSCSupport@sentry.com?Subject=Data&nbsp;Source&nbsp;Credentials&nbsp;Request&Body=Please contact me regarding setting up credentials for a new data source.%0AData Source Name: <Insert Your Value>%0ASource Type: <Insert Your Value>%0ABaseUri: <Insert Your Value>\" > here </a > to start request for credential setup.</p > ";
+
+                    PassHelpText("Warning", text);
+                }
+            });
+
+            function PassHelpText(type, information) {
+
+                var banner;
+                var header;
+                var text;
+
+                if ($('#alertContainer').children().length == 0) {
+                    $('#alertContainer').append("<div id=\"configWarningAlert\" class=\"alert alert-dismissable alert-warning\">" +
+                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>" +
+                        "<h4 id=\"configWarningHeader\">Warning!</h4>" +
+                        "<p id=\"configWarningText\"></p>" +
+                        "</div>");
+                }
+
+                banner = $('#configWarningAlert');
+                header = $('#configWarningHeader');
+                text = $('#configWarningText');
+
+                text.empty();
+
+                if (information.startsWith('u\'')) {
+                    information = information.substr(2, information.length - 1);
+                }
+
+                text.append(information);
+                Banner = information;
+                AlertLevel = type;
+
+                if (type == "Warning") {
+                    banner.switchClass("alert-success", "alert-warning", 10);
+                    banner.switchClass("alert-info", "alert-warning", 10);
+                    header.text("Warning!");
+
+                } else if (type == "Success") {
+                    banner.switchClass("alert-warning", "alert-success", 10);
+                    banner.switchClass("alert-info", "alert-success", 10);
+                    header.text("Success");
+                } else if (type == "Error") {
+                    banner.switchClass("alert-warning", "alert-danger", 10);
+                    banner.switchClass("alert-info", "alert-danger", 10);
+                    header.text("Error");
+                } else {
+                    banner.switchClass("alert-warning", "alert-info", 10);
+                    banner.switchClass("alert-success", "alert-info", 10);
+                    header.text("Information");
+                }
+
+                banner.show();
+
+            }
+
+            $('body').on('click', '.removeHeader', function () {
+
+                $(this).parent().parent().remove();
+            });
+
+            $('.addHeader').click(function () {
+                //This approach is described at the site below
+                // http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/
+                $.get("@Url.Action("HeaderEntryRow", "Config")", function (template) {
+                    $('#requestHeader').append(template);
+                });
+            });
+
+            // For certain types of Data Sources the isUserPassRequired checkbox required to be true.  Setting a checkboxfor to readonly still allows
+            //   a user to change the value.  A workaround being used for this property is using jquery to disable the property
+            //   for the specific data source types which require it to be true.  Then a $('form').on('submit') function
+            //   enables the checkbox right before submitting the form.  This allows the value to be passed back to the controller.
+            //https://stackoverflow.com/questions/40134337/set-mvc-checkbox-to-readonly-or-disabled-on-client-side
+            $("form").on("submit", function (e) {
+                $('#IsUserPassRequired').attr('disabled', false);
+                $('#AuthID').attr('disabled', false);
+            });
+        });
+    </script>
+
+}
