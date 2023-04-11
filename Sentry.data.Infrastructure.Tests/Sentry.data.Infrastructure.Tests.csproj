@@ -242,6 +242,7 @@
     <Compile Include="JsmTicketProviderTests.cs" />
     <Compile Include="TicketMonitorServiceTests.cs" />
     <Compile Include="GlobalDatasetProviderTests.cs" />
+    <Compile Include="UnitTest1.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

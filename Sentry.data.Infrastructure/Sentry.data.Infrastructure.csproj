@@ -308,6 +308,7 @@
     <Compile Include="DomainContexts\ElasticContext.cs" />
     <Compile Include="Exceptions\AcceptableErrorException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
+    <Compile Include="Exceptions\ElasticReindexException.cs" />
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
     <Compile Include="Exceptions\HttpsJobProviderException.cs" />
@@ -496,6 +497,9 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsJobProvider.cs" />
     <Compile Include="ServiceImplementations\MotiveProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
+    <Compile Include="ServiceImplementations\Reindex\ElasticReindexProvider.cs" />
+    <Compile Include="ServiceImplementations\Reindex\GlobalDatasetReindexSource.cs" />
+    <Compile Include="ServiceImplementations\Reindex\ReindexService.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\QualRetrieverJobProvider.cs" />

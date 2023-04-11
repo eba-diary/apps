@@ -128,19 +128,7 @@ namespace Sentry.data.Infrastructure
                     });
                 }
 
-                EnvironmentDataset environmentDataset = new EnvironmentDataset
-                {
-                    DatasetId = dataset.DatasetId,
-                    DatasetDescription = dataset.DatasetDesc,
-                    CategoryCode = dataset.DatasetCategories.First().Name,
-                    NamedEnvironment = dataset.NamedEnvironment,
-                    NamedEnvironmentType = dataset.NamedEnvironmentType.ToString(),
-                    OriginationCode = dataset.OriginationCode,
-                    IsSecured = dataset.IsSecured,
-                    FavoriteUserIds = dataset.Favorities.Select(x => x.UserId).ToList(),
-                    EnvironmentSchemas = environmentSchemas
-                };
-
+                EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
                 globalDataset.EnvironmentDatasets.Add(environmentDataset);
             }
 

@@ -576,6 +576,9 @@
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexProvider.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexService.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexSource.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
