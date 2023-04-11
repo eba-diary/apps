@@ -89,10 +89,10 @@ data.Admin = {
             ],
             'rowCallback': function (row, data)
             {
-                if (data.ReprocessingRequired == true)
+                if (data.ReprocessingRequired)
                 {
                     $('td:eq(4)', row).text("True").addClass('text-danger');
-                } else if (data.ReprocessingRequired == false)
+                } else if (!data.ReprocessingRequired)
                 {
                     $('td:eq(4)', row).text("False").addClass('text-success');
                 }
@@ -157,7 +157,6 @@ data.Admin = {
                     $.fn.dataTable.ext.search.pop();
                     deadJobTable.draw();
 
-                    var table = $("#deadJobs").DataTable();
 
                     $.fn.dataTable.ext.search.push(
                         function (settings, data, dataIndex)
