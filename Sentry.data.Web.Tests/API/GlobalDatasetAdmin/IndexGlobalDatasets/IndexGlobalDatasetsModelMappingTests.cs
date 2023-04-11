@@ -31,12 +31,16 @@ namespace Sentry.data.Web.Tests.API
         {
             IndexGlobalDatasetsResultDto model = new IndexGlobalDatasetsResultDto()
             {
-
+                BackgroundJobId = "123",
+                IndexCount = 1,
+                DeleteCount = 2
             };
 
             IndexGlobalDatasetsResponseModel dto = _mapper.Map<IndexGlobalDatasetsResponseModel>(model);
 
-
+            Assert.AreEqual("123", dto.BackgroundJobId);
+            Assert.AreEqual(1, dto.IndexCount);
+            Assert.AreEqual(2, dto.DeleteCount);
         }
     }
 }
