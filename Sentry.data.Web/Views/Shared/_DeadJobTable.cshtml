@@ -8,26 +8,26 @@
 <table id="deadJobs" aria-label="table of all dead jobs" class="table table-bordered table-hover table-striped nowrap">
     <thead>
         <tr class="table-header">
-            <th>Details</th>
-            <th>Actions</th>
-            <th>Submission Time</th>
-            <th>Dataset Name</th>
-            <th>Reprocessing Required</th>
-            <th>Schema Name</th>
-            <th>Source Key</th>
-            <th>Flow Execution Guid</th>
+            <th scope="col">Details</th>
+            <th scope="col">Actions</th>
+            <th scope="col">Submission Time</th>
+            <th scope="col">Dataset Name</th>
+            <th scope="col">Reprocessing Required</th>
+            <th scope="col">Schema Name</th>
+            <th scope="col">Source Key</th>
+            <th scope="col">Flow Execution Guid</th>
         </tr>
         <tr class="filter-row">
-            <th></th>
-            <th class="dead-job-select-all">
+            <th scope="col"></th>
+            <th scope="col" class="dead-job-select-all">
                 <fieldset class="form-group">
                     <input type="checkbox" id="data-file-select-all" class="form-check-input">
                     <label for="data-file-select-all" class="form-check-label p-0"></label>
                 </fieldset>
             </th>
-            <th></th>
-            <th></th>
-            <th id="reprocess-filter-th">
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col" id="reprocess-filter-th">
                 <select class="mdb-select" name="deadJob-reprocessing-filter" id="deadJob-reprocessing-filter">
                     <option value="">All</option>
                     <option class="text-danger" value="True">True</option>
@@ -35,9 +35,9 @@
                 </select>
                 <label class="mdb-main-label">Reprocess Status</label>
             </th>
-            <th></th>
-            <th></th>
-            <th></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
     </thead>
     <tbody></tbody>
