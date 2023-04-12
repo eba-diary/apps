@@ -656,7 +656,6 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
 
             Mock<IDatasetContext> datasetContext = GetDatasetContext(mr, dataset);
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());

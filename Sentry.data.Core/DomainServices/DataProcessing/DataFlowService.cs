@@ -317,11 +317,8 @@ namespace Sentry.data.Core
         {
             DataFlowDto resultDto = await AddDataFlowAsync_Internal(dto);
 
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
-            {
-                // Create a Hangfire job that will setup the default security groups for this new dataset
-                _securityService.EnqueueCreateDefaultSecurityForDataFlow(resultDto.Id);
-            }
+            // Create a Hangfire job that will setup the default security groups for this new dataset
+            _securityService.EnqueueCreateDefaultSecurityForDataFlow(resultDto.Id);
 
             return resultDto;
         }

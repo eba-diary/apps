@@ -356,11 +356,8 @@ namespace Sentry.data.Core
                 await _datasetContext.AddAsync(dataset);
                 await _datasetContext.SaveChangesAsync();
 
-                if (_featureFlags.CLA3718_Authorization.GetValue())
-                {
-                    // Create a Hangfire job that will setup the default security groups for this new dataset
-                    _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
-                }
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
 
                 if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
                 {
