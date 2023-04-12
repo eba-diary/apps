@@ -28,9 +28,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         public IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
-        public IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; }
         public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
-        public IFeatureFlag<bool> CLA3718_Authorization { get; }
         public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE { get; }
         public IFeatureFlag<bool> CLA4152_UploadFileFromUI { get; }
         public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
@@ -38,8 +36,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; }
         public IFeatureFlag<bool> CLA3756_UpdateSearchPages { get; }
         public IFeatureFlag<bool> CLA4258_DefaultProdSearchFilter { get; }
-        public IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation { get; }
-        public IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand { get; }
         public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
         public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; }
         public IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }
@@ -68,8 +64,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3637_EXPOSE_INV_CATEGORY = new BooleanFeatureFlagAmbientContext("CLA3637_EXPOSE_INV_CATEGORY", false, _ldClient, () => LdUser);
             CLA3553_SchemaSearch = new BooleanFeatureFlagAmbientContext("CLA3553_SchemaSearch", false, _ldClient, () => LdUser);
             CLA3882_DSC_NOTIFICATION_SUBCATEGORY = new BooleanFeatureFlagAmbientContext("CLA3882_DSC_NOTIFICATION_SUBCATEGORY", false, _ldClient, () => LdUser);
-            CLA3861_RefactorGetUserSecurity = new BooleanFeatureFlagAmbientContext("CLA3861_RefactorGetUserSecurity", false, _ldClient, () => LdUser);
-            CLA3718_Authorization = new BooleanFeatureFlagAmbientContext("CLA3718_Authorization", false, _ldClient, () => LdUser);
             CLA4049_ALLOW_S3_FILES_DELETE = new BooleanFeatureFlagAmbientContext("CLA4049_ALLOW_S3_FILES_DELETE", false, _ldClient, () => LdUser);
             CLA4152_UploadFileFromUI = new BooleanFeatureFlagAmbientContext("CLA4152_UploadFileFromUI", false, _ldClient, () => LdUser);
             CLA1130_SHOW_ALTERNATE_EMAIL = new BooleanFeatureFlagAmbientContext("CLA1130_SHOW_ALTERNATE_EMAIL", false, _ldClient, () => LdUser);
@@ -77,8 +71,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4260_QuartermasterNamedEnvironmentTypeFilter = new StringFeatureFlagAmbientContext("CLA4260_QuartermasterNamedEnvironmentTypeFilter", "Prod", _ldClient, () => LdUser);
             CLA3756_UpdateSearchPages = new BooleanFeatureFlagAmbientContext("CLA3756_UpdateSearchPages", false, _ldClient, () => LdUser);
             CLA4258_DefaultProdSearchFilter = new BooleanFeatureFlagAmbientContext("CLA4258_DefaultProdSearchFilter", false, _ldClient, () => LdUser);
-            CLA4410_StopCategoryBasedConsumptionLayerCreation = new BooleanFeatureFlagAmbientContext("CLA4410_StopCategoryBasedConsumptionLayerCreation", false, _ldClient, () => LdUser);
-            CLA440_CategoryConsumptionLayerCreateLineInSand = new StringFeatureFlagAmbientContext("CLA440_CategoryConsumptionLayerCreateLineInSand", "2022-08-15", _ldClient, () => LdUser);
             CLA3878_ManageSchemasAccordion = new BooleanFeatureFlagAmbientContext("CLA3878_ManageSchemasAccordion", false, _ldClient, () => LdUser);
             CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL = new BooleanFeatureFlagAmbientContext("CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL", false, _ldClient, () => LdUser);
             CLA4411_Goldeneye_Consume_NP_Topics = new BooleanFeatureFlagAmbientContext("CLA4411_Goldeneye_Consume_NP_Topics", false, _ldClient, () => LdUser);

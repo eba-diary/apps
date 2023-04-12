@@ -1541,34 +1541,6 @@ namespace Sentry.data.Core
         {
             List<SchemaConsumption> layerList = new List<SchemaConsumption>();
 
-            /* 
-             * All created schema will have dataset based created
-             * 
-             * This is logic for Category based:
-             * IF CLA3718_Authorization is off (false), all created schema will have Category based created
-             * IF CLA3718_Authorization is On (true)
-             *     IF CLA4410_Stop flag is on (true), no newly created schema will have Category based
-             *     IF CLA4410_Stop flag is off (false),  Dataset created date check kicks in
-             *         IF Dataset created date is before constant datetime, Category based will be created
-             *         IF Dataset created date is after constant datetime, category based is not created
-            */
-            if (!_dataFeatures.CLA3718_Authorization.GetValue() ||  (!_dataFeatures.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()
-                                                                      && parentDataset.DatasetDtm < DateTime.Parse(_dataFeatures.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue())))
-            {
-                layerList.Add(
-                new SchemaConsumptionSnowflake()
-                {
-                    Schema = schema,
-                    SnowflakeDatabase = GetSnowflakeDatabaseName(parentDataset.IsHumanResources),
-                    SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.CategorySchemaParquet),
-                    SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
-                });
-            }
-
             //All schemas, regardless of when dataset is created, will have dataset based consumption layers generated
             layerList.AddRange(
             new List<SchemaConsumption>()

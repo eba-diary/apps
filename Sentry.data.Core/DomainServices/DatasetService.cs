@@ -254,22 +254,10 @@ namespace Sentry.data.Core
             ar.ConsumeAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Cnsmr).GetGroupName();
             ar.ProducerAssetGroupName = securityGroups.First(g => g.IsAssetLevelGroup() && g.GroupType == DTO.Security.AdSecurityGroupType.Prdcr).GetGroupName();
 
-            Expression<Func<Permission, bool>> featureFlagPermissionRestrictions;
-            if (!_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                //These permissions have been added as part of CLA-3718, but we don't want them visible on the existing UI when the feature flag is disabled
-                featureFlagPermissionRestrictions = x => x.PermissionCode != PermissionCodes.S3_ACCESS
-                    && x.PermissionCode != PermissionCodes.SNOWFLAKE_ACCESS
-                    && x.PermissionCode != PermissionCodes.INHERIT_PARENT_PERMISSIONS;
-            } else
-            {
-                featureFlagPermissionRestrictions = x => true;
-            }
-
             //Set permission list based on if Dataset is secured (restricted)
             ar.Permissions = !ds.IsSecured
                 ? _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET && x.PermissionCode == PermissionCodes.CAN_MANAGE_SCHEMA).ToList()
-                : _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET).Where(featureFlagPermissionRestrictions).ToList();
+                : _datasetContext.Permission.Where(x => x.SecurableObject == SecurableEntityName.DATASET).ToList();
 
             List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCodeAsync(ds.Asset.SaidKeyCode).ConfigureAwait(false);
             foreach(SAIDRole prodCust in prodCusts)
@@ -381,11 +369,8 @@ namespace Sentry.data.Core
 
         public void CreateExternalDependencies(int datasetId)
         {
-            if (_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                // Create a Hangfire job that will setup the default security groups for this new dataset
-                _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
-            }
+            // Create a Hangfire job that will setup the default security groups for this new dataset
+            _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
         }
 
         public int CreateAndSaveNewDataset(DatasetSchemaDto dto)
@@ -402,11 +387,8 @@ namespace Sentry.data.Core
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
-            if (_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                // Create a Hangfire job that will setup the default security groups for this new dataset
-                _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
-            }
+            // Create a Hangfire job that will setup the default security groups for this new dataset
+            _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
 
             return ds.DatasetId;
         }

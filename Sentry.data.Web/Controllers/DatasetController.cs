@@ -296,7 +296,6 @@ namespace Sentry.data.Web.Controllers
                     DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
                     DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue(),
                     DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
-                    ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
                     DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile,
                     DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue(),
                     CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue(),         //REMOVE WHEN TURNED ON LATER
@@ -665,18 +664,9 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model;
-
-            if (_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-                model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-                model.IsProd = Sentry.Configuration.Config.GetDefaultEnvironmentName() == GlobalConstants.Environments.PROD;
-                return PartialView("Permission/RequestAccessCLA3723", model);
-            }
-            model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("DatasetAccessRequest", model);
+            var model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+            model.IsProd = Sentry.Configuration.Config.GetDefaultEnvironmentName() == GlobalConstants.Environments.PROD;
+            return PartialView("Permission/RequestAccessCLA3723", model);
         }
 
         [HttpPost]

@@ -347,13 +347,12 @@ namespace Sentry.data.Core
         {
             DataFlow dataFlow = _datasetContext.GetById<DataFlow>(dataFlowId);
 
-            if (_dataFeatures.CLA3718_Authorization.GetValue())
-            {
-                // Create a Hangfire job that will setup the default security groups for this new dataset
-                _securityService.EnqueueCreateDefaultSecurityForDataFlow(dataFlow.Id);
-            }
+            // Create a Hangfire job that will setup the default security groups for this new dataset
+            _securityService.EnqueueCreateDefaultSecurityForDataFlow(dataFlow.Id);
+
             //Create S3 Sink Connectors
             CreateS3SinkConnector(dataFlow);
+
             //Create DFS Drop locations
             CreateDataFlowDfsDropLocation(dataFlow);
         }
@@ -366,11 +365,8 @@ namespace Sentry.data.Core
             {
                 DataFlow df = CreateAndSaveDataFlow(dto);
 
-                if (_dataFeatures.CLA3718_Authorization.GetValue())
-                {
-                    // Create a Hangfire job that will setup the default security groups for this new dataset
-                    _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
-                }
+                // Create a Hangfire job that will setup the default security groups for this new dataset
+                _securityService.EnqueueCreateDefaultSecurityForDataFlow(df.Id);
 
                 return df.Id;
             }
