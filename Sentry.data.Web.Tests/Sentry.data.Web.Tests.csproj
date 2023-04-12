@@ -175,7 +175,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="AccessControlTests.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetModelMappingTests.cs" />
     <Compile Include="API\BaseModelMappingTests.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidatorTests.cs" />
@@ -192,7 +191,6 @@
     <Compile Include="BaseWebUnitTests.cs" />
     <Compile Include="CategoryTests.cs" />
     <Compile Include="DataAssetTests.cs" />
-    <Compile Include="DatasetContextTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="DomainModelUnitTests.cs" />
     <Compile Include="Extensions\DataFlowMetricExtensionsTests.cs" />
@@ -202,9 +200,9 @@
     <Compile Include="Extensions\FilterSearchExtensionsTests.cs" />
     <Compile Include="Extensions\JobExtensionsTests.cs" />
     <Compile Include="Extensions\DataFlowExtensionsTests.cs" />
-    <Compile Include="LiveDatabaseUnitTests.cs" />
+    <Compile Include="HelperTests\JiraHelperTests.cs" />
+    <Compile Include="HelperTests\JSMHelperTests.cs" />
     <Compile Include="MetadataControllerTests.cs" />
-    <Compile Include="MockBasedUnitTests.cs" />
     <Compile Include="Mockups\MockClasses.cs" />
     <Compile Include="Mockups\MockControllers.cs" />
     <Compile Include="Mockups\MockUsers.cs" />
