@@ -36,5 +36,8 @@ namespace Sentry.data.Web.Models.Config
         public bool ToDelete { get; set; }
 
         public bool Enabled { get; set; }
+
+        [DisplayName("Token Response Error Needs Review")]
+        public bool AcceptableErrorNeedsReview { get; set; }
     }
 }

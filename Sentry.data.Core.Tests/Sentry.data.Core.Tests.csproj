@@ -156,6 +156,7 @@
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="ConfigServiceTests.cs" />
+    <Compile Include="DatasetFileTests.cs" />
     <Compile Include="DataSourceTests.cs" />
     <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
@@ -200,6 +201,8 @@
     <Compile Include="RequestVariableTests.cs" />
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="SchemaFlowServiceTests.cs" />
+    <Compile Include="MarkdownTests.cs" />
+    <Compile Include="GlobalDatasetExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

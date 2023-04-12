@@ -1,4 +1,4 @@
-﻿SET @ScriptVersion = 'CLA-3556 Default Exhibit SAID ASSET'
+﻿SET @ScriptVersion = 'CLA-5076_SetGlobalDatasetId'
 
 BEGIN TRAN 
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
@@ -7,13 +7,28 @@ BEGIN TRY
     PRINT 'Running script "' + @ScriptVersion + '"...'
     -- BEGIN POST-DEPLOY SCRIPT --
 
+    DECLARE @type AS VARCHAR(2) = 'DS'
 
+    UPDATE Dataset
+    SET GlobalDatasetId = NEXT VALUE FOR seq_GlobalDatasetId
+    WHERE ObjectStatus = 1
+    AND Dataset_TYP = @type
 
-    Update Dataset
-    SET SaidKeyCode = 'DATA'
-    WHERE Dataset_TYP = 'RPT' and SaidKeyCode is null
+    SELECT Dataset_ID, MIN(GlobalDatasetId) OVER (PARTITION BY Dataset_NME) as MinGlobalDatasetId
+    INTO #globalids
+    FROM Dataset
+    WHERE ObjectStatus = 1
+    AND Dataset_TYP = @type
 
+    UPDATE d
+    SET d.GlobalDatasetId = gids.MinGlobalDatasetId
+    FROM Dataset d
+    JOIN #globalids gids
+    ON d.Dataset_ID = gids.Dataset_ID
+    WHERE d.ObjectStatus = 1
+    AND d.Dataset_TYP = @type
 
+    DROP TABLE #globalids
 
     -- END POST-DEPLOY SCRIPT --
     INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
@@ -31,4 +46,3 @@ BEGIN CATCH
 END CATCH 
 
 COMMIT TRAN
-

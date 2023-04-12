@@ -214,6 +214,7 @@ namespace Sentry.data.Core
 
                     dto.DatasetId = 0;
                     dto.NamedEnvironment = migrationRequest.TargetDatasetNamedEnvironment;
+                    dto.NamedEnvironmentType = migrationRequest.TargetDatasetNamedEnvironmentType;
 
                     newDatasetId = CreateWithoutSave(dto);
 
@@ -250,10 +251,12 @@ namespace Sentry.data.Core
                         CreateExternalDependenciesForDataset(new List<int>() { newDatasetId });
                     }
 
+                    var migratedSchemaIds = schemaMigrationResponses.Where(x => x.MigratedSchema).Select(x => x.TargetSchemaId).ToList();
+                    CreateExternalDependenciesForSchemas(migratedSchemaIds);
+
                     //Only kick off dataflow external dependencies if the dataflow metadata was migrated
-                    var schemaWithMigratedDataflows = schemaMigrationResponses.Where(w => w.MigratedDataFlow).ToList();
-                    List<int> newSchemaIds = Enumerable.Range(0, schemaWithMigratedDataflows.Count).Select(i => schemaMigrationResponses[i].TargetSchemaId).ToList();
-                    CreateExternalDependenciesForDataFlowBySchemaId(newSchemaIds);
+                    var migratedDataFlowIds = schemaMigrationResponses.Where(w => w.MigratedDataFlow).Select(x => x.TargetDataFlowId).ToList();
+                    CreateExternalDependenciesForDataFlow(migratedDataFlowIds);
                     
                     //Only kick off schema revision external dependecies if the schema revision was migrated
                     var migratedSchemaRevisions = schemaMigrationResponses.Where(w => w.MigratedSchemaRevision).Select(s => (s.TargetSchemaId, s.TargetSchemaRevisionId)).ToList();
@@ -874,9 +877,14 @@ namespace Sentry.data.Core
 
                 try
                 {
+                    if (response.MigratedSchema)
+                    {
+                        CreateExternalDependenciesForSchemas(new List<int> { response.TargetSchemaId });
+                    }
+
                     if (response.MigratedDataFlow)
                     {
-                        CreateExternalDependenciesForDataFlowBySchemaId(new List<int>() { response.TargetSchemaId });
+                        CreateExternalDependenciesForDataFlow(new List<int>() { response.TargetDataFlowId });
                     }
 
                     if (response.MigratedSchemaRevision)
@@ -906,12 +914,19 @@ namespace Sentry.data.Core
             }
         }
 
-
         internal virtual void CreateExternalDependenciesForDataset(List<int> datasetIdList)
         {
             foreach (int datasetId in datasetIdList)
             {
                 DatasetService.CreateExternalDependencies(datasetId);
+            }
+        }
+
+        internal virtual void CreateExternalDependenciesForSchemas(List<int> schemaIdList)
+        {
+            foreach (int schemaId in schemaIdList)
+            {
+                SchemaService.CreateExternalDependenciesAsync(schemaId).Wait();
             }
         }
 
@@ -922,6 +937,7 @@ namespace Sentry.data.Core
                 CreateExternalDependenciesForSchemaRevision(schemaId, schemaRevisionId);
             }
         }
+
         private void CreateExternalDependenciesForSchemaRevision(int schemaId, int schemaRevisionId)
         {
             SchemaService.CreateSchemaRevisionExternalDependencies(schemaId, schemaRevisionId);
@@ -931,14 +947,6 @@ namespace Sentry.data.Core
         {
             foreach (int dataFlowId in dataFlowIdList)
             {
-                DataFlowService.CreateExternalDependencies(dataFlowId);
-            }
-        }
-        internal virtual void CreateExternalDependenciesForDataFlowBySchemaId(List<int> schemaIdList)
-        {
-            foreach (int schemaId in schemaIdList)
-            {
-                int dataFlowId = _datasetContext.DataFlow.FirstOrDefault(w => w.SchemaId == schemaId && w.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Id;
                 DataFlowService.CreateExternalDependencies(dataFlowId);
             }
         }

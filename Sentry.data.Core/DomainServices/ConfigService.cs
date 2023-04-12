@@ -32,12 +32,12 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _featureFlags;
         private readonly ISAIDService _saidService;
         private readonly IDatasetFileService _datasetFileService;
-
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, 
-            ISAIDService saidService, IDatasetFileService datasetFileService)
+            ISAIDService saidService, IDatasetFileService datasetFileService, IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -51,6 +51,7 @@ namespace Sentry.data.Core
             _dataFlowService = dataFlowService;
             _saidService = saidService;
             _datasetFileService = datasetFileService;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         public List<string> Validate(FileSchemaDto dto)
@@ -533,7 +534,7 @@ namespace Sentry.data.Core
                 SecurableObjectName = ds.Name
             };
 
-            List<SAIDRole> prodCusts = await _saidService.GetAllProdCustByKeyCodeAsync(ds.KeyCode).ConfigureAwait(false);
+            List<SAIDRole> prodCusts = await _saidService.GetApproversByKeyCodeAsync(ds.KeyCode).ConfigureAwait(false);
             foreach (SAIDRole prodCust in prodCusts)
             {
                 ar.ApproverList.Add(new KeyValuePair<string, string>(prodCust.AssociateId, prodCust.Name));
@@ -618,6 +619,13 @@ namespace Sentry.data.Core
                 {
                     Logger.Info($"{methodName} logical - configid:{id} configname:{dfc.Name}");
 
+                    //Remove environment schema from dataset search index
+                    Task deleteEnvironmentSchemaTask = Task.CompletedTask;
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        deleteEnvironmentSchemaTask = _globalDatasetProvider.DeleteEnvironmentSchemaAsync(scm.SchemaId);
+                    }
+
                     /*************************
                     * Legacy processing platform jobs where associated directly to datasetfileconfig object
                     * Disable all associated RetrieverJobs
@@ -640,7 +648,6 @@ namespace Sentry.data.Core
                         returnResult = jobsDeletedSuccessfully;
                     }
 
-
                     /*************************
                     *  Mark all dataflows, for deletion, associated with schema on new processing platform
                     *************************/
@@ -648,13 +655,15 @@ namespace Sentry.data.Core
                     dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
                     dataflows.AddRange(GetProducerFlowsByFileSchema(scm));
 
+                    //finish environment schema delete to not waste time removing asset in data flow delete
+                    deleteEnvironmentSchemaTask.Wait();
+
                     bool allDataFlowDeletesSuccessful = _dataFlowService.Delete(dataflows.Select(s => s.Id).ToList(), user, logicalDelete);
                     //If any dataflows failed to delete, then set returnResult = false
                     if (!allDataFlowDeletesSuccessful)
                     {
                         returnResult = allDataFlowDeletesSuccessful;
                     }
-
 
                     /*************************
                      * Mark objects for delete to ensure they are not displaed in UI
@@ -1127,6 +1136,7 @@ namespace Sentry.data.Core
                 dto.Tokens = new List<DataSourceTokenDto>();
                 MapDataSourceTokensToDtoTokens(((HTTPSSource)dsrc).AllTokens, dto.Tokens);
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
+                dto.AcceptableErrors = ((HTTPSSource)dsrc).AcceptableErrors;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
                 dto.SupportsPaging = ((HTTPSSource)dsrc).SupportsPaging;
                 dto.GrantType = ((HTTPSSource)dsrc).GrantType;
@@ -1163,6 +1173,7 @@ namespace Sentry.data.Core
                     token.TokenUrl = dtoToken.TokenUrl;
                     token.Scope = dtoToken.Scope;
                     token.Enabled = dtoToken.Enabled;
+                    token.AcceptableErrorNeedsReview = dtoToken.AcceptableErrorNeedsReview;
 
                     if (update)
                     {
@@ -1207,7 +1218,8 @@ namespace Sentry.data.Core
                     TokenName = dataSourceToken.TokenName,
                     TokenUrl = dataSourceToken.TokenUrl,
                     Scope = dataSourceToken.Scope,
-                    Enabled = dataSourceToken.Enabled
+                    Enabled = dataSourceToken.Enabled,
+                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview
                 });
             }
         }
@@ -1270,6 +1282,11 @@ namespace Sentry.data.Core
                 {
                     ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders;
                 }
+                
+                if (dto.AcceptableErrors.Any())
+                {
+                    ((HTTPSSource)dsrc).AcceptableErrors = dto.AcceptableErrors;
+                }
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
@@ -1298,6 +1315,7 @@ namespace Sentry.data.Core
             dto.TokenExp = token.TokenExp;
             dto.Scope = token.Scope;
             dto.Enabled = token.Enabled;
+            dto.AcceptableErrorNeedsReview = token.AcceptableErrorNeedsReview;
         }
 
         internal void MapToDataSourceToken(DataSourceTokenDto dto, DataSourceToken token)
@@ -1311,6 +1329,7 @@ namespace Sentry.data.Core
             token.TokenExp = dto.TokenExp;
             token.Scope = dto.Scope;
             token.Enabled = dto.Enabled;
+            token.AcceptableErrorNeedsReview = dto.AcceptableErrorNeedsReview;
         }
 
         private DataSource CreateDataSource(DataSourceDto dto)
@@ -1378,6 +1397,11 @@ namespace Sentry.data.Core
                     if (dto.RequestHeaders.Any())
                     {
                         ((HTTPSSource)source).RequestHeaders = dto.RequestHeaders;
+                    }
+                    
+                    if (dto.AcceptableErrors.Any())
+                    {
+                        ((HTTPSSource)source).AcceptableErrors = dto.AcceptableErrors;
                     }
 
                     if (auth.Is<TokenAuthentication>())

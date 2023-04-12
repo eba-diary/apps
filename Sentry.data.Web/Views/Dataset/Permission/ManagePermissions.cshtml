@@ -3,6 +3,11 @@
     ViewBag.Title = "Manage Dataset Permissions";
 }
 
+@section styles
+{
+    <link rel="stylesheet" href="@Html.GetContent("datatables_css.*.css")" />
+}
+
 <div class="mt-2">
     <a href="@Url.Action("Detail", "Dataset", new {id=Model.DatasetId})" id="linkReturnToDatasetDetails"><span class="icon-chevron-left pr-3"></span>Back to Dataset Details</a>
 </div>
@@ -41,17 +46,20 @@
     @foreach (var pair in new Dictionary<string, IList<ManagePermissionModel>> { { "DSC Permissions", Model.DscPermissions }, { "Snowflake Permissions", Model.SnowflakePermissions }, { "S3 Permissions", Model.AwsIamPermissions } })
     {
         <div class="row">
-            <h6 class="pt-3">@pair.Key</h6>
+            <h5 class="pt-3 pb-2">@pair.Key</h5>
         </div>
         <div class="row">
-            <table class="table dsc-blue-table table-bordered table-hover nowrap" id="permissionsTable" aria-label="@pair.Key">
+            <table class="table table-bordered table-hover table-striped wrap dataTable no-footer" id="@pair.Key.Replace(" ", "")" aria-label="@pair.Key">
                 <thead>
-                    <tr class="table-header">
+                    <tr role="row">
                         <th scope="col">Scope</th>
                         <th scope="col">Identity</th>
                         <th scope="col">Permission</th>
                         <th scope="col">Status</th>
-                        <th scope="col"></th>
+                        <th class="d-none" scope="col">Code</th>
+                        <th scope="col">Approval Ticket</th>
+                        <th scope="col">@(pair.Key == "S3 Permissions" ? "Jira Ticket" : "DBA Ticket")</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,15 +73,14 @@
                                 <td class="permissionDescription">@permission.PermissionDescription</td>
                                 <td class="permissionStatus"><span title="Change #@permission.TicketId">@permission.PermissionStatus</span></td>
                                 <td class="permissionCode d-none">@permission.Code</td>
-                                <td>@if (!permission.IsSystemGenerated && !(permission.PermissionStatus != "Active")) { <em class="far fa-trash-alt removePermissionIcon"></em> }</td>
+                                <td class="approvalTicket">@(permission.TicketId == "DEFAULT_SECURITY" || permission.TicketId == "DEFAULT_SECURITY_INHERITANCE" ? "Default Security" : permission.TicketId)</td>
+                                <td class="externalTicket">@(string.IsNullOrEmpty(permission.ExternalRequestId) ? "No External Request Found" : permission.ExternalRequestId)</td>
+                                <td>
+                                    @if (!permission.IsSystemGenerated && (permission.PermissionStatus == "Active" || permission.PermissionStatus == "DBA Ticket Complete"))
+                                    {<em class="far fa-trash-alt removePermissionIcon"></em>}
+                                </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5">No permissions found</td>
-                        </tr>
                     }
                 </tbody>
             </table>
@@ -87,6 +94,7 @@
 </div>
 
 @section Scripts {
+    <script src="@Html.GetContent("datatables.*.js")"></script>
     <script>
         $(function () {
             data.Dataset.managePermissionsInit();

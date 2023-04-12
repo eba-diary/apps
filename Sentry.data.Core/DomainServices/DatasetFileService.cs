@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using Hangfire;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Helpers.Paginate;
+using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using Sentry.data.Core.Interfaces;
-using Hangfire;
 using System.IO;
+using System.Linq;
 using System.Text;
-using Sentry.data.Core.Helpers;
 
 namespace Sentry.data.Core
 {
@@ -214,11 +214,54 @@ namespace Sentry.data.Core
             {
                 try
                 {
-                    var timeDelay = 30 * counter; 
-                    foreach (int id in batch)
+                    var timeDelay = 30 * counter;
+
+                    //Evaluate CLA-5024 feature flag hear
+                    if (_dataFeatures.CLA5024_PublishReprocessingEvents.GetValue())
                     {
-                        _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(timeDelay));
+                        List<int> datasetFileIdList = new List<int>();
+                        List<int> datasetFileDropIdList = new List<int>();
+
+                        List<DatasetFile> datasetFileList = _datasetContext.DatasetFileStatusAll.Where(w => batch.Contains(w.DatasetFileId)).ToList();
+
+                        foreach (DatasetFile datasetFile in datasetFileList)
+                        {
+                            //Find datasetFileDropId
+                            int datasetFileDropId = datasetFile.GetDatasetFileDropIdListByDatasetFile(_datasetContext);
+
+                            //Pass associated datasetFileDropId if it exist, otherwise pass the datasetFileId
+                            if (datasetFileDropId != 0)
+                            {
+                                datasetFileDropIdList.Add(datasetFileDropId);
+                            }
+                            else 
+                            {
+                                datasetFileIdList.Add(datasetFile.DatasetFileId);
+                            }
+                        }
+
+                        (int schemaId, int datasetId) = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).Select(s => new Tuple<int, int>(s.DataFlow.SchemaId, s.DataFlow.DatasetId)).FirstOrDefault();
+
+                        //Create ReprocessRequestModel
+                        ReprocessFilesRequestModel model = new ReprocessFilesRequestModel()
+                        {
+                            DatasetID = datasetId,
+                            SchemaID = schemaId,
+                            DatasetFileDropIdList = datasetFileDropIdList.ToArray(),
+                            DatasetFileIdList = datasetFileIdList.ToArray()
+                        };
+
+                        //Schedule jobs to publish messages with timeDelay like original
+                        _jobScheduler.Schedule<IMessagePublisher>(m => m.PublishDSCEventAsync(null, JsonConvert.SerializeObject(model), null), TimeSpan.FromSeconds(timeDelay));
                     }
+                    else
+                    {                        
+                        foreach (int id in batch)
+                        {
+                            _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(timeDelay));
+                        }
+                    }
+                    
                 } catch (Exception ex)
                 {
                     submittedSuccessful = false;
@@ -285,6 +328,7 @@ namespace Sentry.data.Core
         }
 
         #region PrivateMethods
+
         internal void DeleteParquetFileByDatsetFile(DatasetFile datasetFile)
         {
             string fileKey = datasetFile.FileKey.Replace("rawquery", "parquet");

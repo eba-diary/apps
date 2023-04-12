@@ -673,7 +673,16 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessToDataset(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit access request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -690,7 +699,16 @@ namespace Sentry.data.Web.Controllers
         {
             model.IsAddingPermission = true;
             AccessRequest ar = model.ToCore();
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessToDataset(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit access request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -718,7 +736,16 @@ namespace Sentry.data.Web.Controllers
         {
             AccessRequest ar = model.ToCore();
             ar.Type = AccessRequestType.Inheritance;
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessToDataset(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit inheritance request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -735,7 +762,16 @@ namespace Sentry.data.Web.Controllers
         {
             AccessRequest ar = model.ToCore();
 
-            string ticketId = await _datasetService.RequestAccessRemoval(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessRemoval(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit remove permission request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {

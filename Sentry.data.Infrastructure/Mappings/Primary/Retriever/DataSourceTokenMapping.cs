@@ -88,6 +88,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("Enabled");
                 m.NotNullable(false);
             });
+            
+            Property(x => x.AcceptableErrorNeedsReview, m =>
+            {
+                m.Column("AcceptableErrorNeedsReview");
+                m.NotNullable(false);
+            });
         }
     }
 }

@@ -284,14 +284,17 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.106.6.9\lib\net452\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=108.0.3.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.108.0.3\lib\netstandard2.0\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Sentry.Associates, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Associates.3.0.3\lib\netstandard2.0\Sentry.Associates.dll</HintPath>
+    <Reference Include="Sentry.Associates, Version=3.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Associates.3.0.4\lib\netstandard2.0\Sentry.Associates.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Associates.Abstractions, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.Abstractions.2.0.2\lib\netstandard2.0\Sentry.Associates.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.ChangeManagement, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.ChangeManagement.1.0.7\lib\netstandard2.0\Sentry.ChangeManagement.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Common.1.6.0\lib\net452\Sentry.Common.dll</HintPath>
@@ -351,6 +354,7 @@
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.7.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.26.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -363,6 +367,9 @@
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
       <Private>True</Private>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.AccessControl, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.FileSystem.AccessControl.5.0.0\lib\net461\System.IO.FileSystem.AccessControl.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Hashing, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.Hashing.7.0.0\lib\net462\System.IO.Hashing.dll</HintPath>
@@ -627,7 +634,8 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="API\Interfaces\IResponseModel.cs" />
-    <Compile Include="Models\Config\DataSourceTokenModel.cs" />
+    <Compile Include="Models\Config\DataSource\AcceptableErrorModel.cs" />
+    <Compile Include="Models\Config\DataSource\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
@@ -766,11 +774,9 @@
     <Compile Include="Models\BusinessArea\BusinessAreaLandingPageModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
-    <Compile Include="Models\Config\CreateSourceModel.cs" />
-    <Compile Include="Models\Config\DataSourceModel.cs" />
+    <Compile Include="Models\Config\DataSource\DataSourceModel.cs" />
     <Compile Include="Models\Config\EditJobModel.cs" />
     <Compile Include="Models\Config\EditSchemaModel.cs" />
-    <Compile Include="Models\Config\EditSourceModel.cs" />
     <Compile Include="Models\Config\FieldModel.cs" />
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
@@ -943,7 +949,6 @@
     <Content Include="Views\Search\TileResults.cshtml" />
     <Content Include="Views\Config\Index.cshtml" />
     <Content Include="Views\Config\_DataFlowStepAccordion.cshtml" />
-    <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
     <Content Include="Views\Migration\_MigrationResponse.cshtml" />
     <Content Include="Views\Migration\_MigrationRequest.cshtml" />
@@ -1141,11 +1146,9 @@
     <Content Include="Views\Config\CreateRetrievalJob.cshtml" />
     <Content Include="Views\Config\Edit.cshtml" />
     <Content Include="Views\Config\EditRetrievalJob.cshtml" />
-    <Content Include="Views\Config\CreateDataSource.cshtml" />
-    <Content Include="Views\Config\EditDataSource.cshtml" />
     <Content Include="Views\DataAsset\Test.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
-    <Content Include="Views\Config\_Headers.cshtml" />
+    <Content Include="Views\Config\DataSource\_Headers.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Collection.cshtml" />
     <Content Include="Views\Config\Fields.cshtml" />
     <Content Include="Views\Config\_Fields.cshtml" />
@@ -1209,6 +1212,10 @@
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
     <Content Include="Views\Migration\_NamedEnvironment.cshtml" />
     <Content Include="Views\Migration\_MigrationHistory.cshtml" />
+    <Content Include="Views\Config\DataSource\_DataSourceToken.cshtml" />
+    <Content Include="Views\Config\DataSource\_AcceptableError.cshtml" />
+    <Content Include="Views\Config\DataSource\CreateDataSource.cshtml" />
+    <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1245,10 +1252,6 @@
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sentry.data.Goldeneye\Sentry.data.Goldeneye.csproj">
-      <Project>{837dbcea-237b-4a4b-a917-557c47f7717e}</Project>
-      <Name>Sentry.data.Goldeneye</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Infrastructure\Sentry.data.Infrastructure.csproj">
       <Project>{c766d10b-0008-4cc8-a0c0-5818e5ee464a}</Project>

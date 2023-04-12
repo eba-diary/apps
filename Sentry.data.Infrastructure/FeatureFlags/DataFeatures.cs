@@ -47,6 +47,9 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4931_SendMotiveEmail { get; }
         public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
         public IFeatureFlag<bool> CLA4912_API { get; }
+        public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents { get; }
+        public IFeatureFlag<bool> CLA4993_JSMTicketProvider { get; }
+        public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability { get; }
 
         public DataFeatures(IUserService userService, ILdClient ldClient)
         {
@@ -82,6 +85,9 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4931_SendMotiveEmail = new BooleanFeatureFlagAmbientContext("CLA4931_SendMotiveEmail", false, _ldClient, () => LdUser);
             CLA4925_ParquetFileType = new BooleanFeatureFlagAmbientContext("CLA4925_ParquetFileType", false, _ldClient, () => LdUser);
             CLA4912_API = new BooleanFeatureFlagAmbientContext("CLA4912_API", false, _ldClient, () => LdUser);
+            CLA5024_PublishReprocessingEvents = new BooleanFeatureFlagAmbientContext("CLA5024_PublishReprocessingEvents", false, _ldClient, () => LdUser);
+            CLA4993_JSMTicketProvider = new BooleanFeatureFlagAmbientContext("CLA4993_JSMTicketProvider", false, _ldClient, () => LdUser);
+            CLA4789_ImprovedSearchCapability = new BooleanFeatureFlagAmbientContext("CLA4789_ImprovedSearchCapability", false, _ldClient, () => LdUser);
         }
 
         /// <summary>

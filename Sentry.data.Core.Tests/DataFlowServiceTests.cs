@@ -34,7 +34,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null,null,null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null,null,null, null);
             var dataFlow = new DataFlowDto() { Name = "Foo" };
 
             // Act
@@ -59,7 +59,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null, null);
             var dataFlow = new DataFlowDto() { Name = "Montana2", TopicName = "Montana", IngestionType = (int)IngestionType.Topic };
 
             // Act
@@ -85,7 +85,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null, null);
             var dataFlow = new DataFlowDto() { Name = "Montana2", TopicName = "Montana2", IngestionType = (int)IngestionType.Topic };
 
             // Act
@@ -108,7 +108,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null, null);
             var dataFlow = new DataFlowDto() {Id=60 ,Name = "Montana", TopicName = "Montana", IngestionType = (int)IngestionType.Topic };
 
             // Act
@@ -133,7 +133,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null, null);
             var dataFlow = new DataFlowDto() { Name = "Montana2", IngestionType = (int)IngestionType.S3_Drop};
 
             // Act
@@ -161,7 +161,7 @@ namespace Sentry.data.Core.Tests
             var validationResults = new ValidationResults();
             quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, quartermasterService.Object, null, null, null, null, null);
             var dataFlow = new DataFlowDto() { Name = "Bar", NamedEnvironment = "TEST", NamedEnvironmentType = GlobalEnums.NamedEnvironmentType.NonProd };
 
             // Act
@@ -998,7 +998,7 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
 
 
-            var dataflowservice = new DataFlowService(context.Object, userService.Object, null, securityService.Object, null, datafeature.Object, null, null, null); // creating the dataflowservice object
+            var dataflowservice = new DataFlowService(context.Object, userService.Object, null, securityService.Object, null, datafeature.Object, null, null, null, null); // creating the dataflowservice object
 
             // Act
             var result = dataflowservice.GetDataFlowDtoByStepId(stepId).Id;// this creates a nullReferenceException  -> gets the step Id from the currrent dataflowservice object
@@ -1033,7 +1033,7 @@ namespace Sentry.data.Core.Tests
             var context = new Mock<IDatasetContext>();
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
 
-            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, null, null, null, null, null);
             
             // Act
             int testSchema = dataflowservice.GetSchemaIdFromDatasetFileId(datafileId);
@@ -1130,7 +1130,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity security = new UserSecurity();
             securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
 
-            var dataflowservice = new DataFlowService(context.Object, userService.Object, null, securityService.Object, null, datafeature.Object, null, null, null);
+            var dataflowservice = new DataFlowService(context.Object, userService.Object, null, securityService.Object, null, datafeature.Object, null, null, null, null);
 
             // Act
             bool indicator = dataflowservice.ValidateStepIdAndDatasetFileIds(stepId, datasetFileIds);
@@ -1205,7 +1205,7 @@ namespace Sentry.data.Core.Tests
             context.SetupGet(f => f.DataFlowStep).Returns(dataflowsteps.AsQueryable);
             context.SetupGet(f => f.DatasetFileStatusActive).Returns(datasetfiles.AsQueryable);
 
-            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, datafeature.Object, null, null, null);
+            var dataflowservice = new DataFlowService(context.Object, null, null, null, null, datafeature.Object, null, null, null, null);
 
             // Act
             Assert.ThrowsException<DataFlowStepNotFound>(() => dataflowservice.GetDataFlowDtoByStepId(stepId));
@@ -1221,7 +1221,7 @@ namespace Sentry.data.Core.Tests
             // Arrange
             var client = new Mock<IBackgroundJobClient>();
 
-            var dataflowService = new DataFlowService(null, null, null, null, null, null, client.Object, null, null);
+            var dataflowService = new DataFlowService(null, null, null, null, null, null, client.Object, null, null, null);
 
             // Act
             dataflowService.Delete_Queue(new List<int>() { 1 }, "123456", true);
@@ -1250,7 +1250,7 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(f => f.GetById<DataFlow>(1)).Returns(dataflow);
 
-            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null, null);
 
             //Assert
             Assert.ThrowsException<DataFlowNotFound>(() => dataflowService.Delete(2, user.Object, false));
@@ -1278,7 +1278,7 @@ namespace Sentry.data.Core.Tests
             //We need to mock out IJobService due to call to DeleteJobByDataFlowId()
             var jobService = new Mock<IJobService>();
 
-            var dataflowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null, null);
 
             //Act
             dataflowService.Delete(1, user.Object, false);
@@ -1298,11 +1298,10 @@ namespace Sentry.data.Core.Tests
             // Arrange
             MockRepository mr = new MockRepository(MockBehavior.Loose);
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
-            user.Setup(s => s.DisplayName).Returns("displayName");
-            user.Setup(s => s.AssociateId).Returns("123456");
-           
+            user.Setup(s => s.AssociateId).Returns("123456");           
 
             DataFlow df = MockClasses.MockDataFlow();
+            df.SchemaId = 2;
             RetrieverJob job = MockClasses.GetMockRetrieverJob(
                                         MockClasses.MockDatasetFileConfig(
                                                 MockClasses.MockDataset()), new FtpSource());
@@ -1314,15 +1313,23 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.RetrieverJob).Returns(jobList.AsQueryable());
 
             Mock<IJobService> jobService = mr.Create<IJobService>();
-            jobService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
+            jobService.Setup(s => s.Delete(It.Is<List<int>>(x => x.Contains(4000)), It.IsAny<IApplicationUser>(), true)).Returns(true);
 
-            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(2, null)).Returns(Task.CompletedTask);
+
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, dataFeatures.Object, null, null, null, globalDatasetProvider.Object);
             
             //Act
             dataFlowService.Delete(df.Id, user.Object, true);
 
             //Assert
             context.Verify(x => x.SaveChanges(true), Times.Never);
+
+            mr.VerifyAll();
         }
 
         [TestCategory("Core DataFlowService")]
@@ -1353,7 +1360,7 @@ namespace Sentry.data.Core.Tests
             Mock<IJobService> jobService = mr.Create<IJobService>();
             jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null, null);
 
             //Act
             //Using this syntax to ensure correct delete overload gets called
@@ -1391,7 +1398,7 @@ namespace Sentry.data.Core.Tests
             Mock<IJobService> jobService = mr.Create<IJobService>();
             jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null, null);
 
             //Act
             //Using this syntax to ensure correct delete overload gets called
@@ -1430,7 +1437,7 @@ namespace Sentry.data.Core.Tests
 
             var mockDataFeatures = new Mock<IDataFeatures>();
 
-            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null, null);
 
             //Act
             DataFlow flow = dataflowService.MapToDataFlow(flowDto);
@@ -1482,7 +1489,7 @@ namespace Sentry.data.Core.Tests
 
             var mockDataFeatures = new Mock<IDataFeatures>();
 
-            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null, null);
 
             //Act
             DataFlow flow = dataflowService.MapToDataFlow(flowDto);
@@ -1581,7 +1588,7 @@ namespace Sentry.data.Core.Tests
 
             var mockDataFeatures = new Mock<IDataFeatures>();
 
-            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null);
+            var dataflowService = new DataFlowService(context.Object, mockUserService.Object, null, null, null, mockDataFeatures.Object, null, null, null, null);
 
             //Act
             DataFlow flow = dataflowService.MapToDataFlow(flowDto);
@@ -1622,7 +1629,7 @@ namespace Sentry.data.Core.Tests
             Mock<IJobService> jobService = mr.Create<IJobService>();
             jobService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, jobService.Object, null, null, null, null, null, null, null);
 
             // Act
             List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(1);
@@ -1648,7 +1655,7 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
            
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null, null);
 
             // Act
             dataFlowService.EnableOrDisableDataFlow(77,ObjectStatusEnum.Active);
@@ -1671,7 +1678,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.GetById<DataFlow>(It.IsAny<int>())).Returns(df);
 
-            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, null, null, null, null, null, null, null, null, null);
 
             // Act
             dataFlowService.EnableOrDisableDataFlow(77, ObjectStatusEnum.Disabled);
@@ -1761,7 +1768,7 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
 
             // Setup DataFlowService
-            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null, null);
 
             // Act
             List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(2);
@@ -1851,7 +1858,7 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(s => s.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(security);
 
             // Setup DataFlowService
-            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null, null);
 
             // Act
             List<DataFlowDetailDto> testFlow = dataFlowService.GetDataFlowDetailDtoByDatasetId(2);
@@ -1943,7 +1950,7 @@ namespace Sentry.data.Core.Tests
 
 
             // Setup DataFlowService
-            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null);
+            var dataFlowService = new DataFlowService(context.Object, userService.Object, jobService.Object, securityService.Object, null, _datafeatures.Object, null, null, null, null);
 
             List<DataFlowDetailDto> testFlow1 = dataFlowService.GetDataFlowDetailDtoByTopicName("TestTopic");
 

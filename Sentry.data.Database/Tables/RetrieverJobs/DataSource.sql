@@ -31,6 +31,7 @@
     [Security_ID] UNIQUEIDENTIFIER NULL, 
     [OAuthGrantType] INT NULL, 
     [SupportsPaging] BIT NOT NULL DEFAULT 0, 
+    [AcceptableErrors] NVARCHAR(MAX) NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
     CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id]),
 	CONSTRAINT [FK_DataSource_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])

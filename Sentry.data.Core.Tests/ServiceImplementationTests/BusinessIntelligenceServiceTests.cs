@@ -820,7 +820,7 @@ namespace Sentry.data.Core.Tests
                 ApprovedById = "078193",
                 RequestedDate = DateTime.Today.AddDays(-5),
                 ApprovedDate = DateTime.Today,
-                TicketStatus = GlobalConstants.HpsmTicketStatus.COMPLETED,
+                TicketStatus = GlobalConstants.ChangeTicketStatus.COMPLETED,
                 AdGroupName = "DDA_DataArchNP_DB",
                 IsRemovingPermission = false,
                 IsAddingPermission = true,

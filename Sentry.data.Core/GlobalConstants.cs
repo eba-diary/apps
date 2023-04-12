@@ -179,18 +179,42 @@ namespace Sentry.data.Core
             public const string GET_LATEST_URL_PARAMETER = "&sInstance=Last";
         }
 
-        public static class HpsmTicketStatus
+        public static class ChangeTicketStatus
         {
             //DSC
             public const string PENDING = "Pending";
             public const string COMPLETED = "Completed";
             public const string DENIED = "Denied";
             public const string WITHDRAWN = "Withdrawn";
-            //hpsm
             public const string APPROVED = "approved";
-            public const string CLOSED = "closed";
-            public const string IMPLEMENTATION = "SI:STD:Implementation";
-            public const string LOG_AND_PREP = "SI:STD:Log and Prep";
+            //dba
+            public const string DbaTicketPending = "DbaTicketPending";
+            public const string DbaTicketAdded = "DbaTicketAdded";
+            public const string DbaTicketApproved = "DbaTicketApproved";
+            public const string DbaTicketComplete = "DbaTicketComplete";
+        }
+
+        public static class JsmAssignmentGroup
+        {
+            public const string BI_PORTAL_ADMIN = "BI Portal Administration";
+        }
+
+        public static class JsmChangeStatus
+        {
+            public const string REVIEW = "Review";
+            public const string INDIVIDUAL_AUTHORIZE = "Individual Authorize";
+            public const string GROUP_AUTHORIZE = "Group Authorize";
+            public const string AWAITING_IMPLEMENTATION = "Awaiting implementation";
+            public const string IMPLEMENTING = "Implementing";
+            public const string COMPLETED = "Completed";
+            public const string CANCELED = "Canceled";
+            public const string DECLINED = "Declined";
+            public const string FAILED = "Failed";
+        }
+
+        public static class JsmChangePhase
+        {
+            public const string READY_APPROVAL = "Ready for Individual Approval";
         }
 
         public static class SecurableEntityName
@@ -605,6 +629,12 @@ namespace Sentry.data.Core
         {
             public const string TYPE_DATASET = "Dataset";
             public const string TYPE_SCHEMA = "Schema";
+        }
+
+        public static class SAIDRoles
+        {
+            public const string CUSTODIAN_PRODUCTION = "Custodian - Production";
+            public const string CUSTODIAN_CERTIFIER = "Custodian - Certifier";
         }
     }
 }

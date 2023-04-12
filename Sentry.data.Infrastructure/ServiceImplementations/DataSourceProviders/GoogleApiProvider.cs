@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
         public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
-            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            RestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
@@ -53,15 +53,14 @@ namespace Sentry.data.Infrastructure
                 baseUri = baseUri.Remove(place, Find.Length).Insert(place, Replace);
             }
 
-            _client = new RestClient
-            {
-                BaseUrl = new Uri(baseUri)
-            };
+            RestClientOptions clientOptions = new RestClientOptions(baseUri);
 
             if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                _client.Proxy = webProxy;
+                clientOptions.Proxy = webProxy;
             }
+
+            _client = new RestClient(clientOptions);
 
             Logger.Debug($"{methodName} Method End");
         }
@@ -75,11 +74,11 @@ namespace Sentry.data.Infrastructure
             switch (_job.JobOptions.HttpOptions.RequestMethod)
             {
                 case HttpMethods.get:
-                    _request.Method = Method.GET;
+                    _request.Method = Method.Get;
                     _request.Resource = _job.GetUri().ToString();
                     break;
                 case HttpMethods.post:
-                    _request.Method = Method.POST;
+                    _request.Method = Method.Post;
                     _request.Resource = "/" + _job.RelativeUri;
 
                     switch (_job.JobOptions.HttpOptions.RequestDataFormat)
@@ -108,7 +107,7 @@ namespace Sentry.data.Infrastructure
 
             ConfigurePaging();                
 
-            IRestResponse resp = SendRequest();
+            RestResponse resp = SendRequest();
 
             FindTargetJob();
 
@@ -205,18 +204,18 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        public override List<IRestResponse> SendPagingRequest()
+        public override List<RestResponse> SendPagingRequest()
         {
             throw new NotImplementedException();
         }
 
-        public override IRestResponse SendRequest()
+        public override RestResponse SendRequest()
         {
-            IRestResponse resp;
+            RestResponse resp;
 
             resp = _providerPolicy.Execute(() =>
             {
-                IRestResponse response = _client.Execute(Request);
+                RestResponse response = _client.Execute(Request);
 
                 if (response.ErrorException != null)
                 {
@@ -237,7 +236,7 @@ namespace Sentry.data.Infrastructure
             return resp;
         }
 
-        protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
+        protected override void ConfigureOAuth(RestRequest req, RetrieverJob job)
         {
             HTTPSSource source = (HTTPSSource)job.DataSource;
 
