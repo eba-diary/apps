@@ -1273,11 +1273,8 @@ namespace Sentry.data.Core
                 {
                     ((HTTPSSource)dsrc).RequestHeaders = dto.RequestHeaders;
                 }
-                
-                if (dto.AcceptableErrors.Any())
-                {
-                    ((HTTPSSource)dsrc).AcceptableErrors = dto.AcceptableErrors;
-                }
+
+                ((HTTPSSource)dsrc).AcceptableErrors = dto.AcceptableErrors;
 
                 if (dsrc.SourceAuthType.Is<OAuthAuthentication>())
                 {
