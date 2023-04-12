@@ -82,7 +82,7 @@
                                     { <span>@permission.TicketId</span> }
                                 </td>
                                 <td class="externalTicket">
-                                    @if (permission.TicketId == "DEFAULT_SECURITY" || permission.TicketId == "DEFAULT_SECURITY_INHERITANCE")
+                                    @if (permission.TicketId == "DEFAULT_SECURITY_INHERITANCE")
                                     {<span>n/a</span> }
                                     else if (string.IsNullOrEmpty(permission.ExternalRequestIdUrl))
                                     { <span>No External Request Found</span> }

@@ -626,25 +626,34 @@ namespace Sentry.data.Core
         {
             string project = "TIS";
             string summary = (ticket.IsAddingPermission && isAddingPermission ? "Create or Update" : "Remove") + " S3 Access Point with the following policy";
-            StringBuilder sb = new StringBuilder();
             string issueType = "Support Request";
 
             //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
             string name = $"sentry-{GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower()}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-{dataset.ShortName.ToLower()}-ae2";
-            sb.AppendLine("");
-            sb.AppendLine(JiraHelper.Format_Bold("If the following S3 access point policy exists:"));
-            sb.AppendLine("* Add the Principle Arn to existing policy");
-            sb.AppendLine("* Replace resources in each statement on existing policy with the respective resource list below");
-            sb.AppendLine("");
-            sb.AppendLine(JiraHelper.Format_Bold("If the S3 access point policy does not exist:"));
-            sb.AppendLine("* Create a new S3 Access Policy and paste the policy from below");
-            sb.AppendLine("");
-            sb.AppendLine(JiraHelper.Format_Bold("Create S3 Access Point"));
-            sb.AppendLine($"Account: {account}");
-            sb.AppendLine("S3 Access Point Name: " + name.Replace(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower(), JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())));
-            sb.AppendLine($"Source Bucket: sentry-{JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-ae2");
-            sb.AppendLine("");
+
+            Markdown markdown = new Markdown();
+            markdown.AddBold("If the following S3 access point policy exists:");
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>
+            {
+                "Add the Principle Arn to existing policy",
+                "Replace resources in each statement on existing policy with the respective resource list below"
+            });
+            markdown.AddBreak();
+            markdown.AddBold("If the S3 access point policy does not exist:");
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>
+            {
+                "Create a new S3 Access Policy and paste the policy from below"
+            });
+            markdown.AddBreak();
+            markdown.AddBold("Create S3 Access Point");
+            markdown.AddBreak();
+            markdown.AddLine($"Account: {account}", false);
+            markdown.AddLine("S3 Access Point Name: " + name.Replace(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower(), JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())), false);
+            markdown.AddLine($"Source Bucket: sentry-{JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-ae2", false);
+            markdown.AddBreak();
 
 
             //Generate S3 Access Policy to add within description of jira ticket
@@ -690,17 +699,20 @@ namespace Sentry.data.Core
             s3AccessPointPolicy.Statement.Add(readWritePrefixesStatement);
             s3AccessPointPolicy.Statement.Add(listBucketStatement);
 
-            sb.AppendLine(JiraHelper.Format_JsonCodeBlock(JsonConvert.SerializeObject(s3AccessPointPolicy, Formatting.Indented)));
-            sb.AppendLine("");
-            sb.AppendLine("");
-            sb.AppendLine("************************************");
-            sb.AppendLine(" This section is informational only ");
-            sb.AppendLine("");
-            sb.AppendLine(JiraHelper.Format_BulletListItem($"Approval Ticket: [{ticket.TicketId}|https://sentryinsurance.atlassian.net/browse/{ticket.TicketId}]"));
-            sb.AppendLine(JiraHelper.Format_BulletListItem($"Dataset: {dataset.DatasetName}"));
-            sb.AppendLine(JiraHelper.Format_BulletListItem($"Schema: {string.Join(",",schemaNameList.ToArray())}"));
-            sb.AppendLine("");
-            sb.AppendLine("************************************");
+            markdown.AddJsonCodeBlock(JsonConvert.SerializeObject(s3AccessPointPolicy, Formatting.Indented));
+            markdown.AddBreak();
+            markdown.AddBreak();
+            markdown.AddLine("************************************", false);
+            markdown.AddLine(" This section is informational only ", false);
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>()
+            {
+                $"Approval Ticket: [{ticket.TicketId}|https://sentryinsurance.atlassian.net/browse/{ticket.TicketId}]",
+                $"Dataset: {dataset.DatasetName}",
+                $"Schema: {string.Join(",",schemaNameList.ToArray())}"
+            });
+            markdown.AddBreak();
+            markdown.AddLine("************************************", false);
 
 
             List<JiraCustomField> customFields = new List<JiraCustomField>();
@@ -716,7 +728,7 @@ namespace Sentry.data.Core
                 Summary = summary,
                 Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions" },
                 Components = new List<string> { "ACID" },
-                Description = sb.ToString()
+                Description = markdown.ToString()
             };
 
             jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };

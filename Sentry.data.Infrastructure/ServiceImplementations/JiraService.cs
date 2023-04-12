@@ -93,13 +93,6 @@ namespace Sentry.data.Infrastructure
             return JsonConvert.DeserializeObject<dynamic>(response.Content.ToString());
         }
 
-        private string GetJiraTicketBrowseUrl()
-        {
-            Uri jiraUri = new Uri(JiraBaseUrl);
-            string jiraBaseTicketBrowseUrl = jiraUri.Scheme + "://" + jiraUri.Host + "/browse/";
-            return jiraBaseTicketBrowseUrl;
-        }
-
         /// <summary>
         /// Validates that a project exists
         /// </summary>
