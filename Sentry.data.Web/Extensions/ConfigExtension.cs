@@ -337,6 +337,10 @@ namespace Sentry.data.Web
         private static Dictionary<string, string> AcceptableErrorModelListToDictionary(List<AcceptableErrorModel> acceptableErrors)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
+            if(acceptableErrors == null)
+            {
+                return result;
+            }
             foreach(var acceptableError in acceptableErrors)
             {
                 result.Add(acceptableError.ErrorMessageKey, acceptableError.ErrorMessageValue);
