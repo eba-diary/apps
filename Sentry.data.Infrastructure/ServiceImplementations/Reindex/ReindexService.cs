@@ -1,7 +1,9 @@
-﻿using Sentry.Common.Logging;
+﻿using Hangfire;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -17,6 +19,8 @@ namespace Sentry.data.Infrastructure
             _reindexProvider = reindexProvider;
         }
 
+        [DisplayName("Reindex " + nameof(T))]
+        [AutomaticRetry(Attempts = 0)]
         public async Task ReindexAsync()
         {
             try

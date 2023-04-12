@@ -202,7 +202,7 @@
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="SchemaFlowServiceTests.cs" />
     <Compile Include="MarkdownTests.cs" />
-    <Compile Include="GlobalDatasetExtensions.cs" />
+    <Compile Include="GlobalDatasetExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

@@ -9,11 +9,11 @@ namespace Sentry.data.Infrastructure
 {
     public class ElasticSchemaSearchProvider
     {
-        private readonly IElasticContext _context;
+        private readonly IElasticDocumentClient _context;
         private readonly int DatasetId;
         private readonly int SchemaId;
 
-        public ElasticSchemaSearchProvider(IElasticContext context, int datasetId, int schemaId)
+        public ElasticSchemaSearchProvider(IElasticDocumentClient context, int datasetId, int schemaId)
         {
             _context = context;
             DatasetId = datasetId;

@@ -6,7 +6,7 @@ using System.Linq;
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class GlobalDatasetExtensions
+    public class GlobalDatasetExtensionsTests
     {
         [TestMethod]
         public void ToGlobalDataset_Dataset_GlobalDataset()

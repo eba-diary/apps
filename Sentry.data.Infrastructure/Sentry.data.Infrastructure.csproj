@@ -305,10 +305,9 @@
   <ItemGroup>
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="DomainContexts\ElasticContext.cs" />
+    <Compile Include="ServiceImplementations\Elastic\ElasticDocumentClient.cs" />
     <Compile Include="Exceptions\AcceptableErrorException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
-    <Compile Include="Exceptions\ElasticReindexException.cs" />
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryNotFoundException.cs" />
     <Compile Include="Exceptions\HttpsJobProviderException.cs" />
@@ -440,6 +439,7 @@
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleSearchConsoleJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
+    <Compile Include="ServiceImplementations\Elastic\ElasticIndexClient.cs" />
     <Compile Include="ServiceImplementations\FileProvider.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentSchemaIdResult.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentDatasetIdResult.cs" />

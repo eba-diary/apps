@@ -1,10 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using Sentry.data.Core.Entities.DataProcessing;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core
 {
     public static class GlobalDatasetExtensions
     {
+        public static GlobalDataset ToGlobalDataset(this List<Dataset> datasets, List<KeyValuePair<int, FileSchema>> datasetIdSchemas, List<DataFlow> datasetDataFlows)
+        {
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                GlobalDatasetId = datasets.First().GlobalDatasetId.Value,
+                DatasetName = datasets.First().DatasetName,
+                DatasetSaidAssetCode = datasets.First().Asset.SaidKeyCode,
+                EnvironmentDatasets = new List<EnvironmentDataset>()
+            };
+
+            foreach (Dataset dataset in datasets)
+            {
+                EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
+
+                foreach (FileSchema datasetSchema in datasetIdSchemas.Where(x => x.Key == dataset.DatasetId).Select(x => x.Value).ToList())
+                {
+                    EnvironmentSchema environmentSchema = datasetSchema.ToEnvironmentSchema();
+                    environmentSchema.SchemaSaidAssetCode = datasetDataFlows.FirstOrDefault(x => x.SchemaId == datasetSchema.SchemaId)?.SaidKeyCode;
+
+                    environmentDataset.EnvironmentSchemas.Add(environmentSchema);
+                }
+
+                globalDataset.EnvironmentDatasets.Add(environmentDataset);
+            }
+
+            return globalDataset;
+        }
+
         public static GlobalDataset ToGlobalDataset(this Dataset dataset)
         {
             return new GlobalDataset
@@ -50,6 +79,16 @@ namespace Sentry.data.Core
                 SchemaId = fileSchemaDto.SchemaId,
                 SchemaName = fileSchemaDto.Name,
                 SchemaDescription = fileSchemaDto.Description
+            };
+        }
+
+        public static EnvironmentSchema ToEnvironmentSchema(this FileSchema fileSchema)
+        {
+            return new EnvironmentSchema
+            {
+                SchemaId = fileSchema.SchemaId,
+                SchemaName = fileSchema.Name,
+                SchemaDescription = fileSchema.Description
             };
         }
     }

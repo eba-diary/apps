@@ -173,6 +173,10 @@ namespace Sentry.data.Infrastructure
             registry.For<IDeadSparkJobService>().Use<DeadSparkJobService>();
             registry.For<IKafkaConnectorService>().Singleton().Use<ConnectorService>();
 
+            registry.For<IReindexProvider>().Use<ElasticReindexProvider>();
+            registry.For<IReindexSource<GlobalDataset>>().Use<GlobalDatasetReindexSource>();
+            registry.For<IGlobalDatasetAdminService>().Use<GlobalDatasetAdminService>().Ctor<IReindexService>().Is<ReindexService<GlobalDataset>>();
+
             registry.For<ITileSearchService<DatasetTileDto>>().Use<DatasetTileSearchService>();
             registry.For<ITileSearchService<BusinessIntelligenceTileDto>>().Use<BusinessIntelligenceTileSearchService>();
 

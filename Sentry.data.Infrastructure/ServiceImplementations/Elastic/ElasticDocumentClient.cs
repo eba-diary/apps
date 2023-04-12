@@ -2,28 +2,25 @@
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class ElasticContext : IElasticContext
+    public class ElasticDocumentClient : IElasticDocumentClient
     {
         #region Fields
         private readonly IElasticClient _client;
         #endregion
 
         #region Constructors
-        public ElasticContext(IElasticClient client)
+        public ElasticDocumentClient(IElasticClient client)
         {
             _client = client;
         }
         #endregion
 
-        #region IElasticContext Implementation
+        #region IElasticDocumentClient Implementation
         public async Task IndexAsync<T>(T document) where T : class
         {
             await _client.IndexDocumentAsync(document).ConfigureAwait(false);
@@ -59,12 +56,17 @@ namespace Sentry.data.Infrastructure
             return response.IsValid;
         }
 
-        public async Task IndexManyAsync<T>(List<T> toIndex) where T : class
+        public async Task IndexManyAsync<T>(List<T> documents) where T : class
         {
-            await _client.IndexManyAsync(toIndex).ConfigureAwait(false);
+            await _client.IndexManyAsync(documents).ConfigureAwait(false);
         }
 
-        public async Task DeleteManyAsync<T>(IEnumerable<T> documents) where T : class
+        public async Task IndexManyAsync<T>(List<T> documents, string indexName) where T : class
+        {
+            await _client.IndexManyAsync(documents, indexName).ConfigureAwait(false);
+        }
+
+        public async Task DeleteManyAsync<T>(List<T> documents) where T : class
         {
             await _client.DeleteManyAsync(documents).ConfigureAwait(false);
         }

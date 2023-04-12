@@ -31,7 +31,7 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
-        private readonly IElasticContext _elasticContext;
+        private readonly IElasticDocumentClient _elasticDocumentClient;
         private readonly IDscEventTopicHelper _dscEventTopicHelper;
         private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
@@ -41,7 +41,7 @@ namespace Sentry.data.Core
         public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
             IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticContext elasticContext, IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider)
+            IEventService eventService, IElasticDocumentClient elasticDocumentClient, IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
@@ -52,7 +52,7 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
             _eventService = eventService;
-            _elasticContext = elasticContext;
+            _elasticDocumentClient = elasticDocumentClient;
             _dscEventTopicHelper = dscEventTopicHelper;
             _globalDatasetProvider = globalDatasetProvider;
         }
@@ -1058,7 +1058,7 @@ namespace Sentry.data.Core
 
         private void DeleteElasticIndexForSchema(int schemaId)
         {
-            _elasticContext.DeleteByQuery<ElasticSchemaField>(q => q
+            _elasticDocumentClient.DeleteByQuery<ElasticSchemaField>(q => q
                 .Query(qm => qm
                     .Bool(b => b
                         .Must(
@@ -1071,8 +1071,8 @@ namespace Sentry.data.Core
 
         private void IndexElasticFieldsForSchema(int schemaId, int datasetId, IList<BaseField> fields)
         {
-            List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList<ElasticSchemaField>();
-            _elasticContext.IndexManyAsync(elasticFields).Wait();
+            List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList();
+            _elasticDocumentClient.IndexManyAsync(elasticFields).Wait();
         }
 
         private HashSet<ElasticSchemaField> BaseFieldsFlatten(IList<BaseField> fields, int schemaId, int datasetId)

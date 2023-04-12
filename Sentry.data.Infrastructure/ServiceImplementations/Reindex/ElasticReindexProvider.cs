@@ -1,7 +1,4 @@
-﻿using Nest;
-using Sentry.data.Core;
-using Sentry.data.Infrastructure.CherwellService;
-using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,19 +8,20 @@ namespace Sentry.data.Infrastructure
 {
     public class ElasticReindexProvider : IReindexProvider
     {
-        private readonly IElasticClient _elasticClient;
+        private readonly IElasticIndexClient _elasticIndexClient;
+        private readonly IElasticDocumentClient _elasticDocumentClient;
 
-        public ElasticReindexProvider(IElasticClient elasticClient)
+        public ElasticReindexProvider(IElasticIndexClient elasticIndexClient, IElasticDocumentClient elasticDocumentClient)
         {
-            _elasticClient = elasticClient;
+            _elasticIndexClient = elasticIndexClient;
+            _elasticDocumentClient = elasticDocumentClient;
         }
 
         public async Task<string> GetCurrentIndexVersionAsync<T>() where T : class
         {
-            if (_elasticClient.ConnectionSettings.DefaultIndices.TryGetValue(typeof(T), out string alias))
+            if (_elasticIndexClient.TryGetAlias<T>(out string alias))
             {
-                GetIndexResponse getResponse = await _elasticClient.Indices.GetAsync(alias);
-                return getResponse.Indices.Keys.First().Name;
+                return await _elasticIndexClient.GetIndexNameByAliasAsync(alias);
             }
 
             return null;
@@ -44,37 +42,22 @@ namespace Sentry.data.Infrastructure
 
             string newIndexName = string.Join("-", indexNameParts);
 
-            CreateIndexResponse createResponse = await _elasticClient.Indices.CreateAsync(newIndexName, x => x.Settings(s => s.NumberOfShards(3)));
-            if (createResponse.IsValid)
-            {
-                return newIndexName;
-            }
+            await _elasticIndexClient.CreateIndexAsync(newIndexName);
 
-            return null;
+            return newIndexName;
         }
 
         public async Task IndexDocumentsAsync<T>(List<T> documents, string indexName) where T : class
         {
-            await _elasticClient.IndexManyAsync(documents, indexName);
+            await _elasticDocumentClient.IndexManyAsync(documents, indexName);
         }
 
         public async Task ChangeToNewIndexAsync<T>(string legacyIndex, string newIndex) where T : class
         {
-            string alias = _elasticClient.ConnectionSettings.DefaultIndices[typeof(T)];
+            _elasticIndexClient.TryGetAlias<T>(out string alias);
 
-            PutAliasResponse aliasResponse = await _elasticClient.Indices.PutAliasAsync(newIndex, alias);
-            if (aliasResponse.IsValid)
-            {
-                DeleteIndexResponse deleteResponse = await _elasticClient.Indices.DeleteAsync(legacyIndex);
-                if (!deleteResponse.IsValid)
-                {
-                    throw new ElasticReindexException($"Failed to delete {legacyIndex}. {deleteResponse.DebugInformation}");
-                }
-            }
-            else
-            {
-                throw new ElasticReindexException($"Failed to add alias to {newIndex}. {aliasResponse.DebugInformation}");
-            }
+            await _elasticIndexClient.AddAliasAsync(newIndex, alias);
+            await _elasticIndexClient.DeleteIndexAsync(legacyIndex);
         }
     }
 }
