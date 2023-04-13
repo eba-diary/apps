@@ -82,6 +82,7 @@ BEGIN TRAN
 			( 'DFSFILEDETECTORBATCHHANDLER', 'TEST', 'ld.sdk', 'sdk-ed5ba68e-57e9-425f-b902-41734886628d' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'TEST', 'ld.proxy.address', 'app-proxy-nonprod.sentry.com' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'TEST', 'ld.proxy.port', '8080' ),
+			( 'DFSFILEDETECTORBATCHHANDLER', 'TEST', 'target.topic', 'DATA-TEST-GOLDENEYE-000000' ),
 
 			( 'DFSTOS3BATCHHANDLER', 'TEST', 'support.database.server', 'DLPP-TEST-SentryDatasets.db.sentry.local' ),
 			( 'DFSTOS3BATCHHANDLER', 'TEST', 'support.database.name', 'SentryDatasets' ),
@@ -287,6 +288,7 @@ BEGIN TRAN
 			( 'DFSFILEDETECTORBATCHHANDLER', 'QUAL', 'ld.sdk', 'sdk-6dea26fc-9169-4c86-a89f-78b93691a711' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'QUAL', 'ld.proxy.address', 'app-proxy-nonprod.sentry.com' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'QUAL', 'ld.proxy.port', '8080' ),
+			( 'DFSFILEDETECTORBATCHHANDLER', 'QUAL', 'target.topic', 'DATA-QUAL-GOLDENEYE-000000E' ),
 
 			( 'DFSTOS3BATCHHANDLER', 'QUAL', 'support.database.server', 'DLPP-QUAL-SentryDatasets.dbal.sentry.local' ),
 			( 'DFSTOS3BATCHHANDLER', 'QUAL', 'support.database.name', 'SentryDatasets' ),
@@ -492,6 +494,7 @@ BEGIN TRAN
 			( 'DFSFILEDETECTORBATCHHANDLER', 'QUALNP', 'ld.sdk', 'sdk-6dea26fc-9169-4c86-a89f-78b93691a711' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'QUALNP', 'ld.proxy.address', 'app-proxy-nonprod.sentry.com' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'QUALNP', 'ld.proxy.port', '8080' ),
+			( 'DFSFILEDETECTORBATCHHANDLER', 'QUALNP', 'target.topic', 'DATA-QUALNP-GOLDENEYE-000000' ),
 
 			( 'DFSTOS3BATCHHANDLER', 'QUALNP', 'support.database.server', 'DLPP-QUALNP-SentryDatasets.dbal.sentry.local' ),
 			( 'DFSTOS3BATCHHANDLER', 'QUALNP', 'support.database.name', 'SentryDatasets' ),
@@ -697,6 +700,7 @@ BEGIN TRAN
 			( 'DFSFILEDETECTORBATCHHANDLER', 'PROD', 'ld.sdk', 'sdk-2c8a53e0-46a8-4b37-9753-418de81db1a2' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'PROD', 'ld.proxy.address', 'app-proxy-prod.sentry.com' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'PROD', 'ld.proxy.port', '8080' ), 
+			( 'DFSFILEDETECTORBATCHHANDLER', 'PROD', 'target.topic', 'DATA-PROD-GOLDENEYE-000000A' ),
 
 			( 'DFSTOS3BATCHHANDLER', 'PROD', 'support.database.server', 'DLPP-PROD-SentryDatasets.dbal.sentry.local' ),
 			( 'DFSTOS3BATCHHANDLER', 'PROD', 'support.database.name', 'SentryDatasets' ),
@@ -902,6 +906,7 @@ BEGIN TRAN
 			( 'DFSFILEDETECTORBATCHHANDLER', 'PRODNP', 'ld.sdk', 'sdk-2c8a53e0-46a8-4b37-9753-418de81db1a2' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'PRODNP', 'ld.proxy.address', 'app-proxy-prod.sentry.com' ),
 			( 'DFSFILEDETECTORBATCHHANDLER', 'PRODNP', 'ld.proxy.port', '8080' ),
+			( 'DFSFILEDETECTORBATCHHANDLER', 'PRODNP', 'target.topic', 'DATA-PRODNP-GOLDENEYE-000000' ),
 
 			( 'DFSTOS3BATCHHANDLER', 'PRODNP', 'support.database.server', 'DLPP-PRODNP-SentryDatasets.dbal.sentry.local' ),
 			( 'DFSTOS3BATCHHANDLER', 'PRODNP', 'support.database.name', 'SentryDatasets' ),
