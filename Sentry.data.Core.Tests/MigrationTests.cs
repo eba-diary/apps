@@ -58,17 +58,18 @@ namespace Sentry.data.Core.Tests
             migrationHistoriesContext.Add(MockClasses.MockMigrationHistory_TEST_to_QUAL());
             context.Setup(f => f.MigrationHistory).Returns(migrationHistoriesContext.AsQueryable());
 
-            List<int> datasetIdList = new List<int>();
-            datasetIdList.Add(1000);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(s => s.GetDatasetDetailDto(It.IsAny<int>())).Returns(MockClasses.MockDatasetDetailDtoForMigrationHistory_DEV());
             
             // Fake
-            MigrationService migrationService = new MigrationService(context.Object);
-            List<MigrationHistory> migrationHistoriesReturned = migrationService.GetMigrationHistory(datasetIdList);
+            MigrationService migrationService = new MigrationService(context.Object, datasetService.Object);
+            List<MigrationHistory> migrationHistoriesReturned = migrationService.GetMigrationHistory(1000,"DEV");
 
             // Verify
-            Assert.AreEqual(2,migrationHistoriesReturned.Count);
-            Assert.AreEqual(0, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 3).Count());
-            Assert.AreEqual(2, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 1 || w.MigrationHistoryId == 2).Count());
+            Assert.AreEqual(2,migrationHistoriesReturned.Count);    //2 TOTAL MigrationHistory returned ONLY
+            Assert.AreEqual(0, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 3).Count());       //MAKE SURE ID 3 was NOT included even though it exists because it wasn't involved in relatives
+            Assert.AreEqual(2, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 1 || w.MigrationHistoryId == 2).Count());  //only Ids 1 and 2 should be returned
         }
 
         [TestMethod]
@@ -83,17 +84,19 @@ namespace Sentry.data.Core.Tests
             migrationHistoriesContext.Add(MockClasses.MockMigrationHistory_TEST_to_QUAL());
             context.Setup(f => f.MigrationHistory).Returns(migrationHistoriesContext.AsQueryable());
 
-            List<int> datasetIdList = new List<int>();
-            datasetIdList.Add(1002);
+
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(s => s.GetDatasetDetailDto(It.IsAny<int>())).Returns(MockClasses.MockDatasetDetailDtoForMigrationHistory_QUAL());
 
             // Fake
-            MigrationService migrationService = new MigrationService(context.Object);
-            List<MigrationHistory> migrationHistoriesReturned = migrationService.GetMigrationHistory(datasetIdList);
+            MigrationService migrationService = new MigrationService(context.Object, datasetService.Object);
+            List<MigrationHistory> migrationHistoriesReturned = migrationService.GetMigrationHistory(1002, "QUAL");
 
             // Verify
-            Assert.AreEqual(1, migrationHistoriesReturned.Count);
-            Assert.AreEqual(1, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 3).Count());
-            Assert.AreEqual(0, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 1 || w.MigrationHistoryId == 2).Count());
+            Assert.AreEqual(1, migrationHistoriesReturned.Count); //1 TOTAL MigrationHistory returned ONLY SINCE QUAL WAS THE ORIGIN and was only involved once
+            Assert.AreEqual(1, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 3).Count());   //QUAL ID WAS ACTUALLY BROUGHT BACK
+            Assert.AreEqual(0, migrationHistoriesReturned.Where(w => w.MigrationHistoryId == 1 || w.MigrationHistoryId == 2).Count());  //DEV AND TEST DON'T EXIST
         }
 
 
@@ -109,14 +112,16 @@ namespace Sentry.data.Core.Tests
             migrationHistoriesContext.Add(MockClasses.MockMigrationHistory_TEST_to_QUAL());
             context.Setup(f => f.MigrationHistory).Returns(migrationHistoriesContext.AsQueryable());
 
-            List<DatasetRelativeDto> relatives = MockClasses.MockRelativeDtos();
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            Mock<IDatasetService> datasetService = mr.Create<IDatasetService>();
+            datasetService.Setup(s => s.GetDatasetDetailDto(It.IsAny<int>())).Returns(MockClasses.MockDatasetDetailDtoForMigrationHistory_QUAL());
 
             // Fake
-            MigrationService migrationService = new MigrationService(context.Object);
-            List<DatasetRelativeDto> relativesWithMigrationHistory = migrationService.GetRelativesWithMigrationHistory(relatives);
+            MigrationService migrationService = new MigrationService(context.Object, datasetService.Object);
+            DatasetRelativeOriginDto relativesWithMigrationHistory = migrationService.GetRelativesWithMigrationHistory(1000);
 
-            //// Verify
-            Assert.AreEqual(3, relativesWithMigrationHistory.Count);
+            // Verify
+            Assert.AreEqual(3, relativesWithMigrationHistory.DatasetRelativesDto.Count);
         }
 
     }

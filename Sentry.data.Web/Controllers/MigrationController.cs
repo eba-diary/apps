@@ -70,26 +70,20 @@ namespace Sentry.data.Web.Controllers
                 return Json(new { Success = false, Message = "Unauthorized access" });
             }
             
-            //GRAB DTO FOR THIS DatasetId
-            DatasetDetailDto dto = _datasetService.GetDatasetDetailDto(id);
-
             //GET RELATIVES WITH MIGRATION HISTORY ONLY
-            List<DatasetRelativeDto> relativesWithMigrationHistory = _migrationService.GetRelativesWithMigrationHistory(dto.DatasetRelatives);
-            
-            //CREATE LIST<int> OF RELATIVES
-            List<int> datasetIdList = new List<int>(relativesWithMigrationHistory.Select(s => s.DatasetId));
+            DatasetRelativeOriginDto datasetRelativeOriginDto =_migrationService.GetRelativesWithMigrationHistory(id);
             
             //DETERMINE IF WE SHOULD SHOW DROP DOWN FILTER (MIGRATION HISTORY)
             //IF THERE IS NO MIGRATION HISTORIES THEN WHY SHOW A FILTER
-            bool showDropDownFilter = (_migrationService.GetMigrationHistory(datasetIdList).Count >= 1);
+            bool showDropDownFilter = (datasetRelativeOriginDto.DatasetRelativesDto.Count >= 1);
 
             //CREATE MODEL WHICH IS MIGRATION HISTORY HEADER
             MigrationHistoryPageModel pageModel = new MigrationHistoryPageModel()
             { 
                 SourceDatasetId = id,
-                SourceDatasetName = dto.DatasetName,
+                SourceDatasetName = datasetRelativeOriginDto.OriginDatasetName,
                 ShowNamedEnvironmentFilter = showDropDownFilter,
-                DatasetRelatives = relativesWithMigrationHistory?.Select(s => s.ToModel()).OrderBy(o => o.DatasetNamedEnvironment).ToList()
+                DatasetRelatives = datasetRelativeOriginDto.DatasetRelativesDto?.Select(s => s.ToModel()).OrderBy(o => o.DatasetNamedEnvironment).ToList()
             };
 
             return View("_MigrationHistory", pageModel);
@@ -106,17 +100,8 @@ namespace Sentry.data.Web.Controllers
                 return Json(new { Success = false, Message = "Unauthorized access" });
             }
 
-            //GRAB DTO FOR THIS DatasetId
-            DatasetDetailDto dto = _datasetService.GetDatasetDetailDto(id);
-
-            //TURN DatasetRelatives INTO datasetIdList AND FILTER ON NAMEDENVIRONMENT SELECTED
-            //NOTE: IF namedEnvironment==ALL THEN IT WILL AUTOMATICALLY GRAB EVERYTHING
-            //THE OR IN LINQ IS A TRICK TO BRING IN ALL RELATIVES IF namedEnvironment==ALL
-            List<int> datasetIdList = new List<int>(dto.DatasetRelatives.Where(w => w.NamedEnvironment == namedEnvironment || namedEnvironment == GlobalConstants.MigrationHistoryNamedEnvFilter.ALL_NAMED_ENV)
-                                                                        .Select(s => s.DatasetId));
-
             //GET ALL MIGRATION HISTORY FOR THESE DATASET RELATIVES
-            List<MigrationHistory> migrationHistories = _migrationService.GetMigrationHistory(datasetIdList);
+            List<MigrationHistory> migrationHistories = _migrationService.GetMigrationHistory(id, namedEnvironment);
 
             //CREATE MODEL WHICH IS MIGRATION HISTORY DETIAL AKA PARTIAL VIEW OF PAGE
             MigrationHistoryDetailPageModel detailPageModel = new MigrationHistoryDetailPageModel()
@@ -127,7 +112,6 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_MigrationHistoryDetail", detailPageModel);
         }
-
 
 
         //CONTROLLER ACTION called from JS to return the Migration History JSON

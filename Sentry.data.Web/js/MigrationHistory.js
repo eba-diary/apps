@@ -30,16 +30,17 @@
             url: '/Migration/Detail/' + sourceDatasetId + '/' + namedEnv,
             success: function (view) {
                 $('#migration-history-detail-container').html(view);
-                $("#migration-history-detail-spinner").hide();
             },
             failure: function () {
                 data.Dataset.makeToast("error", "Failed to Retrieve Migration History.");
-                $("#migration-history-detail-spinner").hide();
             },
             error: function () {
                 data.Dataset.makeToast("error", "Failed to Retrieve Migration History.");
+            },
+            complete: function () {
                 $("#migration-history-detail-spinner").hide();
             }
+
         });
     },
 

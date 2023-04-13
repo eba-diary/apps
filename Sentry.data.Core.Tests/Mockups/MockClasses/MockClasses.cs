@@ -83,6 +83,32 @@ namespace Sentry.data.Core.Tests
             return migrationHistory;
         }
 
+
+        public static DatasetDetailDto MockDatasetDetailDtoForMigrationHistory_DEV()
+        {
+            DatasetDetailDto detailDto = new DatasetDetailDto()
+            {
+                DatasetId = 1000,
+                DatasetName = "ABCD",
+                DatasetRelatives = MockRelativeDtos()
+            };
+
+            return detailDto;
+        }
+
+        public static DatasetDetailDto MockDatasetDetailDtoForMigrationHistory_QUAL()
+        {
+            DatasetDetailDto detailDto = new DatasetDetailDto()
+            {
+                DatasetId = 1002,
+                DatasetName = "ABCD",
+                DatasetRelatives = MockRelativeDtos()
+            };
+
+            return detailDto;
+        }
+
+
         public static DatasetRelativeDto MockRelativeDto_DEV()
         {
             DatasetRelativeDto relative = new DatasetRelativeDto(1000, "DEV", String.Empty);

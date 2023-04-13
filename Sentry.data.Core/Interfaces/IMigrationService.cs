@@ -8,7 +8,7 @@ namespace Sentry.data.Core
 {
     public interface IMigrationService
     {
-        List<MigrationHistory> GetMigrationHistory(List<int> datasetIdList);
-        List<DatasetRelativeDto> GetRelativesWithMigrationHistory(List<DatasetRelativeDto> relativeDtos);
+        List<MigrationHistory> GetMigrationHistory(int datasetId, string namedEnvironment);
+        DatasetRelativeOriginDto GetRelativesWithMigrationHistory(int datasetId);
     }
 }

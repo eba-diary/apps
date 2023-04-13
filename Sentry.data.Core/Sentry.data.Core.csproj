@@ -232,6 +232,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetRelativeOriginDto.cs" />
     <Compile Include="DTO\Dataset\DatasetRelativeDto.cs" />
     <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
