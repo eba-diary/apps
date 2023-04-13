@@ -38,14 +38,31 @@ namespace Sentry.data.Core
             _builder.Append("*");
         }
 
+        public string AddBoldInLine(string text)
+        {
+            return $"*{text}*";
+        }
+
         public void AddBreak()
         {
             _builder.AppendLine();
         }
 
+        public void AddBulletList(List<string> stringList)
+        {
+            stringList.ForEach(x => _builder.AppendLine($"* {x}"));
+        }
+
         public void AddLink(string text, string url)
         {
             _builder.Append($"[{text}|{url}]");
+        }
+
+        public void AddJsonCodeBlock(string jsonstring)
+        {            
+            AddLine("{code:json}", false);
+            AddLine(jsonstring, false);
+            AddLine("{code}", false);
         }
 
         public override string ToString()

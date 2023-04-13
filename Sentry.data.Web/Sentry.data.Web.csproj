@@ -601,6 +601,8 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Extensions\MigrationExtensions.cs" />
     <Compile Include="Extensions\TileExtensions.cs" />
+    <Compile Include="Helpers\JiraHelper.cs" />
+    <Compile Include="Helpers\JSMHelper.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
     <Compile Include="Models\AdminPage\BaseAuditModel.cs" />

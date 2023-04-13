@@ -12,6 +12,10 @@ using static Sentry.data.Core.GlobalConstants;
 using Hangfire;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.Jira;
+using Sentry.data.Core.Helpers;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Sentry.data.Core.Entities.S3.S3AccessPointPolicy;
 
 namespace Sentry.data.Core
 {
@@ -536,36 +540,97 @@ namespace Sentry.data.Core
             BuildS3TicketForDatasetAndTicket(dataset, ticket);
         }
 
-        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
+        internal void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
             string project = "TIS";
             string summary = (ticket.IsAddingPermission && isAddingPermission ? "Create or Update" : "Remove") + " S3 Access Point with the following policy";
-            StringBuilder sb = new StringBuilder();
             string issueType = "Support Request";
 
             //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
-            string name = "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
+            string name = $"sentry-{GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower()}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-{dataset.ShortName.ToLower()}-ae2";
 
-            sb.AppendLine("Account: " + account);
-            sb.AppendLine("S3 Access Point Name: " + name);
-            sb.AppendLine("Source Bucket: " + "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
-            sb.AppendLine("");
+            Markdown markdown = new Markdown();
+            markdown.AddBold("If the following S3 access point policy exists:");
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>
+            {
+                "Add the Principle Arn to existing policy",
+                "Replace resources in each statement on existing policy with the respective resource list below"
+            });
+            markdown.AddBreak();
+            markdown.AddBold("If the S3 access point policy does not exist:");
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>
+            {
+                "Create a new S3 Access Policy and paste the policy from below"
+            });
+            markdown.AddBreak();
+            markdown.AddBold("Create S3 Access Point");
+            markdown.AddBreak();
+            markdown.AddLine($"Account: {account}", false);
+            markdown.AddLine("S3 Access Point Name: " + name.Replace(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower(), JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())), false);
+            markdown.AddLine($"Source Bucket: sentry-{JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-ae2", false);
+            markdown.AddBreak();
 
-            sb.AppendLine("With the following policy:");
-            sb.AppendLine("");
 
-            sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
-            sb.AppendLine("Action: s3.*");
+            //Generate S3 Access Policy to add within description of jira ticket
+            List<string> schemaNameList = new List<string>();
             foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
             {
-                sb.AppendLine("Schema: " + dsfc.Schema.Name);
-                sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name + "/object/" + dsfc.Schema.ParquetStoragePrefix + "/*");
-                sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name + "/object/" + dsfc.Schema.ParquetStoragePrefix);
-                sb.AppendLine("");
+                schemaNameList.Add(dsfc.Schema.Name);
             }
-            sb.AppendLine("Action: S3:ListBucket");
-            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
+
+            List<string> schemaResources = new List<string>();
+            foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
+            {
+                schemaResources.Add($"arn:aws:s3:us-east-2:{account}:accesspoint/{name}/object/{dsfc.Schema.ParquetStoragePrefix}/*");
+                schemaResources.Add($"arn:aws:s3:us-east-2:{account}:accesspoint/{name}/object/{dsfc.Schema.ParquetStoragePrefix}");
+            }
+
+            List<string> bucketResources = new List<string>();
+            bucketResources.Add($"arn:aws:s3:us-east-2:{account}:accesspoint/{name}");
+
+            S3AccessPointPolicy s3AccessPointPolicy = new S3AccessPointPolicy();
+            Statement readWritePrefixesStatement = new Statement()
+            {
+                Sid = "ReadWritePrefixes",
+                Effect = "Allow",
+                Principal = new Principal()
+                {
+                    AWS = new List<string>() { ticket.AwsArn }
+                },
+                Action = new List<string>() { "S3:Get*" , "S3:List*"},
+                Resource = schemaResources
+            };
+            Statement listBucketStatement = new Statement()
+            {
+                Sid = "ListBucket",
+                Effect = "Allow",
+                Principal = new Principal()
+                {
+                    AWS = new List<string>() { ticket.AwsArn }
+                },
+                Action = new List<string>() { "S3:ListBucket" },
+                Resource = bucketResources
+            };
+            s3AccessPointPolicy.Statement.Add(readWritePrefixesStatement);
+            s3AccessPointPolicy.Statement.Add(listBucketStatement);
+
+            markdown.AddJsonCodeBlock(JsonConvert.SerializeObject(s3AccessPointPolicy, Formatting.Indented));
+            markdown.AddBreak();
+            markdown.AddBreak();
+            markdown.AddLine("************************************", false);
+            markdown.AddLine(" This section is informational only ", false);
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>()
+            {
+                $"Approval Ticket: [{ticket.TicketId}|https://sentryinsurance.atlassian.net/browse/{ticket.TicketId}]",
+                $"Dataset: {dataset.DatasetName}",
+                $"Schema: {string.Join(",",schemaNameList.ToArray())}"
+            });
+            markdown.AddBreak();
+            markdown.AddLine("************************************", false);
 
 
             List<JiraCustomField> customFields = new List<JiraCustomField>();
@@ -581,12 +646,15 @@ namespace Sentry.data.Core
                 Summary = summary,
                 Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions" },
                 Components = new List<string> { "ACID" },
-                Description = sb.ToString()
+                Description = markdown.ToString()
             };
 
             jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };
 
-            _jiraService.CreateJiraTickets(jiraRequest);
+            List<string> externalTicketIds = _jiraService.CreateJiraTickets(jiraRequest);
+
+            //We are only submitting a single ticket on the jirarequst, therefore, we can expect only one id returned.
+            ticket.ExternalRequestId = externalTicketIds.First();
         }
 
         public void BuildS3RequestAssistance(IList<Dataset> datasets, SecurityTicket ticket)
