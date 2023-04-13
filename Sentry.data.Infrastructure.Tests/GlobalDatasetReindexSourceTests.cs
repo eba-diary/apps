@@ -1,10 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using NHibernate.Mapping;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Sentry.data.Core.GlobalConstants;
@@ -107,6 +105,7 @@ namespace Sentry.data.Infrastructure.Tests
             mr.VerifyAll();
         }
 
+        #region Helpers
         private List<Dataset> GetDatasets()
         {
             return new List<Dataset>
@@ -260,5 +259,6 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             };
         }
+        #endregion
     }
 }

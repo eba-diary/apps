@@ -31,27 +31,21 @@ namespace Sentry.data.Infrastructure
                     Logger.Info($"REINDEX - Reindexing {currentIndex}");
 
                     string newIndex = await _reindexProvider.CreateNewIndexVersionAsync(currentIndex);
-                    if (!string.IsNullOrEmpty(newIndex))
+
+                    Logger.Info($"REINDEX - Created {newIndex}");
+
+                    while (_reindexSource.TryGetNextDocuments(out List<T> documents))
                     {
-                        Logger.Info($"REINDEX - Created {newIndex}");
+                        Logger.Info($"REINDEX - Indexing {documents.Count} documents");
 
-                        while (_reindexSource.TryGetNextDocuments(out List<T> documents))
-                        {
-                            Logger.Info($"REINDEX - Indexing {documents.Count} documents");
-
-                            await _reindexProvider.IndexDocumentsAsync(documents, newIndex);
-                        }
-
-                        Logger.Info($"REINDEX - Completed indexing to {newIndex}");
-
-                        await _reindexProvider.ChangeToNewIndexAsync<T>(currentIndex, newIndex);
-
-                        Logger.Info($"REINDEX - {newIndex} is now being used. {currentIndex} has been deleted");
+                        await _reindexProvider.IndexDocumentsAsync(documents, newIndex);
                     }
-                    else
-                    {
-                        Logger.Warn($"REINDEX - Unable to create {newIndex}");
-                    }
+
+                    Logger.Info($"REINDEX - Completed indexing to {newIndex}");
+
+                    await _reindexProvider.ChangeToNewIndexAsync<T>(currentIndex, newIndex);
+
+                    Logger.Info($"REINDEX - {newIndex} is now being used. {currentIndex} has been deleted");
                 }
                 else
                 {

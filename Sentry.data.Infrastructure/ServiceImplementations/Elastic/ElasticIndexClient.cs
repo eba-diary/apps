@@ -32,7 +32,7 @@ namespace Sentry.data.Infrastructure
         public async Task<string> GetIndexNameByAliasAsync(string alias)
         {
             GetIndexResponse getResponse = await _elasticClient.Indices.GetAsync(alias);
-            return getResponse.Indices.Keys.First().Name;
+            return getResponse.Indices.Keys.FirstOrDefault()?.Name;
         }
 
         public bool TryGetAlias<T>(out string alias)

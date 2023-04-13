@@ -252,6 +252,7 @@
     <Compile Include="GlobalDatasetAdminServiceTests.cs" />
     <Compile Include="ElasticReindexProviderTests.cs" />
     <Compile Include="GlobalDatasetReindexSourceTests.cs" />
+    <Compile Include="ReindexServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
