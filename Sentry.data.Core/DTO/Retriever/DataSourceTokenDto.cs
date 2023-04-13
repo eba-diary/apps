@@ -19,5 +19,6 @@ namespace Sentry.data.Core.DTO.Retriever
         public bool ToDelete { get; set; }
         public bool Enabled { get; set; }
         public bool AcceptableErrorNeedsReview { get; set; }
+        public bool BackfillComplete { get; set; }
     }
 }
