@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Hangfire;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 using Sentry.data.Core;
@@ -63,7 +64,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null);
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null, null);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
@@ -116,7 +117,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDatasetContext> datasetContext = repository.Create<IDatasetContext>();
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null);
+            MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null, null);
 
             await motiveProvider.MotiveOnboardingAsync(source, token, 999);
 
@@ -254,9 +255,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IBaseJobProvider> jobProvider = new Mock<IBaseJobProvider>();
             jobProvider.Setup(x => x.Execute(It.IsAny<RetrieverJob>()));
 
-            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object);
+            Mock<IBackgroundJobClient> backgroundClient = new Mock<IBackgroundJobClient>();
 
-            var result = motiveProvider.MotiveTokenBackfill(backfillToken);
+            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object, backgroundClient.Object);
+
+            motiveProvider.MotiveTokenBackfill(backfillToken);
 
             //backfill marked complete
             Assert.IsTrue(backfillToken.BackfillComplete);
@@ -410,9 +413,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IBaseJobProvider> jobProvider = new Mock<IBaseJobProvider>();
             jobProvider.Setup(x => x.Execute(It.IsAny<RetrieverJob>()));
 
-            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object);
+            Mock<IBackgroundJobClient> backgroundClient = new Mock<IBackgroundJobClient>();
 
-            var result = motiveProvider.MotiveTokenBackfill(backfillToken);
+            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object, backgroundClient.Object);
+
+            motiveProvider.MotiveTokenBackfill(backfillToken);
 
             //backfill marked complete
             Assert.IsFalse(backfillToken.BackfillComplete);

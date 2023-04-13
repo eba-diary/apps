@@ -191,7 +191,8 @@ namespace Sentry.data.Core
             try
             {
                 var token = _datasetContext.GetById<DataSourceToken>(tokenId);
-                return _motiveProvider.MotiveTokenBackfill(token);
+                _motiveProvider.EnqueueBackfillBackgroundJob(token);
+                return true;
             }
             catch (Exception e)
             {

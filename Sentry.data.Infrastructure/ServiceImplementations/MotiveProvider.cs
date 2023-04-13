@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Hangfire;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -20,15 +22,17 @@ namespace Sentry.data.Infrastructure
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IEmailService _emailService;
         private readonly IBaseJobProvider _backfillJobProvider;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         public MotiveProvider(HttpClient httpClient, IDatasetContext datasetContext, 
-                             IAuthorizationProvider authorizationProvider, IEmailService emailService, IBaseJobProvider backfillJobProvider)
+                             IAuthorizationProvider authorizationProvider, IEmailService emailService, IBaseJobProvider backfillJobProvider, IBackgroundJobClient backgroundJobClient)
         {
             client = httpClient;
             _datasetContext = datasetContext;
             _authorizationProvider = authorizationProvider;
             _emailService = emailService;
             _backfillJobProvider = backfillJobProvider;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
@@ -78,12 +82,19 @@ namespace Sentry.data.Infrastructure
             client.DefaultRequestHeaders.Remove("Authorization"); //Clean the Auth Header out 
         }
 
+        [AutomaticRetry(Attempts = 0)]
+        [DisplayName("Motive Backfill Job")]   /* Used for displaying useful name in hangfire */
+        public void EnqueueBackfillBackgroundJob(DataSourceToken toBackfill)
+        {
+            _backgroundJobClient.Enqueue<MotiveProvider>(x => x.MotiveTokenBackfill(toBackfill));
+        }
+
         /// <summary>
         /// Backfills data for Motive dataset by grabbing all jobs and running with only new token enabled. Config property "MotiveBackfillDate" controls the backfill start date. 
         /// </summary>
         /// <param name="tokenToBackfill">Token we want load data for.</param>
         /// <returns></returns>
-        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
+        internal bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
         {
             try
             {
@@ -124,15 +135,18 @@ namespace Sentry.data.Infrastructure
                 catch (Exception e) //Catch error here so we continue on to restore tokens. 
                 {
                     Common.Logging.Logger.Error($"Backfill on token {tokenToBackfill.TokenName} failed running the jobs.", e);
+                    throw;
                 }
-
-                //clean up
-                foreach (var token in source.AllTokens.Where(t => tokensToEnable.Contains(t.Id)))
+                finally
                 {
-                    token.Enabled = true;
-                }
+                    //clean up
+                    foreach (var token in source.AllTokens.Where(t => tokensToEnable.Contains(t.Id)))
+                    {
+                        token.Enabled = true;
+                    }
 
-                _datasetContext.SaveChanges();
+                    _datasetContext.SaveChanges();
+                }
 
                 return true;
             }
