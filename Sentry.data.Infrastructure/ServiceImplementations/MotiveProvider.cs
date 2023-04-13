@@ -115,6 +115,7 @@ namespace Sentry.data.Infrastructure
                         var currentDateValue = dateParameter.VariableValue; //hold onto old value
                         dateParameter.VariableValue = Config.GetHostSetting("MotiveBackfillDate");
                         _backfillJobProvider.Execute(job);
+                        //reset retriever job param
                         dateParameter.VariableValue = currentDateValue;
                     }
 
@@ -126,7 +127,6 @@ namespace Sentry.data.Infrastructure
                 }
 
                 //clean up
-                //reset retriever job params
                 foreach (var token in source.AllTokens.Where(t => tokensToEnable.Contains(t.Id)))
                 {
                     token.Enabled = true;
