@@ -1,4 +1,5 @@
 ﻿using Nest;
+using NHibernate.Hql.Ast.ANTLR.Tree;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
@@ -58,17 +59,26 @@ namespace Sentry.data.Infrastructure
 
         public async Task IndexManyAsync<T>(List<T> documents) where T : class
         {
-            await _client.IndexManyAsync(documents).ConfigureAwait(false);
+            if (documents?.Any() == true)
+            {
+                await _client.IndexManyAsync(documents).ConfigureAwait(false);
+            }
         }
 
         public async Task IndexManyAsync<T>(List<T> documents, string indexName) where T : class
         {
-            await _client.IndexManyAsync(documents, indexName).ConfigureAwait(false);
+            if (documents?.Any() == true)
+            {
+                await _client.IndexManyAsync(documents, indexName).ConfigureAwait(false);
+            }
         }
 
         public async Task DeleteManyAsync<T>(List<T> documents) where T : class
         {
-            await _client.DeleteManyAsync(documents).ConfigureAwait(false);
+            if (documents?.Any() == true)
+            {
+                await _client.DeleteManyAsync(documents).ConfigureAwait(false);
+            }
         }
 
         public void DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class

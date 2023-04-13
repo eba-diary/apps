@@ -3,11 +3,7 @@ using Sentry.data.Core;
 using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -28,11 +24,12 @@ namespace Sentry.data.Web.API
         /// Index global datasets by IDs
         /// </summary>
         [HttpPost]
-        [Route("Index")]
+        [Route("index")]
         [ApiVersionBegin(WebAPI.Version.v20230315)]
         [SwaggerResponse(HttpStatusCode.Created, null, typeof(IndexGlobalDatasetsResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.ServiceUnavailable)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> IndexGlobalDatasets(IndexGlobalDatasetsRequestModel model)
         {
