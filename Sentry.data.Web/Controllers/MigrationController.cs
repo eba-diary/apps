@@ -18,13 +18,16 @@ namespace Sentry.data.Web.Controllers
         private readonly IDatasetContext _datasetContext;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
         private readonly IDatasetService _datasetService;
-               
-        public MigrationController(IDataFeatures featureFlags, IDatasetContext datasetContext, NamedEnvironmentBuilder namedEnvironmentBuilder, IDatasetService datasetService)
+        private readonly IMigrationService _migrationService;
+
+        public MigrationController(IDataFeatures featureFlags, IDatasetContext datasetContext, NamedEnvironmentBuilder namedEnvironmentBuilder, IDatasetService datasetService, IMigrationService migrationService)
         {
             _featureFlags = featureFlags;
             _datasetContext = datasetContext;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
             _datasetService = datasetService;
+            _migrationService = migrationService;
+
         }
 
         [HttpGet]
@@ -61,23 +64,55 @@ namespace Sentry.data.Web.Controllers
         [Route("Migration/Dataset/{id}")]
         public ActionResult MigrationHistory(int id)
         {
+            //EXIT IF FEATURE FLAG OFF
+            if (!_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
+            {
+                return Json(new { Success = false, Message = "Unauthorized access" });
+            }
+            
+            //GET RELATIVES WITH MIGRATION HISTORY ONLY
+            DatasetRelativeOriginDto datasetRelativeOriginDto =_migrationService.GetRelativesWithMigrationHistory(id);
+            
+            //DETERMINE IF WE SHOULD SHOW DROP DOWN FILTER (MIGRATION HISTORY)
+            //IF THERE IS NO MIGRATION HISTORIES THEN WHY SHOW A FILTER
+            bool showDropDownFilter = (datasetRelativeOriginDto.DatasetRelativesDto.Count >= 1);
+
+            //CREATE MODEL WHICH IS MIGRATION HISTORY HEADER
+            MigrationHistoryPageModel pageModel = new MigrationHistoryPageModel()
+            { 
+                SourceDatasetId = id,
+                SourceDatasetName = datasetRelativeOriginDto.OriginDatasetName,
+                ShowNamedEnvironmentFilter = showDropDownFilter,
+                DatasetRelatives = datasetRelativeOriginDto.DatasetRelativesDto?.Select(s => s.ToModel()).OrderBy(o => o.DatasetNamedEnvironment).ToList()
+            };
+
+            return View("_MigrationHistory", pageModel);
+        }
+
+
+        [HttpPost]
+        [Route("Migration/Detail/{id}/{namedenvironment}/")]
+        public ActionResult MigrationHistoryDetail(int id, string namedEnvironment)
+        {
+            //EXIT IF FEATURE FLAG OFF
             if (!_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
             {
                 return Json(new { Success = false, Message = "Unauthorized access" });
             }
 
-            List<MigrationHistory> migrationHistories = _datasetContext.MigrationHistory.Where(w => w.SourceDatasetId == id || w.TargetDatasetId == id).OrderByDescending(o => o.CreateDateTime).ToList();
-            Dataset dataset = _datasetContext.Datasets.FirstOrDefault(w => w.DatasetId == id);
-            MigrationHistoryPageModel pageModel = new MigrationHistoryPageModel()
-            { 
-                SourceDatasetId = id,
-                SourceDatasetName = (dataset == null)? null : dataset.DatasetName,
+            //GET ALL MIGRATION HISTORY FOR THESE DATASET RELATIVES
+            List<MigrationHistory> migrationHistories = _migrationService.GetMigrationHistory(id, namedEnvironment);
+
+            //CREATE MODEL WHICH IS MIGRATION HISTORY DETIAL AKA PARTIAL VIEW OF PAGE
+            MigrationHistoryDetailPageModel detailPageModel = new MigrationHistoryDetailPageModel()
+            {
                 MigrationHistoryModels = migrationHistories.ToMigrationHistoryModels(),
                 Security = _datasetService.GetUserSecurityForDataset(id)
             };
 
-            return View("_MigrationHistory", pageModel);
+            return PartialView("_MigrationHistoryDetail", detailPageModel);
         }
+
 
         //CONTROLLER ACTION called from JS to return the Migration History JSON
         [HttpPost]

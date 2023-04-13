@@ -179,6 +179,7 @@
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
+    <Compile Include="DomainServices\MigrationService.cs" />
     <Compile Include="DomainServices\DataSourceService.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetRelativeOriginDto.cs" />
     <Compile Include="DTO\Dataset\DatasetRelativeDto.cs" />
     <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
@@ -522,6 +524,7 @@
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
     <Compile Include="Interfaces\IAuthorizationSigner.cs" />
+    <Compile Include="Interfaces\IMigrationService.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
     <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
     <Compile Include="Interfaces\IFileProvider.cs" />
