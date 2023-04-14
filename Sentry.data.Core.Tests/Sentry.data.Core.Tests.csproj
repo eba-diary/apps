@@ -160,6 +160,7 @@
     <Compile Include="DatasetTests.cs" />
     <Compile Include="HelperTests\CustomAttributeHelperTests.cs" />
     <Compile Include="HelperTests\DSCEventTopicHelperTests.cs" />
+    <Compile Include="HelperTests\JiraHelperTests.cs" />
     <Compile Include="JobServiceTests.cs" />
     <Compile Include="ConnectorServiceTests.cs" />
     <Compile Include="MigrationTests.cs" />

@@ -196,6 +196,8 @@
     <Compile Include="Extensions\FilterSearchExtensionsTests.cs" />
     <Compile Include="Extensions\JobExtensionsTests.cs" />
     <Compile Include="Extensions\DataFlowExtensionsTests.cs" />
+    <Compile Include="HelperTests\JiraHelperTests.cs" />
+    <Compile Include="HelperTests\JSMHelperTests.cs" />
     <Compile Include="MetadataControllerTests.cs" />
     <Compile Include="Mockups\MockClasses.cs" />
     <Compile Include="Mockups\MockControllers.cs" />

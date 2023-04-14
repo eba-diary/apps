@@ -69,13 +69,7 @@ namespace Sentry.data.Web.Controllers
 
             model.DisplayDataflowEdit = _dataFeatures.Value.CLA1656_DataFlowEdit_ViewEditPage.GetValue();
             model.UserSecurity = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
-
-            if (DataFeatures.CLA3718_Authorization.GetValue())
-            {
-                model.ProducerAssetGroupName = _dataFlowService.GetSecurityGroup(id);
-            }
-
-            model.CLA3718_Authorization = DataFeatures.CLA3718_Authorization.GetValue();
+            model.ProducerAssetGroupName = _dataFlowService.GetSecurityGroup(id);
 
             return View(model);
         }

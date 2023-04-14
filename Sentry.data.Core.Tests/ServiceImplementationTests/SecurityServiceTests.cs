@@ -2,6 +2,7 @@
 using Moq;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
@@ -2089,6 +2090,40 @@ namespace Sentry.data.Core.Tests
 
             Assert.AreEqual("DS_DATA_SHORTDSNAME_Cnsmr_D", groupName);
         }
+        #endregion
+
+        #region BuildS3TicketForDatasetAndTicket
+
+        [TestMethod]
+        public void BuildS3TicketForDatasetAndTicket_Updates_SecurityTicket()
+        {
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
+            Dataset dataset = MockClasses.MockDataset(addConfig: true);
+            FileSchema schema = new FileSchema() { Name = dataset.DatasetFileConfigs.First().Name, ParquetStoragePrefix = "paquet/DATA/TEST/123456" };
+            dataset.DatasetFileConfigs.First().Schema = schema;
+
+            SecurityTicket securityTicket = new SecurityTicket()
+            {
+                TicketId = "ITCM-924",
+                IsAddingPermission = true,
+                ExternalRequestId = null,
+                RequestedById = "1234567",
+                AwsArn = "arn:aws:iam::846110468969:role/service-role/JCGTest"
+            };
+
+            Mock<IJiraService> jiraService = mr.Create<IJiraService>();
+            jiraService.Setup(s => s.CreateJiraTickets(It.IsAny<JiraIssueCreateRequest>())).Returns(new List<string>() { "ITCM-9999" });
+
+            SecurityService securityService = new SecurityService(null, null, null, null, null, null, null, jiraService.Object);
+
+            //Act
+            securityService.BuildS3TicketForDatasetAndTicket(dataset, securityTicket, true);
+
+            //Assert
+            Assert.AreEqual("ITCM-9999",securityTicket.ExternalRequestId);
+        }
+
         #endregion
 
         #region "Private helpers"

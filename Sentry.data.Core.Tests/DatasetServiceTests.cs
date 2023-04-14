@@ -2118,7 +2118,6 @@ namespace Sentry.data.Core.Tests
             configService.Setup(x => x.CreateAndSaveDatasetFileConfig(It.IsAny<DatasetFileConfigDto>())).Returns(true);
 
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
             
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
@@ -2235,7 +2234,6 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.Assets).Returns(new List<Asset>{ asset }.AsQueryable());
 
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             Category category = new Category { Name = "Category" };
@@ -2564,7 +2562,6 @@ namespace Sentry.data.Core.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
