@@ -19,7 +19,7 @@ namespace Sentry.data.Infrastructure
             _reindexProvider = reindexProvider;
         }
 
-        [DisplayName("Reindex " + nameof(T))]
+        [DisplayName("Reindex")]
         [AutomaticRetry(Attempts = 0)]
         public async Task ReindexAsync()
         {
