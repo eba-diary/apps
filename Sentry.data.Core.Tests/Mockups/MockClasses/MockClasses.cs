@@ -22,6 +22,7 @@ namespace Sentry.data.Core.Tests
                 DatasetCategories = MockCategories(),
                 DatasetName = "Claim Dataset",
                 DatasetDesc = "Test Claim Dataset",
+                ShortName = "CLAIMDATASET",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = user != null ? user.DisplayName : "Nye, Bill",
                 UploadUserName = user != null ? user.DisplayName : "Nye, Bill",
@@ -44,6 +45,106 @@ namespace Sentry.data.Core.Tests
 
             return ds;
         }
+        public static MigrationHistory MockMigrationHistory_DEV_to_TEST()
+        {
+            MigrationHistory migrationHistory = new MigrationHistory() 
+            { 
+                MigrationHistoryId = 1,
+                SourceDatasetId = 1000,
+                SourceNamedEnvironment = "DEV",
+                TargetDatasetId = 1001,
+                TargetNamedEnvironment = "TEST"
+            };
+            return migrationHistory;
+        }
+
+        public static MigrationHistory MockMigrationHistory_TEST_to_DEV()
+        {
+            MigrationHistory migrationHistory = new MigrationHistory()
+            {
+                MigrationHistoryId = 2,
+                SourceDatasetId = 1001,
+                SourceNamedEnvironment = "TEST",
+                TargetDatasetId = 1000,
+                TargetNamedEnvironment = "DEV"
+            };
+            return migrationHistory;
+        }
+
+        public static MigrationHistory MockMigrationHistory_TEST_to_QUAL()
+        {
+            MigrationHistory migrationHistory = new MigrationHistory()
+            {
+                MigrationHistoryId = 3,
+                SourceDatasetId = 1001,
+                SourceNamedEnvironment = "TEST",
+                TargetDatasetId = 1002,
+                TargetNamedEnvironment = "QUAL"
+            };
+            return migrationHistory;
+        }
+
+
+        public static DatasetDetailDto MockDatasetDetailDtoForMigrationHistory_DEV()
+        {
+            DatasetDetailDto detailDto = new DatasetDetailDto()
+            {
+                DatasetId = 1000,
+                DatasetName = "ABCD",
+                DatasetRelatives = MockRelativeDtos()
+            };
+
+            return detailDto;
+        }
+
+        public static DatasetDetailDto MockDatasetDetailDtoForMigrationHistory_QUAL()
+        {
+            DatasetDetailDto detailDto = new DatasetDetailDto()
+            {
+                DatasetId = 1002,
+                DatasetName = "ABCD",
+                DatasetRelatives = MockRelativeDtos()
+            };
+
+            return detailDto;
+        }
+
+
+        public static DatasetRelativeDto MockRelativeDto_DEV()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1000, "DEV", String.Empty);
+            return relative;
+        }
+
+        public static DatasetRelativeDto MockRelativeDto_TEST()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1001, "TEST", String.Empty);
+            return relative;
+        }
+
+        public static DatasetRelativeDto MockRelativeDto_QUAL()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1002, "QUAL", String.Empty);
+            return relative;
+        }
+
+        public static DatasetRelativeDto MockRelativeDto_PROD()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1003, "PROD", String.Empty);
+            return relative;
+        }
+
+        public static List<DatasetRelativeDto> MockRelativeDtos()
+        {
+            List<DatasetRelativeDto> relatives = new List<DatasetRelativeDto>();
+            relatives.Add(MockRelativeDto_DEV());
+            relatives.Add(MockRelativeDto_TEST());
+            relatives.Add(MockRelativeDto_QUAL());
+            relatives.Add(MockRelativeDto_PROD());
+            return relatives;
+        }
+
+
         public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
         {
             List<DatasetDto> dsDtoList = new List<DatasetDto>();

@@ -179,6 +179,7 @@
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
+    <Compile Include="DomainServices\MigrationService.cs" />
     <Compile Include="DomainServices\DataSourceService.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />
     <Compile Include="DomainServices\BusinessAreaService.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="DTO\DataProcessing\SchemaMapDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\DatasetFile\UploadDatasetFileDto.cs" />
+    <Compile Include="DTO\Dataset\DatasetRelativeOriginDto.cs" />
     <Compile Include="DTO\Dataset\DatasetRelativeDto.cs" />
     <Compile Include="DTO\Dataset\DatasetDto.cs" />
     <Compile Include="DTO\Dataset\DatasetFileConfigSchemaDto.cs" />
@@ -376,6 +378,7 @@
     <Compile Include="Entities\Migration\SchemaMigrationRequest.cs" />
     <Compile Include="Entities\Migration\MigrationHistoryDetail.cs" />
     <Compile Include="Entities\Migration\SchemaMigrationRequestResponse.cs" />
+    <Compile Include="Entities\S3\S3AccessPointPolicy\S3AccessPointPolicy.cs" />
     <Compile Include="Entities\Schema\Elastic\ElasticSchemaField.cs" />
     <Compile Include="Entities\Schema\SchemaConsumption.cs" />
     <Compile Include="Entities\Schema\SchemaConsumptionSnowflake.cs" />
@@ -418,6 +421,7 @@
     <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\DSCEventTopicHelper.cs" />
     <Compile Include="Helpers\FilterCategoryOptionNormalizer.cs" />
+    <Compile Include="Helpers\JiraHelper.cs" />
     <Compile Include="Helpers\Markdown.cs" />
     <Compile Include="Helpers\NestExtensions.cs" />
     <Compile Include="Helpers\NestHelper.cs" />
@@ -524,6 +528,7 @@
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
     <Compile Include="Interfaces\IAuthorizationSigner.cs" />
+    <Compile Include="Interfaces\IMigrationService.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
     <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
     <Compile Include="Interfaces\Elastic\IElasticIndexClient.cs" />

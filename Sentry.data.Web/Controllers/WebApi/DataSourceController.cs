@@ -76,5 +76,25 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             return Ok("Token onboarded.");
         }
+
+        [HttpPost]
+        [ApiVersionBegin(WebAPI.Version.v20220609)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [Route("RunMotiveBackfill/{tokenId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK)]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
+        public IHttpActionResult RunMotiveBackfill(int tokenId)
+        {
+            //act
+            var result = _dataSourceService.KickOffMotiveBackfill(tokenId);
+            //return
+            if (!result)
+            {
+                return BadRequest("Token backfill failed.");
+            }
+
+            return Ok("Token backfill successfully triggered.");
+        }
     }
 }

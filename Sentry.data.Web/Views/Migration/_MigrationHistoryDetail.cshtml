@@ -1,0 +1,105 @@
+﻿@model Sentry.data.Web.MigrationHistoryDetailPageModel
+
+@{
+    ViewBag.Title = "Migration History Detail";
+    ViewBag.OverflowScroll = true;
+    string color = "dsc-clcDkBlue-text";
+}
+
+
+
+<div>
+
+    <div class="text-center" id="migration-history-detail-spinner">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!--Accordion wrapper-->
+    <div class="accordion md-accordion" id="accordionMigrationHistory" role="tablist" aria-multiselectable="true">
+        @foreach (MigrationHistoryModel item in Model.MigrationHistoryModels.ToList())
+        {
+            <!-- Accordion card -->
+            <div class="card">
+                <!-- Card header -->
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordionMigrationHistory" href="#collapse-config-@item.MigrationHistoryId" aria-expanded="false" aria-controls="collapse-config-@item.MigrationHistoryId">
+                    <div class="card-header migration-history-card-header" role="tab" id="heading-config-@item.MigrationHistoryId">
+
+                        <h2 class="@color mb-0 pt-0">
+                            @item.SourceNamedEnvironment
+                            <em class='fas fa-arrow-right'></em>
+                            @item.TargetNamedEnvironment
+                            <span class="float-r">
+                                @item.CreateDateTime.ToString("g")
+                                <em class="fas fa-angle-down rotate-icon"></em>
+                            </span>
+                        </h2>
+
+                    </div>
+                </a>
+
+                <!-- Card body -->
+                <div id="collapse-config-@item.MigrationHistoryId" class="collapse" role="tabpanel" aria-labelledby="heading-config-@item.MigrationHistoryId" data-parent="#accordionMigrationHistory">
+                    <div class="card-body ml-3 mr-3">
+
+                        <div class="card-body-header">
+                            <h4 class="@color pt-0">Migration Details</h4>
+
+                            @if (Model.Security.ShowAdminControls)
+                            {
+                                <div class="migration-history-modify-icons">
+                                    <a id="viewMigrationHistoryJSON" class="fa-solid fa-wand-magic-sparkles" data-id="@item.MigrationHistoryId" data-toggle="tooltip" data-placement="top" title="Migration History JSON"></a>
+                                </div>
+                            }
+
+                        </div>
+
+                        <div class="ml-3">
+                            <div class="row">
+                                <table class="table dsc-blud-table table-boardered table-hover" id="MigrationHistoryDetailTable">
+                                    <thead>
+                                        <tr class="table-header">
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach (MigrationHistoryDetailModel itemDetail in item.MigrationHistoryDetailModels.ToList())
+                                        {
+                                            <tr>
+                                                <td>@itemDetail.Type</td>
+                                                <td>@itemDetail.Name</td>
+                                                <td> <em class="fas fa-check-circle fa-2x" />  </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- Accordion card -->
+        }
+    </div>
+    <!-- Accordion wrapper -->
+
+</div>

@@ -1801,107 +1801,6 @@ namespace Sentry.data.Core.Tests
         #region Generate Snowflake Metadata Tests
 
         [TestMethod]
-        public void SchemaService_GenerateConsumptionLayers_AuthOff()
-        {
-            //Arrange
-            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
-            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(false);
-            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(false);
-
-
-            Dataset dataset = MockClasses.MockDataset();
-            dataset.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
-            dataset.NamedEnvironment = "QUAL";
-
-            FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
-            FileSchema schema = new FileSchema() { SchemaId = 1 };
-
-
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
-            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
-            schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
-            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
-
-
-            var dbName_TESTNP = schemaService.Object.GenerateConsumptionLayers(fileSchemaDto, schema, dataset);
-            var snowflakeConsumptionLayers = dbName_TESTNP.OfType<SchemaConsumptionSnowflake>().ToList();
-
-            //Assert
-            Assert.AreEqual(1, snowflakeConsumptionLayers.Count(w => w.SnowflakeType == SnowflakeConsumptionType.CategorySchemaParquet));
-            Assert.AreEqual(1, snowflakeConsumptionLayers.Count(w => w.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaRaw));
-            Assert.AreEqual(1, snowflakeConsumptionLayers.Count(w => w.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaRawQuery));
-            Assert.AreEqual(1, snowflakeConsumptionLayers.Count(w => w.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet));
-        }
-
-        [TestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void SchemaService_GenerateConsumptionLayers_StopCategoryBasedGeneration(bool stopCategoryGeneration)
-        {
-            //Arrange
-            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
-            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(true);
-            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(stopCategoryGeneration);
-            dataFeatures.Setup(s => s.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue()).Returns("2022-08-15");
-
-            Dataset dataset = MockClasses.MockDataset();
-            dataset.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
-            dataset.NamedEnvironment = "QUAL";
-            dataset.DatasetDtm = DateTime.Parse("2022-07-15");
-
-            FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
-            FileSchema schema = new FileSchema() { SchemaId = 1 };
-
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
-            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
-            schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
-            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
-
-            var dbName_TESTNP = schemaService.Object.GenerateConsumptionLayers(fileSchemaDto, schema, dataset);
-            var snowflakeConsumptionLayers = dbName_TESTNP.OfType<SchemaConsumptionSnowflake>().ToList();
-
-            //Assert
-            Assert.AreEqual(!stopCategoryGeneration, snowflakeConsumptionLayers.Any(w => w.SnowflakeType == SnowflakeConsumptionType.CategorySchemaParquet));
-            Assert.AreEqual(3, snowflakeConsumptionLayers.Count(w => w.SnowflakeType != SnowflakeConsumptionType.CategorySchemaParquet));
-        }
-
-        [TestMethod]
-        [DataRow("2022-08-20")]
-        [DataRow("2022-07-20")]
-        public void SchemaService_GenerateConsumptionLayers_StopCategoryBasedDatasetDate(string datasetCreateDTM)
-        {
-            //Arrange
-            Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
-            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(true);
-            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(false);
-            dataFeatures.Setup(s => s.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue()).Returns(datasetCreateDTM);
-
-            Dataset dataset = MockClasses.MockDataset();
-            dataset.DatasetCategories = new List<Category>() { new Category() { Name = "CLAIM" } };
-            dataset.NamedEnvironment = "QUAL";
-            dataset.DatasetDtm = DateTime.Parse("2022-08-01");
-
-            FileSchemaDto fileSchemaDto = new FileSchemaDto() { Name = "Schema YYYY" };
-            FileSchema schema = new FileSchema() { SchemaId = 1 };
-
-            Mock<SchemaService> schemaService = new Mock<SchemaService>(null, null, null, null, null, dataFeatures.Object, null, null, null, null, null, null) { CallBase = true };
-            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>())).Returns("DB_Name");
-            schemaService.Setup(s => s.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("YYYY");
-            schemaService.Setup(s => s.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("DB_Name");
-
-            var dbName_TESTNP = schemaService.Object.GenerateConsumptionLayers(fileSchemaDto, schema, dataset);
-            var snowflakeConsumptionLayers = dbName_TESTNP.OfType<SchemaConsumptionSnowflake>().ToList();
-
-            //Assert
-            Assert.AreEqual(datasetCreateDTM == "2022-08-20", snowflakeConsumptionLayers.Any(w => w.SnowflakeType == SnowflakeConsumptionType.CategorySchemaParquet));
-            Assert.AreEqual(3, snowflakeConsumptionLayers.Count(w => w.SnowflakeType != SnowflakeConsumptionType.CategorySchemaParquet));
-        }
-
-
-        [TestMethod]
         [DataRow(" ")]
         [DataRow("ABC")]
         public void SchemaService_GenerateSnowflakeDatabaseName_Include_Prefix(string allowableEnvironments)
@@ -2140,9 +2039,6 @@ namespace Sentry.data.Core.Tests
             //Arrange
             Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
             dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(true);
-            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(false);
-            dataFeatures.Setup(s => s.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue()).Returns("2022-08-15");
 
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
 
@@ -2162,7 +2058,7 @@ namespace Sentry.data.Core.Tests
             schemaService.Object.CreateOrUpdateConsumptionLayersForSchema(schema, fileSchemaDto, dataset);
 
             //Assert
-            Assert.AreEqual(4, schema.ConsumptionDetails.Count());
+            Assert.AreEqual(3, schema.ConsumptionDetails.Count());
         }
 
         [TestMethod]
@@ -2171,9 +2067,6 @@ namespace Sentry.data.Core.Tests
             //Arrange
             Mock<IDataFeatures> dataFeatures = new Mock<IDataFeatures>();
             dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
-            dataFeatures.Setup(s => s.CLA3718_Authorization.GetValue()).Returns(true);
-            dataFeatures.Setup(s => s.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(false);
-            dataFeatures.Setup(s => s.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue()).Returns("2022-08-15");
 
             Mock<IDatasetContext> datasetContext = new Mock<IDatasetContext>();
 
@@ -2229,7 +2122,7 @@ namespace Sentry.data.Core.Tests
             List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
 
             //Assert
-            Assert.AreEqual(4, schema.ConsumptionDetails.Count());
+            Assert.AreEqual(3, schema.ConsumptionDetails.Count());
             Assert.IsFalse(schemaConsumptionSnowflakeList.Any(w => w.SnowflakeDatabase != "DB_Name"));
             Assert.IsFalse(schemaConsumptionSnowflakeList.Any(w => w.SnowflakeSchema != "YYYY"));
         }
@@ -3417,8 +3310,6 @@ namespace Sentry.data.Core.Tests
             userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000001");
 
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
-            dataFeatures.Setup(x => x.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
 
             SchemaService schemaService = new SchemaService(datasetContext.Object, userService.Object, null, null, null, dataFeatures.Object, null, null, null, null, null, null);

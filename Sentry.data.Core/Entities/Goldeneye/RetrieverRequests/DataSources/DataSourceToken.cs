@@ -37,5 +37,7 @@ namespace Sentry.data.Core
         public virtual bool Enabled { get; set; }
 
         public virtual bool AcceptableErrorNeedsReview { get; set; }
+
+        public virtual bool BackfillComplete { get; set; }
     }
 }

@@ -157,7 +157,6 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
@@ -273,7 +272,6 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
@@ -334,7 +332,6 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
@@ -404,7 +401,6 @@ namespace Sentry.data.Core.Tests
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("NonProd");
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
@@ -462,7 +458,6 @@ namespace Sentry.data.Core.Tests
 
             Mock<IDataFeatures> dataFeatures = mockRepository.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
@@ -661,7 +656,6 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(string.Empty);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
 
             Mock<IDatasetContext> datasetContext = GetDatasetContext(mr, dataset);
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(new List<RetrieverJob>().AsQueryable());
@@ -1118,7 +1112,6 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA3241_DisableDfsDropLocation.GetValue()).Returns(false);
             dataFeatures.Setup(x => x.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns(CLA4260_QuartermasterNamedEnvironmentTypeFilter);
             dataFeatures.Setup(x => x.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue()).Returns(false);
-            dataFeatures.Setup(x => x.CLA3718_Authorization.GetValue()).Returns(true);
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mockRepository.Create<IGlobalDatasetProvider>();

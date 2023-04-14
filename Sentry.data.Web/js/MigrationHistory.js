@@ -1,13 +1,50 @@
 ﻿data.MigrationHistory = {
-    
-    Init: function () {
 
-        $("[id^='viewMigrationHistoryJSON']").off('click').on('click', function (e) {
+    Init: function (sourceDatasetId) {
+
+        //SETUP ON CLICK MAGIC MODAL
+        $(document).on('click', '#viewMigrationHistoryJSON', function (e) {
             data.MigrationHistory.MagicModalMigrationHistory($(this).data("id"));
+        });
+
+        //INIT Migration Details Partial View
+        data.MigrationHistory.RefreshMigrationDetails(sourceDatasetId);
+
+        //SETUP NAMED ENV FILTER
+        $("#migration-history-named-env-filter").change(function (e) {
+            data.MigrationHistory.RefreshMigrationDetails(sourceDatasetId);
         });
     },
 
-     //GENERATE QUERY BASED ON WHERE THEY ARE IN SCHEMA     
+    RefreshMigrationDetails(sourceDatasetId) {
+
+        //SHOW SPINNER
+        $("#migration-history-detail-spinner").show();
+
+        //GRAB NAMED ENV FILTER
+        let namedEnv = $("#migration-history-named-env-filter").val();
+
+        //MAKE AJAX CALL TO REPLACE HTML IN PARTIAL VIEW BASED ON namedEnv FILTER
+        $.ajax({
+            type: "POST",
+            url: '/Migration/Detail/' + sourceDatasetId + '/' + namedEnv,
+            success: function (view) {
+                $('#migration-history-detail-container').html(view);
+            },
+            failure: function () {
+                data.Dataset.makeToast("error", "Failed to Retrieve Migration History.");
+            },
+            error: function () {
+                data.Dataset.makeToast("error", "Failed to Retrieve Migration History.");
+            },
+            complete: function () {
+                $("#migration-history-detail-spinner").hide();
+            }
+
+        });
+    },
+
+     //GENERATE QUERY BASED ON WHERE THEY ARE IN ACCORDIAN     
     MagicModalMigrationHistory: function (migrationHistoryId) {
 
         $.ajax({

@@ -19,10 +19,8 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
-        IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; }
         IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; }
         IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
-        IFeatureFlag<bool> CLA3718_Authorization { get; }
         IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE { get; }
         IFeatureFlag<bool> CLA4152_UploadFileFromUI { get; }
         IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL { get; }
@@ -30,8 +28,6 @@ namespace Sentry.data.Core
         IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter { get; }
         IFeatureFlag<bool> CLA3756_UpdateSearchPages { get; }
         IFeatureFlag<bool> CLA4258_DefaultProdSearchFilter { get; }
-        IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation { get; }
-        IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand { get; }
         IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
         IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; }
         IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }

@@ -606,6 +606,8 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Extensions\MigrationExtensions.cs" />
     <Compile Include="Extensions\TileExtensions.cs" />
+    <Compile Include="Helpers\JiraHelper.cs" />
+    <Compile Include="Helpers\JSMHelper.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
     <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
     <Compile Include="Models\AdminPage\BaseAuditModel.cs" />
@@ -647,6 +649,7 @@
     <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryDetailModel.cs" />
+    <Compile Include="Models\Migration\MigrationHistoryDetailPageModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryPageModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryModel.cs" />
     <Compile Include="Models\Migration\MigrationRequestModel.cs" />
@@ -1221,6 +1224,7 @@
     <Content Include="Views\Config\DataSource\_AcceptableError.cshtml" />
     <Content Include="Views\Config\DataSource\CreateDataSource.cshtml" />
     <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
+    <Content Include="Views\Migration\_MigrationHistoryDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -60,8 +60,13 @@
                 @Html.CheckBoxSimpleFor(m => m.AcceptableErrorNeedsReview, new { @class = "form-check-input" })
                 @Html.LabelFor(m => m.AcceptableErrorNeedsReview, new { @class = "form-check-label" })
             </div>
+            <!-- float-r is weird, it pushes them right in the order they are in the markup, so you want reverse order here -->
             <button type="button" class="btn d-none btn-warning waves-effect waves-light float-r cancelDelete">Cancel Delete</button>
             <button type="button" class="btn btn-danger waves-effect waves-light float-r removeToken">Remove</button>
+            @if (Model != null && Model.ShouldShowBackfillButton)
+            {
+                <button type="button" class="btn btn-info waves-effect waves-light float-r toggleBackfill">Trigger Backfill</button>
+            }
         </div>
     </div>
 }
