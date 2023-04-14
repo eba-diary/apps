@@ -79,10 +79,6 @@
     <Reference Include="NJsonSchema, Version=10.8.0.0, Culture=neutral, PublicKeyToken=c2f9c3bdfae56102, processorArchitecture=MSIL">
       <HintPath>..\packages\NJsonSchema.10.8.0\lib\net45\NJsonSchema.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Sentry.Associates.Abstractions, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.Abstractions.2.0.2\lib\netstandard2.0\Sentry.Associates.Abstractions.dll</HintPath>
     </Reference>
@@ -200,8 +196,6 @@
     <Compile Include="Extensions\FilterSearchExtensionsTests.cs" />
     <Compile Include="Extensions\JobExtensionsTests.cs" />
     <Compile Include="Extensions\DataFlowExtensionsTests.cs" />
-    <Compile Include="HelperTests\JiraHelperTests.cs" />
-    <Compile Include="HelperTests\JSMHelperTests.cs" />
     <Compile Include="MetadataControllerTests.cs" />
     <Compile Include="Mockups\MockClasses.cs" />
     <Compile Include="Mockups\MockControllers.cs" />
@@ -268,7 +262,9 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="HelperTests\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

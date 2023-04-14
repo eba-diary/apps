@@ -415,10 +415,15 @@ namespace Sentry.data.Core.Tests
             Mock<ISecurable> securable = mr.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
+            securable.Setup(x => x.PrimaryContactId).Returns("999999");
+            securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
 
             Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageReports).Returns(false);
+
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
@@ -454,6 +459,8 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true); /* User is part of AD group */
             user.Setup(x => x.IsAdmin).Returns(false);  /* User is not DSC Admin */
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
