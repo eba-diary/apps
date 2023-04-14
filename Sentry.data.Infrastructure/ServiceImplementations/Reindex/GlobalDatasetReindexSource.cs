@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Sentry.Core;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
@@ -21,9 +22,10 @@ namespace Sentry.data.Infrastructure
                 if (_globalDatasetIdGroups == null)
                 {
                     _globalDatasetIdGroups = _datasetContext.Datasets.Where(x => x.DatasetType == DataEntityCodes.DATASET && x.ObjectStatus == ObjectStatusEnum.Active)
-                        .Select(x => new { x.DatasetId, x.GlobalDatasetId })
+                        .Select(x => new { x.GlobalDatasetId, x.DatasetId })
+                        .AsEnumerable()
                         .GroupBy(x => x.GlobalDatasetId)
-                        .ToDictionary(x => x.Key.Value, y => y.Select(s => s.DatasetId).ToList());
+                        .ToDictionary(k => k.Key.Value, v => v.Select(d => d.DatasetId).ToList());
                 }
 
                 return _globalDatasetIdGroups;
@@ -48,7 +50,10 @@ namespace Sentry.data.Infrastructure
                 List<int> batchDatasetIds = batch.SelectMany(x => x.Value).ToList();
 
                 //Pre-retrieve all needed entities from database for batch
-                List<Dataset> batchDatasets = _datasetContext.Datasets.Where(x => batchDatasetIds.Contains(x.DatasetId)).ToList();
+                IQueryable<Dataset> datasetQueryable = _datasetContext.Datasets.Where(x => batchDatasetIds.Contains(x.DatasetId));
+                datasetQueryable.FetchMany(d => d.DatasetCategories).ToFuture();
+                datasetQueryable.Fetch(d => d.Asset).ToFuture();              
+                List<Dataset> batchDatasets = datasetQueryable.FetchMany(d => d.Favorities).ToFuture().ToList();
 
                 //get schemas by dataset ids in batch
                 List<KeyValuePair<int, FileSchema>> schemas = _datasetContext.DatasetFileConfigs

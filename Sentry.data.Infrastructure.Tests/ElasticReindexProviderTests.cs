@@ -60,6 +60,7 @@ namespace Sentry.data.Infrastructure.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             Mock<IElasticIndexClient> elasticIndexClient = mr.Create<IElasticIndexClient>();
+            elasticIndexClient.Setup(x => x.IndexExistsAsync("index-v2")).ReturnsAsync(false);
             elasticIndexClient.Setup(x => x.CreateIndexAsync("index-v2")).Returns(Task.CompletedTask);
 
             ElasticReindexProvider provider = new ElasticReindexProvider(elasticIndexClient.Object, null);
@@ -77,6 +78,7 @@ namespace Sentry.data.Infrastructure.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             Mock<IElasticIndexClient> elasticIndexClient = mr.Create<IElasticIndexClient>();
+            elasticIndexClient.Setup(x => x.IndexExistsAsync("index-v1")).ReturnsAsync(false);
             elasticIndexClient.Setup(x => x.CreateIndexAsync("index-v1")).Returns(Task.CompletedTask);
 
             ElasticReindexProvider provider = new ElasticReindexProvider(elasticIndexClient.Object, null);
@@ -84,6 +86,25 @@ namespace Sentry.data.Infrastructure.Tests
             string result = await provider.CreateNewIndexVersionAsync("index");
 
             Assert.AreEqual("index-v1", result);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task CreateNewIndexVersionAsync_IndexV1_IndexV2_DeleteExistingIndex()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticIndexClient> elasticIndexClient = mr.Create<IElasticIndexClient>();
+            elasticIndexClient.Setup(x => x.IndexExistsAsync("index-v2")).ReturnsAsync(true);
+            elasticIndexClient.Setup(x => x.DeleteIndexAsync("index-v2")).Returns(Task.CompletedTask);
+            elasticIndexClient.Setup(x => x.CreateIndexAsync("index-v2")).Returns(Task.CompletedTask);
+
+            ElasticReindexProvider provider = new ElasticReindexProvider(elasticIndexClient.Object, null);
+
+            string result = await provider.CreateNewIndexVersionAsync("index-v1");
+
+            Assert.AreEqual("index-v2", result);
 
             mr.VerifyAll();
         }

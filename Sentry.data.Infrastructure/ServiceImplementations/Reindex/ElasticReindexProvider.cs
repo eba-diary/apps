@@ -42,6 +42,12 @@ namespace Sentry.data.Infrastructure
 
             string newIndexName = string.Join("-", indexNameParts);
 
+            if (await _elasticIndexClient.IndexExistsAsync(newIndexName))
+            {
+                //delete and recreate index if it exists, it's not being used and likely from a failed reindex
+                await _elasticIndexClient.DeleteIndexAsync(newIndexName);
+            }
+
             await _elasticIndexClient.CreateIndexAsync(newIndexName);
 
             return newIndexName;

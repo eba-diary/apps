@@ -4,6 +4,7 @@ using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
 using System.Linq;
+using Sentry.Core;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -64,7 +65,10 @@ namespace Sentry.data.Infrastructure
             List<int> deleteGlobalDatasetIds = new List<int>();
             List<GlobalDataset> indexGlobalDatasets = new List<GlobalDataset>();
 
-            var globalDatasetGroups = _datasetContext.Datasets.Where(x => x.GlobalDatasetId.HasValue && globalDatasetIds.Contains(x.GlobalDatasetId.Value)).GroupBy(x => x.GlobalDatasetId).ToList();
+            IQueryable<Dataset> datasetQueryable = _datasetContext.Datasets.Where(x => x.GlobalDatasetId.HasValue && globalDatasetIds.Contains(x.GlobalDatasetId.Value));
+            datasetQueryable.FetchMany(d => d.DatasetCategories).ToFuture();
+            datasetQueryable.Fetch(d => d.Asset).ToFuture();
+            var globalDatasetGroups = datasetQueryable.FetchMany(d => d.Favorities).ToFuture().GroupBy(x => x.GlobalDatasetId).ToList();
 
             foreach (var globalDatasetGroup in globalDatasetGroups)
             {

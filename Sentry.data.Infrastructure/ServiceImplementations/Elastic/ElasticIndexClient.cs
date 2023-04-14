@@ -19,6 +19,12 @@ namespace Sentry.data.Infrastructure
             await _elasticClient.Indices.PutAliasAsync(indexName, alias);
         }
 
+        public async Task<bool> IndexExistsAsync(string indexName)
+        {
+            ExistsResponse response = await _elasticClient.Indices.ExistsAsync(indexName);
+            return response.Exists;
+        }
+
         public async Task CreateIndexAsync(string indexName)
         {
             await _elasticClient.Indices.CreateAsync(indexName, x => x.Settings(s => s.NumberOfShards(3)));
