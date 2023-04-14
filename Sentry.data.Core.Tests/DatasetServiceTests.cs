@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Newtonsoft.Json.Bson;
-using Rhino.Mocks.Constraints;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Core.Interfaces;

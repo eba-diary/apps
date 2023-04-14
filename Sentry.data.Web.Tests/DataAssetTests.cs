@@ -1,14 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sentry.data.Web.Controllers;
-using Sentry.data.Core;
-using Rhino.Mocks;
-using System.Web.Mvc;
-using System.Collections.Generic;
-using Sentry.data.Infrastructure;
-using System;
-using System.Linq;
-using Sentry.data.Web.Helpers;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Helpers;
+using System;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Tests
 {
@@ -20,7 +14,7 @@ namespace Sentry.data.Web.Tests
         public void Index_Returns_Index_View_With_Valid_ID()
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.Index(1) as ViewResult;
 
@@ -32,7 +26,7 @@ namespace Sentry.data.Web.Tests
         public void Index_Does_RedirectToAction_NotFound()
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.Index(-1) as RedirectToRouteResult;
 
@@ -45,7 +39,7 @@ namespace Sentry.data.Web.Tests
         public void DataAsset_Returns_Index_View_Given_No_Name()
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.DataAsset(null) as ViewResult;
 
@@ -57,7 +51,7 @@ namespace Sentry.data.Web.Tests
         public void DataAsset_Returns_Index_View_Given_Valid_Name()
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.DataAsset("MockAsset") as ViewResult;
 
@@ -69,7 +63,7 @@ namespace Sentry.data.Web.Tests
         public void DataAsset_Does_RedirectToAction_NotFound()
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.DataAsset("Mock Basset") as RedirectToRouteResult;
 
@@ -112,9 +106,9 @@ namespace Sentry.data.Web.Tests
 
             var user = MockUsers.App_DataMgmt_MgAlert();
 
-            var an = MockClasses.GetMockAssetNotifications(da, user);
+            var an = MockClasses.GetMockAssetNotifications(da, user.Object);
 
-            Assert.IsTrue(an.CreateUser == user.AssociateId);
+            Assert.IsTrue(an.CreateUser == user.Object.AssociateId);
         }
 
         [TestMethod]
@@ -123,8 +117,8 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
             var da = MockClasses.MockDataAsset();
-            var dac = MockControllers.MockDataAssetController(da, user);
-            var an = MockClasses.GetMockAssetNotifications(da, user);
+            var dac = MockControllers.MockDataAssetController(da, user.Object);
+            var an = MockClasses.GetMockAssetNotifications(da, user.Object);
 
             string mock = "This is a Mock Test.  Way different then the Mock.";
             an.Message = mock;

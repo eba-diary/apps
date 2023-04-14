@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Rhino.Mocks;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
@@ -36,32 +35,27 @@ namespace Sentry.data.Core.Tests
         public void Security_Secured_NotOwner_Admin()
         {
             //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
-            SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
-            SecurityTicket ticket2 = BuildBaseTicket(security, "MyAdGroupName2");
-            SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
-            SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.AddedPermissions.Add(previewPermission1);
-            ticket2.AddedPermissions.Add(previewPermission2);
-            security.Tickets.Add(ticket1);
-            security.Tickets.Add(ticket2);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
+            securable.Setup(x => x.PrimaryContactId).Returns("1234567");
+            securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
-
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(false).Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(true);
+            user.Setup(x => x.CanModifyDataset).Returns(true);
+            user.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -79,32 +73,27 @@ namespace Sentry.data.Core.Tests
         public void Security_Secured_NotOwner_Admin_ExplicitPermissions()
         {
             //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
             Security security = BuildBaseSecurity();
-            SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
-            SecurityTicket ticket2 = BuildBaseTicket(security, "MyAdGroupName2");
-            SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
-            SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
 
-            ticket1.AddedPermissions.Add(previewPermission1);
-            ticket2.AddedPermissions.Add(previewPermission2);
-            security.Tickets.Add(ticket1);
-            security.Tickets.Add(ticket2);
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
+            securable.Setup(x => x.PrimaryContactId).Returns("1234567");
+            securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(true);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
-            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(true).Repeat.Any();
-
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(false).Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(true);
+            user.Setup(x => x.CanModifyDataset).Returns(true);
+            user.Setup(x => x.CanManageReports).Returns(true);
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -122,22 +111,28 @@ namespace Sentry.data.Core.Tests
         public void Security_AdminDataPermissionAreExplicit_Prevents_Implicit_Admin_Access()
         {
             //Arrange
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            
             Security security = BuildBaseSecurity();
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
+            securable.Setup(x => x.PrimaryContactId).Returns("123456");
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("072984").Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            Mock<IApplicationUser> AdminUser = mr.Create<IApplicationUser>();
+            AdminUser.Setup(x => x.AssociateId).Returns("072984");
+            AdminUser.Setup(x => x.IsAdmin).Returns(true);
+            AdminUser.Setup(x => x.CanModifyDataset).Returns(true);
+            AdminUser.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, AdminUser.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsFalse(us.CanViewData);
         }
@@ -146,27 +141,32 @@ namespace Sentry.data.Core.Tests
         public void Security_AdminDataPermissionAreExplicit_Admin_Access_When_Requested()
         {
             //Arrange
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
             SecurityPermission viewFullDatasetPermission1 = BuildBasePermission(ticket1, CanViewFullDataset(), true);
             ticket1.AddedPermissions.Add(viewFullDatasetPermission1);
             security.Tickets.Add(ticket1);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.PrimaryContactId).Returns("1234567");
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("072984").Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
+            Mock<IApplicationUser> adminUser = mr.Create<IApplicationUser>();
+            adminUser.Setup(x => x.AssociateId).Returns("072984");
+            adminUser.Setup(x => x.IsAdmin).Returns(true);
+            adminUser.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
+            adminUser.Setup(x => x.CanModifyDataset).Returns(true);
+            adminUser.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, adminUser.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanViewData);
         }
@@ -175,22 +175,27 @@ namespace Sentry.data.Core.Tests
         public void Security_AdminDataPermissionAreExplicit_Allows_Implicit_Admin_Access_When_false()
         {
             //Arrange
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.AdminDataPermissionsAreExplicit).Return(false).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
+            securable.Setup(x => x.PrimaryContactId).Returns("1234567");
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("072984").Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            Mock<IApplicationUser> adminUser = mr.Create<IApplicationUser>();
+            adminUser.Setup(x => x.AssociateId).Returns("072984");
+            adminUser.Setup(x => x.IsAdmin).Returns(true);
+            adminUser.Setup(x => x.CanModifyDataset).Returns(true);
+            adminUser.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, adminUser.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanViewData);
         }
@@ -202,17 +207,26 @@ namespace Sentry.data.Core.Tests
         public void Security_Public_NotOwner_NoModify()
         {
             //ARRAGE
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            Security security = BuildBaseSecurity();
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("078193").Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.PrimaryContactId).Returns("123456");
+            securable.Setup(x => x.Security).Returns(security);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("078193");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -233,14 +247,20 @@ namespace Sentry.data.Core.Tests
         public void Security_With_Null_Securable()
         {
             //ARRAGE
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("078193").Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("078193");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -261,18 +281,26 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Edit_Dataset_User_With_Modify()
         {
             //ARRAGE
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            Security security = BuildBaseSecurity();
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.PrimaryContactId).Returns("123456");
+            securable.Setup(x => x.Security).Returns(security);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(true);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -284,23 +312,32 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Edit_Dataset_As_Owner_Without_Modify_Permission()
         {
             //ARRAGE
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            Security security = BuildBaseSecurity();
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(false).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.PrimaryContactId).Returns("999999");
+            securable.Setup(x => x.Security).Returns(security);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
 
         #endregion
+
 
         #region CanManageSchema
         /// <summary>
@@ -310,18 +347,26 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_NonSecured_User_With_Modify()
         {
             //ARRAGE
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            Security security = BuildBaseSecurity();
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.Security).Returns(security);
+            securable.Setup(x => x.PrimaryContactId).Returns("1234567");
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(true);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -332,20 +377,29 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_Secured_User_With_Modify()
         {
             //ARRAGE
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            Security security = BuildBaseSecurity();
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.PrimaryContactId).Returns("123456");
+            securable.Setup(x => x.Security).Returns(security);
+            securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);  /* User is not an Admin */
+            user.Setup(x => x.CanModifyDataset).Returns(true);
+            user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            Assert.IsFalse(us.CanManageSchema);
-            Assert.IsFalse(us.CanDeleteDatasetFile);
+            mr.VerifyAll();
+            Assert.IsFalse(us.CanManageSchema, $"Failed {nameof(UserSecurity.CanManageSchema)} check");
+            Assert.IsFalse(us.CanDeleteDatasetFile, $"Failed {nameof(UserSecurity.CanDeleteDatasetFile)} check");
         }
 
         /// <summary>
@@ -355,20 +409,23 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_Secured_As_Owner_Without_Modify_Permission()
         {
             //ARRAGE
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(false).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
+
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.CanModifyDataset).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -377,16 +434,7 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_NonSecured_As_ServiceAccount_With_CanManageSchema_Permission()
         {
             //ARRAGE
-            //Security security = BuildBaseSecurity();
-            //ISecurable securable = MockRepository.GenerateMock<ISecurable>();
-            //securable.Stub(x => x.IsSecuredDataFlow).Return(false).Repeat.Any();
-            //securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
-            //securable.Stub(x => x.PrimaryContactId).Return("123456").Repeat.Any();
-            //securable.Stub(x => x.Security).Return(security).Repeat.Any();
-
-            //IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
-            //user.Stub(x => x.AssociateId).Return("BT_ICCM_I_QUAL_V1").Repeat.Any();
-            //user.Stub(x => x.Can)
+            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
 
             //Create security ticket for AD group granting CanManageSchema permission
             Security security = BuildBaseSecurity();
@@ -396,25 +444,24 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.PrimaryContactId).Return("123456").Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.PrimaryContactId).Returns("123456");
+            securable.Setup(x => x.Security).Returns(security);
 
-            //Establish user, ensure users it part of AD group and is not DSC admin
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            //User is part of AD group
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
-            //User is not DSC Admin
-            user.Stub(x => x.IsAdmin).Return(false).Repeat.Any();
+            //Establish user, ensure user is part of AD group and is not DSC admin
+            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true); /* User is part of AD group */
+            user.Setup(x => x.IsAdmin).Returns(false);  /* User is not DSC Admin */
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
 
             //ASSERT
+            mr.VerifyAll();
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsTrue(us.CanDeleteDatasetFile);
 
@@ -482,17 +529,17 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsFalse(us.CanPreviewDataset);
@@ -512,17 +559,17 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
@@ -542,17 +589,17 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
@@ -572,17 +619,17 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(false).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsFalse(us.CanPreviewDataset);
@@ -602,17 +649,17 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket.AdGroupName)).Return(false).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
@@ -625,16 +672,16 @@ namespace Sentry.data.Core.Tests
         public void Security_CanPreview_NullSecurity()
         {
             //ARRAGE
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(null).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(default(Security));
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
@@ -647,12 +694,12 @@ namespace Sentry.data.Core.Tests
         public void Security_CanPreview_NullSecurable()
         {
             //ARRAGE
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
@@ -672,13 +719,13 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(false).Repeat.Any();
-            securable.Stub(x => x.Security).Return(null).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.Security).Returns(default(Security));
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, null);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, null);
 
             //ASSERT
             Assert.IsFalse(us.CanPreviewDataset);
@@ -702,18 +749,18 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
+            user.Setup(x => x.IsInGroup(ticket2.AdGroupName)).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanPreviewDataset);
@@ -737,18 +784,18 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
+            user.Setup(x => x.IsInGroup(ticket2.AdGroupName)).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsFalse(us.CanPreviewDataset);
@@ -772,17 +819,17 @@ namespace Sentry.data.Core.Tests
             ticket1.AddedPermissions.Add(previewPermission3);
             security.Tickets.Add(ticket1);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsFalse(us.CanPreviewDataset);
@@ -846,13 +893,13 @@ namespace Sentry.data.Core.Tests
         public void Security_CanCreateDataflow_NullSecurable_Admin()
         {
             //ARRAGE
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanCreateDataFlow);
@@ -865,12 +912,12 @@ namespace Sentry.data.Core.Tests
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_NoPermissions()
         {
             //ARRAGE
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
             Assert.IsFalse(us.CanCreateDataFlow);
@@ -883,13 +930,13 @@ namespace Sentry.data.Core.Tests
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_With_Modify_Permissions()
         {
             //ARRAGE
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.CanModifyDataset).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.CanModifyDataset).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanCreateDataFlow);
@@ -906,13 +953,13 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(true);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanModifyDataflow);
@@ -927,13 +974,13 @@ namespace Sentry.data.Core.Tests
             //ARRAGE
             Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
-            user.Stub(x => x.IsAdmin).Return(false).Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.AssociateId).Returns("999999");
+            user.Setup(x => x.IsAdmin).Returns(false);
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(null, user);
+            UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
             Assert.IsFalse(us.CanModifyDataflow);
@@ -1068,17 +1115,17 @@ namespace Sentry.data.Core.Tests
             ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
-            ISecurable securable = Rhino.Mocks.MockRepository.GenerateMock<ISecurable>();
-            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
-            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+            var securable = new Mock<ISecurable>();
+            securable.Setup(x => x.IsSecured).Returns(true);
+            securable.Setup(x => x.Security).Returns(security);
 
-            IApplicationUser user = Rhino.Mocks.MockRepository.GenerateMock<IApplicationUser>();
-            user.Stub(x => x.IsInGroup(null)).Throw(new NullReferenceException()); //The real service throws an exception if a null group name is passed in
-            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            var user = new Mock<IApplicationUser>();
+            user.Setup(x => x.IsInGroup(null)).Throws<NullReferenceException>(); //The real service throws an exception if a null group name is passed in
+            user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
             var ss = _container.GetInstance<ISecurityService>();
-            UserSecurity us = ss.GetUserSecurity(securable, user);
+            UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
             Assert.IsTrue(us.CanModifyNotifications);
