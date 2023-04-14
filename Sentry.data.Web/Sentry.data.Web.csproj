@@ -634,7 +634,8 @@
     <Compile Include="Models\ApiModels\Schema20220609\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionJsonStructureModel.cs" />
     <Compile Include="API\Interfaces\IResponseModel.cs" />
-    <Compile Include="Models\Config\DataSourceTokenModel.cs" />
+    <Compile Include="Models\Config\DataSource\AcceptableErrorModel.cs" />
+    <Compile Include="Models\Config\DataSource\DataSourceTokenModel.cs" />
     <Compile Include="Models\DataProcessing\DeadSparkJobModel.cs" />
     <Compile Include="Models\DataProcessing\ConnectorModel.cs" />
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
@@ -773,11 +774,9 @@
     <Compile Include="Models\BusinessArea\BusinessAreaLandingPageModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
-    <Compile Include="Models\Config\CreateSourceModel.cs" />
-    <Compile Include="Models\Config\DataSourceModel.cs" />
+    <Compile Include="Models\Config\DataSource\DataSourceModel.cs" />
     <Compile Include="Models\Config\EditJobModel.cs" />
     <Compile Include="Models\Config\EditSchemaModel.cs" />
-    <Compile Include="Models\Config\EditSourceModel.cs" />
     <Compile Include="Models\Config\FieldModel.cs" />
     <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
@@ -950,7 +949,6 @@
     <Content Include="Views\Search\TileResults.cshtml" />
     <Content Include="Views\Config\Index.cshtml" />
     <Content Include="Views\Config\_DataFlowStepAccordion.cshtml" />
-    <Content Include="Views\Config\_DataSourceToken.cshtml" />
     <Content Include="Views\DataFlow\_RequestVariable.cshtml" />
     <Content Include="Views\Migration\_MigrationResponse.cshtml" />
     <Content Include="Views\Migration\_MigrationRequest.cshtml" />
@@ -1148,11 +1146,9 @@
     <Content Include="Views\Config\CreateRetrievalJob.cshtml" />
     <Content Include="Views\Config\Edit.cshtml" />
     <Content Include="Views\Config\EditRetrievalJob.cshtml" />
-    <Content Include="Views\Config\CreateDataSource.cshtml" />
-    <Content Include="Views\Config\EditDataSource.cshtml" />
     <Content Include="Views\DataAsset\Test.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
-    <Content Include="Views\Config\_Headers.cshtml" />
+    <Content Include="Views\Config\DataSource\_Headers.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Collection.cshtml" />
     <Content Include="Views\Config\Fields.cshtml" />
     <Content Include="Views\Config\_Fields.cshtml" />
@@ -1216,6 +1212,10 @@
     <Content Include="Views\Dataset\Details\_SchemaSearch.cshtml" />
     <Content Include="Views\Migration\_NamedEnvironment.cshtml" />
     <Content Include="Views\Migration\_MigrationHistory.cshtml" />
+    <Content Include="Views\Config\DataSource\_DataSourceToken.cshtml" />
+    <Content Include="Views\Config\DataSource\_AcceptableError.cshtml" />
+    <Content Include="Views\Config\DataSource\CreateDataSource.cshtml" />
+    <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

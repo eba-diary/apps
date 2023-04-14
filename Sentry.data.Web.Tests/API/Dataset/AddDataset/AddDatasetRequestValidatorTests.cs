@@ -42,7 +42,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -191,7 +191,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -268,7 +268,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -333,6 +333,17 @@ namespace Sentry.data.Web.Tests.API
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            List<Dataset> datasets = new List<Dataset>
+            {
+                new Dataset
+                {
+                    DatasetName = "Name Other",
+                    DatasetType = DataEntityCodes.DATASET,
+                    NamedEnvironment = "TEST",
+                    ShortName = "Short"
+                }
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
 
             List<Category> categories = new List<Category>
             {       
@@ -394,7 +405,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -499,7 +510,7 @@ namespace Sentry.data.Web.Tests.API
             ConcurrentFieldValidationResponse fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.DatasetName));
             Assert.IsNotNull(fieldValidation);
             Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
-            Assert.AreEqual("Dataset name already exists for the named environment", fieldValidation.ValidationMessages.First());
+            Assert.AreEqual("Dataset name already exists. If attempting to create a copy of an existing dataset in a different named environment, please use dataset migration.", fieldValidation.ValidationMessages.First());
 
             fieldValidation = fieldValidations.FirstOrDefault(x => x.Field == nameof(AddDatasetRequestModel.ShortName));
             Assert.IsNotNull(fieldValidation);
@@ -539,7 +550,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -606,7 +617,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -673,7 +684,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -737,7 +748,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"
@@ -745,6 +756,8 @@ namespace Sentry.data.Web.Tests.API
             };
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
+
             List<Category> categories = new List<Category>
             {
                 new Category { Name = "Category", ObjectType = DataEntityCodes.DATASET }
@@ -804,7 +817,7 @@ namespace Sentry.data.Web.Tests.API
             {
                 new Dataset
                 {
-                    DatasetName = "Name",
+                    DatasetName = "Name Other",
                     DatasetType = DataEntityCodes.DATASET,
                     NamedEnvironment = "TEST",
                     ShortName = "Short"

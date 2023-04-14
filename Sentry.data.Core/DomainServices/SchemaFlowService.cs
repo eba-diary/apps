@@ -51,9 +51,9 @@ namespace Sentry.data.Core
                 dto.DataFlowDto.IsSecured = true;
                 dto.DataFlowDto.DatasetId = dataset.DatasetId;
                 dto.DataFlowDto.SchemaMap = new List<SchemaMapDto>
-                    {
-                        new SchemaMapDto { DatasetId = dataset.DatasetId, SchemaId = addedSchemaDto.SchemaId }
-                    };
+                {
+                    new SchemaMapDto { DatasetId = dataset.DatasetId, SchemaId = addedSchemaDto.SchemaId }
+                };
                 DataFlowDto addedDataFlowDto = await _dataFlowService.AddDataFlowAsync(dto.DataFlowDto);
 
                 SchemaResultDto resultDto = CreateSchemaResultDto(addedSchemaDto, addedDataFlowDto, dto.DatasetFileConfigDto.DatasetScopeTypeName);

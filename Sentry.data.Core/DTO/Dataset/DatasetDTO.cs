@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         public string NamedEnvironment { get; set; }
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
         public string ShortName { get; set; }
+        public int? GlobalDatasetId { get; set; }
     }
 }
