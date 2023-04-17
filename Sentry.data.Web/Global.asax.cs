@@ -21,9 +21,6 @@ namespace Sentry.data.Web
 
         protected void Application_Start()
         {
-            //Configure Logging
-            LoggerHelper.ConfigureLogger();
-
             //setup the ASP.NET thread pool
             InitThreadPool();
 
@@ -37,7 +34,9 @@ namespace Sentry.data.Web
             ModelBinders.Binders.Add(typeof(DataTables.Shared.DataTablesRequest), new DataTables.Mvc.DataTablesBinder());
 
             //Application Initialization
-            Bootstrapper.Init();
+            var loggerFactory = LoggerHelper.ConfigureLogger();
+
+            Bootstrapper.Init(loggerFactory);
 
             //MVC dependency resolver
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);

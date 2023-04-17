@@ -1,7 +1,9 @@
-﻿using System;
-using System.Web;
-using Sentry.Configuration;
+﻿using Microsoft.Extensions.Logging;
+using Sentry.EnterpriseLogging;
+using System;
 using System.Text;
+using System.Web;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -10,15 +12,37 @@ namespace Sentry.data.Web
         /// <summary>
         /// Wire up logging to use Sentry.Common.Logging
         /// </summary>
-        public static void ConfigureLogger()
+        public static ILoggerFactory ConfigureLogger()
         {
+            //Sentry.Common.Logging.Logger.LoggingFrameworkAdapter =
+            //    new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
+            //Sentry.Web.Logging.Logger.LoggingFrameworkAdapter =
+            //    new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SentryWebLogger"));
+            //Sentry.Smarts.Logging.Logger.LoggingFrameworkAdapter =
+            //    new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SmartsLogger"));
+
+            // JCG NOTES: If you are using any other Sentry components (like Sentry.Eventing, etc.) you can wire up their loggers here also
+
             Sentry.Common.Logging.Logger.LoggingFrameworkAdapter =
-                new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
-            Sentry.Web.Logging.Logger.LoggingFrameworkAdapter =
-                new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SentryWebLogger"));
-            Sentry.Smarts.Logging.Logger.LoggingFrameworkAdapter =
-                new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SmartsLogger"));
-        // JCG NOTES: If you are using any other Sentry components (like Sentry.Eventing, etc.) you can wire up their loggers here also
+                new Sentry.Common.Logging.Adapters.Log4netAdapter("Sentry.Common.Logging");
+
+            // The following is the new ILoggerFactory/ILogger setup for modern logging that is 
+            // ready for .NET 5.
+            var loggerFactory = new SentryLoggerFactory(new LoggerFactory());
+            var log4netOptions = new Log4NetProviderOptions();
+            if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.local.config";
+            }
+            else
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.server.config";
+            }
+
+            loggerFactory.AddLog4Net(log4netOptions);
+
+            return loggerFactory;
+
         }
 
         /// <summary>
@@ -28,19 +52,21 @@ namespace Sentry.data.Web
         /// <param name="context">The current httpcontext</param>
         public static void LogWebException(Exception exception, System.Web.HttpContext context)
         {
+            var logger = DependencyResolver.Current.GetService<ILogger<LoggerHelper>>();
+
             string logMessage = GetLogMessage(exception, context);
 
             if (logMessage.Contains("The remote host closed the connection"))
             {
-                Sentry.Common.Logging.Logger.Info(logMessage);
+                logger.LogInformation(logMessage);
             }
             else if (Is404Exception(exception))
             {
-                Sentry.Common.Logging.Logger.Warn(logMessage);
+                logger.LogWarning(logMessage);
             }
             else
             {
-                Sentry.Common.Logging.Logger.Fatal(logMessage);
+                logger.LogCritical(logMessage);
             }
         }
 

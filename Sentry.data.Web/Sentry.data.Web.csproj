@@ -1325,6 +1325,9 @@
     <Folder Include="Views\TileSearch\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="log4net.local.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>

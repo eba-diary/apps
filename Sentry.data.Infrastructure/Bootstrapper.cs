@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using LaunchDarkly.Sdk.Server.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using NHibernate;
@@ -71,14 +72,23 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Initialize the infrastructure for this application
         /// </summary>
-        public static void Init()
+        public static void Init(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory = null)
         {
+
+            Logging.LoggerFactory = loggerFactory;
 
             //Initialize the default database connection
             _defaultSessionFactory = InitDefaultSessionFactory();
 
             //Wire up the Infrastructure implementations to the interfaces that are in the Core
             StructureMap.Registry registry = new StructureMap.Registry();
+
+            if (loggerFactory != null)
+            {
+                registry.For<Microsoft.Extensions.Logging.ILoggerFactory>().Singleton().Use(loggerFactory);
+                registry.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
+            }
+
             registry.Scan((scanner) =>
             {
                 scanner.AssemblyContainingType<DataAssetContext>();
