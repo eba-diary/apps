@@ -338,7 +338,7 @@
         var createSchemaLink = targetElement.parent().parent().find('#CreateSchema');
         if (datasetId !== null && datasetId !== 0 && datasetId !== "0") {
             var curVal = schemaId;
-            $.getJSON("/api/v2/metadata/dataset/" + String(datasetId) + "/schema", function (result) {
+            $.getJSON("/api/" + data.GetApiVersion() + "/metadata/dataset/" + String(datasetId) + "/schema", function (result) {
                 var subItems;
 
                 //Filter for only ACTIVE schema
@@ -400,7 +400,7 @@
             Sentry.InjectSpinner(cur, 30);
         });
 
-        $.getJSON("/api/v2/metadata/dataset", function (result) {
+        $.getJSON("/api/" + data.GetApiVersion() + "/metadata/dataset", function (result) {
             var newSubItems;
             var groupName;
             var datasetCount = result.length;

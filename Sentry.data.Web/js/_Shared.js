@@ -22,6 +22,14 @@ $(function () {
 // with other libraries
 window.data = new function () {
 
+    // alert(data.GetApiVersion());
+    //" + data.GetApiVersion() + "
+    this.ApiVersion = "v20220609";
+    this.GetApiVersion = function () {
+        return this.ApiVersion;
+    };
+
+
     // Use the format below for adding global methods
     this.HelperMethod = function (param1, param2) {
         //logic goes here
