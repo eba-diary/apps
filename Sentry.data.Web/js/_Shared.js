@@ -22,8 +22,7 @@ $(function () {
 // with other libraries
 window.data = new function () {
 
-    // alert(data.GetApiVersion());
-    //" + data.GetApiVersion() + "
+    //NOTE: UNVIVERSAL PLACE TO STORE WHICH DSC API VERSION ENTIRE APP WILL LEVERAGE.  CHANGE AT YOUR OWN RISK.
     this.ApiVersion = "v20220609";
     this.GetApiVersion = function () {
         return this.ApiVersion;
