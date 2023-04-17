@@ -553,6 +553,11 @@
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestValidator.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\GlobalDatasetController.cs" />
+    <Compile Include="API\Resources\GlobalDataset\Search\GlobalDatasetModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\Search\SearchGlobalDatasetsRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\Search\SearchGlobalDatasetsRequestValidator.cs" />
+    <Compile Include="API\Resources\GlobalDataset\Search\SearchGlobalDatasetsResponseModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />
@@ -565,6 +570,8 @@
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\Search\FilterCategoryOptionRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\Search\FilterCategoryRequestModel.cs" />
     <Compile Include="API\Validation\Models\ConcurrentFieldValidationResponse.cs" />
     <Compile Include="API\Validation\Models\ConcurrentValidationResponse.cs" />
     <Compile Include="API\Validation\Fluent\FluentValidationResponse.cs" />
@@ -588,6 +595,7 @@
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\GlobalDatasetSearchController.cs" />
     <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
@@ -1243,6 +1251,7 @@
     <Folder Include="Views\DatasetSearch\" />
     <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
+    <Folder Include="Views\GlobalDatasetSearch\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Playground\" />
     <Folder Include="Views\Security\" />

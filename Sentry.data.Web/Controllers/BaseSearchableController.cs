@@ -18,9 +18,9 @@ namespace Sentry.data.Web.Controllers
         protected abstract FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel);
 
         protected bool TryGetSavedSearch(string searchType, string savedSearchName, out SavedSearchDto savedSearchDto)
-{
+        {
             if (!string.IsNullOrEmpty(savedSearchName))
-{
+            {
                 savedSearchDto = _filterSearchService.GetSavedSearch(searchType, savedSearchName, SharedContext.CurrentUser.AssociateId);
                 return savedSearchDto != null;
             }

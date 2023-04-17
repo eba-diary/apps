@@ -47,17 +47,24 @@ namespace Sentry.data.Infrastructure
             //get aggregation results
             FilterSearchDto resultDto = new FilterSearchDto();
 
-            AggregateDictionary aggResults = GetElasticResult(dto, resultDto, request).Aggregations;
-
-            //translate results to dto
-            foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
+            try
             {
-                TermsAggregate<string> categoryResults = aggResults?.Terms(categoryName);
-                if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                ElasticResult<DataInventory> elasticResult = _context.SearchAsync(request).Result;
+
+                //translate results to dto
+                foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
                 {
-                    resultDto.FilterCategories.Add(BuildFilterCategoryDto(categoryResults.Buckets, categoryName, dto.FilterCategories));
+                    TermsAggregate<string> categoryResults = elasticResult.Aggregations?.Terms(categoryName);
+                    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                    {
+                        resultDto.FilterCategories.Add(BuildFilterCategoryDto(categoryResults.Buckets, categoryName, dto.FilterCategories));
+                    }
                 }
             }
+            catch (AggregateException ex)
+            {
+                Logger.Error($"Data Inventory Elasticsearch query failed. Exception: {ex.Message}", ex);
+            }            
 
             return resultDto;
         }

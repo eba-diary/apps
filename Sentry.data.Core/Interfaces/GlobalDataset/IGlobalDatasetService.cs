@@ -8,5 +8,7 @@ namespace Sentry.data.Core
 {
     public interface IGlobalDatasetService
     {
+        Task<SearchGlobalDatasetsResultDto> SearchGlobalDatasetsAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto);
+        FilterSearchDto GetFiltersForGlobalDatasets(FilterSearchDto filterSearchDto);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
+using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +20,12 @@ namespace Sentry.data.Infrastructure
         }
 
         #region Global Dataset
+        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            //translate dto to elastic search request
+            throw new NotImplementedException();
+        }
+
         public async Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset)
         {
             await _elasticDocumentClient.IndexAsync(globalDataset).ConfigureAwait(false);
