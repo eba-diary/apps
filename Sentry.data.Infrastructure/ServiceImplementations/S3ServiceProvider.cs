@@ -4,6 +4,7 @@ using Amazon.Runtime.CredentialManagement;
 using Amazon.S3;
 using Amazon.S3.IO;
 using Amazon.S3.Model;
+using Microsoft.Extensions.Logging;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Core;
@@ -1095,7 +1096,7 @@ namespace Sentry.data.Infrastructure
                     MultiPartCopy(srcBucket, srcKey, destBucket, destKey).Wait();
                     stopWatch.Stop();
 
-                    Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
+                    Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new Common.Logging.DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
                     return versionId;
                 }
                 else
@@ -1119,7 +1120,7 @@ namespace Sentry.data.Infrastructure
                     }
                     stopWatch.Stop();
 
-                    Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
+                    Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new Common.Logging.DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
                     return (resp != null) ? Convert.ToString(resp["VersionId"]) : null;
                 }
             }
@@ -1129,7 +1130,7 @@ namespace Sentry.data.Infrastructure
                 {
                     stopWatch.Stop();
                 }
-                Logger.Error($"s3serviceprovider-copyobject failed", ex, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
+                Logger.Error($"s3serviceprovider-copyobject failed", ex, new List<Variable>() { new Common.Logging.DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
                 throw;
             }
                         
