@@ -118,16 +118,16 @@ data.Admin = {
 
     // creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
-        return "../../api/v2/metadata/dataset/" + datasetId + "/schema";
+        return "../../api/" + data.GetApiVersion() + "/metadata/dataset/" + datasetId + "/schema";
     },
 
     GetFileUrl: function (datasetId, schemaId) {
     // creates url for Ajax call to get data files
-        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
+        return "../../api/" + data.GetApiVersion() + "/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
     },
 
     GetFlowStepUrl: function (schemaId) {
-        return "../../api/v2/dataflow?schemaId=" + schemaId;
+        return "../../api/" + data.GetApiVersion() + "/dataflow?schemaId=" + schemaId;
     },
 
     /**
@@ -661,7 +661,7 @@ data.Admin = {
 
                 $.ajax({
                     type: "POST",
-                    url: "../../api/v2/datafile/DataFile/Reprocess",
+                    url: "../../api/" + data.GetApiVersion() + "/datafile/DataFile/Reprocess",
                     // Async has been set to false in order to await callback functions before the next iteration over the returnJson array
                     async: false,
                     contentType: "application/json",
@@ -751,7 +751,7 @@ data.Admin = {
             var flowStep = $("#flowStepsDropdown").find(":selected").val();
             $.ajax({
                 type: "POST",
-                url: "../../api/v2/datafile/DataFile/Reprocess",
+                url: "../../api/" + data.GetApiVersion() + "/datafile/DataFile/Reprocess",
                 contentType: "application/json",
                 data: JSON.stringify({ DataFlowStepId: flowStep, DatasetFileIds: filesToReprocess }),
                 success: function () {

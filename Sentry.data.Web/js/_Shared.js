@@ -22,6 +22,13 @@ $(function () {
 // with other libraries
 window.data = new function () {
 
+    //NOTE: UNVIVERSAL PLACE TO STORE WHICH DSC API VERSION ENTIRE APP WILL LEVERAGE.  CHANGE AT YOUR OWN RISK.
+    this.ApiVersion = "v20220609";
+    this.GetApiVersion = function () {
+        return this.ApiVersion;
+    };
+
+
     // Use the format below for adding global methods
     this.HelperMethod = function (param1, param2) {
         //logic goes here

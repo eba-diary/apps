@@ -167,7 +167,7 @@ data.Dataset = {
         data.Dataset.delroyStructTrackerArray = [];
         data.Dataset.delroySnowflakeViewsArray = snowflakeViews;
 
-        var schemaURL = "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
+        var schemaURL = "/api/" + data.GetApiVersion() + "/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/revision/latest/fields";
         $.get(schemaURL, function (result) {
 
             data.Dataset.delroyAddFieldArray(result.Fields);
@@ -508,7 +508,7 @@ data.Dataset = {
     UpdateMetadata: function () {
         if ($('#datasetConfigList').val() === undefined) { return; }
 
-        var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
+        var metadataURL = "/api/" + data.GetApiVersion() + "/metadata/datasets/" + $('#datasetConfigList').val();
         $.get(metadataURL, function (result) {
 
             data.Dataset.updateUploadButtonOnSchemaChange();
@@ -563,7 +563,7 @@ data.Dataset = {
     },
 
     UpdateConsumptionLayers: function () {
-        var schemaUrl = "/api/v20220609/metadata/dataset/" + $('#RequestAccessButton').attr("data-id") + "/schema/" + self.vm.SchemaId;
+        var schemaUrl = "/api/" + data.GetApiVersion() + "/metadata/dataset/" + $('#RequestAccessButton').attr("data-id") + "/schema/" + self.vm.SchemaId;
         self.vm.FullyQualifiedSnowflakeViews.removeAll();
         $.get(schemaUrl, function (result) {
             var currentView = result.CurrentView;
@@ -582,7 +582,7 @@ data.Dataset = {
     UpdateColumnSchema: function () {
         if ($('#datasetConfigList').val() === undefined) { return; }
 
-        var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
+        var schemaURL = "/api/" + data.GetApiVersion() + "/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
 
         self.vm.DataLoading(true);
         $('#dataSection').hide();
@@ -637,7 +637,7 @@ data.Dataset = {
 
         $.ajax({
             type: "GET",
-            url: "/api/v2/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
+            url: "/api/" + data.GetApiVersion() + "/querytool/dataset/" + location.pathname.split('/')[3] + "/config/" + $('#datasetConfigList').val() + "/SampleRecords",
             data: {
                 rows: 20
             },
@@ -1199,7 +1199,7 @@ data.Dataset = {
 
             Sentry.ShowModalConfirmation(warningMsg, function () {
                 $.ajax({
-                    url: "/api/v2/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
+                    url: "/api/" + data.GetApiVersion() + "/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
                     method: "POST",
                     dataType: 'json',
                     success: function (obj) {
@@ -1392,7 +1392,7 @@ data.Dataset = {
                     data: datasetDetailModel,
                     success: function (view) {
                         $('#tabSchemaSearch').html(view);
-                        var metadataURL = "/api/v2/metadata/datasets/" + $('#datasetConfigList').val();
+                        var metadataURL = "/api/" + data.GetApiVersion() + "/metadata/datasets/" + $('#datasetConfigList').val();
 
                         $.get(metadataURL, function (result) {
                             self.vm.SchemaId = result.SchemaId;
@@ -1443,7 +1443,7 @@ data.Dataset = {
             //delete
             $.ajax({
                 type: "POST",
-                url: '../../api/v2/datafile/dataset/' + datasetId + '/schema/' + schemaId + '/Delete',
+                url: '../../api/" + data.GetApiVersion() + "/datafile/dataset/' + datasetId + '/schema/' + schemaId + '/Delete',
                 data: JSON.stringify({ UserFileIdList: ids }),
                 contentType: "application/json",
                 success: function () {
@@ -1519,7 +1519,7 @@ data.Dataset = {
             //CLICK EVENT IF THEY TURN DataFlow ON
             $("#dataFlowBtnOn").click(function () {
                 $.ajax({
-                    url: "../../api/v20220609/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Enable",
+                    url: "../../api/" + data.GetApiVersion() + "/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Enable",
                     method: "POST",
                     success: function (obj)
                     {
@@ -1537,7 +1537,7 @@ data.Dataset = {
             //CLICK EVENT IF THEY TURN DataFlow OFF
             $("#dataFlowBtnOff").click(function () {
                 $.ajax({
-                    url: "../../api/v20220609/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Disable",
+                    url: "../../api/" + data.GetApiVersion() + "/dataflow/" + encodeURI(data.Dataset.DataFlowIdSelected) + "/Disable",
                     method: "POST",
                     success: function (obj) {
                         data.Dataset.makeToast("success", actionTaken);

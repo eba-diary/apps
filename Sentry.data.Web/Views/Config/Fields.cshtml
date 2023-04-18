@@ -924,7 +924,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/api/v1/metadata/datasets/" + url_parts[3] + "/schemas/" + url_parts[5] + "/columns" ,
+                url: "/api/" + data.GetApiVersion() + "/metadata/datasets/" + url_parts[3] + "/schemas/" + url_parts[5] + "/columns" ,
                 contentType: "application/json",
                 success: function (returnedData) {
                     $('#panelSpinner').hide();
