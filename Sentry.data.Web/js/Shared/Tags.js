@@ -6,7 +6,7 @@ data.Tags = {
 
     initTags: function () {
         $.ajax({
-            url: "/api/v1/tags",
+            url: "/api/" + data.GetApiVersion() + "/tags",
             dataType: 'json',
             type: "GET",
             success: function (msg) {
@@ -16,7 +16,7 @@ data.Tags = {
                     allowClear: true,
                     data: msg,
                     ajax: {
-                        url: "/api/v1/tags",
+                        url: "/api/" + data.GetApiVersion() + "/tags",
                         dataType: 'json',
                         dropdownPosition: 'below',
                         data: function (params) {
@@ -65,7 +65,7 @@ data.Tags = {
 
             $.ajax({
                 type: "GET",
-                url: "/api/v1/tags/" + $("#tagName").val(),
+                url: "/api/" + data.GetApiVersion() + "/tags/" + $("#tagName").val(),
                 dataType: "json",
                 success: function (msg) {
 
@@ -95,7 +95,7 @@ data.Tags = {
         $('body').on('change', '#TagName', function () {
             $.ajax({
                 type: "GET",
-                url: "/api/v1/tags/" + $("#TagName").val(),
+                url: "/api/" + data.GetApiVersion() + "/tags/" + $("#TagName").val(),
                 dataType: "json",
                 success: function (msg) {
 

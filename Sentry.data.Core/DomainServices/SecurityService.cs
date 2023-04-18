@@ -12,38 +12,37 @@ using static Sentry.data.Core.GlobalConstants;
 using Hangfire;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.Jira;
+using Sentry.data.Core.Helpers;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Sentry.data.Core.Entities.S3.S3AccessPointPolicy;
 
 namespace Sentry.data.Core
 {
     public class SecurityService : ISecurityService
     {
-
         private readonly IDatasetContext _datasetContext;
-        //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
-        private readonly IBaseTicketProvider _baseTicketProvider;
+        private readonly ITicketProvider _ticketProvider;
         private readonly IDataFeatures _dataFeatures;
         private readonly IInevService _inevService;
-        private readonly IQuartermasterService _quartermasterService;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IObsidianService _obsidianService;
         private readonly IAdSecurityAdminProvider _adSecurityAdminProvider;
         private readonly IJiraService _jiraService;
 
         public SecurityService(IDatasetContext datasetContext,
-                               IBaseTicketProvider baseTicketProvider,
+                               ITicketProvider ticketProvider,
                                IDataFeatures dataFeatures,
                                IInevService inevService,
-                               IQuartermasterService quartermasterService,
                                IBackgroundJobClient backgroundJobClient,
                                IObsidianService obsidianService,
                                IAdSecurityAdminProvider adSecurityAdminProvider,
                                IJiraService jiraService)
         {
             _datasetContext = datasetContext;
-            _baseTicketProvider = baseTicketProvider;
+            _ticketProvider = ticketProvider;
             _dataFeatures = dataFeatures;
             _inevService = inevService;
-            _quartermasterService = quartermasterService;
             _backgroundJobClient = backgroundJobClient;
             _obsidianService = obsidianService;
             _adSecurityAdminProvider = adSecurityAdminProvider;
@@ -52,7 +51,7 @@ namespace Sentry.data.Core
 
         public async Task<string> RequestPermission(AccessRequest model)
         {
-            string ticketId = _baseTicketProvider.CreateChangeTicket(model);
+            string ticketId = await _ticketProvider.CreateTicketAsync(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
                 Security security = model.Scope.Equals(AccessScope.Asset) ? GetSecurityForAsset(model.SecurableObjectName) : _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
@@ -77,7 +76,7 @@ namespace Sentry.data.Core
                 TicketId = ticketId,
                 AdGroupName = model.AdGroupName,
                 GrantPermissionToUserId = model.PermissionForUserId,
-                TicketStatus = HpsmTicketStatus.PENDING,
+                TicketStatus = ChangeTicketStatus.PENDING,
                 RequestedById = model.RequestorsId,
                 RequestedDate = model.RequestedDate,
                 IsAddingPermission = model.IsAddingPermission,
@@ -110,7 +109,7 @@ namespace Sentry.data.Core
                 TicketId = ticketId,
                 AdGroupName = model.AdGroupName,
                 GrantPermissionToUserId = model.PermissionForUserId,
-                TicketStatus = HpsmTicketStatus.PENDING,
+                TicketStatus = ChangeTicketStatus.PENDING,
                 RequestedById = model.RequestorsId,
                 RequestedDate = model.RequestedDate,
                 IsAddingPermission = model.IsAddingPermission,
@@ -146,89 +145,7 @@ namespace Sentry.data.Core
         public UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user)
         {
             // call different implementations based on the feature flag
-            return _dataFeatures.CLA3861_RefactorGetUserSecurity.GetValue()
-                ? GetUserSecurity_Internal(securable, user)
-                : GetUserSecurity_Internal_Original(securable, user);
-        }
-
-        private UserSecurity GetUserSecurity_Internal_Original(ISecurable securable, IApplicationUser user)
-        {
-            //If the user is nothing for some reason, absolutly no permissions should be returned.
-            if (user == null) { return new UserSecurity(); }
-
-            //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
-            //Admins also get all the permissions, except if the securable is sensitive (ie HR) 
-
-            bool IsAdmin = user.IsAdmin;
-            bool IsOwner = (user.AssociateId == securable?.PrimaryContactId) && user.CanModifyDataset;
-            List<string> userPermissions = new List<string>();
-
-            //set the user based permissions based off obsidian and ownership
-            UserSecurity us = new UserSecurity()
-            {
-                CanEditDataset = IsOwner || IsAdmin,
-                CanCreateDataset = user.CanModifyDataset || IsAdmin,
-                CanEditReport = user.CanManageReports || IsAdmin,
-                CanCreateReport = user.CanManageReports || IsAdmin,
-                CanEditDataSource = IsOwner || IsAdmin,
-                CanCreateDataSource = user.CanModifyDataset || IsAdmin,
-                ShowAdminControls = IsAdmin,
-                CanCreateDataFlow = user.CanModifyDataset || IsAdmin,
-                CanModifyDataflow = user.CanModifyDataset || IsOwner || IsAdmin
-            };
-
-            //if no tickets have been requested, then there should be no permission given.
-            if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
-            {
-                //build a adGroupName and  List(of permissionCode) anonymous obj.
-                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.AddedPermissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.adGroup != null).ToList();
-                //loop through the dictionary to see if the user is part of the group, if so grab the permissions.
-                foreach (var item in adGroups)
-                {
-                    if (user.IsInGroup(item.adGroup))
-                    {
-                        userPermissions.AddRange(item.permissions.Select(x => x.Permission.PermissionCode).ToList());
-                    }
-                }
-
-                //build a userId and  List(of permissionCode) anonymous obj.
-                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.AddedPermissions.Where(y => y.IsEnabled).ToList() }).Where(x => x.userId != null).ToList();
-                //loop through the dictionary to see if the user is the user on the ticket, if so grab the permissions.
-                foreach (var item in userGroups)
-                {
-                    if (item.userId == user.AssociateId)
-                    {
-                        userPermissions.AddRange(item.permissions.Select(x => x.Permission.PermissionCode).ToList());
-                    }
-                }
-            }
-
-            //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
-            if (securable == null || securable.Security == null || !securable.IsSecured)
-            {
-                us.CanPreviewDataset = true;
-                us.CanQueryDataset = true;
-                us.CanViewFullDataset = true;
-                us.CanModifyNotifications = false;
-                us.CanUseDataSource = true;
-                us.CanManageSchema = (userPermissions.Count > 0) ? userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin : (IsOwner || IsAdmin);
-                us.CanUploadToDataset = us.CanManageSchema;
-                us.CanViewData = true;
-                return us;
-            }
-
-            //from the list of permissions, build out the security object.
-            us.CanPreviewDataset = userPermissions.Contains(PermissionCodes.CAN_PREVIEW_DATASET) || IsOwner || IsAdmin;
-            us.CanViewFullDataset = userPermissions.Contains(PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || IsAdmin;
-            us.CanQueryDataset = userPermissions.Contains(PermissionCodes.CAN_QUERY_DATASET) || IsOwner || IsAdmin;
-            us.CanUploadToDataset = userPermissions.Contains(PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
-            us.CanModifyNotifications = userPermissions.Contains(PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
-            us.CanUseDataSource = userPermissions.Contains(PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
-            us.CanManageSchema = userPermissions.Contains(PermissionCodes.CAN_MANAGE_SCHEMA) || IsOwner || IsAdmin;
-            us.CanViewData = userPermissions.Contains(PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || (!securable.AdminDataPermissionsAreExplicit && IsAdmin);
-            us.CanDeleteDatasetFile = CanDeleteDatasetFile(us, _dataFeatures);
-
-            return us;
+            return GetUserSecurity_Internal(securable, user);
         }
 
         /// <summary>
@@ -296,7 +213,7 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public SecurityTicket GetSecurableInheritanceTicket(ISecurable securable)
         {
-            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(HpsmTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
+            SecurityTicket inheritanceTicket = securable.Security.Tickets.FirstOrDefault(t => t.TicketStatus.Equals(ChangeTicketStatus.PENDING) && (t.AddedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS) || t.RemovedPermissions.Any(p => p.Permission.PermissionCode == PermissionCodes.INHERIT_PARENT_PERMISSIONS)));
             if (inheritanceTicket != null && inheritanceTicket.TicketId != null)
             {
                 return inheritanceTicket;
@@ -359,6 +276,8 @@ namespace Sentry.data.Core
                         IdentityType = t.IdentityType,
                         SecurityPermission = p,
                         TicketId = t.TicketId,
+                        ExternalRequestId = t.ExternalRequestId,
+                        TicketStatus = t.TicketStatus,
                         IsSystemGenerated = t.IsSystemGenerated
                     }))
                 );
@@ -373,6 +292,8 @@ namespace Sentry.data.Core
                         IdentityType = s.IdentityType,
                         SecurityPermission = s.SecurityPermission,
                         TicketId = s.TicketId,
+                        ExternalRequestId = s.ExternalRequestId,
+                        TicketStatus = s.TicketStatus,
                         IsSystemGenerated = s.IsSystemGenerated
                     })
                 );
@@ -510,7 +431,8 @@ namespace Sentry.data.Core
         {
             ticket.ApprovedById = approveId;
             ticket.ApprovedDate = DateTime.Now;
-            ticket.TicketStatus = HpsmTicketStatus.COMPLETED;
+            ticket.TicketStatus = ChangeTicketStatus.COMPLETED;
+
             if (ticket.IsAddingPermission)
             {
                 ticket.AddedPermissions.ToList().ForEach(x =>
@@ -585,7 +507,7 @@ namespace Sentry.data.Core
         private async Task PublishDatasetPermissionsUpdatedInfrastructureEvent(SecurityTicket ticket)
         {
             //If the SecurityTicket just approved includes dataset/asset permissions
-            if (_dataFeatures.CLA3718_Authorization.GetValue() && 
+            if (
                 (ticket.AddedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET || p.Permission.SecurableObject == SecurableEntityName.ASSET) ||
                 ticket.RemovedPermissions.Any(p => p.Permission.SecurableObject == SecurableEntityName.DATASET || p.Permission.SecurableObject == SecurableEntityName.ASSET)))
             {
@@ -618,36 +540,97 @@ namespace Sentry.data.Core
             BuildS3TicketForDatasetAndTicket(dataset, ticket);
         }
 
-        private void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
+        internal void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
             string project = "TIS";
             string summary = (ticket.IsAddingPermission && isAddingPermission ? "Create or Update" : "Remove") + " S3 Access Point with the following policy";
-            StringBuilder sb = new StringBuilder();
             string issueType = "Support Request";
 
             //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");
-            string name = "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-" + dataset.ShortName + "-ae2";
+            string name = $"sentry-{GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower()}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-{dataset.ShortName.ToLower()}-ae2";
 
-            sb.AppendLine("Account: " + account);
-            sb.AppendLine("S3 Access Point Name: " + name);
-            sb.AppendLine("Source Bucket: " + "sentry-dlst-" + Sentry.Configuration.Config.GetHostSetting("EnvironmentName") + "-dataset-ae2");
-            sb.AppendLine("");
+            Markdown markdown = new Markdown();
+            markdown.AddBold("If the following S3 access point policy exists:");
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>
+            {
+                "Add the Principle Arn to existing policy",
+                "Replace resources in each statement on existing policy with the respective resource list below"
+            });
+            markdown.AddBreak();
+            markdown.AddBold("If the S3 access point policy does not exist:");
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>
+            {
+                "Create a new S3 Access Policy and paste the policy from below"
+            });
+            markdown.AddBreak();
+            markdown.AddBold("Create S3 Access Point");
+            markdown.AddBreak();
+            markdown.AddLine($"Account: {account}", false);
+            markdown.AddLine("S3 Access Point Name: " + name.Replace(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower(), JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())), false);
+            markdown.AddLine($"Source Bucket: sentry-{JiraHelper.Format_Bold(GlobalConstants.SaidAsset.DATA_LAKE_STORAGE.ToLower())}-{Sentry.Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-dataset-ae2", false);
+            markdown.AddBreak();
 
-            sb.AppendLine("With the following policy:");
-            sb.AppendLine("");
 
-            sb.AppendLine("Principal AWS ARN: " + ticket.AwsArn);
-            sb.AppendLine("Action: s3.*");
+            //Generate S3 Access Policy to add within description of jira ticket
+            List<string> schemaNameList = new List<string>();
             foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
             {
-                sb.AppendLine("Schema: " + dsfc.Schema.Name);
-                sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name + "/object/" + dsfc.Schema.ParquetStoragePrefix + "/*");
-                sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name + "/object/" + dsfc.Schema.ParquetStoragePrefix);
-                sb.AppendLine("");
+                schemaNameList.Add(dsfc.Schema.Name);
             }
-            sb.AppendLine("Action: S3:ListBucket");
-            sb.AppendLine("Resource: " + "arn:aws:s3:us-east-2:" + account + ":accesspoint/" + name);
+
+            List<string> schemaResources = new List<string>();
+            foreach (DatasetFileConfig dsfc in dataset.DatasetFileConfigs)
+            {
+                schemaResources.Add($"arn:aws:s3:us-east-2:{account}:accesspoint/{name}/object/{dsfc.Schema.ParquetStoragePrefix}/*");
+                schemaResources.Add($"arn:aws:s3:us-east-2:{account}:accesspoint/{name}/object/{dsfc.Schema.ParquetStoragePrefix}");
+            }
+
+            List<string> bucketResources = new List<string>();
+            bucketResources.Add($"arn:aws:s3:us-east-2:{account}:accesspoint/{name}");
+
+            S3AccessPointPolicy s3AccessPointPolicy = new S3AccessPointPolicy();
+            Statement readWritePrefixesStatement = new Statement()
+            {
+                Sid = "ReadWritePrefixes",
+                Effect = "Allow",
+                Principal = new Principal()
+                {
+                    AWS = new List<string>() { ticket.AwsArn }
+                },
+                Action = new List<string>() { "S3:Get*" , "S3:List*"},
+                Resource = schemaResources
+            };
+            Statement listBucketStatement = new Statement()
+            {
+                Sid = "ListBucket",
+                Effect = "Allow",
+                Principal = new Principal()
+                {
+                    AWS = new List<string>() { ticket.AwsArn }
+                },
+                Action = new List<string>() { "S3:ListBucket" },
+                Resource = bucketResources
+            };
+            s3AccessPointPolicy.Statement.Add(readWritePrefixesStatement);
+            s3AccessPointPolicy.Statement.Add(listBucketStatement);
+
+            markdown.AddJsonCodeBlock(JsonConvert.SerializeObject(s3AccessPointPolicy, Formatting.Indented));
+            markdown.AddBreak();
+            markdown.AddBreak();
+            markdown.AddLine("************************************", false);
+            markdown.AddLine(" This section is informational only ", false);
+            markdown.AddBreak();
+            markdown.AddBulletList(new List<string>()
+            {
+                $"Approval Ticket: [{ticket.TicketId}|https://sentryinsurance.atlassian.net/browse/{ticket.TicketId}]",
+                $"Dataset: {dataset.DatasetName}",
+                $"Schema: {string.Join(",",schemaNameList.ToArray())}"
+            });
+            markdown.AddBreak();
+            markdown.AddLine("************************************", false);
 
 
             List<JiraCustomField> customFields = new List<JiraCustomField>();
@@ -663,12 +646,15 @@ namespace Sentry.data.Core
                 Summary = summary,
                 Labels = new List<string> { "requestAssistance", "DSCAuthorization", "awspermissions" },
                 Components = new List<string> { "ACID" },
-                Description = sb.ToString()
+                Description = markdown.ToString()
             };
 
             jiraRequest.Tickets = new List<JiraTicket>() { jiraTicket };
 
-            _jiraService.CreateJiraTickets(jiraRequest);
+            List<string> externalTicketIds = _jiraService.CreateJiraTickets(jiraRequest);
+
+            //We are only submitting a single ticket on the jirarequst, therefore, we can expect only one id returned.
+            ticket.ExternalRequestId = externalTicketIds.First();
         }
 
         public void BuildS3RequestAssistance(IList<Dataset> datasets, SecurityTicket ticket)
@@ -750,6 +736,12 @@ namespace Sentry.data.Core
                 throw new ArgumentOutOfRangeException(nameof(datasetId), $"Dataset with ID \"{datasetId}\" could not be found.");
             }
 
+            if (ds.ObjectStatus != ObjectStatusEnum.Active)
+            {
+                Common.Logging.Logger.Info($"Dataset is not active ({datasetId}), default security will not be created");
+                return Task.CompletedTask;
+            }
+
             // This "wrapping" of the async portion of this method is required so that the error checking above runs immediately.
             // See https://sonarqube.sentry.com/coding_rules?open=csharpsquid%3AS4457&rule_key=csharpsquid%3AS4457
             return CreateDefaultSecurityForDatasetAsync();
@@ -768,7 +760,6 @@ namespace Sentry.data.Core
                 //actually create the AD groups
                 await CreateDefaultSecurityForDataset_Internal(ds, groups, permissions, datasetTickets, assetTickets);
             }
-
         }
 
         public Task CreateDefaultSecuityForDataflow(int dataflowId)
@@ -783,6 +774,12 @@ namespace Sentry.data.Core
             if (ds == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(dataflowId), $"Dataset with ID \"{df.DatasetId}\" could not be found.");
+            }
+
+            if (ds.ObjectStatus != ObjectStatusEnum.Active || df.ObjectStatus != ObjectStatusEnum.Active)
+            {
+                Common.Logging.Logger.Info($"Dataflow is not active ({dataflowId}), default security will not be created");
+                return Task.CompletedTask;
             }
 
             return CreateDefaultSecurityForDataflowAsync();
@@ -847,9 +844,7 @@ namespace Sentry.data.Core
                         IsSystemGenerated = true
                     };
                     var securityTicket = BuildAndAddPermissionTicket(accessRequest, group.IsAssetLevelGroup() ? ds.Asset.Security : ds.Security, "DEFAULT_SECURITY");
-                    //don't auto-approve Snowflake permissions - they will be approved when the Cherwell ticket that the DBA portal creates is approved
-                    //ApproveTicket() would call PublishDatasetPermissionsUpdatedInfrastructureEvent() - so we call it explicitely here
-                    await PublishDatasetPermissionsUpdatedInfrastructureEvent(securityTicket);
+                    await ApproveTicket(securityTicket, Environment.UserName);
                     _datasetContext.SaveChanges();
                 }
             }

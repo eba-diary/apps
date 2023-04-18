@@ -1,15 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json.Linq;
-using Rhino.Mocks;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.Models.ApiModels.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Sentry.data.Web.Tests
 {

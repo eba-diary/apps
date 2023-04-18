@@ -20,18 +20,23 @@ namespace Sentry.data.Core
         private readonly IEncryptionService _encryptionService;
         private readonly IMotiveProvider _motiveProvider;
         private readonly HttpClient client;
+        private readonly IEmailService _emailService;
+        private readonly IDataFeatures _featureFlags;
         #endregion
 
         #region Constructor
         public DataSourceService(IDatasetContext datasetContext,
                             IEncryptionService encryptionService,
                             HttpClient httpClient,
-                            IMotiveProvider motiveProvider)
+                            IMotiveProvider motiveProvider,
+                            IEmailService emailService, IDataFeatures featureFlags)
         {
             _datasetContext = datasetContext;
             _encryptionService = encryptionService;
             client = httpClient;
             _motiveProvider = motiveProvider;
+            _emailService = emailService;
+            _featureFlags = featureFlags;
         }
         #endregion
 
@@ -124,17 +129,34 @@ namespace Sentry.data.Core
                         RefreshToken = _encryptionService.EncryptString(refreshToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)dataSource).IVKey).Item1,
                         ParentDataSource = ((HTTPSSource)dataSource),
                         TokenExp = 7200,
-                        TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret"
+                        TokenUrl = "https://keeptruckin.com/oauth/token?grant_type=refresh_token&refresh_token=refreshtoken&redirect_uri=https://webhook.site/27091c3b-f9d0-42a2-a0d0-51b5134ac128&client_id=clientid&client_secret=clientsecret",
+                        Enabled = false,
+                        BackfillComplete = false
                     };
 
-                    ((HTTPSSource)dataSource).Tokens.Add(newToken);
+                    try
+                    {
+                        Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                    }
+                    catch (Exception e)
+                    {
+                        Sentry.Common.Logging.Logger.Error("Onboarding new token failed with message.", e);
+                    }
+
+                    ((HTTPSSource)dataSource).AllTokens.Add(newToken);
                     _datasetContext.SaveChanges();
-                    _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
+
+                    if (_featureFlags.CLA4931_SendMotiveEmail.GetValue())
+                    {
+                        _emailService.SendNewMotiveTokenAddedEmail(newToken);
+                    }
                 }
             }
             catch (Exception e)
             {
-                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}. Exception {e.Message}.");
+                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}.", e);
                 return false;
             }
             return true;
@@ -145,6 +167,38 @@ namespace Sentry.data.Core
             List<AuthenticationType> allAuthTypes = _datasetContext.AuthTypes.ToList();
             List<AuthenticationTypeDto> authenticationTypeDtos = allAuthTypes.Select(x => x.ToDto()).ToList();
             return authenticationTypeDtos;
+        }
+
+        public async Task<bool> KickOffMotiveOnboarding(int tokenId)
+        {
+            try
+            {
+                Sentry.Common.Logging.Logger.Info("Attempting to onboard token.");
+                var dataSource = _datasetContext.DataSources.FirstOrDefault(ds => ds.Id == int.Parse(Configuration.Config.GetHostSetting("MotiveDataSourceId")));
+                var token = ((HTTPSSource)dataSource).AllTokens.First(t => t.Id == tokenId);
+                await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, token, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Sentry.Common.Logging.Logger.Error("Onboarding token failed with message.", e);
+                return false;
+            }
+        }
+
+        public bool KickOffMotiveBackfill(int tokenId)
+        {
+            try
+            {
+                var token = _datasetContext.GetById<DataSourceToken>(tokenId);
+                _motiveProvider.EnqueueBackfillBackgroundJob(token);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Sentry.Common.Logging.Logger.Error($"Backfilling token {tokenId} failed with message.", e);
+                return false;
+            }
         }
 
         #endregion

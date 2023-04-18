@@ -92,14 +92,19 @@
                                 {
                                     <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
                                 }
-                                @if (Model.ShowManagePermissionsLink)
-                                {
-                                    @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId = Model.DatasetId }, new { @class = "dropdown-item" })
-                                }
+
+                                @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId = Model.DatasetId }, new { @class = "dropdown-item" })
+
                                 @if (Model.Security.CanManageSchema)
                                 {
                                     <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
                                 }
+
+                                @if (Model.Security.CanManageSchema)
+                                {
+                                    <a class="dropdown-item" href="/Migration/Dataset/@Model.DatasetId">Migration History </a>
+                                }
+
                                 @if (Model.Security.CanManageSchema && Model.Security.CanEditDataset)
                                 {
                                     <a class="dropdown-item" id="btnMigrationRqeuest" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Migration Request</a>
@@ -339,134 +344,108 @@
 
 <hr />
 
-@if (!Model.DisplayTabSections)
-{
-    if (Model.Security.CanPreviewDataset)
-    {
-        @Html.Partial("Details/_SchemaAbout", Model)
-    }
-    if (Model.HasSchema)
-    {
-        if (Model.Security.CanPreviewDataset)
-        {
-            @Html.Partial("Details/_SchemaColumns", Model)
-        }
-        if (Model.HasDataAccess)
-        {
-            @Html.Partial("Details/_DataPreview", Model)
-        }
-        if (Model.Security.CanViewFullDataset)
-        {
-            @Html.Partial("Details/_DataFiles", Model)
-        }
-    }
-}
-else
-{
 
-
-    <div id="datasetDetailTabs">
-        <div class="tabs-wrapper">
-            <ul class="nav classic-tabs" role="tablist">
+<div id="datasetDetailTabs">
+    <div class="tabs-wrapper">
+        <ul class="nav classic-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
+            </li>
+            @if (Model.HasSchema)
+            {
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#panelSchemaAbout" id="detailTabSchemaAbout" role="tab">About</a>
+                    <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
                 </li>
-                @if (Model.HasSchema)
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
+                </li>
+                if (Model.DisplaySchemaSearch)
                 {
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelSchemaColumns" id="detailTabSchemaColumns" role="tab">Columns</a>
+                        <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search Columns</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelDataPreview" id="detailTabDataPreview" role="tab">Preview</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#panelDataFiles" id="detailTabDataFiles" role="tab">Files</a>
-                    </li>
-                    if (Model.DisplaySchemaSearch)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#panelSchemaSearch" id="detailTabSchemaSearch" role="tab">Search Columns</a>
-                        </li>
-                    }
                 }
-            </ul>
-        </div>
+            }
+        </ul>
+    </div>
 
 
 
-        <!-- Tab panels -->
-        <div class="tab-content" id="tab-container">
-            <div class="text-center" id="tab-spinner">
-                <div class="preloader-wrapper big active">
-                    <div class="spinner-layer spinner-blue-only">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle">
-                            </div>
-                        </div>
-
+    <!-- Tab panels -->
+    <div class="tab-content" id="tab-container">
+        <div class="text-center" id="tab-spinner">
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
                     </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle">
+                        </div>
+                    </div>
+
                 </div>
             </div>
+        </div>
 
-            <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
+        <div class="tab-pane fade" id="panelSchemaAbout" role="tabpanel">
+            @if (Model.Security.CanPreviewDataset)
+            {
+                <div id="tabSchemaAbout"></div>
+            }
+            else
+            {
+                @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+            }
+        </div>
+        @if (Model.HasSchema)
+        {
+            <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
                 @if (Model.Security.CanPreviewDataset)
                 {
-                    <div id="tabSchemaAbout"></div>
+                    <div id="tabSchemaColumns"></div>
                 }
                 else
                 {
                     @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
                 }
             </div>
-            @if (Model.HasSchema)
-            {
-                <div class="tab-pane fade" id="panelSchemaColumns" role="tabpanel">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div id="tabSchemaColumns"></div>
-                    }
-                    else
-                    {
-                        @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
-                    }
-                </div>
 
-                <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
-                    @if (Model.HasDataAccess)
-                    {
-                        <div id="tabDataPreview"></div>
-                    }
-                    else
-                    {
-                        @Html.Partial("Details/_TabUnauthorized", "Full Dataset");
-                    }
-                </div>
-                <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
-                    @if (Model.Security.CanPreviewDataset)
-                    {
-                        <div id="tabDataFiles"></div>
-                    }
-                    else
-                    {
-                        @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
-                    }
-                </div>
-                if (Model.DisplaySchemaSearch)
+            <div class="tab-pane fade" id="panelDataPreview" role="tabpanel">
+                @if (Model.HasDataAccess)
                 {
-                    <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
-                        <div id="tabSchemaSearch"></div>
-                    </div>
+                    <div id="tabDataPreview"></div>
                 }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Full Dataset");
+                }
+            </div>
+            <div class="tab-pane fade" id="panelDataFiles" role="tabpanel">
+                @if (Model.Security.CanPreviewDataset)
+                {
+                    <div id="tabDataFiles"></div>
+                }
+                else
+                {
+                    @Html.Partial("Details/_TabUnauthorized", "Dataset Metadata");
+                }
+            </div>
+            if (Model.DisplaySchemaSearch)
+            {
+                <div class="tab-pane fade" id="panelSchemaSearch" role="tabpanel">
+                    <div id="tabSchemaSearch"></div>
+                </div>
             }
-        </div>
+        }
     </div>
-}
+</div>
 
 <div class="migration-modal-container"></div>
 

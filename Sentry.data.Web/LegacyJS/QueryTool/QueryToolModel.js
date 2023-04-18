@@ -268,7 +268,7 @@ function ViewModel() {
 
         var data = e.params.data;
 
-        var controllerURL = "/api/v1/queryTool/datasets/" + encodeURI(data.id);
+        var controllerURL = "/api/" + data.GetApiVersion() + "/queryTool/datasets/" + encodeURI(data.id);
         $.get(controllerURL, function (result) {
 
             console.log(result);

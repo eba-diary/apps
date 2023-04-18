@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
+using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using System;
@@ -25,16 +26,18 @@ namespace Sentry.data.Infrastructure
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IHttpClientGenerator _httpClientGenerator;
         private readonly IFileProvider _fileProvider;
+        private readonly IDataFeatures _featureFlags;
         #endregion
 
         #region Constructor
-        public PagingHttpsJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IFileProvider fileProvider) 
+        public PagingHttpsJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IFileProvider fileProvider, IDataFeatures featureFlags)
         {
             _datasetContext = datasetContext;
             _s3ServiceProvider = s3ServiceProvider;
             _authorizationProvider = authorizationProvider;
             _httpClientGenerator = httpClientGenerator;
             _fileProvider = fileProvider;
+            _featureFlags = featureFlags;
         }
         #endregion
 
@@ -42,6 +45,12 @@ namespace Sentry.data.Infrastructure
         public void Execute(RetrieverJob job)
         {
             Logger.Info($"Paging Https Retriever Job start - Job: {job.Id}");
+
+            if (!_featureFlags.CLA2869_AllowMotiveJobs.GetValue() && job.DataSource.Name.ToLower().Contains("motive"))
+            {
+                Logger.Error("Blocking Motive Job via Feature Flag.");
+                return;
+            }
 
             if (job.HasValidRequestVariables())
             {
@@ -138,7 +147,21 @@ namespace Sentry.data.Infrastructure
                         SetAuthorizationHeader(config, httpClient);
 
                         //copy response to file
-                        int resultCount = await CopyResponseToFileAsync(httpClient, fileStream, config);
+                        int resultCount;
+                        try
+                        {
+                            resultCount = await CopyResponseToFileAsync(httpClient, fileStream, config);
+                        }
+                        catch(AcceptableErrorException ex)
+                        {
+                            if (!config.CurrentDataSourceToken.AcceptableErrorNeedsReview)
+                            {
+                                config.CurrentDataSourceToken.AcceptableErrorNeedsReview = true;
+                                Logger.Error($"New notifiable 'Acceptable Error' hit on {config.RequestUri} for {config.CurrentDataSourceToken.TokenName}."); //log when a flag is flipped, so we can capture just these to avoid alert spam.
+                            }
+                            resultCount = 0; //continue
+                            Logger.Error($"'Acceptable Error' detected on {config.RequestUri} for {config.CurrentDataSourceToken.TokenName}.", ex);
+                        }
 
                         //get next request to make
                         SetNextRequest(config, resultCount);
@@ -213,7 +236,20 @@ namespace Sentry.data.Infrastructure
                 }
                 else
                 {
-                    throw new HttpsJobProviderException($"HTTPS request to {RequestLog(config)} failed. {response.Content.ReadAsStringAsync().Result}");
+                    using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                    using (StreamReader streamReader = new StreamReader(contentStream))
+                    using (JsonReader jsonReader = new JsonTextReader(streamReader))
+                    {
+                        JObject responseObject = JObject.Load(jsonReader);
+                        foreach (string key in config.Source.AcceptableErrors.Keys)
+                        {
+                            if(string.Equals(responseObject.Value<string>(key), config.Source.AcceptableErrors[key]))
+                            {
+                                throw new AcceptableErrorException();
+                            }
+                        }
+                        throw new HttpsJobProviderException($"HTTPS request to {RequestLog(config)} failed. {responseObject}");
+                    }
                 }
             }
         }
@@ -235,8 +271,8 @@ namespace Sentry.data.Infrastructure
             if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
             {
                 //start from first data source token if using OAuth
-                config.OrderedDataSourceTokens = config.Source.Tokens?.OrderBy(x => x.Id).ToList();
-                config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+                config.OrderedActiveDataSourceTokens = config.Source.GetActiveTokens()?.OrderBy(x => x.Id).ToList();
+                config.CurrentDataSourceToken = config.OrderedActiveDataSourceTokens.First();
             }
 
             ReplaceVariablePlaceholders(config);
@@ -246,9 +282,12 @@ namespace Sentry.data.Infrastructure
                 if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && job.ExecutionParameters.TryGetValue(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, out string value))
                 {
                     int tokenId = int.Parse(value);
-                    config.CurrentDataSourceToken = config.Source.Tokens.First(x => x.Id == tokenId);
+                    config.CurrentDataSourceToken = config.Source.AllTokens.First(x => x.Id == tokenId);
+                    if (!config.CurrentDataSourceToken.Enabled)
+                    {
+                        config.CurrentDataSourceToken = GetNextEnabledToken(config);
+                    }
                 }
-
                 CheckForPagingExecutionParameters(config);
             }       
 
@@ -386,14 +425,14 @@ namespace Sentry.data.Infrastructure
                 config.PageNumber = 1;
                 config.Index = 0;
 
-                if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && config.CurrentDataSourceToken != config.OrderedDataSourceTokens.Last())
+                if (config.Source.SourceAuthType.Is<OAuthAuthentication>() && config.CurrentDataSourceToken != config.OrderedActiveDataSourceTokens.Last())
                 {
                     //using OAuth, move to the next token if there are more
-                    int nextIndex = config.OrderedDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
-                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens[nextIndex];
+                    int nextIndex = config.OrderedActiveDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
+                    config.CurrentDataSourceToken = config.OrderedActiveDataSourceTokens[nextIndex];
                     RemovePageParameter(config);
 
-                    Logger.Info($"Paging Https Retriever Job using data source token {nextIndex + 1} of {config.OrderedDataSourceTokens.Count} - Job: {config.Job.Id}");
+                    Logger.Info($"Paging Https Retriever Job using data source token {nextIndex + 1} of {config.OrderedActiveDataSourceTokens.Count} - Job: {config.Job.Id}");
                 }
                 else
                 {
@@ -430,7 +469,7 @@ namespace Sentry.data.Infrastructure
                 if (config.Source.SourceAuthType.Is<OAuthAuthentication>())
                 {
                     //start from first data source token if using OAuth
-                    config.CurrentDataSourceToken = config.OrderedDataSourceTokens.First();
+                    config.CurrentDataSourceToken = config.OrderedActiveDataSourceTokens.First();
                 }
             }
             else
@@ -519,6 +558,21 @@ namespace Sentry.data.Infrastructure
             }
 
             return log;
+        }
+
+        private DataSourceToken GetNextEnabledToken(PagingHttpsConfiguration config)
+        {
+            var orderedAllDataSourceTokens = config.Source.AllTokens.OrderBy(x => x.Id).ToList();
+            var nextIndex = orderedAllDataSourceTokens.IndexOf(config.CurrentDataSourceToken) + 1;
+            for(int i = nextIndex; i < orderedAllDataSourceTokens.Count; i++)
+            {
+                var token = orderedAllDataSourceTokens[i];
+                if (token.Enabled)
+                {
+                    return token;
+                }
+            }
+            return config.OrderedActiveDataSourceTokens.First(); //there is no next enabled token, start from the first enabled one.
         }
 
         #region PageType Methods

@@ -5,14 +5,18 @@ using Newtonsoft.Json.Linq;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Exceptions;
+using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
@@ -22,28 +26,25 @@ namespace Sentry.data.Core
         public readonly IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
-        private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
-        private readonly IElasticContext _elasticContext;
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly Helpers.DscEventTopicHelper _dscEventTopicHelper;
+        private readonly IElasticDocumentClient _elasticDocumentClient;
+        private readonly IDscEventTopicHelper _dscEventTopicHelper;
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         private string _bucket;
         private readonly IList<string> _eventGeneratingUpdateFields = new List<string>() { "createcurrentview", "parquetstoragebucket", "parquetstorageprefix" };
 
-        public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
+        public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
             IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticContext elasticContext, IBackgroundJobClient backgroundJobClient,
-            Helpers.DscEventTopicHelper dscEventTopicHelper)
+            IEventService eventService, IElasticDocumentClient elasticDocumentClient, IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = dsContext;
             _userService = userService;
-            _emailService = emailService;
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
@@ -51,9 +52,9 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
             _eventService = eventService;
-            _elasticContext = elasticContext;
-            _backgroundJobClient = backgroundJobClient;
+            _elasticDocumentClient = elasticDocumentClient;
             _dscEventTopicHelper = dscEventTopicHelper;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         private string RootBucket
@@ -66,6 +67,13 @@ namespace Sentry.data.Core
                 }
                 return _bucket;
             }
+        }
+
+        public Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto)
+        {
+            FileSchema schema = MapToFileSchema(dto);
+            FileSchemaDto resultDto = MapToDto(schema);
+            return Task.FromResult(resultDto);
         }
 
         public int Create(FileSchemaDto dto)
@@ -92,13 +100,28 @@ namespace Sentry.data.Core
             return newSchema.SchemaId;
         }
 
+        public async Task CreateExternalDependenciesAsync(int schemaId)
+        {
+            FileSchemaDto schemaDto = GetFileSchemaDto(schemaId);
+            schemaDto.ParentDatasetId = _datasetContext.DatasetFileConfigs.Where(x => x.Schema.SchemaId == schemaId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(x => x.ParentDataset.DatasetId).FirstOrDefault();
+            await CreateExternalDependenciesAsync(schemaDto).ConfigureAwait(false);
+        }
+
+        public async Task CreateExternalDependenciesAsync(FileSchemaDto schemaDto)
+        {
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                EnvironmentSchema environmentSchema = schemaDto.ToEnvironmentSchema();
+                await _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(schemaDto.ParentDatasetId, environmentSchema).ConfigureAwait(false);
+            }
+        }
+
         //SINCE SCHEMA SAVED FROM MULTIPLE PLACES, HAVE ONE METHOD TO TAKE CARE OF PUBLISHING SAVE
         public void PublishSchemaEvent(int datasetId, int schemaId)
         {
             _eventService.PublishSuccessEventBySchemaId(GlobalConstants.EventType.CREATE_DATASET_SCHEMA, GlobalConstants.EventType.CREATE_DATASET_SCHEMA, datasetId, schemaId);
         }
-
-        
+                
         [Obsolete("Use " + nameof(CreateSchemaRevision) + "method excepting " + nameof(SchemaRevisionFieldStructureDto),false)]
         public int CreateAndSaveSchemaRevision(int schemaId, List<BaseFieldDto> schemaRows, string revisionname, string jsonSchema = null)
         {
@@ -302,6 +325,19 @@ namespace Sentry.data.Core
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
                 Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
+
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+                {
+                    EnvironmentSchema environmentSchema = schemaDto.ToEnvironmentSchema();
+
+                    DataFlow dataFlow = _datasetContext.DataFlow.FirstOrDefault(x => x.SchemaId == schemaDto.SchemaId && x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
+                    if (dataFlow != null)
+                    {
+                        environmentSchema.SchemaSaidAssetCode = dataFlow.SaidKeyCode;
+                    }
+
+                    _globalDatasetProvider.AddUpdateEnvironmentSchemaAsync(fileConfig.ParentDataset.DatasetId, environmentSchema).Wait();
+                }
             }
             catch (Exception ex)
             {
@@ -339,6 +375,22 @@ namespace Sentry.data.Core
             return true;
         }
 
+        public Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema)
+        {
+            //Uses name in ControlMTrigger comparison, name is immutable
+            dto.Name = schema.Name;
+
+            //Only change delimiter when file type is changing
+            if (string.IsNullOrWhiteSpace(dto.FileExtensionName) && string.IsNullOrEmpty(dto.Delimiter))
+            {
+                dto.Delimiter = schema.Delimiter;
+            }
+
+            UpdateSchema(dto, schema);
+            FileSchemaDto resultDto = MapToDto(schema);
+            return Task.FromResult(resultDto);
+        }
+
         private string GetDSCEventTopic(int datasetId)
         {
             string topicName;
@@ -361,27 +413,24 @@ namespace Sentry.data.Core
             return 0;
         }
 
-        public void CreateConsumptionLayersForSchemaList(int[] schemaIdList)
+        public void CreateOrUpdateConsumptionLayersForSchema(int[] schemaIdList)
         {
             foreach(int schemaId in schemaIdList)
             {
                 FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
                 Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset).FirstOrDefault();
                 FileSchemaDto dto = MapToDto(schema);
-                CreateConsumptionLayersForSchema(schema, dto, ds);
+
+                CreateOrUpdateConsumptionLayersForSchema(schema, dto, ds);
             }
         }
 
-        public void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
+        public void CreateOrUpdateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds)
         {
-            List<SchemaConsumptionSnowflake> schemaConsumptionSnowflakeList = schema.ConsumptionDetails.Cast<SchemaConsumptionSnowflake>().ToList();
 
-            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds))
+            foreach (SchemaConsumptionSnowflake snowflakeConsumption in GenerateConsumptionLayers(dto, schema, ds).Cast<SchemaConsumptionSnowflake>().ToList())
             {
-                if (!schemaConsumptionSnowflakeList.Any(c => c.SnowflakeType == snowflakeConsumption.SnowflakeType))
-                {
-                    schema.ConsumptionDetails.Add(snowflakeConsumption);
-                }
+                schema.AddOrUpdateSnowflakeConsumptionLayer(snowflakeConsumption);
             }
 
             _datasetContext.SaveChanges();
@@ -403,14 +452,14 @@ namespace Sentry.data.Core
             return (schemaId, (schemaId != 0));
         }
 
-        private void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
+        public void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
             /*Generate *-CREATE-TABLE-REQUESTED event when:
             *  - CreateCurrentView changes
             */
             if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
             {
-                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).Take(1).FirstOrDefault();
+                SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
                 GenerateConsumptionLayerCreateEvent(latestRevision, propertyDeltaList);
             }
         }
@@ -528,7 +577,7 @@ namespace Sentry.data.Core
         /// <returns> Returns list of properties that have changed.</returns>
         internal JObject UpdateSchema(FileSchemaDto dto, FileSchema schema)
         {
-            IList<bool> changes = new List<bool>();
+            List<bool> changes = new List<bool>();
             JObject whatPropertiesChanged = new JObject();
 
             changes.Add(TryUpdate(() => schema.Delimiter, () => dto.Delimiter, (x) => schema.Delimiter = x));
@@ -539,9 +588,19 @@ namespace Sentry.data.Core
                             whatPropertiesChanged.Add("createcurrentview", x.ToString().ToLower());
                        }));
 
-            changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+            {
+                changes.Add(TryUpdate(() => schema.Description, () => dto.Description, (x) => schema.Description = x));
+            }
 
-            changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+            if (dto.FileExtensionId > 0)
+            {
+                changes.Add(TryUpdate(() => schema.Extension.Id, () => dto.FileExtensionId, (x) => schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)));
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.FileExtensionName))
+            {
+                changes.Add(TryUpdate(() => schema.Extension.Name, () => dto.FileExtensionName, (x) => schema.Extension = _datasetContext.FileExtensions.First(f => f.Name.ToLower() == dto.FileExtensionName.ToLower())));
+            }
 
             changes.Add(TryUpdate(() => schema.HasHeader, () => dto.HasHeader, (x) => schema.HasHeader = x));
 
@@ -557,13 +616,24 @@ namespace Sentry.data.Core
 
             changes.Add(TryUpdate(() => schema.SchemaRootPath, () => dto.SchemaRootPath, (x) => schema.SchemaRootPath = x));
 
-            //schema=EXISTING; dto=NEW; SETTER
             changes.Add(TryUpdate(() => schema.ControlMTriggerName, () => GetControlMTrigger(dto), (x) => schema.ControlMTriggerName = x));
 
+            SchemaParquetUpdate(schema, dto, changes, whatPropertiesChanged);
 
+            if (changes.Any(x => x))
+            {
+                schema.LastUpdatedDTM = DateTime.Now;
+                schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
+            }
+
+            return whatPropertiesChanged;
+        }
+
+        private void SchemaParquetUpdate(FileSchema schema, FileSchemaDto dto, List<bool> changes, JObject whatPropertiesChanged)
+        {
             if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
             {
-                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket, 
+                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
                     (x) =>
                     {
                         schema.ParquetStorageBucket = x;
@@ -595,14 +665,6 @@ namespace Sentry.data.Core
                     }
                 }
             }
-
-            if (changes.Any(x => x))
-            {
-                schema.LastUpdatedDTM = DateTime.Now;
-                schema.UpdatedBy = _userService.GetCurrentUser().AssociateId;
-            }
-
-            return whatPropertiesChanged;
         }
 
         private string GetControlMTrigger(FileSchemaDto dto)
@@ -614,9 +676,9 @@ namespace Sentry.data.Core
                 Regex reg = new Regex("[^a-zA-Z0-9]");
                 string namedEnvironmentCleaned = reg.Replace((ds.NamedEnvironment != null)? ds.NamedEnvironment.ToUpper() : String.Empty,String.Empty);
                 string shortNameCleaned = reg.Replace((ds.ShortName != null)? ds.ShortName.ToUpper() : String.Empty, String.Empty);
-                string datasetNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
+                string schemaNameCleaned = reg.Replace((dto.Name != null)? dto.Name.ToUpper() : String.Empty, String.Empty);
 
-                                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{datasetNameCleaned}_COMPLETED";
+                controlMTriggerName = $"DATA_{namedEnvironmentCleaned}_{shortNameCleaned}_{schemaNameCleaned}_COMPLETED";
             }
             
             return controlMTriggerName;
@@ -853,7 +915,7 @@ namespace Sentry.data.Core
             FileSchemaDto schemaDto = GetFileSchemaDto(id);
 
             List<Dictionary<string, object>> dicRows = new List<Dictionary<string, object>>();
-            var snowConsumption = schemaDto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault();
+            var snowConsumption = schemaDto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>().FirstOrDefault(consumptionType => consumptionType.SnowflakeType == SnowflakeConsumptionType.DatasetSchemaParquet);
             if (snowConsumption != null)
             {
 
@@ -996,7 +1058,7 @@ namespace Sentry.data.Core
 
         private void DeleteElasticIndexForSchema(int schemaId)
         {
-            _elasticContext.DeleteByQuery<ElasticSchemaField>(q => q
+            _elasticDocumentClient.DeleteByQuery<ElasticSchemaField>(q => q
                 .Query(qm => qm
                     .Bool(b => b
                         .Must(
@@ -1009,8 +1071,8 @@ namespace Sentry.data.Core
 
         private void IndexElasticFieldsForSchema(int schemaId, int datasetId, IList<BaseField> fields)
         {
-            List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList<ElasticSchemaField>();
-            _elasticContext.IndexMany<ElasticSchemaField>(elasticFields);
+            List<ElasticSchemaField> elasticFields = BaseFieldsFlatten(fields, schemaId, datasetId).ToList();
+            _elasticDocumentClient.IndexManyAsync(elasticFields).Wait();
         }
 
         private HashSet<ElasticSchemaField> BaseFieldsFlatten(IList<BaseField> fields, int schemaId, int datasetId)
@@ -1089,9 +1151,7 @@ namespace Sentry.data.Core
             file.DatasetFileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == stepEvent.SchemaId).FirstOrDefault();
             file.FlowExecutionGuid = stepEvent.FlowExecutionGuid;
             file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
-        }
-
-        
+        }        
 
         private FileSchema MapToFileSchema(FileSchemaDto dto)
         {
@@ -1107,7 +1167,7 @@ namespace Sentry.data.Core
                 Extension = GetSchemaFileExtension(dto),
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
+                SasLibrary = CommonExtensions.GenerateSASLibaryName(parentDataset),
                 Description = dto.Description,
                 StorageCode = storageCode,
                 HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
@@ -1125,9 +1185,9 @@ namespace Sentry.data.Core
                 CLA3014_LoadDataToSnowflake = dto.CLA3014_LoadDataToSnowflake,
                 ObjectStatus = dto.ObjectStatus,
                 SchemaRootPath = dto.SchemaRootPath,
-                ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName()),
+                ParquetStorageBucket = GenerateParquetStorageBucket(isHumanResources, GlobalConstants.SaidAsset.DATA_LAKE_STORAGE, Config.GetDefaultEnvironmentName(), parentDataset.NamedEnvironmentType),
                 ParquetStoragePrefix = GenerateParquetStoragePrefix(parentDataset.Asset.SaidKeyCode, parentDataset.NamedEnvironment, storageCode),
-                ControlMTriggerName = GetControlMTrigger(dto),
+                ControlMTriggerName = GetControlMTrigger(dto)
             };
             
             schema.ConsumptionDetails = GenerateConsumptionLayers(dto, schema, parentDataset);           
@@ -1161,6 +1221,7 @@ namespace Sentry.data.Core
                 CreateCurrentView = scm.CreateCurrentView,
                 Delimiter = scm.Delimiter,
                 FileExtensionId = scm.Extension.Id,
+                FileExtensionName = scm.Extension.Name,
                 HasHeader = scm.HasHeader,
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
@@ -1177,7 +1238,6 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtensionName = scm.Extension.Name,
                 CLA1396_NewEtlColumns = scm.CLA1396_NewEtlColumns,
                 CLA1580_StructureHive = scm.CLA1580_StructureHive,
                 CLA2472_EMRSend = scm.CLA2472_EMRSend,
@@ -1187,9 +1247,10 @@ namespace Sentry.data.Core
                 ParquetStorageBucket = scm.ParquetStorageBucket,
                 ParquetStoragePrefix = scm.ParquetStoragePrefix,
                 ConsumptionDetails = scm.ConsumptionDetails?.Select(c => c.Accept(new SchemaConsumptionDtoTransformer())).ToList(),
-                ControlMTriggerName = scm.ControlMTriggerName
+                ControlMTriggerName = scm.ControlMTriggerName,
+                CreateDateTime = scm.CreatedDTM,
+                UpdateDateTime = scm.LastUpdatedDTM
             };
-
         }
 
         private string FormatHiveTableNamePart(string part)
@@ -1265,16 +1326,10 @@ namespace Sentry.data.Core
 
             if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                 && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && dscNamedEnvironment == "QUAL")
+                && (dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD))
             {
                 dbName += dscNamedEnvironment;
-                dbName += "NP";
-            }
-            else if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
-                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd.ToString()
-                && dscNamedEnvironment == "PROD")
-            {
-                dbName += "NONPROD";
+                dbName += GlobalConstants.Environments.NONPROD_SUFFIX.ToUpper();
             }
             else
             {
@@ -1319,8 +1374,19 @@ namespace Sentry.data.Core
             string cleansedDatasetName = dataset.DatasetName.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
             string schemaName = cleansedDatasetName;
 
+            /*********************
+            *  When CLA4260 feature flag is off, system will not allow to datasets with same name.  Therefore, we will not have duplicated snowflake schema.
+            *  
+            *  When CLA4260 feature flag is on, we will have multiple datasets with same name but different named environments.  
+            *  Therefore, we need to ensure snowflake schema is unique.  The check where != "QUAL" is to ensure we generate same
+            *  snowflake schema names between PROD and NonPROD (QUAL) schemas.  This will give users better query experience between QUAL and PROD.
+            *********************/            
 #pragma warning disable S2589 // Boolean expressions should not be gratuitous
-            if (alwaysSuffixSchemaNames || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL"))
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && (alwaysSuffixSchemaNames 
+                    || (!alwaysSuffixSchemaNames && dataset.NamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd && dataset.NamedEnvironment != "QUAL")
+                    )
+                )
 #pragma warning restore S2589 // Boolean expressions should not be gratuitous
             {
                 schemaName += "_" + dataset.NamedEnvironment;
@@ -1344,16 +1410,28 @@ namespace Sentry.data.Core
         /// Generates appropriate bucket after evaluating various variables
         /// </summary>
         /// <param name="isHumanResources"></param>
+        /// <param name="saidKeyCode">Data storage layer SAID asset</param>
+        /// <param name="dscNamedEnvironment">DSC physical named environment</param>
+        /// <param name="datasetNamedEnvironment">Dataset named environment</param>
         /// <remarks> This method is only used by this class, therefore, setting to 
         /// internal for exposure to Sentry.data.Core.Tests project for unit testing. </remarks>
         /// <returns></returns>
-        internal string GenerateParquetStorageBucket(bool isHumanResources, string saidKeyCode, string namedEnvironment)
+        internal string GenerateParquetStorageBucket(bool isHumanResources, string saidKeyCode, string dscNamedEnvironment, GlobalEnums.NamedEnvironmentType datasetNamedEnvironmentType)
         {
-            string bucket = (isHumanResources) 
-                ? GlobalConstants.AwsBuckets.HR_DATASET_BUCKET_AE2.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>",namedEnvironment.ToLower())
-                : GlobalConstants.AwsBuckets.BASE_DATASET_BUCKET_AE2.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnvironment.ToLower());
+            string baseBucketName = (isHumanResources)
+                ? GlobalConstants.AwsBuckets.HR_DATASET_BUCKET_AE2
+                : GlobalConstants.AwsBuckets.BASE_DATASET_BUCKET_AE2;
 
-            return bucket;
+            string namedEnvironment = dscNamedEnvironment.ToLower();
+            if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
+                && datasetNamedEnvironmentType == GlobalEnums.NamedEnvironmentType.NonProd
+                && (dscNamedEnvironment == GlobalConstants.Environments.QUAL || dscNamedEnvironment == GlobalConstants.Environments.PROD))
+            {
+                namedEnvironment += GlobalConstants.Environments.NONPROD_SUFFIX.ToLower();
+            }
+
+            string bucketName = baseBucketName.Replace("<saidkeycode>", saidKeyCode.ToLower()).Replace("<namedenvironment>", namedEnvironment.ToLower());
+            return bucketName;
         }
 
         internal string GenerateParquetStoragePrefix(string saidKeyCode, string namedEnvironment, string storageCode)
@@ -1505,34 +1583,6 @@ namespace Sentry.data.Core
         internal IList<SchemaConsumption> GenerateConsumptionLayers(FileSchemaDto dto, FileSchema schema, Dataset parentDataset)
         {
             List<SchemaConsumption> layerList = new List<SchemaConsumption>();
-
-            /* 
-             * All created schema will have dataset based created
-             * 
-             * This is logic for Category based:
-             * IF CLA3718_Authorization is off (false), all created schema will have Category based created
-             * IF CLA3718_Authorization is On (true)
-             *     IF CLA4410_Stop flag is on (true), no newly created schema will have Category based
-             *     IF CLA4410_Stop flag is off (false),  Dataset created date check kicks in
-             *         IF Dataset created date is before constant datetime, Category based will be created
-             *         IF Dataset created date is after constant datetime, category based is not created
-            */
-            if (!_dataFeatures.CLA3718_Authorization.GetValue() ||  (!_dataFeatures.CLA4410_StopCategoryBasedConsumptionLayerCreation.GetValue()
-                                                                      && parentDataset.DatasetDtm < DateTime.Parse(_dataFeatures.CLA440_CategoryConsumptionLayerCreateLineInSand.GetValue())))
-            {
-                layerList.Add(
-                new SchemaConsumptionSnowflake()
-                {
-                    Schema = schema,
-                    SnowflakeDatabase = GetSnowflakeDatabaseName(parentDataset.IsHumanResources),
-                    SnowflakeSchema = GetSnowflakeSchemaName(parentDataset, SnowflakeConsumptionType.CategorySchemaParquet),
-                    SnowflakeTable = FormatSnowflakeTableNamePart(parentDataset.DatasetName) + "_" + FormatSnowflakeTableNamePart(dto.Name),
-                    SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
-                    SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
-                    SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.CategorySchemaParquet
-                });
-            }
 
             //All schemas, regardless of when dataset is created, will have dataset based consumption layers generated
             layerList.AddRange(

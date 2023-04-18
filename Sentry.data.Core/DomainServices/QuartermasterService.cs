@@ -11,7 +11,7 @@ namespace Sentry.data.Core
     /// <summary>
     /// Domain Service responsible for interactions with Quartermaster
     /// </summary>
-    public class QuartermasterService:IQuartermasterService
+    public class QuartermasterService : IQuartermasterService
     {
         private readonly IClient _quartermasterClient;
         private readonly IDataFeatures _dataFeatures;
@@ -54,7 +54,7 @@ namespace Sentry.data.Core
                     else if (namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType != namedEnvironmentType)
                     {
                         var quarterMasterNamedEnvironmentType = namedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType;
-                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType.ToString()}\")");
+                        results.Add(GlobalConstants.ValidationErrors.NAMED_ENVIRONMENT_TYPE_INVALID, $"Named Environment Type provided (\"{namedEnvironmentType}\") doesn't match Quartermaster (\"{quarterMasterNamedEnvironmentType}\")");
                     }
                 }
             }

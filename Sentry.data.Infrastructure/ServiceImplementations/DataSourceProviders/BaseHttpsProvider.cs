@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Polly;
 using RestSharp;
 using Sentry.Common.Logging;
@@ -18,8 +17,8 @@ namespace Sentry.data.Infrastructure
     public abstract class BaseHttpsProvider : BaseJobProvider, IBaseHttpsProvider
     {
         #region Declarations
-        protected IRestClient _client;
-        protected IRestRequest _request;
+        protected RestClient _client;
+        protected RestRequest _request;
         protected Uri _uri;
         private readonly Lazy<IDatasetContext> _dsContext;
         protected Lazy<IConfigService> _configService;
@@ -33,7 +32,7 @@ namespace Sentry.data.Infrastructure
 
         protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            IRestClient restClient, IDataFeatures dataFeatures)
+            RestClient restClient, IDataFeatures dataFeatures)
         {
             _dsContext = datasetContext;
             _configService = configService;
@@ -55,7 +54,7 @@ namespace Sentry.data.Infrastructure
             get { return _configService.Value; }
         }
         
-        public virtual IRestRequest Request
+        public virtual RestRequest Request
         {
             get { return _request; }
         }
@@ -105,26 +104,7 @@ namespace Sentry.data.Infrastructure
             _request.Resource = _uri.ToString();
         }
 
-        public abstract IRestResponse SendRequest();
-
-        public void CopyToStream(Stream targetStream)
-        {
-            string methodName = $"{nameof(BaseHttpsProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
-            Logger.Debug($"{methodName} Method Start");
-
-            RestClient client = new RestClient();
-
-            if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
-            {
-                client.Proxy = webProxy;
-            }
-
-            _request.ResponseWriter = (responseStream) => responseStream.CopyTo(targetStream);
-
-            client.DownloadData(_request);
-
-            Logger.Debug($"{methodName} Method End");
-        }
+        public abstract RestResponse SendRequest();
 
         public static string ParseContentType(string contentType)
         {
@@ -153,7 +133,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public abstract List<IRestResponse> SendPagingRequest();
+        public abstract List<RestResponse> SendPagingRequest();
 
         #region TargetSpecificMethods
         protected abstract void FindTargetJob();
@@ -161,7 +141,7 @@ namespace Sentry.data.Infrastructure
         #endregion
 
         #region TokenAuthSpecific
-        protected void ConfigureTokenAuth(IRestRequest req, RetrieverJob job)
+        protected void ConfigureTokenAuth(RestRequest req, RetrieverJob job)
         {
             req.AddHeader(((HTTPSSource)job.DataSource).AuthenticationHeaderName, EncryptionService.DecryptString(((HTTPSSource)job.DataSource).AuthenticationTokenValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)job.DataSource).IVKey));
         }
@@ -169,7 +149,7 @@ namespace Sentry.data.Infrastructure
 
         #region OAuthSpecific
         protected abstract string GetOAuthAccessToken(HTTPSSource source);
-        protected abstract void ConfigureOAuth(IRestRequest req, RetrieverJob job);
+        protected abstract void ConfigureOAuth(RestRequest req, RetrieverJob job);
         protected abstract void AddOAuthGrantType(List<KeyValuePair<string, string>> list, HTTPSSource source);
         protected abstract string SignOAuthToken(string claims, HTTPSSource source);
         protected abstract string GenerateJwtToken(HTTPSSource source);
@@ -196,7 +176,7 @@ namespace Sentry.data.Infrastructure
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.Tokens.FirstOrDefault().TokenExp)).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.GetActiveTokens().FirstOrDefault().TokenExp)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);

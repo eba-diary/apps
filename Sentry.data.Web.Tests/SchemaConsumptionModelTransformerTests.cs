@@ -1,13 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sentry.data.Core;
 using Sentry.data.Web.Models.ApiModels.Schema20220609;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sentry.data.Core;
 
-namespace Sentry.data.Core.Tests
+namespace Sentry.data.Web.Tests
 {
     [TestClass]
     public class SchemaConsumptionModelTransformerTests

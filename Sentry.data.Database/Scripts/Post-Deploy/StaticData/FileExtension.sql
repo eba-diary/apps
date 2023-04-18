@@ -11,7 +11,8 @@ BEGIN TRAN
 									('ANY','5/18/2018 7:42:39 AM','072984'),
 									('XML','5/18/2018 7:42:39 AM','072984'),
 									('DELIMITED','2/4/2019 10:22:28 AM','082698'),
-									('FIXEDWIDTH','2/4/2019 10:22:28 AM','072984')
+									('FIXEDWIDTH','2/4/2019 10:22:28 AM','072984'),
+									('PARQUET','2/14/2023 10:22:28 AM','082116')
 								)
 								AS Source (Extension_NME, Created_DTM, CreateUser_ID) 
 

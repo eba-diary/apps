@@ -1,0 +1,95 @@
+﻿using Sentry.data.Core.Entities.DataProcessing;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Sentry.data.Core
+{
+    public static class GlobalDatasetExtensions
+    {
+        public static GlobalDataset ToGlobalDataset(this List<Dataset> datasets, List<KeyValuePair<int, FileSchema>> datasetIdSchemas, List<DataFlow> datasetDataFlows)
+        {
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                GlobalDatasetId = datasets.First().GlobalDatasetId.Value,
+                DatasetName = datasets.First().DatasetName,
+                DatasetSaidAssetCode = datasets.First().Asset.SaidKeyCode,
+                EnvironmentDatasets = new List<EnvironmentDataset>()
+            };
+
+            foreach (Dataset dataset in datasets)
+            {
+                EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
+
+                foreach (FileSchema datasetSchema in datasetIdSchemas.Where(x => x.Key == dataset.DatasetId).Select(x => x.Value).ToList())
+                {
+                    EnvironmentSchema environmentSchema = datasetSchema.ToEnvironmentSchema();
+                    environmentSchema.SchemaSaidAssetCode = datasetDataFlows.FirstOrDefault(x => x.SchemaId == datasetSchema.SchemaId)?.SaidKeyCode;
+
+                    environmentDataset.EnvironmentSchemas.Add(environmentSchema);
+                }
+
+                globalDataset.EnvironmentDatasets.Add(environmentDataset);
+            }
+
+            return globalDataset;
+        }
+
+        public static GlobalDataset ToGlobalDataset(this Dataset dataset)
+        {
+            return new GlobalDataset
+            {
+                GlobalDatasetId = dataset.GlobalDatasetId.Value,
+                DatasetName = dataset.DatasetName,
+                DatasetSaidAssetCode = dataset.Asset.SaidKeyCode,
+                EnvironmentDatasets = new List<EnvironmentDataset> { dataset.ToEnvironmentDataset() }
+            };
+        }
+
+        public static EnvironmentDataset ToEnvironmentDataset(this Dataset dataset)
+        {
+            return new EnvironmentDataset
+            {
+                DatasetId = dataset.DatasetId,
+                DatasetDescription = dataset.DatasetDesc,
+                CategoryCode = dataset.DatasetCategories.First().Name,
+                NamedEnvironment = dataset.NamedEnvironment,
+                NamedEnvironmentType = dataset.NamedEnvironmentType.ToString(),
+                OriginationCode = dataset.OriginationCode,
+                IsSecured = dataset.IsSecured,
+                FavoriteUserIds = dataset.Favorities?.Select(x => x.UserId).ToList() ?? new List<string>(),
+                EnvironmentSchemas = new List<EnvironmentSchema>()
+            };
+        }
+
+        public static EnvironmentSchema ToEnvironmentSchema(this SchemaResultDto schemaResultDto)
+        {
+            return new EnvironmentSchema
+            {
+                SchemaId = schemaResultDto.SchemaId,
+                SchemaName = schemaResultDto.SchemaName,
+                SchemaDescription = schemaResultDto.SchemaDescription,
+                SchemaSaidAssetCode = schemaResultDto.SaidAssetCode
+            };
+        }
+
+        public static EnvironmentSchema ToEnvironmentSchema(this FileSchemaDto fileSchemaDto)
+        {
+            return new EnvironmentSchema
+            {
+                SchemaId = fileSchemaDto.SchemaId,
+                SchemaName = fileSchemaDto.Name,
+                SchemaDescription = fileSchemaDto.Description
+            };
+        }
+
+        public static EnvironmentSchema ToEnvironmentSchema(this FileSchema fileSchema)
+        {
+            return new EnvironmentSchema
+            {
+                SchemaId = fileSchema.SchemaId,
+                SchemaName = fileSchema.Name,
+                SchemaDescription = fileSchema.Description
+            };
+        }
+    }
+}

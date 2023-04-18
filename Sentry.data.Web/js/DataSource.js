@@ -71,14 +71,34 @@
             $(this).parent().parent().remove();
         });
 
+        $('body').on('click', '.removeAcceptableError', function () {
+            $(this).parent().parent().remove();
+        });
+
         $('#AddHeader').on('click', function () {
             //This approach is described at the site below
             // http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/
             $("#AddHeader").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
             $.get("/Config/HeaderEntryRow", function (template) {
                 $('#RequestContainer').append(template);
-                $("#AddHeader").html("Add Header");
+                $("#AddHeader").html("Add");
             });
+        });
+
+        $('#AddAcceptableError').on('click', function () {
+            $("#AddAcceptableError").html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span>Loading...');
+            $.get("/Config/AddAcceptableError", function (template) {
+                $('#AcceptableErrorContainer').append(template);
+                $("#AddAcceptableError").html("Add");
+            });
+        });
+
+        $(".toggleBackfill").on('click', function () {
+            let tokenId = $(this).parent().parent().find("input.tokenId").val();
+            $.post("/api/" + data.GetApiVersion() + "/datasource/RunMotiveBackfill/" + tokenId, null, function () {
+                data.Dataset.makeToast("success", "Token backfill triggered successfully.");
+                $(this).hide();
+            }).fail(function (jqxhr, settings, ex) { data.Dataset.makeToast("error", "Token backfill error occurred.") });
         });
     },
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using Sentry.data.Core;
 using System.Web.Mvc;
@@ -78,8 +79,8 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockUsers.App_DataMgmt_MngDS();
             var ds = MockClasses.MockDataset();
-            var subs = MockClasses.MockDatasetSubscriptions(ds, user);
-            var dsc = MockControllers.MockDatasetController(ds, user, subs);
+            var subs = MockClasses.MockDatasetSubscriptions(ds, user.Object);
+            var dsc = MockControllers.MockDatasetController(ds, user.Object, subs);
 
             var result = dsc.Subscribe(ds.DatasetId) as PartialViewResult;
 
@@ -88,9 +89,9 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as SubscriptionModel);
 
             Assert.IsTrue(model.CurrentSubscriptions.Any(x => x.Interval.Description != "Never")); //There should be one that is labeled Daily
-            Assert.IsTrue(model.CurrentSubscriptions.All(x => x.SentryOwnerName == user.AssociateId));  //Every subscription returned should be belonging to the current user.
+            Assert.IsTrue(model.CurrentSubscriptions.All(x => x.SentryOwnerName == user.Object.AssociateId));  //Every subscription returned should be belonging to the current user.
 
-            Assert.IsTrue(model.SentryOwnerName == user.AssociateId);
+            Assert.IsTrue(model.SentryOwnerName == user.Object.AssociateId);
         }
 
         [TestMethod]
@@ -100,7 +101,7 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockUsers.App_DataMgmt_Upld();
             var ds = MockClasses.MockDataset();
-            var dsc = MockControllers.MockDatasetController(ds, user);
+            var dsc = MockControllers.MockDatasetController(ds, user.Object);
 
             var result = dsc.Subscribe(ds.DatasetId) as PartialViewResult;
 
@@ -109,9 +110,9 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as SubscriptionModel);
 
             Assert.IsTrue(model.CurrentSubscriptions.All(x => x.Interval.Description == "Never")); //There should be NONE that are labeled Daily
-            Assert.IsTrue(model.CurrentSubscriptions.All(x => x.SentryOwnerName == user.AssociateId));  //Every subscription returned should be belonging to the current user.
+            Assert.IsTrue(model.CurrentSubscriptions.All(x => x.SentryOwnerName == user.Object.AssociateId));  //Every subscription returned should be belonging to the current user.
 
-            Assert.IsTrue(model.SentryOwnerName == user.AssociateId);
+            Assert.IsTrue(model.SentryOwnerName == user.Object.AssociateId);
         }
 
         [TestMethod]
@@ -119,10 +120,13 @@ namespace Sentry.data.Web.Tests
         [TestCategory("Dataset Subscriptions")]
         public void Dataset_Controller_Subscribe_Check_Model()
         {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             var user = MockUsers.App_DataMgmt_Admin_User();
+            
             var ds = MockClasses.MockDataset();
-            var subs = MockClasses.MockDatasetSubscriptions(ds, user);
-            var dsc = MockControllers.MockDatasetController(ds, user, subs);
+            var subs = MockClasses.MockDatasetSubscriptions(ds, user.Object);
+            var dsc = MockControllers.MockDatasetController(ds, user.Object, subs);
 
             var result = dsc.Subscribe(ds.DatasetId) as PartialViewResult;
 
@@ -133,7 +137,7 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(model.CurrentSubscriptions.Count == MockClasses.MockEventTypes().Count(x => x.Display));
             Assert.IsTrue(model.AllIntervals.Count() == MockClasses.MockIntervals().Count);
             Assert.IsTrue(model.datasetID == ds.DatasetId);
-            Assert.IsTrue(model.SentryOwnerName == user.AssociateId);
+            Assert.IsTrue(model.SentryOwnerName == user.Object.AssociateId);
         }
 
         [TestMethod]
@@ -143,21 +147,21 @@ namespace Sentry.data.Web.Tests
         public void Dataset_Controller_Utility_InstantiateJobs_For_Create_DFSBasic()
         {
             var user = MockUsers.App_DataMgmt_Admin_User();
-            var ds = MockClasses.MockDataset(user, true);
+            var ds = MockClasses.MockDataset(user.Object, true);
             var dataSource = MockClasses.MockDataSources()[0];
 
             var job = Utility.InstantiateJobsForCreation(ds.DatasetFileConfigs[0], dataSource);
 
             Assert.IsTrue(job.DataSource.Is<DfsBasic>());
-            Assert.IsTrue(job.DataSource.Name == dataSource.Name);
-            Assert.IsTrue(job.DataSource.Id == dataSource.Id);
-            Assert.IsTrue(job.DatasetConfig.ConfigId == ds.DatasetFileConfigs[0].ConfigId);
+            Assert.AreEqual(dataSource.Name, job.DataSource.Name);
+            Assert.AreEqual(dataSource.Id, job.DataSource.Id);
+            Assert.AreEqual(ds.DatasetFileConfigs[0].ConfigId,job.DatasetConfig.ConfigId);
 
-            Assert.IsTrue(job.JobOptions.CompressionOptions.IsCompressed == false);
-            Assert.IsTrue(job.JobOptions.IsRegexSearch == true);
+            Assert.IsFalse(job.JobOptions.CompressionOptions.IsCompressed);
+            Assert.IsTrue(job.JobOptions.IsRegexSearch);
 
-            Assert.IsTrue(job.IsGeneric == true);
-            Assert.IsTrue(job.Schedule == "Instant");
+            Assert.IsTrue(job.IsGeneric);
+            Assert.AreEqual("Instant", job.Schedule);
         }
 
         [TestMethod]
@@ -167,21 +171,21 @@ namespace Sentry.data.Web.Tests
         public void Dataset_Controller_Utility_InstantiateJobs_For_Create_S3Basic()
         {
             var user = MockUsers.App_DataMgmt_Admin_User();
-            var ds = MockClasses.MockDataset(user, true);
+            var ds = MockClasses.MockDataset(user.Object, true);
             var dataSource = MockClasses.MockDataSources()[1];
 
             var job = Utility.InstantiateJobsForCreation(ds.DatasetFileConfigs[0], dataSource);
 
             Assert.IsTrue(job.DataSource.Is<S3Basic>());
-            Assert.IsTrue(job.DataSource.Name == dataSource.Name);
-            Assert.IsTrue(job.DataSource.Id == dataSource.Id);
-            Assert.IsTrue(job.DatasetConfig.ConfigId == ds.DatasetFileConfigs[0].ConfigId);
+            Assert.AreEqual(dataSource.Name, job.DataSource.Name);
+            Assert.AreEqual(dataSource.Id, job.DataSource.Id);
+            Assert.AreEqual(ds.DatasetFileConfigs[0].ConfigId, job.DatasetConfig.ConfigId);
 
-            Assert.IsTrue(job.JobOptions.CompressionOptions.IsCompressed == false);
-            Assert.IsTrue(job.JobOptions.IsRegexSearch == true);
+            Assert.IsFalse(job.JobOptions.CompressionOptions.IsCompressed);
+            Assert.IsTrue(job.JobOptions.IsRegexSearch);
 
-            Assert.IsTrue(job.IsGeneric == true);
-            Assert.IsTrue(job.Schedule == "*/1 * * * *");
+            Assert.IsTrue(job.IsGeneric);
+            Assert.AreEqual("*/1 * * * *", job.Schedule);
         }
 
         [TestMethod]
@@ -191,7 +195,7 @@ namespace Sentry.data.Web.Tests
         public void Dataset_Controller_Utility_InstantiateJobs_For_Create_FTPBasic()
         {
             var user = MockUsers.App_DataMgmt_Admin_User();
-            var ds = MockClasses.MockDataset(user, true);
+            var ds = MockClasses.MockDataset(user.Object, true);
             var dataSource = MockClasses.MockDataSources()[2];
 
             try
@@ -203,9 +207,6 @@ namespace Sentry.data.Web.Tests
             {
                 Assert.IsTrue(ex is NotImplementedException);
             }
-
-
-
         }
     }
 }

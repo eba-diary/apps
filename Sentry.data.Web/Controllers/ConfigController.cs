@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IAssociateInfoProvider _associateInfoProvider;
         private readonly IDatasetContext _datasetContext;
         private readonly IConfigService _configService;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly IEventService _eventService;
         private readonly IDatasetService _DatasetService;
         private readonly IObsidianService _obsidianService;
@@ -35,7 +35,7 @@ namespace Sentry.data.Web.Controllers
         #endregion
 
         #region Constructor
-        public ConfigController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService,
+        public ConfigController(IDatasetContext dsCtxt, IUserService userService, IAssociateInfoProvider associateInfoService,
             IConfigService configService, IEventService eventService, IDatasetService datasetService, 
             IObsidianService obsidianService, ISecurityService securityService, ISchemaService schemaService, 
             IDataFeatures dataFeatures, Lazy<IDataApplicationService> dataApplicationService, IDataSourceService dataSourceService)
@@ -111,16 +111,20 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
         }
 
         [HttpGet]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create(int id)
         {
-            return View(GetDatasetFileConfigsModel(id));
+            var userSecurity = _DatasetService.GetUserSecurityForDataset(id);
+            if (userSecurity.CanManageSchema)
+            {
+                return View(GetDatasetFileConfigsModel(id));
+            }
+            return View("Forbidden");
         }
 
         [Route("Config/Dataset/ShowFileUpload/{configId}")]
@@ -137,7 +141,12 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public PartialViewResult _DatasetFileConfigCreate(int id)
         {
-            return PartialView("_DatasetFileConfigCreate", GetDatasetFileConfigsModel(id));
+            var userSecurity = _DatasetService.GetUserSecurityForDataset(id);
+            if (userSecurity.CanManageSchema)
+            {
+                return PartialView("_DatasetFileConfigCreate", GetDatasetFileConfigsModel(id));
+            }
+            return PartialView("Forbidden");
         }
 
         [HttpPost]
@@ -159,10 +168,13 @@ namespace Sentry.data.Web.Controllers
                     if (newSchemaId != 0)
                     {
                         dto.SchemaId = newSchemaId;
+                        schemaDto.SchemaId = newSchemaId;
 
                         if (_configService.CreateAndSaveDatasetFileConfig(dto))
                         {
                             _schemaService.PublishSchemaEvent(schemaDto.ParentDatasetId, newSchemaId);
+                            _schemaService.CreateExternalDependenciesAsync(schemaDto).Wait();
+
                             return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
                         }
                     }
@@ -239,14 +251,14 @@ namespace Sentry.data.Web.Controllers
                 //Users are unable to edit 
                 if (!us.CanManageSchema || dto.DeleteInd)
                 {
-                    return View("Unauthorized");
+                    return View("Forbidden");
                 }
 
                 DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
 
                 dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
                 dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
+                dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags, dfcm.FileExtensionID);
                 dfcm.DatasetScopeReadonly = dfcm.AllDatasetScopeTypes.Where(s => s.Value == dfcm.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
                 dfcm.FileExtensionReadonly = dfcm.ExtensionList.Where(s => s.Value == dfcm.FileExtensionID.ToString()).Select(n => n.Text).FirstOrDefault();
 
@@ -278,41 +290,12 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
+            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags, edfc.FileExtensionID);
             edfc.DatasetScopeReadonly = edfc.AllDatasetScopeTypes.Where(s => s.Value == edfc.DatasetScopeTypeID.ToString()).Select(n => n.Text).FirstOrDefault();
             ViewBag.ModifyType = "Edit";
 
             return PartialView("_EditConfigFile", edfc);
         }
-
-        //[HttpPost]
-        //[Route("Config/Edit/{configId}")]
-        //[AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        //public ActionResult Edit(EditDatasetFileConfigModel edfc)
-        //{
-        //    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
-
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
-        //            dfc.FileTypeId = edfc.FileTypeId;
-        //            dfc.Description = edfc.ConfigFileDesc;
-        //            dfc.FileExtension = _datasetContext.GetById<FileExtension>(edfc.FileExtensionID);
-        //            _datasetContext.SaveChanges();
-
-        //            return RedirectToAction("Index", new { id = edfc.DatasetId });
-        //        }
-        //    }
-        //    catch (Sentry.Core.ValidationException ex)
-        //    {
-        //        AddCoreValidationExceptionsToModel(ex);
-        //        _datasetContext.Clear();
-        //    }
-
-        //    return View(edfc);
-        //}
 
         [HttpGet]
         [Route("Config/{configId}/Job/Create")]
@@ -548,19 +531,25 @@ namespace Sentry.data.Web.Controllers
             dsm.ReturnUrl = "/";
             dsm.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
             CreateEvent("Viewed Data Source Creation Page");
-            return View("CreateDataSource", dsm);
+            return View("DataSource/CreateDataSource", dsm);
         }
 
         [Route("Config/HeaderEntryRow")]
         public ActionResult HeaderEntryRow()
         {
-            return PartialView("_Headers");
+            return PartialView("DataSource/_Headers");
+        }
+        
+        [Route("Config/AddAcceptableError")]
+        public ActionResult AddAcceptableError()
+        {
+            return PartialView("DataSource/_AcceptableError");
         }
 
         [Route("Config/AddToken")]
         public ActionResult AddToken()
         {
-            return PartialView("_DataSourceToken");
+            return PartialView("DataSource/_DataSourceToken");
         }
 
         public ActionResult FieldEntryRow()
@@ -604,12 +593,12 @@ namespace Sentry.data.Web.Controllers
             if (model.Id == 0)
             {
                 model = CreateSourceDropDown(model);
-                return View("CreateDataSource", model);
+                return View("DataSource/CreateDataSource", model);
             }
             else
             {
                 EditSourceDropDown(model);
-                return View("EditDataSource", model);
+                return View("DataSource/EditDataSource", model);
             }
         }
 
@@ -625,12 +614,16 @@ namespace Sentry.data.Web.Controllers
                 DataSourceModel model = new DataSourceModel(dto);
                 model.ReturnUrl = "/DataFlow/Create";
                 model.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
-
+                bool isMotive = int.Parse(Sentry.Configuration.Config.GetHostSetting("MotiveDataSourceId")) == sourceID;
+                foreach(var token in model.Tokens)
+                {
+                    token.ShouldShowBackfillButton = !token.BackFillComplete && isMotive;
+                }
                 EditSourceDropDown(model);
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
 
-                return View("EditDataSource", model);
+                return View("DataSource/EditDataSource", model);
             }
 
             return View("Forbidden");
@@ -766,7 +759,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (!us.CanManageSchema || configDto.DeleteInd)
                 {
-                    return View("Unauthorized");
+                    return View("Forbidden");
                 }
 
                 if (configDto.Schema.SchemaId == schemaId)
@@ -793,7 +786,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
         }
 
@@ -922,7 +915,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (!us.CanManageSchema || config.DeleteInd)
                 {
-                    return View("Unauthorized");
+                    return View("Forbidden");
                 }
 
                 FileSchemaDto schema = (config.Schema.SchemaId == schemaId) ? config.Schema : null;
@@ -953,7 +946,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
         }
 
@@ -965,7 +958,7 @@ namespace Sentry.data.Web.Controllers
 
             if (!us.CanManageSchema)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
 
             FileSchemaDto fileDto = _schemaService.GetFileSchemaDto(schemaId);
@@ -983,7 +976,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                return View("Unauthorized");
+                return View("Forbidden");
             }
             catch (Sentry.Core.ValidationException ex)
             {
@@ -1028,7 +1021,16 @@ namespace Sentry.data.Web.Controllers
         public async Task<ActionResult> SubmitAccessRequest(DataSourceAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = await _configService.RequestAccessToDataSource(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _configService.RequestAccessToDataSource(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit data source access request", ex);
+            }
 
             return string.IsNullOrEmpty(ticketId) 
                 ? PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false)) 
@@ -1048,37 +1050,38 @@ namespace Sentry.data.Web.Controllers
 
             switch (fe.Name)
             {
-                case GlobalConstants.ExtensionNames.CSV:
+                case ExtensionNames.CSV:
                     model.IsPositional = true;
                     model.IsFixedWidth = false;
                     break;
-                case GlobalConstants.ExtensionNames.ANY:
-                case GlobalConstants.ExtensionNames.DELIMITED:
-                case GlobalConstants.ExtensionNames.TXT:
+                case ExtensionNames.ANY:
+                case ExtensionNames.DELIMITED:
+                case ExtensionNames.TXT:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
                     break;
-                case GlobalConstants.ExtensionNames.FIXEDWIDTH:
+                case ExtensionNames.FIXEDWIDTH:
                     model.IsPositional = true;
                     model.IsFixedWidth = true;
                     break;
-                case GlobalConstants.ExtensionNames.JSON:
-                case GlobalConstants.ExtensionNames.XML:
+                case ExtensionNames.JSON:
+                case ExtensionNames.XML:
+                case ExtensionNames.PARQUET:
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
-                    model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    model.ValidDatatypes.Add(new DataTypeModel(Datatypes.STRUCT, "A struct", "Complex Data Types"));
                     break;
                 default:
                     break;
             }
 
             //Common datatypes across all FileExtensions
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
-            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }
@@ -1119,13 +1122,13 @@ namespace Sentry.data.Web.Controllers
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
         }
 
-        private DatasetFileConfigsModel GetDatasetFileConfigsModel(int id)
+        private DatasetFileConfigsModel GetDatasetFileConfigsModel(int datasetId)
         {
-            Dataset parent = _datasetContext.GetById<Dataset>(id);
+            Dataset parent = _datasetContext.GetById<Dataset>(datasetId);
 
             DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel
             {
-                DatasetId = id,
+                DatasetId = datasetId,
                 ParentDatasetName = parent.DatasetName,
                 ObjectStatus = Core.GlobalEnums.ObjectStatusEnum.Active
             };
@@ -1141,7 +1144,7 @@ namespace Sentry.data.Web.Controllers
         {
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
             dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, _featureFlags);
             dfcm.Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
         }
 

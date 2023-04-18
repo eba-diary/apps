@@ -65,6 +65,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("CurrentTokenExp");
                 m.NotNullable(false);
             });
+            
+            Property(x => x.ForeignId, m =>
+            {
+                m.Column("ForeignId");
+                m.NotNullable(false);
+            });
 
             this.Bag(x => x.Claims, (m) =>
             {
@@ -76,6 +82,24 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_AuthenticationClaims_DataSourceTokens");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(OAuthClaim))));
+
+            Property(x => x.Enabled, m =>
+            {
+                m.Column("Enabled");
+                m.NotNullable(false);
+            });
+            
+            Property(x => x.AcceptableErrorNeedsReview, m =>
+            {
+                m.Column("AcceptableErrorNeedsReview");
+                m.NotNullable(false);
+            });
+            
+            Property(x => x.BackfillComplete, m =>
+            {
+                m.Column("BackfillComplete");
+                m.NotNullable(false);
+            });
         }
     }
 }

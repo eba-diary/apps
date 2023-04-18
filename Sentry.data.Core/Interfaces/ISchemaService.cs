@@ -3,6 +3,7 @@ using Sentry.Core;
 using Sentry.data.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -46,6 +47,13 @@ namespace Sentry.data.Core
         SchemaRevisionFieldStructureDto GetLatestSchemaRevisionFieldStructureBySchemaId(int datasetId, int schemaId);
 
         /// <summary>
+        /// Create new FileSchema entity and it to context. Context add is awaited.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<FileSchemaDto> AddSchemaAsync(FileSchemaDto dto);
+
+        /// <summary>
         /// Create new FileSchema entity and add it to context.  Does not save changes.
         /// </summary>
         /// <param name="dto">FileSchemaDto</param>
@@ -58,6 +66,20 @@ namespace Sentry.data.Core
         /// <param name="schemaDto"></param>
         /// <returns></returns>
         int CreateAndSaveSchema(FileSchemaDto schemaDto);
+
+        /// <summary>
+        /// Performs all necessary external dependency creation statements.
+        /// </summary>
+        /// <remarks>To be executed after creation of schema</remarks>
+        /// <param name="schemaId"></param>
+        Task CreateExternalDependenciesAsync(int schemaId);
+
+        /// <summary>
+        /// Performs all necessary external dependency creation statements.
+        /// </summary>
+        /// <remarks>To be executed after creation of schema</remarks>
+        /// <param name="schemaDto"></param>
+        Task CreateExternalDependenciesAsync(FileSchemaDto schemaDto);
 
         /// <summary>
         /// 
@@ -97,6 +119,7 @@ namespace Sentry.data.Core
         /// <exception cref="SchemaUnauthorizedAccessException">Thrown when user does not have access to manage schema</exception>
         /// <returns></returns>
         bool UpdateAndSaveSchema(FileSchemaDto schemaDto);
+        Task<FileSchemaDto> UpdateSchemaAsync(FileSchemaDto dto, FileSchema schema);
         void PublishSchemaEvent(int datasetId, int schemaId);
 
         /// <summary>
@@ -151,16 +174,23 @@ namespace Sentry.data.Core
         void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList);
         IDictionary<int, string> GetSchemaList();
         /// <summary>
-        /// Creates jobs to create new consumption layer(s) for a schema.
+        /// Create or Update consumption layer(s) for each schema.
         /// </summary>
-        /// <param name="schemaIdList">List of schemas to create a job for.</param>
-        void CreateConsumptionLayersForSchemaList(int[] schemaIdList);
+        /// <remarks>
+        /// It is callers responsibility to sync consumption layer if necessary (e.g. with Snowflake)
+        /// </remarks>
+        /// <param name="schemaIdList">List of schemas.</param>
+        void CreateOrUpdateConsumptionLayersForSchema(int[] schemaIdList);
         /// <summary>
-        /// Creates new consumption layer(s) for a schema.
+        /// Create or Update consumption layer(s) for a schema.
         /// </summary>
+        /// <remarks>
+        /// It is callers responsibility to sync consumption layer if necessary (e.g. with Snowflake)
+        /// </remarks>
         /// <param name="schemaId">Schema ID</param>
-        void CreateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
+        void CreateOrUpdateConsumptionLayersForSchema(FileSchema schema, FileSchemaDto dto, Dataset ds);
 
         (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName);
+        void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList);
     }
 }

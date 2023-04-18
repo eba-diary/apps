@@ -86,9 +86,6 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-    </Reference>
     <Reference Include="Sentry.Core, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.2.1.1\lib\netstandard2.0\Sentry.Core.dll</HintPath>
     </Reference>
@@ -156,14 +153,17 @@
   <ItemGroup>
     <Compile Include="BaseCoreUnitTest.cs" />
     <Compile Include="ConfigServiceTests.cs" />
+    <Compile Include="DatasetFileTests.cs" />
     <Compile Include="DataSourceTests.cs" />
     <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
     <Compile Include="HelperTests\CustomAttributeHelperTests.cs" />
     <Compile Include="HelperTests\DSCEventTopicHelperTests.cs" />
+    <Compile Include="HelperTests\JiraHelperTests.cs" />
     <Compile Include="JobServiceTests.cs" />
     <Compile Include="ConnectorServiceTests.cs" />
+    <Compile Include="MigrationTests.cs" />
     <Compile Include="Mockups\MockClasses\MockClasses.cs" />
     <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />
@@ -198,6 +198,9 @@
     <Compile Include="JobExtensionsTests.cs" />
     <Compile Include="RequestVariableTests.cs" />
     <Compile Include="RetrieverJobTests.cs" />
+    <Compile Include="SchemaFlowServiceTests.cs" />
+    <Compile Include="MarkdownTests.cs" />
+    <Compile Include="GlobalDatasetExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

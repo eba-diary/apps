@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core
@@ -50,6 +51,31 @@ namespace Sentry.data.Core
                     dto.Color = dataset.DatasetCategories.First().Color;
                 }
             }
+        }
+
+        public static DatasetResultDto ToDatasetResultDto(this Dataset dataset)
+        {
+            return new DatasetResultDto
+            {
+                DatasetId = dataset.DatasetId,
+                DatasetName = dataset.DatasetName,
+                DatasetDescription = dataset.DatasetDesc,
+                CategoryName = dataset.DatasetCategories.First()?.Name,
+                ShortName = dataset.ShortName,
+                SaidAssetCode = dataset.Asset.SaidKeyCode,
+                NamedEnvironment = dataset.NamedEnvironment,
+                NamedEnvironmentType = dataset.NamedEnvironmentType,
+                UsageInformation = dataset.DatasetInformation,
+                DataClassificationType = dataset.DataClassification,
+                IsSecured = dataset.IsSecured,
+                PrimaryContactId = dataset.PrimaryContactId,
+                AlternateContactEmail = dataset.AlternateContactEmail,
+                OriginationCode = (DatasetOriginationCode)Enum.Parse(typeof(DatasetOriginationCode), dataset.OriginationCode, true),
+                OriginalCreator = dataset.CreationUserName,
+                CreateDateTime = dataset.DatasetDtm,
+                UpdateDateTime = dataset.ChangedDtm,
+                ObjectStatus = dataset.ObjectStatus
+            };
         }
     }
 }

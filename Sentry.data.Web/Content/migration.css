@@ -3,6 +3,10 @@
     font-size: 15px;
 }
 
+#MigrationResponseTable_wrapper .table, #MigrationResponseTable_wrapper .table caption, #MigrationResponseTable_wrapper .dataTables_info {
+    padding-left: 10px;
+    padding-right: 10px;
+}
 
 #MigrationResponseTable tr.group {
     background-color: #ddd;
@@ -45,4 +49,17 @@
 
 #RequestMigrationFormSection .search-wrap .select-add-option {
     margin-top: -12px; /* default was not set */
+}
+
+#MigrationHistoryDetailTable .fa-check-circle {
+    color: green;
+}
+
+.migration-history-card-header:hover {
+    background-color: #f7f5f5 !important;
+}
+
+.migration-history-modify-icons {
+    font-size: 1.75rem;
+    display: flex;
 }

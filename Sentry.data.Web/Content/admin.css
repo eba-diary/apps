@@ -147,3 +147,8 @@ table#metricGroupsTable td.metric-detail-control {
     background: unset !important;
 }
     
+}
+
+.dead-job-select-all {
+    vertical-align: middle !important;
+}

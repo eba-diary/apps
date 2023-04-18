@@ -274,7 +274,7 @@ namespace Sentry.data.Infrastructure.Tests
         public void GetDataFlowMetrics_MappedReturn()
         {
             //arrange
-            var stubIElasticContext = new Mock<IElasticContext>();
+            var stubIElasticDocumentClient = new Mock<IElasticDocumentClient>();
 
             DataFlowMetricSearchDto dto = new DataFlowMetricSearchDto()
             {
@@ -283,9 +283,9 @@ namespace Sentry.data.Infrastructure.Tests
                 SchemaId = 1
             };
 
-            stubIElasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<Nest.SearchDescriptor<DataFlowMetric>, ISearchRequest>>())).ReturnsAsync(GetDataFlowMetricList);
+            stubIElasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<Func<Nest.SearchDescriptor<DataFlowMetric>, ISearchRequest>>())).ReturnsAsync(GetDataFlowMetricList);
 
-            DataFlowMetricProvider stubDataFlowMetricProvider = new DataFlowMetricProvider(stubIElasticContext.Object);
+            DataFlowMetricProvider stubDataFlowMetricProvider = new DataFlowMetricProvider(stubIElasticDocumentClient.Object);
 
             //act
             List<DataFlowMetric> metricList = stubDataFlowMetricProvider.GetDataFlowMetrics(dto);
@@ -293,7 +293,7 @@ namespace Sentry.data.Infrastructure.Tests
             //assert
             Assert.IsNotNull(metricList);
 
-            stubIElasticContext.VerifyAll();
+            stubIElasticDocumentClient.VerifyAll();
         }
 
         private ElasticResult<DataFlowMetric> GetDataFlowMetricList()

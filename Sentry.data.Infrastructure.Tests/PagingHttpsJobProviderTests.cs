@@ -27,7 +27,8 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
-                SourceAuthType = new AnonymousAuthentication()
+                SourceAuthType = new AnonymousAuthentication(),
+                Name = "UnitTestDataSource"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -78,7 +79,10 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
             s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, null, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, null, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -155,7 +159,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetTokenAuthenticationToken(dataSource)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -176,13 +183,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken() { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -249,7 +256,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -270,13 +280,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_SingleToken_MultipleIncrements_DataGap()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -367,7 +377,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -388,13 +401,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_FailInProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -457,7 +470,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
 
@@ -486,16 +502,221 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void Execute_PagingTypePageNumber_OAuth_StartFromSavedProgress()
+        public void Execute_PagingTypePageNumber_OAuth_MultiplePages_AcceptableError_FailInProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token },
+                AcceptableErrors = new Dictionary<string, string> { { "error", "acceptableError2" } }
+            };
+
+            HttpsOptions options = new HttpsOptions
+            {
+                PagingType = PagingType.PageNumber,
+                PageParameterName = "pageNumber"
+            };
+
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+
+            List<DataFlowStep> steps = GetDataFlowSteps(job.DataFlow);
+
+            Mock<IDatasetContext> datasetContext = repo.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(steps.AsQueryable());
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IFileProvider> fileProvider = repo.Create<IFileProvider>();
+            string expectedPath = @"C:\tmp\GoldenEye\work\Jobs\1";
+            fileProvider.Setup(x => x.CreateDirectory(expectedPath));
+
+            long length = 0;
+            Mock<Stream> stream = repo.Create<Stream>();
+            stream.Setup(x => x.Close());
+            stream.Setup(x => x.Length).Returns(() => length);
+            stream.SetupGet(x => x.CanRead).Returns(true);
+            stream.SetupGet(x => x.CanWrite).Returns(true);
+            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length = (long)Math.Pow(1024, 3) * 2);
+            stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
+
+            string filename = expectedPath + @"\filename.json";
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
+
+            Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
+
+
+            HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
+            string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_AcceptableErrorResponse.json");
+            responseMessage2.StatusCode = HttpStatusCode.InternalServerError;
+            string requestUrl2 = requestUrl + "&pageNumber=2";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl2),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+
+            httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
+
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
+
+            Mock<IHttpClientGenerator> generator = repo.Create<IHttpClientGenerator>();
+            generator.Setup(x => x.GenerateHttpClient(dataSource.BaseUri.ToString())).Returns(httpClient);
+
+            Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
+            s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
+
+            Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
+            authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
+
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+
+            Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
+
+            Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
+            Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
+            Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsTrue(job.ExecutionParameters.Any());
+            Assert.AreEqual(2, job.ExecutionParameters.Count());
+
+            KeyValuePair<string, string> parameter = job.ExecutionParameters.First();
+            Assert.AreEqual("pageNumber", parameter.Key);
+            Assert.AreEqual("2", parameter.Value);
+
+            parameter = job.ExecutionParameters.Last();
+            Assert.AreEqual(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, parameter.Key);
+            Assert.AreEqual("3", parameter.Value);
+
+            Assert.AreEqual(DateTime.Today.AddDays(-2).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(1));
+            repo.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Execute_PagingTypePageNumber_OAuth_MultiplePages_AcceptableError_Handled()
+        {
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                AllTokens = new List<DataSourceToken> { token },
+                AcceptableErrors = new Dictionary<string, string> { { "error", "acceptableError" } }
+            };
+
+            HttpsOptions options = new HttpsOptions
+            {
+                PagingType = PagingType.PageNumber,
+                PageParameterName = "pageNumber"
+            };
+
+            RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 2, 1);
+
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+
+            List<DataFlowStep> steps = GetDataFlowSteps(job.DataFlow);
+
+            Mock<IDatasetContext> datasetContext = repo.Create<IDatasetContext>();
+            datasetContext.SetupGet(x => x.DataFlowStep).Returns(steps.AsQueryable());
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IFileProvider> fileProvider = repo.Create<IFileProvider>();
+            string expectedPath = @"C:\tmp\GoldenEye\work\Jobs\1";
+            fileProvider.Setup(x => x.CreateDirectory(expectedPath));
+
+            long length = 0;
+            Mock<Stream> stream = repo.Create<Stream>();
+            stream.Setup(x => x.Close());
+            stream.Setup(x => x.Length).Returns(() => length);
+            stream.SetupGet(x => x.CanRead).Returns(true);
+            stream.SetupGet(x => x.CanWrite).Returns(true);
+            stream.Setup(x => x.WriteAsync(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() => length = (long)Math.Pow(1024, 3) * 2);
+            stream.Setup(x => x.SetLength(0)).Callback(() => length = 0);
+
+            string filename = expectedPath + @"\filename.json";
+            fileProvider.Setup(x => x.GetFileStream(filename, FileMode.CreateNew, FileAccess.ReadWrite)).Returns(stream.Object);
+            fileProvider.Setup(x => x.DeleteDirectory(expectedPath));
+
+            Mock<HttpMessageHandler> httpMessageHandler = repo.Create<HttpMessageHandler>();
+
+            HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
+            string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage);
+
+            HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_AcceptableErrorResponse.json");
+            responseMessage2.StatusCode = HttpStatusCode.InternalServerError;
+            string requestUrl2 = requestUrl + "&pageNumber=2";
+            httpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
+                                                                            ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl2),
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage2);
+
+            httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
+
+            HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
+
+            Mock<IHttpClientGenerator> generator = repo.Create<IHttpClientGenerator>();
+            generator.Setup(x => x.GenerateHttpClient(dataSource.BaseUri.ToString())).Returns(httpClient);
+
+            Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
+            s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
+
+            Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
+            authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
+            authorizationProvider.Setup(x => x.Dispose());
+
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+
+            provider.Execute(job);
+
+            Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
+            Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
+            Assert.AreEqual("Bearer token", httpClient.DefaultRequestHeaders.First().Value.First());
+
+            Assert.IsTrue(token.AcceptableErrorNeedsReview);
+
+            Assert.IsFalse(job.ExecutionParameters.Any());
+            Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
+            Assert.AreEqual(DateTime.Today.ToString("yyyy-MM-dd"), job.RequestVariables.Last().VariableValue);
+
+            fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(2));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(2));
+            repo.VerifyAll();
+        }
+
+        [TestMethod]
+        public void Execute_PagingTypePageNumber_OAuth_StartFromSavedProgress()
+        {
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
+
+            HTTPSSource dataSource = new HTTPSSource
+            {
+                BaseUri = new Uri("https://www.base.com"),
+                SourceAuthType = new OAuthAuthentication(),
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -562,7 +783,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -583,14 +807,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_StartFromSavedProgress_NoRequestVariables()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -659,7 +883,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -679,14 +906,19 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_MultipleTokens()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token0 = new DataSourceToken { Id = 2, Enabled = false };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
+            DataSourceToken token3 = new DataSourceToken { Id = 5, Enabled = false };
+            DataSourceToken token4 = new DataSourceToken { Id = 6, Enabled = false };
+            DataSourceToken token5 = new DataSourceToken { Id = 7, Enabled = true };
+            DataSourceToken token6 = new DataSourceToken { Id = 8, Enabled = false };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token0, token, token2, token3, token4, token5, token6 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -732,6 +964,19 @@ namespace Sentry.data.Infrastructure.Tests
                     parameter = job.ExecutionParameters.Last();
                     Assert.AreEqual(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, parameter.Key);
                     Assert.AreEqual("4", parameter.Value);
+                }                
+                else if (saveCount == 3)
+                {
+                    Assert.IsTrue(job.ExecutionParameters.Any());
+                    Assert.AreEqual(2, job.ExecutionParameters.Count());
+
+                    KeyValuePair<string, string> parameter = job.ExecutionParameters.First();
+                    Assert.AreEqual("pageNumber", parameter.Key);
+                    Assert.AreEqual("3", parameter.Value);
+
+                    parameter = job.ExecutionParameters.Last();
+                    Assert.AreEqual(ExecutionParameterKeys.PagingHttps.CURRENTDATASOURCETOKENID, parameter.Key);
+                    Assert.AreEqual("7", parameter.Value);
                 }
             });
 
@@ -757,22 +1002,25 @@ namespace Sentry.data.Infrastructure.Tests
 
             HttpResponseMessage responseMessage = GetResponseMessage("PagingHttps_BasicResponse.json");
             HttpResponseMessage responseMessage2 = GetResponseMessage("PagingHttps_BasicResponse.json");
+            HttpResponseMessage responseMessage3 = GetResponseMessage("PagingHttps_BasicResponse.json");
             string requestUrl = $@"{dataSource.BaseUri}Search/{DateTime.Today.AddDays(-2):yyyy-MM-dd}?endDate={DateTime.Today.AddDays(-1):yyyy-MM-dd}";
             httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage).ReturnsAsync(responseMessage2);
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage).ReturnsAsync(responseMessage2).ReturnsAsync(responseMessage3);
 
-            HttpResponseMessage responseMessage3 = GetResponseMessage("PagingHttps_BasicResponse.json");
             HttpResponseMessage responseMessage4 = GetResponseMessage("PagingHttps_BasicResponse.json");
+            HttpResponseMessage responseMessage5 = GetResponseMessage("PagingHttps_BasicResponse.json");
+            HttpResponseMessage responseMessage6 = GetResponseMessage("PagingHttps_BasicResponse.json");
             httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "&pageNumber=2"),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage3).ReturnsAsync(responseMessage4);
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(responseMessage4).ReturnsAsync(responseMessage5).ReturnsAsync(responseMessage6);
 
             HttpResponseMessage emptyMessage = CreateResponseMessage("[]");
             HttpResponseMessage emptyMessage2 = CreateResponseMessage("[]");
+            HttpResponseMessage emptyMessage3 = CreateResponseMessage("[]");
             httpMessageHandler.Protected().SetupSequence<Task<HttpResponseMessage>>("SendAsync",
                                                                             ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString() == requestUrl + "&pageNumber=3"),
-                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(emptyMessage).ReturnsAsync(emptyMessage2);
+                                                                            ItExpr.IsAny<CancellationToken>()).ReturnsAsync(emptyMessage).ReturnsAsync(emptyMessage2).ReturnsAsync(emptyMessage3);
             httpMessageHandler.Protected().Setup("Dispose", ItExpr.Is<bool>(x => x));
 
             HttpClient httpClient = new HttpClient(httpMessageHandler.Object, true);
@@ -786,15 +1034,19 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IAuthorizationProvider> authorizationProvider = repo.Create<IAuthorizationProvider>();
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
+            authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token5)).Returns("token5");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
             Assert.AreEqual(1, httpClient.DefaultRequestHeaders.Count());
             Assert.AreEqual("Authorization", httpClient.DefaultRequestHeaders.First().Key);
-            Assert.AreEqual("Bearer token2", httpClient.DefaultRequestHeaders.First().Value.First());
+            Assert.AreEqual("Bearer token5", httpClient.DefaultRequestHeaders.First().Value.First());
 
             Assert.IsFalse(job.ExecutionParameters.Any());
             Assert.AreEqual(DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd"), job.RequestVariables.First().VariableValue);
@@ -803,9 +1055,10 @@ namespace Sentry.data.Infrastructure.Tests
             fileProvider.Verify(x => x.DeleteDirectory(expectedPath), Times.Exactly(1));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token), Times.Exactly(3));
             authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token2), Times.Exactly(3));
-            s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(2));
-            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(3));
-            stream.Verify(x => x.SetLength(0), Times.Exactly(2));
+            authorizationProvider.Verify(x => x.GetOAuthAccessToken(dataSource, token5), Times.Exactly(3));
+            s3Provider.Verify(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_"))), Times.Exactly(3));
+            datasetContext.Verify(x => x.SaveChanges(true), Times.Exactly(4));
+            stream.Verify(x => x.SetLength(0), Times.Exactly(3));
             repo.VerifyAll();
         }
 
@@ -903,7 +1156,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetTokenAuthenticationToken(dataSource)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -924,14 +1180,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_MultipleTokens_MultipleVariableIncrements()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1023,7 +1279,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1050,7 +1309,8 @@ namespace Sentry.data.Infrastructure.Tests
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
-                SourceAuthType = new AnonymousAuthentication()
+                SourceAuthType = new AnonymousAuthentication(),
+                Name = "UnitTestDataSource"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1060,7 +1320,11 @@ namespace Sentry.data.Infrastructure.Tests
 
             RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 1, 0);
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null);
+            MockRepository repo = new MockRepository(MockBehavior.Strict);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, featureFlags.Object);
 
             provider.Execute(job);
         }
@@ -1068,13 +1332,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_NoRequestVariables()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1143,7 +1407,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1163,14 +1430,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_MultiplePages_MultipleTokens_NoRequestVariables()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1274,7 +1541,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1297,14 +1567,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeNone_OAuth_MultipleTokens_MultipleVariableIncrements()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true};
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1411,7 +1681,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1435,13 +1708,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_MultiplePages()
         {
-            DataSourceToken token = new DataSourceToken();
+            DataSourceToken token = new DataSourceToken { Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 RequestHeaders = new List<RequestHeader>()
             };
 
@@ -1511,7 +1784,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1530,13 +1806,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_MultiplePages_FailInProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token },
+                AllTokens = new List<DataSourceToken> { token },
                 RequestHeaders = new List<RequestHeader>()
             };
 
@@ -1602,7 +1878,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
 
@@ -1630,15 +1909,16 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_StartFromSavedProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 },
-                RequestHeaders = new List<RequestHeader>()
+                AllTokens = new List<DataSourceToken> { token, token2 },
+                RequestHeaders = new List<RequestHeader>(),
+                Name = "UnitTestDataSource"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1707,7 +1987,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1726,14 +2009,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_MultipleTokens_MultipleVariableIncrements()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1847,7 +2130,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1871,13 +2157,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token },
+                Name = "UnitTestDataSource"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -1963,7 +2250,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -1985,13 +2275,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement_SimpleNestedData()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token },
+                Name = "UnitTestSouce"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -2077,7 +2368,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -2099,14 +2393,15 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_StartFromSavedProgress()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
-            DataSourceToken token2 = new DataSourceToken { Id = 4 };
+            DataSourceToken token = new DataSourceToken { Id = 3 , Enabled = true };
+            DataSourceToken token2 = new DataSourceToken { Id = 4, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token, token2 }
+                AllTokens = new List<DataSourceToken> { token, token2 },
+                Name = "UnitTestDataSource"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -2190,7 +2485,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -2212,13 +2510,13 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypePageNumber_OAuth_PostMethod_MultiplePages_SingleToken_NoVariableIncrement()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token }
             };
 
             HttpsOptions options = new HttpsOptions
@@ -2304,7 +2602,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 
@@ -2326,13 +2627,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void Execute_PagingTypeIndex_OAuth_PostMethod_SingleToken_NoResultsOnFirstRequest()
         {
-            DataSourceToken token = new DataSourceToken { Id = 3 };
+            DataSourceToken token = new DataSourceToken { Id = 3, Enabled = true };
 
             HTTPSSource dataSource = new HTTPSSource
             {
                 BaseUri = new Uri("https://www.base.com"),
                 SourceAuthType = new OAuthAuthentication(),
-                Tokens = new List<DataSourceToken> { token }
+                AllTokens = new List<DataSourceToken> { token },
+                Name = "UnitTestDataSource"
             };
 
             HttpsOptions options = new HttpsOptions
@@ -2407,7 +2709,10 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, null, authorizationProvider.Object, generator.Object, fileProvider.Object);
+            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, null, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
             provider.Execute(job);
 

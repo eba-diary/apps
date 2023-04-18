@@ -4,6 +4,8 @@ using Sentry.data.Core;
 using Sentry.data.Core.DTO.Admin;
 using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Helpers;
+using Sentry.DataTables.QueryableAdapter;
+using Sentry.DataTables.Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Sentry.data.Web;
 using Sentry.data.Web.Models.AdminPage;
 
@@ -112,9 +115,16 @@ namespace Sentry.data.Web.Controllers
             return model;
         }
 
-        [Route("Admin/GetDeadJobs/{selectedDate?}")]
+        [Route("Admin/DeadJobTable")]
         [HttpGet]
-        public ActionResult GetDeadJobs(string selectedDate)
+        public ActionResult DeadJobTable()
+        {
+            return PartialView("_DeadJobTable");
+        }
+
+        [Route("Admin/GetDeadJobsForGrid/{selectedDate?}")]
+        [HttpPost]
+        public JsonResult GetDeadJobsForGrid(string selectedDate)
         {
             // Convert selectedDate string to a DateTime object
             DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
@@ -123,7 +133,7 @@ namespace Sentry.data.Web.Controllers
 
             List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
 
-            return PartialView("_DeadJobTable", deadSparkJobModelList);
+            return Json(new { data = deadSparkJobModelList } );
         }
 
         //method for generating a dataset selection model, which contains a list of all Active datasets

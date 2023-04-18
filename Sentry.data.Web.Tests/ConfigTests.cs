@@ -25,7 +25,7 @@ namespace Sentry.data.Web.Tests
 
             ds.DatasetFileConfigs.Add(dfc);
 
-            var cc = MockControllers.MockConfigController(dfc, user);
+            var cc = MockControllers.MockConfigController(dfc, user.Object);
 
             var result = cc.Create(dfc.ParentDataset.DatasetId) as ViewResult;
 

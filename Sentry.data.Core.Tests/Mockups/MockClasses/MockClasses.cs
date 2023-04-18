@@ -22,6 +22,7 @@ namespace Sentry.data.Core.Tests
                 DatasetCategories = MockCategories(),
                 DatasetName = "Claim Dataset",
                 DatasetDesc = "Test Claim Dataset",
+                ShortName = "CLAIMDATASET",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = user != null ? user.DisplayName : "Nye, Bill",
                 UploadUserName = user != null ? user.DisplayName : "Nye, Bill",
@@ -44,6 +45,106 @@ namespace Sentry.data.Core.Tests
 
             return ds;
         }
+        public static MigrationHistory MockMigrationHistory_DEV_to_TEST()
+        {
+            MigrationHistory migrationHistory = new MigrationHistory() 
+            { 
+                MigrationHistoryId = 1,
+                SourceDatasetId = 1000,
+                SourceNamedEnvironment = "DEV",
+                TargetDatasetId = 1001,
+                TargetNamedEnvironment = "TEST"
+            };
+            return migrationHistory;
+        }
+
+        public static MigrationHistory MockMigrationHistory_TEST_to_DEV()
+        {
+            MigrationHistory migrationHistory = new MigrationHistory()
+            {
+                MigrationHistoryId = 2,
+                SourceDatasetId = 1001,
+                SourceNamedEnvironment = "TEST",
+                TargetDatasetId = 1000,
+                TargetNamedEnvironment = "DEV"
+            };
+            return migrationHistory;
+        }
+
+        public static MigrationHistory MockMigrationHistory_TEST_to_QUAL()
+        {
+            MigrationHistory migrationHistory = new MigrationHistory()
+            {
+                MigrationHistoryId = 3,
+                SourceDatasetId = 1001,
+                SourceNamedEnvironment = "TEST",
+                TargetDatasetId = 1002,
+                TargetNamedEnvironment = "QUAL"
+            };
+            return migrationHistory;
+        }
+
+
+        public static DatasetDetailDto MockDatasetDetailDtoForMigrationHistory_DEV()
+        {
+            DatasetDetailDto detailDto = new DatasetDetailDto()
+            {
+                DatasetId = 1000,
+                DatasetName = "ABCD",
+                DatasetRelatives = MockRelativeDtos()
+            };
+
+            return detailDto;
+        }
+
+        public static DatasetDetailDto MockDatasetDetailDtoForMigrationHistory_QUAL()
+        {
+            DatasetDetailDto detailDto = new DatasetDetailDto()
+            {
+                DatasetId = 1002,
+                DatasetName = "ABCD",
+                DatasetRelatives = MockRelativeDtos()
+            };
+
+            return detailDto;
+        }
+
+
+        public static DatasetRelativeDto MockRelativeDto_DEV()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1000, "DEV", String.Empty);
+            return relative;
+        }
+
+        public static DatasetRelativeDto MockRelativeDto_TEST()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1001, "TEST", String.Empty);
+            return relative;
+        }
+
+        public static DatasetRelativeDto MockRelativeDto_QUAL()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1002, "QUAL", String.Empty);
+            return relative;
+        }
+
+        public static DatasetRelativeDto MockRelativeDto_PROD()
+        {
+            DatasetRelativeDto relative = new DatasetRelativeDto(1003, "PROD", String.Empty);
+            return relative;
+        }
+
+        public static List<DatasetRelativeDto> MockRelativeDtos()
+        {
+            List<DatasetRelativeDto> relatives = new List<DatasetRelativeDto>();
+            relatives.Add(MockRelativeDto_DEV());
+            relatives.Add(MockRelativeDto_TEST());
+            relatives.Add(MockRelativeDto_QUAL());
+            relatives.Add(MockRelativeDto_PROD());
+            return relatives;
+        }
+
+
         public static List<DatasetDto> MockDatasetDto(List<Dataset> dsList)
         {
             List<DatasetDto> dsDtoList = new List<DatasetDto>();
@@ -611,31 +712,36 @@ namespace Sentry.data.Core.Tests
                 Id = 12,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ProducerS3DropAction(){
                 Id = 15,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ProducerS3DropAction(){
                 Id = 35,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ProducerS3DropAction(){
                 Id = 20,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ProducerS3DropAction(){
                 Id = 40,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
 
             return actions.ToList();
@@ -650,31 +756,36 @@ namespace Sentry.data.Core.Tests
                 Id = 2,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new RawStorageAction(){
                 Id = 22,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new RawStorageAction(){
                 Id = 42,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new RawStorageAction(){
                 Id = 16,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new RawStorageAction(){
                 Id = 36,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -688,31 +799,36 @@ namespace Sentry.data.Core.Tests
                 Id = 3,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new QueryStorageAction(){
                 Id = 23,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new QueryStorageAction(){
                 Id = 43,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new QueryStorageAction(){
                 Id = 17,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new QueryStorageAction(){
                 Id = 37,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -726,31 +842,36 @@ namespace Sentry.data.Core.Tests
                 Id = 6,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ConvertToParquetAction(){
                 Id = 24,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ConvertToParquetAction(){
                 Id = 44,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ConvertToParquetAction(){
                 Id = 39,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ConvertToParquetAction(){
                 Id = 19,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -764,19 +885,22 @@ namespace Sentry.data.Core.Tests
                 Id = 5,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new UncompressZipAction(){
                 Id = 25,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new UncompressZipAction(){
                 Id = 45,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -790,19 +914,22 @@ namespace Sentry.data.Core.Tests
                 Id = 8,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new GoogleApiAction(){
                 Id = 26,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new GoogleApiAction(){
                 Id = 46,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -816,19 +943,22 @@ namespace Sentry.data.Core.Tests
                 Id = 9,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ClaimIQAction(){
                 Id = 27,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new ClaimIQAction(){
                 Id = 47,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -842,19 +972,22 @@ namespace Sentry.data.Core.Tests
                 Id = 10,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new UncompressGzipAction(){
                 Id = 28,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new UncompressGzipAction(){
                 Id = 48,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -868,19 +1001,22 @@ namespace Sentry.data.Core.Tests
                 Id = 11,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new FixedWidthAction(){
                 Id = 29,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new FixedWidthAction(){
                 Id = 49,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -894,31 +1030,36 @@ namespace Sentry.data.Core.Tests
                 Id = 21,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },new XMLAction()
             {
                 Id = 41,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },new XMLAction()
             {
                 Id = 13,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new XMLAction(){
                 Id = 30,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new XMLAction(){
                 Id = 50,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -932,19 +1073,22 @@ namespace Sentry.data.Core.Tests
                 Id = 14,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new JsonFlatteningAction(){
                 Id = 31,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new JsonFlatteningAction(){
                 Id = 51,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
              } };
             return actions.ToList();
         }
@@ -958,31 +1102,36 @@ namespace Sentry.data.Core.Tests
                 Id = 18,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },new SchemaLoadAction()
             {
                 Id = 38,
                 Name = $"HR {name}",
                 TargetStorageBucket = HrDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },new SchemaLoadAction()
             {
                 Id = 4,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new SchemaLoadAction(){
                 Id = 32,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             },
             new SchemaLoadAction(){
                 Id = 52,
                 Name = name,
                 TargetStorageBucket = DlstDatasetBucketNonProd,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -996,7 +1145,8 @@ namespace Sentry.data.Core.Tests
                 Id = 7,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
@@ -1010,10 +1160,12 @@ namespace Sentry.data.Core.Tests
                 Id = 1,
                 Name = name,
                 TargetStorageBucket = DataDatasetBucket,
-                TargetStoragePrefix = prefix
+                TargetStoragePrefix = prefix,
+                TriggerPrefix = prefix
             } };
             return actions.ToList();
         }
+
         public static DataFlow MockDataFlow()
         {
             DataFlow df = new DataFlow()
@@ -1030,7 +1182,6 @@ namespace Sentry.data.Core.Tests
             };
             return df;
         }
-
 
         public static DataFlow MockDataFlowTopic()
         {
@@ -1049,7 +1200,6 @@ namespace Sentry.data.Core.Tests
             return df;
         }
 
-
         public static DataFlow MockDataFlowIsBackFilledNo()
         {
             DataFlow df = new DataFlow()
@@ -1067,7 +1217,6 @@ namespace Sentry.data.Core.Tests
             };
             return df;
         }
-
 
         public static DataFlow MockDataFlowIsBackFilledYes()
         {
@@ -1153,7 +1302,6 @@ namespace Sentry.data.Core.Tests
             return flowDto;
         }
 
-
         public static DataFlowDto MockDataFlowDtoTopic(DataFlow flow, SchemaMapDto schemaMapDto)
         {
             var flowDto = new DataFlowDto()
@@ -1191,9 +1339,6 @@ namespace Sentry.data.Core.Tests
 
             return flowDto;
         }
-
-
-
 
         public static ConnectorCreateRequestDto MockConnectorCreateRequestDto()
         {
@@ -1242,6 +1387,192 @@ namespace Sentry.data.Core.Tests
             return request;
         }
 
+
+        public static DatasetMigrationRequest MockRequestMontana()
+        {
+            DatasetMigrationRequest request = new DatasetMigrationRequest()
+            {
+                SourceDatasetId = 3,
+                TargetDatasetId = 53,
+                TargetDatasetNamedEnvironment = "NRDEV"
+            };
+
+            return request;
+        }
+
+
+        public static SchemaMigrationRequestResponse MockSchemaResponseGlacier()
+        {
+            SchemaMigrationRequestResponse schemaResponse = new SchemaMigrationRequestResponse()
+            {
+                DataFlowMigrationReason = "Target dataflow metadata already exists",
+                DataFlowName =  "Glacier",
+                MigratedDataFlow =   true ,
+                MigratedSchema  = true,
+                MigratedSchemaRevision = true,
+                SchemaMigrationReason =  "Schema configuration existed in target",
+                SchemaName = "Glacier",
+                SchemaRevisionMigrationReason  = "No column metadata on source schema",
+                SchemaRevisionName = "GlacierRevisionName",
+                SourceSchemaId  = 1,
+                TargetDataFlowId  =  51,
+                TargetSchemaId = 51,
+                TargetSchemaRevisionId = 51
+            };
+            return schemaResponse;
+        }
+
+        public static SchemaMigrationRequestResponse MockSchemaResponseGreatFalls()
+        {
+            SchemaMigrationRequestResponse schemaResponse = new SchemaMigrationRequestResponse()
+            {
+                DataFlowMigrationReason = "Target dataflow metadata already exists",
+                DataFlowName = "GreatFalls",
+                MigratedDataFlow = true,
+                MigratedSchema = true,
+                MigratedSchemaRevision = true,
+                SchemaMigrationReason = "Schema configuration existed in target",
+                SchemaName = "GreatFalls",
+                SchemaRevisionMigrationReason = "No column metadata on source schema",
+                SchemaRevisionName = "GreatFallsRevisionName",
+                SourceSchemaId = 2,
+                TargetDataFlowId = 52,
+                TargetSchemaId = 52,
+                TargetSchemaRevisionId = 52
+            };
+            return schemaResponse;
+        }
+
+        public static SchemaMigrationRequestResponse MockSchemaResponseNewYork()
+        {
+            SchemaMigrationRequestResponse schemaResponse = new SchemaMigrationRequestResponse()
+            {
+                DataFlowMigrationReason = "Target dataflow metadata already exists",
+                MigratedDataFlow = false,
+                MigratedSchema = false,
+                MigratedSchemaRevision = false,
+                SchemaMigrationReason = "Schema configuration existed in target",
+                SourceSchemaId = 7
+                
+            };
+            return schemaResponse;
+        }
+
+        public static DatasetMigrationRequestResponse MockResponseMontana()
+        {
+            List<SchemaMigrationRequestResponse> schemaResponses = new List<SchemaMigrationRequestResponse>();
+            schemaResponses.Add(MockClasses.MockSchemaResponseGlacier());
+            schemaResponses.Add(MockClasses.MockSchemaResponseGreatFalls());
+            schemaResponses.Add(MockClasses.MockSchemaResponseNewYork());
+
+            DatasetMigrationRequestResponse response = new DatasetMigrationRequestResponse()
+            {
+                DatasetId = 53,
+                DatasetMigrationReason = "Dataset already exists in target named environment",
+                DatasetName = "Montana",
+                IsDatasetMigrated = true,
+                SchemaMigrationResponses = schemaResponses
+            };
+            return response;
+        }
+
+        public static MigrationHistory MockHistoryMontana()
+        {
+            MigrationHistory history = new MigrationHistory()
+            {
+                CreateDateTime = DateTime.Now,
+                MigrationHistoryId	= 0,
+                SourceDatasetId = 3,
+                SourceNamedEnvironment = "DEV",
+                TargetDatasetId = 53,
+                TargetNamedEnvironment	= "NRDEV"
+            };
+            return history;
+        }
+
+
+        public static MigrationHistoryDetail MockHistoryDetailDataset()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = 53,
+                DatasetMigrationMessage =  "Dataset already exists in target named environment",
+                DatasetName = "Montana",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SchemaId = null,
+                SchemaRevisionId = null
+            };
+            return historyDetail;
+        }
+
+
+        public static MigrationHistoryDetail MockHistoryDetailSchemaGlacier()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = null,
+                SchemaName = "Glacier",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SourceSchemaId = 1,
+                SchemaId = 51,
+                SchemaMigrationMessage = "Schema configuration existed in target",
+                SchemaRevisionId = 51,
+                SchemaRevisionName = "GlacierRevisionName"
+
+            };
+            return historyDetail;
+        }
+
+
+        public static MigrationHistoryDetail MockHistoryDetailSchemaGreatFalls()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = null,
+                SchemaName = "GreatFalls",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SourceSchemaId = 2,
+                SchemaId = 52,
+                SchemaMigrationMessage = "Schema configuration existed in target",
+                SchemaRevisionId = 52,
+                SchemaRevisionName = "GreatFallsRevisionName"
+
+            };
+            return historyDetail;
+        }
+
+        public static MigrationHistoryDetail MockHistoryDetailSchemaNewYork()
+        {
+
+            MigrationHistoryDetail historyDetail = new MigrationHistoryDetail()
+            {
+
+                SourceDatasetId = 3,
+                DatasetId = null,
+                SchemaName = "NewYork",
+                MigrationHistoryId = 0,
+                DataFlowId = null,
+                SourceSchemaId = 7,
+                SchemaId = null,
+                SchemaMigrationMessage = "Schema configuration existed in target",
+                SchemaRevisionId = null,
+                SchemaRevisionName = null
+
+            };
+            return historyDetail;
+        }
 
     }
 }

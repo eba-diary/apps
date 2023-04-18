@@ -19,5 +19,6 @@
     [AwsArn] VARCHAR(2048) NULL, 
     [IsSystemGenerated] BIT NULL DEFAULT 0, 
     [SnowflakeAccount] VARCHAR(255) NULL, 
+    [ExternalRequestID] VARCHAR(50) NULL, 
     CONSTRAINT [FK_SecurityTicket_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
 )

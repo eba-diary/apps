@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.Config.DataSource;
 
 namespace Sentry.data.Web
 {
@@ -53,6 +54,7 @@ namespace Sentry.data.Web
                 ClientPrivateId = model.ClientPrivateId,
                 Tokens = model.Tokens.Select(t => t.ToDto()).ToList(),
                 RequestHeaders = model.Headers,
+                AcceptableErrors = AcceptableErrorModelListToDictionary(model.AcceptableErrors),
                 IsSecured = model.IsSecured,
                 PrimaryContactId= model.PrimaryContactId,
                 PrimaryContactName = model.PrimaryContactName,
@@ -330,6 +332,20 @@ namespace Sentry.data.Web
             model.ParquetStorageBucket = config.Schema?.ParquetStorageBucket;
             model.ParquetStoragePrefix = config.Schema?.ParquetStoragePrefix;
             model.ControlMTriggerName = config.Schema?.ControlMTriggerName;
+        }
+
+        private static Dictionary<string, string> AcceptableErrorModelListToDictionary(List<AcceptableErrorModel> acceptableErrors)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            if(acceptableErrors == null)
+            {
+                return result;
+            }
+            foreach(var acceptableError in acceptableErrors)
+            {
+                result.Add(acceptableError.ErrorMessageKey, acceptableError.ErrorMessageValue);
+            }
+            return result;
         }
     }
 }

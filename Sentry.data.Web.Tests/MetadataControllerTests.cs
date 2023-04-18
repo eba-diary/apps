@@ -1,10 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Rhino.Mocks;
 using Sentry.data.Core;
 using Sentry.data.Web.Extensions;
 using Sentry.data.Web.Models.ApiModels.Migration;
-using Sentry.data.Web.WebApi.Controllers;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,29 +30,24 @@ namespace Sentry.data.Web.Tests
             {
                 SourceDatasetId = 99,
                 TargetDatasetNamedEnvironment = "TEST",
+                TargetDatasetNamedEnvironmentType  = Core.GlobalEnums.NamedEnvironmentType.Prod,
                 TargetDatasetId = 22,
-                SchemaMigrationRequests = new List<Models.ApiModels.Migration.SchemaMigrationRequestModel>()
+                SchemaMigrationRequests = new List<Models.ApiModels.Migration.DatasetSchemaMigrationRequestModel>()
                 {
-                    new SchemaMigrationRequestModel()
+                    new DatasetSchemaMigrationRequestModel()
                     {
                         SourceSchemaId = 44,
-                        TargetDatasetNamedEnvironment = "TEST",
-                        TargetDataFlowNamedEnviornment = "TEST2",
-                        TargetDatasetId = 33
+                        TargetDataFlowNamedEnviornment = "TEST2"
                     },
-                    new SchemaMigrationRequestModel()
+                    new DatasetSchemaMigrationRequestModel()
                     {
                         SourceSchemaId = 66,
-                        TargetDatasetNamedEnvironment = "TEST",
-                        TargetDataFlowNamedEnviornment = "TEST2",
-                        TargetDatasetId = 33
+                        TargetDataFlowNamedEnviornment = "TEST2"
                     },
-                    new SchemaMigrationRequestModel()
+                    new DatasetSchemaMigrationRequestModel()
                     {
                         SourceSchemaId = 88,
-                        TargetDatasetNamedEnvironment = "TEST",
-                        TargetDataFlowNamedEnviornment = "TEST2",
-                        TargetDatasetId = 33
+                        TargetDataFlowNamedEnviornment = "TEST2"
                     }
                 }
             };
@@ -65,12 +57,11 @@ namespace Sentry.data.Web.Tests
             //Assert
             Assert.AreEqual(99, datasetRequest.SourceDatasetId);
             Assert.AreEqual("TEST", datasetRequest.TargetDatasetNamedEnvironment);
+            Assert.AreEqual(Core.GlobalEnums.NamedEnvironmentType.Prod, datasetRequest.TargetDatasetNamedEnvironmentType);
             Assert.AreEqual(22, datasetRequest.TargetDatasetId);
             Assert.IsNotNull(schemaRequest);
             Assert.AreEqual(44, schemaRequest.SourceSchemaId);
-            Assert.AreEqual("TEST", schemaRequest.TargetDatasetNamedEnvironment);
             Assert.AreEqual("TEST2", schemaRequest.TargetDataFlowNamedEnvironment);
-            Assert.AreEqual(33, schemaRequest.TargetDatasetId);
 
         }
 
@@ -117,6 +108,21 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(schemaRequestResponse.TargetDataFlowId, schemaResponseModel.DataFlowId);
             Assert.AreEqual(schemaRequestResponse.MigratedDataFlow, schemaResponseModel.IsDataFlowMigrated);
             Assert.AreEqual(schemaRequestResponse.DataFlowMigrationReason, schemaResponseModel.DataFlowMigrationMessage);
+        }
+
+        [TestMethod]
+        public void MapToDatasetSchemaMigrationRequest()
+        {
+            DatasetSchemaMigrationRequestModel model = new DatasetSchemaMigrationRequestModel()
+            {
+                SourceSchemaId = 99,
+                TargetDataFlowNamedEnviornment = "TEST"
+            };
+
+            Core.DatasetSchemaMigrationRequest request = model.MapToDatasetSchemaMigrationRequest();
+
+            Assert.AreEqual(99, request.SourceSchemaId);
+            Assert.AreEqual("TEST", request.TargetDataFlowNamedEnvironment);
         }
     }
 }

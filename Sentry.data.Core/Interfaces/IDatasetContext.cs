@@ -30,6 +30,9 @@ namespace Sentry.data.Core
         IQueryable<Status> EventStatus { get; }
         IQueryable<DatasetFile> DatasetFileStatusActive { get; }
         IQueryable<DatasetFile> DatasetFileStatusAll { get; }
+        IQueryable<DatasetFileDrop> DatasetFileDrop { get; }
+        IQueryable<DatasetFileRaw> DatasetFileRaw { get; }
+        IQueryable<DatasetFileQuery> DatasetFileQuery { get; }
 
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
@@ -65,6 +68,7 @@ namespace Sentry.data.Core
         IQueryable<RawStorageAction> RawStorageAction { get; }
         IQueryable<QueryStorageAction> QueryStorageAction { get; }
         IQueryable<ConvertToParquetAction> ConvertToParquetAction { get; }
+        IQueryable<CopyToParquetAction> CopyToParquetAction { get; }
         IQueryable<UncompressZipAction> UncompressZipAction { get; }
         IQueryable<UncompressGzipAction> UncompressGzipAction { get; }
         IQueryable<SchemaMapAction> SchemaMapAction { get; }
@@ -77,6 +81,9 @@ namespace Sentry.data.Core
         IQueryable<SchemaMap> SchemaMap { get; }
         IQueryable<ClaimIQAction> ClaimIQAction { get; }
         IQueryable<SavedSearch> SavedSearches { get; }
+        IQueryable<MigrationHistory> MigrationHistory { get; }
+        IQueryable<MigrationHistoryDetail> MigrationHistoryDetail { get; }
+
         /** Datasets **/
 
         Dataset GetById(int id);
@@ -122,13 +129,11 @@ namespace Sentry.data.Core
         int GetNextStorageCDE();
         string GetNextDataFlowStorageCDE();
         int GetReportCount();
-
+        int GetNextGlobalDatasetId();
 
         /** Favorites **/
-
         Favorite GetFavorite(int favoriteId);
-        List<Favorite> GetFavorites(List<int> favoriteIds);
-        
+        List<Favorite> GetFavorites(List<int> favoriteIds);        
     }
 
 }

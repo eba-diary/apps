@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Nest;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces;
-using Nest;
-using Sentry.Common.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Sentry.data.Infrastructure
 {
     public class DataFlowMetricProvider : IDataFlowMetricProvider
     {
-       private readonly IElasticContext _elasticContext;
+       private readonly IElasticDocumentClient _elasticDocumentClient;
 
-        public DataFlowMetricProvider(IElasticContext elasticContext)
+        public DataFlowMetricProvider(IElasticDocumentClient elasticDocumentClient)
         {
-            _elasticContext = elasticContext;
+            _elasticDocumentClient = elasticDocumentClient;
         }
 
         //returns list of data flow metrics matching searchdto criteria
@@ -38,7 +36,7 @@ namespace Sentry.data.Infrastructure
                 }
             }
 
-            ElasticResult<DataFlowMetric> elasticResult = _elasticContext.SearchAsync<DataFlowMetric>(s => s
+            ElasticResult<DataFlowMetric> elasticResult = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s
                                             .Query(q => q.Bool(bq => bq.Filter(filters)))
                                             .Size(10000).Sort(sq=>sq.Descending(dq=>dq.EventMetricId))).Result;
 

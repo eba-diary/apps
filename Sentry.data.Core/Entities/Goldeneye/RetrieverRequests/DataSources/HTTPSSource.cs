@@ -5,6 +5,7 @@ using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -13,6 +14,7 @@ namespace Sentry.data.Core
         #region Fields
         private Uri _baseUri;
         private string _requestHeaders;
+        private string _acceptableErrors;
         #endregion
 
         #region Constructor
@@ -90,7 +92,7 @@ namespace Sentry.data.Core
         public virtual string IVKey { get; set; }
         public virtual HttpMethods RequestMethod { get; set; }
         public virtual HttpDataFormat RequestDataFormat { get; set; }
-        public virtual IList<DataSourceToken> Tokens { get; set; }
+        public virtual IList<DataSourceToken> AllTokens { get; set; }
         public virtual string ClientId { get; set; }
         public virtual string ClientPrivateId { get; set; }
         public virtual OAuthGrantType GrantType { get; set; }
@@ -106,12 +108,29 @@ namespace Sentry.data.Core
                 _requestHeaders = JsonConvert.SerializeObject(value);
             }
         }
+
+        public virtual Dictionary<string,string> AcceptableErrors
+        {
+            get
+            {
+                return string.IsNullOrEmpty(_acceptableErrors) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string,string>>(_acceptableErrors);
+            }
+            set
+            {
+                _acceptableErrors = JsonConvert.SerializeObject(value);
+            }
+        }
         #endregion
 
         #region Methods
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
             return new Uri(Path.Combine(BaseUri.ToString(), Job.RelativeUri).ToString());
+        }
+
+        public virtual IList<DataSourceToken> GetActiveTokens() 
+        { 
+            return AllTokens.Where(x => x.Enabled).ToList();
         }
 
         public override string GetDropPrefix(RetrieverJob Job)

@@ -38,13 +38,11 @@ namespace Sentry.data.Web
         //NOTE: USED BY KNOCKOUT AS MODEL TO DISPLAY ELEMENTS
         public List<Tuple<string, List<AssociatedDataFlowModel>>> DataFlows { get; set; }
         public bool DisplayDataflowMetadata { get; set; }
-        public bool DisplayTabSections { get; set; }
         public bool DisplaySchemaSearch { get; set; }
         public bool DisplayDataflowEdit { get; set; }
         public bool DisplayDatasetFileDelete { get; set; }
         public bool DisplayDatasetFileUpload { get; set; }
         public bool HasDataAccess { get; set; }
-        public bool ShowManagePermissionsLink { get; set; }
         public bool UseUpdatedSearchPage { get; set; }
         public bool HasSchema { get; set; }
         public bool CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; set; }

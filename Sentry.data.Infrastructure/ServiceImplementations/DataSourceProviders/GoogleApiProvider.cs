@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
         public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
-            IRestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            RestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
@@ -53,15 +53,14 @@ namespace Sentry.data.Infrastructure
                 baseUri = baseUri.Remove(place, Find.Length).Insert(place, Replace);
             }
 
-            _client = new RestClient
-            {
-                BaseUrl = new Uri(baseUri)
-            };
+            RestClientOptions clientOptions = new RestClientOptions(baseUri);
 
             if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
             {
-                _client.Proxy = webProxy;
+                clientOptions.Proxy = webProxy;
             }
+
+            _client = new RestClient(clientOptions);
 
             Logger.Debug($"{methodName} Method End");
         }
@@ -75,11 +74,11 @@ namespace Sentry.data.Infrastructure
             switch (_job.JobOptions.HttpOptions.RequestMethod)
             {
                 case HttpMethods.get:
-                    _request.Method = Method.GET;
+                    _request.Method = Method.Get;
                     _request.Resource = _job.GetUri().ToString();
                     break;
                 case HttpMethods.post:
-                    _request.Method = Method.POST;
+                    _request.Method = Method.Post;
                     _request.Resource = "/" + _job.RelativeUri;
 
                     switch (_job.JobOptions.HttpOptions.RequestDataFormat)
@@ -108,7 +107,7 @@ namespace Sentry.data.Infrastructure
 
             ConfigurePaging();                
 
-            IRestResponse resp = SendRequest();
+            RestResponse resp = SendRequest();
 
             FindTargetJob();
 
@@ -205,18 +204,18 @@ namespace Sentry.data.Infrastructure
             throw new NotImplementedException();
         }
 
-        public override List<IRestResponse> SendPagingRequest()
+        public override List<RestResponse> SendPagingRequest()
         {
             throw new NotImplementedException();
         }
 
-        public override IRestResponse SendRequest()
+        public override RestResponse SendRequest()
         {
-            IRestResponse resp;
+            RestResponse resp;
 
             resp = _providerPolicy.Execute(() =>
             {
-                IRestResponse response = _client.Execute(Request);
+                RestResponse response = _client.Execute(Request);
 
                 if (response.ErrorException != null)
                 {
@@ -237,7 +236,7 @@ namespace Sentry.data.Infrastructure
             return resp;
         }
 
-        protected override void ConfigureOAuth(IRestRequest req, RetrieverJob job)
+        protected override void ConfigureOAuth(RestRequest req, RetrieverJob job)
         {
             HTTPSSource source = (HTTPSSource)job.DataSource;
 
@@ -254,7 +253,7 @@ namespace Sentry.data.Infrastructure
 
             string oAuthToken;
 
-            if (source.Tokens[0].CurrentToken == null || source.Tokens[0].CurrentTokenExp == null || source.Tokens[0].CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
+            if (source.AllTokens[0].CurrentToken == null || source.AllTokens[0].CurrentTokenExp == null || source.AllTokens[0].CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                 var httpHandler = new System.Net.Http.HttpClientHandler();
                 if (WebHelper.TryGetWebProxy(_dataFeatures.CLA3819_EgressEdgeMigration.GetValue(), out WebProxy webProxy))
@@ -268,7 +267,7 @@ namespace Sentry.data.Infrastructure
                 AddOAuthGrantType(keyValues, source);
                 keyValues.Add(new KeyValuePair<string, string>("assertion", GenerateJwtToken(source)));
                 var oAuthPostContent = new System.Net.Http.FormUrlEncodedContent(keyValues);
-                var oAuthPostResult = httpClient.PostAsync(source.Tokens[0].TokenUrl, oAuthPostContent).Result;
+                var oAuthPostResult = httpClient.PostAsync(source.AllTokens[0].TokenUrl, oAuthPostContent).Result;
                 var response = oAuthPostResult.Content.ReadAsStringAsync().Result;
                 var responseAsJson = Newtonsoft.Json.Linq.JObject.Parse(response);
                 var accessToken = responseAsJson.GetValue("access_token");
@@ -284,7 +283,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                oAuthToken = EncryptionService.DecryptString(source.Tokens[0].CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+                oAuthToken = EncryptionService.DecryptString(source.AllTokens[0].CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
 
             Logger.Debug($"{methodName} Method End");

@@ -1,14 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sentry.data.Web.Controllers;
-using Sentry.data.Core;
-using Rhino.Mocks;
-using System.Web.Mvc;
-using System.Collections.Generic;
-using Sentry.data.Infrastructure;
-using System;
-using System.Linq;
-using Sentry.data.Web.Helpers;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Web.Helpers;
+using System;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Tests
 {
@@ -19,7 +13,8 @@ namespace Sentry.data.Web.Tests
         [TestCategory("Data Asset Controller")]
         public void Index_Returns_Index_View_With_Valid_ID()
         {
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset());
+            var user = MockUsers.App_DataMgmt_MgAlert();
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.Index(1) as ViewResult;
 
@@ -30,7 +25,8 @@ namespace Sentry.data.Web.Tests
         [TestCategory("Data Asset Controller")]
         public void Index_Does_RedirectToAction_NotFound()
         {
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset());
+            var user = MockUsers.App_DataMgmt_MgAlert();
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.Index(-1) as RedirectToRouteResult;
 
@@ -42,7 +38,8 @@ namespace Sentry.data.Web.Tests
         [TestCategory("Data Asset Controller")]
         public void DataAsset_Returns_Index_View_Given_No_Name()
         {
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset());
+            var user = MockUsers.App_DataMgmt_MgAlert();
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.DataAsset(null) as ViewResult;
 
@@ -53,7 +50,8 @@ namespace Sentry.data.Web.Tests
         [TestCategory("Data Asset Controller")]
         public void DataAsset_Returns_Index_View_Given_Valid_Name()
         {
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset());
+            var user = MockUsers.App_DataMgmt_MgAlert();
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.DataAsset("MockAsset") as ViewResult;
 
@@ -64,7 +62,8 @@ namespace Sentry.data.Web.Tests
         [TestCategory("Data Asset Controller")]
         public void DataAsset_Does_RedirectToAction_NotFound()
         {
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset());
+            var user = MockUsers.App_DataMgmt_MgAlert();
+            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user.Object);
 
             var result = dac.DataAsset("Mock Basset") as RedirectToRouteResult;
 
@@ -107,89 +106,10 @@ namespace Sentry.data.Web.Tests
 
             var user = MockUsers.App_DataMgmt_MgAlert();
 
-            var an = MockClasses.GetMockAssetNotifications(da, user);
+            var an = MockClasses.GetMockAssetNotifications(da, user.Object);
 
-            Assert.IsTrue(an.CreateUser == user.AssociateId);
+            Assert.IsTrue(an.CreateUser == user.Object.AssociateId);
         }
-
-        //[TestMethod]
-        //[TestCategory("Data Asset Controller")]
-        //[TestCategory("Data Asset Notifications")]
-        //public void DataAsset_Create_Notification_Check_Redirect()
-        //{
-        //    var user = MockUsers.App_DataMgmt_MgAlert();
-        //    var da = MockClasses.MockDataAsset();
-        //    var dac = MockControllers.MockDataAssetController(da, user);
-        //    var an = MockClasses.GetMockAssetNotifications(da, user);
-
-        //    an.Message = "Data Asset Notification Creation Test";
-        //    CreateAssetNotificationModel can = new CreateAssetNotificationModel(an, dac._associateInfoService);
-        //    can.SeverityID = 0;
-        //    can.DataAssetID = da.Id;
-
-        //    var result = dac.CreateAssetNotification(can);
-
-        //    Assert.AreEqual("ManageAssetNotification", (result as ViewResult).ViewName);
-
-        //}
-
-
-        //[TestMethod]
-        //[TestCategory("Data Asset Controller")]
-        //[TestCategory("Data Asset Notifications")]
-        //public void DataAsset_Create_Notification_Model()
-        //{
-        //    var user = MockUsers.App_DataMgmt_MgAlert();
-        //    var da = MockClasses.MockDataAsset();
-        //    var dac = MockControllers.MockDataAssetController(da, user);
-        //    var an = MockClasses.GetMockAssetNotifications(da, user);
-
-        //    CreateAssetNotificationModel can = new CreateAssetNotificationModel();
-        //    can.SeverityID = 0;
-        //    can.Message = "Data Asset Notification Creation Test";
-        //    can.CreateUser = user.AssociateId;
-        //    can.StartTime = an.StartTime;
-        //    can.ExpirationTime = an.ExpirationTime;
-        //    can.DataAssetID = da.Id;
-
-        //    var returnedNotification = new AssetNotifications();
-
-        //    returnedNotification = dac.CreateAssetNotificationFromModel(returnedNotification, can);
-
-        //    Assert.IsTrue(da.Name.ToString() == returnedNotification.ParentDataAsset.Name.ToString());
-
-        //}
-
-        //[TestMethod]
-        //[TestCategory("Data Asset Controller")]
-        //[TestCategory("Data Asset Notifications")]
-        //public void DataAsset_Edit_Notification_Model()
-        //{
-        //    var user = MockUsers.App_DataMgmt_MgAlert();
-        //    var da = MockClasses.MockDataAsset();
-        //    var dac = MockControllers.MockDataAssetController(da, user);
-        //    var an = MockClasses.GetMockAssetNotifications(da, user);
-
-        //    EditAssetNotificationModel ean = new EditAssetNotificationModel();
-        //    ean.SeverityID = an.MessageSeverity + 1;
-        //    ean.Message = "Data Asset Notification Edit Test";
-        //    ean.ExpirationTime = an.ExpirationTime.AddHours(1);
-
-
-        //    var returnedNotification = dac.UpdateAssetNotificationFromModel(an, ean);
-
-        //    Assert.IsTrue(da.Name.ToString() == returnedNotification.ParentDataAsset.Name.ToString());
-
-        //    Assert.IsTrue(returnedNotification.ExpirationTime == ean.ExpirationTime);
-        //    Assert.IsFalse(returnedNotification.ExpirationTime == MockClasses.GetMockAssetNotifications(da, user).ExpirationTime);
-
-        //    Assert.IsTrue(returnedNotification.Message == ean.Message);
-        //    Assert.IsFalse(returnedNotification.Message == MockClasses.GetMockAssetNotifications(da, user).Message);
-
-        //    Assert.IsTrue(returnedNotification.MessageSeverity == ean.SeverityID);
-        //    Assert.IsFalse(returnedNotification.MessageSeverity == MockClasses.GetMockAssetNotifications(da, user).MessageSeverity);
-
-        //}
 
         [TestMethod]
         [TestCategory("Data Asset Notifications")]
@@ -197,8 +117,8 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockUsers.App_DataMgmt_MgAlert();
             var da = MockClasses.MockDataAsset();
-            var dac = MockControllers.MockDataAssetController(da, user);
-            var an = MockClasses.GetMockAssetNotifications(da, user);
+            var dac = MockControllers.MockDataAssetController(da, user.Object);
+            var an = MockClasses.GetMockAssetNotifications(da, user.Object);
 
             string mock = "This is a Mock Test.  Way different then the Mock.";
             an.Message = mock;

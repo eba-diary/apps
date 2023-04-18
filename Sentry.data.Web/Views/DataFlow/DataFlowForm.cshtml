@@ -13,7 +13,7 @@
             @Html.HiddenFor(x => x.StorageCode)
             @Html.HiddenFor(x => x.CreatedBy)
             @Html.HiddenFor(x => x.PrimaryContactId)
-            @Html.HiddenFor(x => x.IsSecured)
+            @Html.HiddenFor(x => x.IsSecuredDataFlow)
             @Html.HiddenFor(x => x.SelectedDataset)
             @Html.HiddenFor(x => x.SelectedSchema)
             @Html.HiddenFor(x => x.ObjectStatus)
@@ -33,7 +33,7 @@
 
         <div class="md-form">
             <h4>How will the data be sent to us?</h4>
-            <div class="material-tooltip-main" data-toggle="tooltip" title="Will your process send a file to DSC (Drop/Topic)? Or will DSC need to pick up the file from an external location (DSC_Pull)?">
+            <div class="material-tooltip-main" data-toggle="tooltip" title="Will your process send a file to DSC (DFS Drop/S3 Drop/Kafka Topic)? Or will DSC need to pick up the file from an external location (DSC Pull)?">
                 @Html.DropDownListFor(x => x.IngestionTypeSelection, Model.IngestionTypeDropDown, new { @class = "mdb-select" })
             </div>
 

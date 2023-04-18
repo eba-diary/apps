@@ -267,6 +267,60 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"Method <SendS3SinkConnectorRequestEmail> S3_SINK_CONNECTOR_REQUEST_EMAIL Successfully Sent. Here are Details.  FROM: {fromString} TO: {toString} Body: {myMail.Body}");
         }
 
+        public void SendNewMotiveTokenAddedEmail(DataSourceToken token)
+        {
+            string toString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.MOTIVEEMAILTO);
+            string fromString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.DATASETEMAIL);
+            if (String.IsNullOrWhiteSpace(toString) || String.IsNullOrWhiteSpace(fromString))
+            {
+                Logger.Error("Tried to send Motive Token email with incomplete sender/recipient.");
+                return;
+            }
+
+            MailAddress mailAddress = new MailAddress(fromString);
+            MailMessage myMail = new MailMessage()
+            {
+                From = mailAddress,
+                Subject = $"New Motive Token Added: {token.TokenName ?? "Company Name Pending"}",
+                IsBodyHtml = true,
+                Body = "<p>New OAuth Token Received, Contact <a href='mailto:DSCSupport@sentry.com'>DSC Support</a> with any questions.</p>"
+            };
+
+            foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }
+
+            _emailClient.Send(myMail);
+        }
+        
+        public void SendMotiveDuplicateTokenEmail(DataSourceToken newToken, DataSourceToken oldToken)
+        {
+            string toString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.MOTIVEEMAILTO);
+            string fromString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.DATASETEMAIL);
+            if (String.IsNullOrWhiteSpace(toString) || String.IsNullOrWhiteSpace(fromString))
+            {
+                Logger.Error("Tried to send Motive Duplicate Token email with incomplete sender/recipient.");
+                return;
+            }
+
+            MailAddress mailAddress = new MailAddress(fromString);
+            MailMessage myMail = new MailMessage()
+            {
+                From = mailAddress,
+                Subject = $"Duplicate Motive Token Received",
+                IsBodyHtml = true,
+                Body = $"<p>Token {oldToken.TokenName} {oldToken.Id} has same ID ({oldToken.ForeignId}) as {newToken.TokenName} {newToken.Id}. Review both tokens and verify the correct one is enabled, and the other is deleted. Contact <a href='mailto:DSCSupport@sentry.com'>DSC Support</a> with any questions.</p>"
+            };
+
+            foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }
+
+            _emailClient.Send(myMail);
+        }
+
         //GET BODY OF S3 SINK EMAIL
         private string GetS3SinkConnectorEmailBody(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto)
         {

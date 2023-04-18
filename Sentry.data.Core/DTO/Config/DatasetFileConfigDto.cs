@@ -15,6 +15,7 @@ namespace Sentry.data.Core
         public virtual int FileTypeId { get; set; }
         public virtual int ParentDatasetId { get; set; }
         public virtual int DatasetScopeTypeId { get; set; }
+        public string DatasetScopeTypeName { get; set; }
         public virtual string StorageCode { get; set; }
         public string StorageLocation { get; set; }
         public virtual int FileExtensionId { get; set; }

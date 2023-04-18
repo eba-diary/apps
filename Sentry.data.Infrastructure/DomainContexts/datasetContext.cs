@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace Sentry.data.Infrastructure
 {
@@ -92,6 +93,30 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<DatasetFile>();
+            }
+        }
+
+        public IQueryable<DatasetFileDrop> DatasetFileDrop
+        {
+            get
+            {
+                return Query<DatasetFileDrop>();
+            }
+        }
+
+        public IQueryable<DatasetFileRaw> DatasetFileRaw
+        {
+            get
+            {
+                return Query<DatasetFileRaw>();
+            }
+        }
+
+        public IQueryable<DatasetFileQuery> DatasetFileQuery
+        {
+            get
+            {
+                return Query<DatasetFileQuery>();
             }
         }
 
@@ -497,6 +522,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<CopyToParquetAction> CopyToParquetAction
+        {
+            get
+            {
+                return Query<CopyToParquetAction>();
+            }
+        }
+
         public IQueryable<UncompressZipAction> UncompressZipAction
         {
             get
@@ -590,6 +623,23 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<SupportLink>();
+            }
+        }
+
+        public IQueryable<MigrationHistory> MigrationHistory
+        {
+            get
+            {
+                return Query<MigrationHistory>();
+            }
+        }
+
+
+        public IQueryable<MigrationHistoryDetail> MigrationHistoryDetail
+        {
+            get
+            {
+                return Query<MigrationHistoryDetail>();
             }
         }
 
@@ -857,6 +907,13 @@ namespace Sentry.data.Infrastructure
              *  This gives all values the same length provides better sorting capabilities
              *****************************/
             return result.ToString().PadLeft(7, '0');
+        }
+
+        public int GetNextGlobalDatasetId()
+        {
+            string sqlConnString = Configuration.Config.GetHostSetting("DatabaseConnectionString");
+            string sqlQueryString = $"SELECT NEXT VALUE FOR seq_GlobalDatasetId";
+            return ExecuteQuery(sqlConnString, sqlQueryString);
         }
 
         private int ExecuteQuery(string sqlConnStr, string sqlQueryStr)

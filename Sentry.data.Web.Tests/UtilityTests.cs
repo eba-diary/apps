@@ -313,7 +313,7 @@ namespace Sentry.data.Web.Tests
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             DatasetFileConfig config = MockClasses.MockDatasetFileConfig();
-            config.Schema = new FileSchema() { SchemaId = 11, Name = "My Schema" };
+            config.Schema = new FileSchema() { SchemaId = 11, Name = "My Schema", ObjectStatus = ObjectStatusEnum.Active };
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.DatasetFileConfigs).Returns(new List<DatasetFileConfig>() { config }.AsQueryable());
@@ -337,7 +337,7 @@ namespace Sentry.data.Web.Tests
             MigrationRequestModel model = new MigrationRequestModel()
             {
                 DatasetId = 1000,
-                TargetNamedEnvironment = "QUAL",
+                DatasetNamedEnvironment = "QUAL",
                 SAIDAssetKeyCode = "ABCD"
             };
 
@@ -385,6 +385,59 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(NamedEnvironmentType.NonProd, model.DatasetNamedEnvironmentType);
         }
 
+
+        [TestMethod]
+        public async Task SetNamedEnvironmentProperties_NonQuartermasterManagedAsset_New_NamedEnvironment()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            MigrationRequestModel model = new MigrationRequestModel()
+            {
+                DatasetId = 1000,
+                DatasetNamedEnvironment = "QUAL",
+                SAIDAssetKeyCode = "ABCD"
+            };
+
+            Dataset dataset_Test = MockClasses.MockDataset(null, true);
+            dataset_Test.Asset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            dataset_Test.ObjectStatus = ObjectStatusEnum.Active;
+            dataset_Test.NamedEnvironment = "TEST";
+            dataset_Test.NamedEnvironmentType = NamedEnvironmentType.NonProd;
+
+            Dataset dataset_Prod = MockClasses.MockDataset(null, true);
+            dataset_Prod.Asset = new Asset() { AssetId = 1, SaidKeyCode = "ABCD" };
+            dataset_Prod.DatasetId = 88;
+            dataset_Prod.ObjectStatus = ObjectStatusEnum.Active;
+            dataset_Prod.NamedEnvironment = "PROD";
+            dataset_Prod.NamedEnvironmentType = NamedEnvironmentType.Prod;
+
+            List<NamedEnvironmentDto> namedEnvironmentDtos = new List<NamedEnvironmentDto>();
+
+            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.Datasets).Returns(new List<Dataset>() { dataset_Test, dataset_Prod }.AsQueryable());
+
+            Mock<IQuartermasterService> qmService = mr.Create<IQuartermasterService>();
+            qmService.Setup(s => s.GetNamedEnvironmentsAsync("ABCD")).Returns(Task.FromResult(namedEnvironmentDtos));
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(s => s.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()).Returns("");
+
+            await model.SetNamedEnvironmentProperties(context.Object, new NamedEnvironmentBuilder(qmService.Object, dataFeatures.Object));
+
+            Assert.IsFalse(model.QuartermasterManagedNamedEnvironments);
+
+            Assert.AreEqual(2, model.DatasetNamedEnvironmentDropDown.Count(), "Named Environment Dropdown Count");
+            Assert.IsTrue(model.DatasetNamedEnvironmentDropDown.Any(x => x.Text == "QUAL"));
+            Assert.IsTrue(model.DatasetNamedEnvironmentDropDown.Any(x => x.Text == "PROD"));
+            Assert.IsTrue(model.NewNonQManagedNamedEnvironment);
+
+            Assert.AreEqual(3, model.DatasetNamedEnvironmentTypeDropDown.Count(), "Named Environment Type Dropdown Count");
+            Assert.AreEqual(1, model.DatasetNamedEnvironmentTypeDropDown.Count(w => w.Selected));
+            Assert.AreEqual("Select Environment Type", model.DatasetNamedEnvironmentTypeDropDown.Where(w => w.Selected).Select(s => s.Text).First(), "Named Environment Type Dropdown Count");
+            Assert.AreEqual(NamedEnvironmentType.NonProd, model.DatasetNamedEnvironmentType);
+            Assert.AreEqual("Select Environment Type", model.DatasetNamedEnvironmentTypeDropDown.First().Text);
+        }
+
         [TestMethod]
         public async Task SetNamedEnvironmentProperties_QuartermasterManagedAsset()
         {
@@ -393,7 +446,7 @@ namespace Sentry.data.Web.Tests
             MigrationRequestModel model = new MigrationRequestModel()
             {
                 DatasetId = 1000,
-                TargetNamedEnvironment = "QUAL",
+                DatasetNamedEnvironment = "QUAL",
                 SAIDAssetKeyCode = "ABCD"
             };
 

@@ -21,12 +21,12 @@
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NOT NULL, 
     [ObjectStatus] INT NOT NULL DEFAULT 1, 
-    [SaidKeyCode] VARCHAR(10) NULL, 
     [NamedEnvironment] VARCHAR(25) NULL, 
     [NamedEnvironmentType] VARCHAR(25) NULL, 
     [Asset_ID] INT NULL, 
     [Short_NME] VARCHAR(12) NULL, 
-    [AlternateContactEmail] VARCHAR(256) NULL,  --256 based on RFC Internet Standard
+    [AlternateContactEmail] VARCHAR(256) NULL, --256 based on RFC Internet Standard
+    [GlobalDatasetId] INT NULL,    
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

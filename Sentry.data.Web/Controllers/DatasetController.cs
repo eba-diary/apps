@@ -29,9 +29,9 @@ namespace Sentry.data.Web.Controllers
     [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
     public class DatasetController : BaseController
     {
-        public readonly IAssociateInfoProvider _associateInfoProvider;
-        public readonly IDatasetContext _datasetContext;
-        private readonly UserService _userService;
+        private readonly IAssociateInfoProvider _associateInfoProvider;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
         private readonly S3ServiceProvider _s3Service;
         private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
@@ -41,14 +41,14 @@ namespace Sentry.data.Web.Controllers
         private readonly ISAIDService _saidService;
         private readonly IJobService _jobService;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
-        private readonly IElasticContext _elasticContext;
+        private readonly IElasticDocumentClient _elasticDocumentClient;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
         private readonly IDatasetFileService _datasetFileService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
             S3ServiceProvider dsSvc,
-            UserService userService,
+            IUserService userService,
             IAssociateInfoProvider associateInfoService,
             IObsidianService obsidianService,
             IDatasetService datasetService,
@@ -58,7 +58,7 @@ namespace Sentry.data.Web.Controllers
             ISAIDService saidService,
             IJobService jobService,
             NamedEnvironmentBuilder namedEnvironmentBuilder,
-            IElasticContext elasticContext,
+            IElasticDocumentClient elasticDocumentClient,
             Lazy<IDataApplicationService> dataApplicationService,
             IDatasetFileService datasetFileService)
         {
@@ -74,7 +74,7 @@ namespace Sentry.data.Web.Controllers
             _saidService = saidService;
             _jobService = jobService;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
-            _elasticContext = elasticContext;
+            _elasticDocumentClient = elasticDocumentClient;
             _dataApplicationService = dataApplicationService;
             _datasetFileService = datasetFileService;
         }
@@ -294,10 +294,8 @@ namespace Sentry.data.Web.Controllers
                 DatasetDetailModel model = new DatasetDetailModel(dto)
                 {
                     DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
-                    DisplayTabSections = _featureFlags.CLA3541_Dataset_Details_Tabs.GetValue(),
                     DisplaySchemaSearch = _featureFlags.CLA3553_SchemaSearch.GetValue(),
                     DisplayDataflowEdit = _featureFlags.CLA1656_DataFlowEdit_ViewEditPage.GetValue(),
-                    ShowManagePermissionsLink = _featureFlags.CLA3718_Authorization.GetValue(),
                     DisplayDatasetFileDelete = userSecurity.CanDeleteDatasetFile,
                     DisplayDatasetFileUpload = userSecurity.CanUploadToDataset && _featureFlags.CLA4152_UploadFileFromUI.GetValue(),
                     CLA1130_SHOW_ALTERNATE_EMAIL = _featureFlags.CLA1130_SHOW_ALTERNATE_EMAIL.GetValue(),         //REMOVE WHEN TURNED ON LATER
@@ -472,7 +470,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SchemaSearch(int datasetId, int schemaId, string search = null)
         {
-            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId, schemaId);
+            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticDocumentClient, datasetId, schemaId);
             List<ElasticSchemaField> results = elasticSchemaSearch.Search(search);
             return Json(results, JsonRequestBehavior.AllowGet);
         }
@@ -666,25 +664,25 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> AccessRequest(int datasetId)
         {
-            DatasetAccessRequestModel model;
-
-            if (_featureFlags.CLA3718_Authorization.GetValue())
-            {
-                model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-                model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-                model.IsProd = Sentry.Configuration.Config.GetDefaultEnvironmentName() == GlobalConstants.Environments.PROD;
-                return PartialView("Permission/RequestAccessCLA3723", model);
-            }
-            model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
-            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("DatasetAccessRequest", model);
+            var model = (await _datasetService.GetAccessRequestAsync(datasetId).ConfigureAwait(false)).ToDatasetModel();
+            model.IsProd = Sentry.Configuration.Config.GetDefaultEnvironmentName() == GlobalConstants.Environments.PROD;
+            return PartialView("Permission/RequestAccessCLA3723", model);
         }
 
         [HttpPost]
         public async Task<ActionResult> SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessToDataset(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit access request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -701,7 +699,16 @@ namespace Sentry.data.Web.Controllers
         {
             model.IsAddingPermission = true;
             AccessRequest ar = model.ToCore();
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessToDataset(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit access request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -729,7 +736,16 @@ namespace Sentry.data.Web.Controllers
         {
             AccessRequest ar = model.ToCore();
             ar.Type = AccessRequestType.Inheritance;
-            string ticketId = await _datasetService.RequestAccessToDataset(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessToDataset(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit inheritance request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {
@@ -746,7 +762,16 @@ namespace Sentry.data.Web.Controllers
         {
             AccessRequest ar = model.ToCore();
 
-            string ticketId = await _datasetService.RequestAccessRemoval(ar);
+            string ticketId = null;
+
+            try
+            {
+                ticketId = await _datasetService.RequestAccessRemoval(ar);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failure to submit remove permission request", ex);
+            }
 
             if (string.IsNullOrEmpty(ticketId))
             {

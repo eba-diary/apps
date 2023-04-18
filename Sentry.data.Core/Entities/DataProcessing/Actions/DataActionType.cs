@@ -36,6 +36,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Google BigQuery API")]
         GoogleBigQueryApi = 15,
         [Description("Google Search Console API")]
-        GoogleSearchConsoleApi = 16
+        GoogleSearchConsoleApi = 16,
+        [Description("Copy To Parquet")]
+        CopyToParquet = 17
     }
 }

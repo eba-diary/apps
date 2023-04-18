@@ -71,7 +71,7 @@ namespace Sentry.data.Infrastructure
                     }
                 }
                 jiraIssue.JiraFields.fields = fields;
-                ticketIds.Add($"Ticket ID - {CreateAndValidateJiraIssue(jiraIssue)}");
+                ticketIds.Add(CreateAndValidateJiraIssue(jiraIssue));
             }
 
             return ticketIds;

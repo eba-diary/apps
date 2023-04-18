@@ -1,0 +1,54 @@
+﻿@model Sentry.data.Web.MigrationHistoryPageModel
+@using Sentry.data.Core
+@{
+    ViewBag.Title = "Migration History";
+    ViewBag.OverflowScroll = true;
+    string color = "dsc-clcDkBlue-text";
+
+}
+
+@helper BackLink()
+{
+    <a class="backToList mt-2 mb-0" href="/Dataset/Detail/@Model.SourceDatasetId"><em class="fas fa-chevron-left pr-2"></em>Back to Dataset Information</a>
+}
+
+@BackLink()
+
+<div class="config-banner">
+    <h1 class="detailName leftFloat @color pt-0">@Model.SourceDatasetName Migration History</h1>
+
+    <div class="margin-right-inherit" style="margin:5px">
+
+        @*ONLY DISPLAY DROP DOWN IF ShowNamedEnvironmentFilter FLAG TRUE*@
+        @if (Model.ShowNamedEnvironmentFilter)
+        {
+            @*NAMED ENVIRONMENT DROP DOWN*@
+            <select id="migration-history-named-env-filter" class="form-control">
+                <option value="ALL" selected>ALL</option>
+                @foreach (DatasetRelativeModel datasetRelativeModel in Model.DatasetRelatives)
+                {
+                    <option value=@datasetRelativeModel.DatasetNamedEnvironment> @datasetRelativeModel.DatasetNamedEnvironment</option>
+                }
+            </select>
+        }
+    </div>
+
+</div>
+
+@*PARTIAL VIEW HOLDS MIGRATION HISTORY DETAILS*@
+<div id="migration-history-detail-container">
+
+</div>
+
+
+
+@BackLink()
+
+@section Scripts {
+    <script src="@Html.GetContent("prettycron.*.js")"></script>
+    <script>
+        $(function () {
+            data.MigrationHistory.Init(@(Html.Raw(Json.Encode(Model.SourceDatasetId))));
+        });
+    </script>
+}
