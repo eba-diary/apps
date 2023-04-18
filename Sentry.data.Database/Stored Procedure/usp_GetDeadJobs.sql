@@ -32,9 +32,8 @@ BEGIN
 END
 ELSE IF @ENV = 'PROD'
 BEGIN 
-    INSERT #EnvironmentJobIDs(Job_ID) values(3190), values(3191), values(465);
+    INSERT #EnvironmentJobIDs(Job_ID) values(3190),(3191),(465);
 END
-
 
 
 Select 
@@ -67,22 +66,22 @@ into #tempSubmissionDetails
 from Submission
 join JobHistory on
     Submission.Submission_ID = JobHistory.Submission
-inner join #EnvironmentJobIDs ON JobHistory.Job_ID = #EnvironmentJobIDs.Job_ID
 CROSS APPLY OPENJSON(Submission.Serialized_Job_Options, '$.args') WITH (
     arguments NVARCHAR(MAX) '$'
 ) Option_Metadata
 CROSS APPLY OPENJSON(Option_Metadata.arguments, '$') WITH ( 
-    topic varchar(250) '$.KafkaProducer.TargetTopic',
-    SourceBucketName varchar(250) '$.ProgramArguments.SourceBucketName',
-    SourceKey varchar(250) '$.ProgramArguments.SourceKey',
-    TargetBucketName varchar(250) '$.ProgramArguments.TargetBucketName',
-    TargetKey varchar(250) '$.ProgramArguments.TargetKey',
+    topic VARCHAR(250) '$.KafkaProducer.TargetTopic',
+    SourceBucketName VARCHAR(250) '$.ProgramArguments.SourceBucketName',
+    SourceKey VARCHAR(250) '$.ProgramArguments.SourceKey',
+    TargetBucketName VARCHAR(250) '$.ProgramArguments.TargetBucketName',
+    TargetKey VARCHAR(250) '$.ProgramArguments.TargetKey',
     Dataset_ID bigint '$.Dataset_ID',
     [Schema_ID] bigint '$.Schema_ID'
 ) Argument_Metadata
 where 
-    JobHistory.State = 'Dead'    
-    and Submission.Created > @TimeCreated
+    JobHistory.State = 'Dead'
+    and Submission.Job_ID in (3190, 3191, 465)
+    and Submission.Created > '""" + str(START_DATETIME_TO_CHECK) + """'
 order by Submission.Created DESC, JobHistory.History_Id DESC
 
 select 
