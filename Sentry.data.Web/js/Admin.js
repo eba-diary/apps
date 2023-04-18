@@ -92,8 +92,7 @@ data.Admin = {
                 if (data.ReprocessingRequired)
                 {
                     $('td:eq(4)', row).text("True").addClass('text-danger');
-                } else if (!data.ReprocessingRequired)
-                {
+                } else {
                     $('td:eq(4)', row).text("False").addClass('text-success');
                 }
             },
@@ -145,7 +144,7 @@ data.Admin = {
             formatSubmit: 'mm/dd/yyyy',
             onSet: function (context)
             {
-                // Grab current selected
+                // Grab selected date values
                 var startDate = $(".yadcf-filter-range-start").val();
                 var endDate = $(".yadcf-filter-range-end").val();
 
