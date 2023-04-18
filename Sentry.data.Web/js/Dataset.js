@@ -1443,7 +1443,7 @@ data.Dataset = {
             //delete
             $.ajax({
                 type: "POST",
-                url: '../../api/" + data.GetApiVersion() + "/datafile/dataset/' + datasetId + '/schema/' + schemaId + '/Delete',
+                url: "../../api/" + data.GetApiVersion() + "/datafile/dataset/" + datasetId + "/schema/" + schemaId + "/Delete",
                 data: JSON.stringify({ UserFileIdList: ids }),
                 contentType: "application/json",
                 success: function () {
