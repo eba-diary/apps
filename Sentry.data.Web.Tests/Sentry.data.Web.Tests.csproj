@@ -182,6 +182,7 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsValidatorTests.cs" />
+    <Compile Include="API\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidatorTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaModelMappingTests.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidatorTests.cs" />

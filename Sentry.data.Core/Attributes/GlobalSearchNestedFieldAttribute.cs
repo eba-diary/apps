@@ -3,7 +3,7 @@
 namespace Sentry.data.Core
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class GlobalSearchField : Attribute
+    public class GlobalSearchNestedFieldAttribute : Attribute
     {
 
     }

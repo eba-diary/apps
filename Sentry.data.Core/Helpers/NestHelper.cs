@@ -10,16 +10,16 @@ namespace Sentry.data.Core
     {
         public static Nest.Fields GetSearchFields<T>()
         {
-            return Infer.Fields(CustomAttributeHelper.GetPropertiesWithAttribute<T, GlobalSearchField>().ToArray());
+            return Infer.Fields(CustomAttributeHelper.GetPropertiesWithAttribute<T, GlobalSearchFieldAttribute>().ToArray());
         }
 
         public static AggregationDictionary GetFilterAggregations<T>() where T : class
         {
             AggregationDictionary aggregations = new AggregationDictionary();
 
-            foreach (PropertyInfo property in CustomAttributeHelper.GetPropertiesWithAttribute<T, FilterSearchField>())
+            foreach (PropertyInfo property in CustomAttributeHelper.GetPropertiesWithAttribute<T, FilterSearchFieldAttribute>())
             {
-                FilterSearchField filterAttribute = property.GetCustomAttribute<FilterSearchField>();
+                FilterSearchFieldAttribute filterAttribute = property.GetCustomAttribute<FilterSearchFieldAttribute>();
                 aggregations.Add(filterAttribute.FilterCategoryName, new TermsAggregation(filterAttribute.FilterCategoryName)
                 {
                     Field = GetFilterCategoryField<T>(property),
@@ -40,6 +40,7 @@ namespace Sentry.data.Core
             throw new InvalidOperationException($"Filter category name: {categoryName} does not match any category names registered to type of: {typeof(T).Name}");         
         }
 
+        #region Private
         private static Field GetFilterCategoryField<T>(PropertyInfo property) where T : class
         {
             if (property.PropertyType == typeof(string))
@@ -52,5 +53,6 @@ namespace Sentry.data.Core
 
             return Infer.Field(property);
         }
+        #endregion
     }
 }

@@ -176,8 +176,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\FilterSearchField.cs" />
-    <Compile Include="Attributes\GlobalSearchField.cs" />
+    <Compile Include="Attributes\FilterSearchFieldAttribute.cs" />
+    <Compile Include="Attributes\FilterSearchNestedFieldAttribute.cs" />
+    <Compile Include="Attributes\GlobalSearchNestedFieldAttribute.cs" />
+    <Compile Include="Attributes\GlobalSearchFieldAttribute.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
     <Compile Include="DomainServices\MigrationService.cs" />
     <Compile Include="DomainServices\DataSourceService.cs" />
@@ -243,7 +245,7 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
-    <Compile Include="DTO\GlobalDataset\GlobalDatasetDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetResultDto.cs" />
     <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsDto.cs" />
     <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsDto.cs" />

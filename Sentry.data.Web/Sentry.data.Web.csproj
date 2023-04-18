@@ -554,10 +554,10 @@
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestValidator.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\GlobalDatasetController.cs" />
-    <Compile Include="API\Resources\GlobalDataset\Search\GlobalDatasetModel.cs" />
-    <Compile Include="API\Resources\GlobalDataset\Search\SearchGlobalDatasetsRequestModel.cs" />
-    <Compile Include="API\Resources\GlobalDataset\Search\SearchGlobalDatasetsRequestValidator.cs" />
-    <Compile Include="API\Resources\GlobalDataset\Search\SearchGlobalDatasetsResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\GlobalDatasetProfile.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsResponseModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />
@@ -570,8 +570,8 @@
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaResponseModel.cs" />
-    <Compile Include="API\Resources\GlobalDataset\Search\FilterCategoryOptionRequestModel.cs" />
-    <Compile Include="API\Resources\GlobalDataset\Search\FilterCategoryRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\FilterCategoryOptionRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\FilterCategoryRequestModel.cs" />
     <Compile Include="API\Validation\Models\ConcurrentFieldValidationResponse.cs" />
     <Compile Include="API\Validation\Models\ConcurrentValidationResponse.cs" />
     <Compile Include="API\Validation\Fluent\FluentValidationResponse.cs" />

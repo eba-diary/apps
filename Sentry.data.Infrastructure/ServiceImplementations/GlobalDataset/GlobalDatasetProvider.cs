@@ -1,14 +1,16 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class GlobalDatasetProvider : IGlobalDatasetProvider
+    public class GlobalDatasetProvider : IGlobalDatasetProvider 
     {
         private readonly IElasticDocumentClient _elasticDocumentClient;
         private readonly IDatasetContext _datasetContext;
@@ -19,13 +21,122 @@ namespace Sentry.data.Infrastructure
             _datasetContext = datasetContext;
         }
 
-        #region Global Dataset
+        #region Search
         public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
         {
             //translate dto to elastic search request
+
+            //split search terms regardless of amount of spaces between words
+            List<string> terms = filterSearchDto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
             throw new NotImplementedException();
         }
 
+        private BoolQuery BuildTextSearchQuery(Type type, List<string> searchTerms, Expression parentExpression, ParameterExpression originParameter)
+        {
+            List<QueryContainer> queryContainers = new List<QueryContainer>();
+
+            List<PropertyInfo> searchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchFieldAttribute>(type).ToList();
+
+            if (searchProperties.Any())
+            {
+                List<Expression<Func<GlobalDataset, object>>> fieldExpressions = new List<Expression<Func<GlobalDataset, object>>>();
+
+                foreach (PropertyInfo property in searchProperties)
+                {
+                    Expression memberExpression = Expression.Property(parentExpression, property.Name);
+                    Expression<Func<GlobalDataset, object>> fieldExpression = Expression.Lambda<Func<GlobalDataset, object>>(memberExpression, originParameter);
+
+                    fieldExpressions.Add(fieldExpression);
+                }
+
+                Nest.Fields fields = Infer.Fields(fieldExpressions.ToArray());
+
+                foreach (Field field in fields)
+                {
+                    //this is where would check custom attribute if boost is required and append
+                    //have to get creative to get attribute from Field info and check boost value
+                    field.Boost = 2;
+                }
+
+                if (searchTerms.Count > 1)
+                {
+                    queryContainers.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", searchTerms),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+
+                    queryContainers.Add(new QueryStringQuery()
+                    {
+                        Query = string.Join(" ", searchTerms.Select(x => $"*{x}*")),
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.CrossFields,
+                        DefaultOperator = Operator.And
+                    });
+                }
+                else
+                {
+                    queryContainers.Add(new QueryStringQuery()
+                    {
+                        Query = searchTerms.First(),
+                        Fields = fields,
+                        Fuzziness = Fuzziness.Auto,
+                        Type = TextQueryType.MostFields
+                    });
+
+                    queryContainers.Add(new QueryStringQuery()
+                    {
+                        Query = $"*{searchTerms.First()}*",
+                        Fields = fields,
+                        AnalyzeWildcard = true,
+                        Type = TextQueryType.MostFields
+                    });
+                }
+            }
+
+            IEnumerable<PropertyInfo> nestedSearchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchNestedFieldAttribute>(type);
+
+            foreach (PropertyInfo property in nestedSearchProperties)
+            {
+                Expression fieldExpression = Expression.Property(parentExpression, property.Name);
+
+                NestedQuery nested = new NestedQuery
+                {
+                    Path = Infer.Field(property),
+                    Query = BuildTextSearchQuery(property.PropertyType, searchTerms, fieldExpression, originParameter)
+                };
+
+                queryContainers.Add(nested);
+            }
+
+            BoolQuery boolQuery = new BoolQuery();
+
+            if (queryContainers.Any())
+            {
+                boolQuery.Should = queryContainers;
+                boolQuery.MinimumShouldMatch = 1;
+            }
+            else
+            {
+                boolQuery.MinimumShouldMatch = 0;
+            }
+
+            return boolQuery;
+        }
+
+        public Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Global Dataset
         public async Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset)
         {
             await _elasticDocumentClient.IndexAsync(globalDataset).ConfigureAwait(false);

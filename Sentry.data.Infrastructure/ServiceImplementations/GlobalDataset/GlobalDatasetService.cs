@@ -30,9 +30,9 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public FilterSearchDto GetFiltersForGlobalDatasets(FilterSearchDto filterSearchDto)
+        public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(FilterSearchDto filterSearchDto)
         {
-            throw new NotImplementedException();
+            return await _globalDatasetProvider.GetGlobalDatasetFiltersAsync(filterSearchDto);
         }
     }
 }

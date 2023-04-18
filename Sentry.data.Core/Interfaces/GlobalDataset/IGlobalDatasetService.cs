@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
@@ -9,6 +6,6 @@ namespace Sentry.data.Core
     public interface IGlobalDatasetService
     {
         Task<SearchGlobalDatasetsResultDto> SearchGlobalDatasetsAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto);
-        FilterSearchDto GetFiltersForGlobalDatasets(FilterSearchDto filterSearchDto);
+        Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(FilterSearchDto filterSearchDto);
     }
 }
