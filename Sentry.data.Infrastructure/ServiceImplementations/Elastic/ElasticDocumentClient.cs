@@ -1,28 +1,27 @@
 ﻿using Nest;
+using NHibernate.Hql.Ast.ANTLR.Tree;
 using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class ElasticContext : IElasticContext
+    public class ElasticDocumentClient : IElasticDocumentClient
     {
         #region Fields
         private readonly IElasticClient _client;
         #endregion
 
         #region Constructors
-        public ElasticContext(IElasticClient client)
+        public ElasticDocumentClient(IElasticClient client)
         {
             _client = client;
         }
         #endregion
 
-        #region IElasticContext Implementation
+        #region IElasticDocumentClient Implementation
         public async Task IndexAsync<T>(T document) where T : class
         {
             await _client.IndexDocumentAsync(document).ConfigureAwait(false);
@@ -58,9 +57,28 @@ namespace Sentry.data.Infrastructure
             return response.IsValid;
         }
 
-        public void IndexMany<T>(List<T> toIndex) where T : class
+        public async Task IndexManyAsync<T>(List<T> documents) where T : class
         {
-            _client.IndexMany(toIndex);
+            if (documents?.Any() == true)
+            {
+                await _client.IndexManyAsync(documents).ConfigureAwait(false);
+            }
+        }
+
+        public async Task IndexManyAsync<T>(List<T> documents, string indexName) where T : class
+        {
+            if (documents?.Any() == true)
+            {
+                await _client.IndexManyAsync(documents, indexName).ConfigureAwait(false);
+            }
+        }
+
+        public async Task DeleteManyAsync<T>(List<T> documents) where T : class
+        {
+            if (documents?.Any() == true)
+            {
+                await _client.DeleteManyAsync(documents).ConfigureAwait(false);
+            }
         }
 
         public void DeleteByQuery<T>(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> query) where T : class

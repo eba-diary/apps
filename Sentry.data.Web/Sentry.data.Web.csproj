@@ -548,6 +548,11 @@
     <Compile Include="API\Resources\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
     <Compile Include="API\Interfaces\IPrimaryContactModel.cs" />
     <Compile Include="API\Interfaces\ISaidEnvironmentModel.cs" />
+    <Compile Include="API\Resources\GlobalDatasetAdmin\GlobalDatasetAdminController.cs" />
+    <Compile Include="API\Resources\GlobalDatasetAdmin\GlobalDatasetAdminProfile.cs" />
+    <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestValidator.cs" />
+    <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsResponseModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />

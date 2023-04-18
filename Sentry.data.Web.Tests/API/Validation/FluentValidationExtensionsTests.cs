@@ -2,6 +2,7 @@
 using Sentry.data.Core.GlobalEnums;
 using Sentry.data.Web.API;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
 
@@ -101,6 +102,86 @@ namespace Sentry.data.Web.Tests.API
         }
 
         [TestMethod]
+        public void Required_List_Success_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            List<int> numbers = new List<int> { 1, 2 };
+
+            FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>> fluent = new FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = numbers
+            };
+
+            fluent = fluent.Required();
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual(numbers, fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName);
+            Assert.IsNull(fluent.ValidationResponse.FieldValidations);
+        }
+
+        [TestMethod]
+        public void Required_List_Null_Fail_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            List<int> numbers = null;
+
+            FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>> fluent = new FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = numbers
+            };
+
+            fluent = fluent.Required();
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual(numbers, fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName); 
+            Assert.AreEqual(1, fluent.ValidationResponse.FieldValidations.Count);
+
+            Assert.IsTrue(fluent.ValidationResponse.FieldValidations.TryDequeue(out ConcurrentFieldValidationResponse fieldValidation));
+            Assert.AreEqual("Field", fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+
+            Assert.IsTrue(fieldValidation.ValidationMessages.TryDequeue(out string message));
+            Assert.AreEqual("Required field", message);
+        }
+
+        [TestMethod]
+        public void Required_List_Empty_Fail_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            List<int> numbers = new List<int>();
+
+            FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>> fluent = new FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = numbers
+            };
+
+            fluent = fluent.Required();
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual(numbers, fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName);
+            Assert.AreEqual(1, fluent.ValidationResponse.FieldValidations.Count);
+
+            Assert.IsTrue(fluent.ValidationResponse.FieldValidations.TryDequeue(out ConcurrentFieldValidationResponse fieldValidation));
+            Assert.AreEqual("Field", fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+
+            Assert.IsTrue(fieldValidation.ValidationMessages.TryDequeue(out string message));
+            Assert.AreEqual("Required field", message);
+        }
+
+        [TestMethod]
         public void MaxLength_Fail_FluentValidationResponse()
         {
             ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
@@ -144,6 +225,78 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual("Value", fluent.PropertyValue);
             Assert.AreEqual("Field", fluent.PropertyName);
             Assert.IsNull(fluent.ValidationResponse.FieldValidations);
+        }
+
+        [TestMethod]
+        public void MaxLength_List_Success_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            List<int> numbers = new List<int> { 1, 2 };
+
+            FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>> fluent = new FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = numbers
+            };
+
+            fluent = fluent.MaxLength(3);
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual(numbers, fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName);
+            Assert.IsNull(fluent.ValidationResponse.FieldValidations);
+        }
+
+        [TestMethod]
+        public void MaxLength_List_Null_Success_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            List<int> numbers = null;
+
+            FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>> fluent = new FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = numbers
+            };
+
+            fluent = fluent.MaxLength(3);
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual(numbers, fluent.PropertyValue);
+            Assert.AreEqual("Field", fluent.PropertyName);
+            Assert.IsNull(fluent.ValidationResponse.FieldValidations);
+        }
+
+        [TestMethod]
+        public void MaxLength_List_Fail_FluentValidationResponse()
+        {
+            ConcurrentValidationResponse validationResponse = new ConcurrentValidationResponse();
+
+            List<int> numbers = new List<int> { 1, 2, 3, 4 };
+
+            FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>> fluent = new FluentValidationResponse<IndexGlobalDatasetsRequestModel, List<int>>
+            {
+                ValidationResponse = validationResponse,
+                PropertyName = "Field",
+                PropertyValue = numbers
+            };
+
+            fluent = fluent.MaxLength(3);
+
+            Assert.AreEqual(validationResponse, fluent.ValidationResponse);
+            Assert.AreEqual(numbers, fluent.PropertyValue);
+            Assert.AreEqual(1, fluent.ValidationResponse.FieldValidations.Count);
+
+            Assert.IsTrue(fluent.ValidationResponse.FieldValidations.TryDequeue(out ConcurrentFieldValidationResponse fieldValidation));
+            Assert.AreEqual("Field", fieldValidation.Field);
+            Assert.AreEqual(1, fieldValidation.ValidationMessages.Count);
+
+            Assert.IsTrue(fieldValidation.ValidationMessages.TryDequeue(out string message));
+            Assert.AreEqual("Max length of 3 values", message);
         }
 
         [TestMethod]
