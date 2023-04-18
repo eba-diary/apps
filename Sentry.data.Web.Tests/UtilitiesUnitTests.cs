@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
 using Sentry.data.Common;
 using Sentry.data.Core;
 
@@ -69,14 +68,5 @@ namespace Sentry.data.Web.Tests
             var result = Utilities.FormatDatasetName("Data_SeT_BlAH");
             Assert.AreEqual("data_set_blah", result);
         }
-        //[TestMethod]
-        //public void GenerateLocationKey_Returns_Correct_Format()
-        //{
-        //    var result = Utilities.GenerateLocationKey("Yearly", "Claim", "Dataset");
-        //    Assert.AreEqual("data/claim/dataset/yrly/", result);
-        //}
-
-    }
-
-   
+    }   
 }

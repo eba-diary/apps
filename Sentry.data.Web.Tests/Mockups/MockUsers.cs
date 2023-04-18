@@ -1,133 +1,128 @@
-﻿using Rhino.Mocks;
+﻿using Moq;
 using Sentry.data.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Tests
 {
     public static class MockUsers
     {
-        public static IApplicationUser App_DataMgmt_Admin_User()
+
+        public static Mock<IApplicationUser> App_DataMgmt_Admin_User()
         {
-            var admin = MockRepository.GenerateStub<IApplicationUser>();
+            Mock<IApplicationUser> adminUser = new Mock<IApplicationUser>();
+            adminUser.Setup(x => x.AssociateId).Returns("012345");
+            adminUser.Setup(x => x.DisplayName).Returns("Nye, Bill");
 
-            admin.Stub(x => x.AssociateId).Return("012345");
-            admin.Stub(x => x.DisplayName).Return("Nye, Bill");
+            adminUser.Setup(x => x.CanModifyDataset).Returns(true);
+            adminUser.Setup(x => x.CanManageAssetAlerts).Returns(true);
+            adminUser.Setup(x => x.CanModifyDataset).Returns(true);
 
-            admin.Stub(x => x.CanModifyDataset).Return(true);
-            admin.Stub(x => x.CanManageAssetAlerts).Return(true);
-            admin.Stub(x => x.CanModifyDataset).Return(true);
+            adminUser.Setup(x => x.CanUseApp).Returns(true);
+            adminUser.Setup(x => x.CanUserSwitch).Returns(true);
 
-            admin.Stub(x => x.CanUseApp).Return(true);
-            admin.Stub(x => x.CanUserSwitch).Return(true);
+            adminUser.Setup(x => x.CanViewDataAsset).Returns(true);
+            adminUser.Setup(x => x.CanViewDataset).Returns(true);
 
-            admin.Stub(x => x.CanViewDataAsset).Return(true);
-            admin.Stub(x => x.CanViewDataset).Return(true);
-
-            return admin;
+            return adminUser;
         }
 
-        public static IApplicationUser User_Who_Not_Authenticated()
+        public static Mock<IApplicationUser> User_Who_Not_Authenticated()
         {
-            var user = MockRepository.GenerateStub<IApplicationUser>();
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
 
-            user.Stub(x => x.AssociateId).Return("012345");
-            user.Stub(x => x.DisplayName).Return("Nye, Bill");
+            user.Setup(x => x.AssociateId).Returns("012345");
+            user.Setup(x => x.DisplayName).Returns("Nye, Bill");
 
-            user.Stub(x => x.CanModifyDataset).Return(false);
-            user.Stub(x => x.CanManageAssetAlerts).Return(false);
-            user.Stub(x => x.CanModifyDataset).Return(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageAssetAlerts).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
 
-            user.Stub(x => x.CanUseApp).Return(false);
-            user.Stub(x => x.CanUserSwitch).Return(false);
+            user.Setup(x => x.CanUseApp).Returns(false);
+            user.Setup(x => x.CanUserSwitch).Returns(false);
 
-            user.Stub(x => x.CanViewDataAsset).Return(false);
-            user.Stub(x => x.CanViewDataset).Return(false);
+            user.Setup(x => x.CanViewDataAsset).Returns(false);
+            user.Setup(x => x.CanViewDataset).Returns(false);
 
             return user;
         }
 
-        public static IApplicationUser App_DataMgmt_MgAlert()
+        public static Mock<IApplicationUser> App_DataMgmt_MgAlert()
         {
-            var user = MockRepository.GenerateStub<IApplicationUser>();
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
 
-            user.Stub(x => x.AssociateId).Return("012345");
-            user.Stub(x => x.DisplayName).Return("Nye, Bill");
+            user.Setup(x => x.AssociateId).Returns("012345");
+            user.Setup(x => x.DisplayName).Returns("Nye, Bill");
 
-            user.Stub(x => x.CanModifyDataset).Return(false);
-            user.Stub(x => x.CanModifyDataset).Return(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
 
-            user.Stub(x => x.CanUseApp).Return(true);
-            user.Stub(x => x.CanUserSwitch).Return(false);
+            user.Setup(x => x.CanUseApp).Returns(true);
+            user.Setup(x => x.CanUserSwitch).Returns(false);
 
-            user.Stub(x => x.CanViewDataAsset).Return(true);
-            user.Stub(x => x.CanViewDataset).Return(true);
+            user.Setup(x => x.CanViewDataAsset).Returns(true);
+            user.Setup(x => x.CanViewDataset).Returns(true);
 
-            user.Stub(x => x.CanManageAssetAlerts).Return(true);
+            user.Setup(x => x.CanManageAssetAlerts).Returns(true);
             return user;
         }
 
-        public static IApplicationUser App_DataMgmt_MngDS()
+        public static Mock<IApplicationUser> App_DataMgmt_MngDS()
         {
-            var user = MockRepository.GenerateStub<IApplicationUser>();
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
 
-            user.Stub(x => x.AssociateId).Return("012345");
-            user.Stub(x => x.DisplayName).Return("Nye, Bill");
+            user.Setup(x => x.AssociateId).Returns("012345");
+            user.Setup(x => x.DisplayName).Returns("Nye, Bill");
 
 
-            user.Stub(x => x.CanUseApp).Return(true);
-            user.Stub(x => x.CanUserSwitch).Return(false);
+            user.Setup(x => x.CanUseApp).Returns(true);
+            user.Setup(x => x.CanUserSwitch).Returns(false);
 
-            user.Stub(x => x.CanViewDataAsset).Return(true);
-            user.Stub(x => x.CanViewDataset).Return(true);
+            user.Setup(x => x.CanViewDataAsset).Returns(true);
+            user.Setup(x => x.CanViewDataset).Returns(true);
 
-            user.Stub(x => x.CanManageAssetAlerts).Return(true);
+            user.Setup(x => x.CanManageAssetAlerts).Returns(true);
 
-            user.Stub(x => x.CanModifyDataset).Return(true);
-            user.Stub(x => x.CanModifyDataset).Return(true);
-
-            return user;
-        }
-
-        public static IApplicationUser App_DataMgmt_Upld()
-        {
-            var user = MockRepository.GenerateStub<IApplicationUser>();
-
-            user.Stub(x => x.AssociateId).Return("012345");
-            user.Stub(x => x.DisplayName).Return("Nye, Bill");
-
-            user.Stub(x => x.CanModifyDataset).Return(false);
-            user.Stub(x => x.CanManageAssetAlerts).Return(false);
-            user.Stub(x => x.CanModifyDataset).Return(false);
-
-            user.Stub(x => x.CanUseApp).Return(true);
-            user.Stub(x => x.CanUserSwitch).Return(false);
-
-            user.Stub(x => x.CanViewDataAsset).Return(true);
-            user.Stub(x => x.CanViewDataset).Return(true);
+            user.Setup(x => x.CanModifyDataset).Returns(true);
+            user.Setup(x => x.CanModifyDataset).Returns(true);
 
             return user;
         }
 
-        public static IApplicationUser App_DataMgmt_User()
+        public static Mock<IApplicationUser> App_DataMgmt_Upld()
         {
-            var user = MockRepository.GenerateStub<IApplicationUser>();
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
 
-            user.Stub(x => x.AssociateId).Return("012345");
-            user.Stub(x => x.DisplayName).Return("Nye, Bill");
+            user.Setup(x => x.AssociateId).Returns("012345");
+            user.Setup(x => x.DisplayName).Returns("Nye, Bill");
 
-            user.Stub(x => x.CanModifyDataset).Return(false);
-            user.Stub(x => x.CanManageAssetAlerts).Return(false);
-            user.Stub(x => x.CanModifyDataset).Return(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageAssetAlerts).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
 
-            user.Stub(x => x.CanUseApp).Return(true);
-            user.Stub(x => x.CanUserSwitch).Return(false);
+            user.Setup(x => x.CanUseApp).Returns(true);
+            user.Setup(x => x.CanUserSwitch).Returns(false);
 
-            user.Stub(x => x.CanViewDataAsset).Return(true);
-            user.Stub(x => x.CanViewDataset).Return(true);
+            user.Setup(x => x.CanViewDataAsset).Returns(true);
+            user.Setup(x => x.CanViewDataset).Returns(true);
+
+            return user;
+        }
+
+        public static Mock<IApplicationUser> App_DataMgmt_User()
+        {
+            Mock<IApplicationUser> user = new Mock<IApplicationUser>();
+
+            user.Setup(x => x.AssociateId).Returns("012345");
+            user.Setup(x => x.DisplayName).Returns("Nye, Bill");
+
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+            user.Setup(x => x.CanManageAssetAlerts).Returns(false);
+            user.Setup(x => x.CanModifyDataset).Returns(false);
+
+            user.Setup(x => x.CanUseApp).Returns(true);
+            user.Setup(x => x.CanUserSwitch).Returns(false);
+
+            user.Setup(x => x.CanViewDataAsset).Returns(true);
+            user.Setup(x => x.CanViewDataset).Returns(true);
 
             return user;
         }
