@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Sentry.data.Core;
+using Sentry.data.Infrastructure;
 using Sentry.EnterpriseLogging;
 using System;
 using System.Linq;
@@ -22,6 +24,14 @@ namespace Sentry.data.Goldeneye
         {
             //initialize logging framework
             var loggerFactory = ConfigureLogger();
+
+            Bootstrapper.Init();
+            Bootstrapper.Container.Configure((x) =>
+            {
+                x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
+                x.For<ILoggerFactory>().Singleton().Use(loggerFactory);
+                x.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
+            });
 
             if (args.Contains("-console"))
             {

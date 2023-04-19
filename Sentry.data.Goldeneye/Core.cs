@@ -103,34 +103,8 @@ namespace Sentry.data.Goldeneye
         {
             _logger.LogInformation("Worker task started.");
 
-            //Initialize the Bootstrapper
-            Bootstrapper.Init();
-
-            var registry = new StructureMap.Registry();
-
-            //var loggerFactory = new SentryLoggerFactory(new Microsoft.Extensions.Logging.LoggerFactory());
-            //var log4netOptions = new Log4NetProviderOptions();
-            //if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
-            //{
-            //    log4netOptions.Log4NetConfigFileName = "log4net.local.config";
-            //}
-            //else
-            //{
-            //    log4netOptions.Log4NetConfigFileName = "log4net.config";
-            //}
-            //loggerFactory.AddLog4Net(log4netOptions);
-
-            //adding ThreadCurrentUserIdProvider similar to how Web app adds this to context.
-            Bootstrapper.Container.Configure((x) =>
-            {
-                x.AddRegistry(registry);
-                x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
-                //x.For<ILoggerFactory>().Singleton().Use(loggerFactory);
-                //x.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
-            });
+            InitializeApp();
             //Start all the internal processes.
-
-            
 
             //Get or Create the Runtime Configuration
             _config = new Configuration
@@ -146,7 +120,7 @@ namespace Sentry.data.Goldeneye
 
             Boolean firstRun = true;
             do
-            {             
+            {
 
                 if (firstRun)
                 {
@@ -180,6 +154,36 @@ namespace Sentry.data.Goldeneye
             };
 
             _logger.LogInformation("Worker task stopped.");
+        }
+
+        private static void InitializeApp()
+        {
+            //Initialize the Bootstrapper
+            //Bootstrapper.Init();
+
+            //var registry = new StructureMap.Registry();
+
+            //var loggerFactory = new SentryLoggerFactory(new Microsoft.Extensions.Logging.LoggerFactory());
+            //var log4netOptions = new Log4NetProviderOptions();
+            //if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
+            //{
+            //    log4netOptions.Log4NetConfigFileName = "log4net.local.config";
+            //}
+            //else
+            //{
+            //    log4netOptions.Log4NetConfigFileName = "log4net.server.config";
+            //}
+
+            //loggerFactory.AddLog4Net(log4netOptions);
+
+            ////adding ThreadCurrentUserIdProvider similar to how Web app adds this to context.
+            //Bootstrapper.Container.Configure((x) =>
+            //{
+            //    x.AddRegistry(registry);
+            //    x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
+            //    //x.For<ILoggerFactory>().Singleton().Use(loggerFactory);
+            //    //x.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
+            //});
         }
 
         private void RunMinutelyProcessing()
