@@ -360,7 +360,7 @@
       <HintPath>..\packages\Sentry.Common.3.2.0\lib\net472\Sentry.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Configuration.3.0.0\lib\net40\Sentry.Configuration.dll</HintPath>
+      <HintPath>..\packages\Sentry.Configuration.3.0.1\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.2.1.1\lib\netstandard2.0\Sentry.Core.dll</HintPath>
@@ -1066,9 +1066,6 @@
       <Link>LocalFeatureFlags.json</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="libman.json" />
     <Content Include="Images\Category\claim.png" />
     <Content Include="Images\Category\claim.svg" />
@@ -1160,6 +1157,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ConfigSchemas\SmartsConfigurationSection.csd.xsd">
       <SubType>Designer</SubType>
     </None>

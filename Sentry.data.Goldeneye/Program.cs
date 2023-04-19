@@ -1,8 +1,8 @@
-﻿using System.ServiceProcess;
-using Sentry.Common.Logging;
-using Sentry.Configuration;
-using System.Linq;
+﻿using Microsoft.Extensions.Logging;
+using Sentry.EnterpriseLogging;
 using System;
+using System.Linq;
+using System.ServiceProcess;
 
 namespace Sentry.data.Goldeneye
 {
@@ -21,12 +21,12 @@ namespace Sentry.data.Goldeneye
         static void Main(string[] args)
         {
             //initialize logging framework
-            Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
+            var loggerFactory = ConfigureLogger();
 
             if (args.Contains("-console"))
             {
                 //start as a console app
-                Core myCore = new Core();
+                Core myCore = new Core(loggerFactory.CreateLogger<Core>());
                 myCore.OnStart();
 
                 Console.WriteLine("Press any key to stop");
@@ -41,9 +41,38 @@ namespace Sentry.data.Goldeneye
             else
             {
                 //start as a windows service
-                Service winService = new Service();
+                Service winService = new Service(loggerFactory);
                 ServiceBase.Run(new ServiceBase[] { winService });
+            }            
+        }
+
+
+        /// <summary>
+        /// Wire up logging to use Sentry.Common.Logging
+        /// </summary>
+        public static ILoggerFactory ConfigureLogger()
+        {
+            // The following configures the "default" logging behavior for anything that continues to 
+            // use Sentry.Common for logging, including legacy Sentry.* libraries
+            Sentry.Common.Logging.Logger.LoggingFrameworkAdapter =
+                new Sentry.Common.Logging.Adapters.Log4netAdapter("Sentry.Common.Logging");
+
+            // The following is the new ILoggerFactory/ILogger setup for modern logging that is 
+            // ready for .NET 5.
+            var loggerFactory = new SentryLoggerFactory(new Microsoft.Extensions.Logging.LoggerFactory());
+            var log4netOptions = new Log4NetProviderOptions();
+            if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.local.config";
             }
+            else
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.server.config";
+            }
+
+            loggerFactory.AddLog4Net(log4netOptions);
+
+            return loggerFactory;
         }
     }
 }

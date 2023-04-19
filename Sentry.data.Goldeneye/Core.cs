@@ -1,8 +1,10 @@
 ﻿using Hangfire;
+using Microsoft.Extensions.Logging;
 using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
+using Sentry.EnterpriseLogging;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -23,13 +25,23 @@ namespace Sentry.data.Goldeneye
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
         private Configuration _config;
+        private readonly ILogger<Core> _logger;
+
+        /// <summary>
+        /// Constructor used for DI
+        /// </summary>
+        /// <param name="logger">A logger to use for this class</param>
+        public Core(ILogger<Core> logger)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Start the core worker
         /// </summary>
         public void OnStart()
         {
-            Logger.Info("Windows Service starting...");
+            _logger.LogInformation("Windows Service starting...");
 
             //setup a token to allow a task to be cancelled
             _tokenSource = new CancellationTokenSource();
@@ -89,20 +101,36 @@ namespace Sentry.data.Goldeneye
         /// </summary>
         private void DoWork()
         {
-            Logger.Info("Worker task started.");
+            _logger.LogInformation("Worker task started.");
 
             //Initialize the Bootstrapper
             Bootstrapper.Init();
 
             var registry = new StructureMap.Registry();
 
+            //var loggerFactory = new SentryLoggerFactory(new Microsoft.Extensions.Logging.LoggerFactory());
+            //var log4netOptions = new Log4NetProviderOptions();
+            //if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
+            //{
+            //    log4netOptions.Log4NetConfigFileName = "log4net.local.config";
+            //}
+            //else
+            //{
+            //    log4netOptions.Log4NetConfigFileName = "log4net.config";
+            //}
+            //loggerFactory.AddLog4Net(log4netOptions);
+
             //adding ThreadCurrentUserIdProvider similar to how Web app adds this to context.
             Bootstrapper.Container.Configure((x) =>
             {
                 x.AddRegistry(registry);
                 x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
+                //x.For<ILoggerFactory>().Singleton().Use(loggerFactory);
+                //x.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
             });
             //Start all the internal processes.
+
+            
 
             //Get or Create the Runtime Configuration
             _config = new Configuration
@@ -148,10 +176,10 @@ namespace Sentry.data.Goldeneye
 
             if (_token.IsCancellationRequested)
             {
-                Logger.Info("Cancellation Requested, shutting down Goldeneye");
+                _logger.LogInformation("Cancellation Requested, shutting down Goldeneye");
             };
 
-            Logger.Info("Worker task stopped.");
+            _logger.LogInformation("Worker task stopped.");
         }
 
         private void RunMinutelyProcessing()
@@ -190,7 +218,7 @@ namespace Sentry.data.Goldeneye
                     }
 
                     Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
-                    Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+                    _logger.LogInformation($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
                 }
 
                 //TODO: CLA-2888 - Add ObjectStatus filtering logic
@@ -225,7 +253,7 @@ namespace Sentry.data.Goldeneye
         private void InitializeEventProcessor()
         {
             //Starting MetadataProcessor Consumer
-            Logger.Info("starting metadataprocessorservice");
+            _logger.LogInformation("starting metadataprocessorservice");
             MetadataProcessorService metaProcessor = Bootstrapper.Container.GetInstance<MetadataProcessorService>();
             currentTasks.Add(new RunningTask(
                             Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));
@@ -280,10 +308,14 @@ namespace Sentry.data.Goldeneye
             //Schecule SpamFactory:Instance to run every minute
             // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
 
-            RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            //RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_instant", x => x.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            //RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_hourly", x => x.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            //RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_daily", x => x.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            //RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_weekly", x => x.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
             //Schedule Livy Job state monitor to run every minute
             RecurringJob.AddOrUpdate<IRetrieverJobService>("LivyJobStateMonitor", x => x.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
@@ -310,7 +342,7 @@ namespace Sentry.data.Goldeneye
         /// </summary>
         public void OnStop()
         {
-            Logger.Info("Windows Service stopping...");
+            _logger.LogInformation("Windows Service stopping...");
             //request the task to cancel itself
             _tokenSource.Cancel();
 
@@ -320,17 +352,17 @@ namespace Sentry.data.Goldeneye
             }
             catch (AggregateException e)
             {
-                Logger.Debug("AggregateException thrown with inner exceptions:");
+                _logger.LogDebug("AggregateException thrown with inner exceptions:");
                 // Display information about each exception. 
                 foreach (var v in e.InnerExceptions)
                 {
                     if (v is TaskCanceledException)
                     {
-                        Logger.Debug($"TaskCanceledException: Task {((TaskCanceledException)v).Task.Id.ToString()}");
+                        _logger.LogDebug($"TaskCanceledException: Task {((TaskCanceledException)v).Task.Id.ToString()}");
                     }
                     else
                     {
-                        Logger.Error($"   Exception: {v.GetType().Name}");
+                        _logger.LogError($"   Exception: {v.GetType().Name}");
                     }
                 }
             }
@@ -341,10 +373,10 @@ namespace Sentry.data.Goldeneye
 
             foreach (RunningTask task in currentTasks)
             {
-                Logger.Info($"Task {task.Name} status is now {task.Task.Status}");
+                _logger.LogInformation($"Task {task.Name} status is now {task.Task.Status}");
             }
 
-            Logger.Info("Windows Service stopped.");
+            _logger.LogInformation("Windows Service stopped.");
         }
 
         /// <summary>
@@ -353,7 +385,7 @@ namespace Sentry.data.Goldeneye
         /// <param name="t">The main thread task</param>
         private void TaskException(Task t)
         {
-            Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
+            _logger.LogCritical(t.Exception,"Exception occurred on main Windows Service Task. Stopping Service immediately.");
             Environment.Exit(10001);
         }
     }

@@ -190,6 +190,9 @@
     <Reference Include="Sentry.Common, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Common.3.2.0\lib\net472\Sentry.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Configuration.3.0.1\lib\net40\Sentry.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="Sentry.Core, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.2.1.1\lib\netstandard2.0\Sentry.Core.dll</HintPath>
     </Reference>
@@ -432,6 +435,9 @@
     <Content Include="ExpectedJSON\Motive_Companies_Unexpected.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ExpectedJSON\PagingHttps_AcceptableErrorResponse.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

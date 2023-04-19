@@ -1,4 +1,5 @@
-﻿using System.ServiceProcess;
+﻿using Microsoft.Extensions.Logging;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Goldeneye
@@ -7,6 +8,12 @@ namespace Sentry.data.Goldeneye
     {
 
         private Core _myCore;
+        private readonly ILoggerFactory _loggerFactory;
+
+        public Service(ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
+        }
 
         protected override void OnStart(string[] args)
         {
@@ -15,7 +22,7 @@ namespace Sentry.data.Goldeneye
 
             //Add code here to start your service. This method should set things
             //in motion so your service can do its work.
-            _myCore = new Core();
+            _myCore = new Core(_loggerFactory.CreateLogger<Core>());
             _myCore.OnStart();
 
         }

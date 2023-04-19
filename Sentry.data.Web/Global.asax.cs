@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.API;
 using StackExchange.Profiling;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -36,7 +35,7 @@ namespace Sentry.data.Web
             //Application Initialization
             var loggerFactory = LoggerHelper.ConfigureLogger();
 
-            Bootstrapper.Init(loggerFactory);
+            Bootstrapper.Init();
 
             //MVC dependency resolver
             _structureMapDependencyResolver = new StructureMapMvcDependencyResolver(Bootstrapper.Container);
@@ -56,6 +55,8 @@ namespace Sentry.data.Web
 
                 x.For<IMapper>().Use(mapper);
                 x.For<ICurrentUserIdProvider>().Use<WebCurrentUserIdProvider>();
+                x.For<Microsoft.Extensions.Logging.ILoggerFactory>().Singleton().Use(loggerFactory);
+                x.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
             });
 
             DependencyResolver.SetResolver(_structureMapDependencyResolver);
