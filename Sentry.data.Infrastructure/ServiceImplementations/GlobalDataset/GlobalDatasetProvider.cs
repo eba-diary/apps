@@ -4,13 +4,11 @@ using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class GlobalDatasetProvider : IGlobalDatasetProvider 
+    public class GlobalDatasetProvider : IGlobalDatasetProvider
     {
         private readonly IElasticDocumentClient _elasticDocumentClient;
         private readonly IDatasetContext _datasetContext;
@@ -24,116 +22,36 @@ namespace Sentry.data.Infrastructure
         #region Search
         public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
         {
-            //translate dto to elastic search request
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Size = 10000;
 
-            //split search terms regardless of amount of spaces between words
-            List<string> terms = filterSearchDto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            throw new NotImplementedException();
+            return elasticResult.Documents.ToList();
         }
 
-        private BoolQuery BuildTextSearchQuery(Type type, List<string> searchTerms, Expression parentExpression, ParameterExpression originParameter)
+        public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
         {
-            List<QueryContainer> queryContainers = new List<QueryContainer>();
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Size = 0;
+            searchRequest.Aggregations = null;
 
-            List<PropertyInfo> searchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchFieldAttribute>(type).ToList();
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            if (searchProperties.Any())
-            {
-                List<Expression<Func<GlobalDataset, object>>> fieldExpressions = new List<Expression<Func<GlobalDataset, object>>>();
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories(filterSearchDto.FilterCategories);
 
-                foreach (PropertyInfo property in searchProperties)
-                {
-                    Expression memberExpression = Expression.Property(parentExpression, property.Name);
-                    Expression<Func<GlobalDataset, object>> fieldExpression = Expression.Lambda<Func<GlobalDataset, object>>(memberExpression, originParameter);
-
-                    fieldExpressions.Add(fieldExpression);
-                }
-
-                Nest.Fields fields = Infer.Fields(fieldExpressions.ToArray());
-
-                foreach (Field field in fields)
-                {
-                    //this is where would check custom attribute if boost is required and append
-                    //have to get creative to get attribute from Field info and check boost value
-                    field.Boost = 2;
-                }
-
-                if (searchTerms.Count > 1)
-                {
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", searchTerms),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", searchTerms.Select(x => $"*{x}*")),
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-                }
-                else
-                {
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = searchTerms.First(),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.MostFields
-                    });
-
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = $"*{searchTerms.First()}*",
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.MostFields
-                    });
-                }
-            }
-
-            IEnumerable<PropertyInfo> nestedSearchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchNestedFieldAttribute>(type);
-
-            foreach (PropertyInfo property in nestedSearchProperties)
-            {
-                Expression fieldExpression = Expression.Property(parentExpression, property.Name);
-
-                NestedQuery nested = new NestedQuery
-                {
-                    Path = Infer.Field(property),
-                    Query = BuildTextSearchQuery(property.PropertyType, searchTerms, fieldExpression, originParameter)
-                };
-
-                queryContainers.Add(nested);
-            }
-
-            BoolQuery boolQuery = new BoolQuery();
-
-            if (queryContainers.Any())
-            {
-                boolQuery.Should = queryContainers;
-                boolQuery.MinimumShouldMatch = 1;
-            }
-            else
-            {
-                boolQuery.MinimumShouldMatch = 0;
-            }
-
-            return boolQuery;
+            return filterCategories;
         }
 
-        public Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
+        private SearchRequest<GlobalDataset> GetSearchRequest(BaseFilterSearchDto filterSearchDto)
         {
-            throw new NotImplementedException();
-        }
+            BoolQuery searchQuery = filterSearchDto.ToSearchQuery<GlobalDataset>();
 
+            return new SearchRequest<GlobalDataset>
+            {
+                Query = searchQuery
+            };
+        }
         #endregion
 
         #region Global Dataset

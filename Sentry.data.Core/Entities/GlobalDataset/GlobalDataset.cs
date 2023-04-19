@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         public int GlobalDatasetId { get; set; }
 
         [PropertyName("datasetname")]
-        [GlobalSearchField]
+        [GlobalSearchField(2)]
         public string DatasetName { get; set; }
 
         [PropertyName("datasetsaidassetcode")]
