@@ -757,7 +757,7 @@ BEGIN TRAN
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'sql.updateDatasetFileRaw', 'UPDATE DatasetFileRaw SET ObjectStatus = {ObjectStatus}, ObjectVersionID = {ObjectVersionID}, ObjectETag = {ObjectETag}, ObjectSizeAMT = {ObjectSizeAMT}, UpdateDTM = GETDATE() WHERE DatasetFileRawID = {DatasetFileRawID};' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'sql.readDatasetFileQuery', 'SELECT DatasetFileDrop.ObjectBucket AS [SourceBucket], DatasetFileDrop.ObjectKey AS [SourceKey], DatasetFileDrop.ObjectVersionID AS [SourceVersionID], DatasetFileQuery.ObjectBucket AS [TargetBucket], DatasetFileQuery.ObjectKey AS [TargetKey], DatasetFileQuery.DatasetFileQueryID AS [DatasetFileQueryID] FROM DatasetFileQuery LEFT JOIN DatasetFileDrop ON DatasetFileQuery.DatasetFileDropID = DatasetFileDrop.DatasetFileDropID LEFT JOIN Dataset ON DatasetFileQuery.DatasetID = Dataset.Dataset_ID WHERE DatasetFileQuery.ObjectStatus = 6 and Dataset.NamedEnvironmentType = ''Prod'';' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'sql.updateDatasetFileQuery', 'UPDATE DatasetFileQuery SET ObjectStatus = {ObjectStatus}, ObjectVersionID = {ObjectVersionID}, ObjectETag = {ObjectETag}, ObjectSizeAMT = {ObjectSizeAMT}, UpdateDTM = GETDATE() WHERE DatasetFileQueryID = {DatasetFileQueryID};' ),
-			( 'FILECOPYBATCHHANDLER', 'PROD', 'executorservice.parallelism', '10' ),
+			( 'FILECOPYBATCHHANDLER', 'PROD', 'executorservice.parallelism', '50' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'ld.sdk', 'sdk-2c8a53e0-46a8-4b37-9753-418de81db1a2' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'ld.proxy.address', 'app-proxy-prod.sentry.com' ),
 			( 'FILECOPYBATCHHANDLER', 'PROD', 'ld.proxy.port', '8080' ), 
