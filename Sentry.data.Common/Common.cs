@@ -16,6 +16,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Logging;
 
 namespace Sentry.data.Common
 {
@@ -264,6 +265,7 @@ namespace Sentry.data.Common
                 IDatasetContext _dscontext = _container.GetInstance<IDatasetContext>();
                 IRequestContext _requestContext = _container.GetInstance<IRequestContext>();
                 IMessagePublisher _publisher = _container.GetInstance<IMessagePublisher>();
+                ILogger _logger = _container.GetInstance<ILogger>();
 
                 DateTime startTime = DateTime.Now;
 
@@ -391,7 +393,7 @@ namespace Sentry.data.Common
 
                     latestSchemaRevision = job.DatasetConfig.GetLatestSchemaRevision();
                     //Should this file be loaded into this config
-                    if (!job.FilterIncomingFile(filename))
+                    if (!job.FilterIncomingFile(_logger, filename))
                     {
                         //Remove ProcessedFilePrefix from file name
                         var newFileName = filename.Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"), "");
@@ -548,7 +550,7 @@ namespace Sentry.data.Common
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
+                                job.JobLoggerMessage(_logger, "ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
                             }
 
                             Event f = new Event()
@@ -648,7 +650,7 @@ namespace Sentry.data.Common
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
+                                job.JobLoggerMessage(_logger, "ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
                             }
 
                             Event f = new Event()

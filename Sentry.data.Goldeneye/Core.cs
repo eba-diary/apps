@@ -1,10 +1,8 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
-using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
-using Sentry.EnterpriseLogging;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -103,7 +101,6 @@ namespace Sentry.data.Goldeneye
         {
             _logger.LogInformation("Worker task started.");
 
-            InitializeApp();
             //Start all the internal processes.
 
             //Get or Create the Runtime Configuration
@@ -156,36 +153,6 @@ namespace Sentry.data.Goldeneye
             _logger.LogInformation("Worker task stopped.");
         }
 
-        private static void InitializeApp()
-        {
-            //Initialize the Bootstrapper
-            //Bootstrapper.Init();
-
-            //var registry = new StructureMap.Registry();
-
-            //var loggerFactory = new SentryLoggerFactory(new Microsoft.Extensions.Logging.LoggerFactory());
-            //var log4netOptions = new Log4NetProviderOptions();
-            //if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
-            //{
-            //    log4netOptions.Log4NetConfigFileName = "log4net.local.config";
-            //}
-            //else
-            //{
-            //    log4netOptions.Log4NetConfigFileName = "log4net.server.config";
-            //}
-
-            //loggerFactory.AddLog4Net(log4netOptions);
-
-            ////adding ThreadCurrentUserIdProvider similar to how Web app adds this to context.
-            //Bootstrapper.Container.Configure((x) =>
-            //{
-            //    x.AddRegistry(registry);
-            //    x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
-            //    //x.For<ILoggerFactory>().Singleton().Use(loggerFactory);
-            //    //x.For(typeof(ILogger<>)).Singleton().Use(typeof(Logger<>));
-            //});
-        }
-
         private void RunMinutelyProcessing()
         {
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
@@ -200,7 +167,7 @@ namespace Sentry.data.Goldeneye
                 {
                     // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
                     RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                    Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
+                    Job.JobLoggerMessage(_logger, "Info", "Job update detected, performing AddOrUpdate to Hangfire");
                 }
 
 
@@ -233,7 +200,7 @@ namespace Sentry.data.Goldeneye
                 {
                     // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
                     RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                    Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
+                    Job.JobLoggerMessage(_logger,"Info", "Job update detected, performing RemoveIfExists from Hangfire");
                 }
 
                 _config.LastRunMinute = DateTime.Now;
@@ -280,11 +247,11 @@ namespace Sentry.data.Goldeneye
                     {
                         // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
                         RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                        Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
+                        Job.JobLoggerMessage(_logger, "Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
                     }
                     catch (Exception ex)
                     {
-                        Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
+                        Job.JobLoggerMessage(_logger, "Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
                     }
                 }
 
@@ -296,11 +263,11 @@ namespace Sentry.data.Goldeneye
                     try
                     {
                         RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                        Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
+                        Job.JobLoggerMessage(_logger, "Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
                     }
                     catch (Exception ex)
                     {
-                        Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
+                        Job.JobLoggerMessage(_logger, "Error", "Failed to remove disabled job on Goldeneye initialization", ex);
                     }
                 }
             }
@@ -312,13 +279,9 @@ namespace Sentry.data.Goldeneye
             //Schecule SpamFactory:Instance to run every minute
             // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
 
-            //RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
             RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_instant", x => x.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            //RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
             RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_hourly", x => x.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            //RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
             RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_daily", x => x.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-            //RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
             RecurringJob.AddOrUpdate<SpamFactory>("spamfactory_weekly", x => x.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
             //Schedule Livy Job state monitor to run every minute
@@ -330,7 +293,7 @@ namespace Sentry.data.Goldeneye
             RecurringJob.AddOrUpdate<InevService>("DBA_Inev_Consumer", x => x.CheckDbaPortalEvents(), Config.GetHostSetting("InevDBAConsumerMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
             
             //Schedule WallEService every day at midnight
-            RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+            RecurringJob.AddOrUpdate<WallEService>("WallEService", x => x.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
         }
 
         private void InitializeHangFireServer()

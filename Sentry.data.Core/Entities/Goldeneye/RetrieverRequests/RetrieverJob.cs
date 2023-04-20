@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Sentry.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
@@ -225,7 +226,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="fileName">File name including extension</param>
         /// <returns></returns>
-        public virtual Boolean FilterIncomingFile(string fileName)
+        public virtual Boolean FilterIncomingFile(ILogger logger, string fileName)
         {
             var filterfile = false;
             //if there are no options, then no filtering can take place
@@ -234,13 +235,13 @@ namespace Sentry.data.Core
                 filterfile = JobOptions.IsRegexSearch ? !(Regex.IsMatch(fileName, JobOptions.SearchCriteria)) : fileName != JobOptions.SearchCriteria;
 
                 if (filterfile) 
-                { this.JobLoggerMessage("Info","Incoming file was filtered (search criteria)"); }
+                { this.JobLoggerMessage(logger, "Info", "Incoming file was filtered (search criteria)"); }
             }                  
 
             return filterfile;
         }
 
-        public virtual void JobLoggerMessage(string severity, string message, Exception ex = null)
+        public virtual void JobLoggerMessage(ILogger logger, string severity, string message, Exception ex = null)
         {
             string jobSpecifics = this.DataFlow == null
                 ? $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}"
@@ -249,22 +250,22 @@ namespace Sentry.data.Core
             switch (severity.ToUpper())
             {
                 case "DEBUG":
-                    Sentry.Common.Logging.Logger.Debug($"{message} - {jobSpecifics}");
+                    logger.LogDebug($"{message} - {jobSpecifics}");
                     break;
                 case "INFO":
-                    Sentry.Common.Logging.Logger.Info($"{message} - {jobSpecifics}");
+                    logger.LogInformation($"{message} - {jobSpecifics}");
                     break;
                 case "WARN":
                     if (ex == null) 
-                    { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}"); }
+                    { logger.LogWarning($"{message} - {jobSpecifics}"); }
                     else 
-                    { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}", ex); }
+                    { logger.LogWarning($"{message} - {jobSpecifics}", ex); }
                     break;
                 case "ERROR":
                     if (ex == null) 
-                    { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}"); }
+                    { logger.LogError($"{message} - {jobSpecifics}"); }
                     else 
-                    { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}", ex); }
+                    { logger.LogError(ex, $"{message} - {jobSpecifics}"); }
                     break;
                 default:
                     break;

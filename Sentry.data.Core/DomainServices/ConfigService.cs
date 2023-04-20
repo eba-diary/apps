@@ -134,16 +134,6 @@ namespace Sentry.data.Core
                         errors.Add("A valid FTP URI starts with ftp:// (i.e. ftp://foo.bar.com/base/dir)");
                     }
                     break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    if (dto.OriginatingId == 0 && _datasetContext.DataSources.Where(w => w is SFtpSource && w.Name == dto.Name).Count() > 0)
-                    {
-                        errors.Add("An SFTP Data Source is already exists with this name.");
-                    }
-                    if (!(dto.BaseUri.ToString().StartsWith("sftp://")))
-                    {
-                        errors.Add("A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)");
-                    }
-                    break;
                 case DataSourceDiscriminator.HTTPS_SOURCE:
                     if (dto.OriginatingId == 0 && _datasetContext.DataSources.Where(w => w is HTTPSSource && w.Name == dto.Name).Count() > 0)
                     {
@@ -1383,9 +1373,6 @@ namespace Sentry.data.Core
                     break;
                 case DataSourceDiscriminator.FTP_SOURCE:
                     source = new FtpSource();
-                    break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    source = new SFtpSource();
                     break;
                 case DataSourceDiscriminator.HTTPS_SOURCE:
                     source = new HTTPSSource()

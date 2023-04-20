@@ -408,9 +408,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="WinSCPnet, Version=1.12.0.12858, Culture=neutral, PublicKeyToken=2271ec4a3c56d0bf, processorArchitecture=MSIL">
-      <HintPath>..\packages\WinSCP.5.21.5\lib\net40\WinSCPnet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
@@ -636,7 +633,6 @@
     <Compile Include="ServiceImplementations\ObsidianService.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobService.cs" />
-    <Compile Include="ServiceImplementations\SftpProvider.cs" />
     <Compile Include="ServiceImplementations\TableauProvider.cs" />
     <Compile Include="ServiceImplementations\BOProvider.cs" />
     <Compile Include="ServiceImplementations\CLPFactory.cs" />
@@ -716,10 +712,8 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\WinSCP.5.21.5\build\WinSCP.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinSCP.5.21.5\build\WinSCP.targets'))" />
     <Error Condition="!Exists('..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props'))" />
   </Target>
-  <Import Project="..\packages\WinSCP.5.21.5\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.21.5\build\WinSCP.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

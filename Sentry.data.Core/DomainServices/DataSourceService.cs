@@ -46,7 +46,6 @@ namespace Sentry.data.Core
             List<string> dropdownTypes = new List<string>
             {
                 DataSourceDiscriminator.FTP_SOURCE,
-                DataSourceDiscriminator.SFTP_SOURCE,
                 DataSourceDiscriminator.DFS_CUSTOM,
                 DataSourceDiscriminator.HTTPS_SOURCE,
                 DataSourceDiscriminator.GOOGLE_API_SOURCE,
@@ -68,9 +67,6 @@ namespace Sentry.data.Core
             {
                 case DataSourceDiscriminator.FTP_SOURCE:
                     validAuthTypes = new FtpSource().ValidAuthTypes;
-                    break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    validAuthTypes = new SFtpSource().ValidAuthTypes;
                     break;
                 case DataSourceDiscriminator.DFS_CUSTOM:
                     validAuthTypes = new DfsCustom().ValidAuthTypes;

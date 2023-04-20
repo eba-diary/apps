@@ -783,7 +783,6 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\TokenAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\HTTPSSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\BasicAuthentication.cs" />
-    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\SFTPSource.cs" />
     <Compile Include="Entities\Livy\HiveColumn.cs" />
     <Compile Include="Entities\Livy\LivyReply.cs" />
     <Compile Include="Entities\Livy\LivySession.cs" />
