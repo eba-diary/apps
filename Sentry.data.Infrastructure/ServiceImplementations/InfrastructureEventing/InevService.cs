@@ -143,35 +143,42 @@ namespace Sentry.data.Infrastructure
             if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
             {
                 var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
-                if (sourceTicket != null)
+                if (sourceTicket != null && ShouldUpdateStatus(sourceTicket.TicketStatus, ChangeTicketStatus.DbaTicketAdded))
                 {
                     message.Details.TryGetValue("RequestID", out string dbaRequestId);
                     sourceTicket.ExternalRequestId = dbaRequestId;
-                    sourceTicket.TicketStatus = GlobalConstants.ChangeTicketStatus.DbaTicketAdded;
+                    sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketAdded;
                 }
             }
         }
         
         private void ProcessDbaApprovedEvent(Message message)
         {
-            if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
+            if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
             {
-                var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
-                if (sourceTicket != null)
+                var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
+                if (sourceTicket != null && ShouldUpdateStatus(sourceTicket.TicketStatus, ChangeTicketStatus.DbaTicketApproved))
                 {
-                    sourceTicket.TicketStatus = GlobalConstants.ChangeTicketStatus.DbaTicketApproved;
+                    message.Details.TryGetValue("RequestID", out string dbaRequestId);
+                    sourceTicket.ExternalRequestId = dbaRequestId;
+                    sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketApproved;
                 }
             }
         }
         
         private void ProcessDbaCompletedEvent(Message message)
         {
-            if (message.Details.TryGetValue("RequestID", out string dbaRequestId))
+            if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
             {
-                var sourceTicket = GetSecurityTicketForDbaRequestId(dbaRequestId);
+                var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
                 if (sourceTicket != null)
                 {
-                    sourceTicket.TicketStatus = GlobalConstants.ChangeTicketStatus.DbaTicketComplete;
+                    //no need to check if we can change this, we can skip to complete.
+                    sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketComplete;
+
+                    message.Details.TryGetValue("RequestID", out string dbaRequestId);
+                    sourceTicket.ExternalRequestId = dbaRequestId;
+
                     if (sourceTicket.IsAddingPermission)
                     {
                         sourceTicket.AddedPermissions.ToList().ForEach(x =>
@@ -191,6 +198,24 @@ namespace Sentry.data.Infrastructure
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Decides whether the status change is needed. Assumes new status will be either added, approved, or completed.
+        /// </summary>
+        /// <param name="oldStatus"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
+        private bool ShouldUpdateStatus(string oldStatus, string newStatus)
+        {
+            if(oldStatus == ChangeTicketStatus.COMPLETED || oldStatus == ChangeTicketStatus.DbaTicketComplete) //never move the ticket back
+            {
+                return false;
+            }
+            if(oldStatus == ChangeTicketStatus.DbaTicketApproved && newStatus == ChangeTicketStatus.DbaTicketAdded)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
