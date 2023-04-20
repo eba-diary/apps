@@ -37,8 +37,8 @@ namespace Sentry.data.Core
         public List<string> FavoriteUserIds { get; set; }
 
         [PropertyName("environmentschemas")]
-        [GlobalSearchNestedField]
-        [FilterSearchNestedField]
+        [GlobalSearchField]
+        [FilterSearchField]
         public List<EnvironmentSchema> EnvironmentSchemas { get; set; }
     }
 }

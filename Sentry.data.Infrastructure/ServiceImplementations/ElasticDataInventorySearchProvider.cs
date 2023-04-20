@@ -25,7 +25,9 @@ namespace Sentry.data.Infrastructure
         {
             DataInventorySearchResultDto resultDto = new DataInventorySearchResultDto();
 
-            SearchRequest<DataInventory> searchRequest = BuildTextSearchRequest(dto, 1000);
+            //SearchRequest<DataInventory> searchRequest = BuildTextSearchRequest(dto, 1000);
+            SearchRequest<DataInventory> searchRequest = GetSearchRequest(dto);
+            searchRequest.Size = 1000;
             searchRequest.TrackTotalHits = true;
 
             ElasticResult<DataInventory> result = GetElasticResult(dto, resultDto, searchRequest);
@@ -41,25 +43,29 @@ namespace Sentry.data.Infrastructure
 
         public FilterSearchDto GetSearchFilters(FilterSearchDto dto)
         {           
-            SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
-            request.Aggregations = NestHelper.GetFilterAggregations<DataInventory>();
+            //SearchRequest<DataInventory> request = BuildTextSearchRequest(dto, 0);
+            SearchRequest<DataInventory> searchRequest = GetSearchRequest(dto);
+            searchRequest.Aggregations = NestHelper.GetFilterAggregations<DataInventory>();
+            searchRequest.Size = 0;
 
             //get aggregation results
             FilterSearchDto resultDto = new FilterSearchDto();
 
             try
             {
-                ElasticResult<DataInventory> elasticResult = _context.SearchAsync(request).Result;
+                ElasticResult<DataInventory> elasticResult = _context.SearchAsync(searchRequest).Result;
+
+                resultDto.FilterCategories = elasticResult.Aggregations.ToFilterCategories(dto.FilterCategories);
 
                 //translate results to dto
-                foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
-                {
-                    TermsAggregate<string> categoryResults = elasticResult.Aggregations?.Terms(categoryName);
-                    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
-                    {
-                        resultDto.FilterCategories.Add(BuildFilterCategoryDto(categoryResults.Buckets, categoryName, dto.FilterCategories));
-                    }
-                }
+                //foreach (string categoryName in request.Aggregations.Select(x => x.Key).ToList())
+                //{
+                //    TermsAggregate<string> categoryResults = elasticResult.Aggregations?.Terms(categoryName);
+                //    if (categoryResults?.Buckets?.Any() == true && categoryResults.SumOtherDocCount.HasValue && categoryResults.SumOtherDocCount == 0)
+                //    {
+                //        resultDto.FilterCategories.Add(BuildFilterCategoryDto(categoryResults.Buckets, categoryName, dto.FilterCategories));
+                //    }
+                //}
             }
             catch (AggregateException ex)
             {
@@ -87,8 +93,11 @@ namespace Sentry.data.Infrastructure
                 must.AddMatch<DataInventory>(x => x.DatabaseName, dto.SearchText);
             }
 
-            BoolQuery boolQuery = GetBaseBoolQuery();
-            boolQuery.Must = must;
+            BoolQuery boolQuery = new BoolQuery
+            {
+                Must = must,
+                MustNot = BuildMustNotQuery()
+            };
 
             SearchRequest<DataInventory> request = new SearchRequest<DataInventory>()
             {
@@ -114,16 +123,24 @@ namespace Sentry.data.Infrastructure
                 }
             };
 
-            Task<ElasticResult<DataInventory>> allCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(GetBaseBoolQuery()));
+            BoolQuery mustNotOnly = new BoolQuery
+            {
+                MustNot = BuildMustNotQuery()
+            };
+
+            Task<ElasticResult<DataInventory>> allCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(mustNotOnly));
 
             List<QueryContainer> filters = new List<QueryContainer>();
             filters.AddMatch<DataInventory>(x => x.AssetCode, search);
             filters.AddMatch<DataInventory>(x => x.IsSensitive, "true");
 
-            BoolQuery boolQuery = GetBaseBoolQuery();
-            boolQuery.Filter = filters;
+            BoolQuery mustNotAndFilters = new BoolQuery
+            {
+                Filter = filters,
+                MustNot = BuildMustNotQuery()
+            };
 
-            Task<ElasticResult<DataInventory>> assetCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(boolQuery));
+            Task<ElasticResult<DataInventory>> assetCategoriesTask = _context.SearchAsync(GetBaseSaidListRequest(mustNotAndFilters));
 
             try
             {
@@ -215,90 +232,112 @@ namespace Sentry.data.Infrastructure
             return new ElasticResult<DataInventory>();
         }
 
-        private SearchRequest<DataInventory> BuildTextSearchRequest(FilterSearchDto dto, int size)
+        private SearchRequest<DataInventory> GetSearchRequest(FilterSearchDto dto)
         {
-            BoolQuery boolQuery = GetBaseBoolQuery();
+            BoolQuery searchQuery = dto.ToSearchQuery<DataInventory>();
+            searchQuery.MustNot = BuildMustNotQuery();
 
-            if (!string.IsNullOrWhiteSpace(dto.SearchText))
+            return new SearchRequest<DataInventory>
             {
-                //broad search for criteria across all searchable fields
-                Nest.Fields fields = NestHelper.GetSearchFields<DataInventory>();
-
-                //split search terms regardless of amount of spaces between words
-                List<string> terms = dto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-
-                //perform cross field search when multiple words in search criteria
-                if (terms.Count > 1)
-                {
-                    boolQuery.Should = new List<QueryContainer>() 
-                    {
-                        new QueryStringQuery()
-                        {
-                            Query = string.Join(" ", terms),
-                            Fields = fields,
-                            Fuzziness = Fuzziness.Auto,
-                            Type = TextQueryType.CrossFields,
-                            DefaultOperator = Operator.And
-                        },
-                        new QueryStringQuery()
-                        {
-                            Query = string.Join(" ", terms.Select(x => $"*{x}*")),
-                            Fields = fields,
-                            AnalyzeWildcard = true,
-                            Type = TextQueryType.CrossFields,
-                            DefaultOperator = Operator.And
-                        }
-                    };
-                }
-                else
-                {
-                    boolQuery.Should = new List<QueryContainer>()
-                    {
-                        new QueryStringQuery()
-                        {
-                            Query = terms.First(),
-                            Fields = fields,
-                            Fuzziness = Fuzziness.Auto,
-                            Type = TextQueryType.MostFields
-                        },
-                        new QueryStringQuery()
-                        {
-                            Query = $"*{terms.First()}*",
-                            Fields = fields,
-                            AnalyzeWildcard = true,
-                            Type = TextQueryType.MostFields
-                        }
-                    };
-                }
-
-                boolQuery.MinimumShouldMatch = boolQuery.Should.Any() ? 1 : 0;
-            }
-
-            List<QueryContainer> filter = new List<QueryContainer>();
-
-            foreach (FilterCategoryDto category in dto.FilterCategories)
-            {
-                filter.Add(new TermsQuery()
-                {
-                    Field = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName),
-                    Terms = category.GetSelectedValues()
-                });
-            }
-
-            boolQuery.Filter = filter;
-
-            return new SearchRequest<DataInventory>()
-            {
-                Size = size,
-                Query = boolQuery
+                Query = searchQuery
             };
         }
 
-        private BoolQuery GetBaseBoolQuery()
+        //private SearchRequest<DataInventory> BuildTextSearchRequest(FilterSearchDto dto, int size)
+        //{
+        //    BoolQuery boolQuery = GetBaseBoolQuery();
+
+        //    if (!string.IsNullOrWhiteSpace(dto.SearchText))
+        //    {
+        //        //broad search for criteria across all searchable fields
+        //        Nest.Fields fields = NestHelper.GetSearchFields<DataInventory>();
+
+        //        //split search terms regardless of amount of spaces between words
+        //        List<string> terms = dto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+        //        //perform cross field search when multiple words in search criteria
+        //        if (terms.Count > 1)
+        //        {
+        //            boolQuery.Should = new List<QueryContainer>() 
+        //            {
+        //                new QueryStringQuery()
+        //                {
+        //                    Query = string.Join(" ", terms),
+        //                    Fields = fields,
+        //                    Fuzziness = Fuzziness.Auto,
+        //                    Type = TextQueryType.CrossFields,
+        //                    DefaultOperator = Operator.And
+        //                },
+        //                new QueryStringQuery()
+        //                {
+        //                    Query = string.Join(" ", terms.Select(x => $"*{x}*")),
+        //                    Fields = fields,
+        //                    AnalyzeWildcard = true,
+        //                    Type = TextQueryType.CrossFields,
+        //                    DefaultOperator = Operator.And
+        //                }
+        //            };
+        //        }
+        //        else
+        //        {
+        //            boolQuery.Should = new List<QueryContainer>()
+        //            {
+        //                new QueryStringQuery()
+        //                {
+        //                    Query = terms.First(),
+        //                    Fields = fields,
+        //                    Fuzziness = Fuzziness.Auto,
+        //                    Type = TextQueryType.MostFields
+        //                },
+        //                new QueryStringQuery()
+        //                {
+        //                    Query = $"*{terms.First()}*",
+        //                    Fields = fields,
+        //                    AnalyzeWildcard = true,
+        //                    Type = TextQueryType.MostFields
+        //                }
+        //            };
+        //        }
+
+        //        boolQuery.MinimumShouldMatch = boolQuery.Should.Any() ? 1 : 0;
+        //    }
+
+        //    List<QueryContainer> filter = new List<QueryContainer>();
+
+        //    foreach (FilterCategoryDto category in dto.FilterCategories)
+        //    {
+        //        filter.Add(new TermsQuery()
+        //        {
+        //            Field = NestHelper.GetFilterCategoryField<DataInventory>(category.CategoryName),
+        //            Terms = category.GetSelectedValues()
+        //        });
+        //    }
+
+        //    boolQuery.Filter = filter;
+
+        //    return new SearchRequest<DataInventory>()
+        //    {
+        //        Size = size,
+        //        Query = boolQuery
+        //    };
+        //}
+
+        //private BoolQuery GetBaseBoolQuery()
+        //{
+        //    return new BoolQuery()
+        //    {
+        //        MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } }
+        //    };
+        //}
+
+        private List<QueryContainer> BuildMustNotQuery()
         {
-            return new BoolQuery()
+            return new List<QueryContainer>()
             {
-                MustNot = new List<QueryContainer>() { new ExistsQuery() { Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime) } }
+                new ExistsQuery()
+                {
+                    Field = Infer.Field<DataInventory>(x => x.ExpirationDateTime)
+                }
             };
         }
 
@@ -328,31 +367,31 @@ namespace Sentry.data.Infrastructure
             return agg.Buckets.SelectMany(x => x.Key.Split(',').Select(s => s.Trim())).Distinct().ToList();
         }
 
-        private FilterCategoryDto BuildFilterCategoryDto(IReadOnlyCollection<KeyedBucket<string>> buckets, string categoryName, List<FilterCategoryDto> requestFilters)
-        {
-            FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
+        //private FilterCategoryDto BuildFilterCategoryDto(IReadOnlyCollection<KeyedBucket<string>> buckets, string categoryName, List<FilterCategoryDto> requestFilters)
+        //{
+        //    FilterCategoryDto categoryDto = new FilterCategoryDto() { CategoryName = categoryName };
 
-            List<FilterCategoryOptionDto> previousCategoryOptions = requestFilters?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions;
+        //    List<FilterCategoryOptionDto> previousCategoryOptions = requestFilters?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions;
 
-            foreach (var bucket in buckets)
-            {
-                string bucketKey = bucket.KeyAsString ?? bucket.Key;
-                categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
-                {
-                    OptionValue = bucketKey,
-                    ResultCount = bucket.DocCount.GetValueOrDefault(),
-                    ParentCategoryName = categoryName,
-                    Selected = previousCategoryOptions.HasSelectedValueOf(bucketKey)
-                });
-            }
+        //    foreach (var bucket in buckets)
+        //    {
+        //        string bucketKey = bucket.KeyAsString ?? bucket.Key;
+        //        categoryDto.CategoryOptions.Add(new FilterCategoryOptionDto()
+        //        {
+        //            OptionValue = bucketKey,
+        //            ResultCount = bucket.DocCount.GetValueOrDefault(),
+        //            ParentCategoryName = categoryName,
+        //            Selected = previousCategoryOptions.HasSelectedValueOf(bucketKey)
+        //        });
+        //    }
 
-            if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
-            {
-                categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
-            }
+        //    if (previousCategoryOptions.TryGetSelectedOptionsWithNoResults(categoryDto.CategoryOptions, out List<FilterCategoryOptionDto> selectedOptionsWithNoResults))
+        //    {
+        //        categoryDto.CategoryOptions.AddRange(selectedOptionsWithNoResults);
+        //    }
 
-            return categoryDto;
-        }
+        //    return categoryDto;
+        //}
         #endregion
     }
 }

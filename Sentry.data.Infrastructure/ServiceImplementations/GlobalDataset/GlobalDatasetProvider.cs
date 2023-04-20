@@ -1,7 +1,6 @@
 ﻿using Nest;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,24 +32,14 @@ namespace Sentry.data.Infrastructure
         public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
         {
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
             searchRequest.Size = 0;
-            searchRequest.Aggregations = null;
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
             List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories(filterSearchDto.FilterCategories);
 
             return filterCategories;
-        }
-
-        private SearchRequest<GlobalDataset> GetSearchRequest(BaseFilterSearchDto filterSearchDto)
-        {
-            BoolQuery searchQuery = filterSearchDto.ToSearchQuery<GlobalDataset>();
-
-            return new SearchRequest<GlobalDataset>
-            {
-                Query = searchQuery
-            };
         }
         #endregion
 
@@ -235,6 +224,16 @@ namespace Sentry.data.Infrastructure
             }
 
             return getByResult;
+        }
+
+        private SearchRequest<GlobalDataset> GetSearchRequest(BaseFilterSearchDto filterSearchDto)
+        {
+            BoolQuery searchQuery = filterSearchDto.ToSearchQuery<GlobalDataset>();
+
+            return new SearchRequest<GlobalDataset>
+            {
+                Query = searchQuery
+            };
         }
         #endregion
     }

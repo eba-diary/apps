@@ -177,8 +177,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\FilterSearchFieldAttribute.cs" />
-    <Compile Include="Attributes\FilterSearchNestedFieldAttribute.cs" />
-    <Compile Include="Attributes\GlobalSearchNestedFieldAttribute.cs" />
     <Compile Include="Attributes\GlobalSearchFieldAttribute.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
     <Compile Include="DomainServices\MigrationService.cs" />

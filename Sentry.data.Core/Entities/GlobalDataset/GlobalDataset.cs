@@ -18,8 +18,8 @@ namespace Sentry.data.Core
         public string DatasetSaidAssetCode { get; set; }
 
         [PropertyName("environmentdatasets")]
-        [GlobalSearchNestedField]
-        [FilterSearchNestedField]
+        [GlobalSearchField]
+        [FilterSearchField]
         public List<EnvironmentDataset> EnvironmentDatasets { get; set; }
     }
 }

@@ -17,5 +17,10 @@ namespace Sentry.data.Core
             DefaultOpen = defaultOpen;
             HideResultCounts = hideResultCounts;
         }
+
+        public FilterSearchFieldAttribute()
+        {
+            //for use by nested object parent
+        }
     }
 }

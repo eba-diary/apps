@@ -1,43 +1,20 @@
 ﻿using Nest;
-using Sentry.data.Core.Entities.S3;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Windows.Forms;
 
 namespace Sentry.data.Core
 {
     public static class NestHelper
     {
-        public static Nest.Fields GetSearchFields<T>()
-        {
-            return Infer.Fields(CustomAttributeHelper.GetPropertiesWithAttribute<T, GlobalSearchFieldAttribute>().ToArray());
-        }
+        //public static Nest.Fields GetSearchFields<T>()
+        //{
+        //    return Infer.Fields(CustomAttributeHelper.GetPropertiesWithAttribute<T, GlobalSearchFieldAttribute>().ToArray());
+        //}
 
-        public static AggregationDictionary GetFilterAggregations<T>() where T : class
-        {
-            AggregationDictionary aggregations = new AggregationDictionary();
-
-            foreach (PropertyInfo property in CustomAttributeHelper.GetPropertiesWithAttribute<T, FilterSearchFieldAttribute>())
-            {
-                FilterSearchFieldAttribute filterAttribute = property.GetCustomAttribute<FilterSearchFieldAttribute>();
-
-                TermsAggregation termsAggregation = new TermsAggregation(filterAttribute.FilterCategoryName)
-                {
-                    Field = GetFilterCategoryField<T>(property),
-                    Size = filterAttribute.IsPinnedFilter ? 10000 : 15
-                };
-
-                aggregations.Add(filterAttribute.FilterCategoryName, termsAggregation);
-            }
-
-            return aggregations;
-        }
-
-        //public static AggregationDictionary GetFilterAggregations2<T>() where T : class
+        //public static AggregationDictionary GetFilterAggregations<T>() where T : class
         //{
         //    AggregationDictionary aggregations = new AggregationDictionary();
 
@@ -57,34 +34,46 @@ namespace Sentry.data.Core
         //    return aggregations;
         //}
 
-        public static Field GetFilterCategoryField<T>(string categoryName) where T : class
+        //public static Field GetFilterCategoryField<T>(string categoryName) where T : class
+        //{
+        //    if (CustomAttributeHelper.TryGetFilterSearchFieldProperty<T>(categoryName, out PropertyInfo property))
+        //    {
+        //        return GetFilterCategoryField<T>(property);
+        //    }
+
+        //    throw new InvalidOperationException($"Filter category name: {categoryName} does not match any category names registered to type of: {typeof(T).Name}");
+        //}
+
+        public static AggregationDictionary GetFilterAggregations<T>() where T : class
         {
-            if (CustomAttributeHelper.TryGetFilterSearchFieldProperty<T>(categoryName, out PropertyInfo property))
+            AggregationDictionary aggregations = new AggregationDictionary();
+
+            List<KeyValuePair<string, TermsAggregation>> termsAggregations = GetAllByAttribute<KeyValuePair<string, TermsAggregation>, FilterSearchFieldAttribute>(typeof(T), null, BuildAggregation);
+
+            foreach (var termsAggregation in termsAggregations)
             {
-                return GetFilterCategoryField<T>(property);
+                aggregations.Add(termsAggregation.Key, termsAggregation.Value);
             }
 
-            throw new InvalidOperationException($"Filter category name: {categoryName} does not match any category names registered to type of: {typeof(T).Name}");
+            return aggregations;
         }
 
         public static BoolQuery ToSearchQuery<T>(this BaseFilterSearchDto filterSearchDto) where T : class
         {
             BoolQuery searchQuery = new BoolQuery();
 
-            ParameterExpression originExpression = Expression.Parameter(typeof(T));
-
             if (!string.IsNullOrWhiteSpace(filterSearchDto.SearchText))
             {
                 //split search terms regardless of amount of spaces between words
                 List<string> terms = filterSearchDto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-                searchQuery.Should = BuildShouldQuery<T>(typeof(T), terms, originExpression, originExpression);
+                searchQuery.Should = GetShouldQueries<T>(terms);
                 searchQuery.MinimumShouldMatch = searchQuery.Should.Any() ? 1 : 0;
             }
 
             if (filterSearchDto.FilterCategories?.Any() == true)
             {
-                searchQuery.Filter = BuildFilterQuery<T>(typeof(T), filterSearchDto.FilterCategories, originExpression, originExpression);
+                searchQuery.Filter = GetAllByAttribute<QueryContainer, FilterSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => GetFilterTermsQuery(prop, field, attr, filterSearchDto.FilterCategories));
             }
 
             return searchQuery;
@@ -133,154 +122,274 @@ namespace Sentry.data.Core
         }
 
         #region Private
-        private static List<QueryContainer> BuildFilterQuery<T>(Type type, List<FilterCategoryDto> filterCategories, Expression parentExpression, ParameterExpression originParameter) where T : class
+        private static QueryContainer GetFilterTermsQuery(PropertyInfo property, string fieldName, FilterSearchFieldAttribute filterAttribute, List<FilterCategoryDto> filterCategories)
+        {
+            string categoryName = filterAttribute.FilterCategoryName;
+            FilterCategoryDto filterCategory = filterCategories.FirstOrDefault(x => x.CategoryName == categoryName);
+
+            if (filterCategory != null)
+            {
+                if (property.PropertyType == typeof(string))
+                {
+                    fieldName = $"{fieldName}.keyword";
+                }
+
+                return new TermsQuery
+                {
+                    Field = fieldName,
+                    Terms = filterCategory.GetSelectedValues()
+                };
+            }
+
+            return null;
+        }
+
+        private static List<QueryContainer> GetShouldQueries<T>(List<string> searchTerms)
         {
             List<QueryContainer> queryContainers = new List<QueryContainer>();
 
-            List<PropertyInfo> filterProperties = CustomAttributeHelper.GetPropertiesWithAttribute<FilterSearchFieldAttribute>(type).ToList();
+            List<string> searchFields = GetAllByAttribute<string, GlobalSearchFieldAttribute>(typeof(T), null, GetSearchField);
 
-            foreach (PropertyInfo property in filterProperties)
+            Nest.Fields fields = Infer.Fields(searchFields.ToArray());
+
+            if (searchTerms.Count > 1)
             {
-                string categoryName = property.GetCustomAttribute<FilterSearchFieldAttribute>().FilterCategoryName;
-                FilterCategoryDto filterCategory = filterCategories.FirstOrDefault(x => x.CategoryName == categoryName);
-
-                if (filterCategory != null)
+                queryContainers.Add(new QueryStringQuery()
                 {
-                    Expression memberExpression = Expression.Property(parentExpression, property.Name);
-                    Expression<Func<T, object>> fieldExpression = Expression.Lambda<Func<T, object>>(memberExpression, originParameter);
+                    Query = string.Join(" ", searchTerms),
+                    Fields = fields,
+                    Fuzziness = Fuzziness.Auto,
+                    Type = TextQueryType.CrossFields,
+                    DefaultOperator = Operator.And
+                });
 
-                    if (property.PropertyType == typeof(string))
-                    {
-                        fieldExpression = fieldExpression.AppendSuffix("keyword");
-                    }
-
-                    queryContainers.Add(new TermsQuery
-                    {
-                        Field = fieldExpression,
-                        Terms = filterCategory.GetSelectedValues()
-                    });
-                }
+                queryContainers.Add(new QueryStringQuery()
+                {
+                    Query = string.Join(" ", searchTerms.Select(x => $"*{x}*")),
+                    Fields = fields,
+                    AnalyzeWildcard = true,
+                    Type = TextQueryType.CrossFields,
+                    DefaultOperator = Operator.And
+                });
             }
-
-            IEnumerable<PropertyInfo> nestedFilterProperties = CustomAttributeHelper.GetPropertiesWithAttribute<FilterSearchNestedFieldAttribute>(type);
-
-            foreach (PropertyInfo property in nestedFilterProperties)
+            else
             {
-                Expression fieldExpression = Expression.Property(parentExpression, property.Name);
-                Expression newParentExpression = AddFirstForEnumerable(fieldExpression, property);
+                queryContainers.Add(new QueryStringQuery()
+                {
+                    Query = searchTerms.First(),
+                    Fields = fields,
+                    Fuzziness = Fuzziness.Auto,
+                    Type = TextQueryType.MostFields
+                });
 
-                List<QueryContainer> nestedQueryContainers = BuildFilterQuery<T>(property.PropertyType, filterCategories, newParentExpression, originParameter);
-
-                queryContainers.AddRange(nestedQueryContainers);
+                queryContainers.Add(new QueryStringQuery()
+                {
+                    Query = $"*{searchTerms.First()}*",
+                    Fields = fields,
+                    AnalyzeWildcard = true,
+                    Type = TextQueryType.MostFields
+                });
             }
 
             return queryContainers;
         }
 
-        private static List<QueryContainer> BuildShouldQuery<T>(Type type, List<string> searchTerms, Expression parentExpression, ParameterExpression originParameter) where T : class
+        private static string GetSearchField(PropertyInfo property, string fieldName, GlobalSearchFieldAttribute searchAttribute)
         {
-            List<QueryContainer> queryContainers = new List<QueryContainer>();
+            double? boost = searchAttribute.Boost;
 
-            List<PropertyInfo> searchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchFieldAttribute>(type).ToList();
-
-            if (searchProperties.Any())
+            if (boost.HasValue)
             {
-                List<Expression<Func<T, object>>> fieldExpressions = new List<Expression<Func<T, object>>>();
-
-                foreach (PropertyInfo property in searchProperties)
-                {
-                    Expression memberExpression = Expression.Property(parentExpression, property.Name);
-                    Expression<Func<T, object>> fieldExpression = Expression.Lambda<Func<T, object>>(memberExpression, originParameter);
-                    fieldExpressions.Add(fieldExpression);
-                }
-
-                Nest.Fields fields = Infer.Fields(fieldExpressions.ToArray());
-
-                foreach (Field field in fields)
-                {
-                    //???
-                    field.Boost = field.Property.GetCustomAttribute<GlobalSearchFieldAttribute>().Boost;
-                }
-
-                if (searchTerms.Count > 1)
-                {
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", searchTerms),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = string.Join(" ", searchTerms.Select(x => $"*{x}*")),
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.CrossFields,
-                        DefaultOperator = Operator.And
-                    });
-                }
-                else
-                {
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = searchTerms.First(),
-                        Fields = fields,
-                        Fuzziness = Fuzziness.Auto,
-                        Type = TextQueryType.MostFields
-                    });
-
-                    queryContainers.Add(new QueryStringQuery()
-                    {
-                        Query = $"*{searchTerms.First()}*",
-                        Fields = fields,
-                        AnalyzeWildcard = true,
-                        Type = TextQueryType.MostFields
-                    });
-                }
+                fieldName = $"{fieldName}^{boost}";
             }
 
-            IEnumerable<PropertyInfo> nestedSearchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchNestedFieldAttribute>(type);
-
-            foreach (PropertyInfo property in nestedSearchProperties)
-            {
-                Expression fieldExpression = Expression.Property(parentExpression, property.Name);
-                Expression newParentExpression = AddFirstForEnumerable(fieldExpression, property);
-
-                List<QueryContainer> nestedQueryContainers = BuildShouldQuery<T>(property.PropertyType, searchTerms, newParentExpression, originParameter);
-
-                queryContainers.AddRange(nestedQueryContainers);
-            }
-
-            return queryContainers;
+            return fieldName;
         }
-
-        private static Expression AddFirstForEnumerable(Expression fieldExpression, PropertyInfo property)
-        {
-            //x.PropertyName.First()
-            if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType) && property.PropertyType != typeof(string))
-            {
-                MethodInfo first = property.PropertyType.GetMethod("First", Type.EmptyTypes);
-                return Expression.Call(fieldExpression, first);
-            }
-
-            return fieldExpression;
-        }
-
-        private static Field GetFilterCategoryField<T>(PropertyInfo property) where T : class
+        private static KeyValuePair<string, TermsAggregation> BuildAggregation(PropertyInfo property, string fieldName, FilterSearchFieldAttribute filterAttribute)
         {
             if (property.PropertyType == typeof(string))
             {
-                ParameterExpression parameter = Expression.Parameter(typeof(T));
-                Expression<Func<T, object>> expression = Expression.Lambda<Func<T, object>>(Expression.Property(parameter, property.Name), parameter);
-
-                return Infer.Field(expression.AppendSuffix("keyword"));
+                fieldName = $"{fieldName}.keyword";
             }
 
-            return Infer.Field(property);
+            TermsAggregation termsAggregation = new TermsAggregation(filterAttribute.FilterCategoryName)
+            {
+                Field = fieldName,
+                Size = filterAttribute.IsPinnedFilter ? 10000 : 15
+            };
+
+            return new KeyValuePair<string, TermsAggregation>(filterAttribute.FilterCategoryName, termsAggregation);
         }
+
+        private static List<TResult> GetAllByAttribute<TResult, TAttribute>(Type type, string parentFieldName, Func<PropertyInfo, string, TAttribute, TResult> createResult) where TAttribute : Attribute
+        {
+            List<TResult> results = new List<TResult>();
+
+            List<PropertyInfo> searchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<TAttribute>(type).ToList();
+
+            foreach (PropertyInfo property in searchProperties)
+            {
+                string fieldName = property.GetCustomAttribute<PropertyNameAttribute>().Name;
+
+                if (!string.IsNullOrEmpty(parentFieldName))
+                {
+                    fieldName = $"{parentFieldName}.{fieldName}";
+                }
+
+                if (property.PropertyType.IsValueType || property.PropertyType == typeof(string))
+                {
+                    TAttribute attribute = property.GetCustomAttribute<TAttribute>();
+
+                    TResult result = createResult(property, fieldName, attribute);
+
+                    if (result != null)
+                    {
+                        results.Add(result);
+                    }
+                }
+                else
+                {
+                    Type propertyType = property.PropertyType;
+
+                    if (typeof(IEnumerable).IsAssignableFrom(propertyType) && propertyType != typeof(string))
+                    {
+                        propertyType = propertyType.GetGenericArguments()[0];
+                    }
+
+                    List<TResult> nestedSearchFields = GetAllByAttribute(propertyType, fieldName, createResult);
+                    results.AddRange(nestedSearchFields);
+                }
+            }
+
+            return results;
+        }
+
+        //private static Field GetFilterCategoryField<T>(PropertyInfo property) where T : class
+        //{
+        //    if (property.PropertyType == typeof(string))
+        //    {
+        //        ParameterExpression parameter = Expression.Parameter(typeof(T));
+        //        Expression<Func<T, object>> expression = Expression.Lambda<Func<T, object>>(Expression.Property(parameter, property.Name), parameter);
+
+        //        return Infer.Field(expression.AppendSuffix("keyword"));
+        //    }
+
+        //    return Infer.Field(property);
+        //}
+
+        //private static List<QueryContainer> BuildFilterQuery(Type type, List<FilterCategoryDto> filterCategories, string parentFieldName)
+        //{
+        //    List<QueryContainer> queryContainers = new List<QueryContainer>();
+
+        //    List<PropertyInfo> filterProperties = CustomAttributeHelper.GetPropertiesWithAttribute<FilterSearchFieldAttribute>(type).ToList();
+
+        //    foreach (PropertyInfo property in filterProperties)
+        //    {
+        //        string fieldName = property.GetFieldName(parentFieldName);
+
+        //        if (property.IsSearchableType())
+        //        {
+        //            string categoryName = property.GetCustomAttribute<FilterSearchFieldAttribute>().FilterCategoryName;
+        //            FilterCategoryDto filterCategory = filterCategories.FirstOrDefault(x => x.CategoryName == categoryName);
+
+        //            if (filterCategory != null)
+        //            {
+        //                if (property.PropertyType == typeof(string))
+        //                {
+        //                    fieldName = $"{fieldName}.keyword";
+        //                }
+
+        //                queryContainers.Add(new TermsQuery
+        //                {
+        //                    Field = fieldName,
+        //                    Terms = filterCategory.GetSelectedValues()
+        //                });
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Type propertyType = property.GetNestedSearchType();
+        //            List<QueryContainer> nestedQueryContainers = BuildFilterQuery(propertyType, filterCategories, fieldName);
+        //            queryContainers.AddRange(nestedQueryContainers);
+        //        }                
+        //    }
+
+        //    return queryContainers;
+        //}
+
+        //private static List<string> GetSearchFields(Type type, string parentFieldName)
+        //{
+        //    List<string> searchFields = new List<string>();
+
+        //    List<PropertyInfo> searchProperties = CustomAttributeHelper.GetPropertiesWithAttribute<GlobalSearchFieldAttribute>(type).ToList();
+
+        //    foreach (PropertyInfo property in searchProperties)
+        //    {
+        //        string fieldName = property.GetFieldName(parentFieldName);
+
+        //        if (property.IsSearchableType())
+        //        {
+        //            double? boost = property.GetCustomAttribute<GlobalSearchFieldAttribute>().Boost;
+
+        //            if (boost.HasValue)
+        //            {
+        //                fieldName = $"{fieldName}^{boost}";
+        //            }
+
+        //            searchFields.Add(fieldName);
+        //        }
+        //        else
+        //        {
+        //            Type propertyType = property.GetNestedSearchType();
+        //            List<string> nestedSearchFields = GetSearchFields(propertyType, fieldName);
+        //            searchFields.AddRange(nestedSearchFields);
+        //        }
+        //    }
+
+        //    return searchFields;
+        //}
+
+        //private static Dictionary<string, TermsAggregation> BuildAggregations(Type type, string parentFieldName)
+        //{
+        //    Dictionary<string, TermsAggregation> aggregations = new Dictionary<string, TermsAggregation>();
+
+        //    List<PropertyInfo> filterProperties = CustomAttributeHelper.GetPropertiesWithAttribute<FilterSearchFieldAttribute>(type).ToList();
+
+        //    foreach (PropertyInfo property in filterProperties)
+        //    {
+        //        string fieldName = property.GetFieldName(parentFieldName);
+
+        //        if (property.IsSearchableType())
+        //        {
+        //            FilterSearchFieldAttribute filterAttribute = property.GetCustomAttribute<FilterSearchFieldAttribute>();
+
+        //            if (property.PropertyType == typeof(string))
+        //            {
+        //                fieldName = $"{fieldName}.keyword";
+        //            }
+
+        //            TermsAggregation termsAggregation = new TermsAggregation(filterAttribute.FilterCategoryName)
+        //            {
+        //                Field = fieldName,
+        //                Size = filterAttribute.IsPinnedFilter ? 10000 : 15
+        //            };
+
+        //            aggregations.Add(filterAttribute.FilterCategoryName, termsAggregation);
+        //        }
+        //        else
+        //        {
+        //            Type propertyType = property.GetNestedSearchType();
+        //            Dictionary<string, TermsAggregation> nestedAggregations = BuildAggregations(propertyType, fieldName);
+
+        //            foreach (var nestedAggregation in nestedAggregations)
+        //            {
+        //                aggregations.Add(nestedAggregation.Key, nestedAggregation.Value);
+        //            }
+        //        }                
+        //    }
+
+        //    return aggregations;
+        //}
         #endregion
     }
 }
