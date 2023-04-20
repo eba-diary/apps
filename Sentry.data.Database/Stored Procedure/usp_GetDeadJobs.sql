@@ -81,7 +81,7 @@ CROSS APPLY OPENJSON(Option_Metadata.arguments, '$') WITH (
 where 
     JobHistory.State = 'Dead'
     and Submission.Job_ID in (3190, 3191, 465)
-    and Submission.Created > '""" + str(START_DATETIME_TO_CHECK) + """'
+    and Submission.Created > @TimeCreated
 order by Submission.Created DESC, JobHistory.History_Id DESC
 
 select 
