@@ -14,7 +14,7 @@
             <a id="edit-dataflow-icon" class="far fa-edit" data-toggle="tooltip" data-placement="top" title="Edit DataFlow" href="/DataFlow/Edit/@Model.Id"></a>
         }
     </h2>
-    @if (Model.DisplayDataflowEdit && Model.CLA3718_Authorization && !Model.UserSecurity.CanModifyDataflow)
+    @if (Model.DisplayDataflowEdit && !Model.UserSecurity.CanModifyDataflow)
     {
         <div id="RequestAccessManageTypeSection" class="requestAccessStage pb-4 pt-4">
             <h6 class="pt-1">To Request Manage Access:</h6>

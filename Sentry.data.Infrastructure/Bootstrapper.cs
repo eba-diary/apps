@@ -157,12 +157,14 @@ namespace Sentry.data.Infrastructure
             registry.For<IInstanceGenerator>().Singleton().Use<ThreadSafeInstanceGenerator>();
             registry.For<IJobScheduler>().Singleton().Use<HangfireJobScheduler>();
             registry.For<ISupportLinkService>().Singleton().Use<SupportLinkService>();
+            
 
             ConnectionSettings settings = new ConnectionSettings(new Uri(Configuration.Config.GetHostSetting("ElasticUrl")));
             settings.DefaultMappingFor<ElasticSchemaField>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexSchemaSearch")));
             settings.DefaultMappingFor<DataFlowMetric>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexFlowMetricSearch")).IdProperty(p=>p.EventMetricId));
-            settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.DefaultMappingFor<DataInventory>(x => x.IndexName(ElasticAliases.DATA_INVENTORY)); //using index alias
+            settings.DefaultMappingFor<GlobalDataset>(x => x.IndexName(Configuration.Config.GetHostSetting("ElasticIndexDataset")).IdProperty(p => p.GlobalDatasetId));
+            settings.BasicAuthentication(Configuration.Config.GetHostSetting("ServiceAccountID"), Configuration.Config.GetHostSetting("ServiceAccountPassword"));
             settings.ThrowExceptions();
             registry.For<IElasticClient>().Singleton().Use(new ElasticClient(settings));
 
@@ -218,7 +220,7 @@ namespace Sentry.data.Infrastructure
             {
                 Proxy = webProxy
             });
-            registry.For<IMotiveProvider>().Use<MotiveProvider>().Ctor<HttpClient>().Is(motiveProviderClient);
+            registry.For<IMotiveProvider>().Use<MotiveProvider>().Ctor<HttpClient>().Is(motiveProviderClient).Ctor<IBaseJobProvider>().Is(x => x.GetInstance<IBaseJobProvider>(DataSourceDiscriminator.PAGING_HTTPS_SOURCE));
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

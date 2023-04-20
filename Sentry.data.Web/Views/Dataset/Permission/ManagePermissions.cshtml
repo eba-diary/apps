@@ -73,8 +73,23 @@
                                 <td class="permissionDescription">@permission.PermissionDescription</td>
                                 <td class="permissionStatus"><span title="Change #@permission.TicketId">@permission.PermissionStatus</span></td>
                                 <td class="permissionCode d-none">@permission.Code</td>
-                                <td class="approvalTicket">@(permission.TicketId == "DEFAULT_SECURITY" || permission.TicketId == "DEFAULT_SECURITY_INHERITANCE" ? "Default Security" : permission.TicketId)</td>
-                                <td class="externalTicket">@(string.IsNullOrEmpty(permission.ExternalRequestId) ? "No External Request Found" : permission.ExternalRequestId)</td>
+                                <td class="approvalTicket">
+                                    @if (!string.IsNullOrWhiteSpace(permission.TicketIdUrl))
+                                    {<a href="@Html.Encode(permission.TicketIdUrl)" target="_blank">@permission.TicketId</a>}
+                                    else if (permission.TicketId == "DEFAULT_SECURITY" || permission.TicketId == "DEFAULT_SECURITY_INHERITANCE")
+                                    { <span>Default Security</span> }
+                                    else
+                                    { <span>@permission.TicketId</span> }
+                                </td>
+                                <td class="externalTicket">
+                                    @if (permission.TicketId == "DEFAULT_SECURITY_INHERITANCE")
+                                    {<span>n/a</span> }
+                                    else if (string.IsNullOrEmpty(permission.ExternalRequestIdUrl))
+                                    { <span>No External Request Found</span> }
+                                    else
+                                    { <a href="@Html.Encode(permission.ExternalRequestIdUrl)" target="_blank">@permission.ExternalRequestId</a>}
+
+                                </td>
                                 <td>
                                     @if (!permission.IsSystemGenerated && (permission.PermissionStatus == "Active" || permission.PermissionStatus == "DBA Ticket Complete"))
                                     {<em class="far fa-trash-alt removePermissionIcon"></em>}

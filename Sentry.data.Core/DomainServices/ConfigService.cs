@@ -32,12 +32,12 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _featureFlags;
         private readonly ISAIDService _saidService;
         private readonly IDatasetFileService _datasetFileService;
-
+        private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, 
-            ISAIDService saidService, IDatasetFileService datasetFileService)
+            ISAIDService saidService, IDatasetFileService datasetFileService, IGlobalDatasetProvider globalDatasetProvider)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -51,6 +51,7 @@ namespace Sentry.data.Core
             _dataFlowService = dataFlowService;
             _saidService = saidService;
             _datasetFileService = datasetFileService;
+            _globalDatasetProvider = globalDatasetProvider;
         }
 
         public List<string> Validate(FileSchemaDto dto)
@@ -618,6 +619,13 @@ namespace Sentry.data.Core
                 {
                     Logger.Info($"{methodName} logical - configid:{id} configname:{dfc.Name}");
 
+                    //Remove environment schema from dataset search index
+                    Task deleteEnvironmentSchemaTask = Task.CompletedTask;
+                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    {
+                        deleteEnvironmentSchemaTask = _globalDatasetProvider.DeleteEnvironmentSchemaAsync(scm.SchemaId);
+                    }
+
                     /*************************
                     * Legacy processing platform jobs where associated directly to datasetfileconfig object
                     * Disable all associated RetrieverJobs
@@ -640,7 +648,6 @@ namespace Sentry.data.Core
                         returnResult = jobsDeletedSuccessfully;
                     }
 
-
                     /*************************
                     *  Mark all dataflows, for deletion, associated with schema on new processing platform
                     *************************/
@@ -648,13 +655,15 @@ namespace Sentry.data.Core
                     dataflows.AddRange(GetSchemaFlowByFileSchema(scm));
                     dataflows.AddRange(GetProducerFlowsByFileSchema(scm));
 
+                    //finish environment schema delete to not waste time removing asset in data flow delete
+                    deleteEnvironmentSchemaTask.Wait();
+
                     bool allDataFlowDeletesSuccessful = _dataFlowService.Delete(dataflows.Select(s => s.Id).ToList(), user, logicalDelete);
                     //If any dataflows failed to delete, then set returnResult = false
                     if (!allDataFlowDeletesSuccessful)
                     {
                         returnResult = allDataFlowDeletesSuccessful;
                     }
-
 
                     /*************************
                      * Mark objects for delete to ensure they are not displaed in UI
@@ -1165,6 +1174,7 @@ namespace Sentry.data.Core
                     token.Scope = dtoToken.Scope;
                     token.Enabled = dtoToken.Enabled;
                     token.AcceptableErrorNeedsReview = dtoToken.AcceptableErrorNeedsReview;
+                    token.BackfillComplete = dtoToken.BackfillComplete;
 
                     if (update)
                     {
@@ -1210,7 +1220,8 @@ namespace Sentry.data.Core
                     TokenUrl = dataSourceToken.TokenUrl,
                     Scope = dataSourceToken.Scope,
                     Enabled = dataSourceToken.Enabled,
-                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview
+                    AcceptableErrorNeedsReview = dataSourceToken.AcceptableErrorNeedsReview,
+                    BackfillComplete = dataSourceToken.BackfillComplete
                 });
             }
         }
@@ -1304,6 +1315,7 @@ namespace Sentry.data.Core
             dto.Scope = token.Scope;
             dto.Enabled = token.Enabled;
             dto.AcceptableErrorNeedsReview = token.AcceptableErrorNeedsReview;
+            dto.BackfillComplete = token.BackfillComplete;
         }
 
         internal void MapToDataSourceToken(DataSourceTokenDto dto, DataSourceToken token)
@@ -1318,6 +1330,7 @@ namespace Sentry.data.Core
             token.Scope = dto.Scope;
             token.Enabled = dto.Enabled;
             token.AcceptableErrorNeedsReview = dto.AcceptableErrorNeedsReview;
+            token.BackfillComplete = dto.BackfillComplete;
         }
 
         private DataSource CreateDataSource(DataSourceDto dto)

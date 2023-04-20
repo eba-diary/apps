@@ -92,10 +92,9 @@
                                 {
                                     <a class="dropdown-item" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
                                 }
-                                @if (Model.ShowManagePermissionsLink)
-                                {
-                                    @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId = Model.DatasetId }, new { @class = "dropdown-item" })
-                                }
+
+                                @Html.ActionLink("Manage Permissions", nameof(Sentry.data.Web.Controllers.DatasetController.ManagePermissions), new { datasetId = Model.DatasetId }, new { @class = "dropdown-item" })
+
                                 @if (Model.Security.CanManageSchema)
                                 {
                                     <a class="dropdown-item" href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>

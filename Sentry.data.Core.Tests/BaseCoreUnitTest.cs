@@ -76,10 +76,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3553_SchemaSearch => throw new NotImplementedException();
-            public IFeatureFlag<bool> CLA3861_RefactorGetUserSecurity { get; } = new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA3819_EgressEdgeMigration => throw new NotImplementedException();
             public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY => throw new NotImplementedException();
-            public IFeatureFlag<bool> CLA3718_Authorization { get; } = new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4049_ALLOW_S3_FILES_DELETE => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4152_UploadFileFromUI => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA1130_SHOW_ALTERNATE_EMAIL => new MockBooleanFeatureFlag(true);
@@ -87,8 +85,6 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<string> CLA4260_QuartermasterNamedEnvironmentTypeFilter => new MockStringFeatureFlag("");
             public IFeatureFlag<bool> CLA3756_UpdateSearchPages => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4258_DefaultProdSearchFilter => new MockBooleanFeatureFlag(true);
-            public IFeatureFlag<bool> CLA4410_StopCategoryBasedConsumptionLayerCreation => new MockBooleanFeatureFlag(false);
-            public IFeatureFlag<string> CLA440_CategoryConsumptionLayerCreateLineInSand => new MockStringFeatureFlag("2022-08-15");
             public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics => new MockBooleanFeatureFlag(true);
@@ -102,6 +98,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA4912_API => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4993_JSMTicketProvider => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability => new MockBooleanFeatureFlag(true);
         }
     }
 }
