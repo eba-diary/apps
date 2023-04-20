@@ -143,14 +143,11 @@ namespace Sentry.data.Infrastructure
             if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
             {
                 var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
-                if (sourceTicket != null)
+                if (sourceTicket != null && ShouldUpdateStatus(sourceTicket.TicketStatus, ChangeTicketStatus.DbaTicketAdded))
                 {
-                    if (ShouldUpdateStatus(sourceTicket.TicketStatus, ChangeTicketStatus.DbaTicketAdded))
-                    {
-                        message.Details.TryGetValue("RequestID", out string dbaRequestId);
-                        sourceTicket.ExternalRequestId = dbaRequestId;
-                        sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketAdded;
-                    }
+                    message.Details.TryGetValue("RequestID", out string dbaRequestId);
+                    sourceTicket.ExternalRequestId = dbaRequestId;
+                    sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketAdded;
                 }
             }
         }
@@ -160,14 +157,11 @@ namespace Sentry.data.Infrastructure
             if (message.Details.TryGetValue("SourceRequest_ID", out string sourceRequestID))
             {
                 var sourceTicket = GetSecurityTicketForSourceRequestId(sourceRequestID);
-                if (sourceTicket != null)
+                if (sourceTicket != null && ShouldUpdateStatus(sourceTicket.TicketStatus, ChangeTicketStatus.DbaTicketApproved))
                 {
-                    if(ShouldUpdateStatus(sourceTicket.TicketStatus, ChangeTicketStatus.DbaTicketApproved))
-                    {
-                        message.Details.TryGetValue("RequestID", out string dbaRequestId);
-                        sourceTicket.ExternalRequestId = dbaRequestId;
-                        sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketApproved;
-                    }
+                    message.Details.TryGetValue("RequestID", out string dbaRequestId);
+                    sourceTicket.ExternalRequestId = dbaRequestId;
+                    sourceTicket.TicketStatus = ChangeTicketStatus.DbaTicketApproved;
                 }
             }
         }
