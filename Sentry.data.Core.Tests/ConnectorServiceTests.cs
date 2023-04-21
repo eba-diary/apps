@@ -19,7 +19,9 @@ namespace Sentry.data.Core.Tests
 
             mockProvider.Setup(x=>x.GetS3ConnectorConfigAsync(It.IsAny<string>())).ReturnsAsync(connectorStatusJObject);
 
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+            Mock<MockLoggingService<ConnectorService>> logger = new Mock<MockLoggingService<ConnectorService>>();
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, logger.Object);
 
             //Act
             JObject configJObj = await mockService.GetS3ConnectorConfigJSONAsync(It.IsAny<string>());
@@ -40,7 +42,10 @@ namespace Sentry.data.Core.Tests
                 ReasonPhrase = "Created",
             };
             mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+            Mock<MockLoggingService<ConnectorService>> logger = new Mock<MockLoggingService<ConnectorService>>();
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, logger.Object);
 
 
             ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
@@ -64,7 +69,10 @@ namespace Sentry.data.Core.Tests
                 ReasonPhrase = "Not Found",
             };
             mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+            Mock<MockLoggingService<ConnectorService>> logger = new Mock<MockLoggingService<ConnectorService>>();
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, logger.Object);
 
 
             ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
@@ -88,7 +96,10 @@ namespace Sentry.data.Core.Tests
                 ReasonPhrase = "Not Found",
             };
             mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+            Mock<MockLoggingService<ConnectorService>> logger = new Mock<MockLoggingService<ConnectorService>>();
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, logger.Object);
 
 
             ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();

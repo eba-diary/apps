@@ -1,7 +1,5 @@
-﻿using Nest;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.data.Core.DTO.Retriever;
 using Sentry.data.Core.Entities;
@@ -33,11 +31,13 @@ namespace Sentry.data.Core
         private readonly ISAIDService _saidService;
         private readonly IDatasetFileService _datasetFileService;
         private readonly IGlobalDatasetProvider _globalDatasetProvider;
+        private readonly ILogger<ConfigService> _logger;
 
         public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
             IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
             IJobService jobService, ISchemaService schemaService, IDataFeatures dataFeatures, IDataFlowService dataFlowService, 
-            ISAIDService saidService, IDatasetFileService datasetFileService, IGlobalDatasetProvider globalDatasetProvider)
+            ISAIDService saidService, IDatasetFileService datasetFileService, IGlobalDatasetProvider globalDatasetProvider,
+            ILogger<ConfigService> logger)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -52,6 +52,7 @@ namespace Sentry.data.Core
             _saidService = saidService;
             _datasetFileService = datasetFileService;
             _globalDatasetProvider = globalDatasetProvider;
+            _logger = logger;
         }
 
         public List<string> Validate(FileSchemaDto dto)
@@ -290,7 +291,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 _datasetContext.Clear();
-                Logger.Error("Error creating data source", ex);
+                _logger.LogError(ex, "Error creating data source");
 
                 return false;
             }
@@ -310,7 +311,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 _datasetContext.Clear();
-                Logger.Error("datasource_save_error", ex);
+                _logger.LogError(ex,"datasource_save_error");
 
                 return false;
             }
@@ -325,7 +326,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error creating Dataset File Config", ex);
+                _logger.LogError(ex, "Error creating Dataset File Config");
                 throw;
             }
 
@@ -343,7 +344,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error creating Dataset File Config", ex);
+                _logger.LogError(ex, "Error creating Dataset File Config");
                 return false;
             }            
         }
@@ -359,7 +360,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("datasetfileconfig_save_error", ex);
+                _logger.LogError(ex, "datasetfileconfig_save_error");
                 return false;
             }
         }
@@ -410,7 +411,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"configservice-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"configservice-validateviewpermissionsfordataset failed to retrieve UserSecurity object");
                 throw new DatasetUnauthorizedAccessException();
             }
 
@@ -419,11 +420,11 @@ namespace Sentry.data.Core
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Warn($"configservice-validateviewpermissionsfordataset unauthorized_access: Id:{user.AssociateId}");
+                    _logger.LogWarning($"configservice-validateviewpermissionsfordataset unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("configservice-validateviewpermissionsfordataset unauthorized_access", ex);
+                    _logger.LogError(ex, "configservice-validateviewpermissionsfordataset unauthorized_access");
                 }
                 throw new DatasetUnauthorizedAccessException();
             }
@@ -491,7 +492,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to save new OAuthToken", ex);
+                _logger.LogError(ex, "Failed to save new OAuthToken");
                 return false;
             }
         }
@@ -576,7 +577,7 @@ namespace Sentry.data.Core
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
             string methodName = $"{nameof(ConfigService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             bool returnResult = true;
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
@@ -597,7 +598,7 @@ namespace Sentry.data.Core
 
             if (IsAlreadyMarked)
             {
-                Logger.Info($"{methodName} Method End");
+                _logger.LogInformation($"{methodName} Method End");
                 return returnResult;
             }
 
@@ -607,7 +608,7 @@ namespace Sentry.data.Core
             {
                 try
                 {
-                    Logger.Info($"{methodName} logical - configid:{id} configname:{dfc.Name}");
+                    _logger.LogInformation($"{methodName} logical - configid:{id} configname:{dfc.Name}");
 
                     //Remove environment schema from dataset search index
                     Task deleteEnvironmentSchemaTask = Task.CompletedTask;
@@ -670,7 +671,7 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"{methodName} logical-failed - configid:{id}", ex);
+                    _logger.LogError(ex, $"{methodName} logical-failed - configid:{id}");
                     returnResult = false;
                     return returnResult;
                 }
@@ -691,13 +692,13 @@ namespace Sentry.data.Core
                     var flatArgExs = agEx.Flatten().InnerExceptions;
                     foreach (var ex in flatArgExs)
                     {
-                        Logger.Error("Failed generating consumption layer event", ex);
+                        _logger.LogError(ex, "Failed generating consumption layer event");
                     }
                 }
             }
             else
             {
-                Logger.Info($"{methodName} physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                _logger.LogInformation($"{methodName} physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                 try
                 {
                     //Mark DatasetFileConfig record deleted
@@ -744,12 +745,12 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"{methodName} physical-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
+                    _logger.LogError(ex, $"{methodName} physical-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                     return false;
                 }
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return returnResult;
         }
 
@@ -793,19 +794,19 @@ namespace Sentry.data.Core
             //some legacy dataset\schema may not have associated schema flow
             if (schemaFlow == null)
             {
-                Logger.Debug($"Schema Flow not found by name, attempting to detect by id...");
+                _logger.LogDebug($"Schema Flow not found by name, attempting to detect by id...");
 
                 SchemaMap mappedStep = _datasetContext.SchemaMap.SingleOrDefault(w => w.MappedSchema.SchemaId == scm.SchemaId && w.DataFlowStepId.Action.Name == "Schema Load" && w.DataFlowStepId.DataFlow.Name.StartsWith("FileSchema"));
                 if (mappedStep != null)
                 {
-                    Logger.Debug($"detected schema flow by Id");
+                    _logger.LogDebug($"detected schema flow by Id");
                     schemaFlow = mappedStep.DataFlowStepId.DataFlow;
                     dataflowList.Add(schemaFlow);
                 }
                 else
                 {
-                    Logger.Debug($"schema flow not detected by id");
-                    Logger.Debug($"no schema flow associated with schema");
+                    _logger.LogDebug($"schema flow not detected by id");
+                    _logger.LogDebug($"no schema flow associated with schema");
                 }
             }
             else
@@ -879,7 +880,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("configservice-syncconsumptionlayer failed", ex);
+                _logger.LogError(ex, "configservice-syncconsumptionlayer failed");
                 return false;
             }
         }
@@ -916,7 +917,7 @@ namespace Sentry.data.Core
 
             try
             {
-                Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {hiveDelete.EventType.ToLower()} event...");
+                _logger.LogDebug($"<generateconsumptionlayerdeleteevent> sending {hiveDelete.EventType.ToLower()} event...");
 
                 string topicName = null;
                 if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
@@ -928,11 +929,11 @@ namespace Sentry.data.Core
                 {
                     _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete), topicName);
                 }
-                Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {hiveDelete.EventType.ToLower()} event");
+                _logger.LogDebug($"<generateconsumptionlayerdeleteevent> sent {hiveDelete.EventType.ToLower()} event");
             }
             catch (Exception ex)
             {
-                Logger.Error($"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(hiveDelete)}");
+                _logger.LogError(ex, $"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(hiveDelete)}");
                 exceptionList.Add(ex);
             }
 
@@ -946,7 +947,7 @@ namespace Sentry.data.Core
 
             try
             {
-                Logger.Debug($"<generateconsumptionlayerdeleteevent> sending {snowDelete.EventType.ToLower()} event...");
+                _logger.LogDebug($"<generateconsumptionlayerdeleteevent> sending {snowDelete.EventType.ToLower()} event...");
 
                 string topicName = null;
                 if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
@@ -959,11 +960,11 @@ namespace Sentry.data.Core
                     _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(snowDelete), topicName);
                 }
 
-                Logger.Debug($"<generateconsumptionlayerdeleteevent> sent {snowDelete.EventType.ToLower()} event");               
+                _logger.LogDebug($"<generateconsumptionlayerdeleteevent> sent {snowDelete.EventType.ToLower()} event");               
             }
             catch (Exception ex)
             {
-                Logger.Error($"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(snowDelete)}");
+                _logger.LogError(ex, $"<generateconsumptionlayerdeleteevent> failed sending event: {JsonConvert.SerializeObject(snowDelete)}");
                 exceptionList.Add(ex);
             }
 
@@ -997,7 +998,7 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
+                    _logger.LogDebug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
 
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
@@ -1010,11 +1011,11 @@ namespace Sentry.data.Core
                         _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel), topicName);
                     }
 
-                    Logger.Debug($"<generateschemacreateevent> sent {hiveModel.EventType.ToLower()} event");
+                    _logger.LogDebug($"<generateschemacreateevent> sent {hiveModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(hiveModel)}");
+                    _logger.LogError(ex, $"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(hiveModel)}");
                     exceptionList.Add(ex);
                 }                
 
@@ -1029,7 +1030,7 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
+                    _logger.LogDebug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
 
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
@@ -1041,11 +1042,11 @@ namespace Sentry.data.Core
                     {
                         _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
                     }
-                    Logger.Debug($"<generateschemacreateevent> sent {snowModel.EventType.ToLower()} event");
+                    _logger.LogDebug($"<generateschemacreateevent> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
+                    _logger.LogError(ex, $"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
                     exceptionList.Add(ex);
                 }
             }
