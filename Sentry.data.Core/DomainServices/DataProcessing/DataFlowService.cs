@@ -1,16 +1,10 @@
 ﻿using Hangfire;
-using Nest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
+using Microsoft.Extensions.Logging;
 using Sentry.Core;
 using Sentry.data.Core.DTO.Security;
 using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Entities.Jira;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Core.Interfaces.QuartermasterRestClient;
-using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -33,6 +27,7 @@ namespace Sentry.data.Core
         private readonly IEmailService _emailService;
         private readonly IKafkaConnectorService _connectorService;
         private readonly IGlobalDatasetProvider _globalDatasetProvider;
+        private readonly ILogger<DataFlowService> _logger;
 
         public DataFlowService(
                 IDatasetContext datasetContext, 
@@ -44,7 +39,8 @@ namespace Sentry.data.Core
                 IBackgroundJobClient backgroundJobClient,
                 IEmailService emailService,
                 IKafkaConnectorService connectorService,
-                IGlobalDatasetProvider globalDatasetProvider)
+                IGlobalDatasetProvider globalDatasetProvider,
+                ILogger<DataFlowService> logger)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -56,6 +52,7 @@ namespace Sentry.data.Core
             _emailService = emailService;
             _connectorService = connectorService;
             _globalDatasetProvider = globalDatasetProvider;
+            _logger = logger;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -151,14 +148,14 @@ namespace Sentry.data.Core
         public bool Delete_Queue(List<int> idList, string userId, bool logicalDelete)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             foreach(int id in idList)
             {
                 _hangfireBackgroundJobClient.Enqueue<DataFlowService>(x => x.Delete(id, userId, true));                
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return true;
         }
 
@@ -220,8 +217,8 @@ namespace Sentry.data.Core
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Debug($"{methodName} Method Start");
-            Logger.Info($"{methodName} - dataflowid:{id}");
+            _logger.LogDebug($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} - dataflowid:{id}");
 
             bool returnResult = true;
 
@@ -231,7 +228,7 @@ namespace Sentry.data.Core
             bool PerformDeleteLogic = true;
             if (flow == null)
             {
-                Logger.Debug($"{methodName} DataFlow not found - dataflowid:{id}");
+                _logger.LogDebug($"{methodName} DataFlow not found - dataflowid:{id}");
                 throw new DataFlowNotFound();
             }
 
@@ -247,8 +244,8 @@ namespace Sentry.data.Core
 
             if (!PerformDeleteLogic)
             {
-                Logger.Info($"{methodName} Object already has status {flow.ObjectStatus}");
-                Logger.Info($"{methodName} Method End");
+                _logger.LogInformation($"{methodName} Object already has status {flow.ObjectStatus}");
+                _logger.LogInformation($"{methodName} Method End");
                 return returnResult;
             }
 
@@ -302,7 +299,7 @@ namespace Sentry.data.Core
                 _jobService.Delete(jobList, user, false);
             }
 
-            Logger.Debug($"{methodName} Method End");
+            _logger.LogDebug($"{methodName} Method End");
             return returnResult;
         }
 
@@ -338,7 +335,7 @@ namespace Sentry.data.Core
         public DataFlow Create(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(Create).ToLower()}";
-            Logger.Info($"{methodName} Method Start");            
+            _logger.LogInformation($"{methodName} Method Start");            
 
             DataFlow newDataFlow;
             try
@@ -349,11 +346,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} - Failed to create dataflow", ex);
+                _logger.LogError(ex, $"{methodName} - Failed to create dataflow");
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newDataFlow;
         }
 
@@ -408,7 +405,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
+                _logger.LogError(ex, "dataflowservice-createandsavedataflow failed to save dataflow");
                 throw;
             }
         }
@@ -562,7 +559,7 @@ namespace Sentry.data.Core
             }
             catch(Exception ex) 
             {
-                Logger.Error($"{nameof(DataFlowService)}.{nameof(EnableOrDisableDataFlow)} failed", ex);
+                _logger.LogError(ex, $"{nameof(DataFlowService)}.{nameof(EnableOrDisableDataFlow)} failed");
                 throw;
             }
         }
@@ -820,7 +817,7 @@ namespace Sentry.data.Core
 
         private List<int> GetProducerFlowsToBeDeletedBySchemaId(int schemaId)
         {
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method Start");
+            _logger.LogInformation($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method Start");
             List<int> producerFlowIdList = new List<int>();
 
             /* Get producer flow Ids which map to schema that are active*/
@@ -848,7 +845,7 @@ namespace Sentry.data.Core
                 }
             }
 
-            Logger.Info($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method End");
+            _logger.LogInformation($"{nameof(DataFlowService).ToLower()}_{nameof(GetProducerFlowsToBeDeletedBySchemaId).ToLower()} Method End");
             return producerFlowIdList;
         }
 
@@ -950,7 +947,7 @@ namespace Sentry.data.Core
             //ONLY CreateS3SinkConnector IF FEATURE FLAG IS ON: REMOVE THIS WHOLE IF STATEMENT AFTER GOLIVE
             if (!_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL.GetValue())
             {
-                Logger.Info($"Method {nameof(CreateS3SinkConnector)} Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
+                _logger.LogInformation($"Method {nameof(CreateS3SinkConnector)} Check feature flag {nameof(_dataFeatures.CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL)} is not turned on.  No email will be sent.");
                 return;
             }
 
@@ -962,7 +959,7 @@ namespace Sentry.data.Core
                 //If topic exists on any "deleted" DataFlows matching TopicName, do not create S3SinkConnector since one was already created
                 if (_datasetContext.DataFlow.Any(w => w.TopicName != null && w.TopicName.ToUpper() == df.TopicName.ToUpper() && w.ObjectStatus != ObjectStatusEnum.Active))
                 {
-                    Logger.Info($"Method {nameof(CreateS3SinkConnector)}: {nameof(_connectorService.CreateS3SinkConnectorAsync)} not executed because TopicName already exists on this Dataflow or others.");
+                    _logger.LogInformation($"Method {nameof(CreateS3SinkConnector)}: {nameof(_connectorService.CreateS3SinkConnectorAsync)} not executed because TopicName already exists on this Dataflow or others.");
                     return;
                 }
 
@@ -1027,7 +1024,7 @@ namespace Sentry.data.Core
         {
             try 
             { 
-                Logger.Info($"DataFlowService_CreateAndSaveDataFlow Method Start");
+                _logger.LogInformation($"DataFlowService_CreateAndSaveDataFlow Method Start");
 
                 DataFlow df = MapToDataFlow(dto);
 
@@ -1053,7 +1050,7 @@ namespace Sentry.data.Core
 
                 CreateDataFlowDfsDropLocation(df);
 
-                Logger.Info($"DataFlowService_CreateAndSaveDataFlow Method End");
+                _logger.LogInformation($"DataFlowService_CreateAndSaveDataFlow Method End");
                 return df;
             }
             catch (ValidationException)
@@ -1065,7 +1062,7 @@ namespace Sentry.data.Core
 
         internal DataFlow MapToDataFlow(DataFlowDto dto)
         {
-            Logger.Info($"MapToDataFlow Method Start");
+            _logger.LogInformation($"MapToDataFlow Method Start");
 
             DataFlow df = new DataFlow
             {
@@ -1104,7 +1101,7 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(df);
 
-            Logger.Info($"MapToDataFlow Method End");
+            _logger.LogInformation($"MapToDataFlow Method End");
             return df;
         }
 
@@ -1140,11 +1137,11 @@ namespace Sentry.data.Core
         private void CreateDataFlowDfsRetrieverJobMetadata(DataFlow df)
         {
             string methodName = $"{nameof(DataFlowService).ToLower()}_{nameof(CreateDataFlowDfsRetrieverJobMetadata).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
 
-            Logger.Debug($"Is DataFlow Null:{df == null}");
+            _logger.LogDebug($"Is DataFlow Null:{df == null}");
 
             if (df.ShouldCreateDFSDropLocations(_dataFeatures))
             {
@@ -1169,7 +1166,7 @@ namespace Sentry.data.Core
                 _ = _jobService.CreateDfsRetrieverJob(df, dfsDataSource);
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
         }
 
         private void CreateDataFlowDfsDropLocation(DataFlow dataflow)
@@ -1187,13 +1184,13 @@ namespace Sentry.data.Core
 
         private void CreateDataFlowExternalRetrieverJobMetadata(DataFlowDto dto, DataFlow df)
         {
-            Logger.Info($"DataFlowService_MapDataFlowStepsForPull Method Start");
+            _logger.LogInformation($"DataFlowService_MapDataFlowStepsForPull Method Start");
 
             dto.RetrieverJob.DataFlow = df.Id;
             dto.RetrieverJob.FileSchema = df.SchemaId;
             _jobService.CreateRetrieverJob(dto.RetrieverJob);
 
-            Logger.Info($"DataFlowService_MapDataFlowStepsForPull Method End");
+            _logger.LogInformation($"DataFlowService_MapDataFlowStepsForPull Method End");
         }
 
         private void MapDataFlowSteps(DataFlowDto dto, DataFlow df)
@@ -1536,8 +1533,8 @@ namespace Sentry.data.Core
                         bool exists = DataFlowExistsForFileSchema(mapDto.SchemaId);
                         if (!exists)
                         {
-                            Logger.Debug("dataflowservice-createdataflowstep fileschema-dataflow-not-detected");
-                            Logger.Debug("dataflowservice-createdataflowstep creating-fileschema-dataflow");
+                            _logger.LogDebug("dataflowservice-createdataflowstep fileschema-dataflow-not-detected");
+                            _logger.LogDebug("dataflowservice-createdataflowstep creating-fileschema-dataflow");
                             FileSchema scm = _datasetContext.GetById<FileSchema>(mapDto.SchemaId);
                             CreateDataFlowForSchema(scm);
                         }

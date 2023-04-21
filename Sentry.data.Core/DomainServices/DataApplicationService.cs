@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Extensions;
