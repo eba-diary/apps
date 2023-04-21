@@ -20,6 +20,12 @@ namespace Sentry.data.Web
 
         protected void Application_Start()
         {
+            //Application Initialization
+            var loggerFactory = LoggerHelper.ConfigureLogger();
+
+            //Configured for cases where DI is not possible
+            Logging.LoggerFactory = loggerFactory;
+
             //setup the ASP.NET thread pool
             InitThreadPool();
 
@@ -32,11 +38,7 @@ namespace Sentry.data.Web
             MiniProfilerConfig.RegisterMiniProfilerSettings();
             ModelBinders.Binders.Add(typeof(DataTables.Shared.DataTablesRequest), new DataTables.Mvc.DataTablesBinder());
 
-            //Application Initialization
-            var loggerFactory = LoggerHelper.ConfigureLogger();
-
-            //Configured for cases where DI is not possible
-            Logging.LoggerFactory = loggerFactory;
+            
 
             Bootstrapper.Init();
 
