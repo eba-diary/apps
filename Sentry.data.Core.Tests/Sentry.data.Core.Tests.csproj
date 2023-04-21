@@ -89,9 +89,6 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-    </Reference>
     <Reference Include="Sentry.Core, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Core.2.1.1\lib\netstandard2.0\Sentry.Core.dll</HintPath>
     </Reference>
@@ -210,7 +207,7 @@
     <Compile Include="RetrieverJobTests.cs" />
     <Compile Include="SchemaFlowServiceTests.cs" />
     <Compile Include="MarkdownTests.cs" />
-    <Compile Include="GlobalDatasetExtensions.cs" />
+    <Compile Include="GlobalDatasetExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

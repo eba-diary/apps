@@ -62,72 +62,205 @@ data.Admin = {
     },
 
     // load and initialize dead job data table
-    DeadJobTableInit: function () {
-        $('#deadJobs').DataTable({
-            responsive: {
-                details: {
-                    type: 'column',
-                    target: '.dropdown-control',
-                    renderer: function (api, rowIdx, columns) {
-                        var data = $.map(columns, function (col, i) {
-                            return col.hidden ?
-                                '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' + col.columnIndex + '">' +
-                                '<td>' + col.title + ':' + '</td> ' +
-                                '<td>' + col.data + '</td>' +
-                                '</tr>' :
-                                '';
-                        }).join('');
-
-                        return data ?
-                            $('<table/>').append(data) :
-                            false;
-                    }
+    DeadJobTableInit: function (selectedDate) {
+        data.Admin.DeadJobTable = $('#deadJobs').DataTable({
+            ajax: {
+                url: data.Admin.GetDeadJobResultsUrl(selectedDate),
+                type: "POST"
+            },
+            searching: true,
+            paging: true,
+            orderCellsTop: true,
+            iDisplayLength: 10,
+            order: [4, 'desc'],
+            aLengthMenu: [
+                [10, 25, 50, 100, 200, 1000],
+                [10, 25, 50, 100, 200, 1000]
+            ],
+            columns: [
+                { data: null, className: "details-control", orderable: false, defaultContent: "", searchable: false },
+                { data: null, name: "jobSelect", className: "jobSelect text-center", render: (d) => data.Admin.renderDeadJobSelectOptions(d), searchable: false, orderable: false },
+                { data: "SubmissionTime", type: "date", className: "submissionTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "DatasetName", className: "datasetName" },
+                { data: "ReprocessingRequired", className: "reprocessingRequired"},
+                { data: "SchemaName", className: "sourceName" },
+                { data: "SourceKey", className: "sourceKey" },
+                { data: "FlowExecutionGuid", className: "flowexecutionGuid" }
+            ],
+            'rowCallback': function (row, data)
+            {
+                if (data.ReprocessingRequired)
+                {
+                    $('td:eq(4)', row).text("True").addClass('text-danger');
+                } else {
+                    $('td:eq(4)', row).text("False").addClass('text-success');
                 }
             },
-            columnDefs: [
-                {
-                    targets: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-                    className: 'dropdown-control'
-                },
-                {
-                    targets: [0, 1],
-                    orderable: false
-                }
-            ],
-            order: [4, 'desc'],
-            drawCallback: function () {
+            drawCallback: function ()
+            {
                 $('#data-file-select-all').prop('checked', false);
                 $('.select-all-target').prop('checked', false);
             }
         });
 
-        // click event logic for table row + and - icons based on dropdown state
-        $(".dropdown-control").click(function () {
-            var targetId = $(this).parents("tr").data("file-id");
-            var childRow = $(`#dropdown-toggle-${targetId}`);
+        // intialize filters
 
-            if (!$(this).parents("tr").hasClass("parent")) {
-                childRow.removeClass("fa-plus");
-                childRow.addClass("fa-minus");
-            } else {
-                childRow.addClass("fa-plus");
-                childRow.removeClass("fa-minus");
+        yadcf.init(data.Admin.DeadJobTable,
+            [
+                {
+                    column_number: 2,
+                    filter_type: 'range_date',
+                    datepicker_type: null, // disable Yadcf datepicker
+                    moment_date_format: 'MM/DD/YYYY h:mm:ss a',
+                    filter_reset_button_text: false,
+                    filter_delay: 500
+                }
+            ],
+            {
+                filters_tr_index: 1
+            }
+        );
+
+        data.Admin.deadJobTableInitEvents(data.Admin.DeadJobTable);
+    },
+
+    deadJobTableInitEvents: function (deadJobTable)
+    {
+        $('#deadJob-reprocessing-filter').materialSelect();
+
+        $("#deadJob-reprocessing-filter").change(function ()
+        {
+            var table = $("#deadJobs").DataTable();
+
+            var selectedValue = $(this).find(":selected").val();
+
+            // Search for rows matching the current select value (corresponding reprocess required status)
+            table.column(4).search(selectedValue).draw();
+        });
+
+
+        $(".yadcf-filter-range-date", deadJobTable.settings()[0].nTHead).pickadate({
+            format: 'mm/dd/yyyy',
+            formatSubmit: 'mm/dd/yyyy',
+            onSet: function (context)
+            {
+                // Grab selected date values
+                var startDate = $(".yadcf-filter-range-start").val();
+                var endDate = $(".yadcf-filter-range-end").val();
+
+                if (startDate != '' && endDate != '')
+                {
+                    var formattedStart = moment(startDate);
+                    var formattedEnd = moment(endDate);
+
+                    $.fn.dataTable.ext.search.pop();
+                    deadJobTable.draw();
+
+
+                    $.fn.dataTable.ext.search.push(
+                        function (settings, data, dataIndex)
+                        {
+                            var rowDate = moment(data[2]);
+
+                            return rowDate.isBetween(formattedStart, formattedEnd);
+                        }
+                    );
+
+                    deadJobTable.draw();
+                }
+            }
+        });
+
+        $('#deadJobs tbody').on('click', 'td.details-control', function ()
+        {
+            var tr = $(this).closest('tr');
+            var row = $('#deadJobs').DataTable().row(tr);
+
+            if (row.child.isShown())
+            {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else
+            {
+                // Open this row
+                row.child(data.Admin.formatDeadJobDetails(row.data())).show();
+                tr.addClass('shown');
             }
         });
     },
 
+    // Renders checkboxes for dead job table
+    renderDeadJobSelectOptions: function (d)
+    {
+        var checkboxId = 'dead-job-select-' + d.SubmissionID;
+
+        return '<fieldset class="form-group mb-0 text-left">' +
+            '<input type="checkbox" id="' + checkboxId + '" data-id="' + d.SubmissionID + '" class="form-check-input dead-job-select-checkbox select-all-target" >' +
+            '<label for="' + checkboxId + '" class="form-check-label p-0"></label>' +
+            '</fieldset >';
+    },
+
+    // Creates extension to the dead job table to allow for exapandable accordion
+    formatDeadJobDetails: function (d)
+    {
+        // `d` is the original data object for the row
+        var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+        
+        table +=
+            '<tr>' +
+            '<td><b>Dataset File ID</b>: </td>' +
+            '<td>' + d.DatasetFileID + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>Livy Spark Ui Url</b>:</td>' +
+            '<td>' + d.LivySparkUiUrl + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>Livy Driver Log Url</b>: </td>' +
+            '<td>' + d.LivyDriverlogUrl + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>Livy App ID</b>: </td>' +
+            '<td>' + d.LivyAppID + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>Batch ID</b>: </td>' +
+            '<td>' + d.BatchID + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>Submission ID</b>: </td>' +
+            '<td>' + d.SubmissionID + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td><b>Run Instance Guid</b>: </td>' +
+            '<td>' + d.RunInstanceGuid + '</td>' +
+            '</tr>' +
+
+            '</table>';
+
+        return table;
+    },
+
     // creates url for ajax call to get schema associated with selected dataset
     GetSchemaUrl: function (datasetId) {
-        return "../../api/v2/metadata/dataset/" + datasetId + "/schema";
+        return "../../api/" + data.GetApiVersion() + "/metadata/dataset/" + datasetId + "/schema";
     },
 
     GetFileUrl: function (datasetId, schemaId) {
     // creates url for Ajax call to get data files
-        return "../../api/v2/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
+        return "../../api/" + data.GetApiVersion() + "/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
     },
 
     GetFlowStepUrl: function (schemaId) {
-        return "../../api/v2/dataflow?schemaId=" + schemaId;
+        return "../../api/" + data.GetApiVersion() + "/dataflow?schemaId=" + schemaId;
+    },
+
+    // creates url for ajax call to get all dead jobs succeeding the selected date
+    GetDeadJobResultsUrl: function (selectedDate)
+    {
+        return "GetDeadJobsForGrid?selectedDate=" + encodeURIComponent(selectedDate);
     },
 
     /**
@@ -360,18 +493,19 @@ data.Admin = {
             if (timeCheck) {
                 $.ajax({
                     type: "GET",
-                    url: "GetDeadJobs?selectedDate=" + encodeURIComponent(formattedDateString),
+                    url: "DeadJobTable",
                     dataType: "html",
-                    success: function (msg) {
+                    success: function (view) {
                         // Append table to parent div
-                        $("#deadJobTable").html(msg);
+                        $("#tab-spinner").hide();
+                        $("#deadJobTable").html(view);
                     },
                     error: function (msg) {
                         alert(msg);
                     },
                     complete: function (msg) {
                         // Hide spinner
-                        $("#tab-spinner").hide();
+                        data.Admin.DeadJobTableInit(selectedDate);
                     }
                 });
             }
@@ -661,7 +795,7 @@ data.Admin = {
 
                 $.ajax({
                     type: "POST",
-                    url: "../../api/v2/datafile/DataFile/Reprocess",
+                    url: "../../api/" + data.GetApiVersion() + "/datafile/DataFile/Reprocess",
                     // Async has been set to false in order to await callback functions before the next iteration over the returnJson array
                     async: false,
                     contentType: "application/json",
@@ -751,7 +885,7 @@ data.Admin = {
             var flowStep = $("#flowStepsDropdown").find(":selected").val();
             $.ajax({
                 type: "POST",
-                url: "../../api/v2/datafile/DataFile/Reprocess",
+                url: "../../api/" + data.GetApiVersion() + "/datafile/DataFile/Reprocess",
                 contentType: "application/json",
                 data: JSON.stringify({ DataFlowStepId: flowStep, DatasetFileIds: filesToReprocess }),
                 success: function () {

@@ -41,7 +41,7 @@ namespace Sentry.data.Web.Controllers
         private readonly ISAIDService _saidService;
         private readonly IJobService _jobService;
         private readonly NamedEnvironmentBuilder _namedEnvironmentBuilder;
-        private readonly IElasticContext _elasticContext;
+        private readonly IElasticDocumentClient _elasticDocumentClient;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
         private readonly IDatasetFileService _datasetFileService;
         private readonly ILogger<DatasetController> _logger;
@@ -59,7 +59,7 @@ namespace Sentry.data.Web.Controllers
             ISAIDService saidService,
             IJobService jobService,
             NamedEnvironmentBuilder namedEnvironmentBuilder,
-            IElasticContext elasticContext,
+            IElasticDocumentClient elasticDocumentClient,
             Lazy<IDataApplicationService> dataApplicationService,
             IDatasetFileService datasetFileService,
             ILogger<DatasetController> logger)
@@ -76,7 +76,7 @@ namespace Sentry.data.Web.Controllers
             _saidService = saidService;
             _jobService = jobService;
             _namedEnvironmentBuilder = namedEnvironmentBuilder;
-            _elasticContext = elasticContext;
+            _elasticDocumentClient = elasticDocumentClient;
             _dataApplicationService = dataApplicationService;
             _datasetFileService = datasetFileService;
             _logger = logger;
@@ -473,7 +473,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult SchemaSearch(int datasetId, int schemaId, string search = null)
         {
-            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticContext, datasetId, schemaId);
+            ElasticSchemaSearchProvider elasticSchemaSearch = new ElasticSchemaSearchProvider(_elasticDocumentClient, datasetId, schemaId);
             List<ElasticSchemaField> results = elasticSchemaSearch.Search(search);
             return Json(results, JsonRequestBehavior.AllowGet);
         }

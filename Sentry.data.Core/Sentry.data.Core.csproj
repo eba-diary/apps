@@ -43,11 +43,11 @@
     <Reference Include="Elasticsearch.Net, Version=7.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\Elasticsearch.Net.7.17.4\lib\net461\Elasticsearch.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Core.1.7.31\lib\net46\Hangfire.Core.dll</HintPath>
+    <Reference Include="Hangfire.Core, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.7.34\lib\net46\Hangfire.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.SqlServer.1.7.31\lib\net45\Hangfire.SqlServer.dll</HintPath>
+    <Reference Include="Hangfire.SqlServer, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.SqlServer.1.7.34\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
@@ -373,6 +373,8 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
+    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
@@ -523,6 +525,7 @@
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\FeatureNotEnabledException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
+    <Compile Include="Exceptions\ResourceFeatureDisabledException.cs" />
     <Compile Include="Exceptions\ResourceForbiddenException.cs" />
     <Compile Include="Exceptions\ResourceNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
@@ -631,6 +634,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
+    <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
@@ -657,6 +661,7 @@
     <Compile Include="Interfaces\IMigrationService.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
     <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
+    <Compile Include="Interfaces\Elastic\IElasticIndexClient.cs" />
     <Compile Include="Interfaces\IFileProvider.cs" />
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
@@ -673,7 +678,7 @@
     <Compile Include="Interfaces\IDataFlowMetricService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
-    <Compile Include="Interfaces\IElasticContext.cs" />
+    <Compile Include="Interfaces\Elastic\IElasticDocumentClient.cs" />
     <Compile Include="Interfaces\IDeadSparkJobService.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
@@ -707,6 +712,9 @@
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexProvider.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexService.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexSource.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />

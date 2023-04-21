@@ -67,11 +67,11 @@
     <Reference Include="Elasticsearch.Net, Version=7.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\Elasticsearch.Net.7.17.4\lib\net461\Elasticsearch.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Core.1.7.31\lib\net46\Hangfire.Core.dll</HintPath>
+    <Reference Include="Hangfire.Core, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.7.34\lib\net46\Hangfire.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.SqlServer.1.7.31\lib\net45\Hangfire.SqlServer.dll</HintPath>
+    <Reference Include="Hangfire.SqlServer, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.SqlServer.1.7.34\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.4\lib\net461\Iesi.Collections.dll</HintPath>
@@ -412,7 +412,7 @@
   <ItemGroup>
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="DomainContexts\ElasticContext.cs" />
+    <Compile Include="ServiceImplementations\Elastic\ElasticDocumentClient.cs" />
     <Compile Include="Exceptions\AcceptableErrorException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
@@ -546,9 +546,11 @@
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleSearchConsoleJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
+    <Compile Include="ServiceImplementations\Elastic\ElasticIndexClient.cs" />
     <Compile Include="ServiceImplementations\FileProvider.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentSchemaIdResult.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentDatasetIdResult.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GlobalDatasetAdminService.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />
@@ -602,6 +604,9 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsJobProvider.cs" />
     <Compile Include="ServiceImplementations\MotiveProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
+    <Compile Include="ServiceImplementations\Reindex\ElasticReindexProvider.cs" />
+    <Compile Include="ServiceImplementations\Reindex\GlobalDatasetReindexSource.cs" />
+    <Compile Include="ServiceImplementations\Reindex\ReindexService.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\QualRetrieverJobProvider.cs" />

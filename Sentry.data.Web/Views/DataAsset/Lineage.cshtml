@@ -429,7 +429,7 @@
 
         $(document).on('click', '.btnShowDetails', function () {
 
-            var url = "/api/v1/lineage/description?LineCDE=" + Line_CDE + "&DataAsset_ID=" + DataAsset_ID;
+            var url = "/api/" + data.GetApiVersion() + "/lineage/description?LineCDE=" + Line_CDE + "&DataAsset_ID=" + DataAsset_ID;
             if ($($(this).parent().children('.SourceElement_NME')[0]).text()) {
                 url += "&DataElement_NME=" + $($(this).parent().children('.SourceElement_NME')[0]).text();
             }
@@ -811,7 +811,7 @@
                     baseUrlParameters = "?LineCDE=" + Line_CDE;
                 }
 
-                var url = "/api/v1/lineage/businessTerms" + baseUrlParameters;
+                var url = "/api/" + data.GetApiVersion() + "/lineage/businessTerms" + baseUrlParameters;
 
                 if (($('#dataElements').val() && !first) || (elementFromURL && first)) {
                     url += dataElementParameter;
@@ -824,7 +824,7 @@
                     allData.push('');
                     self.availableDataObjectFields(allData);
 
-                    var url2 = "/api/v1/lineage/lineageTables" + baseUrlParameters;
+                    var url2 = "/api/" + data.GetApiVersion() + "/lineage/lineageTables" + baseUrlParameters;
 
                     if ($('#dataElements').val() && !first) {
                         url2 += dataElementParameter;
@@ -846,7 +846,7 @@
                         }
                     });
 
-                    var url3 = "/api/v1/lineage/layers" + baseUrlParameters;
+                    var url3 = "/api/" + data.GetApiVersion() + "/lineage/layers" + baseUrlParameters;
 
                     if ($('#dataObjects').val() && !first) {
                         url3 += dataObjectParameter;
@@ -869,7 +869,7 @@
                         }
                     });
 
-                    var url4 = "/api/v1/lineage/lineage" + baseUrlParameters;
+                    var url4 = "/api/" + data.GetApiVersion() + "/lineage/lineage" + baseUrlParameters;
 
                     if ($('#dataElements').val()) {
                         url4 += dataElementParameter;
@@ -901,7 +901,7 @@
                         });
                     }
 
-                    var url6 = "/api/v1/lineage/businessTermDescription" + baseUrlParameters;
+                    var url6 = "/api/" + data.GetApiVersion() + "/lineage/businessTermDescription" + baseUrlParameters;
 
                     if ($('#dataObjectFields').val() && !first) {
                         url6 += dataFieldParameter;
@@ -916,7 +916,7 @@
 
                 //THIS WILL RUN IF AND ONLY IF THERE IS A DATA ELEMENT IN THE URL.
                 if (first && elementFromURL) {
-                    var url5 = "/api/v1/lineage/lineage" + baseUrlParameters + elementFromURL;
+                    var url5 = "/api/" + data.GetApiVersion() + "/lineage/lineage" + baseUrlParameters + elementFromURL;
 
                     $.getJSON(encodeURI(url5), function (allData) {
                         var items = $.map(allData, function (item) { return new Lineage(item, self) });

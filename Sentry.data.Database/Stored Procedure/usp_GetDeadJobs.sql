@@ -4,9 +4,6 @@ AS
 
 SET NOCOUNT ON
 
-IF OBJECT_ID('tempdb..#tempSubmission') IS NOT NULL DROP TABLE #tempSubmission
-IF OBJECT_ID('tempdb..#tempSubs') IS NOT NULL DROP TABLE #tempSubs
-IF OBJECT_ID('tempdb..#Submissions') IS NOT NULL DROP TABLE #Submissions
 IF OBJECT_ID('tempdb..#tempSubmissionDetails') IS NOT NULL DROP TABLE #tempSubmissionDetails
 IF OBJECT_ID('tempdb..#TempSubmissionDetails_RowNum') IS NOT NULL DROP TABLE #TempSubmissionDetails_RowNum
 IF OBJECT_ID('tempdb..#IdentifiedDeadJobs') IS NOT NULL DROP TABLE #IdentifiedDeadJobs
@@ -14,18 +11,11 @@ IF OBJECT_ID('tempdb..#EventMetadata') IS NOT NULL DROP TABLE #EventMetadata
 IF OBJECT_ID('tempdb..#EnvironmentJobIDs') IS NOT NULL DROP TABLE #EnvironmentJobIDs
 
 /************************
-This stored procedure is used to produce results to UI
-
-Do not change output format unless UI is tested. 
-
-Job IDs:
-PRDO     = 465
-QUAL OG  = 529
-QUAL NEW = 4638
-QUALNP   = 4637
-TEST     = 262
+Job IDs
+prod = 465
+QUAL = 529
+TEST = 262
 ************************/
-
 /* Determine current named environment */
 DECLARE @ENV VARCHAR(10) = (select CAST(value as VARCHAR(10)) from sys.extended_properties where NAME = 'NamedEnvironment')
 
@@ -42,71 +32,67 @@ BEGIN
 END
 ELSE IF @ENV = 'PROD'
 BEGIN 
-    INSERT #EnvironmentJobIDs(Job_ID) values(465);
+    INSERT #EnvironmentJobIDs(Job_ID) values(3190),(3191),(465);
 END
 
 
-select distinct Submission,History_Id
-into #Submissions
-from JobHistory
-inner join #EnvironmentJobIDs ON JobHistory.Job_ID = #EnvironmentJobIDs.Job_ID
-where State = 'Dead' and Created > @TimeCreated
-order by History_Id DESC
-
-/* SELECT * FROM #Submissions */
-
-select
-subs.Submission_ID,
-subs.Job_ID,
-subs.Created,
-subs.Serialized_Job_Options,
+Select 
+Submission.Submission_ID,
+Submission.Job_ID as 'sub_Job_ID',
+Submission.Created as 'sub_Created',
+Submission.Serialized_Job_Options,
 REPLACE(
     REPLACE(
         REPLACE(
-                     REPLACE(
-                           REPLACE(JSON_QUERY(CAST(subs.Serialized_Job_Options as NVARCHAR(MAX)), '$.args'),'\',''),
-                           '"', '"'),
+            REPLACE(
+                REPLACE(Option_Metadata.arguments,'\\',''),
+                '\"', '"'),
         '["{','{'),
     '}"]','}'),
-'} "]','}') as 'arguments'
-into #tempSubs
-from Submission subs
-join #Submissions selectedSubs on
-    subs.Submission_ID = selectedSubs.Submission
-order by subs.Submission_ID DESC
-
-/* SELECT * FROM #tempSubs */
-
-select
-subs.Submission_ID,
-subs.Job_ID as 'sub_Job_ID',
-subs.Created as 'sub_Created',
-subs.Serialized_Job_Options,
-JSON_VALUE(arguments, '$.KafkaProducer.TargetTopic') as 'topic',
-JSON_VALUE(arguments, '$.ProgramArguments.SourceBucketName') as 'SourceBucketName',
-JSON_VALUE(arguments, '$.ProgramArguments.SourceKey') as 'SourceKey',
-JSON_VALUE(arguments, '$.ProgramArguments.TargetBucketName') as 'TargetBucketName',
-JSON_VALUE(arguments, '$.ProgramArguments.TargetKey') as 'TargetKey',
-JSON_VALUE(arguments, '$.Dataset_ID') as 'Dataset_ID',
-JSON_VALUE(arguments, '$.Schema_ID') as 'Schema_ID',
-JSON_VALUE(arguments, '$.FlowExecutionGuid') as 'FlowExecutionGuid',
-JSON_VALUE(arguments, '$.RunInstanceGuid') as 'RunInstanceGuid',
-hist.*
+'} "]','}') as 'arguments',
+Argument_Metadata.topic,
+Argument_Metadata.SourceBucketName,
+Argument_Metadata.SourceKey,
+Argument_Metadata.TargetBucketName,
+Argument_Metadata.TargetKey,
+Argument_Metadata.Dataset_ID,
+Argument_Metadata.[Schema_ID],
+CASE
+    WHEN Submission.Created > '2023-03-31 17:05:00' THEN REVERSE(SUBSTRING(REVERSE(Argument_Metadata.TargetKey),0,16))
+    ELSE REVERSE(SUBSTRING(REVERSE(Argument_Metadata.TargetKey),0,35))
+END as FileNameSnippetValidator,  /* The case statement is needed due to flowexecutionguid being prefixed vs suffixed on file name after 2023-03-31 17:05:00*/
+JobHistory.*
 into #tempSubmissionDetails
-from #tempSubs subs
-join JobHistory hist on
-    subs.Submission_ID = hist.Submission
-order by subs.Created DESC, hist.History_Id DESC
-
-/* SELECT * FROM #tempSubmissionDetails */
+from Submission
+join JobHistory on
+    Submission.Submission_ID = JobHistory.Submission
+CROSS APPLY OPENJSON(Submission.Serialized_Job_Options, '$.args') WITH (
+    arguments NVARCHAR(MAX) '$'
+) Option_Metadata
+CROSS APPLY OPENJSON(Option_Metadata.arguments, '$') WITH ( 
+    topic VARCHAR(250) '$.KafkaProducer.TargetTopic',
+    SourceBucketName VARCHAR(250) '$.ProgramArguments.SourceBucketName',
+    SourceKey VARCHAR(250) '$.ProgramArguments.SourceKey',
+    TargetBucketName VARCHAR(250) '$.ProgramArguments.TargetBucketName',
+    TargetKey VARCHAR(250) '$.ProgramArguments.TargetKey',
+    Dataset_ID bigint '$.Dataset_ID',
+    [Schema_ID] bigint '$.Schema_ID'
+) Argument_Metadata
+where 
+    JobHistory.State = 'Dead'
+    and Submission.Job_ID in (3190, 3191, 465)
+    and Submission.Created > @TimeCreated
+order by Submission.Created DESC, JobHistory.History_Id DESC
 
 select 
 ROW_NUMBER() OVER(PARTITION BY Dataset_ID,Schema_ID,BatchId ORDER BY History_Id DESC) AS RowNumber,
-*
+*,
+CASE
+    WHEN sub_Created > '2023-03-31 17:05:00' THEN SUBSTRING(REVERSE(SUBSTRING(REVERSE(TargetKey),0,CHARINDEX('/',REVERSE(TargetKey),0))),0,18)
+    ELSE REVERSE(SUBSTRING(REVERSE(TargetKey), CHARINDEX('.',REVERSE(TargetKey),0) + 1, 17))
+END as 'ExecutionGuid'
 into #TempSubmissionDetails_RowNum
 from #tempSubmissionDetails
-
-/* SELECT * FROM #TempSubmissionDetails_RowNum */
 
 select 
 ROW_NUMBER() OVER(PARTITION BY TSD_Num.Submission_Id ORDER BY EM.EventMetricsId DESC) AS RowNumber,
@@ -115,15 +101,14 @@ EM.EventMetricsId
 into #EventMetadata
 from #TempSubmissionDetails_RowNum TSD_Num
 join EventMetrics EM on
-       TSD_Num.FlowExecutionGuid = EM.FlowExecutionGuid
+    TSD_Num.ExecutionGuid = EM.FlowExecutionGuid
 join DataFlowStep DFS on
-       EM.DataFlowStepId = DFS.Id
+    EM.DataFlowStepId = DFS.Id
 where 
-       TSD_Num.RowNumber = 1
-       and DFS.DataAction_Type_Id = 5
-
-/* SELECT * FROM #EventMetadata where RowNumber = 1 */
-
+    TSD_Num.RowNumber = 1
+    and DFS.DataAction_Type_Id in (5, 17)
+    and EM.MessageValue like '%' + TSD_NUM.FileNameSnippetValidator + '%'   /* Needed due to FlowExecutionGuid duplication within a given schema */
+    
 
 select
 TSD.Submission_id,
@@ -152,28 +137,16 @@ TSD.RunInstanceGuid
 into #IdentifiedDeadJobs
 from #TempSubmissionDetails_RowNum TSD
 join Dataset DS on
-       TSD.Dataset_ID = DS.Dataset_ID
+    TSD.Dataset_ID = DS.Dataset_ID
 join [Schema] SCM on
-       TSD.Schema_ID = SCM.Schema_ID
+    TSD.Schema_ID = SCM.Schema_ID
 join #EventMetadata EvMetadata on
-       TSD.Submission_ID = EvMetadata.Submission_ID
+    TSD.Submission_ID = EvMetadata.Submission_ID
 join EventMetrics EM on
-       EvMetadata.EventMetricsId = EM.EventMetricsId
-left join DatasetFile DF on
-    DF.Dataset_Id = TSD.Dataset_ID and
-    DF.Schema_ID = TSD.Schema_ID and
-    DF.FlowExecutionGuid = TSD.FlowExecutionGuid and
-       COALESCE(DF.RunInstanceGuid, 'none') = COALESCE(TSD.RunInstanceGuid, 'none') and
-    DF.FileKey = TSD.SourceKey
-left join DataFlow DFlow on
-       TSD.Dataset_ID = DFlow.DatasetId and
-       TSD.Schema_ID = DFlow.SchemaId
-left join DataFlowStep DFlowStep on
-       DFlowStep.DataFlow_Id = DFlow.Id and
-       DFlowStep.DataAction_Type_Id = 2
-where TSD.RowNumber = 1 and EvMetadata.RowNumber = 1
+    EvMetadata.EventMetricsId = EM.EventMetricsId
+where 
+    TSD.RowNumber = 1 
+    and EvMetadata.RowNumber = 1
 order by TSD.sub_Created
 
 SELECT * FROM #IdentifiedDeadJobs
-
-GO

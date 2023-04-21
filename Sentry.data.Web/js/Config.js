@@ -104,7 +104,7 @@ data.Config = {
 
             Sentry.ShowModalConfirmation(warningMsg, function () {
                 $.ajax({
-                    url: "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/syncconsumptionlayer",
+                    url: "/api/" + data.GetApiVersion() + "/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/syncconsumptionlayer",
                     method: "POST",
                     dataType: 'json',
                     success: function (obj) {
