@@ -14,15 +14,6 @@ namespace Sentry.data.Web
         /// </summary>
         public static ILoggerFactory ConfigureLogger()
         {
-            //Sentry.Common.Logging.Logger.LoggingFrameworkAdapter =
-            //    new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
-            //Sentry.Web.Logging.Logger.LoggingFrameworkAdapter =
-            //    new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SentryWebLogger"));
-            //Sentry.Smarts.Logging.Logger.LoggingFrameworkAdapter =
-            //    new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SmartsLogger"));
-
-            // JCG NOTES: If you are using any other Sentry components (like Sentry.Eventing, etc.) you can wire up their loggers here also
-
             Sentry.Common.Logging.Logger.LoggingFrameworkAdapter =
                 new Sentry.Common.Logging.Adapters.Log4netAdapter("Sentry.Common.Logging");
 

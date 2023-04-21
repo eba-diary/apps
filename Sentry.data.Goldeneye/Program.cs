@@ -25,6 +25,9 @@ namespace Sentry.data.Goldeneye
             //initialize logging framework
             var loggerFactory = ConfigureLogger();
 
+            //Configured for cases where DI is not possible
+            Logging.LoggerFactory = loggerFactory;
+
             Bootstrapper.Init();
             Bootstrapper.Container.Configure((x) =>
             {

@@ -35,6 +35,9 @@ namespace Sentry.data.Web
             //Application Initialization
             var loggerFactory = LoggerHelper.ConfigureLogger();
 
+            //Configured for cases where DI is not possible
+            Logging.LoggerFactory = loggerFactory;
+
             Bootstrapper.Init();
 
             //MVC dependency resolver
