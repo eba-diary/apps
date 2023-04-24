@@ -11,7 +11,7 @@ namespace Sentry.data.Core
         {
             if (TryGetFilterSearchFieldProperty<T>(categoryName, out PropertyInfo property))
             {
-                result = property.GetCustomAttribute<FilterSearchField>().FilterCategoryName;
+                result = property.GetCustomAttribute<FilterSearchFieldAttribute>().FilterCategoryName;
                 return true;
             }
 
@@ -21,13 +21,18 @@ namespace Sentry.data.Core
 
         public static bool TryGetFilterSearchFieldProperty<T>(string categoryName, out PropertyInfo property)
         {
-            property = GetPropertiesWithAttribute<T, FilterSearchField>().FirstOrDefault(x => x.GetCustomAttribute<FilterSearchField>().FilterCategoryName.Equals(categoryName, StringComparison.OrdinalIgnoreCase));
+            property = GetPropertiesWithAttribute<T, FilterSearchFieldAttribute>().FirstOrDefault(x => x.GetCustomAttribute<FilterSearchFieldAttribute>().FilterCategoryName.Equals(categoryName, StringComparison.OrdinalIgnoreCase));
             return property != null;
         }
         
         public static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<T, attrT>()
         {
-            return typeof(T).GetProperties().Where(p => Attribute.IsDefined(p, typeof(attrT)));
+            return GetPropertiesWithAttribute<attrT>(typeof(T));
+        }
+
+        public static IEnumerable<PropertyInfo> GetPropertiesWithAttribute<attrT>(Type type)
+        {
+            return type.GetProperties().Where(p => Attribute.IsDefined(p, typeof(attrT)));
         }
     }
 }

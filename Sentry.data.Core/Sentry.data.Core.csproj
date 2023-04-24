@@ -176,8 +176,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\FilterSearchField.cs" />
-    <Compile Include="Attributes\GlobalSearchField.cs" />
+    <Compile Include="Attributes\FilterSearchFieldAttribute.cs" />
+    <Compile Include="Attributes\GlobalSearchFieldAttribute.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
     <Compile Include="DomainServices\MigrationService.cs" />
     <Compile Include="DomainServices\DataSourceService.cs" />
@@ -210,9 +210,9 @@
     <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchDto.cs" />
-    <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryAssetCategoriesDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryCategoryDto.cs" />
+    <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchResultDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryEventDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySearchResultDto.cs" />
@@ -243,8 +243,11 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
-    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsDto.cs" />
-    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
@@ -272,6 +275,7 @@
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
+    <Compile Include="DTO\Search\BaseFilterSearchDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />

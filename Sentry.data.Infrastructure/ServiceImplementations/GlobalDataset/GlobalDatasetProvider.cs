@@ -1,4 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,31 @@ namespace Sentry.data.Infrastructure
             _elasticDocumentClient = elasticDocumentClient;
             _datasetContext = datasetContext;
         }
+
+        #region Search
+        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Size = 10000;
+
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            return elasticResult.Documents.ToList();
+        }
+
+        public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
+            searchRequest.Size = 0;
+
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(filterSearchDto.FilterCategories);
+
+            return filterCategories;
+        }
+        #endregion
 
         #region Global Dataset
         public async Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset)
@@ -198,6 +224,16 @@ namespace Sentry.data.Infrastructure
             }
 
             return getByResult;
+        }
+
+        private SearchRequest<GlobalDataset> GetSearchRequest(BaseFilterSearchDto filterSearchDto)
+        {
+            BoolQuery searchQuery = filterSearchDto.ToSearchQuery<GlobalDataset>();
+
+            return new SearchRequest<GlobalDataset>
+            {
+                Query = searchQuery
+            };
         }
         #endregion
     }
