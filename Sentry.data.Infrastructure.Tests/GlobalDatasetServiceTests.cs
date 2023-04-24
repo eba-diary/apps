@@ -2,6 +2,7 @@
 using Moq;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Infrastructure.FeatureFlags;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -91,7 +92,10 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IUserService> userService = mr.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("082116");
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object, dataFeatures.Object);
 
             SearchGlobalDatasetsResultDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
@@ -142,7 +146,10 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IUserService> userService = mr.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("082116");
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object, dataFeatures.Object);
 
             SearchGlobalDatasetsResultDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
@@ -163,7 +170,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             globalDatasetProvider.Setup(x => x.GetGlobalDatasetFiltersAsync(filterSearchDto)).ReturnsAsync(filterCategories);
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null);
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, null);
 
             List<FilterCategoryDto> results = await globalDatasetService.GetGlobalDatasetFiltersAsync(filterSearchDto);
 
