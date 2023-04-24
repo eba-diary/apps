@@ -36,16 +36,17 @@ namespace Sentry.data.Core.Tests
         public void Security_Secured_NotOwner_Admin()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
+
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
             securable.Setup(x => x.PrimaryContactId).Returns("1234567");
             securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(true);
             user.Setup(x => x.CanModifyDataset).Returns(true);
@@ -56,7 +57,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -74,17 +75,17 @@ namespace Sentry.data.Core.Tests
         public void Security_Secured_NotOwner_Admin_ExplicitPermissions()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
 
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
             securable.Setup(x => x.PrimaryContactId).Returns("1234567");
             securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(true);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(true);
             user.Setup(x => x.CanModifyDataset).Returns(true);
@@ -94,7 +95,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -112,17 +113,17 @@ namespace Sentry.data.Core.Tests
         public void Security_AdminDataPermissionAreExplicit_Prevents_Implicit_Admin_Access()
         {
             //Arrange
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
             
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
             securable.Setup(x => x.PrimaryContactId).Returns("123456");
 
-            Mock<IApplicationUser> AdminUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> AdminUser = _mockRepository.Create<IApplicationUser>();
             AdminUser.Setup(x => x.AssociateId).Returns("072984");
             AdminUser.Setup(x => x.IsAdmin).Returns(true);
             AdminUser.Setup(x => x.CanModifyDataset).Returns(true);
@@ -133,7 +134,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(securable.Object, AdminUser.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsFalse(us.CanViewData);
         }
@@ -142,7 +143,7 @@ namespace Sentry.data.Core.Tests
         public void Security_AdminDataPermissionAreExplicit_Admin_Access_When_Requested()
         {
             //Arrange
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
 
             Security security = BuildBaseSecurity();
             SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
@@ -150,12 +151,12 @@ namespace Sentry.data.Core.Tests
             ticket1.AddedPermissions.Add(viewFullDatasetPermission1);
             security.Tickets.Add(ticket1);
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.PrimaryContactId).Returns("1234567");
             securable.Setup(x => x.Security).Returns(security);
 
-            Mock<IApplicationUser> adminUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> adminUser = _mockRepository.Create<IApplicationUser>();
             adminUser.Setup(x => x.AssociateId).Returns("072984");
             adminUser.Setup(x => x.IsAdmin).Returns(true);
             adminUser.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
@@ -167,7 +168,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(securable.Object, adminUser.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanViewData);
         }
@@ -176,16 +177,16 @@ namespace Sentry.data.Core.Tests
         public void Security_AdminDataPermissionAreExplicit_Allows_Implicit_Admin_Access_When_false()
         {
             //Arrange
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
             securable.Setup(x => x.PrimaryContactId).Returns("1234567");
             securable.Setup(x => x.Security).Returns(security);
 
-            Mock<IApplicationUser> adminUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> adminUser = _mockRepository.Create<IApplicationUser>();
             adminUser.Setup(x => x.AssociateId).Returns("072984");
             adminUser.Setup(x => x.IsAdmin).Returns(true);
             adminUser.Setup(x => x.CanModifyDataset).Returns(true);
@@ -196,7 +197,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(securable.Object, adminUser.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanViewData);
         }
@@ -440,7 +441,7 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_NonSecured_As_ServiceAccount_With_CanManageSchema_Permission()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
 
             //Create security ticket for AD group granting CanManageSchema permission
             Security security = BuildBaseSecurity();
@@ -450,13 +451,13 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
             securable.Setup(x => x.PrimaryContactId).Returns("123456");
             securable.Setup(x => x.Security).Returns(security);
 
             //Establish user, ensure user is part of AD group and is not DSC admin
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true); /* User is part of AD group */
             user.Setup(x => x.IsAdmin).Returns(false);  /* User is not DSC Admin */
@@ -469,7 +470,7 @@ namespace Sentry.data.Core.Tests
 
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsTrue(us.CanDeleteDatasetFile);
 
@@ -482,6 +483,7 @@ namespace Sentry.data.Core.Tests
         public void GetUserSecurity_CanManageSchema_InheritedFromParent()
         {
             //ARRAGE
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
 
             //Create security ticket for parent asset securable
             var parentSecurity = BuildBaseSecurity();
@@ -901,7 +903,9 @@ namespace Sentry.data.Core.Tests
         public void Security_CanCreateDataflow_NullSecurable_Admin()
         {
             //ARRAGE
-            var user = new Mock<IApplicationUser>();
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
+
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(true);
 
@@ -947,6 +951,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanCreateDataFlow);
         }
         #endregion
@@ -959,9 +964,9 @@ namespace Sentry.data.Core.Tests
         public void Security_CanModifyDataflow_NullSecurable_Admin()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(true);
 
@@ -970,6 +975,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanModifyDataflow);
         }
 
@@ -1001,13 +1007,14 @@ namespace Sentry.data.Core.Tests
         public void Security_CanModifyDataflow_Securable_Admin()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
+            _dataFeatures.Setup(s => s.CLA4049_ALLOW_S3_FILES_DELETE.GetValue()).Returns(true);
+
             Security security = BuildBaseSecurity(securableEntityName: SecurableEntityName.DATAFLOW);
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(true);
 
@@ -1017,6 +1024,7 @@ namespace Sentry.data.Core.Tests
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanModifyDataflow);           
         }
         

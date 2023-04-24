@@ -309,6 +309,9 @@
     <Compile Include="Attributes\FilterSearchField.cs" />
     <Compile Include="Attributes\GlobalSearchField.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
+    <Compile Include="DependencyInjection\DomainServiceCommonDependency.cs" />
+    <Compile Include="DependencyInjection\CommonDependency.cs" />
+    <Compile Include="DomainServices\BaseDomainSerivce.cs" />
     <Compile Include="DomainServices\MigrationService.cs" />
     <Compile Include="DomainServices\DataSourceService.cs" />
     <Compile Include="DomainServices\DeadSparkJobService.cs" />

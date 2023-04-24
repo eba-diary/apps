@@ -164,6 +164,7 @@
     <Compile Include="DeadSparkJobServiceTests.cs" />
     <Compile Include="DataApplicationServiceTests.cs" />
     <Compile Include="DatasetTests.cs" />
+    <Compile Include="DomainServiceUnitTest.cs" />
     <Compile Include="HelperTests\CustomAttributeHelperTests.cs" />
     <Compile Include="HelperTests\DSCEventTopicHelperTests.cs" />
     <Compile Include="HelperTests\JiraHelperTests.cs" />

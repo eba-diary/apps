@@ -12,14 +12,18 @@ namespace Sentry.data.Core.Tests
     public class BaseCoreUnitTest
     {
         protected static IContainer _container;
-
+        protected MockRepository _mockRepository;
 
         protected ISecurityService _securityService;
-        protected IDatasetContext _datasetContext;
+        protected Mock<IDatasetContext> _datasetContext;
+        protected Mock<IDataFeatures> _dataFeatures;
 
-        public virtual void TestInitialize()
+        public virtual void TestInitialize(MockBehavior mockBehavior = MockBehavior.Loose)
         {
             StructureMap.Registry registry = new StructureMap.Registry();
+            _mockRepository = new MockRepository(mockBehavior);
+            _dataFeatures = _mockRepository.Create<IDataFeatures>();
+            _datasetContext = _mockRepository.Create<IDatasetContext>();
 
             //this should can all core assembly for implementations
             registry.Scan((scanner) =>
@@ -28,10 +32,13 @@ namespace Sentry.data.Core.Tests
                 scanner.WithDefaultConventions();
             });
 
+
+
+
             //add in the infrastructure implementations using MockRepository so we don't actually initalize contexts or services.
-            registry.For<IDatasetContext>().Use(() => new Mock<IDatasetContext>().Object);
+            registry.For<IDatasetContext>().Use(() => _datasetContext.Object);
             registry.For<ITicketProvider>().Use(() => new Mock<ICherwellProvider>().Object);
-            registry.For<IDataFeatures>().Use(new MockDataFeatures());
+            registry.For<IDataFeatures>().Use(_dataFeatures.Object);
             registry.For<IInevService>().Use(() => new Mock<IInevService>().Object);
             registry.For<IQuartermasterService>().Use(() => new Mock<IQuartermasterService>().Object);
             registry.For<IJiraService>().Use(() => new Mock<IJiraService>().Object);

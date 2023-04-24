@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -8,15 +10,13 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class ConnectorService : IKafkaConnectorService
+    public class ConnectorService : BaseDomainSerivce<ConnectorService>, IKafkaConnectorService
     {
         private readonly IKafkaConnectorProvider _connectorProvider;
-        private readonly ILogger<ConnectorService> _logger;
         
-        public ConnectorService(IKafkaConnectorProvider connectorProvider, ILogger<ConnectorService> logger)
+        public ConnectorService(IKafkaConnectorProvider connectorProvider, DomainServiceCommonDependency<ConnectorService> commonDepenencies) : base(commonDepenencies)
         {
             _connectorProvider = connectorProvider;
-            _logger = logger;
         }
 
         /// <summary>
