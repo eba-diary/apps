@@ -1,10 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Nest;
 using NHibernate.Util;
 using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -984,6 +986,86 @@ namespace Sentry.data.Infrastructure.Tests
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, datasetContext.Object);
 
             await globalDatasetProvider.AddUpdateEnvironmentSchemaSaidAssetCodeAsync(4, "SAID");
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task SearchGlobalDatasetsAsync_BaseFilterSearchDto_GlobalDatasets()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticDocumentClient> elasticDocumentClient = mr.Create<IElasticDocumentClient>();
+
+            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            {
+                Documents = new List<GlobalDataset>
+                {
+                    new GlobalDataset()
+                }
+            };
+
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult);
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
+
+            BaseFilterSearchDto filterSearchDto = new BaseFilterSearchDto
+            {
+                SearchText = "search",
+                FilterCategories = new List<FilterCategoryDto>
+                {
+                    new FilterCategoryDto
+                    {
+                        CategoryName = FilterCategoryNames.Dataset.PRODUCERASSET,
+                        CategoryOptions = new List<FilterCategoryOptionDto>
+                        {
+                            new FilterCategoryOptionDto
+                            {
+                                OptionValue = "TEST",
+                                Selected = true
+                            }
+                        }
+                    },
+                    new FilterCategoryDto
+                    {
+                        CategoryName = FilterCategoryNames.Dataset.SECURED,
+                        CategoryOptions = new List<FilterCategoryOptionDto>
+                        {
+                            new FilterCategoryOptionDto
+                            {
+                                OptionValue = "true",
+                                Selected = true
+                            },
+                            new FilterCategoryOptionDto
+                            {
+                                OptionValue = "false",
+                                Selected = false
+                            }
+                        }
+                    },
+                    new FilterCategoryDto
+                    {
+                        CategoryName = FilterCategoryNames.Dataset.DATASETASSET,
+                        CategoryOptions = new List<FilterCategoryOptionDto>
+                        {
+                            new FilterCategoryOptionDto
+                            {
+                                OptionValue = "SAID",
+                                Selected = true
+                            },
+                            new FilterCategoryOptionDto
+                            {
+                                OptionValue = "DATA",
+                                Selected = true
+                            }
+                        }
+                    }
+                }
+            };
+
+            List<GlobalDataset> results = await globalDatasetProvider.SearchGlobalDatasetsAsync(filterSearchDto);
+
+            Assert.AreEqual(1, results.Count);
 
             mr.VerifyAll();
         }

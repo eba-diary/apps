@@ -14,16 +14,23 @@ namespace Sentry.data.Web
 
             if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.DATASET_SEARCH, StringComparison.OrdinalIgnoreCase))
             {
-                if (dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
-                {
-                    values["controller"] = "GlobalDatasetSearch";
-                    values["action"] = "Search";
-                }
-                else if (dataFeatures.CLA3756_UpdateSearchPages.GetValue())
+                if (dataFeatures.CLA3756_UpdateSearchPages.GetValue())
                 {
                     values["controller"] = "DatasetSearch";
                     values["action"] = "Search";
                 }
+
+                //commenting out until UI work
+                //if (dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+                //{
+                //    values["controller"] = "GlobalDatasetSearch";
+                //    values["action"] = "Search";
+                //}
+                //else if (dataFeatures.CLA3756_UpdateSearchPages.GetValue())
+                //{
+                //    values["controller"] = "DatasetSearch";
+                //    values["action"] = "Search";
+                //}
             }                
 
             return true;

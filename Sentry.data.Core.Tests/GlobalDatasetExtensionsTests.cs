@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Nest;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
@@ -201,6 +202,130 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Schema Name 1", environmentSchema.SchemaName);
             Assert.AreEqual("Schema Description 1", environmentSchema.SchemaDescription);
             Assert.AreEqual("SAID", environmentSchema.SchemaSaidAssetCode);
+        }
+
+        [TestMethod]
+        public void ToSearchResult_GlobalDataset_SearchGlobalDatasetResultDto_ProdEnvironment()
+        {
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                GlobalDatasetId = 1,
+                DatasetName = "Name",
+                DatasetSaidAssetCode = "SAID",
+                EnvironmentDatasets = new List<EnvironmentDataset>
+                {
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 11,
+                        DatasetDescription = "Description",
+                        CategoryCode = "Category",
+                        NamedEnvironment = "DEV",
+                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                        IsSecured = true,
+                        FavoriteUserIds = new List<string> { "082116" }
+                    },
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 12,
+                        DatasetDescription = "Description - Prod",
+                        CategoryCode = "Category",
+                        NamedEnvironment = "PROD",
+                        NamedEnvironmentType = NamedEnvironmentType.Prod.ToString(),
+                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                        IsSecured = true,
+                        FavoriteUserIds = new List<string>()
+                    },
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 13,
+                        DatasetDescription = "Description",
+                        CategoryCode = "Category",
+                        NamedEnvironment = "TEST",
+                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                        IsSecured = true,
+                        FavoriteUserIds = new List<string>()
+                    }
+                }
+            };
+
+            SearchGlobalDatasetResultDto result = globalDataset.ToSearchResult("082116");
+
+            Assert.AreEqual(1, result.GlobalDatasetId);
+            Assert.AreEqual("Name", result.DatasetName);
+            Assert.AreEqual("SAID", result.DatasetSaidAssetCode);
+            Assert.AreEqual("Description - Prod", result.DatasetDescription);
+            Assert.AreEqual("Category", result.CategoryCode);
+            Assert.AreEqual(3, result.NamedEnvironments.Count);
+            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
+            Assert.AreEqual("PROD", result.NamedEnvironments[1]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[2]);
+            Assert.IsTrue(result.IsSecured);
+            Assert.IsTrue(result.IsFavorite);
+            Assert.AreEqual("/Dataset/Detail/12", result.DatasetDetailPage);
+        }
+
+        [TestMethod]
+        public void ToSearchResult_GlobalDataset_SearchGlobalDatasetResultDto_NonProdEnvironment()
+        {
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                GlobalDatasetId = 1,
+                DatasetName = "Name",
+                DatasetSaidAssetCode = "SAID",
+                EnvironmentDatasets = new List<EnvironmentDataset>
+                {
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 11,
+                        DatasetDescription = "Description",
+                        CategoryCode = "Category",
+                        NamedEnvironment = "DEV",
+                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                        IsSecured = false,
+                        FavoriteUserIds = new List<string> { "082116" }
+                    },
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 12,
+                        DatasetDescription = "Description",
+                        CategoryCode = "Category",
+                        NamedEnvironment = "NRTEST",
+                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                        IsSecured = false,
+                        FavoriteUserIds = new List<string>()
+                    },
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 13,
+                        DatasetDescription = "Description - Last",
+                        CategoryCode = "Category",
+                        NamedEnvironment = "TEST",
+                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                        IsSecured = false,
+                        FavoriteUserIds = new List<string>()
+                    }
+                }
+            };
+
+            SearchGlobalDatasetResultDto result = globalDataset.ToSearchResult("000000");
+
+            Assert.AreEqual(1, result.GlobalDatasetId);
+            Assert.AreEqual("Name", result.DatasetName);
+            Assert.AreEqual("SAID", result.DatasetSaidAssetCode);
+            Assert.AreEqual("Description - Last", result.DatasetDescription);
+            Assert.AreEqual("Category", result.CategoryCode);
+            Assert.AreEqual(3, result.NamedEnvironments.Count);
+            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
+            Assert.AreEqual("NRTEST", result.NamedEnvironments[1]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[2]);
+            Assert.IsFalse(result.IsSecured);
+            Assert.IsFalse(result.IsFavorite);
+            Assert.AreEqual("/Dataset/Detail/13", result.DatasetDetailPage);
         }
 
         #region Helpers
