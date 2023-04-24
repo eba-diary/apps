@@ -37,7 +37,7 @@ namespace Sentry.data.Infrastructure
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories(filterSearchDto.FilterCategories);
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(filterSearchDto.FilterCategories);
 
             return filterCategories;
         }
