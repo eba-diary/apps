@@ -66,7 +66,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null, null);
 
-            await motiveProvider.MotiveOnboardingAsync(source, token, 999);
+            await motiveProvider.MotiveOnboardingAsync(source, token);
 
             Assert.AreEqual("COMPANY NAME", token.TokenName);
             
@@ -119,7 +119,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             MotiveProvider motiveProvider = new MotiveProvider(httpClient, datasetContext.Object, authProvider.Object, null, null, null);
 
-            await motiveProvider.MotiveOnboardingAsync(source, token, 999);
+            await motiveProvider.MotiveOnboardingAsync(source, token);
 
             Assert.AreEqual("OriginalName", token.TokenName);
 
