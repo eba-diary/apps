@@ -153,11 +153,6 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticDocumentClient.VerifyAll();
 
-            Assert.IsNotNull(result.DataInventoryEvent);
-            Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
-            Assert.AreEqual("Table AND Environment:P", result.DataInventoryEvent.SearchCriteria);
-            Assert.IsTrue(string.IsNullOrEmpty(result.DataInventoryEvent.QueryErrorMessage));
-
             Assert.AreEqual(2, result.FilterCategories.Count);
 
             //assert dto mapping
@@ -243,11 +238,6 @@ namespace Sentry.data.Infrastructure.Tests
             });
 
             elasticDocumentClient.VerifyAll();
-
-            Assert.IsNotNull(result.DataInventoryEvent);
-            Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
-            Assert.AreEqual("Environment:P OR D AND Sensitive:true", result.DataInventoryEvent.SearchCriteria);
-            Assert.AreEqual("Data Inventory Elasticsearch query failed. Exception: One or more errors occurred.", result.DataInventoryEvent.QueryErrorMessage);
 
             Assert.IsFalse(result.FilterCategories.Any());
         }

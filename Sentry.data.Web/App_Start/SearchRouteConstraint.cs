@@ -10,19 +10,28 @@ namespace Sentry.data.Web
     {
         public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection)
         {
-            if (DependencyResolver.Current.GetService<IDataFeatures>().CLA3756_UpdateSearchPages.GetValue())
+            IDataFeatures dataFeatures = DependencyResolver.Current.GetService<IDataFeatures>();
+
+            if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.DATASET_SEARCH, StringComparison.OrdinalIgnoreCase))
             {
-                if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.DATASET_SEARCH, StringComparison.OrdinalIgnoreCase))
+                if (dataFeatures.CLA3756_UpdateSearchPages.GetValue())
                 {
                     values["controller"] = "DatasetSearch";
                     values["action"] = "Search";
                 }
-                //else if (string.Equals(values["searchType"].ToString(), GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH, StringComparison.OrdinalIgnoreCase))
+
+                //commenting out until UI work
+                //if (dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                 //{
-                //    values["controller"] = "BusinessIntelligenceSearch";
+                //    values["controller"] = "GlobalDatasetSearch";
                 //    values["action"] = "Search";
                 //}
-            }
+                //else if (dataFeatures.CLA3756_UpdateSearchPages.GetValue())
+                //{
+                //    values["controller"] = "DatasetSearch";
+                //    values["action"] = "Search";
+                //}
+            }                
 
             return true;
         }
