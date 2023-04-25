@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Sentry.Common.Logging;
 using Sentry.Core;
-using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.Schema.Elastic;
