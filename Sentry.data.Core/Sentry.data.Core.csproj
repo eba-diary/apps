@@ -243,11 +243,13 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
-    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\GetGlobalDatasetFiltersDto.cs" />
+    <Compile Include="DTO\GlobalDataset\GetGlobalDatasetFiltersResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsDto.cs" />
     <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsDto.cs" />
-    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsResultsDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />

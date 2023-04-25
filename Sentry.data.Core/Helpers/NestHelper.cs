@@ -51,20 +51,22 @@ namespace Sentry.data.Core
             if (aggregations?.Any() == true)
             {
                 //get all property names by type
-                List<string> filterCategoryNames = GetAllByAttribute<string, FilterSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => GetFilterCategoryName(attr));
+                List<FilterSearchFieldAttribute> filterAttributes = GetAllByAttribute<FilterSearchFieldAttribute, FilterSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => GetFilterAttribute(attr));
 
-                foreach (string categoryName in filterCategoryNames)
+                foreach (FilterSearchFieldAttribute filterAttribute in filterAttributes)
                 {
-                    TermsAggregate<string> termsAggregate = aggregations.Terms(categoryName);
+                    TermsAggregate<string> termsAggregate = aggregations.Terms(filterAttribute.FilterCategoryName);
 
                     if (termsAggregate?.Buckets?.Any() == true)
                     {
                         FilterCategoryDto filterCategory = new FilterCategoryDto
                         {
-                            CategoryName = categoryName
+                            CategoryName = filterAttribute.FilterCategoryName,
+                            HideResultCounts = filterAttribute.HideResultCounts,
+                            DefaultCategoryOpen = filterAttribute.DefaultOpen
                         };
 
-                        List<FilterCategoryOptionDto> previousCategoryOptions = requestedFilterCategories?.FirstOrDefault(x => x.CategoryName == categoryName)?.CategoryOptions;
+                        List<FilterCategoryOptionDto> previousCategoryOptions = requestedFilterCategories?.FirstOrDefault(x => x.CategoryName == filterAttribute.FilterCategoryName)?.CategoryOptions;
 
                         foreach (var bucket in termsAggregate.Buckets)
                         {
@@ -73,7 +75,7 @@ namespace Sentry.data.Core
                             {
                                 OptionValue = bucketKey,
                                 ResultCount = bucket.DocCount.GetValueOrDefault(),
-                                ParentCategoryName = categoryName,
+                                ParentCategoryName = filterAttribute.FilterCategoryName,
                                 Selected = previousCategoryOptions.HasSelectedValueOf(bucketKey)
                             });
                         }
@@ -192,9 +194,9 @@ namespace Sentry.data.Core
             return new KeyValuePair<string, TermsAggregation>(filterAttribute.FilterCategoryName, termsAggregation);
         }
 
-        private static string GetFilterCategoryName(FilterSearchFieldAttribute filterAttribute)
+        private static FilterSearchFieldAttribute GetFilterAttribute(FilterSearchFieldAttribute filterAttribute)
         {
-            return filterAttribute.FilterCategoryName;
+            return filterAttribute;
         }
 
         private static List<TResult> GetAllByAttribute<TResult, TAttribute>(Type type, string parentFieldName, Func<PropertyInfo, string, TAttribute, TResult> createResult) where TAttribute : Attribute

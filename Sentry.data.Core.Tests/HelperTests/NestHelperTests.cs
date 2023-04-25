@@ -425,6 +425,8 @@ namespace Sentry.data.Core.Tests
             FilterCategoryDto filter = filters[0];
             Assert.AreEqual(FilterCategoryNames.DataInventory.COLUMN, filter.CategoryName);
             Assert.AreEqual(3, filter.CategoryOptions.Count);
+            Assert.IsFalse(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             FilterCategoryOptionDto option = filter.CategoryOptions[0];
             Assert.AreEqual("Value1", option.OptionValue);
@@ -447,6 +449,8 @@ namespace Sentry.data.Core.Tests
             filter = filters[1];
             Assert.AreEqual(FilterCategoryNames.DataInventory.SENSITIVE, filter.CategoryName);
             Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsFalse(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("false", option.OptionValue);
@@ -576,6 +580,8 @@ namespace Sentry.data.Core.Tests
             FilterCategoryDto filter = filters[0];
             Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, filter.CategoryName);
             Assert.AreEqual(3, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             FilterCategoryOptionDto option = filter.CategoryOptions[0];
             Assert.AreEqual("SAID", option.OptionValue);
@@ -598,6 +604,8 @@ namespace Sentry.data.Core.Tests
             filter = filters[1];
             Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, filter.CategoryName);
             Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("false", option.OptionValue);
@@ -614,6 +622,8 @@ namespace Sentry.data.Core.Tests
             filter = filters[2];
             Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, filter.CategoryName);
             Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("SAID", option.OptionValue);

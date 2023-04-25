@@ -177,6 +177,7 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsValidatorTests.cs" />
+    <Compile Include="API\GlobalDataset\GetGlobalDatasetFilters\GetGlobalDatasetFiltersModelMappingTests.cs" />
     <Compile Include="API\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidatorTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaModelMappingTests.cs" />
@@ -267,9 +268,7 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="HelperTests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

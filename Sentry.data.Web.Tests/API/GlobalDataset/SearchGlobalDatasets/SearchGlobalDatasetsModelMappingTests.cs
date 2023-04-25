@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Tests.API
                         CategoryName = "Category1",
                         CategoryOptions = new List<FilterCategoryOptionRequestModel>
                         {
-                            new FilterCategoryOptionRequestModel 
+                            new FilterCategoryOptionRequestModel
                             {
                                 OptionValue = "Option1"
                             },
@@ -86,11 +86,11 @@ namespace Sentry.data.Web.Tests.API
         [TestMethod]
         public void Map_SearchGlobalDatasetsResultDto_SearchGlobalDatasetsResponseModel()
         {
-            SearchGlobalDatasetsResultDto dto = new SearchGlobalDatasetsResultDto
+            SearchGlobalDatasetsResultsDto dto = new SearchGlobalDatasetsResultsDto
             {
-                GlobalDatasets = new List<SearchGlobalDatasetResultDto>
+                GlobalDatasets = new List<SearchGlobalDatasetsResultDto>
                 {
-                    new SearchGlobalDatasetResultDto
+                    new SearchGlobalDatasetsResultDto
                     {
                         GlobalDatasetId = 1,
                         DatasetName = "Name",
@@ -102,7 +102,7 @@ namespace Sentry.data.Web.Tests.API
                         IsFavorite = true,
                         DatasetDetailPage = "Dataset/Detail/2"
                     },
-                    new SearchGlobalDatasetResultDto
+                    new SearchGlobalDatasetsResultDto
                     {
                         GlobalDatasetId = 2,
                         DatasetName = "Name 2",

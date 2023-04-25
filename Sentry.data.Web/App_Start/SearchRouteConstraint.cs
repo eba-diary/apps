@@ -19,8 +19,6 @@ namespace Sentry.data.Web
                     values["controller"] = "DatasetSearch";
                     values["action"] = "Search";
                 }
-
-                //commenting out until UI work
                 //if (dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                 //{
                 //    values["controller"] = "GlobalDatasetSearch";

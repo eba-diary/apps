@@ -1009,7 +1009,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
 
-            BaseFilterSearchDto filterSearchDto = new BaseFilterSearchDto
+            SearchGlobalDatasetsDto filterSearchDto = new SearchGlobalDatasetsDto
             {
                 SearchText = "search",
                 FilterCategories = new List<FilterCategoryDto>

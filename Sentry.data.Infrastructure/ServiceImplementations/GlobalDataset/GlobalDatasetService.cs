@@ -1,8 +1,10 @@
 ﻿using Sentry.data.Core;
-using Sentry.data.Infrastructure.FeatureFlags;
+using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
+using System.Web;
 
 namespace Sentry.data.Infrastructure
 {
@@ -19,7 +21,7 @@ namespace Sentry.data.Infrastructure
             _dataFeatures = dataFeatures;
         }
 
-        public async Task<SearchGlobalDatasetsResultDto> SearchGlobalDatasetsAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto)
+        public async Task<SearchGlobalDatasetsResultsDto> SearchGlobalDatasetsAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto)
         {
             if (!_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
             {
@@ -29,7 +31,7 @@ namespace Sentry.data.Infrastructure
             List<GlobalDataset> globalDatasets = await _globalDatasetProvider.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
             string currentUserId = _userService.GetCurrentUser().AssociateId;
-            SearchGlobalDatasetsResultDto resultDto = new SearchGlobalDatasetsResultDto
+            SearchGlobalDatasetsResultsDto resultDto = new SearchGlobalDatasetsResultsDto
             {
                 GlobalDatasets = globalDatasets.Select(x => x.ToSearchResult(currentUserId)).ToList()
             };
@@ -37,9 +39,72 @@ namespace Sentry.data.Infrastructure
             return resultDto;
         }
 
-        public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(FilterSearchDto filterSearchDto)
+        public async Task<GetGlobalDatasetFiltersResultDto> GetGlobalDatasetFiltersAsync(GetGlobalDatasetFiltersDto getGlobalDatasetFiltersDto)
         {
-            return await _globalDatasetProvider.GetGlobalDatasetFiltersAsync(filterSearchDto);
+            if (!_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
+            {
+                throw new ResourceFeatureDisabledException(nameof(_dataFeatures.CLA4789_ImprovedSearchCapability), "SearchGlobalDatasets");
+            }
+
+            GetGlobalDatasetFiltersResultDto resultsDto = new GetGlobalDatasetFiltersResultDto
+            {
+                FilterCategories = await _globalDatasetProvider.GetGlobalDatasetFiltersAsync(getGlobalDatasetFiltersDto)
+            };
+
+            return resultsDto;
+        }
+
+        public List<FilterCategoryDto> GetInitialFilters(List<string> filters)
+        {
+            List<FilterCategoryDto> categories = new List<FilterCategoryDto>();
+
+            if (filters != null)
+            {
+                foreach (string filter in filters)
+                {
+                    if (!string.IsNullOrWhiteSpace(filter))
+                    {
+                        List<string> parts = filter.Split('_').ToList();
+                        string category = parts.First();
+
+                        FilterCategoryOptionDto optionModel = new FilterCategoryOptionDto()
+                        {
+                            OptionValue = HttpUtility.UrlDecode(parts.Last()),
+                            ParentCategoryName = category,
+                            Selected = true
+                        };
+
+                        FilterCategoryDto existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
+
+                        if (existingCategory != null)
+                        {
+                            if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
+                            {
+                                existingCategory.CategoryOptions.Add(optionModel);
+                            }
+                        }
+                        else
+                        {
+                            FilterCategoryDto newCategory = new FilterCategoryDto() { CategoryName = category };
+                            newCategory.CategoryOptions.Add(optionModel);
+                            categories.Add(newCategory);
+                        }
+                    }
+                }
+            }
+            else if (_dataFeatures.CLA4258_DefaultProdSearchFilter.GetValue())
+            {
+                FilterCategoryDto defaultProd = new FilterCategoryDto() { CategoryName = FilterCategoryNames.Dataset.ENVIRONMENTTYPE };
+                defaultProd.CategoryOptions.Add(new FilterCategoryOptionDto()
+                {
+                    OptionValue = NamedEnvironmentType.Prod.GetDescription(),
+                    ParentCategoryName = defaultProd.CategoryName,
+                    Selected = true
+                });
+                categories.Add(defaultProd);
+            }
+
+            return categories;
         }
     }
 }
