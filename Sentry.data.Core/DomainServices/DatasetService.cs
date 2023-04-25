@@ -1,13 +1,12 @@
-﻿using Nest;
-using Sentry.Common.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Sentry.Core;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities;
-using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class DatasetService : IDatasetService
+    public class DatasetService : BaseDomainService<DatasetService>, IDatasetService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
@@ -25,7 +24,6 @@ namespace Sentry.data.Core
         private readonly IQuartermasterService _quartermasterService;
         private readonly ObjectCache cache = MemoryCache.Default;
         private readonly ISAIDService _saidService;
-        private readonly IDataFeatures _featureFlags;
         private readonly IDatasetFileService _datasetFileService;
         private readonly IGlobalDatasetProvider _globalDatasetProvider;
 
@@ -33,9 +31,9 @@ namespace Sentry.data.Core
                             IUserService userService, IConfigService configService, 
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
-                            IDataFeatures featureFlags,
                             IDatasetFileService datasetFileService,
-                            IGlobalDatasetProvider globalDatasetProvider)
+                            IGlobalDatasetProvider globalDatasetProvider,
+                            DomainServiceCommonDependency<DatasetService> commonDependency) : base(commonDependency)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -44,7 +42,6 @@ namespace Sentry.data.Core
             _schemaService = schemaService;
             _quartermasterService = quartermasterService;
             _saidService = saidService;
-            _featureFlags = featureFlags;
             _datasetFileService = datasetFileService;
             _globalDatasetProvider = globalDatasetProvider;
         }
@@ -359,7 +356,7 @@ namespace Sentry.data.Core
                 // Create a Hangfire job that will setup the default security groups for this new dataset
                 _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
 
-                if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                 {
                     GlobalDataset globalDataset = dataset.ToGlobalDataset();
                     await _globalDatasetProvider.AddUpdateGlobalDatasetAsync(globalDataset);
@@ -387,7 +384,7 @@ namespace Sentry.data.Core
             _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
 
 
-            if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
             {
                 //Coming from migration, only have to add environment dataset (global dataset should exist)
                 Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
@@ -413,7 +410,7 @@ namespace Sentry.data.Core
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
 
-            if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
             {
                 GlobalDataset globalDataset = ds.ToGlobalDataset();
                 fileDto.SchemaId = configDto.SchemaId;
@@ -480,7 +477,7 @@ namespace Sentry.data.Core
 
         private async Task UpdateEnvironmentDatasetAsync(Dataset dataset)
         {
-            if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+            if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
             {
                 EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
                 await _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset).ConfigureAwait(false);
@@ -579,7 +576,7 @@ namespace Sentry.data.Core
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
             string methodName = $"{nameof(DatasetService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Debug($"{methodName} Method Start");
+            _logger.LogDebug($"{methodName} Method Start");
 
             bool result = true;
             Dataset ds = _datasetContext.GetById<Dataset>(id);
@@ -603,14 +600,14 @@ namespace Sentry.data.Core
 
             if (logicalDelete)
             {
-                Logger.Info($"datasetservice-delete-logical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
+                _logger.LogInformation($"datasetservice-delete-logical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
 
                 try
                 {
                     //Mark dataset for soft delete
                     MarkForDelete(ds, user);
 
-                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                     {
                         _globalDatasetProvider.DeleteEnvironmentDatasetAsync(ds.DatasetId).Wait();
                     }
@@ -624,13 +621,13 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"datasetservice-delete-logical failed", ex);
+                    _logger.LogError(ex, $"datasetservice-delete-logical failed");
                     result = false;
                 }
             }
             else
             {
-                Logger.Info($"datasetservice-delete-physical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
+                _logger.LogInformation($"datasetservice-delete-physical - datasetid:{ds.DatasetId} datasetname:{ds.DatasetName}");
 
                 try
                 {
@@ -643,12 +640,12 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"datasetservice-delete failed", ex);
+                    _logger.LogError(ex, $"datasetservice-delete failed");
                     result = false;
                 }                    
             }
 
-            Logger.Debug($"{methodName} Method End");
+            _logger.LogDebug($"{methodName} Method End");
 
             return result;
         }       
@@ -718,7 +715,7 @@ namespace Sentry.data.Core
 
                     _datasetContext.Merge(f);
                     
-                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                     {
                         _globalDatasetProvider.AddEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
                     }
@@ -731,7 +728,7 @@ namespace Sentry.data.Core
                 {
                     _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
 
-                    if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
+                    if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                     {
                         _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
                     }
@@ -805,7 +802,7 @@ namespace Sentry.data.Core
 
                     if (existing != null)
                     {
-                        if (_featureFlags.CLA1797_DatasetSchemaMigration.GetValue())
+                        if (_dataFeatures.CLA1797_DatasetSchemaMigration.GetValue())
                         {
                             results.Add(Dataset.ValidationErrors.datasetNameDuplicate, "Dataset name already exists. If attempting to create a copy of an existing dataset in a different named environment, please use dataset migration.");
                         }
@@ -849,7 +846,7 @@ namespace Sentry.data.Core
         private void DeleteDatasetFiles(int datasetId, int schemaId)
         {
             //DO NOT DELETE IF FEATURE IS OFF
-            if (!_featureFlags.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
+            if (!_dataFeatures.CLA4049_ALLOW_S3_FILES_DELETE.GetValue())
             {
                 return;
             }

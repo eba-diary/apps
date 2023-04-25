@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class ConnectorService : BaseDomainSerivce<ConnectorService>, IKafkaConnectorService
+    public class ConnectorService : BaseDomainService<ConnectorService>, IKafkaConnectorService
     {
         private readonly IKafkaConnectorProvider _connectorProvider;
         

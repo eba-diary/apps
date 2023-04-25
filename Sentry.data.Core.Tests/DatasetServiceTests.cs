@@ -14,8 +14,21 @@ using static Sentry.data.Core.GlobalConstants;
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class DatasetServiceTests
+    public class DatasetServiceTests : DomainServiceUnitTest<DatasetService>
     {
+
+        [TestInitialize]
+        public void MyTestInitialize()
+        {
+            DomainServiceTestInitalize(MockBehavior.Strict);
+        }
+
+        [TestCleanup]
+        public void MyTestCleanup()
+        {
+            TestCleanup();
+        }
+
         /// <summary>
         /// - Test that the DatasetService.Validate() method correctly identifies a duplicate Dataset name
         /// and responds with the correct validation result.
@@ -25,23 +38,20 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_DuplicateName_DifferentNamedEnvironments()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DatasetCategories = new List<Category> { new Category() { Id=1 } },
                 NamedEnvironment = "PROD"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object,null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null,null, null,TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -64,23 +74,20 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_DuplicateName_SameNamedEnvironments()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DatasetCategories = new List<Category> { new Category() { Id=1 } },
                 NamedEnvironment = "PROD"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(false);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(false);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -107,7 +114,6 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_DuplicateName_ButInDifferentEnvironments()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 ShortName = "Foo",
@@ -115,16 +121,14 @@ namespace Sentry.data.Core.Tests
                 DatasetCategories = new List<Category> { new Category() { Id=1 } },
                 NamedEnvironment = "QUAL"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(false);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(false);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -146,22 +150,19 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_AlternateContactEmailIsNotSentry()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 AlternateContactEmail = "jeb@gmail.com"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -185,22 +186,19 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_AlternateContactEmailIsInvalid()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 AlternateContactEmail = "jeb@@@@@gmail.com"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -225,22 +223,19 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_AlternateContactEmailIsValid()
         {
             // Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetName = "Foo",
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 AlternateContactEmail = "jeb@sentry.com"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -263,15 +258,18 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_ShortName_Regex()
         {
             //Arrange
-            var context = new Mock<IDatasetContext>();
-            var quartermasterService = new Mock<IQuartermasterService>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo2",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            } };
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -294,15 +292,18 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_ShortName_Default()
         {
             //Arrange
-            var context = new Mock<IDatasetContext>();
-            var quartermasterService = new Mock<IQuartermasterService>();
+            var datasets = new[] { new Dataset() {
+                DatasetName = "Foo2",
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET
+            } };
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetName = "Foo",
@@ -324,7 +325,6 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_ShortName_Duplicate()
         {
             //Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetId = 17,
                 DatasetName = "Foo",
@@ -332,16 +332,14 @@ namespace Sentry.data.Core.Tests
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DatasetCategories = new List<Category> { new Category() { Id=1 } }
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 0,
@@ -364,7 +362,6 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_ShortName_Duplicate_ButInDifferentEnvironments()
         {
             //Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetId = 17,
                 DatasetName = "Foo",
@@ -373,16 +370,14 @@ namespace Sentry.data.Core.Tests
                 DatasetCategories = new List<Category> { new Category() { Id=1 } },
                 NamedEnvironment = "QUAL"
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
 
-            var quartermasterService = new Mock<IQuartermasterService>();
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 0,
@@ -405,7 +400,6 @@ namespace Sentry.data.Core.Tests
         public async Task Validate_Success()
         {
             //Arrange
-            var context = new Mock<IDatasetContext>();
             var datasets = new[] { new Dataset() {
                 DatasetId = 1000,
                 DatasetName = "FooBar",
@@ -416,15 +410,13 @@ namespace Sentry.data.Core.Tests
                 Asset = new Asset() {SaidKeyCode="ABCD"},
                 OriginationCode = ((int)DatasetOriginationCode.Internal).ToString()
             } };
-            context.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
-            var quartermasterService = new Mock<IQuartermasterService>();
+            _datasetContext.Setup(f => f.Datasets).Returns(datasets.AsQueryable());
             var validationResults = new ValidationResults();
-            quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
+            _quartermasterService.Setup(f => f.VerifyNamedEnvironmentAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<NamedEnvironmentType>()).Result).Returns(validationResults);
 
-            var dataFeature = new Mock<IDataFeatures>();
-            dataFeature.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA1797_DatasetSchemaMigration.GetValue()).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, quartermasterService.Object, null, dataFeature.Object, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, _quartermasterService.Object, null, null, null, TestDependencies);
             var dataset = new DatasetSchemaDto()
             {
                 DatasetId = 1000,
@@ -505,8 +497,6 @@ namespace Sentry.data.Core.Tests
             DateTime now = DateTime.Now;
 
             //Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
             Category category = new Category { Name = "Category", Id = 1 };
             Asset asset = new Asset { SaidKeyCode = "SAID" };
             Security security = new Security { CreatedById = "000001" };
@@ -537,10 +527,8 @@ namespace Sentry.data.Core.Tests
                 GlobalDatasetId = 2
             };
 
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-
-            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
-            datasetContext.Setup(x => x.SaveChanges(true));
+            _datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+            _datasetContext.Setup(x => x.SaveChanges(true));
 
             Category other = new Category { Name = "Other", Id = 2 };
             List<Category> categories = new List<Category>
@@ -548,18 +536,17 @@ namespace Sentry.data.Core.Tests
                 category,
                 other
             };
-            datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
+            _datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
-            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> applicationUser = _mockRepository.Create<IApplicationUser>();
             applicationUser.SetupGet(x => x.AssociateId).Returns("000003");
 
-            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentDatasetAsync(2, It.IsAny<EnvironmentDataset>())).Returns(Task.CompletedTask).Callback<int, EnvironmentDataset>((id, x) =>
             {
                 Assert.AreEqual(1, x.DatasetId);
@@ -592,7 +579,7 @@ namespace Sentry.data.Core.Tests
                 CreationUserId = "Creator New"
             };
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, userService.Object, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, null, userService.Object, null, null, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             datasetService.UpdateAndSaveDataset(dto);
 
@@ -624,7 +611,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("000003", ds.Security.UpdatedById);
             Assert.AreEqual(2, ds.GlobalDatasetId);
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
         }
 
         private static void Setup_UpdateAndSaveDataset(out DatasetSchemaDto newDataset, out DatasetService datasetService, Action<DatasetSchemaDto> datasetDtoUpdateAction)
@@ -662,32 +649,29 @@ namespace Sentry.data.Core.Tests
         public void Delete_Does_Not_Call_Save_Changes()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(s => s.DisplayName).Returns("displayName");
 
             Dataset ds = MockClasses.MockDataset(user.Object, true, false);
 
-            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             userService.Setup(s => s.GetCurrentUser()).Returns(user.Object);
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(s => s.GetUserSecurity(ds, user.Object));
+            _securityService.Setup(s => s.GetUserSecurity(ds, user.Object));
 
-            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            Mock<IConfigService> configService = _mockRepository.Create<IConfigService>();
             configService.Setup(s => s.Delete(ds.DatasetFileConfigs[0].ConfigId, user.Object, true)).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, securityService.Object, userService.Object, configService.Object,
-                                                    null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, _securityService.Object, userService.Object, configService.Object,
+                                                    null, null, null, null, null, TestDependencies);
 
             //Act
             datasetService.Delete(ds.DatasetId, user.Object, true);
 
             //Assert
-            context.Verify(x => x.SaveChanges(true), Times.Never);
+            _datasetContext.Verify(x => x.SaveChanges(true), Times.Never);
         }
 
 
@@ -1038,16 +1022,14 @@ namespace Sentry.data.Core.Tests
         public void Delete_Returns_True_When_Incoming_Dataset_Marked_PendingDelete_And_LogicalDelete_Is_True()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.DisplayName).Returns("user1");
             Dataset ds = MockClasses.MockDataset(user.Object, false, false);
             ds.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, null, TestDependencies);
 
             // Act
             bool IsSuccessful = datasetService.Delete(ds.DatasetId, user.Object, true);
@@ -1061,25 +1043,22 @@ namespace Sentry.data.Core.Tests
         public void Delete_Does_Not_Call_SaveChanges_When_Incoming_Dataset_Marked_PendingDelete_And_LogicalDelete_Is_True()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.DisplayName).Returns("user1");
 
             Dataset ds = MockClasses.MockDataset(user.Object, false, false);
             ds.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
-            context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, null, TestDependencies);
 
             // Act
             datasetService.Delete(ds.DatasetId, user.Object, true);
 
             // Assert
-            context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
+            _datasetContext.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
         }
 
         [TestCategory("Core DatasetService")]
@@ -1087,16 +1066,14 @@ namespace Sentry.data.Core.Tests
         public void Delete_Returns_True_When_Incoming_Dataset_Marked_Deleted_And_LogicalDelete_Is_False()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.DisplayName).Returns("user1");
             Dataset ds = MockClasses.MockDataset(user.Object, false, false);
             ds.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, null, TestDependencies);
 
             // Act
             bool IsSuccessful = datasetService.Delete(ds.DatasetId, user.Object, false);
@@ -1110,16 +1087,14 @@ namespace Sentry.data.Core.Tests
         public void Delete_Returns_True_When_Incoming_Dataset_Marked_Deleted_And_LogicalDelete_Is_True()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.DisplayName).Returns("user1");
             Dataset ds = MockClasses.MockDataset(user.Object, false, false);
             ds.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, null, TestDependencies);
 
             // Act
             bool IsSuccessful = datasetService.Delete(ds.DatasetId, user.Object, true);
@@ -1133,25 +1108,22 @@ namespace Sentry.data.Core.Tests
         public void Delete_Does_Not_Call_SaveChanges_When_Incoming_Dataset_Marked_Deleted_And_LogicalDelete_Is_False()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.DisplayName).Returns("user1");
 
             Dataset ds = MockClasses.MockDataset(user.Object, false, false);
             ds.ObjectStatus = ObjectStatusEnum.Deleted;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
-            context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var datasetService = new DatasetService(context.Object, null, null, null, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, null, TestDependencies);
 
             // Act
             datasetService.Delete(ds.DatasetId, user.Object, false);
 
             // Assert
-            context.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
+            _datasetContext.Verify(x => x.SaveChanges(It.IsAny<bool>()), Times.Never);
         }
 
         [TestCategory("Core DatasetService")]
@@ -1159,20 +1131,17 @@ namespace Sentry.data.Core.Tests
         public void Delete_Passes_Incoming_User_Info_To_ConfigService_Delete_When_LogicalDelete_Is_False()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
 
             Dataset ds = MockClasses.MockDataset(null, true, false);
             ds.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            Mock<IConfigService> configService = _mockRepository.Create<IConfigService>();
             configService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, configService.Object, null, null, null, null, null, TestDependencies);
 
             // Act
             datasetService.Delete(ds.DatasetId, user.Object, false);
@@ -1228,18 +1197,15 @@ namespace Sentry.data.Core.Tests
         public void Delete_Passes_Null_User_Info_To_ConfigService_Delete_When_LogicalDelete_Is_False()
         {
             // Arrange
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
             Dataset ds = MockClasses.MockDataset(null, true, false);
             ds.ObjectStatus = ObjectStatusEnum.Pending_Delete;
 
-            Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
-            context.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
+            _datasetContext.Setup(s => s.GetById<Dataset>(ds.DatasetId)).Returns(ds);
 
-            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            Mock<IConfigService> configService = _mockRepository.Create<IConfigService>();
             configService.Setup(s => s.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
 
-            var datasetService = new DatasetService(context.Object, null, null, configService.Object, null, null, null, null, null, null);
+            var datasetService = new DatasetService(_datasetContext.Object, null, null, configService.Object, null, null, null, null, null, TestDependencies);
 
             // Act
             datasetService.Delete(ds.DatasetId, null, false);
@@ -1269,35 +1235,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void SetDatasetFavorite_1_000000_Add()
         {
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-
             Dataset ds = new Dataset()
             {
                 DatasetId = 1,
                 Favorities = new List<Favorite>()
             };
 
-            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
-            datasetContext.Setup(x => x.Merge(It.IsAny<Favorite>())).Returns<Favorite>(null).Callback<Favorite>(x =>
+            _datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+            _datasetContext.Setup(x => x.Merge(It.IsAny<Favorite>())).Returns<Favorite>(null).Callback<Favorite>(x =>
             {
                 Assert.AreEqual(1, x.DatasetId);
                 Assert.AreEqual("000000", x.UserId);
             });
-            datasetContext.Setup(x => x.SaveChanges(true));
+            _datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddEnvironmentDatasetFavoriteUserIdAsync(1, "000000")).Returns(Task.CompletedTask);
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             string result = datasetService.SetDatasetFavorite(1, "000000");
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
 
             Assert.AreEqual("Successfully added favorite.", result);
         }
@@ -1305,10 +1266,6 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void SetDatasetFavorite_1_000000_Remove()
         {
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-
             Dataset ds = new Dataset()
             {
                 DatasetId = 1,
@@ -1322,25 +1279,24 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
-            datasetContext.Setup(x => x.Remove(It.IsAny<Favorite>())).Callback<Favorite>(x =>
+            _datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+            _datasetContext.Setup(x => x.Remove(It.IsAny<Favorite>())).Callback<Favorite>(x =>
             {
                 Assert.AreEqual(1, x.DatasetId);
                 Assert.AreEqual("000000", x.UserId);
             });
-            datasetContext.Setup(x => x.SaveChanges(true));
+            _datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.RemoveEnvironmentDatasetFavoriteUserIdAsync(1, "000000")).Returns(Task.CompletedTask);
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, null, null, null, null, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             string result = datasetService.SetDatasetFavorite(1, "000000");
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
 
             Assert.AreEqual("Successfully removed favorite.", result);
         }
@@ -2043,24 +1999,20 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void CreateAndSaveNewDataset_DatasetSchemaDto_1()
         {
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> applicationUser = _mockRepository.Create<IApplicationUser>();
             applicationUser.SetupGet(x => x.AssociateId).Returns("000001");
 
-            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
 
-            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
+            _securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
 
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             Asset asset = new Asset { SaidKeyCode = "SAID" };
-            datasetContext.SetupGet(x => x.Assets).Returns(new List<Asset> { asset }.AsQueryable());
+            _datasetContext.SetupGet(x => x.Assets).Returns(new List<Asset> { asset }.AsQueryable());
 
             Category category = new Category { Id = 2, Name = "Category" };
-            datasetContext.SetupGet(x => x.Categories).Returns(new List<Category> { category }.AsQueryable());
-            datasetContext.Setup(x => x.Add(It.IsAny<Dataset>())).Callback<Dataset>(x =>
+            _datasetContext.SetupGet(x => x.Categories).Returns(new List<Category> { category }.AsQueryable());
+            _datasetContext.Setup(x => x.Add(It.IsAny<Dataset>())).Callback<Dataset>(x =>
             {
                 x.DatasetId = 1;
                 Assert.AreEqual("Name", x.DatasetName);
@@ -2086,8 +2038,8 @@ namespace Sentry.data.Core.Tests
                 Assert.AreEqual("000001", x.Security.CreatedById);
                 Assert.AreEqual(1, x.GlobalDatasetId);
             });
-            datasetContext.Setup(x => x.SaveChanges(true));
-            datasetContext.Setup(x => x.GetNextGlobalDatasetId()).Returns(1);
+            _datasetContext.Setup(x => x.SaveChanges(true));
+            _datasetContext.Setup(x => x.GetNextGlobalDatasetId()).Returns(1);
 
             DatasetSchemaDto dto = new DatasetSchemaDto
             {
@@ -2110,17 +2062,16 @@ namespace Sentry.data.Core.Tests
                 ConfigFileDesc = "Schema Description"
             };
 
-            Mock<ISchemaService> schemaService = mr.Create<ISchemaService>();
+            Mock<ISchemaService> schemaService = _mockRepository.Create<ISchemaService>();
             schemaService.Setup(x => x.CreateAndSaveSchema(It.IsAny<FileSchemaDto>())).Returns(3);
             schemaService.Setup(x => x.PublishSchemaEvent(1, 3));
 
-            Mock<IConfigService> configService = mr.Create<IConfigService>();
+            Mock<IConfigService> configService = _mockRepository.Create<IConfigService>();
             configService.Setup(x => x.CreateAndSaveDatasetFileConfig(It.IsAny<DatasetFileConfigDto>())).Returns(true);
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
             
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateGlobalDatasetAsync(It.IsAny<GlobalDataset>())).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 Assert.AreEqual(1, x.GlobalDatasetId);
@@ -2145,13 +2096,13 @@ namespace Sentry.data.Core.Tests
                 Assert.AreEqual("Schema Description", envSchema.SchemaDescription);
             });
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, configService.Object, schemaService.Object, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, _securityService.Object, userService.Object, configService.Object, schemaService.Object, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             int result = datasetService.CreateAndSaveNewDataset(dto);
 
             Assert.AreEqual(1, result);
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
         }
 
         [TestMethod]
@@ -2216,29 +2167,24 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void AddDatasetAsync_DatasetDto_DatasetResultDto()
         {
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> applicationUser = _mockRepository.Create<IApplicationUser>();
             applicationUser.SetupGet(x => x.AssociateId).Returns("000001");
 
-            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
 
             UserSecurity userSecurity = new UserSecurity { CanCreateDataset = true };
-            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(null, applicationUser.Object)).Returns(userSecurity);
-            securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
+            _securityService.Setup(x => x.GetUserSecurity(null, applicationUser.Object)).Returns(userSecurity);
+            _securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
 
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             Asset asset = new Asset { SaidKeyCode = "SAID" };
-            datasetContext.SetupGet(x => x.Assets).Returns(new List<Asset>{ asset }.AsQueryable());
+            _datasetContext.SetupGet(x => x.Assets).Returns(new List<Asset>{ asset }.AsQueryable());
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             Category category = new Category { Name = "Category" };
-            datasetContext.SetupGet(x => x.Categories).Returns(new List<Category> { category }.AsQueryable());
-            datasetContext.Setup(x => x.AddAsync(It.IsAny<Dataset>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback<Dataset, CancellationToken>((x, token) =>
+            _datasetContext.SetupGet(x => x.Categories).Returns(new List<Category> { category }.AsQueryable());
+            _datasetContext.Setup(x => x.AddAsync(It.IsAny<Dataset>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback<Dataset, CancellationToken>((x, token) =>
             {
                 x.DatasetId = 1;
                 Assert.AreEqual("Name", x.DatasetName);
@@ -2266,10 +2212,10 @@ namespace Sentry.data.Core.Tests
                 Assert.AreEqual("000001", x.Security.CreatedById);
                 Assert.AreEqual(1, x.GlobalDatasetId);
             });
-            datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-            datasetContext.Setup(x => x.GetNextGlobalDatasetId()).Returns(1);
+            _datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            _datasetContext.Setup(x => x.GetNextGlobalDatasetId()).Returns(1);
 
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateGlobalDatasetAsync(It.IsAny<GlobalDataset>())).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
             {
                 Assert.AreEqual(1, x.GlobalDatasetId);
@@ -2309,7 +2255,7 @@ namespace Sentry.data.Core.Tests
                 CategoryName = "Category"
             };
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, _securityService.Object, userService.Object, null, null, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             DatasetResultDto resultDto = datasetService.AddDatasetAsync(dto).Result;
 
@@ -2332,7 +2278,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(new DateTime(2023, 02, 21, 11, 0, 0), resultDto.UpdateDateTime);
             Assert.AreEqual(ObjectStatusEnum.Active, resultDto.ObjectStatus);
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
         }
 
         [TestMethod]
@@ -2361,12 +2307,10 @@ namespace Sentry.data.Core.Tests
         {
             DateTime now = DateTime.Now;
 
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> applicationUser = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> applicationUser = _mockRepository.Create<IApplicationUser>();
             applicationUser.SetupGet(x => x.AssociateId).Returns("000003");
 
-            Mock<IUserService> userService = mr.Create<IUserService>();
+            Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser()).Returns(applicationUser.Object);
 
             Category category = new Category { Name = "Category" };
@@ -2400,12 +2344,9 @@ namespace Sentry.data.Core.Tests
             };
 
             UserSecurity userSecurity = new UserSecurity { CanEditDataset = true };
-            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.GetUserSecurity(ds, applicationUser.Object)).Returns(userSecurity);
-
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-
-            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
+            _securityService.Setup(x => x.GetUserSecurity(ds, applicationUser.Object)).Returns(userSecurity);
+            
+            _datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(ds);
 
             Category other = new Category { Name = "Other" };
             List<Category> categories = new List<Category>
@@ -2413,9 +2354,9 @@ namespace Sentry.data.Core.Tests
                 category,
                 other
             };
-            datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
+            _datasetContext.SetupGet(x => x.Categories).Returns(categories.AsQueryable());
 
-            datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() =>
+            _datasetContext.Setup(x => x.SaveChangesAsync(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask).Callback(() =>
             {
                 Assert.AreEqual(1, ds.DatasetId);
                 Assert.AreEqual("Name", ds.DatasetName);
@@ -2446,7 +2387,7 @@ namespace Sentry.data.Core.Tests
                 Assert.AreEqual(2, ds.GlobalDatasetId);
             });
 
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentDatasetAsync(2, It.IsAny<EnvironmentDataset>())).Returns(Task.CompletedTask).Callback<int, EnvironmentDataset>((id, x) =>
             {
                 Assert.AreEqual(1, x.DatasetId);
@@ -2460,8 +2401,7 @@ namespace Sentry.data.Core.Tests
                 Assert.IsFalse(x.EnvironmentSchemas.Any());
             });
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             DatasetDto dto = new DatasetDto
             {
@@ -2477,7 +2417,7 @@ namespace Sentry.data.Core.Tests
                 CategoryName = "Other"
             };
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, _securityService.Object, userService.Object, null, null, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             DatasetResultDto resultDto = datasetService.UpdateDatasetAsync(dto).Result;
 
@@ -2500,7 +2440,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(resultDto.UpdateDateTime >= now);
             Assert.AreEqual(ObjectStatusEnum.Active, resultDto.ObjectStatus);
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
         }
 
         [TestMethod]
@@ -2559,13 +2499,9 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void CreateExternalDependencies_1_Success()
         {
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
+            _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
-            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-
-            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
-            securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
+            _securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
 
             Dataset dataset = new Dataset
             {
@@ -2582,10 +2518,9 @@ namespace Sentry.data.Core.Tests
                 IsSecured = false
             };
 
-            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
-            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
+            _datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
 
-            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentDatasetAsync(2, It.IsAny<EnvironmentDataset>())).Returns(Task.CompletedTask).Callback<int, EnvironmentDataset>((id, x) =>
             {
                 Assert.AreEqual(1, x.DatasetId);
@@ -2599,11 +2534,11 @@ namespace Sentry.data.Core.Tests
                 Assert.IsFalse(x.EnvironmentSchemas.Any());
             });
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object);
+            DatasetService datasetService = new DatasetService(_datasetContext.Object, _securityService.Object, null, null, null, null, null, null, globalDatasetProvider.Object, TestDependencies);
 
             datasetService.CreateExternalDependencies(1);
 
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
         }
     }
 }

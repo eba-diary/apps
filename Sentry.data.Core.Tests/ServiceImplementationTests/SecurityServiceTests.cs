@@ -53,7 +53,7 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
@@ -91,7 +91,7 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.CanModifyDataset).Returns(true);
             user.Setup(x => x.CanManageReports).Returns(true);
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
@@ -130,7 +130,7 @@ namespace Sentry.data.Core.Tests
             AdminUser.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, AdminUser.Object);
 
             //ASSERT
@@ -164,7 +164,7 @@ namespace Sentry.data.Core.Tests
             adminUser.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, adminUser.Object);
 
             //ASSERT
@@ -193,7 +193,7 @@ namespace Sentry.data.Core.Tests
             adminUser.Setup(x => x.CanManageReports).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, adminUser.Object);
 
             //ASSERT
@@ -209,26 +209,25 @@ namespace Sentry.data.Core.Tests
         public void Security_Public_NotOwner_NoModify()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
             securable.Setup(x => x.PrimaryContactId).Returns("123456");
             securable.Setup(x => x.Security).Returns(security);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("078193");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(false);
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -249,20 +248,18 @@ namespace Sentry.data.Core.Tests
         public void Security_With_Null_Securable()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
-
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("078193");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(false);
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
             Assert.IsTrue(us.CanViewFullDataset);
             Assert.IsTrue(us.CanQueryDataset);
@@ -283,26 +280,25 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Edit_Dataset_User_With_Modify()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
             securable.Setup(x => x.PrimaryContactId).Returns("123456");
             securable.Setup(x => x.Security).Returns(security);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(true);
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -314,26 +310,25 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Edit_Dataset_As_Owner_Without_Modify_Permission()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
             securable.Setup(x => x.PrimaryContactId).Returns("999999");
             securable.Setup(x => x.Security).Returns(security);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(false);
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanEditDataset);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -349,26 +344,25 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_NonSecured_User_With_Modify()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
             securable.Setup(x => x.Security).Returns(security);
             securable.Setup(x => x.PrimaryContactId).Returns("1234567");
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(true);
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -382,24 +376,24 @@ namespace Sentry.data.Core.Tests
             Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.PrimaryContactId).Returns("123456");
             securable.Setup(x => x.Security).Returns(security);
             securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);  /* User is not an Admin */
             user.Setup(x => x.CanModifyDataset).Returns(true);
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanManageSchema, $"Failed {nameof(UserSecurity.CanManageSchema)} check");
             Assert.IsFalse(us.CanDeleteDatasetFile, $"Failed {nameof(UserSecurity.CanDeleteDatasetFile)} check");
         }
@@ -411,16 +405,15 @@ namespace Sentry.data.Core.Tests
         public void Security_Can_Manage_Schema_Secured_As_Owner_Without_Modify_Permission()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
             Security security = BuildBaseSecurity();
 
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
             securable.Setup(x => x.PrimaryContactId).Returns("999999");
             securable.Setup(x => x.AdminDataPermissionsAreExplicit).Returns(false);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.CanModifyDataset).Returns(false);
@@ -428,11 +421,11 @@ namespace Sentry.data.Core.Tests
 
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
-            mr.VerifyAll();
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanManageSchema);
             Assert.IsFalse(us.CanDeleteDatasetFile);
         }
@@ -465,7 +458,7 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.CanManageReports).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
 
@@ -501,23 +494,24 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.SetupGet(x => x.IsSecured).Returns(false);
             securable.SetupGet(x => x.PrimaryContactId).Returns("123456");
             securable.SetupGet(x => x.Security).Returns(security);
             securable.SetupGet(x => x.Parent).Returns(parentSecurable);
 
             //Establish user, ensure users it part of AD group and is not DSC admin
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.SetupGet(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(parentTicket.AdGroupName)).Returns(true);
             user.SetupGet(x => x.IsAdmin).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanManageSchema);
             Assert.IsTrue(us.CanDeleteDatasetFile);
         }
@@ -539,19 +533,20 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanPreviewDataset);
         }
 
@@ -569,19 +564,20 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
         }
 
@@ -599,19 +595,20 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
         }
 
@@ -629,19 +626,20 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanPreviewDataset);
         }
 
@@ -659,19 +657,20 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
         }
 
@@ -682,18 +681,18 @@ namespace Sentry.data.Core.Tests
         public void Security_CanPreview_NullSecurity()
         {
             //ARRAGE
-            var securable = new Mock<ISecurable>();
-            securable.Setup(x => x.IsSecured).Returns(true);
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.Security).Returns(default(Security));
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
         }
 
@@ -704,14 +703,15 @@ namespace Sentry.data.Core.Tests
         public void Security_CanPreview_NullSecurable()
         {
             //ARRAGE
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
         }
 
@@ -729,15 +729,16 @@ namespace Sentry.data.Core.Tests
             ticket.AddedPermissions.Add(previewPermission);
             security.Tickets.Add(ticket);
 
-            var securable = new Mock<ISecurable>();
-            securable.Setup(x => x.IsSecured).Returns(false);
-            securable.Setup(x => x.Security).Returns(default(Security));
+            var securable = _mockRepository.Create<ISecurable>();
+            //securable.Setup(x => x.IsSecured).Returns(false);
+           // securable.Setup(x => x.Security).Returns(default(Security));
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, null);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanPreviewDataset);
         }
 
@@ -759,20 +760,20 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
-            user.Setup(x => x.IsInGroup(ticket2.AdGroupName)).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanPreviewDataset);
         }
 
@@ -794,20 +795,20 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
             security.Tickets.Add(ticket2);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
-            user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
             user.Setup(x => x.IsInGroup(ticket2.AdGroupName)).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanPreviewDataset);
         }
 
@@ -829,19 +830,20 @@ namespace Sentry.data.Core.Tests
             ticket1.AddedPermissions.Add(previewPermission3);
             security.Tickets.Add(ticket1);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanPreviewDataset);
         }
 
@@ -873,23 +875,29 @@ namespace Sentry.data.Core.Tests
             security.Tickets.Add(ticket1);
 
             //mock out securable object and attach security object established above
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.SetupGet(x => x.IsSecured).Returns(true);
             securable.SetupGet(x => x.PrimaryContactId).Returns("123456");
             securable.SetupGet(x => x.Security).Returns(security);
-            securable.SetupGet(x => x.Parent).Returns(parentSecurable);
 
             //Establish user, ensure users it part of AD group and is not DSC admin
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.SetupGet(x => x.AssociateId).Returns("999999");
-            user.Setup(x => x.IsInGroup(parentTicket.AdGroupName)).Returns(true);
             user.SetupGet(x => x.IsAdmin).Returns(false);
 
+            //Additional mocks when ticket is approved
+            if (approvalStatus)
+            {
+                user.Setup(x => x.IsInGroup(parentTicket.AdGroupName)).Returns(true);
+                securable.SetupGet(x => x.Parent).Returns(parentSecurable);
+            }
+
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.AreEqual(approvalStatus, us.CanPreviewDataset);
         }
 
@@ -910,10 +918,11 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.IsAdmin).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanCreateDataFlow);
         }
 
@@ -924,11 +933,11 @@ namespace Sentry.data.Core.Tests
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_NoPermissions()
         {
             //ARRAGE
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
@@ -942,12 +951,12 @@ namespace Sentry.data.Core.Tests
         public void Security_CanCreateDataflow_NullSecurable_NonAdmin_With_Modify_Permissions()
         {
             //ARRAGE
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.CanModifyDataset).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
@@ -971,7 +980,7 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.IsAdmin).Returns(true);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
@@ -986,17 +995,16 @@ namespace Sentry.data.Core.Tests
         public void Security_CanModifyDataflow_NullSecurable_User()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Strict);
-
-            var user = new Mock<IApplicationUser>();
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(null, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanModifyDataflow);
         }
 
@@ -1018,7 +1026,7 @@ namespace Sentry.data.Core.Tests
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(true);
 
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
 
             //ACT
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
@@ -1035,20 +1043,19 @@ namespace Sentry.data.Core.Tests
         public void Security_CanModifyDataflow_Securable_User_With_No_Permissions()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
-            securable.Setup(x => x.IsSecured).Returns(false);
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
 
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
 
             //ACT
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanModifyDataflow);
         }
 
@@ -1067,25 +1074,22 @@ namespace Sentry.data.Core.Tests
 
 
             //mock out securable and attach security object establihsed above
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-
-
-
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
             user.Setup(x => x.IsInGroup(ticket1.AdGroupName)).Returns(true);
 
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
 
             //ACT
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanModifyDataflow);
         }
 
@@ -1096,20 +1100,20 @@ namespace Sentry.data.Core.Tests
         public void Security_CanModifyDataflow_NonSecurable_NonAdmin()
         {
             //ARRAGE
-            Moq.MockRepository mr = new Moq.MockRepository(MockBehavior.Loose);
-            Mock<ISecurable> securable = mr.Create<ISecurable>();
+            Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
 
-            Mock<IApplicationUser> user = mr.Create<IApplicationUser>();
+            Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
             user.Setup(x => x.IsAdmin).Returns(false);
 
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
 
             //ACT
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsFalse(us.CanModifyDataflow);
         }
         #endregion
@@ -1131,19 +1135,19 @@ namespace Sentry.data.Core.Tests
             ticket1.AddedPermissions.Add(previewPermission1);
             security.Tickets.Add(ticket1);
 
-            var securable = new Mock<ISecurable>();
+            var securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(true);
             securable.Setup(x => x.Security).Returns(security);
 
-            var user = new Mock<IApplicationUser>();
-            user.Setup(x => x.IsInGroup(null)).Throws<NullReferenceException>(); //The real service throws an exception if a null group name is passed in
+            var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
 
             //ACT
-            var ss = _container.GetInstance<ISecurityService>();
+            var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
             UserSecurity us = ss.GetUserSecurity(securable.Object, user.Object);
 
             //ASSERT
+            _mockRepository.VerifyAll();
             Assert.IsTrue(us.CanModifyNotifications);
         }
         #endregion

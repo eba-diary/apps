@@ -14,9 +14,10 @@ namespace Sentry.data.Core.Tests
         protected static IContainer _container;
         protected MockRepository _mockRepository;
 
-        protected ISecurityService _securityService;
+        protected Mock<ISecurityService> _securityService;
         protected Mock<IDatasetContext> _datasetContext;
         protected Mock<IDataFeatures> _dataFeatures;
+        protected Mock<IQuartermasterService> _quartermasterService;
 
         public virtual void TestInitialize(MockBehavior mockBehavior = MockBehavior.Loose)
         {
@@ -24,6 +25,8 @@ namespace Sentry.data.Core.Tests
             _mockRepository = new MockRepository(mockBehavior);
             _dataFeatures = _mockRepository.Create<IDataFeatures>();
             _datasetContext = _mockRepository.Create<IDatasetContext>();
+            _securityService = _mockRepository.Create<ISecurityService>();
+            _quartermasterService = _mockRepository.Create<IQuartermasterService>();
 
             //this should can all core assembly for implementations
             registry.Scan((scanner) =>
@@ -40,11 +43,12 @@ namespace Sentry.data.Core.Tests
             registry.For<ITicketProvider>().Use(() => new Mock<ICherwellProvider>().Object);
             registry.For<IDataFeatures>().Use(_dataFeatures.Object);
             registry.For<IInevService>().Use(() => new Mock<IInevService>().Object);
-            registry.For<IQuartermasterService>().Use(() => new Mock<IQuartermasterService>().Object);
+            registry.For<IQuartermasterService>().Use(() => _quartermasterService.Object);
             registry.For<IJiraService>().Use(() => new Mock<IJiraService>().Object);
             registry.For<Hangfire.IBackgroundJobClient>().Use(() => new Mock<Hangfire.IBackgroundJobClient>().Object);
             registry.For<IObsidianService>().Use(() => new Mock<IObsidianService>().Object);
             registry.For<IAdSecurityAdminProvider>().Use(() => new Mock<IAdSecurityAdminProvider>().Object);
+            registry.For<ISecurityService>().Use(() => _securityService.Object);
 
             //set the container
             _container = new StructureMap.Container(registry);

@@ -18,7 +18,7 @@ using System.Text;
 namespace Sentry.data.Core
 {
 
-    public class DatasetFileService : BaseDomainSerivce<DatasetFileService>, IDatasetFileService
+    public class DatasetFileService : BaseDomainService<DatasetFileService>, IDatasetFileService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;

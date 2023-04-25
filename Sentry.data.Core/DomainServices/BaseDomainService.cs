@@ -3,7 +3,7 @@ using Sentry.data.Core.DependencyInjection;
 
 namespace Sentry.data.Core.DomainServices
 {
-    public class BaseDomainSerivce<T> where T : BaseDomainSerivce<T>
+    public class BaseDomainService<T> where T : BaseDomainService<T>
     {
         private readonly DomainServiceCommonDependency<T> _commonDependencies;
 #pragma warning disable IDE1006 // Naming Styles
@@ -12,7 +12,7 @@ namespace Sentry.data.Core.DomainServices
 #pragma warning restore IDE1006 // Naming Styles
 
 
-        public BaseDomainSerivce(DomainServiceCommonDependency<T> commonDependency)
+        public BaseDomainService(DomainServiceCommonDependency<T> commonDependency)
         {
             _commonDependencies = commonDependency;
         }
