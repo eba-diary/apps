@@ -137,7 +137,7 @@ namespace Sentry.data.Core
                     try
                     {
                         Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
-                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken);
                     }
                     catch (Exception e)
                     {
@@ -176,7 +176,7 @@ namespace Sentry.data.Core
                 Sentry.Common.Logging.Logger.Info("Attempting to onboard token.");
                 var dataSource = _datasetContext.DataSources.FirstOrDefault(ds => ds.Id == int.Parse(Configuration.Config.GetHostSetting("MotiveDataSourceId")));
                 var token = ((HTTPSSource)dataSource).AllTokens.First(t => t.Id == tokenId);
-                await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, token, int.Parse(Configuration.Config.GetHostSetting("MotiveCompaniesDataFlowId")));
+                await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, token);
                 return true;
             }
             catch (Exception e)
