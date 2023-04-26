@@ -1,11 +1,5 @@
 ﻿using Moq;
 using Sentry.data.Core.DependencyInjection;
-using Sentry.data.Core.DomainServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Tests
 {
@@ -21,7 +15,7 @@ namespace Sentry.data.Core.Tests
             }
         }
 
-        public void DomainServiceTestInitalize(MockBehavior mockBehavior = MockBehavior.Strict)
+        public void DomainServiceTestInitialize(MockBehavior mockBehavior = MockBehavior.Strict)
         {
             TestInitialize(mockBehavior);
 

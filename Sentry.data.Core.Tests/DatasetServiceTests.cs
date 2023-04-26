@@ -20,7 +20,7 @@ namespace Sentry.data.Core.Tests
         [TestInitialize]
         public void MyTestInitialize()
         {
-            DomainServiceTestInitalize(MockBehavior.Strict);
+            DomainServiceTestInitialize(MockBehavior.Strict);
         }
 
         [TestCleanup]

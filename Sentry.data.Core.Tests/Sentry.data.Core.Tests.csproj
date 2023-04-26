@@ -176,6 +176,7 @@
     <Compile Include="Mockups\MockExtensions.cs" />
     <Compile Include="PaginateTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleTest\SampleDomainServiceTest.cs" />
     <Compile Include="SchemaConsumptionDtoTransformerTests.cs" />
     <Compile Include="SchemaTests.cs" />
     <Compile Include="ServiceImplementationTests\BusinessAreaServiceTests.cs" />

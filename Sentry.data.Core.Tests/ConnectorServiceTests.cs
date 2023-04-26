@@ -13,7 +13,7 @@ namespace Sentry.data.Core.Tests
         [TestInitialize]
         public void MyTestInitialize()
         {
-            DomainServiceTestInitalize();
+            DomainServiceTestInitialize();
         }
 
         [TestCleanup]

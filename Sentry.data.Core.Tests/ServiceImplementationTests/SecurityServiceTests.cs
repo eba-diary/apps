@@ -539,7 +539,6 @@ namespace Sentry.data.Core.Tests
 
             var user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");
-            user.Setup(x => x.IsInGroup(ticket.AdGroupName)).Returns(true);
 
             //ACT
             var ss = new SecurityService(_datasetContext.Object, null, _dataFeatures.Object, null, null, null, null, null);
@@ -1100,8 +1099,11 @@ namespace Sentry.data.Core.Tests
         public void Security_CanModifyDataflow_NonSecurable_NonAdmin()
         {
             //ARRAGE
+            Security security = BuildBaseSecurity(securableEntityName: SecurableEntityName.DATAFLOW);
             Mock<ISecurable> securable = _mockRepository.Create<ISecurable>();
             securable.Setup(x => x.IsSecured).Returns(false);
+            securable.Setup(x => x.Security).Returns(security);
+
 
             Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             user.Setup(x => x.AssociateId).Returns("999999");

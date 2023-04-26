@@ -331,6 +331,7 @@
     <Compile Include="DomainServices\MessageHandlers\DataStepProcessorHandler.cs" />
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\QuartermasterService.cs" />
+    <Compile Include="DomainServices\SampleService\SampleDomainService.cs" />
     <Compile Include="DomainServices\SchemaFlowService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\AuditDto.cs" />

@@ -806,7 +806,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void DatasetFileService_Delete()
         {
-            DomainServiceTestInitalize(MockBehavior.Loose);
+            DomainServiceTestInitialize(MockBehavior.Loose);
 
             var userService = _mockRepository.Create<IUserService>();
             var user1 = _mockRepository.Create<IApplicationUser>();
@@ -956,7 +956,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void UploadDatasetFileToS3_UploadDatasetFileDto_DatasetFileConfigNotFound()
         {
-            DomainServiceTestInitalize(MockBehavior.Strict);
+            DomainServiceTestInitialize(MockBehavior.Strict);
                         
             _datasetContext.Setup(x => x.GetById<DatasetFileConfig>(1)).Returns<DatasetFileConfig>(null);
 
@@ -975,7 +975,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void UploadDatasetFileToS3_UploadDatasetFileDto_DataFlowNotFound()
         {
-            DomainServiceTestInitalize(MockBehavior.Strict);
+            DomainServiceTestInitialize(MockBehavior.Strict);
 
             DatasetFileConfig datasetFileConfig = new DatasetFileConfig()
             {
@@ -1096,7 +1096,7 @@ namespace Sentry.data.Core.Tests
         public void CheckHangFireDelayedJob_ReprocessingDataFiles()
         {
             // Arrange
-            DomainServiceTestInitalize(MockBehavior.Loose);
+            DomainServiceTestInitialize(MockBehavior.Loose);
 
             Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
             _dataFeatures.Setup(s => s.CLA5024_PublishReprocessingEvents.GetValue()).Returns(false);
@@ -1173,7 +1173,7 @@ namespace Sentry.data.Core.Tests
         {
             // Arrange
 
-            DomainServiceTestInitalize(MockBehavior.Loose);
+            DomainServiceTestInitialize(MockBehavior.Loose);
 
             Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             Mock<IApplicationUser> user = _mockRepository.Create<IApplicationUser>();
@@ -1246,7 +1246,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void ScheduleReprocess_Publish_Event()
         {
-            DomainServiceTestInitalize(MockBehavior.Strict);
+            DomainServiceTestInitialize(MockBehavior.Strict);
 
             _dataFeatures.Setup(s => s.CLA5024_PublishReprocessingEvents.GetValue()).Returns(true);
 
