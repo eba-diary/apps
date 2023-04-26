@@ -370,6 +370,7 @@
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesRequestModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
+    <Compile Include="Entities\MessageFormats\SnowSchemaCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
