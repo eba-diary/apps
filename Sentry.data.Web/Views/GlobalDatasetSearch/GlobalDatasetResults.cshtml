@@ -27,7 +27,7 @@
         <label class="mdb-main-label">Page Size</label>
     </div>
 
-    <div class="row tile-results">
+    <div class="row" id="tile-results">
         @if (Model.GlobalDatasets?.Any() == true)
         {
             foreach (GlobalDatasetViewModel globalDataset in Model.GlobalDatasets)
