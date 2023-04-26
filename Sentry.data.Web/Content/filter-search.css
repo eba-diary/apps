@@ -266,6 +266,7 @@
     height: 1.5rem;
 }
 
-.pagination {
-    padding-bottom: 2rem;
+.search-card-subtitle {
+    display: flex;
+    justify-content: space-between;
 }

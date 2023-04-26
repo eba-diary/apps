@@ -31,3 +31,5 @@ import '@sentry-insurance/mdbootstrap/src/js/vendor/free/waves.js';
 ////Using commonJS with imports loader as to not interfere with MDB's half-supported module implementaion in picker-date
 import 'imports-loader?type=commonjs&imports=single|jquery|$!@sentry-insurance/mdbootstrap/src/js/vendor/pro/picker-date.js';
 import '@sentry-insurance/mdbootstrap/src/js/vendor/pro/picker-time.js';
+import '@sentry-insurance/mdbootstrap/src/js/pro/cards.js';
+import '@sentry-insurance/mdbootstrap/src/js/pro/chips.js';

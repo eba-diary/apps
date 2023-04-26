@@ -562,6 +562,7 @@
     <Compile Include="API\Resources\GlobalDataset\GetGlobalDatasetFilters\GetGlobalDatasetFiltersResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\GlobalDatasetController.cs" />
     <Compile Include="API\Resources\GlobalDataset\GlobalDatasetProfile.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\BaseGlobalDatasetModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsResponseModel.cs" />

@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("PROD", result.NamedEnvironments[1]);
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/12", result.DatasetDetailPage);
+            Assert.AreEqual(12, result.TargetDatasetId);
 
             result = results.GlobalDatasets[1];
             Assert.AreEqual(2, result.GlobalDatasetId);
@@ -125,7 +125,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("TEST", result.NamedEnvironments[1]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/22", result.DatasetDetailPage);
+            Assert.AreEqual(22, result.TargetDatasetId);
 
             mr.VerifyAll();
         }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Sentry.data.Core
+namespace Sentry.data.Web.API
 {
-    public class SearchGlobalDatasetDto
+    public abstract class BaseGlobalDatasetModel
     {
         public int GlobalDatasetId { get; set; }
         public string DatasetName { get; set; }

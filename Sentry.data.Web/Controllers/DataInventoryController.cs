@@ -122,8 +122,6 @@ namespace Sentry.data.Web.Controllers
             {
                 PageTitle = "Data Inventory",
                 SearchType = SearchType.DATA_INVENTORY,
-                IconPath = "~/Images/DataInventory/DataInventoryIconBlue.svg",
-                InfoLink = "https://confluence.sentry.com/display/CLA/Data+Inventory+-+Elastic",
                 DefaultSearch = searchModel
             };
         }

@@ -26,7 +26,7 @@ namespace Sentry.data.Infrastructure
                     globalDatasetEnumerable = globalDatasetPageRequestDto.GlobalDatasets.OrderBy(x => x.DatasetName);
                     break;
                 case GlobalDatasetSortByOption.Favorites:
-                    globalDatasetEnumerable = globalDatasetPageRequestDto.GlobalDatasets.OrderByDescending(x => x.IsFavorite).ThenBy(x => x.DatasetName);
+                    globalDatasetEnumerable = globalDatasetPageRequestDto.GlobalDatasets.OrderByDescending(x => x.IsFavorite);
                     break;
             }
 

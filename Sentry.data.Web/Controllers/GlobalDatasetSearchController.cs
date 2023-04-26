@@ -21,7 +21,7 @@ namespace Sentry.data.Web.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
+        public ActionResult Search(string searchText = null, int sortBy = -1, int pageNumber = 1, int pageSize = 12, int layout = 0, List<string> filters = null, string savedSearch = null)
         {
             if (TryGetSavedSearch(SearchType.GLOBAL_DATASET, savedSearch, out SavedSearchDto savedSearchDto))
             {
@@ -39,6 +39,18 @@ namespace Sentry.data.Web.Controllers
                 catch (Exception ex)
                 {
                     Logger.Error("Error getting result parameters for saved search", ex);
+                }
+            }
+
+            if (sortBy == -1)
+            {
+                if (!string.IsNullOrWhiteSpace(searchText))
+                {
+                    sortBy = (int)GlobalDatasetSortByOption.Relevance;
+                }
+                else
+                {
+                    sortBy = (int)GlobalDatasetSortByOption.Favorites;
                 }
             }
 
@@ -63,7 +75,7 @@ namespace Sentry.data.Web.Controllers
         [ChildActionOnly]
         public override ActionResult Results(Dictionary<string, string> parameters)
         {
-            GlobalDatasetResultsViewModel tileResultsModel = new GlobalDatasetResultsViewModel()
+            GlobalDatasetResultsViewModel resultsViewModel = new GlobalDatasetResultsViewModel()
             {
                 GlobalDatasets = new List<GlobalDatasetViewModel>(),
                 PageItems = new List<PageItemModel>()
@@ -79,7 +91,7 @@ namespace Sentry.data.Web.Controllers
                 LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(int.Parse(parameters[TileResultParameters.LAYOUT]))
             };
 
-            return PartialView("GlobalDatasetResults.cshtml", tileResultsModel);
+            return PartialView("GlobalDatasetResults", resultsViewModel);
         }
 
         [HttpPost]
@@ -100,7 +112,6 @@ namespace Sentry.data.Web.Controllers
             {
                 PageTitle = "Datasets",
                 SearchType = SearchType.GLOBAL_DATASET,
-                IconPath = "~/Images/Icons/DatasetsBlue.svg",
                 DefaultSearch = searchModel
             };
         }

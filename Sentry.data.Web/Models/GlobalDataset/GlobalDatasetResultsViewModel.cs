@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Amazon.S3.Model;
+using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web

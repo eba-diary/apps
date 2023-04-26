@@ -16,7 +16,7 @@ data.GlobalDatasetSearch = {
 
     retrieveResultConfig: function () {
         //get sort, page size, layout
-        var resultParameters = {
+        let resultParameters = {
             PageSize: $("#tile-result-page-size").val(),
             SortBy: $("#tile-result-sort").val(),
             Layout: $("#tile-result-layout").val()
@@ -116,29 +116,21 @@ data.GlobalDatasetSearch = {
     },
 
     initEvents: function () {
-        //tile click event
-        //$(document).on("click", ".tile-result", function (e) {
-        //    if ($(this).hasClass("tile-active")) {
-        //        var datasetId = $(this).data("id");
-        //        data.GlobalDatasetSearch.setPreviousSearch();
-
-        //        //TO DO: shouldn't have to do this anymore
-        //        window.location.href = "/Dataset/Detail/" + encodeURIComponent(datasetId);
-        //    }
-        //});
+        $(document).on("click", ".tile-result", data.GlobalDatasetSearch.setPreviousSearch);
 
         //favorite click event
-        $(document).on("click", ".tile-favorite", function (e) {
+        $(document).on("click", ".card-favorite", function (e) {
             e.stopPropagation();
+            e.preventDefault();
 
-            var element = $(this);
-            var datasetId = element.data("id");
+            let element = $(this);
+            let datasetId = element.data("id");
 
             $.ajax({
                 url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(datasetId),
                 method: "GET",
                 success: function () {
-                    element.toggleClass("fas far");
+                    $(element[0].firstElementChild).toggleClass("fas lt_gold far gray");
                 },
                 error: function () {
                     data.Dataset.makeToast("error", "Failed to remove favorite.");
@@ -154,13 +146,13 @@ data.GlobalDatasetSearch = {
 
         //page change events
         $(document).on("click", "#tile-page-previous", function () {
-            var previousPage = data.GlobalDatasetSearch.getActivePage();
+            let previousPage = data.GlobalDatasetSearch.getActivePage();
             previousPage--;
             data.GlobalDatasetSearch.updatePageOrganizationFromEvent(previousPage);
         });
 
         $(document).on("click", "#tile-page-next", function () {
-            var nextPage = data.GlobalDatasetSearch.getActivePage();
+            let nextPage = data.GlobalDatasetSearch.getActivePage();
             nextPage++;
             data.GlobalDatasetSearch.updatePageOrganizationFromEvent(nextPage);
         });
@@ -199,7 +191,22 @@ data.GlobalDatasetSearch = {
         });
 
         //text box type delay
-        $(document).on("input", "#filter-search-text", () => data.GlobalDatasetSearch.setInputTimeout(data.GlobalDatasetSearch.executeSearch));
+        $(document).on("input", "#filter-search-text", function () {
+            let searchText = $.trim($(this).val()).length
+            if (searchText > 2 || searchText == 0) {
+                data.GlobalDatasetSearch.setInputTimeout(data.GlobalDatasetSearch.executeTextSearch)
+            }
+        });
+    },
+
+    executeTextSearch: function () {
+        if ($.trim($("#filter-search-text").val()).length > 0) {
+            $("#tile-result-sort").val('0');
+        }
+        else {
+            $("#tile-result-sort").val('1');
+        }
+        data.GlobalDatasetSearch.executeSearch();
     },
 
     setInputTimeout: function (searchFunction) {
@@ -228,11 +235,11 @@ data.GlobalDatasetSearch = {
         //set localStorage items for searchText, filteredIds, pageSelection, sortByVal, itemsToShow
         localStorage.setItem("searchText", $.trim($("#filter-search-text").val()));
         localStorage.setItem("sortBy", $("#tile-result-sort").val());
-        localStorage.setItem("pageNumber", data.GlobalDatasetSearch.getActivePage());
+        localStorage.setItem("pageNumber", data.GlobalDatasetSearch.getActivePage().toString());
         localStorage.setItem("pageSize", $("#tile-result-page-size").val());
         localStorage.setItem("layout", $("#tile-result-layout").val());
 
-        var filters = [];
+        let filters = [];
         $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
             filters.push(this.id);
         });

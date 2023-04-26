@@ -263,7 +263,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("TEST", result.NamedEnvironments[2]);
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/12", result.DatasetDetailPage);
+            Assert.AreEqual(12, result.TargetDatasetId);
         }
 
         [TestMethod]
@@ -325,7 +325,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("TEST", result.NamedEnvironments[2]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/13", result.DatasetDetailPage);
+            Assert.AreEqual(13, result.TargetDatasetId);
         }
 
         #region Helpers

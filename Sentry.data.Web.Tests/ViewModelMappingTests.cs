@@ -32,7 +32,7 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "DEV", "TEST" },
                         IsFavorite = true,
                         IsSecured = true,
-                        DatasetDetailPage = "/page/1"
+                        TargetDatasetId = 1
                     },
                     new GlobalDatasetViewModel
                     {
@@ -44,7 +44,7 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "NRTEST" },
                         IsFavorite = false,
                         IsSecured = false,
-                        DatasetDetailPage = "/page/2"
+                        TargetDatasetId = 2
                     }
                 }
             };
@@ -68,7 +68,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("TEST", globalDataset.NamedEnvironments[1]);
             Assert.IsTrue(globalDataset.IsFavorite);
             Assert.IsTrue(globalDataset.IsSecured);
-            Assert.AreEqual("/page/1", globalDataset.DatasetDetailPage);
+            Assert.AreEqual(1, globalDataset.TargetDatasetId);
 
             globalDataset = dto.GlobalDatasets[1];
             Assert.AreEqual(2, globalDataset.GlobalDatasetId);
@@ -80,7 +80,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("NRTEST", globalDataset.NamedEnvironments[0]);
             Assert.IsFalse(globalDataset.IsFavorite);
             Assert.IsFalse(globalDataset.IsSecured);
-            Assert.AreEqual("/page/2", globalDataset.DatasetDetailPage);
+            Assert.AreEqual(2, globalDataset.TargetDatasetId);
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "DEV", "TEST" },
                         IsFavorite = true,
                         IsSecured = true,
-                        DatasetDetailPage = "/page/1"
+                        TargetDatasetId = 1
                     },
                     new SearchGlobalDatasetDto
                     {
@@ -116,7 +116,7 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "NRTEST" },
                         IsFavorite = false,
                         IsSecured = false,
-                        DatasetDetailPage = "/page/2"
+                        TargetDatasetId = 2
                     }
                 },
                 TotalResults = 2
@@ -148,7 +148,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("TEST", globalDataset.NamedEnvironments[1]);
             Assert.IsTrue(globalDataset.IsFavorite);
             Assert.IsTrue(globalDataset.IsSecured);
-            Assert.AreEqual("/page/1", globalDataset.DatasetDetailPage);
+            Assert.AreEqual(1, globalDataset.TargetDatasetId);
 
             globalDataset = viewModel.GlobalDatasets[1];
             Assert.AreEqual(2, globalDataset.GlobalDatasetId);
@@ -160,7 +160,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("NRTEST", globalDataset.NamedEnvironments[0]);
             Assert.IsFalse(globalDataset.IsFavorite);
             Assert.IsFalse(globalDataset.IsSecured);
-            Assert.AreEqual("/page/2", globalDataset.DatasetDetailPage);
+            Assert.AreEqual(2, globalDataset.TargetDatasetId);
         }
     }
 }

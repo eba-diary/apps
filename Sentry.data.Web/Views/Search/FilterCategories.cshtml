@@ -1,7 +1,7 @@
 ﻿@model List<FilterCategoryModel>
 
 @{
-    IEnumerable<FilterCategoryModel> orderedModel = Model.Where(x => x.CategoryOptions.Count > 1 || x.CategoryOptions.All(a => a.Selected)).OrderBy(x => x.CategoryName);
+    IEnumerable<FilterCategoryModel> orderedModel = Model.Where(x => x.CategoryOptions.Count > 1 || x.CategoryOptions.All(a => a.Selected)).OrderByDescending(x => x.DefaultCategoryOpen).ThenBy(x => x.CategoryName);
     List<FilterCategoryOptionModel> allOptions = orderedModel.SelectMany(x => x.CategoryOptions).ToList();
 }
 

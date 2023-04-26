@@ -100,7 +100,7 @@ namespace Sentry.data.Web.Tests.API
                         NamedEnvironments = new List<string> { "DEV" },
                         IsSecured = true,
                         IsFavorite = true,
-                        DatasetDetailPage = "Dataset/Detail/2"
+                        TargetDatasetId = 2
                     },
                     new SearchGlobalDatasetDto
                     {
@@ -112,7 +112,7 @@ namespace Sentry.data.Web.Tests.API
                         NamedEnvironments = new List<string> { "DEV", "TEST" },
                         IsSecured = false,
                         IsFavorite = false,
-                        DatasetDetailPage = "Dataset/Detail/3"
+                        TargetDatasetId = 1
                     }
                 }
             };
@@ -131,7 +131,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual("DEV", globalDataset.NamedEnvironments.First());
             Assert.IsTrue(globalDataset.IsSecured);
             Assert.IsTrue(globalDataset.IsFavorite);
-            Assert.AreEqual("Dataset/Detail/2", globalDataset.DatasetDetailPage);
+            Assert.AreEqual(2, globalDataset.TargetDatasetId);
 
             globalDataset = model.GlobalDatasets[1];
             Assert.AreEqual(2, globalDataset.GlobalDatasetId);
@@ -144,7 +144,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.AreEqual("TEST", globalDataset.NamedEnvironments.Last());
             Assert.IsFalse(globalDataset.IsSecured);
             Assert.IsFalse(globalDataset.IsFavorite);
-            Assert.AreEqual("Dataset/Detail/3", globalDataset.DatasetDetailPage);
+            Assert.AreEqual(1, globalDataset.TargetDatasetId);
         }
     }
 }

@@ -31,13 +31,17 @@ namespace Sentry.data.Infrastructure
 
         public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
         {
+            //only use the filter categories for what results need to be selected
+            List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
+            filterSearchDto.FilterCategories = null;
+
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
             searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
             searchRequest.Size = 0;
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(filterSearchDto.FilterCategories);
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters);
 
             return filterCategories;
         }
