@@ -250,7 +250,7 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            SearchGlobalDatasetsResultDto result = globalDataset.ToSearchResult("082116");
+            SearchGlobalDatasetDto result = globalDataset.ToSearchResult("082116");
 
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);
@@ -312,7 +312,7 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            SearchGlobalDatasetsResultDto result = globalDataset.ToSearchResult("000000");
+            SearchGlobalDatasetDto result = globalDataset.ToSearchResult("000000");
 
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);

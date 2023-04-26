@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Bibliography;
 using Sentry.data.Core;
 using System.Collections.Generic;
 
@@ -21,7 +20,7 @@ namespace Sentry.data.Web.API
 
             CreateMap<SearchGlobalDatasetsRequestModel, SearchGlobalDatasetsDto>();
 
-            CreateMap<SearchGlobalDatasetsResultDto, SearchGlobalDatasetResponseModel>();
+            CreateMap<SearchGlobalDatasetDto, SearchGlobalDatasetResponseModel>();
             CreateMap<SearchGlobalDatasetsResultsDto, SearchGlobalDatasetsResponseModel>();
 
             CreateMap<GetGlobalDatasetFiltersRequestModel, GetGlobalDatasetFiltersDto>();

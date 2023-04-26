@@ -1,1 +1,86 @@
-﻿
+﻿@model GlobalDatasetResultsViewModel
+
+@{
+    ViewBag.Fluid = true;
+}
+
+<div class="tile-result-content">
+    <input type="hidden" id="result-count" value="@Model.GlobalDatasets.Count">
+
+    <div class="tile-result-options mt-4 tile-mr">
+        @* sort *@
+        <div class="mr-2">
+            @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Sort By</label>
+        </div>
+
+        @* layout *@
+        <div>
+            @Html.DropDownList("tile-result-layout", Model.LayoutOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Layout</label>
+        </div>
+    </div>
+
+    @* page size *@
+    <div class="mt-4">
+        @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
+        <label class="mdb-main-label">Page Size</label>
+    </div>
+
+    <div class="row tile-results">
+        @if (Model.GlobalDatasets?.Any() == true)
+        {
+            foreach (GlobalDatasetViewModel globalDataset in Model.GlobalDatasets)
+            {
+                <div class="col-4 m-0 p-0">
+                    <div class="card m-1">
+                        <!-- Card content -->
+                        <div class="card-body">
+                            <!-- Favorite Icon -->
+                            <a class="activator waves-effect waves-light mr-4">
+                                <i class="far fa-star"></i>
+                            </a>
+
+                            <!-- Dataset Name and Category -->
+                            <h4 class="card-title pt-0 mb-0">@globalDataset.DatasetName</h4>
+                            <h6 class="card-title pt-0 mb-0">@globalDataset.CategoryCode</h6>
+                            <hr class="my-2">
+
+                            <!-- Dataset Description -->
+                            <p class="card-text"> @globalDataset.DatasetDescription </p>
+
+                            <a href="@globalDataset.DatasetDetailPage" class="black-text d-flex justify-content-end">
+                                <h6 class="pt-0 mb-0">
+                                    View Details
+                                    <i class="fas fa-angle-double-right"></i>
+                                </h6>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @if (Model.PageItems?.Any() == true)
+    {
+        <div class="tile-mr">
+            <ul class="pagination">
+                <li class="page-item @(Model.PageItems.First().IsActive ? "disabled" : "")" id="tile-page-previous">
+                    <span class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</span>
+                </li>
+
+                @foreach (PageItemModel item in Model.PageItems)
+                {
+                    <li class="page-item tile-page-number @(item.IsActive ? "active" : "") @(item.IsDisabled ? "disabled" : "")" data-page="@item.PageNumber">
+                        <span class="page-link waves-effect" href="#">@item.PageNumber</span>
+                    </li>
+                }
+
+                <li class="page-item @(Model.PageItems.Last().IsActive ? "disabled" : "")" id="tile-page-next">
+                    <span class="page-link next waves-effect" href="#" aria-label="Next">Next</span>
+                </li>
+            </ul>
+        </div>
+    }
+</div>

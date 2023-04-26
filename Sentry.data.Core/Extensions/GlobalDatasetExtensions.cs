@@ -93,7 +93,7 @@ namespace Sentry.data.Core
             };
         }
 
-        public static SearchGlobalDatasetsResultDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
+        public static SearchGlobalDatasetDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
         {
             EnvironmentDataset targetEnvironmentDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.NamedEnvironmentType == NamedEnvironmentType.Prod.ToString());
 
@@ -102,7 +102,7 @@ namespace Sentry.data.Core
                 targetEnvironmentDataset = globalDataset.EnvironmentDatasets.Last();
             }
 
-            return new SearchGlobalDatasetsResultDto
+            return new SearchGlobalDatasetDto
             {
                 GlobalDatasetId = globalDataset.GlobalDatasetId,
                 DatasetName = globalDataset.DatasetName,

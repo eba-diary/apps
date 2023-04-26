@@ -594,6 +594,7 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="AutoMapper\ViewModelProfile.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="API\Resources\Dataset\DatasetController.cs" />
     <Compile Include="Controllers\DataFlowMetricController.cs" />
@@ -663,6 +664,9 @@
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\GlobalDataset\GlobalDatasetPageRequestViewModel.cs" />
+    <Compile Include="Models\GlobalDataset\GlobalDatasetResultsViewModel.cs" />
+    <Compile Include="Models\GlobalDataset\GlobalDatasetViewModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryDetailModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryDetailPageModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryPageModel.cs" />
@@ -893,6 +897,7 @@
     <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
+    <Content Include="js\GlobalDatasetSearch.js" />
     <Content Include="js\Job.js" />
     <Content Include="js\MigrationHistory.js" />
     <Content Include="js\Shared\Images.js" />

@@ -88,9 +88,9 @@ namespace Sentry.data.Web.Tests.API
         {
             SearchGlobalDatasetsResultsDto dto = new SearchGlobalDatasetsResultsDto
             {
-                GlobalDatasets = new List<SearchGlobalDatasetsResultDto>
+                GlobalDatasets = new List<SearchGlobalDatasetDto>
                 {
-                    new SearchGlobalDatasetsResultDto
+                    new SearchGlobalDatasetDto
                     {
                         GlobalDatasetId = 1,
                         DatasetName = "Name",
@@ -102,7 +102,7 @@ namespace Sentry.data.Web.Tests.API
                         IsFavorite = true,
                         DatasetDetailPage = "Dataset/Detail/2"
                     },
-                    new SearchGlobalDatasetsResultDto
+                    new SearchGlobalDatasetDto
                     {
                         GlobalDatasetId = 2,
                         DatasetName = "Name 2",

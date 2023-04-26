@@ -101,7 +101,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.AreEqual(2, results.GlobalDatasets.Count);
 
-            SearchGlobalDatasetsResultDto result = results.GlobalDatasets[0];
+            SearchGlobalDatasetDto result = results.GlobalDatasets[0];
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);
             Assert.AreEqual("SAID", result.DatasetSaidAssetCode);

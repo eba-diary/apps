@@ -100,6 +100,29 @@ namespace Sentry.data.Web.Tests
         }
 
         [TestMethod]
+        public void BuildSelectListFromEnum_GlobalDatasetSortByOption_SelectListItems()
+        {
+            List<SelectListItem> items = Utility.BuildSelectListFromEnum<GlobalDatasetSortByOption>(2);
+
+            Assert.AreEqual(3, items.Count);
+
+            SelectListItem item = items.First();
+            Assert.AreEqual("Favorites", item.Text);
+            Assert.AreEqual("0", item.Value);
+            Assert.IsFalse(item.Selected);
+
+            item = items[1];
+            Assert.AreEqual("Alphabetical", item.Text);
+            Assert.AreEqual("1", item.Value);
+            Assert.IsFalse(item.Selected);
+
+            item = items.Last();
+            Assert.AreEqual("Relevance", item.Text);
+            Assert.AreEqual("2", item.Value);
+            Assert.IsTrue(item.Selected);
+        }
+
+        [TestMethod]
         public void BuildPageItemList_NoResults_PageItemModels()
         {
             List<PageItemModel> items = Utility.BuildPageItemList(0, 15, 1);

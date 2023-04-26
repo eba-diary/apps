@@ -1,12 +1,10 @@
-﻿using Sentry.Common.Logging;
+﻿using AutoMapper;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Infrastructure.FeatureFlags;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -14,16 +12,18 @@ namespace Sentry.data.Web.Controllers
 {
     public class GlobalDatasetSearchController : BaseSearchableController
     {
-        private readonly IGlobalDatasetService _globalDatasetService;
+        private readonly IGlobalDatasetSearchService _globalDatasetSearchService;
+        private readonly IMapper _mapper;
 
-        public GlobalDatasetSearchController(IGlobalDatasetService globalDatasetService, IFilterSearchService filterSearchService) : base(filterSearchService)
+        public GlobalDatasetSearchController(IGlobalDatasetSearchService globalDatasetSearchService, IMapper mapper, IFilterSearchService filterSearchService) : base(filterSearchService)
         {
-            _globalDatasetService = globalDatasetService;
+            _globalDatasetSearchService = globalDatasetSearchService;
+            _mapper = mapper;
         }
 
         public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
         {
-            if (TryGetSavedSearch(SearchType.DATASET_SEARCH, savedSearch, out SavedSearchDto savedSearchDto))
+            if (TryGetSavedSearch(SearchType.GLOBAL_DATASET, savedSearch, out SavedSearchDto savedSearchDto))
             {
                 try
                 {
@@ -46,7 +46,7 @@ namespace Sentry.data.Web.Controllers
             {
                 SearchName = savedSearch,
                 SearchText = searchText,
-                FilterCategories = _globalDatasetService.GetInitialFilters(filters).ToModels()
+                FilterCategories = _globalDatasetSearchService.GetInitialFilters(filters).ToModels()
             };
 
             Dictionary<string, string> resultParameters = new Dictionary<string, string>()
@@ -63,9 +63,9 @@ namespace Sentry.data.Web.Controllers
         [ChildActionOnly]
         public override ActionResult Results(Dictionary<string, string> parameters)
         {
-            TileResultsModel tileResultsModel = new TileResultsModel()
+            GlobalDatasetResultsViewModel tileResultsModel = new GlobalDatasetResultsViewModel()
             {
-                Tiles = new List<TileModel>(),
+                GlobalDatasets = new List<GlobalDatasetViewModel>(),
                 PageItems = new List<PageItemModel>()
                 {
                     new PageItemModel()
@@ -75,11 +75,23 @@ namespace Sentry.data.Web.Controllers
                     }
                 },
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(parameters[TileResultParameters.PAGESIZE]),
-                SortByOptions = Utility.BuildSelectListFromEnum<TileSearchSortByOption>(int.Parse(parameters[TileResultParameters.SORTBY])),
+                SortByOptions = Utility.BuildSelectListFromEnum<GlobalDatasetSortByOption>(int.Parse(parameters[TileResultParameters.SORTBY])),
                 LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(int.Parse(parameters[TileResultParameters.LAYOUT]))
             };
 
             return PartialView("GlobalDatasetResults.cshtml", tileResultsModel);
+        }
+
+        [HttpPost]
+        public ActionResult GlobalDatasetResults(GlobalDatasetPageRequestViewModel resultsRequestModel)
+        {
+            GlobalDatasetPageRequestDto requestDto = _mapper.Map<GlobalDatasetPageRequestDto>(resultsRequestModel);
+
+            GlobalDatasetPageResultDto resultDto = _globalDatasetSearchService.SetGlobalDatasetPageResults(requestDto);
+
+            GlobalDatasetResultsViewModel resultsViewModel = _mapper.Map<GlobalDatasetResultsViewModel>(resultDto);
+
+            return PartialView(resultsViewModel);
         }
 
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
@@ -87,7 +99,7 @@ namespace Sentry.data.Web.Controllers
             return new FilterSearchConfigModel()
             {
                 PageTitle = "Datasets",
-                SearchType = SearchType.DATASET_SEARCH,
+                SearchType = SearchType.GLOBAL_DATASET,
                 IconPath = "~/Images/Icons/DatasetsBlue.svg",
                 DefaultSearch = searchModel
             };

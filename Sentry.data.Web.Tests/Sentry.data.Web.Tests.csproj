@@ -220,6 +220,7 @@
     <Compile Include="Extensions\DatasetExtensionsTests.cs" />
     <Compile Include="ModelTests.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidatorTests.cs" />
+    <Compile Include="ViewModelMappingTests.cs" />
     <Compile Include="UtilityTests.cs" />
     <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>

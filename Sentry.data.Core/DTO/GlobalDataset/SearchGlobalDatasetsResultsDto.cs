@@ -4,6 +4,6 @@ namespace Sentry.data.Core
 {
     public class SearchGlobalDatasetsResultsDto
     {
-        public List<SearchGlobalDatasetsResultDto> GlobalDatasets { get; set; }
+        public List<SearchGlobalDatasetDto> GlobalDatasets { get; set; }
     }
 }
