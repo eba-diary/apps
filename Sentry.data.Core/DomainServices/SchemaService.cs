@@ -1,14 +1,13 @@
-﻿using Hangfire;
-using Nest;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.Core;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Exceptions;
-using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,18 +15,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class SchemaService : ISchemaService
+    public class SchemaService : BaseDomainService<SchemaService>, ISchemaService
     {
         public readonly IDataFlowService _dataFlowService;
         public readonly IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly ISecurityService _securityService;
-        private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
@@ -40,15 +37,16 @@ namespace Sentry.data.Core
 
         public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticDocumentClient elasticDocumentClient, IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider)
+            IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
+            IEventService eventService, IElasticDocumentClient elasticDocumentClient, 
+            IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider,
+            DomainServiceCommonDependency<SchemaService> commonDependency) : base(commonDependency)
         {
             _datasetContext = dsContext;
             _userService = userService;
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
-            _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
             _eventService = eventService;
@@ -93,7 +91,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("schemaservice-createandsaveschema", ex);
+                _logger.LogError(ex, "schemaservice-createandsaveschema");
                 throw;
             }
 
@@ -140,18 +138,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access", ex);
+                        _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -200,12 +198,12 @@ namespace Sentry.data.Core
                 var flatArgExs = agEx.Flatten().InnerExceptions;
                 foreach(var ex in flatArgExs)
                 {
-                    Logger.Error("Failed generating consumption layer event", ex);
+                    _logger.LogError(ex, "Failed generating consumption layer event");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to add revision", ex);
+                _logger.LogError(ex, "Failed to add revision");
             }
 
             return 0;
@@ -228,18 +226,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access", ex);
+                        _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -282,13 +280,13 @@ namespace Sentry.data.Core
                 var flatArgExs = agEx.Flatten().InnerExceptions;
                 foreach (var ex in flatArgExs)
                 {
-                    Logger.Error("Failed generating consumption layer event", ex);
+                    _logger.LogError(ex, "Failed generating consumption layer event");
                 }
                 throw;
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to add revision", ex);
+                _logger.LogError(ex, "Failed to add revision");
                 throw;
             }
 
@@ -314,7 +312,7 @@ namespace Sentry.data.Core
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            Logger.Info($"startmethod <{m.ReflectedType.Name}>");
+            _logger.LogInformation($"startmethod <{m.ReflectedType.Name}>");
 
             DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId, x => x.CanManageSchema);
 
@@ -323,7 +321,7 @@ namespace Sentry.data.Core
             try
             {
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
+                _logger.LogInformation($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
 
                 if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
@@ -341,7 +339,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed schema save", ex);
+                _logger.LogError(ex, $"<{m.ReflectedType.Name.ToLower()}> Failed schema save");
                 return false;
             }
 
@@ -368,10 +366,10 @@ namespace Sentry.data.Core
             */
             if (exceptions.Count > 0)
             {
-                Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
+                _logger.LogError(new AggregateException(exceptions), $"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events");
             }
 
-            Logger.Info($"endmethod <{m.ReflectedType.Name}>");
+            _logger.LogInformation($"endmethod <{m.ReflectedType.Name}>");
             return true;
         }
 
@@ -477,7 +475,7 @@ namespace Sentry.data.Core
             //Do nothing if there is no revision associated with schema
             if (schemaRevision == null)
             {
-                Logger.Debug($"<{methodName}> - consumption layer event not generated - no schema revision");
+               _logger.LogDebug($"<{methodName}> - consumption layer event not generated - no schema revision");
                 return;
             }
                         
@@ -511,7 +509,7 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<{methodName}> sending {hiveCreate.EventType.ToLower()} event...");
+                   _logger.LogDebug($"<{methodName}> sending {hiveCreate.EventType.ToLower()} event...");
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
@@ -523,11 +521,11 @@ namespace Sentry.data.Core
                         _messagePublisher.PublishDSCEvent(schemaRevision.ParentSchema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate), topicName);
                     }
 
-                    Logger.Debug($"<{methodName}> sent {hiveCreate.EventType.ToLower()} event");
+                   _logger.LogDebug($"<{methodName}> sent {hiveCreate.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<{methodName}> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
+                    _logger.LogError(ex, $"<{methodName}> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
                     exceptionList.Add(ex);
                 }
 
@@ -543,7 +541,7 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Info($"<{methodName}> sending {snowModel.EventType.ToLower()} event...");
+                    _logger.LogInformation($"<{methodName}> sending {snowModel.EventType.ToLower()} event...");
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
@@ -554,11 +552,11 @@ namespace Sentry.data.Core
                     {
                         _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
                     }
-                    Logger.Info($"<{methodName}> sent {snowModel.EventType.ToLower()} event");
+                    _logger.LogInformation($"<{methodName}> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<{methodName}> failed sending event: {snowModel}");
+                    _logger.LogError(ex, $"<{methodName}> failed sending event: {snowModel}");
                     exceptionList.Add(ex);
                 }
 
@@ -734,18 +732,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"schemacontroller-fetSchemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"schemacontroller-fetSchemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("schemacontroller-fetSchemarevisiondtobyschema unauthorized_access", ex);
+                        _logger.LogError(ex, "schemacontroller-fetSchemarevisiondtobyschema unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-fetSchemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"schemacontroller-fetSchemarevisiondtobyschema failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -785,18 +783,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access", ex);
+                        _logger.LogError(ex, "schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-getlatestschemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"schemacontroller-getlatestschemarevisiondtobyschema failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -897,18 +895,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access", ex);
+                        _logger.LogError(ex, $"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -956,19 +954,19 @@ namespace Sentry.data.Core
         {
             if (objectKey == null)
             {
-                Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
+               _logger.LogDebug($"schemaservice-registerrawfile no-objectkey-input");
                 throw new ArgumentException("schemaservice-registerrawfile no-objectkey-input");
             }
 
             if (schema == null)
             {
-                Logger.Debug($"schemaservice-registerrawfile no-schema-input");
+               _logger.LogDebug($"schemaservice-registerrawfile no-schema-input");
                 throw new ArgumentException("schemaservice-registerrawfile no-schema-input");
             }
 
             if (stepEvent == null)
             {
-                Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+               _logger.LogDebug($"schemaservice-registerrawfile no-stepevent-input");
                 throw new ArgumentException("schemaservice-registerrawfile no-stepevent-input");
             }
 
@@ -988,7 +986,7 @@ namespace Sentry.data.Core
 
                     if (previousFileList.Any())
                     {
-                        Logger.Debug($"schemaservice-registerrawfile setting-parentdatasetfileid detected {previousFileList.Count} file(s) to be updated");
+                       _logger.LogDebug($"schemaservice-registerrawfile setting-parentdatasetfileid detected {previousFileList.Count} file(s) to be updated");
                     }
 
                     foreach (DatasetFile item in previousFileList)
@@ -1001,7 +999,7 @@ namespace Sentry.data.Core
             }
             catch(Exception ex)
             {
-                Logger.Error($"schemaservice-registerrawfile-failed", ex);
+                _logger.LogError(ex, $"schemaservice-registerrawfile-failed");
                 throw;
             }
         }
@@ -1101,11 +1099,11 @@ namespace Sentry.data.Core
                     return;
                 }
 
-                Logger.Info($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
+                _logger.LogInformation($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-checkdatasetpermission failed to check access", ex);
+                _logger.LogError(ex, $"schemacontroller-checkdatasetpermission failed to check access");
             }
 
             throw new SchemaUnauthorizedAccessException();
@@ -1517,7 +1515,7 @@ namespace Sentry.data.Core
         public void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
             MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
-            Logger.Debug($"schemaservice start method <{mBase.Name.ToLower()}>");
+           _logger.LogDebug($"schemaservice start method <{mBase.Name.ToLower()}>");
 
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
 
@@ -1528,7 +1526,7 @@ namespace Sentry.data.Core
                 throw new ValidationException(errors);
             }
 
-            Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
+           _logger.LogDebug($"schemaservice end method <{mBase.Name.ToLower()}>");
         }
 
         private ValidationResults ValidateCleanedFields(string extensionName, List<BaseFieldDto> fieldDtoList)
