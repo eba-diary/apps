@@ -243,6 +243,8 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
+    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsResultDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
@@ -393,6 +395,7 @@
     <Compile Include="Exceptions\DfsRetrieverJobException.cs" />
     <Compile Include="Exceptions\FeatureNotEnabledException.cs" />
     <Compile Include="Exceptions\LivyBatchNotFoundException.cs" />
+    <Compile Include="Exceptions\ResourceFeatureDisabledException.cs" />
     <Compile Include="Exceptions\ResourceForbiddenException.cs" />
     <Compile Include="Exceptions\ResourceNotFoundException.cs" />
     <Compile Include="Extensions\AdminExtensions.cs" />
@@ -501,6 +504,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
+    <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
@@ -527,6 +531,7 @@
     <Compile Include="Interfaces\IMigrationService.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
     <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
+    <Compile Include="Interfaces\Elastic\IElasticIndexClient.cs" />
     <Compile Include="Interfaces\IFileProvider.cs" />
     <Compile Include="Interfaces\IGoogleBigQueryService.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
@@ -543,7 +548,7 @@
     <Compile Include="Interfaces\IDataFlowMetricService.cs" />
     <Compile Include="Interfaces\IDatasetFileService.cs" />
     <Compile Include="Interfaces\IEntityService.cs" />
-    <Compile Include="Interfaces\IElasticContext.cs" />
+    <Compile Include="Interfaces\Elastic\IElasticDocumentClient.cs" />
     <Compile Include="Interfaces\IDeadSparkJobService.cs" />
     <Compile Include="Interfaces\IHostSettings.cs" />
     <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
@@ -577,6 +582,9 @@
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\ITileSearchService.cs" />
     <Compile Include="Interfaces\ITrackableSchema.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexProvider.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexService.cs" />
+    <Compile Include="Interfaces\Reindex\IReindexSource.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />

@@ -26,7 +26,7 @@
         $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
 
             let request = data.MigrationRequest.MapToDatasetMigrationRequestModel($('#DatasetId').val(), $('#DatasetNamedEnvironment').val(), $('#DatasetNamedEnvironmentType').val(), $('#SelectedSchema').val())
-            let postDatasetMigrationUrl = "/api/v20220609/metadata/MigrateDataset";
+            let postDatasetMigrationUrl = "/api/" + data.GetApiVersion() + "/metadata/MigrateDataset";
 
             data.MigrationRequest.InitMigrationRequestSubmission(postDatasetMigrationUrl, request);
         });
@@ -43,7 +43,7 @@
         $("[id^='MigrationRequestSubmitButton']").off('click').on('click', function (e) {
 
             let request = data.MigrationRequest.MapToSchemaMigrationRequestModel($('#DatasetId').val(), $('#DatasetNamedEnvironment').val(),  $('#SelectedSchema').val())
-            let postDatasetMigrationUrl = "/api/v20220609/metadata/MigrateSchema";
+            let postDatasetMigrationUrl = "/api/" + data.GetApiVersion() + "/metadata/MigrateSchema";
 
             data.MigrationRequest.InitMigrationRequestSubmission(postDatasetMigrationUrl, request);
         });

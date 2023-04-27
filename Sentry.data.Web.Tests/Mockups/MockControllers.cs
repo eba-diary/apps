@@ -35,7 +35,7 @@ namespace Sentry.data.Web.Tests
 
             mockDataAssetContext.Setup(x => x.GetAssetNotificationByID(da.AssetNotifications[0].NotificationId)).Returns(da.AssetNotifications[0]);
 
-            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User());
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User().Object);
 
             var dac = new DataAssetController(mockMetadataRepositoryService, mockDataAssetContext.Object, mockDatasetContext.Object, mockAssociateService.Object, mockUserService.Object);
             dac.SharedContext = new SharedContextModel { CurrentUser = user };
@@ -63,7 +63,7 @@ namespace Sentry.data.Web.Tests
 
             var mockFeatureFlag = new Mock<IDataFeatures>();
 
-            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User());
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User().Object);
 
             mockAssociateService.Setup(x => x.GetAssociateInfo(user.AssociateId)).Returns(new Associates.Associate() { FullName = "Bill Nye" });
 
@@ -140,7 +140,7 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Setup(x => x.EventStatus).Returns(MockClasses.MockEventStatuses().AsQueryable());
             mockDatasetContext.Setup(x => x.FileExtensions).Returns(MockClasses.MockFileExtensions().AsQueryable());
 
-            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User());
+            mockUserService.Setup(x => x.GetCurrentUser()).Returns(user ?? MockUsers.App_DataMgmt_Admin_User().Object);
 
             var cc = new ConfigController(mockDatasetContext.Object, mockUserService.Object, mockAssociateService.Object, mockConfigService.Object, mockEvensService.Object, 
                 mockDatasetService.Object, mockObsidianService.Object, mockSecurityService.Object, mockSchemaService.Object, mockDataFeatures.Object, null, null);

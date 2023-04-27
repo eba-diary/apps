@@ -97,3 +97,7 @@ table#metricGroupsTable td.metric-detail-control {
 .LinksRow {
     align-items: end;
 }
+
+.dead-job-select-all {
+    vertical-align: middle !important;
+}

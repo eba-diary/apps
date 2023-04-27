@@ -305,7 +305,7 @@
   <ItemGroup>
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="DomainContexts\ElasticContext.cs" />
+    <Compile Include="ServiceImplementations\Elastic\ElasticDocumentClient.cs" />
     <Compile Include="Exceptions\AcceptableErrorException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />
     <Compile Include="Exceptions\GoogleBigQuerySchemaException.cs" />
@@ -439,9 +439,11 @@
     <Compile Include="ServiceImplementations\DataFlowMetricService.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleSearchConsoleJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsConfiguration.cs" />
+    <Compile Include="ServiceImplementations\Elastic\ElasticIndexClient.cs" />
     <Compile Include="ServiceImplementations\FileProvider.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentSchemaIdResult.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GetByEnvironmentDatasetIdResult.cs" />
+    <Compile Include="ServiceImplementations\GlobalDataset\GlobalDatasetAdminService.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryConfiguration.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryJobProvider.cs" />
     <Compile Include="ServiceImplementations\GoogleBigQuery\GoogleBigQueryService.cs" />
@@ -495,6 +497,9 @@
     <Compile Include="ServiceImplementations\DataSourceProviders\PagingHttpsJobProvider.cs" />
     <Compile Include="ServiceImplementations\MotiveProvider.cs" />
     <Compile Include="ServiceImplementations\QuartermasterRestClient.cs" />
+    <Compile Include="ServiceImplementations\Reindex\ElasticReindexProvider.cs" />
+    <Compile Include="ServiceImplementations\Reindex\GlobalDatasetReindexSource.cs" />
+    <Compile Include="ServiceImplementations\Reindex\ReindexService.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\EnvironmentTypeRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\ProdRetrieverJobProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobProviders\QualRetrieverJobProvider.cs" />

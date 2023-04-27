@@ -1,15 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Polly;
+using Moq;
 using Polly.Registry;
-using Rhino.Mocks;
+using Sentry.data.Core.Interfaces;
+using Sentry.data.Infrastructure.PollyPolicies;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Sentry.data.Core;
-using Sentry.data.Core.Interfaces;
-using Sentry.data.Infrastructure.PollyPolicies;
-using System.Threading;
-using System;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -20,13 +17,13 @@ namespace Sentry.data.Infrastructure.Tests
         public async Task ApacheLivyProvider_GetRequestAsync_BadRequest()
         {
             var policyRegistry = new PolicyRegistry();
-            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Mock<ApacheLivyProviderPolicy>(policyRegistry);
             pollyPolicyLivy.Object.Register();
 
-            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
-            httpClientProvider.Setup(h => h.GetAsync(Moq.It.IsAny<string>())).Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
+            Mock<IHttpClientProvider> httpClientProvider = new Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(h => h.GetAsync(It.IsAny<string>())).Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
 
-            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            Mock<ApacheLivyProvider> providerB = new Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
             providerB.Object.SetBaseUrl("www.abc.com");
             var result = await providerB.Object.GetRequestAsync("/batches");
 
@@ -38,13 +35,13 @@ namespace Sentry.data.Infrastructure.Tests
         public async Task ApacheLivyProvider_GetRequestAsync_HttpRequestException()
         {
             var policyRegistry = new PolicyRegistry();
-            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Mock<ApacheLivyProviderPolicy>(policyRegistry);
             pollyPolicyLivy.Object.Register();
 
-            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            Mock<IHttpClientProvider> httpClientProvider = new Mock<IHttpClientProvider>();
             httpClientProvider.Setup(h => h.GetAsync(Moq.It.IsAny<string>())).Throws(new HttpRequestException());
 
-            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            Mock<ApacheLivyProvider> providerB = new Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
             providerB.Object.SetBaseUrl("www.abc.com");
             var result = await providerB.Object.GetRequestAsync("/batches");
@@ -56,12 +53,12 @@ namespace Sentry.data.Infrastructure.Tests
         public void ApacheLivyProvider_GetRequestAsync_NoResource_ArgumentNullException()
         {
             var policyRegistry = new PolicyRegistry();
-            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Mock<ApacheLivyProviderPolicy>(policyRegistry);
             pollyPolicyLivy.Object.Register();
 
-            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            Mock<IHttpClientProvider> httpClientProvider = new Mock<IHttpClientProvider>();
 
-            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            Mock<ApacheLivyProvider> providerB = new Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
             providerB.Object.SetBaseUrl("www.abc.com");
 
@@ -72,12 +69,12 @@ namespace Sentry.data.Infrastructure.Tests
         public void ApacheLivyProvider_GetRequestAsync_NoBaseUrl_ArgumentNullException()
         {
             var policyRegistry = new PolicyRegistry();
-            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Mock<ApacheLivyProviderPolicy>(policyRegistry);
             pollyPolicyLivy.Object.Register();
 
-            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
+            Mock<IHttpClientProvider> httpClientProvider = new Mock<IHttpClientProvider>();
 
-            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            Mock<ApacheLivyProvider> providerB = new Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
             Assert.ThrowsException<ArgumentNullException>(() => providerB.Object.GetRequestAsync("/batches").Wait());
         }
@@ -86,13 +83,13 @@ namespace Sentry.data.Infrastructure.Tests
         public void ApacheLivyProvider_GetRequestAsync_TaskCanceledException()
         {
             var policyRegistry = new PolicyRegistry();
-            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Mock<ApacheLivyProviderPolicy>(policyRegistry);
             pollyPolicyLivy.Object.Register();
 
-            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
-            httpClientProvider.Setup(x => x.GetAsync(Moq.It.IsAny<string>())).Throws<TaskCanceledException>();
+            Mock<IHttpClientProvider> httpClientProvider = new Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(x => x.GetAsync(It.IsAny<string>())).Throws<TaskCanceledException>();
 
-            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            Mock<ApacheLivyProvider> providerB = new Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
             providerB.Object.SetBaseUrl("www.abc.com");
 
@@ -117,13 +114,13 @@ namespace Sentry.data.Infrastructure.Tests
         {
 
             var policyRegistry = new PolicyRegistry();
-            Moq.Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Moq.Mock<ApacheLivyProviderPolicy>(policyRegistry);
+            Mock<ApacheLivyProviderPolicy> pollyPolicyLivy = new Mock<ApacheLivyProviderPolicy>(policyRegistry);
             pollyPolicyLivy.Object.Register();
 
-            Moq.Mock<IHttpClientProvider> httpClientProvider = new Moq.Mock<IHttpClientProvider>();
-            httpClientProvider.Setup(h => h.PostAsync(Moq.It.IsAny<string>(), Moq.It.IsAny<HttpContent>())).Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
+            Mock<IHttpClientProvider> httpClientProvider = new Mock<IHttpClientProvider>();
+            httpClientProvider.Setup(h => h.PostAsync(It.IsAny<string>(), It.IsAny<HttpContent>())).Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)));
 
-            Moq.Mock<ApacheLivyProvider> providerB = new Moq.Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
+            Mock<ApacheLivyProvider> providerB = new Mock<ApacheLivyProvider>(httpClientProvider.Object, policyRegistry) { CallBase = true };
 
             var result = await providerB.Object.PostRequestAsync("/batches", new StringContent(""));
 

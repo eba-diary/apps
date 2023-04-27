@@ -321,7 +321,7 @@
 
         $(document).on('click', '.btnShowDetails', function () {
 
-            var url = "/api/v1/lineage/description?DataAsset_ID=2";
+            var url = "/api/" + data.GetApiVersion() + "/lineage/description?DataAsset_ID=2";
             if ($($(this).parent().children('.SourceElement_NME')[0]).text()) {
                 url += "&DataElement_NME=" + $($(this).parent().children('.SourceElement_NME')[0]).text();
             }
@@ -544,7 +544,7 @@
 
                 $('#filterSpinner').show();
 
-                var url = "/api/v1/lineage/layers?DataAsset_ID=2";
+                var url = "/api/" + data.GetApiVersion() + "/lineage/layers?DataAsset_ID=2";
 
                 if ($('#dataObjects').val() && !first) {
                     url += "&DataObject_NME=" + encodeURIComponent($('#dataObjects').val());
@@ -557,7 +557,7 @@
                     allData.push('');
                     self.availableDataElements(allData);
 
-                    var url2 = "/api/v1/lineage/lineageTables?DataAsset_ID=2";
+                    var url2 = "/api/" + data.GetApiVersion() + "/lineage/lineageTables?DataAsset_ID=2";
 
                     if ($('#dataElements').val() && !first) {
                         url2 += "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());
@@ -574,7 +574,7 @@
                         }
                     });
 
-                    var url3 = "/api/v1/lineage/businessTerms?DataAsset_ID=2";
+                    var url3 = "/api/" + data.GetApiVersion() + "/lineage/businessTerms?DataAsset_ID=2";
 
                     if ($('#dataElements').val() && !first) {
                         url3 += "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());
@@ -592,7 +592,7 @@
                         }
                     });
 
-                    var url4 = "/api/v1/lineage/lineage?DataAsset_ID=2";
+                    var url4 = "/api/" + data.GetApiVersion() + "/lineage/lineage?DataAsset_ID=2";
 
                     if ($('#dataElements').val()) {
                         url4 += "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());

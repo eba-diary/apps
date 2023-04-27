@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
 using System.Linq;
 
 namespace Sentry.data.Core.Tests
@@ -24,13 +22,15 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void Get_Rows_For_Business_Area_Type()
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.BusinessAreaTileRows).Return(BuildMockTileRow(BusinessAreaType.PersonalLines)).Repeat.Any();
+            Moq.MockRepository mr = new Moq.MockRepository(Moq.MockBehavior.Strict);
+            Moq.Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
+            context.Setup(s => s.BusinessAreaTileRows).Returns(BuildMockTileRow(BusinessAreaType.PersonalLines));
 
-            _container.Inject(dsContext);
+            _container.Inject(context.Object);
             var baSrvc = _container.GetInstance<IBusinessAreaService>();
             List<BusinessAreaTileRowDto> rows = baSrvc.GetRows(BusinessAreaType.PersonalLines);
 
+            mr.VerifyAll();
             Assert.IsNotNull(rows);
             Assert.AreEqual(1, rows.Count);
             Assert.AreEqual(2, rows[0].ColumnSpan);

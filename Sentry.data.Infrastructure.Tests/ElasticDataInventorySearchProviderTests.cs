@@ -18,14 +18,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetSearchResults_BasicSearch_DataInventorySearchResultDto()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventorySearchResultDto result = searchProvider.GetSearchResults(new FilterSearchDto() { SearchText = "Table" });
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
@@ -61,14 +61,14 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetSearchResults_NoResultsSearch_EmptyDataInventorySearchResultDto()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(new ElasticResult<DataInventory>()));
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).Returns(Task.FromResult(new ElasticResult<DataInventory>()));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventorySearchResultDto result = searchProvider.GetSearchResults(new FilterSearchDto());
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.AreEqual(0, result.SearchTotal);
             Assert.IsFalse(result.DataInventoryResults.Any());
@@ -77,15 +77,15 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetSearchResults_ErrorSearch_QueryFailDataInventoryEvent()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventorySearchResultDto result = searchProvider.GetSearchResults(new FilterSearchDto() { SearchText = "Table" });
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
@@ -99,10 +99,10 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void DoesItemContainSensitive_FilterSearchDto_True()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetDataInventoryList());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventorySensitiveSearchDto dto = new DataInventorySensitiveSearchDto()
             {
@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             DataInventorySensitiveSearchResultDto result = searchProvider.DoesItemContainSensitive(dto);
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
@@ -125,10 +125,10 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetSearchFilters_BasicSearch_FilterSearchDto()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetAggregateDictionary());
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>())).ReturnsAsync(GetAggregateDictionary());
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             FilterSearchDto result = searchProvider.GetSearchFilters(new FilterSearchDto() 
             {
@@ -151,7 +151,7 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             });
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
@@ -197,11 +197,11 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetSearchFilters_ErrorSearch_QueryFailDataInventoryEvent()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             FilterSearchDto result = searchProvider.GetSearchFilters(new FilterSearchDto()
             {
@@ -242,7 +242,7 @@ namespace Sentry.data.Infrastructure.Tests
                 }
             });
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
@@ -255,16 +255,16 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetCategoriesByAsset_AssetHasSensitive_DataInventoryAssetCategoriesDto()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>() { "PCI", "User Setting" }));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventoryAssetCategoriesDto result = searchProvider.GetCategoriesByAsset("DATA");
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
@@ -294,16 +294,16 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetCategoriesByAsset_AssetNotFound_DataInventoryAssetCategoriesDto()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.SetupSequence(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(GetAllCategories()))
                 .ReturnsAsync(GetCategoryAggregateDictionary(new List<string>()));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventoryAssetCategoriesDto result = searchProvider.GetCategoriesByAsset("DATA");
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsTrue(result.DataInventoryEvent.QuerySuccess);
@@ -333,15 +333,15 @@ namespace Sentry.data.Infrastructure.Tests
         [TestMethod]
         public void GetCategoriesByAsset_Error_DataInventoryAssetCategoriesDto()
         {
-            Mock<IElasticContext> elasticContext = new Mock<IElasticContext>(MockBehavior.Strict);
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
+            Mock<IElasticDocumentClient> elasticDocumentClient = new Mock<IElasticDocumentClient>(MockBehavior.Strict);
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<DataInventory>>()))
                 .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, null);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, null);
 
             DataInventoryAssetCategoriesDto result = searchProvider.GetCategoriesByAsset("DATA");
 
-            elasticContext.VerifyAll();
+            elasticDocumentClient.VerifyAll();
 
             Assert.IsNotNull(result.DataInventoryEvent);
             Assert.IsFalse(result.DataInventoryEvent.QuerySuccess);
@@ -359,20 +359,20 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
             dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>()));
 
-            Mock<IElasticContext> elasticContext = mockRepository.Create<IElasticContext>();
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>())).ReturnsAsync(GetDataInventoryListWithMultiple());
-            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 1))).Callback<DataInventory>(x =>
+            Mock<IElasticDocumentClient> elasticDocumentClient = mockRepository.Create<IElasticDocumentClient>();
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>())).ReturnsAsync(GetDataInventoryListWithMultiple());
+            elasticDocumentClient.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 1))).Callback<DataInventory>(x =>
             {
                 Assert.IsTrue(x.IsSensitive);
                 Assert.IsFalse(x.IsOwnerVerified);
             }).ReturnsAsync(true);
-            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 2))).Callback<DataInventory>(x =>
+            elasticDocumentClient.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 2))).Callback<DataInventory>(x =>
             {
                 Assert.IsFalse(x.IsSensitive);
                 Assert.IsTrue(x.IsOwnerVerified);
             }).ReturnsAsync(true);
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, dbExecuter.Object);
 
             List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {
@@ -414,11 +414,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
             dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>()));
 
-            Mock<IElasticContext> elasticContext = mockRepository.Create<IElasticContext>();
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>()))
+            Mock<IElasticDocumentClient> elasticDocumentClient = mockRepository.Create<IElasticDocumentClient>();
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>()))
                 .ThrowsAsync(new ElasticsearchClientException("FAIL"));
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, dbExecuter.Object);
 
             List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {
@@ -439,16 +439,16 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDbExecuter> dbExecuter = mockRepository.Create<IDbExecuter>();
             dbExecuter.Setup(x => x.ExecuteCommand(It.IsAny<object>()));
 
-            Mock<IElasticContext> elasticContext = mockRepository.Create<IElasticContext>();
-            elasticContext.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>())).ReturnsAsync(GetDataInventoryListWithMultiple());
-            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 1))).ThrowsAsync(new ElasticsearchClientException("FAIL"));
-            elasticContext.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 2))).Callback<DataInventory>(x =>
+            Mock<IElasticDocumentClient> elasticDocumentClient = mockRepository.Create<IElasticDocumentClient>();
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<Func<SearchDescriptor<DataInventory>, ISearchRequest>>())).ReturnsAsync(GetDataInventoryListWithMultiple());
+            elasticDocumentClient.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 1))).ThrowsAsync(new ElasticsearchClientException("FAIL"));
+            elasticDocumentClient.Setup(x => x.Update(It.Is<DataInventory>(i => i.Id == 2))).Callback<DataInventory>(x =>
             {
                 Assert.IsFalse(x.IsSensitive);
                 Assert.IsTrue(x.IsOwnerVerified);
             }).ReturnsAsync(true);
 
-            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticContext.Object, dbExecuter.Object);
+            ElasticDataInventorySearchProvider searchProvider = new ElasticDataInventorySearchProvider(elasticDocumentClient.Object, dbExecuter.Object);
 
             List<DataInventoryUpdateDto> dtos = new List<DataInventoryUpdateDto>()
             {

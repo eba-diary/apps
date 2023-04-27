@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
 using System.Linq;
 
 namespace Sentry.data.Core.Tests
@@ -25,27 +25,28 @@ namespace Sentry.data.Core.Tests
         [Ignore]
         public void Get_Business_Intelligence_Dto_By_Id()
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.GetById<Dataset>(1)).Return(BuildMockDataset().First()).Repeat.Any();
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            daContext.Stub(x => x.Users).Return(BuildMockDomainUsers()).Repeat.Any();
+            Mock<IDatasetContext> dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.GetById<Dataset>(1)).Returns(BuildMockDataset().First());
 
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            extUsrInfoProvider.Stub(x => x.GetByUserId("081226")).Return(BuildMockExtendedUserInfo()).Repeat.Any();
+            Mock<IDataAssetContext> daContext = new Mock<IDataAssetContext>();
+            daContext.Setup(x => x.Users).Returns(BuildMockDomainUsers());
 
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            Mock<IExtendedUserInfoProvider> extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            extUsrInfoProvider.Setup(x => x.GetByUserId("081226")).Returns(BuildMockExtendedUserInfo().Object);
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(securitySrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(s3ServiceProvider);
+            Mock<IEmailService> emailSrvc = new Mock<IEmailService>();
+            Mock<ISecurityService> securitySrvc = new Mock<ISecurityService>();
+            Mock<ICurrentUserIdProvider> currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            Mock<IS3ServiceProvider> s3ServiceProvider = new Mock<IS3ServiceProvider>();
+
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(s3ServiceProvider.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -64,27 +65,26 @@ namespace Sentry.data.Core.Tests
         [Ignore]
         public void Get_Business_Intelligence_Detail_Dto_By_Id()
         {
-            
 
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.GetById<Dataset>(1)).Return(BuildMockDataset().First()).Repeat.Any();
-            dsContext.Stub(x => x.IsUserSubscribedToDataset("081226", 1)).Return(true).Repeat.Any();
-            dsContext.Stub(x => x.GetAllUserSubscriptionsForDataset("081226", 1)).Return(BuildMockDatasetSubscriptions()).Repeat.Any();
-            dsContext.Stub(x => x.Events).Return(BuildMockEvents(1)).Repeat.Any();
+            var dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.GetById<Dataset>(1)).Returns(BuildMockDataset().First());
+            dsContext.Setup(x => x.IsUserSubscribedToDataset("081226", 1)).Returns(true);
+            dsContext.Setup(x => x.GetAllUserSubscriptionsForDataset("081226", 1)).Returns(BuildMockDatasetSubscriptions());
+            dsContext.Setup(x => x.Events).Returns(BuildMockEvents(1));
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            daContext.Stub(x => x.Users).Return(BuildMockDomainUsers()).Repeat.Any();
+            var daContext = new Mock<IDataAssetContext>();
+            daContext.Setup(x => x.Users).Returns(BuildMockDomainUsers());
 
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            extUsrInfoProvider.Stub(x => x.GetByUserId("081226")).Return(BuildMockExtendedUserInfo()).Repeat.Any();
+            var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            extUsrInfoProvider.Setup(x => x.GetByUserId("081226")).Returns(BuildMockExtendedUserInfo().Object);
 
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            currUsrIdProvider.Stub(x => x.GetImpersonatedUserId()).Return("").Repeat.Any();
-            currUsrIdProvider.Stub(x => x.GetRealUserId()).Return("081226").Repeat.Any();
+            var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            currUsrIdProvider.Setup(x => x.GetImpersonatedUserId()).Returns("");
+            currUsrIdProvider.Setup(x => x.GetRealUserId()).Returns("081226");
 
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            var emailSrvc = new Mock<IEmailService>();
+            var securitySrvc = new Mock<ISecurityService>();
+            var s3ServiceProvider = new Mock<IS3ServiceProvider>();
 
             _container.Inject(dsContext);
             _container.Inject(emailSrvc);
@@ -111,29 +111,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void Get_Home_Dto()
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.GetReportCount()).Return(7).Repeat.Any();
-            dsContext.Stub(x => x.Categories).Return(BuildMockCategories()).Repeat.Any();
 
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            extUsrInfoProvider.Stub(x => x.GetByUserId("081226")).Return(BuildMockExtendedUserInfo()).Repeat.Any();
+            Mock<IDatasetContext> dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.GetReportCount()).Returns(7);
+            dsContext.Setup(x => x.Categories).Returns(BuildMockCategories());
 
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            currUsrIdProvider.Stub(x => x.GetImpersonatedUserId()).Return("").Repeat.Any();
-            currUsrIdProvider.Stub(x => x.GetRealUserId()).Return("081226").Repeat.Any();
+            Mock<IExtendedUserInfoProvider> extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            extUsrInfoProvider.Setup(x => x.GetByUserId("081226")).Returns(BuildMockExtendedUserInfo().Object);
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            Mock<ICurrentUserIdProvider> currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            currUsrIdProvider.Setup(x => x.GetImpersonatedUserId()).Returns("");
+            currUsrIdProvider.Setup(x => x.GetRealUserId()).Returns("081226");
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(securitySrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(s3ServiceProvider);
+            Mock<IDataAssetContext> daContext = new Mock<IDataAssetContext>();
+            Mock<IEmailService> emailSrvc = new Mock<IEmailService>();
+            Mock<ISecurityService> securitySrvc = new Mock<ISecurityService>();
+            Mock<IS3ServiceProvider> s3ServiceProvider = new Mock<IS3ServiceProvider>();
+
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(s3ServiceProvider.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -156,32 +157,32 @@ namespace Sentry.data.Core.Tests
                 BuildMockDataset().First()
             };
 
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.Datasets).Return(datasets.AsQueryable()).Repeat.Any();
-            dsContext.Stub(x => x.Security).Return(BuildMockDatasetSecurity()).Repeat.Any();
-            dsContext.Stub(x => x.SecurityTicket).Return(BuildMockSecurityTickets()).Repeat.Any();
+            var dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.Datasets).Returns(datasets.AsQueryable());
+            dsContext.Setup(x => x.Security).Returns(BuildMockDatasetSecurity());
+            dsContext.Setup(x => x.SecurityTicket).Returns(BuildMockSecurityTickets());
 
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            extUsrInfoProvider.Stub(x => x.GetByUserId("081226")).Return(BuildMockExtendedUserInfo()).Repeat.Any();
+            var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            extUsrInfoProvider.Setup(x => x.GetByUserId("081226")).Returns(BuildMockExtendedUserInfo().Object);
 
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            currUsrIdProvider.Stub(x => x.GetImpersonatedUserId()).Return("").Repeat.Any();
-            currUsrIdProvider.Stub(x => x.GetRealUserId()).Return("081226").Repeat.Any();
+            var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            currUsrIdProvider.Setup(x => x.GetImpersonatedUserId()).Returns("");
+            currUsrIdProvider.Setup(x => x.GetRealUserId()).Returns("081226");
 
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            securitySrvc.Stub(x => x.GetUserSecurity(Arg<Dataset>.Is.Anything, Arg<IApplicationUser>.Is.Anything)).Return(BuildMockUserSecurity()).Repeat.Any();
+            var securitySrvc = new Mock<ISecurityService>();
+            securitySrvc.Setup(x => x.GetUserSecurity(It.IsAny<ISecurable>(), It.IsAny<IApplicationUser>())).Returns(BuildMockUserSecurity());
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            var daContext = new Mock<IDataAssetContext>();
+            var emailSrvc = new Mock<IEmailService>();
+            var s3ServiceProvider = new Mock<IS3ServiceProvider>();
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(securitySrvc);
-            _container.Inject(s3ServiceProvider);
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(s3ServiceProvider.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -284,30 +285,30 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void Create_Dataset_Success()
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.Categories).Return(BuildMockCategories()).Repeat.Any();
-            dsContext.Stub(x => x.BusinessUnits).Return(BuildMockBusinessUnits()).Repeat.Any();
-            dsContext.Stub(x => x.DatasetFunctions).Return(BuildMockDatasetFunctions()).Repeat.Any();
-            dsContext.Stub(x => x.Tags).Return(BuildMockMetadataTags()).Repeat.Any();
-            dsContext.Stub(x => x.DatasetScopeTypes).Return(BuildMockDatasetScopeTypes()).Repeat.Any();
-            dsContext.Stub(x => x.FileExtensions).Return(BuildMockFileExtensions()).Repeat.Any();
-            dsContext.Stub(x => x.Datasets).Return(BuildMockDataset()).Repeat.Any();
-            dsContext.Stub(x => x.Assets).Return(BuildMockAsset()).Repeat.Any();
+            var dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.Categories).Returns(BuildMockCategories());
+            dsContext.Setup(x => x.BusinessUnits).Returns(BuildMockBusinessUnits());
+            dsContext.Setup(x => x.DatasetFunctions).Returns(BuildMockDatasetFunctions());
+            dsContext.Setup(x => x.Tags).Returns(BuildMockMetadataTags());
+            dsContext.Setup(x => x.DatasetScopeTypes).Returns(BuildMockDatasetScopeTypes());
+            dsContext.Setup(x => x.FileExtensions).Returns(BuildMockFileExtensions());
+            dsContext.Setup(x => x.Datasets).Returns(BuildMockDataset());
+            dsContext.Setup(x => x.Assets).Returns(BuildMockAsset());
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            var daContext = new Mock<IDataAssetContext>();
+            var emailSrvc = new Mock<IEmailService>();
+            var securitySrvc = new Mock<ISecurityService>();
+            var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            var s3ServiceProvider = new Mock<IS3ServiceProvider>();
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(securitySrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(s3ServiceProvider);
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(s3ServiceProvider.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -319,29 +320,29 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void Create_Dataset_Failure()
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.Categories).Return(BuildMockCategories()).Repeat.Any();
-            dsContext.Stub(x => x.BusinessUnits).Return(BuildMockBusinessUnits()).Repeat.Any();
-            dsContext.Stub(x => x.DatasetFunctions).Return(BuildMockDatasetFunctions()).Repeat.Any();
-            dsContext.Stub(x => x.Tags).Return(BuildMockMetadataTags()).Repeat.Any();
-            dsContext.Stub(x => x.DatasetScopeTypes).Return(BuildMockDatasetScopeTypes()).Repeat.Any();
-            dsContext.Stub(x => x.FileExtensions).Return(BuildMockFileExtensions()).Repeat.Any();
+            var dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.Categories).Returns(BuildMockCategories());
+            dsContext.Setup(x => x.BusinessUnits).Returns(BuildMockBusinessUnits());
+            dsContext.Setup(x => x.DatasetFunctions).Returns(BuildMockDatasetFunctions());
+            dsContext.Setup(x => x.Tags).Returns(BuildMockMetadataTags());
+            dsContext.Setup(x => x.DatasetScopeTypes).Returns(BuildMockDatasetScopeTypes());
+            dsContext.Setup(x => x.FileExtensions).Returns(BuildMockFileExtensions());
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            var daContext = new Mock<IDataAssetContext>();
+            var emailSrvc = new Mock<IEmailService>();
+            var securitySrvc = new Mock<ISecurityService>();
+            var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            var s3ServiceProvider = new Mock<IS3ServiceProvider>();
 
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(securitySrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(s3ServiceProvider);
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(s3ServiceProvider.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -356,23 +357,23 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void Delete_Dataset()
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.GetById<Dataset>(1)).Return(BuildMockDataset().First()).Repeat.Any();
+            var dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.GetById<Dataset>(1)).Returns(BuildMockDataset().First());
 
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            var daContext = new Mock<IDataAssetContext>();
+            var emailSrvc = new Mock<IEmailService>();
+            var securitySrvc = new Mock<ISecurityService>();
+            var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            var s3ServiceProvider = new Mock<IS3ServiceProvider>();
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(securitySrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(s3ServiceProvider);
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(s3ServiceProvider.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -509,14 +510,14 @@ namespace Sentry.data.Core.Tests
             return ds.AsQueryable();
         }
 
-        private IExtendedUserInfo BuildMockExtendedUserInfo()
+        private Mock<IExtendedUserInfo> BuildMockExtendedUserInfo()
         {
-            IExtendedUserInfo extUsrInfo = MockRepository.GenerateMock<IExtendedUserInfo>();
-            extUsrInfo.Stub(x => x.UserId).Return("081226").Repeat.Any();
-            extUsrInfo.Stub(x => x.FirstName).Return("James").Repeat.Any();
-            extUsrInfo.Stub(x => x.LastName).Return("Gordon").Repeat.Any();
-            extUsrInfo.Stub(x => x.EmailAddress).Return("james.gordon@gcpd.com").Repeat.Any();
-            extUsrInfo.Stub(x => x.Permissions).Return(BuildMockPermissions()).Repeat.Any();
+            var extUsrInfo = new Mock<IExtendedUserInfo>();
+            extUsrInfo.Setup(x => x.UserId).Returns("081226");
+            extUsrInfo.Setup(x => x.FirstName).Returns("James");
+            extUsrInfo.Setup(x => x.LastName).Returns("Gordon");
+            extUsrInfo.Setup(x => x.EmailAddress).Returns("james.gordon@gcpd.com");
+            extUsrInfo.Setup(x => x.Permissions).Returns(BuildMockPermissions());
 
             return extUsrInfo;
         }
@@ -917,23 +918,23 @@ namespace Sentry.data.Core.Tests
 
         private void SetupBusinessIntelligenceServiceForValidations(IQueryable<Dataset> datasets)
         {
-            IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
-            dsContext.Stub(x => x.Datasets).Return(datasets).Repeat.Any();
+            var dsContext = new Mock<IDatasetContext>();
+            dsContext.Setup(x => x.Datasets).Returns(datasets);
 
-            IExtendedUserInfoProvider extUsrInfoProvider = MockRepository.GenerateMock<IExtendedUserInfoProvider>();
-            ICurrentUserIdProvider currUsrIdProvider = MockRepository.GenerateMock<ICurrentUserIdProvider>();
-            ISecurityService securitySrvc = MockRepository.GenerateMock<ISecurityService>();
-            IDataAssetContext daContext = MockRepository.GenerateMock<IDataAssetContext>();
-            IEmailService emailSrvc = MockRepository.GenerateMock<IEmailService>();
-            IS3ServiceProvider s3ServiceProvider = MockRepository.GenerateMock<IS3ServiceProvider>();
+            var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
+            var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
+            var securitySrvc = new Mock<ISecurityService>();
+            var daContext = new Mock<IDataAssetContext>();
+            var emailSrvc = new Mock<IEmailService>();
+            var s3ServiceProvider = new Mock<IS3ServiceProvider>();
 
-            _container.Inject(dsContext);
-            _container.Inject(emailSrvc);
-            _container.Inject(daContext);
-            _container.Inject(extUsrInfoProvider);
-            _container.Inject(currUsrIdProvider);
-            _container.Inject(securitySrvc);
-            _container.Inject(s3ServiceProvider);
+            _container.Inject(dsContext.Object);
+            _container.Inject(emailSrvc.Object);
+            _container.Inject(daContext.Object);
+            _container.Inject(extUsrInfoProvider.Object);
+            _container.Inject(currUsrIdProvider.Object);
+            _container.Inject(securitySrvc.Object);
+            _container.Inject(s3ServiceProvider.Object);
         }
 
         private BusinessIntelligenceDto BuildMockBusinessIntelligenceDto()

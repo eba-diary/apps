@@ -57,7 +57,7 @@ function callFileDownload(s3Key) {
     console.log(s3Key);
     $.ajax({
         type: "GET",
-        url: "/api/v1/queryTool/files/DownloadUrl/" + key,
+        url: "/api/" + data.GetApiVersion() + "/queryTool/files/DownloadUrl/" + key,
         dataType: "json",
         success: function (msg) {
             $('#s3DownloadLocation').attr('href', msg);

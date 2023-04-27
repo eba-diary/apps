@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
-using Sentry.data.Web.Tests;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sentry.Configuration;
-using System.IO;
 using Sentry.data.Core;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace Sentry.data.Web.Tests
 {
@@ -67,7 +62,7 @@ namespace Sentry.data.Web.Tests
         {
             RetrieverJob rtjob = MockClasses.GetMockRetrieverJob(null, null, null);
             var vr = rtjob.IsEnabled;
-            Assert.IsTrue(vr == true);
+            Assert.IsTrue(vr);
         }
     }
 }
