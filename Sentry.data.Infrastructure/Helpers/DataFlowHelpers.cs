@@ -1,12 +1,7 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core;
-using Sentry.data.Core.Entities.DataProcessing;
+﻿using Sentry.data.Core;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Helpers
 {

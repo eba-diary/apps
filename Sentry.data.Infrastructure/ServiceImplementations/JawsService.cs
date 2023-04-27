@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
 using Sentry.data.Core;
 using StructureMap;
-using Sentry.Common.Logging;
-using Hangfire;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using Microsoft.Extensions.Logging;
+using System.Linq;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Helpers;
 using System;
