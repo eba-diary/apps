@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sentry.data.Core;
 using Sentry.data.Web.Tests.API;
-using StructureMap.Query;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -89,7 +87,7 @@ namespace Sentry.data.Web.Tests
             GlobalDatasetPageResultDto dto = new GlobalDatasetPageResultDto
             {
                 PageNumber = 1,
-                PageSize = 15,
+                PageSize = 12,
                 SortBy = 2,
                 Layout = 1,
                 GlobalDatasets = new List<SearchGlobalDatasetDto>
@@ -128,7 +126,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(1, viewModel.PageItems.Count);
             Assert.AreEqual("1", viewModel.PageItems.First(x => x.IsActive).PageNumber);
             Assert.AreEqual(4, viewModel.PageSizeOptions.Count);
-            Assert.AreEqual("15", viewModel.PageSizeOptions.First(x => x.Selected).Value);
+            Assert.AreEqual("12", viewModel.PageSizeOptions.First(x => x.Selected).Value);
             Assert.AreEqual(3, viewModel.SortByOptions.Count);
             Assert.AreEqual("2", viewModel.SortByOptions.First(x => x.Selected).Value);
             Assert.AreEqual(2, viewModel.LayoutOptions.Count);

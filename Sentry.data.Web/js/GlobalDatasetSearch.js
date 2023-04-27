@@ -221,10 +221,10 @@ data.GlobalDatasetSearch = {
 
     setLayout: function () {
         $("#tile-result-layout option").each(function () {
-            $(".tile-result").removeClass(`tile-result-layout-${$(this).val()}`);
+            $(".tile-result").removeClass(`card-result-layout-${$(this).val()}`);
         });
 
-        $(".tile-result").addClass(`tile-result-layout-${$("#tile-result-layout").val()}`)
+        $(".tile-result").addClass(`card-result-layout-${$("#tile-result-layout").val()}`)
     },
 
     getActivePage: function () {

@@ -225,3 +225,11 @@
     display: flex;
     align-items: center;
 }
+
+.card-result-layout-0 {
+    width: calc(100% / 3);
+}
+
+.card-result-layout-1 {
+    width: 100%;
+}

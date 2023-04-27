@@ -108,8 +108,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Description", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(2, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
-            Assert.AreEqual("PROD", result.NamedEnvironments[1]);
+            Assert.AreEqual("PROD", result.NamedEnvironments[0]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[1]);
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
             Assert.AreEqual(12, result.TargetDatasetId);
@@ -121,8 +121,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Description 2", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(2, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
-            Assert.AreEqual("TEST", result.NamedEnvironments[1]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[0]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[1]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
             Assert.AreEqual(22, result.TargetDatasetId);

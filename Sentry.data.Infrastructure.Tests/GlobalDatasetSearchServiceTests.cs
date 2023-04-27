@@ -93,8 +93,8 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(3, resultDto.TotalResults);
 
             Assert.AreEqual("Name 2", resultDto.GlobalDatasets[0].DatasetName);
-            Assert.AreEqual("Name 1", resultDto.GlobalDatasets[1].DatasetName);
-            Assert.AreEqual("Name 3", resultDto.GlobalDatasets[2].DatasetName);
+            Assert.AreEqual("Name 3", resultDto.GlobalDatasets[1].DatasetName);
+            Assert.AreEqual("Name 1", resultDto.GlobalDatasets[2].DatasetName);
         }
 
         [TestMethod]

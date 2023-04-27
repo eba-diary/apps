@@ -19,10 +19,10 @@ namespace Sentry.data.Web.Tests
         [TestMethod]
         public void BuildTilePageSizeOptions_15_SelectListItems()
         {
-            List<SelectListItem> items = Utility.BuildTilePageSizeOptions("15");
+            List<SelectListItem> items = Utility.BuildTilePageSizeOptions("12");
 
             Assert.AreEqual(4, items.Count);
-            Assert.IsTrue(items.FirstOrDefault(x => x.Selected).Value == "15");
+            Assert.IsTrue(items.FirstOrDefault(x => x.Selected).Value == "12");
         }
 
         [TestMethod]
@@ -102,24 +102,24 @@ namespace Sentry.data.Web.Tests
         [TestMethod]
         public void BuildSelectListFromEnum_GlobalDatasetSortByOption_SelectListItems()
         {
-            List<SelectListItem> items = Utility.BuildSelectListFromEnum<GlobalDatasetSortByOption>(2);
+            List<SelectListItem> items = Utility.BuildSelectListFromEnum<GlobalDatasetSortByOption>((int)GlobalDatasetSortByOption.Favorites);
 
             Assert.AreEqual(3, items.Count);
 
             SelectListItem item = items.First();
-            Assert.AreEqual("Favorites", item.Text);
+            Assert.AreEqual("Relevance", item.Text);
             Assert.AreEqual("0", item.Value);
             Assert.IsFalse(item.Selected);
 
             item = items[1];
-            Assert.AreEqual("Alphabetical", item.Text);
+            Assert.AreEqual("Favorites", item.Text);
             Assert.AreEqual("1", item.Value);
-            Assert.IsFalse(item.Selected);
+            Assert.IsTrue(item.Selected);
 
             item = items.Last();
-            Assert.AreEqual("Relevance", item.Text);
+            Assert.AreEqual("Alphabetical", item.Text);
             Assert.AreEqual("2", item.Value);
-            Assert.IsTrue(item.Selected);
+            Assert.IsFalse(item.Selected);
         }
 
         [TestMethod]

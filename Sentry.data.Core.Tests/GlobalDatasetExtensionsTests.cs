@@ -258,9 +258,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Description - Prod", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(3, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
-            Assert.AreEqual("PROD", result.NamedEnvironments[1]);
-            Assert.AreEqual("TEST", result.NamedEnvironments[2]);
+            Assert.AreEqual("PROD", result.NamedEnvironments[0]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[1]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[2]);
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
             Assert.AreEqual(12, result.TargetDatasetId);
@@ -320,9 +320,9 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Description - Last", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(3, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[2]);
             Assert.AreEqual("NRTEST", result.NamedEnvironments[1]);
-            Assert.AreEqual("TEST", result.NamedEnvironments[2]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[0]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
             Assert.AreEqual(13, result.TargetDatasetId);

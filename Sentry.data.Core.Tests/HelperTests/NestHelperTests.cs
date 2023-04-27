@@ -306,7 +306,7 @@ namespace Sentry.data.Core.Tests
             IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
             Assert.AreEqual("search me", stringQuery.Query);
             Assert.AreEqual(4, stringQuery.Fields.Count());
-            Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 2));
+            Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
             Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
             Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
             Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
@@ -314,7 +314,7 @@ namespace Sentry.data.Core.Tests
             stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
             Assert.AreEqual("*search* *me*", stringQuery.Query);
             Assert.AreEqual(4, stringQuery.Fields.Count());
-            Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 2));
+            Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
             Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
             Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
             Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));

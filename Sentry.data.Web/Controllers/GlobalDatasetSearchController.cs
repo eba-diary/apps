@@ -42,14 +42,17 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
+            //only set sort if it wasn't specified on request
             if (sortBy == -1)
             {
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
+                    //set to relevance because a text search will be executed
                     sortBy = (int)GlobalDatasetSortByOption.Relevance;
                 }
                 else
                 {
+                    //default to favorites otherwise
                     sortBy = (int)GlobalDatasetSortByOption.Favorites;
                 }
             }
