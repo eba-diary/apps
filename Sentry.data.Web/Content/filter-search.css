@@ -129,16 +129,9 @@
 }
 
 .filter-search-active-options-container {
-    text-align: center;
-}
-
-.filter-search-active-option-close {
-    padding: 0.75em !important;
-    font-size: 0.8em !important;
-}
-
-.active-option-close-symbol {
-    margin-right: 0.25em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .active-option-category-label {
@@ -266,7 +259,6 @@
     height: 1.5rem;
 }
 
-.search-card-subtitle {
-    display: flex;
-    justify-content: space-between;
+.filter-search-chip {
+    margin: 0.125rem 0.125rem 0.125rem 0;
 }

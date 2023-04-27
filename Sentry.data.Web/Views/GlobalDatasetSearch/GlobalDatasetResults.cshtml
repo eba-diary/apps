@@ -61,19 +61,14 @@
                             <p class="card-text tile-description" title="@globalDataset.DatasetDescription"> @globalDataset.DatasetDescription </p>
 
                             <div class="d-flex">
-                                @foreach (string environment in globalDataset.NamedEnvironments.Take(3))
+                                @foreach (string environment in globalDataset.NamedEnvironments.Take(globalDataset.NamedEnvironments.Count <= 4 ? 4 : 3))
                                 {
-                                    <div class="chip @(environment.Contains("PROD") ? "blue" : "") lighten-4 search-chip-spacing chip-disabled">@environment</div>
+                                    <div class="chip @(environment.Contains("PROD") ? "blue" : "") lighten-4 chip-disabled environment-chip-sm">@environment</div>
                                 }
 
-                                @if (globalDataset.NamedEnvironments.Count == 4)
+                                @if (globalDataset.NamedEnvironments.Count > 4)
                                 {
-                                    string environment = @globalDataset.NamedEnvironments[3];
-                                    <div class="chip @(environment.Contains("PROD") ? "blue" : "") lighten-4 search-chip-spacing chip-disabled">@environment</div>
-                                }
-                                else if (globalDataset.NamedEnvironments.Count > 4)
-                                {
-                                    <div class="chip lighten-4 search-chip-spacing chip-disabled">...</div>
+                                    <div class="chip lighten-4 chip-disabled environment-chip-sm">...</div>
                                 }
                                 <div class="d-flex justify-content-end view-details-spacing">
                                     <h6 class="pt-0 mb-0">

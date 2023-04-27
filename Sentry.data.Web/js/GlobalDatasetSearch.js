@@ -67,6 +67,7 @@ data.GlobalDatasetSearch = {
     },
 
     updatePageOrganizationFromEvent: function (pageNumber) {
+        $("#tile-results").addClass("search-blur");
         data.FilterSearch.clearActiveSavedSearch();
         data.GlobalDatasetSearch.updatePageOrganization(pageNumber);
     },
@@ -180,43 +181,39 @@ data.GlobalDatasetSearch = {
         $(document).off("change", ".filter-search-category-option-checkbox");
         $(document).on("change", ".filter-search-category-option-checkbox", function () {
             data.FilterSearch.handleCheckboxChange(this);
-            data.GlobalDatasetSearch.setInputTimeout(data.GlobalDatasetSearch.executeSearchOnly)
+            data.FilterSearch.clearActiveSavedSearch();
+            data.GlobalDatasetSearch.executeSearchOnly();
         });
 
         //remove filter option from badge
-        $(document).off("click", "[id^='clearOption_']");
-        $(document).on("click", "[id^='clearOption_']", function () {
+        $(document).off("click", ".chip .close");
+        $(document).on("click", ".chip .close", function () {
             data.FilterSearch.handleBadgeClear(this);
-            data.GlobalDatasetSearch.setInputTimeout(data.GlobalDatasetSearch.executeSearchOnly)
+            data.FilterSearch.clearActiveSavedSearch();
+            data.GlobalDatasetSearch.executeSearchOnly();
         });
 
         //text box type delay
         $(document).on("input", "#filter-search-text", function () {
             let searchText = $.trim($(this).val()).length
             if (searchText > 2 || searchText == 0) {
-                data.GlobalDatasetSearch.setInputTimeout(data.GlobalDatasetSearch.executeTextSearch)
+                data.FilterSearch.clearActiveSavedSearch();
+
+                if (data.GlobalDatasetSearch.inputTimeout) {
+                    clearTimeout(data.GlobalDatasetSearch.inputTimeout);
+                }
+
+                data.GlobalDatasetSearch.inputTimeout = setTimeout(function () {
+                    if ($.trim($("#filter-search-text").val()).length > 0) {
+                        $("#tile-result-sort").val('0');
+                    }
+                    else {
+                        $("#tile-result-sort").val('1');
+                    }
+                    data.GlobalDatasetSearch.executeSearch();
+                }, 500);
             }
         });
-    },
-
-    executeTextSearch: function () {
-        if ($.trim($("#filter-search-text").val()).length > 0) {
-            $("#tile-result-sort").val('0');
-        }
-        else {
-            $("#tile-result-sort").val('1');
-        }
-        data.GlobalDatasetSearch.executeSearch();
-    },
-
-    setInputTimeout: function (searchFunction) {
-        data.FilterSearch.clearActiveSavedSearch();
-
-        if (data.GlobalDatasetSearch.inputTimeout) {
-            clearTimeout(data.GlobalDatasetSearch.inputTimeout);
-        }
-
-        data.GlobalDatasetSearch.inputTimeout = setTimeout(searchFunction, 500);
     },
 
     setLayout: function () {

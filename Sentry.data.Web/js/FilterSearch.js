@@ -52,8 +52,8 @@
         });
 
         //clear single badge
-        $(document).on("click", "[id^='clearOption_']", function (e) {
-            e.preventDefault();
+        $(document).off("click", ".chip .close");
+        $(document).on("click", ".chip .close", function () {
             data.FilterSearch.handleBadgeClear(this);
             data.FilterSearch.showHideApplyFilter();
         });
@@ -186,11 +186,11 @@
         data.FilterSearch.hideBadgeContainer(false);
 
         //uncheck the category option that was removed
-        var optionId = $.escapeSelector(element.id.replace("clearOption_", ""));
+        let optionId = $.escapeSelector(element.parentElement.id.replace("clearOption_", ""));
         data.FilterSearch.setOptionCheckbox(optionId, false);
 
         //hide the clicked badge
-        $(element).addClass("display-none");
+        $(element.parentElement).addClass("display-none");
     },
 
     handleClearAll: function () {
@@ -222,13 +222,13 @@
 
     hideBadgeContainer: function (clearAll) {
         if ($("[id^='clearOption_']:visible").length === 1 || clearAll) {
-            $(".filter-search-active-options-container").slideUp();
+            $(".filter-search-active-options-container").addClass("display-none");
             $("#filter-search-clear").addClass("display-none");
         }
     },
 
     showBadgeContainer: function () {
-        $(".filter-search-active-options-container").slideDown();
+        $(".filter-search-active-options-container").removeClass("display-none");
         $("#filter-search-clear").removeClass("display-none");
     },
 

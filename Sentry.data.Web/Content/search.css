@@ -213,10 +213,6 @@
     margin: auto 0 0 auto;
 }
 
-.search-chip-spacing {
-    margin: 0 5px 0 0;
-}
-
 .chip:is(.chip-disabled):hover {
     background-color: #eceff1
 }
@@ -232,4 +228,17 @@
 
 .card-result-layout-1 {
     width: 100%;
+}
+
+.environment-chip-sm {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+    line-height: 30px;
+    margin: 0 5px 0 0;
+}
+
+.search-card-subtitle {
+    display: flex;
+    justify-content: space-between;
 }
