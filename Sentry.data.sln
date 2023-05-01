@@ -29,8 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Web.Tests", "Sentry.data.Web.Tests\Sentry.data.Web.Tests.csproj", "{BA84F274-4EDA-4C2E-8440-5F9762A2892C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Common", "Sentry.data.Common\Sentry.data.Common.csproj", "{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Goldeneye", "Sentry.data.Goldeneye\Sentry.data.Goldeneye.csproj", "{837DBCEA-237B-4A4B-A917-557C47F7717E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Bundler", "Sentry.data.Bundler\Sentry.data.Bundler.csproj", "{647FD2CD-F82C-4CA3-BCBA-79CB22C179E3}"
@@ -90,10 +88,6 @@ Global
 		{BA84F274-4EDA-4C2E-8440-5F9762A2892C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA84F274-4EDA-4C2E-8440-5F9762A2892C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA84F274-4EDA-4C2E-8440-5F9762A2892C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Release|Any CPU.Build.0 = Release|Any CPU
 		{837DBCEA-237B-4A4B-A917-557C47F7717E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{837DBCEA-237B-4A4B-A917-557C47F7717E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{837DBCEA-237B-4A4B-A917-557C47F7717E}.Release|Any CPU.ActiveCfg = Release|Any CPU

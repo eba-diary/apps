@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure
             _backgroundJobClient = backgroundJobClient;
         }
 
-        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token, int companiesDataflowId)
+        public async Task MotiveOnboardingAsync(DataSource motiveSource, DataSourceToken token)
         {
             var motiveCompaniesUrl = Config.GetHostSetting("MotiveCompaniesUrl");
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_authorizationProvider.GetOAuthAccessToken((HTTPSSource)motiveSource, token)}");
@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="tokenToBackfill">Token we want load data for.</param>
         /// <returns></returns>
-        internal bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
+        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
         {
             try
             {

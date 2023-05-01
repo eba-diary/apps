@@ -222,13 +222,8 @@
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidatorTests.cs" />
     <Compile Include="ViewModelMappingTests.cs" />
     <Compile Include="UtilityTests.cs" />
-    <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
-      <Project>{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}</Project>
-      <Name>Sentry.data.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
