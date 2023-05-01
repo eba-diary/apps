@@ -72,15 +72,27 @@ namespace Sentry.data.Goldeneye
 
             // The following is the new ILoggerFactory/ILogger setup for modern logging that is 
             // ready for .NET 5.
-            var loggerFactory = new SentryLoggerFactory(new Microsoft.Extensions.Logging.LoggerFactory());
+            var loggerFactory = new SentryLoggerFactory(new LoggerFactory());
             var log4netOptions = new Log4NetProviderOptions();
-            if (Sentry.Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
+            if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
             {
                 log4netOptions.Log4NetConfigFileName = "log4net.local.config";
             }
-            else
+            else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "TEST")
             {
-                log4netOptions.Log4NetConfigFileName = "log4net.server.config";
+                log4netOptions.Log4NetConfigFileName = "log4net.server.test.config";
+            }
+            else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "NRTEST")
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.server.nrtest.config";
+            }
+            else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "QUAL")
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.server.qual.config";
+            }
+            else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "PROD")
+            {
+                log4netOptions.Log4NetConfigFileName = "log4net.server.prod.config";
             }
 
             loggerFactory.AddLog4Net(log4netOptions);

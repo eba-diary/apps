@@ -1330,7 +1330,19 @@
     <Folder Include="Views\TileSearch\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="log4net.local.config">
+    <Content Include="Log4net\log4net.local.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Log4net\log4net.server.test.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Log4net\log4net.server.qual.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Log4net\log4net.server.prod.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Log4net\log4net.server.nrtest.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Project_Readme.html" />
