@@ -120,13 +120,24 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
+        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId, bool removeForAllEnvironments)
         {
             GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (getByResult.WasFound() && getByResult.EnvironmentDataset.FavoriteUserIds.Contains(favoriteUserId))
+            if (getByResult.WasFound())
             {
-                getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                //removeForAllEnvironments only true when favorite is being removed from dataset search page
+                if (removeForAllEnvironments)
+                {
+                    foreach (EnvironmentDataset environmentDataset in getByResult.GlobalDataset.EnvironmentDatasets)
+                    {
+                        environmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                    }
+                }
+                else
+                {
+                    getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                }
 
                 await _elasticDocumentClient.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }

@@ -126,20 +126,21 @@ data.GlobalDatasetSearch = {
 
             let element = $(this);
             let datasetId = element.data("id");
+            let iconElement = $(element[0].firstElementChild);
 
             $.ajax({
-                url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(datasetId),
+                url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent(datasetId) + '&removeForAllEnvironments=' + iconElement.hasClass("lt_gold"),
                 method: "GET",
                 success: function () {
-                    $(element[0].firstElementChild).toggleClass("fas lt_gold far gray");
+                    iconElement.toggleClass("fas lt_gold far gray");
+
+                    let updatedDatasetIndex = data.GlobalDatasetSearch.globalDatasets.findIndex(x => x.TargetDatasetId == datasetId);
+                    data.GlobalDatasetSearch.globalDatasets[updatedDatasetIndex].IsFavorite = iconElement.hasClass("lt_gold");
                 },
                 error: function () {
                     data.Dataset.makeToast("error", "Failed to remove favorite.");
                 }
             });
-
-            //use this function once converted to UserFavorite
-            //data.Favorites.toggleFavorite(this, "Dataset", function () { })
         });
 
         //sort by change event
@@ -187,7 +188,7 @@ data.GlobalDatasetSearch = {
 
         //remove filter option from badge
         $(document).off("click", ".chip .close");
-        $(document).on("click", ".chip .close", function () {
+        $(document).on("click", ".filter-search-chip-close", function () {
             data.FilterSearch.handleBadgeClear(this);
             data.FilterSearch.clearActiveSavedSearch();
             data.GlobalDatasetSearch.executeSearchOnly();

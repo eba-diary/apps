@@ -55,19 +55,9 @@
     padding: 0 1rem;
 }
 
-.saved-search-option-icon {
-    padding: 0.5rem;
-    color: #003DA5 !important;
-}
-.saved-search-delete {
-    color: #B3140B !important;
-    margin-right: 0.5rem;
-}
-
 .saved-search-option-spinner {
     padding: 0.35rem;
     margin: 0 0.5rem;
-    color: #003DA5 !important;
 }
 
 [id^=deleteSpinner_] {

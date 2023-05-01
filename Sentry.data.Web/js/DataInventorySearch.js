@@ -47,7 +47,7 @@
 
     initDataTable: function (obj) {
         $("#di-result-table").DataTable({
-            pageLength: 10,
+            pageLength: 12,
             deferRender: true,
             ordering: false,
             ajax: {

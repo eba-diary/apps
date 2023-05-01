@@ -13,7 +13,7 @@ namespace Sentry.data.Core
         Task AddUpdateEnvironmentDatasetAsync(int globalDatasetId, EnvironmentDataset environmentDataset);
         Task DeleteEnvironmentDatasetAsync(int environmentDatasetId);
         Task AddEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId);
-        Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId);
+        Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId, bool removeForAllEnvironments);
         Task AddUpdateEnvironmentSchemaAsync(int environmentDatasetId, EnvironmentSchema environmentSchema);
         Task AddUpdateEnvironmentSchemaSaidAssetCodeAsync(int environmentSchemaId, string saidAssetCode);
         Task DeleteEnvironmentSchemaAsync(int environmentSchemaId);

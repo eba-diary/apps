@@ -133,7 +133,7 @@ namespace Sentry.data.Infrastructure.Tests
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
-            globalDatasetProvider.Setup(x => x.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000")).Returns(Task.CompletedTask);
+            globalDatasetProvider.Setup(x => x.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000", false)).Returns(Task.CompletedTask);
 
             UserFavoriteService userFavoriteService = new UserFavoriteService(datasetContext.Object, globalDatasetProvider.Object, dataFeatures.Object);
 

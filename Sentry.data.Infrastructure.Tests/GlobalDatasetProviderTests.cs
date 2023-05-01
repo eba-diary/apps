@@ -438,7 +438,58 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, datasetContext.Object);
 
-            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
+            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000", false);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync_2_RemoveForAllEnvironments()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticDocumentClient> elasticDocumentClient = mr.Create<IElasticDocumentClient>();
+
+            GlobalDataset globalDataset = new GlobalDataset
+            {
+                GlobalDatasetId = 1,
+                EnvironmentDatasets = new List<EnvironmentDataset>
+                {
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 2,
+                        FavoriteUserIds = new List<string> { "000000" }
+                    },
+                    new EnvironmentDataset
+                    {
+                        DatasetId = 3,
+                        FavoriteUserIds = new List<string> { "000000", "000001" }
+                    }
+                }
+            };
+
+            elasticDocumentClient.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+            elasticDocumentClient.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
+            {
+                EnvironmentDataset updatedDataset = x.EnvironmentDatasets.First();
+                Assert.AreEqual(0, updatedDataset.FavoriteUserIds.Count);
+                
+                updatedDataset = x.EnvironmentDatasets.Last();
+                Assert.AreEqual(1, updatedDataset.FavoriteUserIds.Count);
+                Assert.AreEqual("000001", updatedDataset.FavoriteUserIds.First());
+            });
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+            Dataset dataset = new Dataset
+            {
+                DatasetId = 2,
+                GlobalDatasetId = 1
+            };
+            datasetContext.SetupGet(x => x.Datasets).Returns(new List<Dataset> { dataset }.AsQueryable());
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, datasetContext.Object);
+
+            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000", true);
 
             mr.VerifyAll();
         }
@@ -464,6 +515,11 @@ namespace Sentry.data.Infrastructure.Tests
             };
 
             elasticDocumentClient.Setup(x => x.GetByIdAsync<GlobalDataset>(1)).ReturnsAsync(globalDataset);
+            elasticDocumentClient.Setup(x => x.IndexAsync(globalDataset)).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
+            {
+                EnvironmentDataset updatedDataset = x.EnvironmentDatasets.First();
+                Assert.AreEqual(0, updatedDataset.FavoriteUserIds.Count);
+            });
 
             Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             Dataset dataset = new Dataset
@@ -475,7 +531,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, datasetContext.Object);
 
-            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
+            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000", false);
 
             mr.VerifyAll();
         }
@@ -501,7 +557,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, datasetContext.Object);
 
-            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000");
+            await globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(2, "000000", false);
 
             mr.VerifyAll();
         }
