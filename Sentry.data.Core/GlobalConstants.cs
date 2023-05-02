@@ -278,6 +278,7 @@ namespace Sentry.data.Core
             public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
             public const string DATASET_SEARCH = "Datasets";
             public const string DATA_INVENTORY = "DataInventory";
+            public const string GLOBAL_DATASET = "GlobalDataset";
         }
 
         public static class StoragePrefixes

@@ -13,20 +13,6 @@
 }
 
 <div class="pt-4">
-    <div class="text-center">
-        <div class="search-head-item"><img src="@Url.Content(Model.IconPath)" class="search-head-img" alt="Source icon" /></div>
-        <div class="search-head-item">
-            <h1 class="filter-search-page-title">@Model.PageTitle</h1>
-        </div>
-
-        @if (!string.IsNullOrEmpty(Model.InfoLink))
-        {
-            <a class="filter-search-page-info" target="_blank" rel="noopener noreferrer" href="@Url.Content(Model.InfoLink)">
-                <em class="icon-info-solid dsc-blue-text"></em>
-            </a>
-        }
-    </div>
-
     <div class="filter-search-box-and-save">
         <div class="filter-search-save-search-container display-none">
             @{

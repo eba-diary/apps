@@ -21,7 +21,7 @@ namespace Sentry.data.Web.Controllers
             _dataFeatures = dataFeatures;
         }
 
-        public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 15, int layout = 0, List<string> filters = null, string savedSearch = null)
+        public ActionResult Search(string searchText = null, int sortBy = 0, int pageNumber = 1, int pageSize = 12, int layout = 0, List<string> filters = null, string savedSearch = null)
         {
             if (HasPermission())
             {

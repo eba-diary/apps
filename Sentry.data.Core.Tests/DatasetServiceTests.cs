@@ -1295,7 +1295,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object, null);
 
-            string result = datasetService.SetDatasetFavorite(1, "000000");
+            string result = datasetService.SetDatasetFavorite(1, "000000", false);
 
             mr.VerifyAll();
 
@@ -1334,11 +1334,79 @@ namespace Sentry.data.Core.Tests
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
-            globalDatasetProvider.Setup(x => x.RemoveEnvironmentDatasetFavoriteUserIdAsync(1, "000000")).Returns(Task.CompletedTask);
+            globalDatasetProvider.Setup(x => x.RemoveEnvironmentDatasetFavoriteUserIdAsync(1, "000000", false)).Returns(Task.CompletedTask);
 
             DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object, null);
 
-            string result = datasetService.SetDatasetFavorite(1, "000000");
+            string result = datasetService.SetDatasetFavorite(1, "000000", false);
+
+            mr.VerifyAll();
+
+            Assert.AreEqual("Successfully removed favorite.", result);
+        }
+
+        [TestMethod]
+        public void SetDatasetFavorite_1_000000_Remove_SetForAllEnvironments()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
+
+            List<Favorite> favorites = new List<Favorite>
+            {
+                new Favorite()
+                {
+                    DatasetId = 1,
+                    UserId = "000000"
+                },
+                new Favorite()
+                {
+                    DatasetId = 2,
+                    UserId = "000001"
+                },
+                new Favorite()
+                {
+                    DatasetId = 2,
+                    UserId = "000000"
+                }
+            };
+
+            List<Dataset> datasets = new List<Dataset>
+            {
+                new Dataset()
+                {
+                    DatasetId = 1,
+                    GlobalDatasetId = 1,
+                    Favorities = new List<Favorite> { favorites.First() }
+                },
+                new Dataset()
+                {
+                    DatasetId = 2,
+                    GlobalDatasetId = 1
+                },
+                new Dataset()
+                {
+                    DatasetId = 3,
+                    GlobalDatasetId = 1
+                }
+            };
+
+            datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(datasets.First());
+            datasetContext.SetupGet(x => x.Datasets).Returns(datasets.AsQueryable());
+            datasetContext.SetupGet(x => x.Favorites).Returns(favorites.AsQueryable());
+            datasetContext.Setup(x => x.Remove(favorites.First()));
+            datasetContext.Setup(x => x.Remove(favorites.Last()));
+            datasetContext.Setup(x => x.SaveChanges(true));
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+            globalDatasetProvider.Setup(x => x.RemoveEnvironmentDatasetFavoriteUserIdAsync(1, "000000", true)).Returns(Task.CompletedTask);
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, dataFeatures.Object, null, globalDatasetProvider.Object, null);
+
+            string result = datasetService.SetDatasetFavorite(1, "000000", true);
 
             mr.VerifyAll();
 
@@ -1355,7 +1423,7 @@ namespace Sentry.data.Core.Tests
 
             DatasetService datasetService = new DatasetService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null);
 
-            Assert.ThrowsException<Exception>(() => datasetService.SetDatasetFavorite(1, "000000"), "foo");
+            Assert.ThrowsException<Exception>(() => datasetService.SetDatasetFavorite(1, "000000", false), "foo");
 
             datasetContext.VerifyAll();
         }

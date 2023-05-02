@@ -45,7 +45,7 @@ namespace Sentry.data.Core
         /// Retrieve all the permissions granted to the dataset with the given <paramref name="datasetId"/>.
         /// </summary>
         DatasetPermissionsDto GetDatasetPermissions(int datasetId);
-        string SetDatasetFavorite(int datasetId, string associateId);
+        string SetDatasetFavorite(int datasetId, string associateId, bool removeForAllEnvironments);
         SecurityTicket GetLatestInheritanceTicket(int datasetId);
         List<string> GetDatasetNamesForAsset(string asset);
         List<string> GetInheritanceEnabledDatasetNamesForAsset(string asset);

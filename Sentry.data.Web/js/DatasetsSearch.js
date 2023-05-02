@@ -176,8 +176,8 @@ data.DatasetsSearch = {
             data.DatasetsSearch.executeSearchWithoutLoader(1);
         });
 
-        $(document).off("click", "[id^='clearOption_']");
-        $(document).on("click", "[id^='clearOption_']", function () {
+        $(document).off("click", ".chip .close");
+        $(document).on("click", ".filter-search-chip-close", function () {
             data.FilterSearch.handleBadgeClear(this);
             data.DatasetsSearch.executeSearchWithoutLoader(1);
         });

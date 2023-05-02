@@ -714,13 +714,14 @@ namespace Sentry.data.Core
             return dsList;
         }
 
-        public string SetDatasetFavorite(int datasetId, string associateId)
+        public string SetDatasetFavorite(int datasetId, string associateId, bool removeForAllEnvironments)
         {
             try
             {
                 Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+                Favorite dsFavorite = ds.Favorities.FirstOrDefault(x => x.UserId == associateId);
 
-                if (!ds.Favorities.Any(w => w.UserId == associateId))
+                if (dsFavorite == null && !removeForAllEnvironments)
                 {
                     Favorite f = new Favorite()
                     {
@@ -742,11 +743,25 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+                    List<Favorite> favorites;
+                    if (removeForAllEnvironments)
+                    {
+                        List<int> datasetIds = _datasetContext.Datasets.Where(x => x.GlobalDatasetId == ds.GlobalDatasetId).Select(x => x.DatasetId).ToList();
+                        favorites = _datasetContext.Favorites.Where(x => datasetIds.Contains(x.DatasetId) && x.UserId == associateId).ToList();
+                    }
+                    else
+                    {
+                        favorites = new List<Favorite> { dsFavorite };
+                    }
+
+                    foreach (Favorite favorite in favorites)
+                    {
+                        _datasetContext.Remove(favorite);
+                    }
 
                     if (_featureFlags.CLA4789_ImprovedSearchCapability.GetValue())
                     {
-                        _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                        _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId, removeForAllEnvironments).Wait();
                     }
 
                     _datasetContext.SaveChanges();

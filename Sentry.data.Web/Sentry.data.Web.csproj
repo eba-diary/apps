@@ -553,8 +553,16 @@
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestValidator.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\BaseGlobalDatasetRequestModel.cs" />
+    <Compile Include="API\Resources\FilterCategory\FilterCategoryOptionRequestModel.cs" />
+    <Compile Include="API\Resources\FilterCategory\FilterCategoryOptionResponseModel.cs" />
+    <Compile Include="API\Resources\FilterCategory\FilterCategoryRequestModel.cs" />
+    <Compile Include="API\Resources\FilterCategory\FilterCategoryResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\GetGlobalDatasetFilters\GetGlobalDatasetFiltersRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\GetGlobalDatasetFilters\GetGlobalDatasetFiltersResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\GlobalDatasetController.cs" />
     <Compile Include="API\Resources\GlobalDataset\GlobalDatasetProfile.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\BaseGlobalDatasetModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsResponseModel.cs" />
@@ -570,8 +578,8 @@
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaResponseModel.cs" />
-    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\FilterCategoryOptionRequestModel.cs" />
-    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\FilterCategoryRequestModel.cs" />
+    <Compile Include="API\Resources\FilterCategory\BaseFilterCategoryOptionModel.cs" />
+    <Compile Include="API\Resources\FilterCategory\BaseFilterCategoryModel.cs" />
     <Compile Include="API\Validation\Models\ConcurrentFieldValidationResponse.cs" />
     <Compile Include="API\Validation\Models\ConcurrentValidationResponse.cs" />
     <Compile Include="API\Validation\Fluent\FluentValidationResponse.cs" />
@@ -587,6 +595,7 @@
     <AdditionalFiles Include="..\.sonarlint\data_data.sentry.com\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
+    <Compile Include="AutoMapper\ViewModelProfile.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="API\Resources\Dataset\DatasetController.cs" />
     <Compile Include="Controllers\DataFlowMetricController.cs" />
@@ -656,6 +665,9 @@
     <Compile Include="Models\DataProcessing\RequestVariableModel.cs" />
     <Compile Include="Models\Dataset\DatasetRelativeModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileConfigSchemaModel.cs" />
+    <Compile Include="Models\GlobalDataset\GlobalDatasetPageRequestViewModel.cs" />
+    <Compile Include="Models\GlobalDataset\GlobalDatasetResultsViewModel.cs" />
+    <Compile Include="Models\GlobalDataset\GlobalDatasetViewModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryDetailModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryDetailPageModel.cs" />
     <Compile Include="Models\Migration\MigrationHistoryPageModel.cs" />
@@ -886,6 +898,7 @@
     <Content Include="js\FilterSearch.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
+    <Content Include="js\GlobalDatasetSearch.js" />
     <Content Include="js\Job.js" />
     <Content Include="js\MigrationHistory.js" />
     <Content Include="js\Shared\Images.js" />
@@ -1233,6 +1246,7 @@
     <Content Include="Views\Config\DataSource\CreateDataSource.cshtml" />
     <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
     <Content Include="Views\Migration\_MigrationHistoryDetail.cshtml" />
+    <Content Include="Views\GlobalDatasetSearch\GlobalDatasetResults.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1251,7 +1265,7 @@
     <Folder Include="Views\DatasetSearch\" />
     <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
-    <Folder Include="Views\GlobalDatasetSearch\" />
+    <Folder Include="Views\FilterCategory\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Playground\" />
     <Folder Include="Views\Security\" />

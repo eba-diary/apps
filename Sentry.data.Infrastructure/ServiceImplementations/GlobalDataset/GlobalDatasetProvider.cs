@@ -31,13 +31,17 @@ namespace Sentry.data.Infrastructure
 
         public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
         {
+            //only use the filter categories for what results need to be selected
+            List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
+            filterSearchDto.FilterCategories = null;
+
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
             searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
             searchRequest.Size = 0;
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(filterSearchDto.FilterCategories);
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters);
 
             return filterCategories;
         }
@@ -116,13 +120,24 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
+        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId, bool removeForAllEnvironments)
         {
             GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (getByResult.WasFound() && getByResult.EnvironmentDataset.FavoriteUserIds.Contains(favoriteUserId))
+            if (getByResult.WasFound())
             {
-                getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                //removeForAllEnvironments only true when favorite is being removed from dataset search page
+                if (removeForAllEnvironments)
+                {
+                    foreach (EnvironmentDataset environmentDataset in getByResult.GlobalDataset.EnvironmentDatasets)
+                    {
+                        environmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                    }
+                }
+                else
+                {
+                    getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                }
 
                 await _elasticDocumentClient.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }

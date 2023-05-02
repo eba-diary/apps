@@ -61,11 +61,11 @@ namespace Sentry.data.Web.Controllers
             return Json(new { Success = true });
         }
 
-        public JsonResult SetFavorite(int datasetId)
+        public JsonResult SetFavorite(int datasetId, bool removeForAllEnvironments = false)
         {
             try
             {
-                string result = _datasetService.SetDatasetFavorite(datasetId, SharedContext.CurrentUser.AssociateId);
+                string result = _datasetService.SetDatasetFavorite(datasetId, SharedContext.CurrentUser.AssociateId, removeForAllEnvironments);
                 Response.StatusCode = (int)HttpStatusCode.OK;
                 return Json(new { message = result }, JsonRequestBehavior.AllowGet);
             }

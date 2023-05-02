@@ -32,6 +32,7 @@ namespace Sentry.data.Core
                     url = "DataInventory/Search";
                     break;
                 case GlobalConstants.SearchType.DATASET_SEARCH:
+                case GlobalConstants.SearchType.GLOBAL_DATASET:
                     url = "Search/Datasets";
                     break;
             }
@@ -46,6 +47,7 @@ namespace Sentry.data.Core
                 case GlobalConstants.SearchType.DATA_INVENTORY:
                     return "/Images/DataInventory/DataInventoryIcon.svg";
                 case GlobalConstants.SearchType.DATASET_SEARCH:
+                case GlobalConstants.SearchType.GLOBAL_DATASET:
                     return "/Images/Icons/search_icon.svg";
                 default:
                     return "";

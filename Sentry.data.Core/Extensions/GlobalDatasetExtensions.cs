@@ -93,26 +93,29 @@ namespace Sentry.data.Core
             };
         }
 
-        public static SearchGlobalDatasetResultDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
+        public static SearchGlobalDatasetDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
         {
+            //use first prod environment dataset for display fields
             EnvironmentDataset targetEnvironmentDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.NamedEnvironmentType == NamedEnvironmentType.Prod.ToString());
 
+            //if no prod environment, use the most recent added
+            globalDataset.EnvironmentDatasets.Reverse();
             if (targetEnvironmentDataset == null)
             {
-                targetEnvironmentDataset = globalDataset.EnvironmentDatasets.Last();
+                targetEnvironmentDataset = globalDataset.EnvironmentDatasets.First();
             }
 
-            return new SearchGlobalDatasetResultDto
+            return new SearchGlobalDatasetDto
             {
                 GlobalDatasetId = globalDataset.GlobalDatasetId,
                 DatasetName = globalDataset.DatasetName,
                 DatasetSaidAssetCode = globalDataset.DatasetSaidAssetCode,
                 DatasetDescription = targetEnvironmentDataset.DatasetDescription,
                 CategoryCode = targetEnvironmentDataset.CategoryCode,
-                NamedEnvironments = globalDataset.EnvironmentDatasets.Select(x => x.NamedEnvironment).ToList(),
+                NamedEnvironments = globalDataset.EnvironmentDatasets.OrderByDescending(x => x.NamedEnvironmentType).Select(x => x.NamedEnvironment).ToList(),
                 IsSecured = targetEnvironmentDataset.IsSecured,
                 IsFavorite = globalDataset.EnvironmentDatasets.Any(x => x.FavoriteUserIds.Contains(userId)),
-                DatasetDetailPage = $@"/Dataset/Detail/{targetEnvironmentDataset.DatasetId}"
+                TargetDatasetId = targetEnvironmentDataset.DatasetId
             };
         }
     }
