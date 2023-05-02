@@ -212,3 +212,7 @@ div.dataTables_wrapper div.dataTables_filter input {
 .yadcf-filter-range {
     width: auto;
 }
+
+#confirmEnvironment .popover h3 {
+    color: #E57200;
+}

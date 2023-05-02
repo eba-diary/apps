@@ -1552,6 +1552,9 @@ data.Dataset = {
             });
             
         });
+
+        $('#datasetRelativesDropdown').popover('show');
+        setTimeout(() => $('#datasetRelativesDropdown').popover('hide'), 5000);
     },
 
     toggleDeleteButton: function () {
