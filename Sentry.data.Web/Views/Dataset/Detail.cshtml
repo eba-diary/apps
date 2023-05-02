@@ -305,7 +305,7 @@
                             <p>@Model.DataClassificationDescription</p>
                         </div>
 
-                        <div id="confirmEnvironment"></div>
+                        <div id="ConfirmEnvironment"></div>
 
                         @*NAMED ENVIRONMENT DROP DOWN OR LABEL*@
                         <div class="col margin-left-inherit margin-right-inherit padding-right-one">
@@ -314,7 +314,7 @@
                             @*ONLY DISPLAY DROP DOWN IF RELATIVES FOUND ARE ATLEAST 2*@
                             @if (Model.DatasetRelatives != null && Model.DatasetRelatives.Count() > 1)
                             {
-                                <select class="form-control" onchange="location = this.value;" id="datasetRelativesDropdown" data-toggle="popover" data-title="Confirm Environment" data-content="Confirm you are in the desired environment." data-trigger="manual" data-placement="right" data-container="#confirmEnvironment">
+                                <select class="form-control" onchange="location = this.value;" id="DatasetRelativesDropdown" data-toggle="popover" data-title="Confirm Environment" data-content="Confirm you are in the desired environment." data-trigger="manual" data-placement="right" data-container="#ConfirmEnvironment">
                                     @foreach (DatasetRelativeModel datasetRelativeModel in Model.DatasetRelatives)
                                     {
                                         if (datasetRelativeModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)
