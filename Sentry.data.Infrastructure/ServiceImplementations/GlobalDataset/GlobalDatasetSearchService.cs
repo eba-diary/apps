@@ -56,34 +56,7 @@ namespace Sentry.data.Infrastructure
             {
                 foreach (string filter in filters)
                 {
-                    if (!string.IsNullOrWhiteSpace(filter))
-                    {
-                        List<string> parts = filter.Split('_').ToList();
-                        string category = parts.First();
-
-                        FilterCategoryOptionDto optionModel = new FilterCategoryOptionDto()
-                        {
-                            OptionValue = HttpUtility.UrlDecode(parts.Last()),
-                            ParentCategoryName = category,
-                            Selected = true
-                        };
-
-                        FilterCategoryDto existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
-
-                        if (existingCategory != null)
-                        {
-                            if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
-                            {
-                                existingCategory.CategoryOptions.Add(optionModel);
-                            }
-                        }
-                        else
-                        {
-                            FilterCategoryDto newCategory = new FilterCategoryDto() { CategoryName = category };
-                            newCategory.CategoryOptions.Add(optionModel);
-                            categories.Add(newCategory);
-                        }
-                    }
+                    AddFilter(filter, categories);
                 }
             }
             else if (_dataFeatures.CLA4258_DefaultProdSearchFilter.GetValue())
@@ -100,5 +73,39 @@ namespace Sentry.data.Infrastructure
 
             return categories;
         }
+
+        #region Private
+        private void AddFilter(string filter, List<FilterCategoryDto> categories)
+        {
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                List<string> parts = filter.Split('_').ToList();
+                string category = parts.First();
+
+                FilterCategoryOptionDto optionModel = new FilterCategoryOptionDto()
+                {
+                    OptionValue = HttpUtility.UrlDecode(parts.Last()),
+                    ParentCategoryName = category,
+                    Selected = true
+                };
+
+                FilterCategoryDto existingCategory = categories.FirstOrDefault(x => x.CategoryName == category);
+
+                if (existingCategory != null)
+                {
+                    if (!existingCategory.CategoryOptions.Any(x => x.OptionValue == optionModel.OptionValue))
+                    {
+                        existingCategory.CategoryOptions.Add(optionModel);
+                    }
+                }
+                else
+                {
+                    FilterCategoryDto newCategory = new FilterCategoryDto() { CategoryName = category };
+                    newCategory.CategoryOptions.Add(optionModel);
+                    categories.Add(newCategory);
+                }
+            }
+        }
+        #endregion
     }
 }
