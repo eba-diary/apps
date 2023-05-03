@@ -566,6 +566,7 @@
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchHighlightModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />

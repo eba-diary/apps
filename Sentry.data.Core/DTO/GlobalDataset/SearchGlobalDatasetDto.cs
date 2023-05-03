@@ -2,7 +2,7 @@
 
 namespace Sentry.data.Core
 {
-    public class SearchGlobalDatasetDto
+    public class SearchGlobalDatasetDto : SearchHighlightableDto
     {
         public int GlobalDatasetId { get; set; }
         public string DatasetName { get; set; }

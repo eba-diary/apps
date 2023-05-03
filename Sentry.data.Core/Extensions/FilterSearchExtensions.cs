@@ -95,7 +95,21 @@ namespace Sentry.data.Core
             return result?.Any() == true;
         }
 
+        public static List<SearchHighlightDto> ToDtos(this List<SearchHighlight> searchHighlights)
+        {
+            return searchHighlights.Select(x => x.ToDto()).ToList();
+        }
+
         #region Private Methods
+        private static SearchHighlightDto ToDto(this SearchHighlight searchHighlight)
+        {
+            return new SearchHighlightDto
+            {
+                PropertyName = searchHighlight.PropertyName,
+                Highlights = searchHighlight.Highlights
+            };
+        }
+
         private static async Task<FilterCategoryDto> CreateFilterCategoryAsync<T>(List<T> results, List<FilterCategoryDto> searchedFilters, PropertyInfo propertyInfo) where T : IFilterSearchable
         {
             return await Task.Run(() =>

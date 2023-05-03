@@ -52,6 +52,19 @@ namespace Sentry.data.Infrastructure.Tests
                             IsSecured = true,
                             FavoriteUserIds = new List<string>()
                         }
+                    },
+                    SearchHighlights = new List<SearchHighlight>
+                    {
+                        new SearchHighlight
+                        {
+                            PropertyName = "DatasetName",
+                            Highlights = new List<string> { "Name" }
+                        },
+                        new SearchHighlight
+                        {
+                            PropertyName = "DatasetDescription",
+                            Highlights = new List<string> { "Description" }
+                        }
                     }
                 },
                 new GlobalDataset
@@ -83,6 +96,14 @@ namespace Sentry.data.Infrastructure.Tests
                             IsSecured = false,
                             FavoriteUserIds = new List<string>()
                         }
+                    },
+                    SearchHighlights = new List<SearchHighlight>
+                    {
+                        new SearchHighlight
+                        {
+                            PropertyName = "DatasetDescription",
+                            Highlights = new List<string> { "Description 2"}
+                        }
                     }
                 }
             };
@@ -113,6 +134,17 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
             Assert.AreEqual(12, result.TargetDatasetId);
+            Assert.AreEqual(2, result.SearchHighlights.Count);
+
+            SearchHighlightDto highlight = result.SearchHighlights.First();
+            Assert.AreEqual("DatasetName", highlight.PropertyName);
+            Assert.AreEqual(1, highlight.Highlights.Count);
+            Assert.AreEqual("Name", highlight.Highlights.First());
+
+            highlight = result.SearchHighlights.Last();
+            Assert.AreEqual("DatasetDescription", highlight.PropertyName);
+            Assert.AreEqual(1, highlight.Highlights.Count);
+            Assert.AreEqual("Description", highlight.Highlights.First());
 
             result = results.GlobalDatasets[1];
             Assert.AreEqual(2, result.GlobalDatasetId);
@@ -126,6 +158,12 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
             Assert.AreEqual(22, result.TargetDatasetId);
+            Assert.AreEqual(1, result.SearchHighlights.Count);
+
+            highlight = result.SearchHighlights.First();
+            Assert.AreEqual("DatasetDescription", highlight.PropertyName);
+            Assert.AreEqual(1, highlight.Highlights.Count);
+            Assert.AreEqual("Description 2", highlight.Highlights.First());
 
             mr.VerifyAll();
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Nest;
 using System;
 using System.Collections.Generic;
@@ -421,7 +422,7 @@ namespace Sentry.data.Core.Tests
             List<FilterCategoryDto> filters = aggregates.ToFilterCategories<DataInventory>(requestedFilters);
 
             Assert.AreEqual(2, filters.Count);
-            
+
             FilterCategoryDto filter = filters[0];
             Assert.AreEqual(FilterCategoryNames.DataInventory.COLUMN, filter.CategoryName);
             Assert.AreEqual(3, filter.CategoryOptions.Count);
@@ -636,6 +637,79 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(8, option.ResultCount);
             Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
             Assert.IsFalse(option.Selected);
+        }
+
+        [TestMethod]
+        public void ToSearchHighlightedResults_Hits_GlobalDatasets()
+        {
+            Mock<IHit<GlobalDataset>> hit = new Mock<IHit<GlobalDataset>>();
+            GlobalDataset globalDataset = new GlobalDataset();
+            hit.SetupGet(x => x.Source).Returns(globalDataset);
+            IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlight = new Dictionary<string, IReadOnlyCollection<string>>
+            {
+                { "datasetname", new List<string> { "value", "value 2" } },
+                { "environmentdatasets.datasetdescription", new List<string> { "value" } },
+                { "environmentdatasets.issecured", new List<string> { "true" } },
+                { "environmentdatasets.environmentschemas.schemasaidassetcode.keyword", new List<string> { "DATA", "SAID" } }
+            };
+            hit.SetupGet(x => x.Highlight).Returns(highlight);
+
+            Mock<IHit<GlobalDataset>> hit2 = new Mock<IHit<GlobalDataset>>();
+            GlobalDataset globalDataset2 = new GlobalDataset();
+            hit2.SetupGet(x => x.Source).Returns(globalDataset2);
+            IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlight2 = new Dictionary<string, IReadOnlyCollection<string>>
+            {
+                { "environmentdatasets.datasetdescription", new List<string> { "value", "value 2" } },
+                { "environmentdatasets.environmentschemas.schemasaidassetcode.keyword", new List<string> { "DATA", "SAID" } }
+            };
+            hit2.SetupGet(x => x.Highlight).Returns(highlight2);
+
+            List<IHit<GlobalDataset>> hits = new List<IHit<GlobalDataset>> { hit.Object, hit2.Object };
+
+            List<GlobalDataset> globalDatasets = hits.ToSearchHighlightedResults();
+
+            Assert.AreEqual(2, globalDatasets.Count);
+            Assert.AreEqual(4, globalDatasets.First().SearchHighlights.Count);
+
+            List<SearchHighlight> searchHighlights = globalDatasets.First().SearchHighlights;
+
+            SearchHighlight searchHighlight = searchHighlights[0];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.DATASETNAME, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
+            Assert.AreEqual("value 2", searchHighlight.Highlights[1]);
+
+            searchHighlight = searchHighlights[1];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.DATASETDESCRIPTION, searchHighlight.PropertyName);
+            Assert.AreEqual(1, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
+
+            searchHighlight = searchHighlights[2];
+            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, searchHighlight.PropertyName);
+            Assert.AreEqual(1, searchHighlight.Highlights.Count);
+            Assert.AreEqual("true", searchHighlight.Highlights[0]);
+
+            searchHighlight = searchHighlights[3];
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("DATA", searchHighlight.Highlights[0]);
+            Assert.AreEqual("SAID", searchHighlight.Highlights[1]);
+
+            Assert.AreEqual(2, globalDatasets.Last().SearchHighlights.Count);
+
+            searchHighlights = globalDatasets.Last().SearchHighlights;
+
+            searchHighlight = searchHighlights[0];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.DATASETDESCRIPTION, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
+            Assert.AreEqual("value 2", searchHighlight.Highlights[1]);
+
+            searchHighlight = searchHighlights[1];
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("DATA", searchHighlight.Highlights[0]);
+            Assert.AreEqual("SAID", searchHighlight.Highlights[1]);
         }
     }
 }

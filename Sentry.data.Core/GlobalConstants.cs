@@ -504,6 +504,17 @@ namespace Sentry.data.Core
             }
         }
 
+        public static class SearchDisplayNames
+        {
+            public static class GlobalDataset
+            {
+                public const string DATASETNAME = "Dataset Name";
+                public const string DATASETDESCRIPTION = "Dataset Description";
+                public const string SCHEMANAME = "Schema Name";
+                public const string SCHEMADESCRIPTION = "Schema Description";
+            }
+        }
+
         public static class FilterCategoryOptions
         {
             public const string ENVIRONMENT_PROD = "P";

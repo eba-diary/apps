@@ -87,9 +87,10 @@ data.GlobalDatasetSearch = {
                 PageSize: $("#tile-result-page-size").val(),
                 SortBy: $("#tile-result-sort").val(),
                 Layout: $("#tile-result-layout").val(),
-            };
+            };            
 
-            $(".filter-search-results-container").load("/GlobalDatasetSearch/GlobalDatasetResults/", request, function () {
+            $(".filter-search-results-container").load("/GlobalDatasetSearch/GlobalDatasetResults/", request, function (resp) {
+                console.log(resp);
                 let totalResults = data.GlobalDatasetSearch.globalDatasets.length;
 
                 if (totalResults > 0 && pageNumber > 1) {
