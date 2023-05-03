@@ -58,7 +58,7 @@ namespace Sentry.data.Core
         public virtual string StructurePosition { get; set; }
 
         //abstract properties
-        public abstract SchemaDatatypes FieldType { get; set; }
+        public abstract SchemaDatatypes FieldType { get; }
 
         public virtual JObject ToJsonPropertyDefinition()
         {

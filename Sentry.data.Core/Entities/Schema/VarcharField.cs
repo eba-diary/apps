@@ -10,7 +10,6 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.VARCHAR;
             }
-            set => FieldType = SchemaDatatypes.VARCHAR;
         }
 
         protected override JObject GetJsonTypeDefinition()

@@ -7,6 +7,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
     public class VariantFieldDto : BaseFieldDto
     {
         public VariantFieldDto() : base() { }
+
         public VariantFieldDto(KeyValuePair<string, JsonSchemaProperty> prop, int position, bool array) : base(prop, position, array) { }
 
         public VariantFieldDto(VariantField field) : base(field) { }
@@ -31,7 +32,7 @@ namespace Sentry.data.Core.DTO.Schema.Fields
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new VariantField();
-            base.ToEntity(newEntityField, parentField, parentRevision);
+            ToEntity(newEntityField, parentField, parentRevision);
             return newEntityField;
         }
 

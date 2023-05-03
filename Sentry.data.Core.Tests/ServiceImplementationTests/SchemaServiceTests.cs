@@ -791,6 +791,65 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        #region VariantFieldDto Tests
+        [TestMethod, TestCategory("VariantFieldDto Constructor")]
+        public void VariantFieldDto_Constructor_Base()
+        {
+            var variantBaseDto = new VariantFieldDto();
+            Assert.IsInstanceOfType(variantBaseDto, typeof(VariantFieldDto));
+            Assert.AreEqual(Datatypes.VARIANT, variantBaseDto.FieldType);
+        }
+
+        [TestMethod, TestCategory("VariantFieldDto Constructor")]
+        public void VariantFieldDto_Constructor_VariantField()
+        {
+            VariantField baseField = new VariantField()
+            {
+                Name = "VariantField",
+                Description = "Variant Description"
+            };
+            VariantFieldDto variantFieldDto = new VariantFieldDto(baseField);
+            Assert.AreEqual(baseField.Name, variantFieldDto.Name);
+            Assert.AreEqual(baseField.Description, variantFieldDto.Description);
+            Assert.AreEqual(Datatypes.VARIANT, variantFieldDto.FieldType);
+        }
+
+        [TestMethod, TestCategory("VariantFieldDto Constructor")]
+        public void VariantFieldDto_Constructor_SchemaRow()
+        {
+            SchemaRow schemaRow = new SchemaRow()
+            {
+                Name = "SchemaRowToVariant"
+            };
+            var variantFieldDto = new VariantFieldDto(schemaRow);
+
+            Assert.AreEqual(schemaRow.Name, variantFieldDto.Name);
+        }
+
+        [TestMethod, TestCategory("VariantFieldDto ToEntity")]
+        public void VariantFieldDto_ToEntity_ParentField()
+        {
+            StructField parentField = new StructField()
+            {
+                Name = "parent struct field"
+            };
+
+            SchemaRevision revision = new SchemaRevision();
+
+            var variantDto = new VariantFieldDto()
+            {
+                Name = "variant field"
+            };
+
+            var baseField = variantDto.ToEntity(parentField, revision);
+
+            Assert.AreEqual(parentField, baseField.ParentField);
+            Assert.AreEqual("variant field", baseField.Name);
+        }
+
+        #endregion
+
+
         #region VarcharFieldDto JsonConstructor Tests
         #region __VarcharFieldDto Length Tests
         /*********Start __VarcharFieldDto Length Tests************/
@@ -1615,6 +1674,9 @@ namespace Sentry.data.Core.Tests
 
             FieldDtoFactory varcharFieldFactory;
             varcharFieldFactory = new VarcharFieldDtoFactory(row);
+            
+            FieldDtoFactory variantFieldFactory;
+            variantFieldFactory = new VariantFieldDtoFactory(row);
 
             //Action
             BaseFieldDto dateFieldDto = dateFieldFactory.GetField();
@@ -1623,6 +1685,7 @@ namespace Sentry.data.Core.Tests
             BaseFieldDto structFieldDto = structFieldFactory.GetField();
             BaseFieldDto timestampFieldDto = timestampFieldFactory.GetField();
             BaseFieldDto varcharFieldDto = varcharFieldFactory.GetField();
+            BaseFieldDto variantFieldDto = variantFieldFactory.GetField();
 
             //Assert
             Assert.IsTrue(dateFieldDto.DeleteInd, "DateFieldDtoFactory failed DeleteInd Check");
@@ -1631,7 +1694,9 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(structFieldDto.DeleteInd, "StructFieldDtoFactory failed DeleteInd Check");
             Assert.IsTrue(timestampFieldDto.DeleteInd, "TimestampFieldDtoFactory failed DeleteInd Check");
             Assert.IsTrue(varcharFieldDto.DeleteInd, "VarcharFieldDtoFactory failed DeleteInd Check");
+            Assert.IsTrue(variantFieldDto.DeleteInd, "VariantFieldDtoFactory failed DeleteInd Check");
         }
+
         [TestMethod]
         public void FieldFactory_GetField_Returns_DeleteInd_False()
         {
@@ -1661,6 +1726,9 @@ namespace Sentry.data.Core.Tests
             FieldDtoFactory varcharFieldFactory;
             varcharFieldFactory = new VarcharFieldDtoFactory(row);
 
+            FieldDtoFactory variantFieldFactory;
+            variantFieldFactory = new VariantFieldDtoFactory(row);
+
             //Action
             BaseFieldDto dateFieldDto = dateFieldFactory.GetField();
             BaseFieldDto decimalFieldDto = decimalFieldFactory.GetField();
@@ -1668,6 +1736,7 @@ namespace Sentry.data.Core.Tests
             BaseFieldDto structFieldDto = structFieldFactory.GetField();
             BaseFieldDto timestampFieldDto = timestampFieldFactory.GetField();
             BaseFieldDto varcharFieldDto = varcharFieldFactory.GetField();
+            BaseFieldDto variantFieldDto = variantFieldFactory.GetField();
 
             //Assert
             Assert.IsFalse(dateFieldDto.DeleteInd, "DateFieldDtoFactory failed DeleteInd Check");
@@ -1676,6 +1745,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsFalse(structFieldDto.DeleteInd, "StructFieldDtoFactory failed DeleteInd Check");
             Assert.IsFalse(timestampFieldDto.DeleteInd, "TimestampFieldDtoFactory failed DeleteInd Check");
             Assert.IsFalse(varcharFieldDto.DeleteInd, "VarcharFieldDtoFactory failed DeleteInd Check");
+            Assert.IsFalse(variantFieldDto.DeleteInd, "VariantFieldDtoFactory failed DeleteInd Check");
         }
         #endregion
 

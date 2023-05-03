@@ -11,7 +11,6 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.STRUCT;
             }
-            set => FieldType = SchemaDatatypes.STRUCT;
         }
 
         protected override JObject GetJsonTypeDefinition()
