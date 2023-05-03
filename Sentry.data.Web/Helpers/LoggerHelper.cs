@@ -23,23 +23,23 @@ namespace Sentry.data.Web
             var log4netOptions = new Log4NetProviderOptions();
             if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "DEV")
             {
-                log4netOptions.Log4NetConfigFileName = "log4net.local.config";
+                log4netOptions.Log4NetConfigFileName = "Log4net\\log4net.local.config";
             }
             else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "TEST")
             {
-                log4netOptions.Log4NetConfigFileName = "log4net.server.test.config";
+                log4netOptions.Log4NetConfigFileName = "Log4net\\log4net.server.test.config";
             }
             else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "NRTEST")
             {
-                log4netOptions.Log4NetConfigFileName = "log4net.server.nrtest.config";
+                log4netOptions.Log4NetConfigFileName = "Log4net\\log4net.server.nrtest.config";
             }
             else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "QUAL")
             {
-                log4netOptions.Log4NetConfigFileName = "log4net.server.qual.config";
+                log4netOptions.Log4NetConfigFileName = "Log4net\\log4net.server.qual.config";
             }
             else if (Configuration.Config.GetDefaultEnvironmentName().ToUpper() == "PROD")
             {
-                log4netOptions.Log4NetConfigFileName = "log4net.server.prod.config";
+                log4netOptions.Log4NetConfigFileName = "Log4net\\log4net.server.prod.config";
             }
 
             loggerFactory.AddLog4Net(log4netOptions);
