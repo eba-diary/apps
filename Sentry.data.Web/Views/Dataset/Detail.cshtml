@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "View Dataset Details";
+    ViewBag.Fluid = true;
     string headerColor = "categoryBanner-blue";
     string textColor = "dsc-" + Model.CategoryColor + "-text";
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
@@ -40,7 +41,7 @@
 <div style="font-feature-settings: 'lnum';">
     <div class="topBanner" style="border-bottom: 1px #DDDDDD solid;">
 
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-7 pl-0">
                     <!-- Dataset Name and Request Access-->
