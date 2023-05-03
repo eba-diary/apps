@@ -344,6 +344,7 @@ namespace Sentry.data.Core
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
+            public const string VARIANT = "VARIANT";
 
             public static class Defaults
             {                

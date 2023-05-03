@@ -15,6 +15,7 @@ namespace Sentry.data.Core
         DECIMAL = 4,
         VARCHAR = 5,
         DATE = 6,
-        TIMESTAMP = 7        
+        TIMESTAMP = 7,
+        VARIANT = 8
     }
 }
