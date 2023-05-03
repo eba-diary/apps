@@ -28,11 +28,6 @@ namespace Sentry.data.Core.DTO.Schema.Fields
             return SchemaExtensions.TryConvertTo<VariantField>(field) == null;
         }
 
-        public override ValidationResults Validate(string extension)
-        {
-            return base.Validate(extension);
-        }
-
         public override BaseField ToEntity(BaseField parentField, SchemaRevision parentRevision)
         {
             BaseField newEntityField = new VariantField();
