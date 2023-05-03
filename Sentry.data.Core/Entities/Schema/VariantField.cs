@@ -11,7 +11,10 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.VARIANT;
             }
-            set { FieldType = SchemaDatatypes.VARIANT; }
+            set
+            {
+                value = SchemaDatatypes.VARIANT;
+            }
         }
 
         protected override JObject GetJsonTypeDefinition()
