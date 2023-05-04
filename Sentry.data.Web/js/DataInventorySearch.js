@@ -47,7 +47,7 @@
 
     initDataTable: function (obj) {
         $("#di-result-table").DataTable({
-            pageLength: 10,
+            pageLength: 12,
             deferRender: true,
             ordering: false,
             ajax: {
@@ -99,7 +99,7 @@
                 { data: "ScanCategory", className: "ScanCategory", visible: false },
                 { data: "ScanType", className: "ScanType", visible: false }
             ],
-            aLengthMenu: [10, 20, 50, 100, 500],
+            aLengthMenu: [12, 20, 50, 100, 500],
             dom: '<"d-inline-block mt-4"l><"float-right d-inline-block"B>tr<p>',
             buttons: [{ extend: 'colvis', text: 'Columns' }, { text: 'Save', className: 'display-none di-save', action: data.DataInventorySearch.saveUpdates }],
             initComplete: (settings, json) => data.DataInventorySearch.completeDataInventorySearch(json),

@@ -10,7 +10,6 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.TIMESTAMP;
             }
-            set => FieldType = SchemaDatatypes.TIMESTAMP;
         }
         public virtual string SourceFormat { get; set; }
 

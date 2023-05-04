@@ -315,7 +315,9 @@ namespace Sentry.data.Infrastructure.Tests
 
             var messageAddedNoMatch = new Message { };
             messageAddedNoMatch.Details = new Dictionary<string, string>();
+            messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("SourceRequest_ID", "79CAE2AB-6044-47A2-8072-AFA100FC26A4"));
             messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("RequestID", "1001"));
+
 
             var messagesResponse = new MessageResponse();
             messagesResponse.Messages = new List<Message>();
@@ -332,7 +334,6 @@ namespace Sentry.data.Infrastructure.Tests
             {
                 SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A4"),
                 TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
-                ExternalRequestId = "1001"
             };
 
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
@@ -343,6 +344,7 @@ namespace Sentry.data.Infrastructure.Tests
             inevService.CheckDbaPortalEvents();
 
             Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketApproved);
+            Assert.IsTrue(mockTicket.ExternalRequestId == "1001");
 
             repository.VerifyAll();
         }
@@ -356,6 +358,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             var messageAddedNoMatch = new Message { };
             messageAddedNoMatch.Details = new Dictionary<string, string>();
+            messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("SourceRequest_ID", "79CAE2AB-6044-47A2-8072-AFA100FC26A5"));
             messageAddedNoMatch.Details.Add(new KeyValuePair<string, string>("RequestID", "1002"));
 
             var messagesResponse = new MessageResponse();
@@ -374,7 +377,6 @@ namespace Sentry.data.Infrastructure.Tests
                 SecurityTicketId = new Guid("79CAE2AB-6044-47A2-8072-AFA100FC26A5"),
                 TicketStatus = GlobalConstants.ChangeTicketStatus.PENDING,
                 IsAddingPermission = true,
-                ExternalRequestId = "1002",
                 AddedPermissions = new List<SecurityPermission>()
             };
 
@@ -393,6 +395,8 @@ namespace Sentry.data.Infrastructure.Tests
 
             Assert.IsTrue(mockTicket.TicketStatus == GlobalConstants.ChangeTicketStatus.DbaTicketComplete);
             Assert.IsTrue(mockTicket.AddedPermissions.First().IsEnabled);
+            Assert.IsTrue(mockTicket.ExternalRequestId == "1002");
+
 
             repository.VerifyAll();
         }

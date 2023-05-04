@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using Sentry.Configuration;
-using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -50,6 +50,9 @@ namespace Sentry.data.Core
                 case StructField s:
                     factory = new StructFieldDtoFactory(s);
                     break;
+                case VariantField variant:
+                    factory = new VariantFieldDtoFactory(variant);
+                    break;
                 case BigIntField bi:
                     factory = new BigIntFieldDtoFactory(bi);
                     break;

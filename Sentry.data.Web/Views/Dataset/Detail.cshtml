@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "View Dataset Details";
+    ViewBag.Fluid = true;
     string headerColor = "categoryBanner-blue";
     string textColor = "dsc-" + Model.CategoryColor + "-text";
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
@@ -40,7 +41,7 @@
 <div style="font-feature-settings: 'lnum';">
     <div class="topBanner" style="border-bottom: 1px #DDDDDD solid;">
 
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-7 pl-0">
                     <!-- Dataset Name and Request Access-->
@@ -305,6 +306,8 @@
                             <p>@Model.DataClassificationDescription</p>
                         </div>
 
+                        <div id="ConfirmEnvironment"></div>
+
                         @*NAMED ENVIRONMENT DROP DOWN OR LABEL*@
                         <div class="col margin-left-inherit margin-right-inherit padding-right-one">
                             <h5 class="@textColor pt-1">Environment</h5>
@@ -312,7 +315,7 @@
                             @*ONLY DISPLAY DROP DOWN IF RELATIVES FOUND ARE ATLEAST 2*@
                             @if (Model.DatasetRelatives != null && Model.DatasetRelatives.Count() > 1)
                             {
-                                <select class="form-control" onchange="location = this.value;">
+                                <select class="form-control" onchange="location = this.value;" id="DatasetRelativesDropdown" data-toggle="popover" data-title="Confirm Environment" data-content="Confirm you are in the desired environment." data-trigger="manual" data-placement="bottom" data-container="#ConfirmEnvironment">
                                     @foreach (DatasetRelativeModel datasetRelativeModel in Model.DatasetRelatives)
                                     {
                                         if (datasetRelativeModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)

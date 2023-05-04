@@ -10,7 +10,6 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.BIGINT;
             }
-            set => FieldType = SchemaDatatypes.BIGINT;
         }
 
         protected override JObject GetJsonTypeDefinition()

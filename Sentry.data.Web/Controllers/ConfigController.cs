@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
-using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models;
 using System;
@@ -1082,6 +1082,10 @@ namespace Sentry.data.Web.Controllers
             model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
             model.ValidDatatypes.Add(new DataTypeModel(Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
             model.ValidDatatypes.Add(new DataTypeModel(Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
+            if (_featureFlags.CLA3214_VariantDataType.GetValue())
+            {
+                model.ValidDatatypes.Add(new DataTypeModel(Datatypes.VARIANT, "A semi-structured field that can store a value of any other type.", "Complex Data Types"));
+            }
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }

@@ -1,4 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,35 @@ namespace Sentry.data.Infrastructure
             _elasticDocumentClient = elasticDocumentClient;
             _datasetContext = datasetContext;
         }
+
+        #region Search
+        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Size = 10000;
+
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            return elasticResult.Documents.ToList();
+        }
+
+        public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            //only use the filter categories for what results need to be selected
+            List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
+            filterSearchDto.FilterCategories = null;
+
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
+            searchRequest.Size = 0;
+
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters);
+
+            return filterCategories;
+        }
+        #endregion
 
         #region Global Dataset
         public async Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset)
@@ -90,13 +120,24 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId)
+        public async Task RemoveEnvironmentDatasetFavoriteUserIdAsync(int environmentDatasetId, string favoriteUserId, bool removeForAllEnvironments)
         {
             GetByEnvironmentDatasetIdResult getByResult = await GetGlobalDatasetByEnvironmentDatasetIdAsync(environmentDatasetId).ConfigureAwait(false);
 
-            if (getByResult.WasFound() && getByResult.EnvironmentDataset.FavoriteUserIds.Contains(favoriteUserId))
+            if (getByResult.WasFound())
             {
-                getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                //removeForAllEnvironments only true when favorite is being removed from dataset search page
+                if (removeForAllEnvironments)
+                {
+                    foreach (EnvironmentDataset environmentDataset in getByResult.GlobalDataset.EnvironmentDatasets)
+                    {
+                        environmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                    }
+                }
+                else
+                {
+                    getByResult.EnvironmentDataset.FavoriteUserIds.Remove(favoriteUserId);
+                }
 
                 await _elasticDocumentClient.IndexAsync(getByResult.GlobalDataset).ConfigureAwait(false);
             }
@@ -198,6 +239,16 @@ namespace Sentry.data.Infrastructure
             }
 
             return getByResult;
+        }
+
+        private SearchRequest<GlobalDataset> GetSearchRequest(BaseFilterSearchDto filterSearchDto)
+        {
+            BoolQuery searchQuery = filterSearchDto.ToSearchQuery<GlobalDataset>();
+
+            return new SearchRequest<GlobalDataset>
+            {
+                Query = searchQuery
+            };
         }
         #endregion
     }

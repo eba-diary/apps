@@ -112,7 +112,7 @@ data.Favorites = {
 
     toggleFavorite: function (element, type, successFunction) {
 
-        var path;
+        let path;
         
         if ($(element).hasClass("far")) {
             path = "/Favorites/AddFavorite";
@@ -121,13 +121,13 @@ data.Favorites = {
             path = "/Favorites/RemoveFavorite";
         }
 
-        var request = {
+        let request = {
             favoriteType: type,
             entityId: $(element).data("id")
         };
 
         $.post(path, request, function () {
-            $(element).toggleClass("fas far");
+            $(element).toggleClass("fas lt_gold far gray");
             successFunction();
         }).fail(function () {
             data.Dataset.makeToast("error", "There was an issue setting favorite. Please try again or reach out to DSCSupport@sentry.com.")

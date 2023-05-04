@@ -26,7 +26,7 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void GetPropertiesWithAttribute_DataInventory_FilterSearchField_Properties()
         {
-            IEnumerable<PropertyInfo> properties = CustomAttributeHelper.GetPropertiesWithAttribute<DataInventory, FilterSearchField>();
+            IEnumerable<PropertyInfo> properties = CustomAttributeHelper.GetPropertiesWithAttribute<DataInventory, FilterSearchFieldAttribute>();
             Assert.AreEqual(11, properties.Count());
         }
 

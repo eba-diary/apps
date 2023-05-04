@@ -853,10 +853,10 @@ data.Admin = {
             $("#tab-spinner").show();
 
             // Retrieve seleced date
-            var formattedDateString = moment(new Date($('#datetime-picker').val())).format("YYYY-MM-DDThh:mm:ss");
+            var selectedDate = moment(new Date($('#datetime-picker').val())).format("YYYY-MM-DDThh:mm:ss");
 
             // Determine if the time is within 30 day (720 hrs)
-            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(formattedDateString, 720);
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
 
             // Check if selected date is within a month (720hrs) of current date
             if (timeCheck) {

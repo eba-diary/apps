@@ -16,7 +16,6 @@ namespace Sentry.data.Web.Controllers
             {
                 PageTitle = "Datasets",
                 SearchType = SearchType.DATASET_SEARCH,
-                IconPath = "~/Images/Icons/DatasetsBlue.svg",
                 DefaultSearch = searchModel
             };
         }

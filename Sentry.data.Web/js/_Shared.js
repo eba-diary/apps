@@ -28,6 +28,7 @@ window.data = new function () {
         return this.ApiVersion;
     };
 
+    this.BetaApiVersion = "v20230315";
 
     // Use the format below for adding global methods
     this.HelperMethod = function (param1, param2) {

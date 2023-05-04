@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
-using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using Swashbuckle.Swagger.Annotations;

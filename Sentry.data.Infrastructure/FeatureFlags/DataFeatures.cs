@@ -52,6 +52,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents { get; }
         public IFeatureFlag<bool> CLA4993_JSMTicketProvider { get; }
         public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability { get; }
+        public IFeatureFlag<bool> CLA3214_VariantDataType { get; }
 
         public DataFeatures(IUserService userService, ILdClient ldClient)
         {
@@ -92,6 +93,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA5024_PublishReprocessingEvents = new BooleanFeatureFlagAmbientContext("CLA5024_PublishReprocessingEvents", false, _ldClient, () => LdUser);
             CLA4993_JSMTicketProvider = new BooleanFeatureFlagAmbientContext("CLA4993_JSMTicketProvider", false, _ldClient, () => LdUser);
             CLA4789_ImprovedSearchCapability = new BooleanFeatureFlagAmbientContext("CLA4789_ImprovedSearchCapability", false, _ldClient, () => LdUser);
+            CLA3214_VariantDataType = new BooleanFeatureFlagAmbientContext("CLA3214_VariantDataType", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
