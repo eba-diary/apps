@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="tokenToBackfill">Token we want load data for.</param>
         /// <returns></returns>
-        internal bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
+        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
         {
             try
             {

@@ -177,6 +177,7 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsValidatorTests.cs" />
+    <Compile Include="API\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidatorTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaModelMappingTests.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidatorTests.cs" />
@@ -219,13 +220,8 @@
     <Compile Include="ModelTests.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidatorTests.cs" />
     <Compile Include="UtilityTests.cs" />
-    <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
-      <Project>{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}</Project>
-      <Name>Sentry.data.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
@@ -266,9 +262,7 @@
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.8.51.0.59060\analyzers\SonarAnalyzer.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="HelperTests\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

@@ -151,11 +151,11 @@
     <Reference Include="Google.Cloud.Storage.V1, Version=4.1.0.0, Culture=neutral, PublicKeyToken=185c282632e132a0, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Cloud.Storage.V1.4.1.0\lib\net462\Google.Cloud.Storage.V1.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Core.1.7.31\lib\net46\Hangfire.Core.dll</HintPath>
+    <Reference Include="Hangfire.Core, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.7.34\lib\net46\Hangfire.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.SqlServer.1.7.31\lib\net45\Hangfire.SqlServer.dll</HintPath>
+    <Reference Include="Hangfire.SqlServer, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.SqlServer.1.7.34\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Hangfire.StructureMap, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.StructureMap.2.0.2\lib\net462\Hangfire.StructureMap.dll</HintPath>
@@ -553,6 +553,11 @@
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsRequestValidator.cs" />
     <Compile Include="API\Resources\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\GlobalDatasetController.cs" />
+    <Compile Include="API\Resources\GlobalDataset\GlobalDatasetProfile.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsResponseModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />
@@ -565,6 +570,8 @@
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\UpdateSchema\UpdateSchemaResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\FilterCategoryOptionRequestModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\FilterCategoryRequestModel.cs" />
     <Compile Include="API\Validation\Models\ConcurrentFieldValidationResponse.cs" />
     <Compile Include="API\Validation\Models\ConcurrentValidationResponse.cs" />
     <Compile Include="API\Validation\Fluent\FluentValidationResponse.cs" />
@@ -588,6 +595,7 @@
     <Compile Include="Controllers\DataInventoryController.cs" />
     <Compile Include="Controllers\DatasetSearchController.cs" />
     <Compile Include="Controllers\FilterSearchController.cs" />
+    <Compile Include="Controllers\GlobalDatasetSearchController.cs" />
     <Compile Include="Controllers\MigrationController.cs" />
     <Compile Include="Controllers\TileSearchController.cs" />
     <Compile Include="Controllers\WebApi\AuthController.cs" />
@@ -1243,6 +1251,7 @@
     <Folder Include="Views\DatasetSearch\" />
     <Folder Include="Views\Dataset\Migration\" />
     <Folder Include="Views\ExternalFile\" />
+    <Folder Include="Views\GlobalDatasetSearch\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Playground\" />
     <Folder Include="Views\Security\" />
@@ -1254,10 +1263,6 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
-      <Project>{30fbadfb-e6ed-4859-b15e-67bbcdceae17}</Project>
-      <Name>Sentry.data.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>

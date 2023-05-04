@@ -70,11 +70,11 @@
     <Reference Include="Elasticsearch.Net, Version=7.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\Elasticsearch.Net.7.17.4\lib\net461\Elasticsearch.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.Core, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.Core.1.7.31\lib\net46\Hangfire.Core.dll</HintPath>
+    <Reference Include="Hangfire.Core, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.7.34\lib\net46\Hangfire.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Hangfire.SqlServer, Version=1.7.31.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hangfire.SqlServer.1.7.31\lib\net45\Hangfire.SqlServer.dll</HintPath>
+    <Reference Include="Hangfire.SqlServer, Version=1.7.34.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.SqlServer.1.7.34\lib\net45\Hangfire.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Hangfire.StructureMap, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.StructureMap.2.0.2\lib\net462\Hangfire.StructureMap.dll</HintPath>
@@ -383,10 +383,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
-      <Project>{30fbadfb-e6ed-4859-b15e-67bbcdceae17}</Project>
-      <Name>Sentry.data.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
