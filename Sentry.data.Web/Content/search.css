@@ -235,10 +235,28 @@
     padding: 0 10px;
     font-size: 12px;
     line-height: 30px;
-    margin: 0 5px 0 0;
+    margin: 0;
 }
 
 .search-card-subtitle {
     display: flex;
     justify-content: space-between;
+}
+
+.searchCardFooter {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.searchHighlightsIcon {
+    font-size: 1.25rem;
+}
+
+.highlightArrow {
+    right: -0.5rem !important
+}
+
+.highlightBody em {
+    color: #E57200;
 }

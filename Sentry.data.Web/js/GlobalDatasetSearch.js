@@ -87,22 +87,30 @@ data.GlobalDatasetSearch = {
                 PageSize: $("#tile-result-page-size").val(),
                 SortBy: $("#tile-result-sort").val(),
                 Layout: $("#tile-result-layout").val(),
-            };            
+            };
 
-            $(".filter-search-results-container").load("/GlobalDatasetSearch/GlobalDatasetResults/", request, function (resp) {
-                console.log(resp);
-                let totalResults = data.GlobalDatasetSearch.globalDatasets.length;
+            $.ajax({
+                method: "POST",
+                url: "/GlobalDatasetSearch/GlobalDatasetResults/",
+                dataType: "html",
+                data: JSON.stringify(request),
+                contentType: "application/json",
+                success: function (html) {
+                    $(".filter-search-results-container").html(html);
 
-                if (totalResults > 0 && pageNumber > 1) {
-                    let pageSize = parseInt(request.PageSize);
-                    let pageStart = ((pageNumber - 1) * pageSize) + 1;
-                    let pageEnd = pageNumber * pageSize;
-                    let resultCount = parseInt($("#result-count").val())
+                    let totalResults = data.GlobalDatasetSearch.globalDatasets.length;
 
-                    data.FilterSearch.setPageInfo(pageStart, resultCount < pageSize ? totalResults : pageEnd);
+                    if (totalResults > 0 && pageNumber > 1) {
+                        let pageSize = parseInt(request.PageSize);
+                        let pageStart = ((pageNumber - 1) * pageSize) + 1;
+                        let pageEnd = pageNumber * pageSize;
+                        let resultCount = parseInt($("#result-count").val())
+
+                        data.FilterSearch.setPageInfo(pageStart, resultCount < pageSize ? totalResults : pageEnd);
+                    }
+
+                    data.GlobalDatasetSearch.initUI()
                 }
-
-                data.GlobalDatasetSearch.initUI()
             });
         }
     },
@@ -113,6 +121,14 @@ data.GlobalDatasetSearch = {
         $('#tile-result-layout').materialSelect();
         $("#tile-results").removeClass("search-blur");
         $(".filter-search-categories-container").removeClass("search-blur");
+
+        $('.searchHighlights').popover({
+            template: "<div class='popover'><div class='arrow highlightArrow'></div><h3 class='popover-header'></h3><hr class='mx-2 my-0'><p class='popover-body highlightBody'></p></div>",
+            html: true,
+            title: "Why do you see this dataset?",
+            placement: "left",
+            trigger: "hover click"
+        })
 
         data.GlobalDatasetSearch.setLayout();
     },
@@ -142,6 +158,16 @@ data.GlobalDatasetSearch = {
                     data.Dataset.makeToast("error", "Failed to remove favorite.");
                 }
             });
+        });
+
+        $(document).on("click", ".searchHighlights", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        $(document).on("click", ".searchHighlights2", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
         });
 
         //sort by change event
