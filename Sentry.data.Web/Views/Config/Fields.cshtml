@@ -174,7 +174,7 @@
                         </div>
 
                         <div class="showArray d-inline-flex position-absolute pl-4">
-                            <div data-bind="visible: $root.AllowArrays" class="form-group">
+                            <div data-bind="visible: $root.AllowArrays && DataType() !== 'VARIANT'" class="form-group">
                                 <input type="checkbox" data-bind="checked: IsArray, attr: { id: 'IsArray_' + Position() }" class="form-check-input array">
                                 <label class="form-check-label" data-bind="attr: { for: 'IsArray_' + Position() }">Is Array?</label>
                             </div>

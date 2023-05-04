@@ -61,6 +61,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 DiscriminatorValue("STRUCT");
             }
         }
+        
+        public class VariantFieldMapping : SubclassMapping<VariantField>
+        {
+            public VariantFieldMapping()
+            {
+                DiscriminatorValue("VARIANT");
+            }
+        }
 
         public class IntegerFieldMapping : SubclassMapping<IntegerField>
         {

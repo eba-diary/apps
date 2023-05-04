@@ -1,23 +1,23 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class IntegerField : BaseField, ISchemaField
+    public class VariantField : BaseField, ISchemaField
     {
         public override SchemaDatatypes FieldType
         {
             get
             {
-                return SchemaDatatypes.INTEGER;
+                return SchemaDatatypes.VARIANT;
             }
         }
 
         protected override JObject GetJsonTypeDefinition()
         {
-            return new JObject()
-            {
-                { "type", "integer"}
-            };
+            JObject definition = new JObject() { { "type", "variant" } };
+
+            return definition;
         }
     }
 }

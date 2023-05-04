@@ -98,6 +98,8 @@ namespace Sentry.data.Infrastructure
                 case "RECORD":
                 case "STRUCT":
                     return CreateStructField(bigQueryField, ref index);
+                case "VARIANT":
+                    return CreateVariantField(bigQueryField, index);
                 default:
                     return CreateVarcharField(bigQueryField, index);
             }
@@ -138,6 +140,14 @@ namespace Sentry.data.Infrastructure
 
             return fieldDto;
         }
+                
+        private VariantFieldDto CreateVariantField(JToken bigQueryField, int index)
+        {
+            VariantFieldDto fieldDto = CreateField<VariantFieldDto>(bigQueryField, index);
+
+            return fieldDto;
+        }
+
         #endregion
     }
 }

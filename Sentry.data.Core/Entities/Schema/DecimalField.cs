@@ -10,7 +10,6 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.DECIMAL;
             }
-            set => FieldType = SchemaDatatypes.DECIMAL;
         }
         
         public virtual int Precision { get; set; }
