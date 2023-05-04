@@ -315,7 +315,7 @@
                             @*ONLY DISPLAY DROP DOWN IF RELATIVES FOUND ARE ATLEAST 2*@
                             @if (Model.DatasetRelatives != null && Model.DatasetRelatives.Count() > 1)
                             {
-                                <select class="form-control" onchange="location = this.value;" id="DatasetRelativesDropdown" data-toggle="popover" data-title="Confirm Environment" data-content="Confirm you are in the desired environment." data-trigger="manual" data-placement="right" data-container="#ConfirmEnvironment">
+                                <select class="form-control" onchange="location = this.value;" id="DatasetRelativesDropdown" data-toggle="popover" data-title="Confirm Environment" data-content="Confirm you are in the desired environment." data-trigger="manual" data-placement="bottom" data-container="#ConfirmEnvironment">
                                     @foreach (DatasetRelativeModel datasetRelativeModel in Model.DatasetRelatives)
                                     {
                                         if (datasetRelativeModel.DatasetNamedEnvironment == Model.DatasetNamedEnvironment)
