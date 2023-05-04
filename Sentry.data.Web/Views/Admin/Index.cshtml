@@ -10,7 +10,7 @@
 
 <html>
 <body>
-    @if (Model.FeatureFlag == true)
+    @if (Model.CLA4553_FeatureFlag == true)
     {
         <div id="dashboard">
 
@@ -21,14 +21,21 @@
                 <h3>Processing Activity</h3>
                 <br />
                 <div class="row">
+                    @if (Model.CLA5112_FeatureFlag == true)
+                    {
                     <div class="column">
                         <div class="container">
                             <h5>Total Files Today</h5>
+                            <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { status = "TotalFiles" })">View</a>
                             <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
                         </div>
 
                     </div>
-                    <div class="column">
+                    }
+
+                   @* Commented out could will be used in future development and future versions of this page
+
+                   <div class="column">
                         <div class="container">
                             <h5>Files In-Flight</h5>
                             <button id="buttonInFlightFiles"><strong class="num_style">@Model.InFlightFiles</strong></button>
@@ -41,14 +48,10 @@
                             <button id="buttonFailedFiles"><strong class="failure_style">@Model.FailedFiles</strong></button>
                         </div>
 
-                    </div>
+                    </div>*@
                 </div>
             </div>
         </div>
-
-        @Html.Partial("_FailedFilesDetails")
-
-
     }
     else
     {

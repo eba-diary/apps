@@ -135,18 +135,11 @@ table#metricGroupsTable td.metric-detail-control {
     text-align: center;
     width: 50%;
 }
-/*
-#failedFiles, #completedFiles, #inFlightFiles {
-    display: none;
-    margin: auto;
-}
-    */
+
 #buttonCompletedFiles, #buttonFailedFiles, #buttonInFlightFiles {
     border: none;
     background-color: none !important;
     background: unset !important;
-}
-    
 }
 
 .dead-job-select-all {

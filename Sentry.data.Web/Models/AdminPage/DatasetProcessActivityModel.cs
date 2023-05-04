@@ -5,12 +5,14 @@ using System.Web;
 
 namespace Sentry.data.Web.Models.AdminPage
 {
-    public class FailedFilesDetailsModel
+    public class DatasetProcessActivityModel
     {
-        public String Dataset { get; set; }
+        public string Dataset { get; set; }
+
+        public int DatasetId { get; set; }
 
         public int FileCount { get; set; }
 
-        public String Schema { get; set; }
+        public DateTime RecentRun { get; set; }
     }
 }

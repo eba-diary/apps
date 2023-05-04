@@ -232,23 +232,25 @@ namespace Sentry.data.Web.Controllers
             int totalFailedFiles = 2;
 
             // boolean variable that captures feature flag
-            bool featureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue();
-            //bool featureFlag = true;
-            //bool featureFlag = false;
+            bool CLA4553_featureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue();
+            bool CLA5112_featureFlag = _dataFeatures.CLA5112_PlatformActivity_TotalFiles_ViewPage.GetValue();
 
             AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
             {
                 CompletedFiles = totalCompletedFiles,
                 InFlightFiles = totalInFlightFiles,
                 FailedFiles = totalFailedFiles,
-                FeatureFlag = featureFlag,
+                CLA4553_FeatureFlag = CLA4553_featureFlag,
+                CLA5112_FeatureFlag = CLA5112_featureFlag
             };
 
             return View(adminElasticFileModel);
         }
+
         public ActionResult DataFileReprocessing()
         {
             DatasetSelectionModel dataReprocessingModel = GetDatasetSelectionModel();
+           
             return View(dataReprocessingModel);
         }
         public ActionResult DataFlowMetrics()
@@ -256,16 +258,19 @@ namespace Sentry.data.Web.Controllers
             DatasetSelectionModel flowMetricsModel = GetDatasetSelectionModel();
             return View(flowMetricsModel);
         }
+
         public async Task<ActionResult> ConnectorStatus()
         {
             List<ConnectorDto> connectorDtos = await _connectorService.GetS3ConnectorsDTOAsync();
             return View(connectorDtos.MapToModelList());
         }
+
         public ActionResult ReprocessDeadSparkJobs()
         {
             ReprocessDeadSparkJobModel reprocessDeadSparkJobModel = new ReprocessDeadSparkJobModel();
             return View(reprocessDeadSparkJobModel);
         }
+
         [HttpGet]
         public ActionResult SupportLinks()
         {
@@ -288,36 +293,91 @@ namespace Sentry.data.Web.Controllers
             return View(model);
         }
 
-        /*
-         * Partial View to present more data on FailedFiles 
-         */
-        public ActionResult FailedFilesDetails()
+        public ActionResult ProcessActivityResults(string status)
         {
-            // have some service method that gets the data from elastic 
+            ProcessActivityModel processActivityModel = new ProcessActivityModel();
 
-            FailedFilesDetailsModel failedModel = new FailedFilesDetailsModel()
+            switch (status)
             {
-                Dataset = "ZZZ Test Data",
-                FileCount = 5,
-                Schema = "CSV 01",
+                case "TotalFiles":
+                    processActivityModel.PageTitle = "Total Files";
+                    processActivityModel.TitleId = "TotalFiles";
+                    break;
+                case "FailedFiles":
+                    processActivityModel.PageTitle = "Failed Files";
+                    processActivityModel.TitleId = "FailedFiles";
+                    break;
+                case "InFlightFiles":
+                    processActivityModel.PageTitle = "In Flight Files";
+                    processActivityModel.TitleId = "InFlightFiles";
+                    break;
+            }
+
+            return View(processActivityModel);
+        }
+
+        [Route("Admin/GetProcessActivityTable")]
+        [HttpGet]
+        public ActionResult GetProcessActivityTable()
+        {
+            return PartialView("_ProcessActivityResultsTable");
+        }
+
+        [Route("Admin/GetDatasetProcessingActivityForGrid/{status?}")]
+        [HttpPost]
+        public JsonResult GetDatasetProcessingActivityForGrid(string status)
+        {
+            List<DatasetProcessActivityModel> processActivityResultsModels = new List<DatasetProcessActivityModel>() { 
+                new DatasetProcessActivityModel() { Dataset="Dataset",  DatasetId = 1, FileCount=1,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset2", DatasetId = 2, FileCount=3,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset3", DatasetId = 3, FileCount=4,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset4", DatasetId = 4, FileCount=6,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset5", DatasetId = 5, FileCount=8,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset6", DatasetId = 6, FileCount=32, RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset7", DatasetId = 7, FileCount=2,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset8", DatasetId = 8, FileCount=6,  RecentRun = DateTime.Now},
+                new DatasetProcessActivityModel() { Dataset="Dataset9", DatasetId = 9, FileCount=1,  RecentRun = DateTime.Now}
             };
-            return PartialView(failedModel);
+
+            return Json(new { data = processActivityResultsModels });
         }
 
-        /*
-         * Partial View to present more data on Completed Files
-         */
-        public ActionResult CompletedFilesDetails()
+        [Route("Admin/GetSchemaProcessingActivityForGrid/{status?}/{datasetId?}")]
+        [HttpPost]
+        public JsonResult GetSchemaProcessingActivityForGrid(string status, int datasetId)
         {
-            return PartialView();
+            List<SchemaProcessActivityModel> processActivityResultsModels = new List<SchemaProcessActivityModel>() {
+                new SchemaProcessActivityModel() { Schema="Schema4", SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=3, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema1", SchemaId = 4, DatasetId = datasetId, FileCount=5, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema3", SchemaId = 4, DatasetId = datasetId, FileCount=8, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=8, RecentRun = DateTime.Now},
+                new SchemaProcessActivityModel() { Schema="Schema5", SchemaId = 4, DatasetId = datasetId, FileCount=0, RecentRun = DateTime.Now}
+            };
+
+
+            return Json(new { data = processActivityResultsModels });
         }
 
-        /*
-         * Partial View to present more data on In-Flight Files 
-         */
-        public ActionResult InFlightFilesDetails()
+        [Route("Admin/GetDatasetFileProcessingActivityForGrid/{status?}/{schemaId?}/{datasetId?}")]
+        [HttpPost]
+        public JsonResult GetDatasetFileProcessingActivityForGrid(string status, int schemaId, int datasetId)
         {
-            return PartialView();
+            List<DatasetFileProcessActivityModel> processActivityResultsModels = new List<DatasetFileProcessActivityModel>() {
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile4", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile",  FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile8", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile7", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile5", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile1", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
+                new DatasetFileProcessActivityModel() { FileName="DatasetFile2", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now}
+            };
+
+
+            return Json(new { data = processActivityResultsModels });
         }
     }
 }

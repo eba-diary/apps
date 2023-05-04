@@ -13,6 +13,7 @@ namespace Sentry.data.Web
 
         public int FailedFiles { get; set; }
 
-        public bool FeatureFlag { get; set; }
+        public bool CLA4553_FeatureFlag { get; set; }
+        public bool CLA5112_FeatureFlag { get; set; }
     }
 }

@@ -1,0 +1,46 @@
+﻿@model ProcessActivityModel
+@{
+    ViewBag.Title = Model.PageTitle;
+    ViewBag.Fluid = true;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#tab-spinner").hide();
+        data.Admin.ProcessActivityInit();
+    })
+</script>
+
+@Html.HiddenFor(m => m.TitleId)
+
+<div class="d-inline-block">
+    <div id="partialViewCompletedFiles">
+        <h1>@Model.PageTitle Details</h1>
+        <a data-nav-id="datafilereprocessing" class="side-nav-links btn btn-outline-primary waves-effect" href="@Url.Action("Index", "Admin")">Go Back</a>
+    </div>
+</div>
+
+
+<div id="ProcessActivityResults"></div>
+
+
+<!-- Spinner -->
+<div class="text-center" id="tab-spinner">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

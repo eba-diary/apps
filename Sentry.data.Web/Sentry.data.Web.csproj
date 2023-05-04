@@ -609,6 +609,9 @@
     <Compile Include="Helpers\JiraHelper.cs" />
     <Compile Include="Helpers\JSMHelper.cs" />
     <Compile Include="Helpers\NamedEnvironmentBuilder.cs" />
+    <Compile Include="Models\AdminPage\DatasetFileProcessActivityModel.cs" />
+    <Compile Include="Models\AdminPage\SchemaProcessActivityModel.cs" />
+    <Compile Include="Models\AdminPage\ProcessActivityModel.cs" />
     <Compile Include="Models\AdminPage\AuditSelectionModel.cs" />
     <Compile Include="Models\AdminPage\BaseAuditModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricGroupModel.cs" />
@@ -616,7 +619,7 @@
     <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
     <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
     <Compile Include="Models\AdminPage\AdminElasticFileModel.cs" />
-    <Compile Include="Models\AdminPage\FailedFilesDetailsModel.cs" />
+    <Compile Include="Models\AdminPage\DatasetProcessActivityModel.cs" />
     <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
     <Compile Include="Models\AdminPage\SupportLinkWrapper.cs" />
     <Compile Include="Models\AdminPage\SupportLinkModel.cs" />
@@ -968,9 +971,7 @@
     <Content Include="src\fancybox.scss" />
     <Content Include="src\quill.scss" />
     <Content Include="src\site.scss" />
-    <Content Include="Views\Admin\_FailedFilesDetails.cshtml" />
-    <Content Include="Views\Admin\_CompletedFilesDetails.cshtml" />
-    <Content Include="Views\Admin\_InFlightFilesDetails.cshtml" />
+    <Content Include="Views\Admin\ProcessActivityResults.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
@@ -1230,6 +1231,7 @@
     <Content Include="Views\Config\DataSource\CreateDataSource.cshtml" />
     <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
     <Content Include="Views\Migration\_MigrationHistoryDetail.cshtml" />
+    <Content Include="Views\Shared\_ProcessActivityResultsTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
