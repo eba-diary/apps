@@ -131,7 +131,7 @@ namespace Sentry.data.Core
                     try
                     {
                         _logger.LogInformation("Attempting to onboard new token.");
-                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken));
+                        await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken);
                     }
                     catch (Exception e)
                     {
