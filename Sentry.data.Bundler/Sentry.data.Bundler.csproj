@@ -330,10 +330,6 @@
     </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
-      <Project>{30fbadfb-e6ed-4859-b15e-67bbcdceae17}</Project>
-      <Name>Sentry.data.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Infrastructure\Sentry.data.Infrastructure.csproj">
       <Project>{c766d10b-0008-4cc8-a0c0-5818e5ee464a}</Project>
       <Name>Sentry.data.Infrastructure</Name>

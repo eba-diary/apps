@@ -6,7 +6,6 @@ using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using Sentry.Associates;
-using Sentry.data.Common;
 
 namespace Sentry.data.Web
 {

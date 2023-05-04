@@ -8,7 +8,7 @@ using System.Web.Mvc;
 using Sentry.Configuration;
 using System.IO;
 using System.Net;
-using Sentry.data.Common;
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web.Controllers
 {
