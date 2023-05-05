@@ -123,7 +123,7 @@ data.GlobalDatasetSearch = {
         $(".filter-search-categories-container").removeClass("search-blur");
 
         $('.searchHighlights').popover({
-            template: "<div class='popover'><div class='arrow highlightArrow'></div><h3 class='popover-header'></h3><hr class='mx-2 my-0'><p class='popover-body highlightBody'></p></div>",
+            template: "<div class='popover'><div class='arrow highlightArrow'></div><h3 class='popover-header mt-1'></h3><div class='popover-body highlightBody pt-0'></div></div>",
             html: true,
             title: "Why do you see this dataset?",
             placement: "left",

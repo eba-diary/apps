@@ -647,10 +647,10 @@ namespace Sentry.data.Core.Tests
             hit.SetupGet(x => x.Source).Returns(globalDataset);
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlight = new Dictionary<string, IReadOnlyCollection<string>>
             {
-                { "datasetname", new List<string> { "value", "value 2" } },
-                { "environmentdatasets.datasetdescription", new List<string> { "value" } },
+                { "environmentdatasets.environmentschemas.schemasaidassetcode.keyword", new List<string> { "DATA", "SAID" } },
                 { "environmentdatasets.issecured", new List<string> { "true" } },
-                { "environmentdatasets.environmentschemas.schemasaidassetcode.keyword", new List<string> { "DATA", "SAID" } }
+                { "environmentdatasets.datasetdescription", new List<string> { "value" } },
+                { "datasetname", new List<string> { "value", "value 2" } }
             };
             hit.SetupGet(x => x.Highlight).Returns(highlight);
 
@@ -659,8 +659,8 @@ namespace Sentry.data.Core.Tests
             hit2.SetupGet(x => x.Source).Returns(globalDataset2);
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlight2 = new Dictionary<string, IReadOnlyCollection<string>>
             {
-                { "environmentdatasets.datasetdescription", new List<string> { "value", "value 2" } },
-                { "environmentdatasets.environmentschemas.schemasaidassetcode.keyword", new List<string> { "DATA", "SAID" } }
+                { "environmentdatasets.environmentschemas.schemasaidassetcode.keyword", new List<string> { "DATA", "SAID" } },
+                { "environmentdatasets.datasetdescription", new List<string> { "value", "value 2" } }
             };
             hit2.SetupGet(x => x.Highlight).Returns(highlight2);
 
@@ -710,6 +710,27 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(2, searchHighlight.Highlights.Count);
             Assert.AreEqual("DATA", searchHighlight.Highlights[0]);
             Assert.AreEqual("SAID", searchHighlight.Highlights[1]);
+        }
+
+        [TestMethod]
+        public void GetHighlight_GlobalDataset_Highlight()
+        {
+            Highlight highlight = NestHelper.GetHighlight<GlobalDataset>();
+
+            Assert.AreEqual(11, highlight.Fields.Count);
+
+            List<Field> fields = highlight.Fields.Keys.ToList();
+            Assert.AreEqual("datasetname", fields[0].Name);
+            Assert.AreEqual("environmentdatasets.datasetdescription", fields[1].Name);
+            Assert.AreEqual("environmentdatasets.environmentschemas.schemaname", fields[2].Name);
+            Assert.AreEqual("environmentdatasets.environmentschemas.schemadescription", fields[3].Name);
+            Assert.AreEqual("datasetsaidassetcode.keyword", fields[4].Name);
+            Assert.AreEqual("environmentdatasets.categorycode.keyword", fields[5].Name);
+            Assert.AreEqual("environmentdatasets.namedenvironment.keyword", fields[6].Name);
+            Assert.AreEqual("environmentdatasets.namedenvironmenttype.keyword", fields[7].Name);
+            Assert.AreEqual("environmentdatasets.originationcode.keyword", fields[8].Name);
+            Assert.AreEqual("environmentdatasets.issecured", fields[9].Name);
+            Assert.AreEqual("environmentdatasets.environmentschemas.schemasaidassetcode.keyword", fields[10].Name);
         }
     }
 }

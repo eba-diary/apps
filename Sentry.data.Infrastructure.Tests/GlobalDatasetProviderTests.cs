@@ -1110,6 +1110,11 @@ namespace Sentry.data.Infrastructure.Tests
                 termsQuery = filters.FirstOrDefault(x => x.Terms.Field.Name == "environmentdatasets.environmentschemas.schemasaidassetcode.keyword").Terms;
                 Assert.IsNotNull(termsQuery);
                 Assert.AreEqual("TEST", termsQuery.Terms.First().ToString());
+
+                Assert.IsNotNull(s.Highlight);
+
+                IHighlight highlight = s.Highlight;
+                Assert.AreEqual(11, highlight.Fields.Count);
             });
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);

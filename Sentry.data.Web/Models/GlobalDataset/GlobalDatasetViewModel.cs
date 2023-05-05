@@ -11,11 +11,13 @@ namespace Sentry.data.Web
 
             foreach (SearchHighlightModel searchHighlight in SearchHighlights)
             {
-                builder.AppendLine($"<div class='col'>{searchHighlight.PropertyName}:</div>");
+                builder.Append($"<h4 class='highlightPropertyName p-0 mt-2 text-info'>{searchHighlight.PropertyName}</h4>");
+                builder.Append("<ul class='highlightList mb-0 pl-4'>");
                 foreach (string highlight in searchHighlight.Highlights)
-                { 
-                    builder.AppendLine(highlight);
+                {
+                    builder.Append($"<li>{highlight}</li>");
                 }
+                builder.Append("</ul>");
             }
 
             return builder.ToString();

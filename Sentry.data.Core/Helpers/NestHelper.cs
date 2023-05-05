@@ -104,7 +104,7 @@ namespace Sentry.data.Core
                 List<KeyValuePair<string, string>> highlightFields = GetAllByAttribute<KeyValuePair<string, string>, GlobalSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => new KeyValuePair<string, string>(field, attr.DisplayName));
                 highlightFields.AddRange(GetAllByAttribute<KeyValuePair<string, string>, FilterSearchFieldAttribute>(typeof(T), null, GetFieldNameForFilterSearch));
 
-                foreach (var highlight in hit.Highlight)
+                foreach (var highlight in hit.Highlight.Reverse())
                 {
                     KeyValuePair<string, string> highlightField = highlightFields.First(x => x.Key == highlight.Key);
 
