@@ -18,7 +18,8 @@ namespace Sentry.data.Web.API
 
             CreateMap<BaseGlobalDatasetRequestModel, BaseFilterSearchDto>().IncludeAllDerived();
 
-            CreateMap<SearchGlobalDatasetsRequestModel, SearchGlobalDatasetsDto>();
+            CreateMap<SearchGlobalDatasetsRequestModel, SearchGlobalDatasetsDto>()
+                .ForMember(dest => dest.UseHighlighting, x => x.MapFrom(src => true));
 
             CreateMap<SearchHighlightDto, SearchHighlightModel>().ReverseMap();
 

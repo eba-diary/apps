@@ -514,6 +514,11 @@ namespace Sentry.data.Core
                 public const string SCHEMANAME = "Schema Name";
                 public const string SCHEMADESCRIPTION = "Schema Description";
             }
+
+            public static class SchemaField
+            {
+                public const string COLUMNNAME = "Column Name";
+            }
         }
 
         public static class FilterCategoryOptions

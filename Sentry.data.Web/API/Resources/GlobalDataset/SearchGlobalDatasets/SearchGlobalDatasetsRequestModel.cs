@@ -2,5 +2,6 @@
 {
     public class SearchGlobalDatasetsRequestModel : BaseGlobalDatasetRequestModel
     {
+        public bool ShouldSearchColumns { get; set; }
     }
 }

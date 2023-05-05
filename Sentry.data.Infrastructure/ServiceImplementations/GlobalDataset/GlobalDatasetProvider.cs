@@ -19,15 +19,28 @@ namespace Sentry.data.Infrastructure
         }
 
         #region Search
-        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
+        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(HighlightableFilterSearchDto filterSearchDto)
         {
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
             searchRequest.Size = 10000;
-            searchRequest.Highlight = NestHelper.GetHighlight<GlobalDataset>();
+
+            if (filterSearchDto.UseHighlighting)
+            {
+                searchRequest.Highlight = NestHelper.GetHighlight<GlobalDataset>();
+            }
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            List<GlobalDataset> globalDatasets = elasticResult.Hits.ToSearchHighlightedResults();
+            List<GlobalDataset> globalDatasets;
+
+            if (filterSearchDto.UseHighlighting)
+            {
+                globalDatasets = elasticResult.Hits.ToSearchHighlightedResults();
+            }
+            else
+            {
+                globalDatasets = elasticResult.Documents.ToList();
+            }
 
             return globalDatasets;
         }
@@ -47,6 +60,11 @@ namespace Sentry.data.Infrastructure
             List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters);
 
             return filterCategories;
+        }
+
+        public async Task<List<GlobalDataset>> SearchGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds)
+        {
+            return new List<GlobalDataset>();
         }
         #endregion
 
