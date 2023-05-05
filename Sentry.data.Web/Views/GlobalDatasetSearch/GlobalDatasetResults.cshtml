@@ -75,7 +75,7 @@
 
                                 @if (globalDataset.SearchHighlights?.Any() == true)
                                 {
-                                    <div class="d-flex material-tooltip-main searchHighlights" data-content="@globalDataset.GetSearchHighlightsTooltip()">
+                                    <div class="d-flex material-tooltip-main searchHighlights" data-content="@globalDataset.GetSearchHighlightsHtml()">
                                         <em class="far fa-circle-question text-info searchHighlightsIcon"></em>
                                     </div>
                                 }

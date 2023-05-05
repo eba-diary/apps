@@ -5,7 +5,7 @@ namespace Sentry.data.Web
 {
     public class GlobalDatasetViewModel : BaseGlobalDatasetModel
     {
-        public string GetSearchHighlightsTooltip()
+        public string GetSearchHighlightsHtml()
         {
             StringBuilder builder = new StringBuilder();
 
