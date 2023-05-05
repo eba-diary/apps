@@ -224,7 +224,8 @@ namespace Sentry.data.Infrastructure
             {
                 Proxy = webProxy
             });
-            registry.For<IMotiveProvider>().Use<MotiveProvider>().Ctor<HttpClient>().Is(motiveProviderClient).Ctor<IBaseJobProvider>().Is(x => x.GetInstance<IBaseJobProvider>(DataSourceDiscriminator.PAGING_HTTPS_SOURCE));
+
+            registry.For<IMotiveProvider>().Use<MotiveProvider>().Ctor<HttpClient>().Is(motiveProviderClient).Ctor<PagingHttpsJobProvider>().Is(x => x.GetInstance<PagingHttpsJobProvider>(DataSourceDiscriminator.PAGING_HTTPS_SOURCE));
 
             //establish generic httpclient singleton to be used where needed across the application
             var client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true });

@@ -21,11 +21,11 @@ namespace Sentry.data.Infrastructure
         private readonly IDatasetContext _datasetContext;
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IEmailService _emailService;
-        private readonly IBaseJobProvider _backfillJobProvider;
+        private readonly PagingHttpsJobProvider _backfillJobProvider;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
         public MotiveProvider(HttpClient httpClient, IDatasetContext datasetContext, 
-                             IAuthorizationProvider authorizationProvider, IEmailService emailService, IBaseJobProvider backfillJobProvider, IBackgroundJobClient backgroundJobClient)
+                             IAuthorizationProvider authorizationProvider, IEmailService emailService, PagingHttpsJobProvider backfillJobProvider, IBackgroundJobClient backgroundJobClient)
         {
             client = httpClient;
             _datasetContext = datasetContext;
