@@ -982,7 +982,7 @@ namespace Sentry.data.Core
             {
                 ConnectorClass = "io.confluent.connect.s3.S3SinkConnector",
                 S3Region = "us-east-2",
-                TopicsDir = "topics_2",
+                TopicsDir = "topics",
                 FlushSize = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.CONFLUENT_CONNECTOR_FLUSH_SIZE),
                 TasksMax = "1",
                 Timezone = "UTC",
@@ -1011,7 +1011,9 @@ namespace Sentry.data.Core
                 PathFormat = "YYYY/MM/dd",
                 TimestampExtractor = "Record",
                 TransformsInsertMetadataType = "org.apache.kafka.connect.transforms.InsertField$Value",
-                S3ProxyUrl = "https://app-proxy-nonprod.sentry.com:8080"
+                S3ProxyUrl = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.S3CONNECTOR_PROXY) //e.g. "https://app-proxy-nonprod.sentry.com:8080"
+                //NOTE! 04.27.2023 I'm using the generic config setting for EdgeWebProxyUrl, I noticed DEV/NRDEV has no value
+                //according to kafka admin i need one for even DEV but we don't actually do any real testing in DEV other then to ensure connector was created so share same config setting
             };
 
             ConnectorCreateRequestDto request = new ConnectorCreateRequestDto()

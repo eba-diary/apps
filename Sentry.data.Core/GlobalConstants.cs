@@ -344,6 +344,7 @@ namespace Sentry.data.Core
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
+            public const string VARIANT = "VARIANT";
 
             public static class Defaults
             {                
@@ -611,6 +612,7 @@ namespace Sentry.data.Core
             public const string CONFLUENT_CONNECTOR_USERNAME = "ConfluentConnectorUserName";
             public const string CONFLUENT_CONNECTOR_PASSWORD = "ConfluentConnectorPassword";
             public const string CONFLUENT_CONNECTOR_FLUSH_SIZE = "ConfluentConnectorFlushSize";
+            public const string S3CONNECTOR_PROXY = "EdgeWebProxyUrl";
         }
 
         public static class DLPPEnvironments

@@ -80,7 +80,7 @@ CROSS APPLY OPENJSON(Option_Metadata.arguments, '$') WITH (
 ) Argument_Metadata
 where 
     JobHistory.State = 'Dead'
-    and Submission.Job_ID in (3190, 3191, 465)
+    and Submission.Job_ID in (SELECT * FROM #EnvironmentJobIDs)
     and Submission.Created > @TimeCreated
 order by Submission.Created DESC, JobHistory.History_Id DESC
 

@@ -259,6 +259,7 @@
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\Schema\Fields\VariantFieldDto.cs" />
     <Compile Include="DTO\Schema\SchemaFlowDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
@@ -398,6 +399,7 @@
     <Compile Include="Entities\Schema\SnowflakeConsumptionType.cs" />
     <Compile Include="Entities\GlobalDataset\EnvironmentDataset.cs" />
     <Compile Include="Entities\GlobalDataset\EnvironmentSchema.cs" />
+    <Compile Include="Entities\Schema\VariantField.cs" />
     <Compile Include="Entities\Search\SearchHighlight.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
@@ -417,6 +419,7 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Extensions\GlobalDatasetExtensions.cs" />
     <Compile Include="Extensions\MigrationExtensions.cs" />
+    <Compile Include="Factories\Fields\VariantFieldFactory.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
     <Compile Include="GlobalEnums\AuditSearchType.cs" />

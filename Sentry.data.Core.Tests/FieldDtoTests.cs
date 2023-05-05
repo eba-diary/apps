@@ -726,6 +726,51 @@ namespace Sentry.data.Core.Tests
         }
         #endregion
 
+        #region Variant
+        [TestMethod]
+        public void Validate_VariantFieldDto_Success()
+        {
+            SchemaRow row = new SchemaRow()
+            {
+                Description = "A variant field"
+            };
+
+            SetSchemaRow(row);
+
+            VariantFieldDto dto = new VariantFieldDto(row);
+
+            ValidationResults results = dto.Validate(GlobalConstants.ExtensionNames.JSON);
+
+            Assert.IsTrue(results.IsValid());
+        }
+
+        [TestMethod]
+        public void Validate_VariantFieldDto_Fail()
+        {
+            SchemaRow row = new SchemaRow() { Description = "A variant field" };
+            SetSchemaRow(row);
+            row.Name = "123 Test";
+
+            VariantFieldDto dto = new VariantFieldDto(row);
+
+            ValidationResults results = dto.Validate(GlobalConstants.ExtensionNames.CSV);
+
+            Assert.IsFalse(results.IsValid());
+            Assert.AreEqual(2, results.GetAll().Count);
+
+            List<ValidationResult> resultList = results.GetAll();
+
+            ValidationResult result = resultList.First();
+            Assert.AreEqual("1", result.Id);
+            Assert.AreEqual("Field name (123 Test) must start with a letter or underscore", result.Description);
+
+            result = resultList[1];
+            Assert.AreEqual("1", result.Id);
+            Assert.AreEqual("Field name (123 Test) can only contain letters, underscores, digits (0-9), and dollar signs (\"$\")", result.Description);
+        }
+
+        #endregion
+
         #region Methods
         private void SetSchemaRow(SchemaRow schemaRow)
         {
