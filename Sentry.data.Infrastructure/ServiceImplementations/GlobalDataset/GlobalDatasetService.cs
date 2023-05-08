@@ -28,9 +28,11 @@ namespace Sentry.data.Infrastructure
             List<GlobalDataset> globalDatasets = await _globalDatasetProvider.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
             string currentUserId = _userService.GetCurrentUser().AssociateId;
+            List<SearchGlobalDatasetDto> searchDtos = globalDatasets.ToSearchResults(currentUserId);
+
             SearchGlobalDatasetsResultsDto resultDto = new SearchGlobalDatasetsResultsDto
             {
-                GlobalDatasets = globalDatasets.Select(x => x.ToSearchResult(currentUserId)).ToList()
+                GlobalDatasets = searchDtos
             };
 
             return resultDto;

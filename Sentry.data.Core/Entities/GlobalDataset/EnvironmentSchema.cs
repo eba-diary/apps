@@ -9,11 +9,11 @@ namespace Sentry.data.Core
         public int SchemaId { get; set; }
 
         [PropertyName("schemaname")]
-        [GlobalSearchField]
+        [GlobalSearchField(SearchDisplayNames.GlobalDataset.SCHEMANAME)]
         public string SchemaName { get; set; }
 
         [PropertyName("schemadescription")]
-        [GlobalSearchField]
+        [GlobalSearchField(SearchDisplayNames.GlobalDataset.SCHEMADESCRIPTION)]
         public string SchemaDescription { get; set; }
 
         [PropertyName("schemasaidassetcode")]

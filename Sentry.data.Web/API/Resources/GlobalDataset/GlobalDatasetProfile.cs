@@ -20,6 +20,8 @@ namespace Sentry.data.Web.API
 
             CreateMap<SearchGlobalDatasetsRequestModel, SearchGlobalDatasetsDto>();
 
+            CreateMap<SearchHighlightDto, SearchHighlightModel>().ReverseMap();
+
             CreateMap<SearchGlobalDatasetDto, SearchGlobalDatasetResponseModel>();
             CreateMap<SearchGlobalDatasetsResultsDto, SearchGlobalDatasetsResponseModel>();
 

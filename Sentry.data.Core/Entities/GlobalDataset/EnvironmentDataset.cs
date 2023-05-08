@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         public int DatasetId { get; set; }
 
         [PropertyName("datasetdescription")]
-        [GlobalSearchField]
+        [GlobalSearchField(SearchDisplayNames.GlobalDataset.DATASETDESCRIPTION)]
         public string DatasetDescription { get; set; }
 
         [PropertyName("categorycode")]

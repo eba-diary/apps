@@ -60,22 +60,25 @@
                             <!-- Dataset Description -->
                             <p class="card-text tile-description" title="@globalDataset.DatasetDescription"> @globalDataset.DatasetDescription </p>
 
-                            <div class="d-flex">
-                                @foreach (string environment in globalDataset.NamedEnvironments.Take(globalDataset.NamedEnvironments.Count <= 4 ? 4 : 3))
-                                {
-                                    <div class="chip @(environment.Contains("PROD") ? "blue" : "") lighten-4 chip-disabled environment-chip-sm">@environment</div>
-                                }
+                            <div class="searchCardFooter">
+                                <div>
+                                    @foreach (string environment in globalDataset.NamedEnvironments.Take(globalDataset.NamedEnvironments.Count <= 5 ? 5 : 4))
+                                    {
+                                        <div class="chip @(environment.Contains("PROD") ? "blue" : "") lighten-4 chip-disabled environment-chip-sm">@environment</div>
+                                    }
 
-                                @if (globalDataset.NamedEnvironments.Count > 4)
-                                {
-                                    <div class="chip lighten-4 chip-disabled environment-chip-sm">...</div>
-                                }
-                                <div class="d-flex justify-content-end view-details-spacing">
-                                    <h6 class="pt-0 mb-0">
-                                        View Details
-                                        <em class="fas fa-angle-double-right"></em>
-                                    </h6>
+                                    @if (globalDataset.NamedEnvironments.Count > 5)
+                                    {
+                                        <div class="chip lighten-4 chip-disabled environment-chip-sm">...</div>
+                                    }
                                 </div>
+
+                                @if (globalDataset.SearchHighlights?.Any() == true)
+                                {
+                                    <div class="d-flex material-tooltip-main searchHighlights" data-content="@globalDataset.GetSearchHighlightsHtml()">
+                                        <em class="far fa-circle-question text-info searchHighlightsIcon"></em>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

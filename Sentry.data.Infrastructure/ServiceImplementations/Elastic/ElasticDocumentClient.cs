@@ -101,7 +101,8 @@ namespace Sentry.data.Infrastructure
             {
                 SearchTotal = response.Total,
                 Documents = response.Documents.ToList(),
-                Aggregations = response.Aggregations
+                Aggregations = response.Aggregations,
+                Hits = response.Hits.ToList()
             };
         }
         #endregion

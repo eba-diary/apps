@@ -23,10 +23,13 @@ namespace Sentry.data.Infrastructure
         {
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
             searchRequest.Size = 10000;
+            searchRequest.Highlight = NestHelper.GetHighlight<GlobalDataset>();
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            return elasticResult.Documents.ToList();
+            List<GlobalDataset> globalDatasets = elasticResult.Hits.ToSearchHighlightedResults();
+
+            return globalDatasets;
         }
 
         public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)

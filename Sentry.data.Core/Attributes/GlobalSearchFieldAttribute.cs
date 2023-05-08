@@ -6,9 +6,16 @@ namespace Sentry.data.Core
     public class GlobalSearchFieldAttribute : Attribute
     {
         public double? Boost { get; set;  }
+        public string DisplayName { get; set; }
 
         public GlobalSearchFieldAttribute() { }
-        public GlobalSearchFieldAttribute(double boost) 
+
+        public GlobalSearchFieldAttribute(string displayName)
+        {
+            DisplayName = displayName;
+        }
+
+        public GlobalSearchFieldAttribute(string displayName, double boost) : this(displayName)
         {
             Boost = boost;
         }

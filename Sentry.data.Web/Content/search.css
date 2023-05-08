@@ -235,10 +235,41 @@
     padding: 0 10px;
     font-size: 12px;
     line-height: 30px;
-    margin: 0 5px 0 0;
+    margin: 0;
 }
 
 .search-card-subtitle {
     display: flex;
     justify-content: space-between;
+}
+
+.searchCardFooter {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.searchHighlightsIcon {
+    font-size: 1.25rem;
+}
+
+.highlightArrow {
+    right: -0.5rem !important
+}
+
+.highlightBody {
+    padding-bottom: 0.75rem;
+}
+
+    .highlightBody em {
+        color: #E57200;
+    }
+
+.highlightPropertyName {
+    border-bottom: 1px solid #ebebeb;
+    font-size: 0.9rem;
+}
+
+.highlightList li::marker {
+    color: #285780;
 }

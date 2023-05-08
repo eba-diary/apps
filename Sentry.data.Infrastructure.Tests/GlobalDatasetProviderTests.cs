@@ -1054,12 +1054,19 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticDocumentClient> elasticDocumentClient = mr.Create<IElasticDocumentClient>();
 
+            Mock<IHit<GlobalDataset>> hit = mr.Create<IHit<GlobalDataset>>();
+            GlobalDataset globalDataset = new GlobalDataset();
+            hit.SetupGet(x => x.Source).Returns(globalDataset);
+            hit.SetupGet(x => x.Highlight).Returns(new Dictionary<string, IReadOnlyCollection<string>>());
+
+            Mock<IHit<GlobalDataset>> hit2 = mr.Create<IHit<GlobalDataset>>();
+            GlobalDataset globalDataset2 = new GlobalDataset();
+            hit2.SetupGet(x => x.Source).Returns(globalDataset2);
+            hit2.SetupGet(x => x.Highlight).Returns(new Dictionary<string, IReadOnlyCollection<string>>());
+
             ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
             {
-                Documents = new List<GlobalDataset>
-                {
-                    new GlobalDataset()
-                }
+                Hits = new List<IHit<GlobalDataset>> { hit.Object, hit2.Object }
             };
 
             elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
@@ -1103,6 +1110,11 @@ namespace Sentry.data.Infrastructure.Tests
                 termsQuery = filters.FirstOrDefault(x => x.Terms.Field.Name == "environmentdatasets.environmentschemas.schemasaidassetcode.keyword").Terms;
                 Assert.IsNotNull(termsQuery);
                 Assert.AreEqual("TEST", termsQuery.Terms.First().ToString());
+
+                Assert.IsNotNull(s.Highlight);
+
+                IHighlight highlight = s.Highlight;
+                Assert.AreEqual(11, highlight.Fields.Count);
             });
 
             GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
@@ -1163,7 +1175,11 @@ namespace Sentry.data.Infrastructure.Tests
 
             List<GlobalDataset> results = await globalDatasetProvider.SearchGlobalDatasetsAsync(filterSearchDto);
 
-            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual(2, results.Count);
+            Assert.AreEqual(globalDataset, results[0]);
+            Assert.IsNotNull(results[0].SearchHighlights);
+            Assert.AreEqual(globalDataset2, results[1]);
+            Assert.IsNotNull(results[1].SearchHighlights);
 
             mr.VerifyAll();
         }

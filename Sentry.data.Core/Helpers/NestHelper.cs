@@ -51,7 +51,7 @@ namespace Sentry.data.Core
             if (aggregations?.Any() == true)
             {
                 //get all property names by type
-                List<FilterSearchFieldAttribute> filterAttributes = GetAllByAttribute<FilterSearchFieldAttribute, FilterSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => GetFilterAttribute(attr));
+                List<FilterSearchFieldAttribute> filterAttributes = GetAllByAttribute<FilterSearchFieldAttribute, FilterSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => attr);
 
                 foreach (FilterSearchFieldAttribute filterAttribute in filterAttributes)
                 {
@@ -93,6 +93,56 @@ namespace Sentry.data.Core
             return filterCategories;
         }
 
+        public static List<T> ToSearchHighlightedResults<T>(this List<IHit<T>> hits) where T : SearchHighlightable
+        {
+            List<T> results = new List<T>();
+
+            foreach (IHit<T> hit in hits)
+            {
+                hit.Source.SearchHighlights = new List<SearchHighlight>();
+
+                List<KeyValuePair<string, string>> highlightFields = GetAllByAttribute<KeyValuePair<string, string>, GlobalSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => new KeyValuePair<string, string>(field, attr.DisplayName));
+                highlightFields.AddRange(GetAllByAttribute<KeyValuePair<string, string>, FilterSearchFieldAttribute>(typeof(T), null, GetFieldNameForFilterSearch));
+
+                foreach (var highlight in hit.Highlight.Reverse())
+                {
+                    KeyValuePair<string, string> highlightField = highlightFields.First(x => x.Key == highlight.Key);
+
+                    SearchHighlight searchHighlight = new SearchHighlight
+                    {
+                        PropertyName = highlightField.Value,
+                        Highlights = highlight.Value.Distinct().ToList()
+                    };
+
+                    hit.Source.SearchHighlights.Add(searchHighlight);
+                }
+
+                results.Add(hit.Source);
+            }
+
+            return results;
+        }
+
+        public static Highlight GetHighlight<T>()
+        {
+            List<string> fields = GetAllByAttribute<string, GlobalSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => field);
+            fields.AddRange(GetAllByAttribute<string, FilterSearchFieldAttribute>(typeof(T), null, (prop, field, attr) => AddKeyword(prop, field)));
+            
+            Dictionary<Field, IHighlightField> fieldDictionary = new Dictionary<Field, IHighlightField>();
+
+            foreach (string field in fields)
+            {
+                fieldDictionary.Add(field, new HighlightField());
+            }
+
+            Highlight highlight = new Highlight
+            {
+                Fields = fieldDictionary
+            };
+            
+            return highlight;
+        }
+
         #region Private
         private static QueryContainer GetFilterTermsQuery(PropertyInfo property, string fieldName, FilterSearchFieldAttribute filterAttribute, List<FilterCategoryDto> filterCategories)
         {
@@ -101,10 +151,7 @@ namespace Sentry.data.Core
 
             if (filterCategory != null)
             {
-                if (property.PropertyType == typeof(string))
-                {
-                    fieldName = $"{fieldName}.keyword";
-                }
+                fieldName = AddKeyword(property, fieldName);
 
                 return new TermsQuery
                 {
@@ -180,10 +227,7 @@ namespace Sentry.data.Core
 
         private static KeyValuePair<string, TermsAggregation> BuildAggregation(PropertyInfo property, string fieldName, FilterSearchFieldAttribute filterAttribute)
         {
-            if (property.PropertyType == typeof(string))
-            {
-                fieldName = $"{fieldName}.keyword";
-            }
+            fieldName = AddKeyword(property, fieldName);
 
             TermsAggregation termsAggregation = new TermsAggregation(filterAttribute.FilterCategoryName)
             {
@@ -194,9 +238,20 @@ namespace Sentry.data.Core
             return new KeyValuePair<string, TermsAggregation>(filterAttribute.FilterCategoryName, termsAggregation);
         }
 
-        private static FilterSearchFieldAttribute GetFilterAttribute(FilterSearchFieldAttribute filterAttribute)
+        private static KeyValuePair<string, string> GetFieldNameForFilterSearch(PropertyInfo property, string fieldName, FilterSearchFieldAttribute filterAttribute)
         {
-            return filterAttribute;
+            fieldName = AddKeyword(property, fieldName);
+            return new KeyValuePair<string, string>(fieldName, filterAttribute.FilterCategoryName);
+        }
+
+        private static string AddKeyword(PropertyInfo property, string fieldName)
+        {
+            if (property.PropertyType == typeof(string))
+            {
+                fieldName = $"{fieldName}.keyword";
+            }
+
+            return fieldName;
         }
 
         private static List<TResult> GetAllByAttribute<TResult, TAttribute>(Type type, string parentFieldName, Func<PropertyInfo, string, TAttribute, TResult> createResult) where TAttribute : Attribute
