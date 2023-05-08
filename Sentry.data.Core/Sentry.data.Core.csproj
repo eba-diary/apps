@@ -306,8 +306,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\FilterSearchField.cs" />
-    <Compile Include="Attributes\GlobalSearchField.cs" />
+    <Compile Include="Attributes\FilterSearchFieldAttribute.cs" />
+    <Compile Include="Attributes\GlobalSearchFieldAttribute.cs" />
     <Compile Include="Attributes\SkipConcurrentExecutionAttribute.cs" />
     <Compile Include="DependencyInjection\DomainServiceCommonDependency.cs" />
     <Compile Include="DependencyInjection\CommonDependency.cs" />
@@ -344,9 +344,9 @@
     <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchDto.cs" />
-    <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryAssetCategoriesDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryCategoryDto.cs" />
+    <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySensitiveSearchResultDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryEventDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventorySearchResultDto.cs" />
@@ -377,14 +377,23 @@
     <Compile Include="DTO\DataSource\AuthenticationTypeDto.cs" />
     <Compile Include="DTO\DataSource\DataSourceTypeDto.cs" />
     <Compile Include="DTO\DeleteFiles\DeleteFilesParamDto.cs" />
-    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsDto.cs" />
-    <Compile Include="DTO\GlobalDatasets\IndexGlobalDatasetsResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\BaseGlobalDatasetPageDto.cs" />
+    <Compile Include="DTO\GlobalDataset\GetGlobalDatasetFiltersDto.cs" />
+    <Compile Include="DTO\GlobalDataset\GetGlobalDatasetFiltersResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\GlobalDatasetPageRequestDto.cs" />
+    <Compile Include="DTO\GlobalDataset\GlobalDatasetPageResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetDto.cs" />
+    <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDataset\IndexGlobalDatasetsResultDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsDto.cs" />
+    <Compile Include="DTO\GlobalDataset\SearchGlobalDatasetsResultsDto.cs" />
     <Compile Include="DTO\Job\DfsMonitorDto.cs" />
     <Compile Include="DTO\Job\JavaOptionsOverrideDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\Schema\Fields\VariantFieldDto.cs" />
     <Compile Include="DTO\Schema\SchemaFlowDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
     <Compile Include="DTO\Schema\Fields\BaseFieldDto.cs" />
@@ -406,6 +415,7 @@
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
+    <Compile Include="DTO\Search\BaseFilterSearchDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
@@ -500,6 +510,7 @@
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesRequestModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
+    <Compile Include="Entities\MessageFormats\SnowSchemaCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableCreateModel.cs" />
     <Compile Include="Entities\MessageFormats\SnowTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\DeleteFilesResponseModel.cs" />
@@ -520,6 +531,7 @@
     <Compile Include="Entities\Schema\SnowflakeConsumptionType.cs" />
     <Compile Include="Entities\GlobalDataset\EnvironmentDataset.cs" />
     <Compile Include="Entities\GlobalDataset\EnvironmentSchema.cs" />
+    <Compile Include="Entities\Schema\VariantField.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
@@ -538,11 +550,13 @@
     <Compile Include="Extensions\FilterSearchExtensions.cs" />
     <Compile Include="Extensions\GlobalDatasetExtensions.cs" />
     <Compile Include="Extensions\MigrationExtensions.cs" />
+    <Compile Include="Factories\Fields\VariantFieldFactory.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
     <Compile Include="GlobalEnums\AuditSearchType.cs" />
     <Compile Include="GlobalEnums\AuditType.cs" />
     <Compile Include="GlobalEnums\DatasetFileStatusType.cs" />
+    <Compile Include="GlobalEnums\GlobalDatasetSortByOption.cs" />
     <Compile Include="GlobalEnums\IntervalType.cs" />
     <Compile Include="GlobalEnums\LayoutOption.cs" />
     <Compile Include="GlobalEnums\NotificationSubCategoryNews.cs" />
@@ -639,6 +653,7 @@
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
+    <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetSearchService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />

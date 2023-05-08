@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -89,6 +90,32 @@ namespace Sentry.data.Core
                 SchemaId = fileSchema.SchemaId,
                 SchemaName = fileSchema.Name,
                 SchemaDescription = fileSchema.Description
+            };
+        }
+
+        public static SearchGlobalDatasetDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
+        {
+            //use first prod environment dataset for display fields
+            EnvironmentDataset targetEnvironmentDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.NamedEnvironmentType == NamedEnvironmentType.Prod.ToString());
+
+            //if no prod environment, use the most recent added
+            globalDataset.EnvironmentDatasets.Reverse();
+            if (targetEnvironmentDataset == null)
+            {
+                targetEnvironmentDataset = globalDataset.EnvironmentDatasets.First();
+            }
+
+            return new SearchGlobalDatasetDto
+            {
+                GlobalDatasetId = globalDataset.GlobalDatasetId,
+                DatasetName = globalDataset.DatasetName,
+                DatasetSaidAssetCode = globalDataset.DatasetSaidAssetCode,
+                DatasetDescription = targetEnvironmentDataset.DatasetDescription,
+                CategoryCode = targetEnvironmentDataset.CategoryCode,
+                NamedEnvironments = globalDataset.EnvironmentDatasets.OrderByDescending(x => x.NamedEnvironmentType).Select(x => x.NamedEnvironment).ToList(),
+                IsSecured = targetEnvironmentDataset.IsSecured,
+                IsFavorite = globalDataset.EnvironmentDatasets.Any(x => x.FavoriteUserIds.Contains(userId)),
+                TargetDatasetId = targetEnvironmentDataset.DatasetId
             };
         }
     }

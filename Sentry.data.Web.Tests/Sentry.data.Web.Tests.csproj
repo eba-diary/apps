@@ -334,6 +334,8 @@
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsValidatorTests.cs" />
+    <Compile Include="API\GlobalDataset\GetGlobalDatasetFilters\GetGlobalDatasetFiltersModelMappingTests.cs" />
+    <Compile Include="API\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsModelMappingTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaRequestValidatorTests.cs" />
     <Compile Include="API\Schema\AddSchema\AddSchemaModelMappingTests.cs" />
     <Compile Include="API\Schema\UpdateSchema\UpdateSchemaRequestValidatorTests.cs" />
@@ -375,6 +377,7 @@
     <Compile Include="Extensions\DatasetExtensionsTests.cs" />
     <Compile Include="ModelTests.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetRequestValidatorTests.cs" />
+    <Compile Include="ViewModelMappingTests.cs" />
     <Compile Include="UtilityTests.cs" />
   </ItemGroup>
   <ItemGroup>

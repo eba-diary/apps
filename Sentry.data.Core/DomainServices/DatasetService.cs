@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Core;
 using Sentry.data.Core.DependencyInjection;
 using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Helpers;
 using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -26,13 +29,15 @@ namespace Sentry.data.Core
         private readonly ISAIDService _saidService;
         private readonly IDatasetFileService _datasetFileService;
         private readonly IGlobalDatasetProvider _globalDatasetProvider;
+        private readonly IMessagePublisher _messagePublisher;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
-                            IUserService userService, IConfigService configService, 
+                            IUserService userService, IConfigService configService,
                             ISchemaService schemaService,
                             IQuartermasterService quartermasterService, ISAIDService saidService,
                             IDatasetFileService datasetFileService,
                             IGlobalDatasetProvider globalDatasetProvider,
+                            IMessagePublisher messagePublisher,
                             DomainServiceCommonDependency<DatasetService> commonDependency) : base(commonDependency)
         {
             _datasetContext = datasetContext;
@@ -44,6 +49,7 @@ namespace Sentry.data.Core
             _saidService = saidService;
             _datasetFileService = datasetFileService;
             _globalDatasetProvider = globalDatasetProvider;
+            _messagePublisher = messagePublisher;
         }
 
         public DatasetSchemaDto GetDatasetSchemaDto(int id)
@@ -353,6 +359,8 @@ namespace Sentry.data.Core
                 await _datasetContext.AddAsync(dataset);
                 await _datasetContext.SaveChangesAsync();
 
+                GenerateSnowSchemaCreateForDataset(dataset);
+
                 // Create a Hangfire job that will setup the default security groups for this new dataset
                 _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
 
@@ -380,6 +388,11 @@ namespace Sentry.data.Core
 
         public void CreateExternalDependencies(int datasetId)
         {
+            Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
+
+            // Publish a message to create the Schema in Snowflake 
+            GenerateSnowSchemaCreateForDataset(dataset);
+
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
 
@@ -387,7 +400,6 @@ namespace Sentry.data.Core
             if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
             {
                 //Coming from migration, only have to add environment dataset (global dataset should exist)
-                Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
                 EnvironmentDataset environmentDataset = dataset.ToEnvironmentDataset();
                 _globalDatasetProvider.AddUpdateEnvironmentDatasetAsync(dataset.GlobalDatasetId.Value, environmentDataset).Wait();
             }
@@ -406,6 +418,8 @@ namespace Sentry.data.Core
             _configService.CreateAndSaveDatasetFileConfig(configDto);
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
+
+            GenerateSnowSchemaCreateForDataset(ds);
 
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
@@ -698,13 +712,14 @@ namespace Sentry.data.Core
             return dsList;
         }
 
-        public string SetDatasetFavorite(int datasetId, string associateId)
+        public string SetDatasetFavorite(int datasetId, string associateId, bool removeForAllEnvironments)
         {
             try
             {
                 Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+                Favorite dsFavorite = ds.Favorities.FirstOrDefault(x => x.UserId == associateId);
 
-                if (!ds.Favorities.Any(w => w.UserId == associateId))
+                if (dsFavorite == null && !removeForAllEnvironments)
                 {
                     Favorite f = new Favorite()
                     {
@@ -726,11 +741,25 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == associateId));
+                    List<Favorite> favorites;
+                    if (removeForAllEnvironments)
+                    {
+                        List<int> datasetIds = _datasetContext.Datasets.Where(x => x.GlobalDatasetId == ds.GlobalDatasetId).Select(x => x.DatasetId).ToList();
+                        favorites = _datasetContext.Favorites.Where(x => datasetIds.Contains(x.DatasetId) && x.UserId == associateId).ToList();
+                    }
+                    else
+                    {
+                        favorites = new List<Favorite> { dsFavorite };
+                    }
+
+                    foreach (Favorite favorite in favorites)
+                    {
+                        _datasetContext.Remove(favorite);
+                    }
 
                     if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                     {
-                        _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId).Wait();
+                        _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(datasetId, associateId, removeForAllEnvironments).Wait();
                     }
 
                     _datasetContext.SaveChanges();
@@ -1070,6 +1099,40 @@ namespace Sentry.data.Core
         private string GetUrl(int datasetId)
         {
             return $"{Configuration.Config.GetHostSetting("SentryDataBaseUrl")}/Dataset/Detail/{datasetId}";
+        }
+
+        private void GenerateSnowSchemaCreateForDataset(Dataset dataset)
+        {
+            JObject datasetCreatedChangeInd = new JObject();
+            datasetCreatedChangeInd.Add("dataset", "added");
+
+            //Always generate snowflake table create event
+            SnowSchemaCreateModel snowModel = new SnowSchemaCreateModel()
+            {
+                DatasetID = dataset.DatasetId,
+                InitiatorID = _userService.GetCurrentUser().AssociateId,
+                ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
+            };
+
+            try
+            {
+                _logger.LogInformation($"<GenerateSnowSchemaCreateForDataset> sending event: {JsonConvert.SerializeObject(snowModel)}");
+
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = new DscEventTopicHelper().GetDSCTopic(dataset);
+                    _messagePublisher.Publish(topicName, snowModel.DatasetID.ToString(), JsonConvert.SerializeObject(snowModel));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(snowModel.DatasetID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
+            }
         }
         #endregion
 

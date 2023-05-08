@@ -27,9 +27,9 @@
         $(document).on("click", "[id^='categoryType_']", function (e) {
             e.preventDefault();
 
-            var id = $(this).attr("id");
-            var category = "#hide_" + id
-            var icon = "#icon_" + id;
+            let id = $(this).attr("id");
+            let category = "#hide_" + id
+            let icon = "#icon_" + id;
 
             $(category).slideToggle();
             $(icon).toggleClass("fa-chevron-down fa-chevron-up");
@@ -39,7 +39,7 @@
         $(document).on("click", "[id^='categoryMore_']", function (e) {
             e.preventDefault();
 
-            var show = "#hidden_" + $(this).attr("id");
+            let show = "#hidden_" + $(this).attr("id");
 
             $(show).slideToggle();
 
@@ -52,8 +52,8 @@
         });
 
         //clear single badge
-        $(document).on("click", "[id^='clearOption_']", function (e) {
-            e.preventDefault();
+        $(document).off("click", ".chip .close");
+        $(document).on("click", ".chip .close", function () {
             data.FilterSearch.handleBadgeClear(this);
             data.FilterSearch.showHideApplyFilter();
         });
@@ -74,7 +74,7 @@
 
         //search when focus on search box and hit enter
         $(document).on("keypress", "#filter-search-text", function (e) {
-            var keycode = (e.keyCode ? e.keyCode : e.which);
+            let keycode = (e.keyCode ? e.keyCode : e.which);
 
             if (keycode == '13') {
                 data.FilterSearch.clearActiveSavedSearch();
@@ -107,7 +107,7 @@
             $('#filter-search-save-close').addClass('display-none');
             $('.filter-search-save-search-modal-spinner').removeClass('display-none');
             
-            var request = data.FilterSearch.buildSearchRequest();
+            let request = data.FilterSearch.buildSearchRequest();
             request.Id = $("#save-search-id").val();
             request.SearchType = $("#save-search-type").val();
             request.SearchName = $.trim($("#save-search-name").val());
@@ -124,8 +124,8 @@
         $(document).on("click", ".saved-search-favorite", function (e) {
             e.stopPropagation();
 
-            var id = $(this).data("id");
-            var element = this;
+            let id = $(this).data("id");
+            let element = this;
             
             $(element).addClass("display-none");
             $("#favoriteSpinner_" + id).removeClass("display-none");
@@ -137,7 +137,7 @@
         });
 
         $(document).on("click", ".saved-search-edit", function (e) {
-            var id = $(this).data("id")
+            let id = $(this).data("id")
             
             $("#save-search-id").val(id);            
             $("#save-search-name").val($(this).data("name"));
@@ -150,8 +150,8 @@
         $(document).on("click", ".saved-search-delete", function (e) {
             e.stopPropagation();
 
-            var element = this;
-            var id = $(element).data("id");
+            let element = this;
+            let id = $(element).data("id");
             
             $(element).addClass("display-none");
             $("#deleteSpinner_" + id).removeClass("display-none");
@@ -160,7 +160,7 @@
                 url: '/FilterSearch/RemoveSearch?savedSearchId=' + id,
                 type: 'DELETE',
                 success: function () {
-                    var container = $("#saved_" + id);
+                    let container = $("#saved_" + id);
                     
                     if (container.closest(".saved-search-option-name.active")) {
                         window.history.replaceState({}, "", location.pathname);
@@ -186,11 +186,11 @@
         data.FilterSearch.hideBadgeContainer(false);
 
         //uncheck the category option that was removed
-        var optionId = $.escapeSelector(element.id.replace("clearOption_", ""));
+        let optionId = $.escapeSelector(element.parentElement.id.replace("clearOption_", ""));
         data.FilterSearch.setOptionCheckbox(optionId, false);
 
         //hide the clicked badge
-        $(element).addClass("display-none");
+        $(element.parentElement).addClass("display-none");
     },
 
     handleClearAll: function () {
@@ -222,20 +222,20 @@
 
     hideBadgeContainer: function (clearAll) {
         if ($("[id^='clearOption_']:visible").length === 1 || clearAll) {
-            $(".filter-search-active-options-container").slideUp();
+            $(".filter-search-active-options-container").addClass("display-none");
             $("#filter-search-clear").addClass("display-none");
         }
     },
 
     showBadgeContainer: function () {
-        $(".filter-search-active-options-container").slideDown();
+        $(".filter-search-active-options-container").removeClass("display-none");
         $("#filter-search-clear").removeClass("display-none");
     },
 
     handleCheckboxChange: function (element) {
-        var id = $.escapeSelector(element.id.replace('modal_', ''));
+        let id = $.escapeSelector(element.id.replace('modal_', ''));
 
-        var badge = $("#clearOption_" + id);
+        let badge = $("#clearOption_" + id);
 
         if (element.checked) {
             //making sure both modal and filter checkbox gets checked
@@ -255,9 +255,9 @@
 
     showHideApplyFilter: function () {
         //get all checked filters
-        var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
+        let selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
 
-        var hasSameValues = true;
+        let hasSameValues = true;
         //determine all selected filters were in the initial filter
         selectedOptions.each(function () {
             hasSameValues = data.FilterSearch.lastSelectedOptionIds.includes(this.id);
@@ -332,7 +332,7 @@
 
     completeFilterRetrieval: function (filters) {
 
-        var categories = { 'filterCategories': [] }
+        let categories = { 'filterCategories': [] }
 
         if (filters && filters.length) {
             categories.filterCategories = filters;
@@ -348,7 +348,7 @@
             $(".filter-search-categories-progress").addClass("display-none");
             $(".filter-search-categories-container").removeClass("display-none");
 
-            var selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
+            let selectedOptions = $('.filter-search-category-option-checkbox:checkbox:checked');
 
             data.FilterSearch.lastSelectedOptionIds = selectedOptions.map(function () { return this.id }).get();
 
@@ -377,8 +377,8 @@
             data.FilterSearch.resetSaveSearchModal();
         }
         else {
-            var encodedSearchName = encodeURIComponent(searchName);
-            var params = "?searchType=" + $("#save-search-type").val() + "&activeSearchName=" + encodedSearchName;
+            let encodedSearchName = encodeURIComponent(searchName);
+            let params = "?searchType=" + $("#save-search-type").val() + "&activeSearchName=" + encodedSearchName;
 
             $('.filter-search-save-search-container').load("/FilterSearch/SavedSearches" + params, function () {
                 window.history.replaceState({}, "", location.pathname + "?savedSearch=" + encodedSearchName);
@@ -412,19 +412,19 @@
 
     getSelectedCategoryOptions: function () {
 
-        var categories = [];
+        let categories = [];
 
         $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
-            var parts = this.id.split('_');
+            let parts = this.id.split('_');
 
             if (parts[0] != 'modal') {
-                var option = {
+                let option = {
                     OptionValue: $(this).attr('value'),
                     ParentCategoryName: $(this).data('category'),
                     Selected: true
                 };
 
-                var exists = categories.find(x => x.CategoryName == option.ParentCategoryName);
+                let exists = categories.find(x => x.CategoryName == option.ParentCategoryName);
 
                 if (exists) {
                     exists.CategoryOptions.push(option)
