@@ -102,7 +102,7 @@ namespace Sentry.data.Infrastructure
 
                 if (environmentDatasetIdsToGet.Any())
                 {
-                    List<GlobalDataset> columnGlobalDatasets = await _globalDatasetProvider.SearchGlobalDatasetsByEnvironmentDatasetIdsAsync(environmentDatasetIdsToGet);
+                    List<GlobalDataset> columnGlobalDatasets = await _globalDatasetProvider.GetGlobalDatasetsByEnvironmentDatasetIdsAsync(environmentDatasetIdsToGet);
                     globalDatasets.AddRange(columnGlobalDatasets);
                 }
 

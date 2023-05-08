@@ -7,7 +7,7 @@ namespace Sentry.data.Core
     {
         Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(HighlightableFilterSearchDto filterSearchDto);
         Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto);
-        Task<List<GlobalDataset>> SearchGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds);
+        Task<List<GlobalDataset>> GetGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds);
         Task AddUpdateGlobalDatasetAsync(GlobalDataset globalDataset);
         Task AddUpdateGlobalDatasetsAsync(List<GlobalDataset> globalDatasets);
         Task DeleteGlobalDatasetsAsync(List<int> globalDatasetIds);

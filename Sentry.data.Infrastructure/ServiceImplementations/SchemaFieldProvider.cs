@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
                     new TermsQuery
                     {
                         Field = Infer.Field<ElasticSchemaField>(x => x.DatasetId),
-                        Terms = (IEnumerable<object>)searchSchemaFieldsDto.DatasetIds
+                        Terms = searchSchemaFieldsDto.DatasetIds.Select(x => (object)x).ToArray()
                     }
                 };
             }

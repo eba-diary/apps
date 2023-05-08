@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Nest;
+using Sentry.data.Core.Entities.Schema.Elastic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -731,6 +732,40 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("environmentdatasets.originationcode.keyword", fields[8].Name);
             Assert.AreEqual("environmentdatasets.issecured", fields[9].Name);
             Assert.AreEqual("environmentdatasets.environmentschemas.schemasaidassetcode.keyword", fields[10].Name);
+        }
+
+        [TestMethod]
+        public void ToSearchQuery_ElastiSchemaField_BoolQuery()
+        {
+            SearchSchemaFieldsDto searchSchemaFieldsDto = new SearchSchemaFieldsDto
+            {
+                DatasetIds = new List<int>(),
+                SearchText = "search"
+            };
+
+            BoolQuery query = searchSchemaFieldsDto.ToSearchQuery<ElasticSchemaField>();
+            Assert.AreEqual(2, query.Should.Count());
+
+            IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
+            Assert.AreEqual("search", stringQuery.Query);
+            Assert.AreEqual(1, stringQuery.Fields.Count());
+            Assert.IsTrue(stringQuery.Fields.Any(f => f.Name == "Name"));
+
+            stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
+            Assert.AreEqual("*search*", stringQuery.Query);
+            Assert.AreEqual(1, stringQuery.Fields.Count());
+            Assert.IsTrue(stringQuery.Fields.Any(f => f.Name == "Name"));
+        }
+
+        [TestMethod]
+        public void GetHighlight_ElasticSchemaField_Highlight()
+        {
+            Highlight highlight = NestHelper.GetHighlight<ElasticSchemaField>();
+
+            Assert.AreEqual(1, highlight.Fields.Count);
+
+            List<Field> fields = highlight.Fields.Keys.ToList();
+            Assert.AreEqual("Name", fields[0].Name);
         }
     }
 }

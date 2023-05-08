@@ -255,6 +255,7 @@
     <Compile Include="ReindexServiceTests.cs" />
     <Compile Include="GlobalDatasetServiceTests.cs" />
     <Compile Include="GlobalDatasetSearchServiceTests.cs" />
+    <Compile Include="SchemaFieldProviderTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

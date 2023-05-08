@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Sentry.data.Core
 {
@@ -15,6 +16,7 @@ namespace Sentry.data.Core
             }
 
             Highlights.AddRange(highlights);
+            Highlights = Highlights.Distinct().ToList();
         }
     }
 }

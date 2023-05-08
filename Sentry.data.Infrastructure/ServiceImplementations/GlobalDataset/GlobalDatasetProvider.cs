@@ -62,7 +62,7 @@ namespace Sentry.data.Infrastructure
             return filterCategories;
         }
 
-        public async Task<List<GlobalDataset>> SearchGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds)
+        public async Task<List<GlobalDataset>> GetGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds)
         {
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync<GlobalDataset>(x => x
             .Query(q => q
@@ -71,7 +71,7 @@ namespace Sentry.data.Infrastructure
                         .Terms(environmentDatasetIds)
                     )
                 )
-            );
+            .Size(10000));
 
             return elasticResult.Documents.ToList();
         }
