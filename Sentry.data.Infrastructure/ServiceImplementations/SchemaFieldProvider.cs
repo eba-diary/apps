@@ -1,9 +1,8 @@
-﻿using Sentry.data.Core;
+﻿using Nest;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.Schema.Elastic;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
@@ -19,7 +18,32 @@ namespace Sentry.data.Infrastructure
 
         public async Task<List<ElasticSchemaField>> SearchSchemaFieldsAsync(SearchSchemaFieldsDto searchSchemaFieldsDto)
         {
-            throw new NotImplementedException();
+            BoolQuery searchQuery = searchSchemaFieldsDto.ToSearchQuery<ElasticSchemaField>();
+
+            if (searchSchemaFieldsDto.DatasetIds.Any())
+            {
+                searchQuery.Filter = new List<QueryContainer>
+                {
+                    new TermsQuery
+                    {
+                        Field = Infer.Field<ElasticSchemaField>(x => x.DatasetId),
+                        Terms = (IEnumerable<object>)searchSchemaFieldsDto.DatasetIds
+                    }
+                };
+            }
+
+            SearchRequest<ElasticSchemaField> searchRequest = new SearchRequest<ElasticSchemaField>()
+            {
+                Query = searchQuery,
+                Size = 10000,
+                Highlight = NestHelper.GetHighlight<ElasticSchemaField>()
+            };
+
+            ElasticResult<ElasticSchemaField> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            List<ElasticSchemaField> schemaFields = elasticResult.Hits.ToSearchHighlightedResults();
+
+            return schemaFields;
         }
     }
 }

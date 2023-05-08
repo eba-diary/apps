@@ -9,25 +9,28 @@ namespace Sentry.data.Core
         [Ignore]
         public List<SearchHighlight> SearchHighlights { get; set;  }
 
-        public void AddSearchHighlight(string propertyName, string highlight)
+        public void MergeSearchHighlights(List<SearchHighlight> mergeSearchHighlights)
         {
             if (SearchHighlights == null)
             {
                 SearchHighlights = new List<SearchHighlight>();
             }
 
-            SearchHighlight searchHighlight = SearchHighlights.FirstOrDefault(x => x.PropertyName == propertyName);
-
-            if (searchHighlight == null)
+            foreach (SearchHighlight searchHighlight in mergeSearchHighlights)
             {
-                searchHighlight = new SearchHighlight { PropertyName = propertyName };
-                searchHighlight.AddHighlight(highlight);
+                SearchHighlight existingSearchHighlight = SearchHighlights.FirstOrDefault(x => x.PropertyName == searchHighlight.PropertyName);
 
-                SearchHighlights.Add(searchHighlight);
-            }
-            else
-            {
-                searchHighlight.AddHighlight(highlight);
+                if (existingSearchHighlight == null)
+                {
+                    existingSearchHighlight = new SearchHighlight { PropertyName = searchHighlight.PropertyName };
+                    existingSearchHighlight.AddHighlights(searchHighlight.Highlights);
+
+                    SearchHighlights.Add(existingSearchHighlight);
+                }
+                else
+                {
+                    existingSearchHighlight.AddHighlights(searchHighlight.Highlights);
+                }
             }
         }
     }

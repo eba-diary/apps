@@ -1170,7 +1170,8 @@ namespace Sentry.data.Infrastructure.Tests
                             }
                         }
                     }
-                }
+                },
+                UseHighlighting = true
             };
 
             List<GlobalDataset> results = await globalDatasetProvider.SearchGlobalDatasetsAsync(filterSearchDto);

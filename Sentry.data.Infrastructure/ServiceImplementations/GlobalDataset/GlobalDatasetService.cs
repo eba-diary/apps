@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure
                     GlobalDataset retrievedGlobalDataset = globalDatasets.FirstOrDefault(x => x.EnvironmentDatasets.Select(d => d.DatasetId).Contains(schemaField.DatasetId));
                     if (retrievedGlobalDataset != null)
                     {
-                        retrievedGlobalDataset.AddSearchHighlight(SearchDisplayNames.SchemaField.COLUMNNAME, $"<em>{schemaField.Name}</em>");
+                        retrievedGlobalDataset.MergeSearchHighlights(schemaField.SearchHighlights);
                     }
                 }
             }

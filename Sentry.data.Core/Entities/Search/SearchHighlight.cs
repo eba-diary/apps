@@ -7,14 +7,14 @@ namespace Sentry.data.Core
         public string PropertyName { get; set; }
         public List<string> Highlights { get; set; }
 
-        public void AddHighlight(string highlight)
+        public void AddHighlights(List<string> highlights)
         {
             if (Highlights == null)
             {
                 Highlights = new List<string>();
             }
 
-            Highlights.Add(highlight);
+            Highlights.AddRange(highlights);
         }
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Sentry.data.Core
 {
-    public class SearchSchemaFieldsDto
+    public class SearchSchemaFieldsDto : BaseSearchDto
     {
-        public string SearchText { get; set; }
         public List<int> DatasetIds { get; set; }
     }
 }

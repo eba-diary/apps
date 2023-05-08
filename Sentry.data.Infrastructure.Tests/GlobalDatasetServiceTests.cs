@@ -2,7 +2,6 @@
 using Moq;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Infrastructure.FeatureFlags;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -116,7 +115,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object, dataFeatures.Object);
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, userService.Object, dataFeatures.Object);
 
             SearchGlobalDatasetsResultsDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
@@ -187,7 +186,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object, dataFeatures.Object);
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, userService.Object, dataFeatures.Object);
 
             SearchGlobalDatasetsResultsDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
@@ -211,7 +210,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
             dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, dataFeatures.Object);
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, null, dataFeatures.Object);
 
             GetGlobalDatasetFiltersResultDto results = await globalDatasetService.GetGlobalDatasetFiltersAsync(filtersDto);
 
