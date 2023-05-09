@@ -24,7 +24,7 @@
                     @if (Model.CLA5112_FeatureFlag == true)
                     {
                     <div class="column">
-                        <div class="container">
+                        <div class="activity-container">
                             <h5>Total Files Today</h5>
                             <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { status = "TotalFiles" })">View</a>
                             <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
