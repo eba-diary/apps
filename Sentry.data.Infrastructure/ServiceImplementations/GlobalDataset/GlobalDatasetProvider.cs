@@ -31,49 +31,64 @@ namespace Sentry.data.Infrastructure
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            List<GlobalDataset> globalDatasets;
-
             if (filterSearchDto.UseHighlighting)
             {
-                globalDatasets = elasticResult.Hits.ToSearchHighlightedResults();
+                return elasticResult.Hits.ToSearchHighlightedResults();
             }
             else
             {
-                globalDatasets = elasticResult.Documents.ToList();
+                return elasticResult.Documents.ToList();
             }
-
-            return globalDatasets;
         }
 
         public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)
         {
             //only use the filter categories for what results need to be selected
             List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
-            filterSearchDto.FilterCategories = null;
 
-            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
-            searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
-            searchRequest.Size = 0;
-
-            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+            ElasticResult<GlobalDataset> elasticResult = await GetFilterAggregationResultAsync(filterSearchDto, 0);
 
             List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters);
 
             return filterCategories;
         }
 
+        public async Task<DocumentsFiltersDto<GlobalDataset>> GetGlobalDatasetsAndFiltersAsync(BaseFilterSearchDto filterSearchDto)
+        {
+            List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
+
+            ElasticResult<GlobalDataset> elasticResult = await GetFilterAggregationResultAsync(filterSearchDto, 10000);
+
+            DocumentsFiltersDto<GlobalDataset> documentsFiltersDto = new DocumentsFiltersDto<GlobalDataset>
+            {
+                Documents = elasticResult.Documents.ToList(),
+                FilterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters)
+            };
+
+            return documentsFiltersDto;
+        }
+
         public async Task<List<GlobalDataset>> GetGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds)
         {
-            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync<GlobalDataset>(x => x
-            .Query(q => q
-                .Terms(t => t
-                        .Field(f => f.EnvironmentDatasets.First().DatasetId)
-                        .Terms(environmentDatasetIds)
-                    )
-                )
-            .Size(10000));
+            SearchRequest<GlobalDataset> searchRequest = GetByEnvironmentDatasetIdsSearchRequest(environmentDatasetIds);
+            searchRequest.Size = 10000;
+
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
             return elasticResult.Documents.ToList();
+        }
+
+        public async Task<List<FilterCategoryDto>> GetFiltersByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds)
+        {
+            SearchRequest<GlobalDataset> searchRequest = GetByEnvironmentDatasetIdsSearchRequest(environmentDatasetIds);
+            searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
+            searchRequest.Size = 0;
+
+            ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(null);
+
+            return filterCategories;
         }
         #endregion
 
@@ -279,6 +294,31 @@ namespace Sentry.data.Infrastructure
             {
                 Query = searchQuery
             };
+        }
+
+        private async Task<ElasticResult<GlobalDataset>> GetFilterAggregationResultAsync(BaseFilterSearchDto filterSearchDto, int size)
+        {
+            filterSearchDto.FilterCategories = null;
+
+            SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
+            searchRequest.Size = size;
+
+            return await _elasticDocumentClient.SearchAsync(searchRequest);
+        }
+
+        private SearchRequest<GlobalDataset> GetByEnvironmentDatasetIdsSearchRequest(List<int> environmentDatasetIds)
+        {
+            SearchRequest<GlobalDataset> searchRequest = new SearchRequest<GlobalDataset>
+            {
+                Query = new TermsQuery
+                {
+                    Field = Infer.Field<GlobalDataset>(x => x.EnvironmentDatasets.First().DatasetId),
+                    Terms = environmentDatasetIds.Select(x => (object)x).ToList()
+                }
+            };
+
+            return searchRequest;
         }
         #endregion
     }

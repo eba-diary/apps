@@ -14,7 +14,7 @@ namespace Sentry.data.Infrastructure.Tests
     public class SchemaFieldProviderTests
     {
         [TestMethod]
-        public async Task SearchSchemaFieldsAsync_WithDatasetIds_ElasticSchemaFields()
+        public async Task SearchSchemaFieldsWithHighlightingAsync_WithDatasetIds_ElasticSchemaFields()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
@@ -81,7 +81,7 @@ namespace Sentry.data.Infrastructure.Tests
                 SearchText = "search"
             };
 
-            List<ElasticSchemaField> schemaFields = await schemaFieldProvider.SearchSchemaFieldsAsync(searchSchemaFieldsDto);
+            List<ElasticSchemaField> schemaFields = await schemaFieldProvider.SearchSchemaFieldsWithHighlightingAsync(searchSchemaFieldsDto);
 
             Assert.AreEqual(2, schemaFields.Count);
 
@@ -103,7 +103,7 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public async Task SearchSchemaFieldsAsync_NoDatasetIds_ElasticSchemaFields()
+        public async Task SearchSchemaFieldsWithHighlightingAsync_NoDatasetIds_ElasticSchemaFields()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
@@ -165,7 +165,7 @@ namespace Sentry.data.Infrastructure.Tests
                 SearchText = "search"
             };
 
-            List<ElasticSchemaField> schemaFields = await schemaFieldProvider.SearchSchemaFieldsAsync(searchSchemaFieldsDto);
+            List<ElasticSchemaField> schemaFields = await schemaFieldProvider.SearchSchemaFieldsWithHighlightingAsync(searchSchemaFieldsDto);
 
             Assert.AreEqual(2, schemaFields.Count);
 
@@ -184,6 +184,57 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(SearchDisplayNames.SchemaField.COLUMNNAME, searchHighlight.PropertyName);
             Assert.AreEqual(1, searchHighlight.Highlights.Count);
             Assert.AreEqual("Field2", searchHighlight.Highlights[0]);
+        }
+
+        [TestMethod]
+        public async Task SearchSchemaFieldsAsync_ElasticSchemaFields()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticDocumentClient> documentClient = mr.Create<IElasticDocumentClient>();
+
+            ElasticResult<ElasticSchemaField> elasticResult = new ElasticResult<ElasticSchemaField>
+            {
+                Documents = new List<ElasticSchemaField> { new ElasticSchemaField(), new ElasticSchemaField() }
+            };
+
+            documentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<ElasticSchemaField>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<ElasticSchemaField>>(x =>
+            {
+                IBoolQuery query = ((IQueryContainer)x.Query).Bool;
+                Assert.AreEqual(2, query.Should.Count());
+
+                IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
+                Assert.AreEqual("search", stringQuery.Query);
+                Assert.AreEqual(1, stringQuery.Fields.Count());
+                Assert.IsTrue(stringQuery.Fields.Any(f => f.Name == "Name"));
+
+                stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
+                Assert.AreEqual("*search*", stringQuery.Query);
+                Assert.AreEqual(1, stringQuery.Fields.Count());
+                Assert.IsTrue(stringQuery.Fields.Any(f => f.Name == "Name"));
+
+                Assert.IsNull(query.Filter);
+
+                Assert.AreEqual(10000, x.Size);
+                Assert.IsNull(x.Highlight);
+            });
+
+            SchemaFieldProvider schemaFieldProvider = new SchemaFieldProvider(documentClient.Object);
+
+            SearchSchemaFieldsDto searchSchemaFieldsDto = new SearchSchemaFieldsDto
+            {
+                SearchText = "search"
+            };
+
+            List<ElasticSchemaField> schemaFields = await schemaFieldProvider.SearchSchemaFieldsAsync(searchSchemaFieldsDto);
+
+            Assert.AreEqual(2, schemaFields.Count);
+
+            ElasticSchemaField resultField = schemaFields[0];
+            Assert.IsNull(resultField.SearchHighlights);
+
+            resultField = schemaFields[1];
+            Assert.IsNull(resultField.SearchHighlights);
         }
     }
 }

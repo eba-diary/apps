@@ -16,7 +16,7 @@ namespace Sentry.data.Infrastructure
             _elasticDocumentClient = elasticDocumentClient;
         }
 
-        public async Task<List<ElasticSchemaField>> SearchSchemaFieldsAsync(SearchSchemaFieldsDto searchSchemaFieldsDto)
+        public async Task<List<ElasticSchemaField>> SearchSchemaFieldsWithHighlightingAsync(SearchSchemaFieldsDto searchSchemaFieldsDto)
         {
             BoolQuery searchQuery = searchSchemaFieldsDto.ToSearchQuery<ElasticSchemaField>();
 
@@ -44,6 +44,21 @@ namespace Sentry.data.Infrastructure
             List<ElasticSchemaField> schemaFields = elasticResult.Hits.ToSearchHighlightedResults();
 
             return schemaFields;
+        }
+
+        public async Task<List<ElasticSchemaField>> SearchSchemaFieldsAsync(BaseSearchDto searchDto)
+        {
+            BoolQuery searchQuery = searchDto.ToSearchQuery<ElasticSchemaField>();
+
+            SearchRequest<ElasticSchemaField> searchRequest = new SearchRequest<ElasticSchemaField>()
+            {
+                Query = searchQuery,
+                Size = 10000
+            };
+
+            ElasticResult<ElasticSchemaField> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
+
+            return elasticResult.Documents.ToList();
         }
     }
 }

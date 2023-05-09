@@ -6,6 +6,7 @@ namespace Sentry.data.Core
 {
     public interface ISchemaFieldProvider
     {
-        Task<List<ElasticSchemaField>> SearchSchemaFieldsAsync(SearchSchemaFieldsDto searchSchemaFieldsDto);
+        Task<List<ElasticSchemaField>> SearchSchemaFieldsAsync(BaseSearchDto searchDto);
+        Task<List<ElasticSchemaField>> SearchSchemaFieldsWithHighlightingAsync(SearchSchemaFieldsDto searchSchemaFieldsDto);
     }
 }

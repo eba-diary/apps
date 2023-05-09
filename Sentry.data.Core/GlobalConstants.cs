@@ -590,6 +590,7 @@ namespace Sentry.data.Core
             public const string PAGENUMBER = "PageNumber";
             public const string PAGESIZE = "PageSize";
             public const string LAYOUT = "Layout";
+            public const string SEARCHCOLUMNS = "ShouldSearchColumns";
         }
 
         public static class ExecutionParameterKeys

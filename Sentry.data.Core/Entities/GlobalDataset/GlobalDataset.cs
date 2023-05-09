@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         public string DatasetName { get; set; }
 
         [PropertyName("datasetsaidassetcode")]
-        [FilterSearchField(FilterCategoryNames.Dataset.DATASETASSET, hideResultCounts: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.DATASETASSET, hideResultCounts: true, isPinnedFilter: true)]
         public string DatasetSaidAssetCode { get; set; }
 
         [PropertyName("environmentdatasets")]

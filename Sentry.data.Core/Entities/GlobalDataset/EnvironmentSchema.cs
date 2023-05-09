@@ -17,7 +17,7 @@ namespace Sentry.data.Core
         public string SchemaDescription { get; set; }
 
         [PropertyName("schemasaidassetcode")]
-        [FilterSearchField(FilterCategoryNames.Dataset.PRODUCERASSET, hideResultCounts: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.PRODUCERASSET, hideResultCounts: true, isPinnedFilter: true)]
         public string SchemaSaidAssetCode { get; set; }
     }
 }

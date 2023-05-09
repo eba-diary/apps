@@ -143,6 +143,125 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
+        public async Task GetGlobalDatasetFiltersAsync_GetGlobalDatasetFiltersDto_ShouldSearchColumns_GetGlobalDatasetFiltersResultDto()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
+
+            GetGlobalDatasetFiltersDto filtersDto = new GetGlobalDatasetFiltersDto 
+            { 
+                SearchText = "search",
+                ShouldSearchColumns = true
+            };
+
+            DocumentsFiltersDto<GlobalDataset> documentsFiltersDto = new DocumentsFiltersDto<GlobalDataset>
+            {
+                FilterCategories = new List<FilterCategoryDto> 
+                {
+                    new FilterCategoryDto
+                    {
+                        CategoryName = FilterCategoryNames.Dataset.CATEGORY,
+                        CategoryOptions = new List<FilterCategoryOptionDto>
+                        {
+                            new FilterCategoryOptionDto
+                            {
+                                OptionValue = "Category",
+                                Selected = true,
+                                ResultCount = 1
+                            }
+                        }
+                    }
+                },
+                Documents = new List<GlobalDataset>
+                {
+                    new GlobalDataset
+                    {
+                        EnvironmentDatasets = new List<EnvironmentDataset>
+                        {
+                            new EnvironmentDataset { DatasetId = 11 }
+                        }
+                    }
+                }
+            };
+
+            globalDatasetProvider.Setup(x => x.GetGlobalDatasetsAndFiltersAsync(filtersDto)).ReturnsAsync(documentsFiltersDto);
+
+            List<FilterCategoryDto> additionalFilters = new List<FilterCategoryDto>
+            {
+                new FilterCategoryDto
+                {
+                    CategoryName = FilterCategoryNames.Dataset.CATEGORY,
+                    CategoryOptions = new List<FilterCategoryOptionDto>
+                    {
+                        new FilterCategoryOptionDto
+                        {
+                            OptionValue = "Category",
+                            Selected = false,
+                            ResultCount = 1
+                        },
+                        new FilterCategoryOptionDto
+                        {
+                            OptionValue = "Category 2",
+                            Selected = false,
+                            ResultCount = 1
+                        }
+                    }
+                }
+            };
+
+            globalDatasetProvider.Setup(x => x.GetFiltersByEnvironmentDatasetIdsAsync(It.Is<List<int>>(i => i.Count == 1 && i[0] == 31))).ReturnsAsync(additionalFilters);
+            
+            Mock<ISchemaFieldProvider> schemaFieldProvider = mr.Create<ISchemaFieldProvider>();
+
+            List<ElasticSchemaField> schemaFields = new List<ElasticSchemaField>
+            {
+                new ElasticSchemaField
+                {
+                    DatasetId = 11
+                },
+                new ElasticSchemaField
+                {
+                    DatasetId = 31
+                },
+                new ElasticSchemaField
+                {
+                    DatasetId = 11
+                }
+            };
+
+            schemaFieldProvider.Setup(x => x.SearchSchemaFieldsAsync(filtersDto)).ReturnsAsync(schemaFields).Callback<BaseSearchDto>(x =>
+            {
+                Assert.AreEqual("search", x.SearchText);
+            });
+
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, schemaFieldProvider.Object, null, dataFeatures.Object);
+
+            GetGlobalDatasetFiltersResultDto results = await globalDatasetService.GetGlobalDatasetFiltersAsync(filtersDto);
+
+            Assert.AreEqual(1, results.FilterCategories.Count);
+
+            FilterCategoryDto category = results.FilterCategories.First();
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, category.CategoryName);
+            Assert.AreEqual(2, category.CategoryOptions.Count);
+
+            FilterCategoryOptionDto option = category.CategoryOptions[0];
+            Assert.AreEqual("Category", option.OptionValue);
+            Assert.IsTrue(option.Selected);
+            Assert.AreEqual(2, option.ResultCount);
+
+            option = category.CategoryOptions[1];
+            Assert.AreEqual("Category 2", option.OptionValue);
+            Assert.IsFalse(option.Selected);
+            Assert.AreEqual(1, option.ResultCount);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
         public async Task SearchGlobalDatasetsAsync_SearchGlobalDatasetsDto_SearchColumns_WithFilterCategories_SearchGlobalDatasetsResultDto()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
@@ -239,7 +358,7 @@ namespace Sentry.data.Infrastructure.Tests
                     }
                 }
             };
-            schemaFieldProvider.Setup(x => x.SearchSchemaFieldsAsync(It.IsAny<SearchSchemaFieldsDto>())).ReturnsAsync(schemaFields).Callback<SearchSchemaFieldsDto>(x =>
+            schemaFieldProvider.Setup(x => x.SearchSchemaFieldsWithHighlightingAsync(It.IsAny<SearchSchemaFieldsDto>())).ReturnsAsync(schemaFields).Callback<SearchSchemaFieldsDto>(x =>
             {
                 Assert.AreEqual(5, x.DatasetIds.Count);
                 Assert.AreEqual("search", x.SearchText);
@@ -347,7 +466,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<ISchemaFieldProvider> schemaFieldProvider = mr.Create<ISchemaFieldProvider>();
             List<ElasticSchemaField> schemaFields = new List<ElasticSchemaField>();
-            schemaFieldProvider.Setup(x => x.SearchSchemaFieldsAsync(It.IsAny<SearchSchemaFieldsDto>())).ReturnsAsync(schemaFields).Callback<SearchSchemaFieldsDto>(x =>
+            schemaFieldProvider.Setup(x => x.SearchSchemaFieldsWithHighlightingAsync(It.IsAny<SearchSchemaFieldsDto>())).ReturnsAsync(schemaFields).Callback<SearchSchemaFieldsDto>(x =>
             {
                 Assert.IsFalse(x.DatasetIds.Any());
                 Assert.AreEqual("search", x.SearchText);

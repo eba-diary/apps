@@ -284,6 +284,7 @@
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Search\BaseFilterSearchDto.cs" />
     <Compile Include="DTO\Search\BaseSearchDto.cs" />
+    <Compile Include="DTO\Search\DocumentsFiltersDto.cs" />
     <Compile Include="DTO\Search\HighlightableFilterSearchDto.cs" />
     <Compile Include="DTO\Search\SearchHighlightableDto.cs" />
     <Compile Include="DTO\Search\SearchHighlightDto.cs" />

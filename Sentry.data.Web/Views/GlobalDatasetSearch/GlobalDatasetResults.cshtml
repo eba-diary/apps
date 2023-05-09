@@ -7,7 +7,7 @@
 <div class="tile-result-content">
     <input type="hidden" id="result-count" value="@Model.GlobalDatasets.Count">
 
-    <div class="tile-result-options mt-4">
+    <div class="d-flex mt-4">
         @* sort *@
         <div class="mr-2">
             @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
@@ -22,9 +22,19 @@
     </div>
 
     @* page size *@
-    <div class="mt-4">
-        @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
-        <label class="mdb-main-label">Page Size</label>
+    <div class="d-flex">
+        <div class="switch ml-1 mr-2 text-center">
+            <div class="searchColumnsLabel">Search Columns</div>
+            <label>
+                <input type="checkbox" id="ShouldSearchColumns" checked="@Model.ShouldSearchColumns">
+                <span class="lever"></span>
+            </label>
+        </div>
+
+        <div class="mt-4">
+            @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Page Size</label>
+        </div>
     </div>
 
     <div class="row mr-0 ml-0" id="tile-results">

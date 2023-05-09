@@ -342,6 +342,31 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        public void ToSearchQuery_ElasticSchemaField_BoolQuery()
+        {
+            SearchSchemaFieldsDto filterSearchDto = new SearchSchemaFieldsDto
+            {
+                SearchText = "search"
+            };
+
+            BoolQuery query = filterSearchDto.ToSearchQuery<ElasticSchemaField>();
+
+            Assert.AreEqual(2, query.Should.Count());
+
+            IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
+            Assert.AreEqual("search", stringQuery.Query);
+            Assert.AreEqual(1, stringQuery.Fields.Count());
+            Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "Name"));
+
+            stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
+            Assert.AreEqual("*search*", stringQuery.Query);
+            Assert.AreEqual(1, stringQuery.Fields.Count());
+            Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "Name"));
+
+            Assert.IsNull(query.Filter);
+        }
+
+        [TestMethod]
         public void ToFilterCategories_AggregateDictionary_DataInventory_FilterCategoryDtos()
         {
             AggregateDictionary aggregates = new AggregateDictionary(new Dictionary<string, IAggregate>

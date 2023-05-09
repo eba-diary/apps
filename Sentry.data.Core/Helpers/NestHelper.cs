@@ -23,14 +23,14 @@ namespace Sentry.data.Core
             return aggregations;
         }
 
-        public static BoolQuery ToSearchQuery<T>(this BaseSearchDto searchDto) where T : class
+        public static BoolQuery ToSearchQuery<T>(this BaseSearchDto filterSearchDto) where T : class
         {
             BoolQuery searchQuery = new BoolQuery();
 
-            if (!string.IsNullOrWhiteSpace(searchDto.SearchText))
+            if (!string.IsNullOrWhiteSpace(filterSearchDto.SearchText))
             {
                 //split search terms regardless of amount of spaces between words
-                List<string> terms = searchDto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                List<string> terms = filterSearchDto.SearchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 searchQuery.Should = GetShouldQueries<T>(terms);
                 searchQuery.MinimumShouldMatch = searchQuery.Should.Any() ? 1 : 0;
