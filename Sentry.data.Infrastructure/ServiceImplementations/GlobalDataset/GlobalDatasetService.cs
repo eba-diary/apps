@@ -118,7 +118,17 @@ namespace Sentry.data.Infrastructure
                 foreach (ElasticSchemaField schemaField in schemaFields)
                 {
                     GlobalDataset retrievedGlobalDataset = globalDatasets.FirstOrDefault(x => x.EnvironmentDatasets.Select(d => d.DatasetId).Contains(schemaField.DatasetId));
-                    retrievedGlobalDataset?.MergeSearchHighlights(schemaField.SearchHighlights);
+
+                    if (retrievedGlobalDataset != null)
+                    {
+                        retrievedGlobalDataset.MergeSearchHighlights(schemaField.SearchHighlights);
+                    }
+                    else if (searchGlobalDatasetsDto.FilterCategories.Any())
+                    {
+                        //Have to match up the environment dataset id to the filter??
+                        //is it even possible to get the correct filter highlight associated with the column 
+                        //don't want when 2 filters are selected, both to show up in the highlights
+                    }
                 }
             }
 

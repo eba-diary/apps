@@ -109,11 +109,16 @@ data.GlobalDatasetSearch = {
 
                     let totalResults = data.GlobalDatasetSearch.globalDatasets.length;
 
-                    if (totalResults > 0 && pageNumber > 1) {
+                    if (totalResults > 0) {
                         let pageSize = parseInt(request.PageSize);
-                        let pageStart = ((pageNumber - 1) * pageSize) + 1;
-                        let pageEnd = pageNumber * pageSize;
-                        let resultCount = parseInt($("#result-count").val())
+                        let pageStart = 1;
+                        let pageEnd = pageSize;
+                        let resultCount = parseInt($("#result-count").val());
+
+                        if (pageNumber > 1) {
+                            pageStart = ((pageNumber - 1) * pageSize) + 1;
+                            pageEnd = pageNumber * pageSize;
+                        }
 
                         data.FilterSearch.setPageInfo(pageStart, resultCount < pageSize ? totalResults : pageEnd);
                     }
