@@ -27,7 +27,7 @@
 
         @if (Model.HasSearchSettings)
         {
-            <div class="searchSettingsContainer">
+            <div class="searchSettingsContainer display-none">
                 @{
                     Html.RenderAction("SearchSettings", new { parameters = Model.ResultParameters });
                 }

@@ -285,6 +285,7 @@
         $(".filter-search-start").addClass("display-none");
         $(".filter-search-results-none").addClass("display-none");
         $(".filter-search-result-count-container").addClass("display-none");
+        $(".searchSettingsContainer").addClass("display-none");
 
         $(".filter-search-result-progress").removeClass("display-none");
     },
@@ -297,6 +298,7 @@
 
         $(".icon-search").removeClass("display-none");
         $(".filter-search-save-search-container").removeClass("display-none");
+        $(".searchSettingsContainer").removeClass("display-none");
 
         if (totalResultCount > 0) {
             $(".filter-search-results-none").addClass("display-none");
