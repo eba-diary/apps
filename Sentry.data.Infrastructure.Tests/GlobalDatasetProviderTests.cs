@@ -1072,7 +1072,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
             {
-                Assert.AreEqual(10000, s.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.MAX, s.Size);
 
                 IBoolQuery query = ((IQueryContainer)s.Query).Bool;
                 Assert.AreEqual(2, query.Should.Count());
@@ -1196,7 +1196,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
             {
-                Assert.AreEqual(0, s.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.ZERO, s.Size);
 
                 IBoolQuery query = ((IQueryContainer)s.Query).Bool;
                 Assert.AreEqual(2, query.Should.Count());
@@ -1276,7 +1276,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, filter.CategoryName);
             Assert.AreEqual(3, filter.CategoryOptions.Count);
             Assert.IsFalse(filter.HideResultCounts);
-            Assert.IsTrue(filter.DefaultCategoryOpen);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("Sentry", option.OptionValue);
@@ -1318,7 +1318,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, filter.CategoryName);
             Assert.AreEqual(2, filter.CategoryOptions.Count);
             Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsTrue(filter.DefaultCategoryOpen);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("NonProd", option.OptionValue);
@@ -1376,7 +1376,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
             {
-                Assert.AreEqual(10000, s.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.MAX, s.Size);
 
                 IBoolQuery query = ((IQueryContainer)s.Query).Bool;
                 Assert.AreEqual(2, query.Should.Count());
@@ -1457,7 +1457,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, filter.CategoryName);
             Assert.AreEqual(3, filter.CategoryOptions.Count);
             Assert.IsFalse(filter.HideResultCounts);
-            Assert.IsTrue(filter.DefaultCategoryOpen);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("Sentry", option.OptionValue);
@@ -1499,7 +1499,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, filter.CategoryName);
             Assert.AreEqual(2, filter.CategoryOptions.Count);
             Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsTrue(filter.DefaultCategoryOpen);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
 
             option = filter.CategoryOptions[0];
             Assert.AreEqual("NonProd", option.OptionValue);
@@ -1565,7 +1565,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticDocumentClient> documentClient = mr.Create<IElasticDocumentClient>();
             documentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(x =>
             {
-                Assert.AreEqual(10000, x.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.MAX, x.Size);
 
                 ITermsQuery terms = ((IQueryContainer)x.Query).Terms;
                 Assert.AreEqual(2, terms.Terms.Count());
@@ -1592,7 +1592,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IElasticDocumentClient> documentClient = mr.Create<IElasticDocumentClient>();
             documentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(x =>
             {
-                Assert.AreEqual(0, x.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.ZERO, x.Size);
 
                 ITermsQuery terms = ((IQueryContainer)x.Query).Terms;
                 Assert.AreEqual(2, terms.Terms.Count());

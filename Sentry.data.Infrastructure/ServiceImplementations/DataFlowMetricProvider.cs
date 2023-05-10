@@ -4,6 +4,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -38,7 +39,7 @@ namespace Sentry.data.Infrastructure
 
             ElasticResult<DataFlowMetric> elasticResult = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s
                                             .Query(q => q.Bool(bq => bq.Filter(filters)))
-                                            .Size(10000).Sort(sq=>sq.Descending(dq=>dq.EventMetricId))).Result;
+                                            .Size(ElasticQueryValues.Size.MAX).Sort(sq=>sq.Descending(dq=>dq.EventMetricId))).Result;
 
             return elasticResult.Documents.ToList();
         }

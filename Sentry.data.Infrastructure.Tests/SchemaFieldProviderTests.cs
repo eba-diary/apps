@@ -65,7 +65,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("1", terms.Terms.First().ToString());
                 Assert.AreEqual("2", terms.Terms.Last().ToString());
 
-                Assert.AreEqual(10000, x.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.MAX, x.Size);
                 Assert.IsNotNull(x.Highlight);
 
                 IHighlight requestHighlight = x.Highlight;
@@ -149,7 +149,7 @@ namespace Sentry.data.Infrastructure.Tests
 
                 Assert.IsNull(query.Filter);
 
-                Assert.AreEqual(10000, x.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.MAX, x.Size);
                 Assert.IsNotNull(x.Highlight);
 
                 IHighlight requestHighlight = x.Highlight;
@@ -215,7 +215,7 @@ namespace Sentry.data.Infrastructure.Tests
 
                 Assert.IsNull(query.Filter);
 
-                Assert.AreEqual(10000, x.Size);
+                Assert.AreEqual(ElasticQueryValues.Size.MAX, x.Size);
                 Assert.IsNull(x.Highlight);
             });
 
