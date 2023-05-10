@@ -188,7 +188,7 @@ data.Admin = {
             $("#processActivityResultsTable").empty();
         }
 
-        table = $("#processActivityResultsTable").DataTable({
+        data.Admin.ProcessActivityTable = $("#processActivityResultsTable").DataTable({
             ajax: {
                 url: ajaxUrl,
                 type: "POST"
