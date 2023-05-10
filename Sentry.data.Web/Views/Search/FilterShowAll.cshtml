@@ -14,7 +14,7 @@
                         <ul class="list-unstyled">
                             @foreach (FilterCategoryOptionModel option in category.CategoryOptions.OrderBy(x => x.OptionValue).ToList())
                             {
-                                <li class="filter-search-category-option filter-search-modal-option" title="@option.OptionValue">
+                                <li class="filter-search-category-option filter-search-modal-option" @(option.OptionValue.Length > 25 ? $"title={option.OptionValue} data-toggle=tooltip data-placement=right" : "")>
                                     <div class="form-group mb-0">
                                         <input type="checkbox" id="modal_@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" checked="@option.Selected">
                                         <label for="modal_@option.OptionId" class="form-check-label filter-search-category-option-label">

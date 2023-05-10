@@ -76,27 +76,13 @@ namespace Sentry.data.Infrastructure
         #region Private
         private async Task<List<GlobalDataset>> GetGlobalDatasetsWithColumnSearchAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto, Task<List<GlobalDataset>> globalDatasetsTask)
         {
-            //get only schemafields that match full search, highlighting, filter by dataset id if there are filter categories
+            List<GlobalDataset> filteredGlobalDatasets = await GetFilteredGlobalDatasetsAsync(searchGlobalDatasetsDto.FilterCategories);
 
-            //get columns that match search
             SearchSchemaFieldsDto searchSchemaFieldsDto = new SearchSchemaFieldsDto
             {
                 SearchText = searchGlobalDatasetsDto.SearchText,
-                DatasetIds = new List<int>()
+                DatasetIds = filteredGlobalDatasets.SelectMany(x => x.EnvironmentDatasets.Select(d => d.DatasetId)).ToList()
             };
-
-            //only get a subset of dataset ids if search includes filters
-            if (searchGlobalDatasetsDto.FilterCategories.Any())
-            {
-                HighlightableFilterSearchDto additionalSearchDto = new HighlightableFilterSearchDto
-                {
-                    FilterCategories = searchGlobalDatasetsDto.FilterCategories,
-                    UseHighlighting = false
-                };
-
-                List<GlobalDataset> globalDatasetsForColumnSearch = await _globalDatasetProvider.SearchGlobalDatasetsAsync(additionalSearchDto);
-                searchSchemaFieldsDto.DatasetIds = globalDatasetsForColumnSearch.SelectMany(x => x.EnvironmentDatasets.Select(d => d.DatasetId)).ToList();
-            }
 
             //get columns that match search
             List<ElasticSchemaField> schemaFields = await _schemaFieldProvider.SearchSchemaFieldsWithHighlightingAsync(searchSchemaFieldsDto);
@@ -105,34 +91,60 @@ namespace Sentry.data.Infrastructure
 
             if (schemaFields.Any())
             {
-                //only retrieve additional global datasets that we don't already have
-                List<int> environmentDatasetIdsToGet = GetAdditionalEnvironmentDatasetIds(schemaFields, globalDatasets);
-
-                if (environmentDatasetIdsToGet.Any())
-                {
-                    List<GlobalDataset> columnGlobalDatasets = await _globalDatasetProvider.GetGlobalDatasetsByEnvironmentDatasetIdsAsync(environmentDatasetIdsToGet);
-                    globalDatasets.AddRange(columnGlobalDatasets);
-                }
+                await AddAdditionalGlobalDatasetsForMatchedColumns(globalDatasets, schemaFields, filteredGlobalDatasets);
 
                 //add columns to search highlights
                 foreach (ElasticSchemaField schemaField in schemaFields)
                 {
                     GlobalDataset retrievedGlobalDataset = globalDatasets.FirstOrDefault(x => x.EnvironmentDatasets.Select(d => d.DatasetId).Contains(schemaField.DatasetId));
-
-                    if (retrievedGlobalDataset != null)
-                    {
-                        retrievedGlobalDataset.MergeSearchHighlights(schemaField.SearchHighlights);
-                    }
-                    else if (searchGlobalDatasetsDto.FilterCategories.Any())
-                    {
-                        //Have to match up the environment dataset id to the filter??
-                        //is it even possible to get the correct filter highlight associated with the column 
-                        //don't want when 2 filters are selected, both to show up in the highlights
-                    }
+                    retrievedGlobalDataset?.MergeSearchHighlights(schemaField.SearchHighlights);
                 }
             }
 
             return globalDatasets;
+        }
+
+        private async Task<List<GlobalDataset>> GetFilteredGlobalDatasetsAsync(List<FilterCategoryDto> filterCategories)
+        {
+            List<GlobalDataset> filteredGlobalDatasets = new List<GlobalDataset>();
+
+            //only get a subset of dataset ids if search includes filters
+            if (filterCategories.Any())
+            {
+                SearchGlobalDatasetsDto additionalSearchDto = new SearchGlobalDatasetsDto
+                {
+                    FilterCategories = filterCategories
+                };
+
+                filteredGlobalDatasets = await _globalDatasetProvider.SearchGlobalDatasetsAsync(additionalSearchDto);
+            }
+
+            return filteredGlobalDatasets;
+        }
+
+        private async Task AddAdditionalGlobalDatasetsForMatchedColumns(List<GlobalDataset> globalDatasets, List<ElasticSchemaField> schemaFields, List<GlobalDataset> filteredGlobalDatasets)
+        {
+            //only retrieve additional global datasets that we don't already have
+            List<int> environmentDatasetIdsToGet = GetAdditionalEnvironmentDatasetIds(schemaFields, globalDatasets);
+
+            if (environmentDatasetIdsToGet.Any())
+            {
+                List<GlobalDataset> additionalGlobalDatasetsForColumns = await _globalDatasetProvider.GetGlobalDatasetsByEnvironmentDatasetIdsAsync(environmentDatasetIdsToGet);
+
+                if (filteredGlobalDatasets.Any())
+                {
+                    foreach (GlobalDataset additionalGlobalDataset in additionalGlobalDatasetsForColumns)
+                    {
+                        GlobalDataset globalDatasetWithHighlight = filteredGlobalDatasets.FirstOrDefault(x => x.GlobalDatasetId == additionalGlobalDataset.GlobalDatasetId);
+                        if (globalDatasetWithHighlight != null)
+                        {
+                            additionalGlobalDataset.MergeSearchHighlights(globalDatasetWithHighlight.SearchHighlights);
+                        }
+                    }
+                }
+
+                globalDatasets.AddRange(additionalGlobalDatasetsForColumns);
+            }
         }
 
         private async Task<List<FilterCategoryDto>> GetFilterCategoriesWithColumnSearchAsync(GetGlobalDatasetFiltersDto getGlobalDatasetFiltersDto)

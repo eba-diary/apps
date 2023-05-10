@@ -1171,8 +1171,7 @@ namespace Sentry.data.Infrastructure.Tests
                             }
                         }
                     }
-                },
-                UseHighlighting = true
+                }
             };
 
             List<GlobalDataset> results = await globalDatasetProvider.SearchGlobalDatasetsAsync(filterSearchDto);
@@ -1182,138 +1181,6 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsNotNull(results[0].SearchHighlights);
             Assert.AreEqual(globalDataset2, results[1]);
             Assert.IsNotNull(results[1].SearchHighlights);
-
-            mr.VerifyAll();
-        }
-
-        [TestMethod]
-        public async Task SearchGlobalDatasetsAsync_BaseFilterSearchDto_NoHighlighting_GlobalDatasets()
-        {
-            MockRepository mr = new MockRepository(MockBehavior.Strict);
-
-            Mock<IElasticDocumentClient> elasticDocumentClient = mr.Create<IElasticDocumentClient>();
-
-            GlobalDataset globalDataset = new GlobalDataset();
-            GlobalDataset globalDataset2 = new GlobalDataset();
-
-            ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
-            {
-                Documents = new List<GlobalDataset>
-                {
-                    globalDataset,
-                    globalDataset2
-                }
-            };
-
-            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
-            {
-                Assert.AreEqual(10000, s.Size);
-
-                IBoolQuery query = ((IQueryContainer)s.Query).Bool;
-                Assert.AreEqual(2, query.Should.Count());
-
-                IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
-                Assert.AreEqual("search", stringQuery.Query);
-                Assert.AreEqual(4, stringQuery.Fields.Count());
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
-
-                stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
-                Assert.AreEqual("*search*", stringQuery.Query);
-                Assert.AreEqual(4, stringQuery.Fields.Count());
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
-
-                Assert.AreEqual(3, query.Filter.Count());
-
-                List<IQueryContainer> filters = query.Filter.Select(x => (IQueryContainer)x).ToList();
-
-                ITermsQuery termsQuery = filters.FirstOrDefault(x => x.Terms.Field.Name == "datasetsaidassetcode.keyword").Terms;
-                Assert.IsNotNull(termsQuery);
-                Assert.AreEqual(2, termsQuery.Terms.Count());
-                Assert.AreEqual("SAID", termsQuery.Terms.First().ToString());
-                Assert.AreEqual("DATA", termsQuery.Terms.Last().ToString());
-
-                termsQuery = filters.FirstOrDefault(x => x.Terms.Field.Name == "environmentdatasets.issecured").Terms;
-                Assert.IsNotNull(termsQuery);
-                Assert.AreEqual(1, termsQuery.Terms.Count());
-                Assert.AreEqual("true", termsQuery.Terms.First().ToString());
-
-                termsQuery = filters.FirstOrDefault(x => x.Terms.Field.Name == "environmentdatasets.environmentschemas.schemasaidassetcode.keyword").Terms;
-                Assert.IsNotNull(termsQuery);
-                Assert.AreEqual("TEST", termsQuery.Terms.First().ToString());
-
-                Assert.IsNull(s.Highlight);
-            });
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
-
-            SearchGlobalDatasetsDto filterSearchDto = new SearchGlobalDatasetsDto
-            {
-                SearchText = "search",
-                FilterCategories = new List<FilterCategoryDto>
-                {
-                    new FilterCategoryDto
-                    {
-                        CategoryName = FilterCategoryNames.Dataset.PRODUCERASSET,
-                        CategoryOptions = new List<FilterCategoryOptionDto>
-                        {
-                            new FilterCategoryOptionDto
-                            {
-                                OptionValue = "TEST",
-                                Selected = true
-                            }
-                        }
-                    },
-                    new FilterCategoryDto
-                    {
-                        CategoryName = FilterCategoryNames.Dataset.SECURED,
-                        CategoryOptions = new List<FilterCategoryOptionDto>
-                        {
-                            new FilterCategoryOptionDto
-                            {
-                                OptionValue = "true",
-                                Selected = true
-                            },
-                            new FilterCategoryOptionDto
-                            {
-                                OptionValue = "false",
-                                Selected = false
-                            }
-                        }
-                    },
-                    new FilterCategoryDto
-                    {
-                        CategoryName = FilterCategoryNames.Dataset.DATASETASSET,
-                        CategoryOptions = new List<FilterCategoryOptionDto>
-                        {
-                            new FilterCategoryOptionDto
-                            {
-                                OptionValue = "SAID",
-                                Selected = true
-                            },
-                            new FilterCategoryOptionDto
-                            {
-                                OptionValue = "DATA",
-                                Selected = true
-                            }
-                        }
-                    }
-                },
-                UseHighlighting = false
-            };
-
-            List<GlobalDataset> results = await globalDatasetProvider.SearchGlobalDatasetsAsync(filterSearchDto);
-
-            Assert.AreEqual(2, results.Count);
-            Assert.AreEqual(globalDataset, results[0]);
-            Assert.IsNull(results[0].SearchHighlights);
-            Assert.AreEqual(globalDataset2, results[1]);
-            Assert.IsNull(results[1].SearchHighlights);
 
             mr.VerifyAll();
         }

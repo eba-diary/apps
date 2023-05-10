@@ -272,7 +272,12 @@
 
 .searchColumnsLabel {
     font-size: 0.8rem;
-    color: #757575;
-    margin-top: 0.53rem;
-    margin-bottom: 0.5rem;
+}
+
+.searchColumnsSwitch {
+    margin-bottom: 0.375rem;
+}
+
+.searchSettingsContainer {
+    margin-left: 0.75rem;
 }

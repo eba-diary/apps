@@ -18,10 +18,10 @@
 {
     foreach (FilterCategoryOptionModel option in options.ToList())
     {
-        <li class="filter-search-category-option" title="@option.OptionValue">
+        <li class="filter-search-category-option" @(option.OptionValue.Length > 25 ? $"title={option.OptionValue} data-toggle=tooltip data-placement=right" : "")>
             <div class="form-group mb-0">
                 <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" data-category="@option.ParentCategoryName" checked="@option.Selected">
-                <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
+                <label for="@option.OptionId" class="form-check-label filter-search-category-option-label") >
                     @SafeValue(option.OptionValue)
                     @if (!hideCounts)
                     {
@@ -33,14 +33,16 @@
     }
 }
 
-<div class="filter-search-active-options-container bottom-border @(allOptions.Any(x => x.Selected) ? "" : "display-none")">
-    @foreach (FilterCategoryOptionModel option in allOptions)
-    {
-        <div class="chip filter-search-chip display-none" id="clearOption_@option.OptionId" title="@option.ParentCategoryName">
-            @SafeValue(option.OptionValue)
-            <em class="close filter-search-chip-close fas fa-times"></em>
-        </div>
-    }
+<div class="filter-search-active-options-container @(allOptions.Any(x => x.Selected) ? "" : "display-none")">
+    <div class="filter-search-active-options bottom-border w-100">
+        @foreach (FilterCategoryOptionModel option in allOptions)
+        {
+            <div class="chip filter-search-chip display-none" id="clearOption_@option.OptionId" data-toggle="tooltip" data-placement="top" title="@option.ParentCategoryName">
+                @SafeValue(option.OptionValue)
+                <em class="close filter-search-chip-close fas fa-times"></em>
+            </div>
+        }
+    </div>
 </div>
 
 <div class="filter-search-categories">
@@ -64,7 +66,7 @@
                     @DisplayCategoryOptions(category.CategoryOptions.Take(visibleOptionCount), category.HideResultCounts)
 
                     <li class="display-none" id="hidden_@categoryMoreId">
-                        <ul class="notNested">
+                        <ul class="list-unstyled">
                             @DisplayCategoryOptions(category.CategoryOptions.Skip(visibleOptionCount), category.HideResultCounts)
                         </ul>
                     </li>

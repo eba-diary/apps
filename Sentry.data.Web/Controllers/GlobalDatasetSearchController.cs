@@ -111,13 +111,19 @@ namespace Sentry.data.Web.Controllers
             return PartialView(resultsViewModel);
         }
 
+        public ActionResult SearchSettings(Dictionary<string, string> parameters)
+        {
+            return PartialView(bool.Parse(parameters[TileResultParameters.SEARCHCOLUMNS]));
+        }
+
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
             return new FilterSearchConfigModel()
             {
                 PageTitle = "Datasets",
                 SearchType = SearchType.GLOBAL_DATASET,
-                DefaultSearch = searchModel
+                DefaultSearch = searchModel,
+                HasSearchSettings = true
             };
         }
     }

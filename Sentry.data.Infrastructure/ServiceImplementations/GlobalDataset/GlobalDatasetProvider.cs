@@ -19,26 +19,16 @@ namespace Sentry.data.Infrastructure
         }
 
         #region Search
-        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(HighlightableFilterSearchDto filterSearchDto)
+        public async Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto)
         {
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
+            searchRequest.Highlight = NestHelper.GetHighlight<GlobalDataset>();
             searchRequest.Size = 10000;
-
-            if (filterSearchDto.UseHighlighting)
-            {
-                searchRequest.Highlight = NestHelper.GetHighlight<GlobalDataset>();
-            }
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
-            if (filterSearchDto.UseHighlighting)
-            {
-                return elasticResult.Hits.ToSearchHighlightedResults();
-            }
-            else
-            {
-                return elasticResult.Documents.ToList();
-            }
+            List<GlobalDataset> globalDatasets = elasticResult.Hits.ToSearchHighlightedResults();
+            return globalDatasets;
         }
 
         public async Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto)

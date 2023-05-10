@@ -5,7 +5,7 @@ namespace Sentry.data.Core
 {
     public interface IGlobalDatasetProvider
     {
-        Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(HighlightableFilterSearchDto filterSearchDto);
+        Task<List<GlobalDataset>> SearchGlobalDatasetsAsync(BaseFilterSearchDto filterSearchDto);
         Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(BaseFilterSearchDto filterSearchDto);
         Task<DocumentsFiltersDto<GlobalDataset>> GetGlobalDatasetsAndFiltersAsync(BaseFilterSearchDto filterSearchDto);
         Task<List<GlobalDataset>> GetGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds);

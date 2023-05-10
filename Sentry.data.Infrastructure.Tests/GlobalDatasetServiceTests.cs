@@ -20,10 +20,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
 
-            SearchGlobalDatasetsDto searchGlobalDatasetsDto = new SearchGlobalDatasetsDto
-            {
-                UseHighlighting = true
-            };
+            SearchGlobalDatasetsDto searchGlobalDatasetsDto = new SearchGlobalDatasetsDto();
 
             List<GlobalDataset> globalDatasets = GetGlobalDatasets();
 
@@ -94,10 +91,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
 
-            SearchGlobalDatasetsDto searchGlobalDatasetsDto = new SearchGlobalDatasetsDto
-            {
-                UseHighlighting = true
-            };
+            SearchGlobalDatasetsDto searchGlobalDatasetsDto = new SearchGlobalDatasetsDto();
 
             List<GlobalDataset> globalDatasets = new List<GlobalDataset>();
 
@@ -270,7 +264,6 @@ namespace Sentry.data.Infrastructure.Tests
 
             SearchGlobalDatasetsDto searchGlobalDatasetsDto = new SearchGlobalDatasetsDto
             {
-                UseHighlighting = true,
                 ShouldSearchColumns = true,
                 SearchText = "search",
                 FilterCategories = new List<FilterCategoryDto>
@@ -310,12 +303,20 @@ namespace Sentry.data.Infrastructure.Tests
                         IsSecured = false,
                         FavoriteUserIds = new List<string>()
                     }
+                },
+                SearchHighlights = new List<SearchHighlight>
+                {
+                    new SearchHighlight
+                    {
+                        PropertyName = FilterCategoryNames.Dataset.DATASETASSET,
+                        Highlights = new List<string> { "DATA"}
+                    }
                 }
             };
             globalDatasets2.Add(additionalGlobalDataset);
 
+            globalDatasetProvider.Setup(x => x.SearchGlobalDatasetsAsync(It.IsAny<SearchGlobalDatasetsDto>())).ReturnsAsync(globalDatasets2);
             globalDatasetProvider.Setup(x => x.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto)).ReturnsAsync(globalDatasets);
-            globalDatasetProvider.Setup(x => x.SearchGlobalDatasetsAsync(It.Is<HighlightableFilterSearchDto>(h => !h.UseHighlighting))).ReturnsAsync(globalDatasets2);
             globalDatasetProvider.Setup(x => x.GetGlobalDatasetsByEnvironmentDatasetIdsAsync(It.Is<List<int>>(i => i.Count == 1 && i.First() == 31))).ReturnsAsync(new List<GlobalDataset> { additionalGlobalDataset });
 
             Mock<ISchemaFieldProvider> schemaFieldProvider = mr.Create<ISchemaFieldProvider>();
@@ -436,9 +437,14 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
             Assert.AreEqual(31, result.TargetDatasetId);
-            Assert.AreEqual(1, result.SearchHighlights.Count);
+            Assert.AreEqual(2, result.SearchHighlights.Count);
 
             highlight = result.SearchHighlights.First();
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, highlight.PropertyName);
+            Assert.AreEqual(1, highlight.Highlights.Count);
+            Assert.AreEqual("DATA", highlight.Highlights.First());
+
+            highlight = result.SearchHighlights.Last();
             Assert.AreEqual(SearchDisplayNames.SchemaField.COLUMNNAME, highlight.PropertyName);
             Assert.AreEqual(1, highlight.Highlights.Count);
             Assert.AreEqual("Field2", highlight.Highlights.First());
@@ -455,7 +461,6 @@ namespace Sentry.data.Infrastructure.Tests
 
             SearchGlobalDatasetsDto searchGlobalDatasetsDto = new SearchGlobalDatasetsDto
             {
-                UseHighlighting = true,
                 ShouldSearchColumns = true,
                 SearchText = "search"
             };

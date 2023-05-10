@@ -52,7 +52,6 @@ namespace Sentry.data.Web.Tests.API
 
             Assert.AreEqual("search text", dto.SearchText);
             Assert.IsTrue(dto.ShouldSearchColumns);
-            Assert.IsTrue(dto.UseHighlighting);
             Assert.AreEqual(2, dto.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = dto.FilterCategories[0];
