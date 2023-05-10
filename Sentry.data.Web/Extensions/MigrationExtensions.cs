@@ -137,6 +137,9 @@ namespace Sentry.data.Web.Extensions
                 model.DatasetNamedEnvironmentDropDown = namedEnvironmentList;
                 model.DatasetNamedEnvironmentTypeDropDown = namedEnvironmentTypeList;
 
+                //REMOVE namedEnvironment FROM LIST THAT IS THE SOURCE OF THE MIGRATION REQUEST
+                model.DatasetNamedEnvironmentDropDown = namedEnvironmentList.Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
+
                 //SET WHICH namedEnvironmentType will be picked to match the namedEnvironment
                 model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironmentTypeList.First(l => l.Selected).Value);
                 model.QuartermasterManagedNamedEnvironments = true;
