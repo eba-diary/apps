@@ -7,7 +7,7 @@ namespace Sentry.data.Web
 {
     public class ProcessActivityModel
     {
-        public string TitleId { get; set; }
+        public string ActivityType { get; set; }
 
         public string PageTitle { get; set; }
     }

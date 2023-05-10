@@ -7,7 +7,7 @@ namespace Sentry.data.Web.Models.AdminPage
 {
     public class DatasetProcessActivityModel
     {
-        public string Dataset { get; set; }
+        public string DatasetName { get; set; }
 
         public int DatasetId { get; set; }
 

@@ -7,7 +7,7 @@ namespace Sentry.data.Web.Models.AdminPage
 {
     public class SchemaProcessActivityModel
     {
-        public string Schema { get; set; }
+        public string SchemaName { get; set; }
 
         public int SchemaId { get; set; }
         

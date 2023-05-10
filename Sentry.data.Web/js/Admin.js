@@ -157,7 +157,7 @@ data.Admin = {
     // intial call of process activity view 
     ProcessActivityInit: function ()
     {
-        $("#tab-spinner").show();
+        $("#ProcessActivityResultsSpinner").show();
 
         $.ajax({
             type: "GET",
@@ -174,7 +174,7 @@ data.Admin = {
             },
             complete: function ()
             {
-                $("#tab-spinner").hide();
+                $("#ProcessActivityResultsSpinner").hide();
             }
         });
     },
@@ -210,13 +210,13 @@ data.Admin = {
     // used to create dataset json column configuration for ProcessActivityTableInit
     ProcessActivityDatasetConfig: function ()
     {
-        var activityStatus = $("#TitleId").val();
+        var activityType = $("#ActivityType").val();
 
         $("#ProcessActivityBreadcrumbs").append('<a href="#" id="dataset-breadcrumb">Home</a>');
 
         var columnObj = [
             {
-                data: "Dataset", title: "Dataset Name", className: "dataset-deeplink",
+                data: "DatasetName", title: "Dataset Name", className: "dataset-deeplink",
                 "render": function (data, type, row, meta)
                 {
                     if (type === 'display')
@@ -232,7 +232,7 @@ data.Admin = {
 
         var orderObj = [1, 'desc'];
 
-        var ajaxUrl = data.Admin.GetProcessActivityDatasetUrl(activityStatus)
+        var ajaxUrl = data.Admin.GetProcessActivityDatasetUrl(activityType)
 
         data.Admin.ProcessActivityTableInit(columnObj, orderObj,  ajaxUrl);
 
@@ -264,13 +264,13 @@ data.Admin = {
     // used to create schema json column configuration for ProcessActivityTableInit
     ProcessActivitySchemaConfig: function (datasetName, datasetId)
     {
-        var activityStatus = $("#TitleId").val();
+        let activityType = $("#ActivityType").val();
 
         $("#ProcessActivityBreadcrumbs").append('<span id="schema-breadcrumb"> 〉<a href="#">' + datasetName + '</a></span>');
 
         var columnObj = [
             {
-                data: "Schema", title: "Schema", className: "schema-deeplink",
+                data: "SchemaName", title: "Schema", className: "schema-deeplink",
                 "render": function (data, type, row, meta)
                 {
                     if (type === 'display')
@@ -286,7 +286,7 @@ data.Admin = {
 
         var orderObj = [1, 'desc'];
 
-        var ajaxUrl = data.Admin.GetProcessActivitySchemaUrl(activityStatus, datasetId)
+        var ajaxUrl = data.Admin.GetProcessActivitySchemaUrl(activityType, datasetId)
 
         data.Admin.ProcessActivityTableInit(columnObj, orderObj, ajaxUrl);
 
@@ -323,7 +323,7 @@ data.Admin = {
     // used to create dataset file json column configuration for ProcessActivityTableInit
     ProcessActivityDatasetFileConfig: function (schemaName, schemaId, datasetId)
     {
-        var activityStatus = $("#TitleId").val();
+        var activityType = $("#ActivityType").val();
 
         $("#ProcessActivityBreadcrumbs").append('<span id="dataset-file-breadcrumb"> 〉' + schemaName + '</span>');
 
@@ -336,7 +336,7 @@ data.Admin = {
 
         var orderObj = [3, 'desc'];
 
-        var ajaxUrl = data.Admin.GetProcessActivityDatasetFileUrl(activityStatus, schemaId, datasetId)
+        var ajaxUrl = data.Admin.GetProcessActivityDatasetFileUrl(activityType, schemaId, datasetId)
 
         data.Admin.ProcessActivityTableInit(columnObj, orderObj, ajaxUrl);
     },
@@ -576,19 +576,19 @@ data.Admin = {
         return "GetDeadJobsForGrid?selectedDate=" + encodeURIComponent(selectedDate);
     },
 
-    GetProcessActivityDatasetUrl: function (activityStatus)
+    GetProcessActivityDatasetUrl: function (activityType)
     {
-        return "GetDatasetProcessingActivityForGrid?status=" + activityStatus;
+        return "GetDatasetProcessingActivityForGrid?activityType=" + activityType;
     },
 
-    GetProcessActivitySchemaUrl: function (activityStatus, datasetId)
+    GetProcessActivitySchemaUrl: function (activityType, datasetId)
     {
-        return "GetSchemaProcessingActivityForGrid?status=" + activityStatus + "&datasetId=" + datasetId;
+        return "GetSchemaProcessingActivityForGrid?activityType=" + activityType + "&datasetId=" + datasetId;
     },
 
-    GetProcessActivityDatasetFileUrl: function (activityStatus, schemaId, datasetId)
+    GetProcessActivityDatasetFileUrl: function (activityType, schemaId, datasetId)
     {
-        return "GetDatasetFileProcessingActivityForGrid?status=" + activityStatus + "&schemaId=" + schemaId+ "&datasetId=" + datasetId;
+        return "GetDatasetFileProcessingActivityForGrid?activityType=" + activityType + "&schemaId=" + schemaId+ "&datasetId=" + datasetId;
     },
 
     //****************************************************************************************************

@@ -9,7 +9,7 @@
 
 <html>
 <body>
-    @if (Model.CLA4553_FeatureFlag == true)
+    @if (Model.CLA4553_FeatureFlag)
     {
         <div id="dashboard">
 
@@ -20,12 +20,12 @@
                 <h3>Processing Activity</h3>
                 <br />
                 <div class="row">
-                    @if (Model.CLA5112_FeatureFlag == true)
+                    @if (Model.CLA5112_FeatureFlag)
                     {
                     <div class="column">
                         <div class="activity-container">
                             <h5>Total Files Today</h5>
-                            <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { status = "TotalFiles" })">View</a>
+                            <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { activityType = "TotalFiles" })">View</a>
                             <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
                         </div>
 
@@ -59,94 +59,3 @@
 
 </body>
 </html>
-
-<script>
-
-
-    /*
-    // Elements of div to be hidden and displayed
-    dashboardDiv = document.getElementById("dashboard");
-    failedFileDiv = document.getElementById("failedFiles");
-    inFlightFilesDiv = document.getElementById("inFlightFiles");
-    completedFilesDiv = document.getElementById("completedFiles");
-
-    // Elements of div to be hidden for going back to the main page of admin page
-    partialViewFailedFilesDiv = document.getElementById("partialViewFailedFiles");
-    partialViewCompletedFilesDiv = document.getElementById("partialViewCompletedFiles");
-    partialViewInFlightFiles = document.getElementById("partialViewInFlightFiles");
-
-    // JQuery for toggling Completed File details
-    $(document).ready(function () {
-        $("#buttonCompletedFiles").click(function () {
-            // show hide paragraph on button click
-            $("#completedFiles").toggle("fast", function () {
-                // check paragraph once toggle effect is completed
-                if ($("#completedFiles").is(":visible")) {
-                    dashboardDiv.style.display = "none";
-                    inFlightFilesDiv.style.display = "none";
-                    failedFileDiv.style.display = "none";
-                    partialViewCompletedFilesDiv.style.display = "block";
-                }
-            });
-        });
-    });
-
-    // JQuery for toggling Failed File details
-    $(document).ready(function () {
-        $("#buttonFailedFiles").click(function () {
-            // show hide paragraph on button click
-            $("#failedFiles").toggle("fast", function () {
-                // check paragraph once toggle effect is completed
-                if ($("#failedFiles").is(":visible")) {
-                    dashboardDiv.style.display = "none";
-                    inFlightFilesDiv.style.display = "none";
-                    completedFilesDiv.style.display = "none";
-                    partialViewFailedFilesDiv.style.display = "block";
-                }
-            });
-        });
-    });
-
-    // JQuery for toggling InFlight File details
-    $(document).ready(function () {
-        $("#buttonInFlightFiles").click(function () {
-            // show hide paragraph on button click
-            $("#inFlightFiles").toggle("fast", function () {
-                // check paragraph once toggle effect is completed
-                if ($("#inFlightFiles").is(":visible")) {
-                    dashboardDiv.style.display = "none";
-                    failedFileDiv.style.display = "none";
-                    completedFilesDiv.style.display = "none";
-                    partialViewInFlightFiles.style.display = "block";
-                }
-            });
-        });
-    });
-
-    // Go back from the Completed Files partial View
-    $(document).ready(function () {
-        $("#partialFailedButton").click(function () {
-            partialViewFailedFilesDiv.style.display = "none";
-            dashboardDiv.style.display = "block";
-
-        });
-    });
-
-    // Go back from the Completed Files partial View
-    $(document).ready(function () {
-        $("#partialCompletedButton").click(function () {
-            partialViewCompletedFilesDiv.style.display = "none";
-            dashboardDiv.style.display = "block";
-        });
-    });
-
-    // Go back from the Completed Files partial View
-    $(document).ready(function () {
-        $("#partialInFlightButton").click(function () {
-            partialViewInFlightFiles.style.display = "none";
-            dashboardDiv.style.display = "block";
-        });
-    });
-    */
-
-</script>
