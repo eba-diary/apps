@@ -25,8 +25,9 @@ namespace Sentry.data.Web.Helpers
         /// Used by both the Dataflow and Dataset controllers
         /// </summary>
         /// <param name="saidAssetKeyCode">SAID Asset key code</param>
-        /// <param name="namedEnvironment">If a named environment has already been selected by the user; otherwise leave blank</param>
-        public async Task<(List<SelectListItem> namedEnvironmentList, List<SelectListItem> namedEnvironmentTypeList)> BuildNamedEnvironmentDropDownsAsync(string saidAssetKeyCode, string namedEnvironment)
+        /// <param name="namedEnvironmentToSelect">If a named environment has already been selected by the user; otherwise leave blank</param>
+        /// <param name="namedEnvironmentToExclude">Exclude option remove that namedEnvironment from the list of Q named Environment</param>
+        public async Task<(List<SelectListItem> namedEnvironmentList, List<SelectListItem> namedEnvironmentTypeList)> BuildNamedEnvironmentDropDownsAsync(string saidAssetKeyCode, string namedEnvironmentToSelect, string namedEnvironmentToExclude=null)
         {
             //if no keyCode has been selected yet, skip the call to Quartermaster
             List<NamedEnvironmentDto> qNamedEnvironmentList = new List<NamedEnvironmentDto>();
@@ -35,35 +36,54 @@ namespace Sentry.data.Web.Helpers
                 qNamedEnvironmentList = await _quartermasterService.GetNamedEnvironmentsAsync(saidAssetKeyCode);
             }
 
-            List<SelectListItem> namedEnvironmentList = BuildNamedEnvironmentDropDown(namedEnvironment, qNamedEnvironmentList);
+            //FIGURE OUT WHICH NAMED ENVIRONMENT SHOULD BE MARKED WITH  "Selected" = TRUE
+            //ONLY APPLY LOGIC IF namedEnvironmentToExclude!=NULL AND namedEnvironmentToSelect=NULL
+            if (namedEnvironmentToExclude != null && namedEnvironmentToSelect == null)
+            {
+                //GOAL IS TO default the first item in the list to be "selected" BUT IGNORE namedEnvironmentToExclude
+                //NOTE: qNamedEnvironmentList is already ordered by name so no need to re-order
+                foreach (NamedEnvironmentDto item in qNamedEnvironmentList)
+                {
+                    if(item.NamedEnvironment != namedEnvironmentToExclude)
+                    {
+                        //SET namedEnvironmentToSelect so when building the List<SelectListItem> below the drop downs in the UI know which ones to "Select"
+                        namedEnvironmentToSelect = item.NamedEnvironment;
+                        break;
+                    }
+                }
+            }
 
-            List<SelectListItem> namedEnvironmentTypeList = BuildNamedEnvironmentTypeDropDown(namedEnvironment, qNamedEnvironmentList);
+            //NOTE: pass namedEnvironmentToSelect which tells this function to mark the correct namedEnvironment with "select"
+            List<SelectListItem> namedEnvironmentList = BuildNamedEnvironmentDropDown(namedEnvironmentToSelect, qNamedEnvironmentList);
 
+            //NOTE: pass namedEnvironmentToSelect which tells this function to mark the correct namedEnvironment's Type with "select" (e.g. NonProd vs Prod)
+            // REMEMBER EACH NAMEDENVIRONMENT DROP DOWN HAS AN ASSOCIATED NAMEDENVIRONMENTTYPE DROP DOWN THAT NEEDS TO BE SELECTED
+            List<SelectListItem> namedEnvironmentTypeList = BuildNamedEnvironmentTypeDropDown(namedEnvironmentToSelect, qNamedEnvironmentList);
             return (namedEnvironmentList, namedEnvironmentTypeList);
         }
 
         /// <summary>
         /// Creates the "Named Environment" drop down used on the DataFlow and Dataset pages
         /// </summary>
-        /// <param name="namedEnvironment">What Named Environment is selected</param>
+        /// <param name="namedEnvironmentToSelect">What Named Environment is selected</param>
         /// <param name="qNamedEnvironmentList">The list of Environments from Quartermaster</param>
-        public static List<SelectListItem> BuildNamedEnvironmentDropDown(string namedEnvironment, List<NamedEnvironmentDto> qNamedEnvironmentList)
+        public static List<SelectListItem> BuildNamedEnvironmentDropDown(string namedEnvironmentToSelect, List<NamedEnvironmentDto> qNamedEnvironmentList)
         {
             //convert the list of Quartermaster environments into SelectListItems
             return qNamedEnvironmentList.Select(env => new SelectListItem()
             {
                 Value = env.NamedEnvironment,
                 Text = env.NamedEnvironment,
-                Selected = (!string.IsNullOrWhiteSpace(namedEnvironment) && env.NamedEnvironment == namedEnvironment)
+                Selected = (!string.IsNullOrWhiteSpace(namedEnvironmentToSelect) && env.NamedEnvironment == namedEnvironmentToSelect)
             }).ToList();
         }
 
         /// <summary>
         /// Creates the "Named Environment type" drop down used on the DataFlow and Dataset pages
         /// </summary>
-        /// <param name="namedEnvironment">What Named Environment is selected</param>
+        /// <param name="namedEnvironmentToSelect">What Named Environment is selected</param>
         /// <param name="qNamedEnvironmentList">The list of Environments from Quartermaster</param>
-        public List<SelectListItem> BuildNamedEnvironmentTypeDropDown(string namedEnvironment, List<NamedEnvironmentDto> qNamedEnvironmentList)
+        public List<SelectListItem> BuildNamedEnvironmentTypeDropDown(string namedEnvironmentToSelect, List<NamedEnvironmentDto> qNamedEnvironmentList)
         {
             //figure out the correct NamedEnvironmentType for the selected NamedEnvironment
             string namedEnvironmentType = NamedEnvironmentType.NonProd.ToString();
@@ -81,13 +101,13 @@ namespace Sentry.data.Web.Helpers
             //(the DataFlowService will already have filtered them down to only the appropriate namedEnvironmentTypes)
             if (qNamedEnvironmentList.Any())
             {
-                if (string.IsNullOrWhiteSpace(namedEnvironment))
+                if (string.IsNullOrWhiteSpace(namedEnvironmentToSelect))
                 {
                     namedEnvironmentType = qNamedEnvironmentList.First().NamedEnvironmentType.ToString();
                 }
-                else if (qNamedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironment))
+                else if (qNamedEnvironmentList.Any(e => e.NamedEnvironment == namedEnvironmentToSelect))
                 {
-                    namedEnvironmentType = qNamedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironment).NamedEnvironmentType.ToString();
+                    namedEnvironmentType = qNamedEnvironmentList.First(e => e.NamedEnvironment == namedEnvironmentToSelect).NamedEnvironmentType.ToString();
                 }
             }
 

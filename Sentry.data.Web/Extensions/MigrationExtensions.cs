@@ -97,12 +97,12 @@ namespace Sentry.data.Web.Extensions
                     .Select(s => s.NamedEnvironment)
                     .FirstOrDefault();           
             
-            var (namedEnvironmentList, namedEnvironmentTypeList) = await namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.DatasetNamedEnvironment);
+            //PASS sourceNamedEnvironment AS THE NAMED ENVIRONMENT TO EXCLUDE FROM THE DROP DOWN LIST
+            var (namedEnvironmentList, namedEnvironmentTypeList) = await namedEnvironmentBuilder.BuildNamedEnvironmentDropDownsAsync(model.SAIDAssetKeyCode, model.DatasetNamedEnvironment,sourceNamedEnvironment);
 
             if (namedEnvironmentList == null || !namedEnvironmentList.Any())
             {
                 //Build out model properties based on SAID asset named environments defined in DSC for the given dataset name
-
                 var datasetName = context.Datasets.Where(w => w.DatasetId == model.DatasetId).Select(s => s.DatasetName).FirstOrDefault();
 
                 List<NamedEnvironmentDto> datasetNamedEnvironmentDtoList = context.Datasets
@@ -134,10 +134,10 @@ namespace Sentry.data.Web.Extensions
             else
             {
                 //Build out model properties based on SAID asset named environments defined within Quartermaster
-
-                //Filter out the source dataset named environment from list and order
-                model.DatasetNamedEnvironmentDropDown = namedEnvironmentList.Where(w => w.Value != sourceNamedEnvironment).OrderBy(o => o.Text);
+                model.DatasetNamedEnvironmentDropDown = namedEnvironmentList;
                 model.DatasetNamedEnvironmentTypeDropDown = namedEnvironmentTypeList;
+
+                //SET WHICH namedEnvironmentType will be picked to match the namedEnvironment
                 model.DatasetNamedEnvironmentType = (NamedEnvironmentType)Enum.Parse(typeof(NamedEnvironmentType), namedEnvironmentTypeList.First(l => l.Selected).Value);
                 model.QuartermasterManagedNamedEnvironments = true;
                 model.NewNonQManagedNamedEnvironment = false;
