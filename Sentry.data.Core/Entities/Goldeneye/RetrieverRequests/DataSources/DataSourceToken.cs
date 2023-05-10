@@ -32,6 +32,7 @@ namespace Sentry.data.Core
 
         public virtual string ForeignId { get; set; }
 
+        [JsonIgnore]
         public virtual IList<OAuthClaim> Claims { get; set; }
 
         public virtual bool Enabled { get; set; }
