@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         public string DatasetDescription { get; set; }
 
         [PropertyName("categorycode")]
-        [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, defaultOpen: true, isPinnedFilter: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, isPinnedFilter: true)]
         public string CategoryCode { get; set; }
 
         [PropertyName("namedenvironment")]
@@ -22,7 +22,7 @@ namespace Sentry.data.Core
         public string NamedEnvironment { get; set; }
 
         [PropertyName("namedenvironmenttype")]
-        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, defaultOpen: true, hideResultCounts: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, hideResultCounts: true)]
         public string NamedEnvironmentType { get; set; }
 
         [PropertyName("originationcode")]
