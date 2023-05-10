@@ -40,17 +40,8 @@ namespace Sentry.data.Web.Helpers
             //ONLY APPLY LOGIC IF namedEnvironmentToExclude!=NULL AND namedEnvironmentToSelect=NULL
             if (namedEnvironmentToExclude != null && namedEnvironmentToSelect == null)
             {
-                //GOAL IS TO default the first item in the list to be "selected" BUT IGNORE namedEnvironmentToExclude
-                //NOTE: qNamedEnvironmentList is already ordered by name so no need to re-order
-                foreach (NamedEnvironmentDto item in qNamedEnvironmentList)
-                {
-                    if(item.NamedEnvironment != namedEnvironmentToExclude)
-                    {
-                        //SET namedEnvironmentToSelect so when building the List<SelectListItem> below the drop downs in the UI know which ones to "Select"
-                        namedEnvironmentToSelect = item.NamedEnvironment;
-                        break;
-                    }
-                }
+                //GOAL IS TO default the first item in the list to be "selected" BUT IGNORE namedEnvironmentToExclude,  NOTE: qNamedEnvironmentList is already ordered by name so no need to re-order
+                namedEnvironmentToSelect = qNamedEnvironmentList.FirstOrDefault(w => w.NamedEnvironment != namedEnvironmentToExclude)?.NamedEnvironment;
             }
 
             //NOTE: pass namedEnvironmentToSelect which tells this function to mark the correct namedEnvironment with "select"
