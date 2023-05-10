@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -26,7 +27,7 @@ namespace Sentry.data.Infrastructure
             DataInventorySearchResultDto resultDto = new DataInventorySearchResultDto();
 
             SearchRequest<DataInventory> searchRequest = GetSearchRequest(dto);
-            searchRequest.Size = 1000;
+            searchRequest.Size = ElasticQueryValues.Size.MAX;
             searchRequest.TrackTotalHits = true;
 
             ElasticResult<DataInventory> result = GetElasticResult(dto, resultDto, searchRequest);
@@ -44,7 +45,7 @@ namespace Sentry.data.Infrastructure
         {           
             SearchRequest<DataInventory> searchRequest = GetSearchRequest(dto);
             searchRequest.Aggregations = NestHelper.GetFilterAggregations<DataInventory>();
-            searchRequest.Size = 0;
+            searchRequest.Size = ElasticQueryValues.Size.ZERO;
 
             //get aggregation results
             FilterSearchDto resultDto = new FilterSearchDto();

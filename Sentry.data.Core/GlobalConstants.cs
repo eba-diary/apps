@@ -661,5 +661,14 @@ namespace Sentry.data.Core
         {
             public const string ALL_NAMED_ENV = "ALL";
         }
+
+        public static class ElasticQueryValues
+        {
+            public static class Size
+            {
+                public const int MAX = 10000;
+                public const int ZERO = 0;
+            }
+        }
     }
 }

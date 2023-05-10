@@ -4,6 +4,7 @@ using Sentry.data.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
@@ -23,7 +24,7 @@ namespace Sentry.data.Infrastructure
         {
             SearchRequest<GlobalDataset> searchRequest = GetSearchRequest(filterSearchDto);
             searchRequest.Highlight = NestHelper.GetHighlight<GlobalDataset>();
-            searchRequest.Size = 10000;
+            searchRequest.Size = ElasticQueryValues.Size.MAX;
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
@@ -36,7 +37,7 @@ namespace Sentry.data.Infrastructure
             //only use the filter categories for what results need to be selected
             List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
 
-            ElasticResult<GlobalDataset> elasticResult = await GetFilterAggregationResultAsync(filterSearchDto, 0);
+            ElasticResult<GlobalDataset> elasticResult = await GetFilterAggregationResultAsync(filterSearchDto, ElasticQueryValues.Size.ZERO);
 
             List<FilterCategoryDto> filterCategories = elasticResult.Aggregations.ToFilterCategories<GlobalDataset>(selectedFilters);
 
@@ -47,7 +48,7 @@ namespace Sentry.data.Infrastructure
         {
             List<FilterCategoryDto> selectedFilters = filterSearchDto.FilterCategories;
 
-            ElasticResult<GlobalDataset> elasticResult = await GetFilterAggregationResultAsync(filterSearchDto, 10000);
+            ElasticResult<GlobalDataset> elasticResult = await GetFilterAggregationResultAsync(filterSearchDto, ElasticQueryValues.Size.MAX);
 
             DocumentsFiltersDto<GlobalDataset> documentsFiltersDto = new DocumentsFiltersDto<GlobalDataset>
             {
@@ -61,7 +62,7 @@ namespace Sentry.data.Infrastructure
         public async Task<List<GlobalDataset>> GetGlobalDatasetsByEnvironmentDatasetIdsAsync(List<int> environmentDatasetIds)
         {
             SearchRequest<GlobalDataset> searchRequest = GetByEnvironmentDatasetIdsSearchRequest(environmentDatasetIds);
-            searchRequest.Size = 10000;
+            searchRequest.Size = ElasticQueryValues.Size.MAX;
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
@@ -72,7 +73,7 @@ namespace Sentry.data.Infrastructure
         {
             SearchRequest<GlobalDataset> searchRequest = GetByEnvironmentDatasetIdsSearchRequest(environmentDatasetIds);
             searchRequest.Aggregations = NestHelper.GetFilterAggregations<GlobalDataset>();
-            searchRequest.Size = 0;
+            searchRequest.Size = ElasticQueryValues.Size.ZERO;
 
             ElasticResult<GlobalDataset> elasticResult = await _elasticDocumentClient.SearchAsync(searchRequest);
 
