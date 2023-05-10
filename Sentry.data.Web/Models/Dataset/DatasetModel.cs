@@ -66,6 +66,10 @@ namespace Sentry.data.Web
         [DisplayName("Create Current View")]
         public bool CreateCurrentView { get; set; }
 
+        [Required]
+        [DisplayName("Category")]
+        public int DatasetCategoryId { get; set; }
+
         public ObjectStatusEnum ObjectStatus { get; set; }
 
         [Required]
