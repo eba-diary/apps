@@ -5,7 +5,6 @@
   "Layout": 1,
   "TotalResults": 50,
   "SearchName": "SearchName",
-  "SearchText": "SearchText",
   "FilterCategories": [
     {
       "CategoryName": "Category",
@@ -20,5 +19,6 @@
       "DefaultCategoryOpen": true,
       "HideResultCounts": false
     }
-  ]
+  ],
+  "SearchText": "SearchText"
 }

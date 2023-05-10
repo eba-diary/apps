@@ -4,6 +4,7 @@ using Nest;
 using NHibernate.Util;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure.CherwellService;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -1191,7 +1192,430 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IElasticDocumentClient> elasticDocumentClient = mr.Create<IElasticDocumentClient>();
 
+            ElasticResult<GlobalDataset> elasticResult = GetElasticResult();
+
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
+            {
+                Assert.AreEqual(0, s.Size);
+
+                IBoolQuery query = ((IQueryContainer)s.Query).Bool;
+                Assert.AreEqual(2, query.Should.Count());
+
+                IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
+                Assert.AreEqual("search", stringQuery.Query);
+                Assert.AreEqual(4, stringQuery.Fields.Count());
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
+
+                stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
+                Assert.AreEqual("*search*", stringQuery.Query);
+                Assert.AreEqual(4, stringQuery.Fields.Count());
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
+
+                Assert.IsNull(query.Filter);
+
+                Assert.IsNotNull(s.Aggregations);
+
+                AggregationDictionary fields = s.Aggregations;
+                Assert.AreEqual(7, fields.Count());
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.DATASETASSET));
+                Assert.AreEqual("datasetsaidassetcode.keyword", fields[FilterCategoryNames.Dataset.DATASETASSET].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.CATEGORY));
+                Assert.AreEqual("environmentdatasets.categorycode.keyword", fields[FilterCategoryNames.Dataset.CATEGORY].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ENVIRONMENT));
+                Assert.AreEqual("environmentdatasets.namedenvironment.keyword", fields[FilterCategoryNames.Dataset.ENVIRONMENT].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ENVIRONMENTTYPE));
+                Assert.AreEqual("environmentdatasets.namedenvironmenttype.keyword", fields[FilterCategoryNames.Dataset.ENVIRONMENTTYPE].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ORIGIN));
+                Assert.AreEqual("environmentdatasets.originationcode.keyword", fields[FilterCategoryNames.Dataset.ORIGIN].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.SECURED));
+                Assert.AreEqual("environmentdatasets.issecured", fields[FilterCategoryNames.Dataset.SECURED].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.PRODUCERASSET));
+                Assert.AreEqual("environmentdatasets.environmentschemas.schemasaidassetcode.keyword", fields[FilterCategoryNames.Dataset.PRODUCERASSET].Terms.Field.Name);
+            });
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
+
+            SearchGlobalDatasetsDto filterSearchDto = GetSearchGlobalDatasetsDto();
+
+            List<FilterCategoryDto> results = await globalDatasetProvider.GetGlobalDatasetFiltersAsync(filterSearchDto);
+
+            Assert.AreEqual(6, results.Count);
+
+            FilterCategoryDto filter = results[0];
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            FilterCategoryOptionDto option = filter.CategoryOptions[0];
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.AreEqual(5, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("DATA", option.OptionValue);
+            Assert.AreEqual(3, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            filter = results[1];
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, filter.CategoryName);
+            Assert.AreEqual(3, filter.CategoryOptions.Count);
+            Assert.IsFalse(filter.HideResultCounts);
+            Assert.IsTrue(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("Sentry", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("Industry", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[2];
+            Assert.AreEqual("Claim", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            filter = results[2];
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("DEV", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("TEST", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            filter = results[3];
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsTrue(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("NonProd", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("Prod", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            filter = results[4];
+            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, filter.CategoryName);
+            Assert.AreEqual(1, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("true", option.OptionValue);
+            Assert.AreEqual(6, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            filter = results[5];
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("OTHR", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task GetGlobalDatasetsAndFiltersAsync_BaseFilterSearchDto_GlobalDatasets()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            Mock<IElasticDocumentClient> elasticDocumentClient = mr.Create<IElasticDocumentClient>();
+
+            ElasticResult<GlobalDataset> elasticResult = GetElasticResult();
+
+            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
+            {
+                Assert.AreEqual(10000, s.Size);
+
+                IBoolQuery query = ((IQueryContainer)s.Query).Bool;
+                Assert.AreEqual(2, query.Should.Count());
+
+                IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
+                Assert.AreEqual("search", stringQuery.Query);
+                Assert.AreEqual(4, stringQuery.Fields.Count());
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
+
+                stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
+                Assert.AreEqual("*search*", stringQuery.Query);
+                Assert.AreEqual(4, stringQuery.Fields.Count());
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
+                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
+
+                Assert.IsNull(query.Filter);
+
+                Assert.IsNotNull(s.Aggregations);
+
+                AggregationDictionary fields = s.Aggregations;
+                Assert.AreEqual(7, fields.Count());
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.DATASETASSET));
+                Assert.AreEqual("datasetsaidassetcode.keyword", fields[FilterCategoryNames.Dataset.DATASETASSET].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.CATEGORY));
+                Assert.AreEqual("environmentdatasets.categorycode.keyword", fields[FilterCategoryNames.Dataset.CATEGORY].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ENVIRONMENT));
+                Assert.AreEqual("environmentdatasets.namedenvironment.keyword", fields[FilterCategoryNames.Dataset.ENVIRONMENT].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ENVIRONMENTTYPE));
+                Assert.AreEqual("environmentdatasets.namedenvironmenttype.keyword", fields[FilterCategoryNames.Dataset.ENVIRONMENTTYPE].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ORIGIN));
+                Assert.AreEqual("environmentdatasets.originationcode.keyword", fields[FilterCategoryNames.Dataset.ORIGIN].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.SECURED));
+                Assert.AreEqual("environmentdatasets.issecured", fields[FilterCategoryNames.Dataset.SECURED].Terms.Field.Name);
+
+                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.PRODUCERASSET));
+                Assert.AreEqual("environmentdatasets.environmentschemas.schemasaidassetcode.keyword", fields[FilterCategoryNames.Dataset.PRODUCERASSET].Terms.Field.Name);
+            });
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
+
+            SearchGlobalDatasetsDto filterSearchDto = GetSearchGlobalDatasetsDto();
+
+            DocumentsFiltersDto<GlobalDataset> documentsFilters = await globalDatasetProvider.GetGlobalDatasetsAndFiltersAsync(filterSearchDto);
+
+            List<FilterCategoryDto> results = documentsFilters.FilterCategories;
+            Assert.AreEqual(6, results.Count);
+
+            FilterCategoryDto filter = results[0];
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            FilterCategoryOptionDto option = filter.CategoryOptions[0];
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.AreEqual(5, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("DATA", option.OptionValue);
+            Assert.AreEqual(3, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            filter = results[1];
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, filter.CategoryName);
+            Assert.AreEqual(3, filter.CategoryOptions.Count);
+            Assert.IsFalse(filter.HideResultCounts);
+            Assert.IsTrue(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("Sentry", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("Industry", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[2];
+            Assert.AreEqual("Claim", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            filter = results[2];
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("DEV", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("TEST", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            filter = results[3];
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsTrue(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("NonProd", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("Prod", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            filter = results[4];
+            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, filter.CategoryName);
+            Assert.AreEqual(1, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("true", option.OptionValue);
+            Assert.AreEqual(6, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            filter = results[5];
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, filter.CategoryName);
+            Assert.AreEqual(2, filter.CategoryOptions.Count);
+            Assert.IsTrue(filter.HideResultCounts);
+            Assert.IsFalse(filter.DefaultCategoryOpen);
+
+            option = filter.CategoryOptions[0];
+            Assert.AreEqual("SAID", option.OptionValue);
+            Assert.AreEqual(2, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
+            Assert.IsFalse(option.Selected);
+
+            option = filter.CategoryOptions[1];
+            Assert.AreEqual("OTHR", option.OptionValue);
+            Assert.AreEqual(8, option.ResultCount);
+            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
+            Assert.IsTrue(option.Selected);
+
+            Assert.AreEqual(1, documentsFilters.Documents.Count);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task GetGlobalDatasetsByEnvironmentDatasetIdsAsync_EnvironmentDatasetIds_GlobalDatasets()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
             ElasticResult<GlobalDataset> elasticResult = new ElasticResult<GlobalDataset>
+            {
+                Documents = new List<GlobalDataset>
+                {
+                    new GlobalDataset(),
+                    new GlobalDataset()
+                }
+            };
+
+            Mock<IElasticDocumentClient> documentClient = mr.Create<IElasticDocumentClient>();
+            documentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(x =>
+            {
+                Assert.AreEqual(10000, x.Size);
+
+                ITermsQuery terms = ((IQueryContainer)x.Query).Terms;
+                Assert.AreEqual(2, terms.Terms.Count());
+                Assert.AreEqual("1", terms.Terms.First().ToString());
+                Assert.AreEqual("2", terms.Terms.Last().ToString());
+            });
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(documentClient.Object, null);
+
+            List<GlobalDataset> globalDatasets = await globalDatasetProvider.GetGlobalDatasetsByEnvironmentDatasetIdsAsync(new List<int> { 1, 2 });
+
+            Assert.AreEqual(2, globalDatasets.Count);
+
+            mr.VerifyAll();
+        }
+
+        [TestMethod]
+        public async Task GetFiltersByEnvironmentDatasetIdsAsync_EnvironmentDatasetIds_FilterCategoryDtos()
+        {
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
+
+            ElasticResult<GlobalDataset> elasticResult = GetElasticResult();
+
+            Mock<IElasticDocumentClient> documentClient = mr.Create<IElasticDocumentClient>();
+            documentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(x =>
+            {
+                Assert.AreEqual(0, x.Size);
+
+                ITermsQuery terms = ((IQueryContainer)x.Query).Terms;
+                Assert.AreEqual(2, terms.Terms.Count());
+                Assert.AreEqual("1", terms.Terms.First().ToString());
+                Assert.AreEqual("2", terms.Terms.Last().ToString());
+
+                Assert.IsNotNull(x.Aggregations);
+                Assert.AreEqual(7, x.Aggregations.Count());
+            });
+
+            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(documentClient.Object, null);
+
+            List<FilterCategoryDto> filters = await globalDatasetProvider.GetFiltersByEnvironmentDatasetIdsAsync(new List<int> { 1, 2 });
+
+            Assert.AreEqual(6, filters.Count);
+
+            mr.VerifyAll();
+        }
+
+        #region Helpers
+        private ElasticResult<GlobalDataset> GetElasticResult()
+        {
+            return new ElasticResult<GlobalDataset>
             {
                 Documents = new List<GlobalDataset>
                 {
@@ -1309,62 +1733,11 @@ namespace Sentry.data.Infrastructure.Tests
                     }
                 })
             };
+        }
 
-            elasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<SearchRequest<GlobalDataset>>())).ReturnsAsync(elasticResult).Callback<SearchRequest<GlobalDataset>>(s =>
-            {
-                Assert.AreEqual(0, s.Size);
-
-                IBoolQuery query = ((IQueryContainer)s.Query).Bool;
-                Assert.AreEqual(2, query.Should.Count());
-
-                IQueryStringQuery stringQuery = ((IQueryContainer)query.Should.First()).QueryString;
-                Assert.AreEqual("search", stringQuery.Query);
-                Assert.AreEqual(4, stringQuery.Fields.Count());
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
-
-                stringQuery = ((IQueryContainer)query.Should.Last()).QueryString;
-                Assert.AreEqual("*search*", stringQuery.Query);
-                Assert.AreEqual(4, stringQuery.Fields.Count());
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "datasetname" && x.Boost == 5));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.datasetdescription"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemaname"));
-                Assert.IsTrue(stringQuery.Fields.Any(x => x.Name == "environmentdatasets.environmentschemas.schemadescription"));
-
-                Assert.IsNull(query.Filter);
-
-                Assert.IsNotNull(s.Aggregations);
-
-                AggregationDictionary fields = s.Aggregations;
-                Assert.AreEqual(7, fields.Count());
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.DATASETASSET));
-                Assert.AreEqual("datasetsaidassetcode.keyword", fields[FilterCategoryNames.Dataset.DATASETASSET].Terms.Field.Name);
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.CATEGORY));
-                Assert.AreEqual("environmentdatasets.categorycode.keyword", fields[FilterCategoryNames.Dataset.CATEGORY].Terms.Field.Name);
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ENVIRONMENT));
-                Assert.AreEqual("environmentdatasets.namedenvironment.keyword", fields[FilterCategoryNames.Dataset.ENVIRONMENT].Terms.Field.Name);
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ENVIRONMENTTYPE));
-                Assert.AreEqual("environmentdatasets.namedenvironmenttype.keyword", fields[FilterCategoryNames.Dataset.ENVIRONMENTTYPE].Terms.Field.Name);
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.ORIGIN));
-                Assert.AreEqual("environmentdatasets.originationcode.keyword", fields[FilterCategoryNames.Dataset.ORIGIN].Terms.Field.Name);
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.SECURED));
-                Assert.AreEqual("environmentdatasets.issecured", fields[FilterCategoryNames.Dataset.SECURED].Terms.Field.Name);
-
-                Assert.IsTrue(fields.Any(x => x.Key == FilterCategoryNames.Dataset.PRODUCERASSET));
-                Assert.AreEqual("environmentdatasets.environmentschemas.schemasaidassetcode.keyword", fields[FilterCategoryNames.Dataset.PRODUCERASSET].Terms.Field.Name);
-            });
-
-            GlobalDatasetProvider globalDatasetProvider = new GlobalDatasetProvider(elasticDocumentClient.Object, null);
-
-            SearchGlobalDatasetsDto filterSearchDto = new SearchGlobalDatasetsDto
+        private SearchGlobalDatasetsDto GetSearchGlobalDatasetsDto()
+        {
+            return new SearchGlobalDatasetsDto
             {
                 SearchText = "search",
                 FilterCategories = new List<FilterCategoryDto>
@@ -1412,126 +1785,7 @@ namespace Sentry.data.Infrastructure.Tests
                     }
                 }
             };
-
-            List<FilterCategoryDto> results = await globalDatasetProvider.GetGlobalDatasetFiltersAsync(filterSearchDto);
-
-            Assert.AreEqual(6, results.Count);
-
-            FilterCategoryDto filter = results[0];
-            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, filter.CategoryName);
-            Assert.AreEqual(2, filter.CategoryOptions.Count);
-            Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsFalse(filter.DefaultCategoryOpen);
-
-            FilterCategoryOptionDto option = filter.CategoryOptions[0];
-            Assert.AreEqual("SAID", option.OptionValue);
-            Assert.AreEqual(5, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, option.ParentCategoryName);
-            Assert.IsTrue(option.Selected);
-
-            option = filter.CategoryOptions[1];
-            Assert.AreEqual("DATA", option.OptionValue);
-            Assert.AreEqual(3, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.DATASETASSET, option.ParentCategoryName);
-            Assert.IsTrue(option.Selected);
-
-            filter = results[1];
-            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, filter.CategoryName);
-            Assert.AreEqual(3, filter.CategoryOptions.Count);
-            Assert.IsFalse(filter.HideResultCounts);
-            Assert.IsTrue(filter.DefaultCategoryOpen);
-
-            option = filter.CategoryOptions[0];
-            Assert.AreEqual("Sentry", option.OptionValue);
-            Assert.AreEqual(2, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            option = filter.CategoryOptions[1];
-            Assert.AreEqual("Industry", option.OptionValue);
-            Assert.AreEqual(8, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            option = filter.CategoryOptions[2];
-            Assert.AreEqual("Claim", option.OptionValue);
-            Assert.AreEqual(8, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.CATEGORY, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            filter = results[2];
-            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, filter.CategoryName);
-            Assert.AreEqual(2, filter.CategoryOptions.Count);
-            Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsFalse(filter.DefaultCategoryOpen);
-
-            option = filter.CategoryOptions[0];
-            Assert.AreEqual("DEV", option.OptionValue);
-            Assert.AreEqual(2, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            option = filter.CategoryOptions[1];
-            Assert.AreEqual("TEST", option.OptionValue);
-            Assert.AreEqual(8, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENT, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            filter = results[3];
-            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, filter.CategoryName);
-            Assert.AreEqual(2, filter.CategoryOptions.Count);
-            Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsTrue(filter.DefaultCategoryOpen);
-
-            option = filter.CategoryOptions[0];
-            Assert.AreEqual("NonProd", option.OptionValue);
-            Assert.AreEqual(2, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            option = filter.CategoryOptions[1];
-            Assert.AreEqual("Prod", option.OptionValue);
-            Assert.AreEqual(8, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            filter = results[4];
-            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, filter.CategoryName);
-            Assert.AreEqual(1, filter.CategoryOptions.Count);
-            Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsFalse(filter.DefaultCategoryOpen);
-
-            option = filter.CategoryOptions[0];
-            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, filter.CategoryName);
-            Assert.AreEqual(1, filter.CategoryOptions.Count);
-            Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsFalse(filter.DefaultCategoryOpen);
-
-            option = filter.CategoryOptions[0];
-            Assert.AreEqual("true", option.OptionValue);
-            Assert.AreEqual(6, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.SECURED, option.ParentCategoryName);
-            Assert.IsTrue(option.Selected);
-
-            filter = results[5];
-            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, filter.CategoryName);
-            Assert.AreEqual(2, filter.CategoryOptions.Count);
-            Assert.IsTrue(filter.HideResultCounts);
-            Assert.IsFalse(filter.DefaultCategoryOpen);
-
-            option = filter.CategoryOptions[0];
-            Assert.AreEqual("SAID", option.OptionValue);
-            Assert.AreEqual(2, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
-            Assert.IsFalse(option.Selected);
-
-            option = filter.CategoryOptions[1];
-            Assert.AreEqual("OTHR", option.OptionValue);
-            Assert.AreEqual(8, option.ResultCount);
-            Assert.AreEqual(FilterCategoryNames.Dataset.PRODUCERASSET, option.ParentCategoryName);
-            Assert.IsTrue(option.Selected);
-
-            mr.VerifyAll();
         }
+        #endregion
     }
 }

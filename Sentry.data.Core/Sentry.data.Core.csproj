@@ -259,6 +259,7 @@
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\SchemaField\SearchSchemaFieldsDto.cs" />
     <Compile Include="DTO\Schema\Fields\VariantFieldDto.cs" />
     <Compile Include="DTO\Schema\SchemaFlowDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
@@ -282,6 +283,8 @@
     <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Search\BaseFilterSearchDto.cs" />
+    <Compile Include="DTO\Search\BaseSearchDto.cs" />
+    <Compile Include="DTO\Search\DocumentsFiltersDto.cs" />
     <Compile Include="DTO\Search\SearchHighlightableDto.cs" />
     <Compile Include="DTO\Search\SearchHighlightDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
@@ -580,6 +583,7 @@
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISchemaFieldProvider.cs" />
     <Compile Include="Interfaces\ISchemaFlowService.cs" />
     <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />

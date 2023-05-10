@@ -19,7 +19,8 @@ data.GlobalDatasetSearch = {
         let resultParameters = {
             PageSize: $("#tile-result-page-size").val(),
             SortBy: $("#tile-result-sort").val(),
-            Layout: $("#tile-result-layout").val()
+            Layout: $("#tile-result-layout").val(),
+            ShouldSearchColumns: $('#ShouldSearchColumns').is(':checked')
         }
 
         return JSON.stringify({ ResultParameters: resultParameters });
@@ -33,12 +34,19 @@ data.GlobalDatasetSearch = {
         return "/api/" + data.BetaApiVersion + "/globaldatasets/";
     },
 
+    getSearchRequest: function () {
+        let request = data.FilterSearch.buildSearchRequest();
+        request.ShouldSearchColumns = $('#ShouldSearchColumns').is(':checked');
+
+        return request;
+    },
+
     executeSearchAndFilters: function (pageNumber) {
         //gets new filters and search results
         $(".filter-search-categories-container").addClass("search-blur");
 
         let endpoint = data.GlobalDatasetSearch.getEndpoint() + "filters";
-        let request = data.FilterSearch.buildSearchRequest();
+        let request = data.GlobalDatasetSearch.getSearchRequest();
 
         data.GlobalDatasetSearch.executeSearchWithRequest(request, pageNumber);
         $.post(endpoint, request, (x) => data.FilterSearch.completeFilterRetrieval(x.FilterCategories));
@@ -46,7 +54,7 @@ data.GlobalDatasetSearch = {
 
     executeSearchOnly: function () {
         //only get new search results, keep current filters
-        let request = data.FilterSearch.buildSearchRequest();
+        let request = data.GlobalDatasetSearch.getSearchRequest();
         data.GlobalDatasetSearch.executeSearchWithRequest(request, 1);
     },
 
@@ -87,6 +95,7 @@ data.GlobalDatasetSearch = {
                 PageSize: $("#tile-result-page-size").val(),
                 SortBy: $("#tile-result-sort").val(),
                 Layout: $("#tile-result-layout").val(),
+                ShouldSearchColumns: $('#ShouldSearchColumns').is(':checked')
             };
 
             $.ajax({
@@ -100,11 +109,16 @@ data.GlobalDatasetSearch = {
 
                     let totalResults = data.GlobalDatasetSearch.globalDatasets.length;
 
-                    if (totalResults > 0 && pageNumber > 1) {
+                    if (totalResults > 0) {
                         let pageSize = parseInt(request.PageSize);
-                        let pageStart = ((pageNumber - 1) * pageSize) + 1;
-                        let pageEnd = pageNumber * pageSize;
-                        let resultCount = parseInt($("#result-count").val())
+                        let pageStart = 1;
+                        let pageEnd = pageSize;
+                        let resultCount = parseInt($("#result-count").val());
+
+                        if (pageNumber > 1) {
+                            pageStart = ((pageNumber - 1) * pageSize) + 1;
+                            pageEnd = pageNumber * pageSize;
+                        }
 
                         data.FilterSearch.setPageInfo(pageStart, resultCount < pageSize ? totalResults : pageEnd);
                     }
@@ -242,6 +256,15 @@ data.GlobalDatasetSearch = {
                 }, 500);
             }
         });
+
+        $(document).on("change", "#ShouldSearchColumns", function () {
+            data.FilterSearch.clearActiveSavedSearch();
+            let searchText = $.trim($("#filter-search-text").val()).length
+
+            if (searchText > 2) {
+                data.GlobalDatasetSearch.executeSearch();
+            }
+        });
     },
 
     setLayout: function () {
@@ -263,6 +286,7 @@ data.GlobalDatasetSearch = {
         localStorage.setItem("pageNumber", data.GlobalDatasetSearch.getActivePage().toString());
         localStorage.setItem("pageSize", $("#tile-result-page-size").val());
         localStorage.setItem("layout", $("#tile-result-layout").val());
+        localStorage.setItem("searchColumns", $('#ShouldSearchColumns').is(':checked'));
 
         let filters = [];
         $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
