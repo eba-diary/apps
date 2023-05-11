@@ -197,10 +197,6 @@
     justify-content: space-between;
 }
 
-.tile-result-options {
-    display: flex;
-}
-
 .search-blur {
     opacity: 0.5;
 }
@@ -272,4 +268,16 @@
 
 .highlightList li::marker {
     color: #285780;
+}
+
+.searchColumnsLabel {
+    font-size: 0.8rem;
+}
+
+.searchColumnsSwitch {
+    margin-bottom: 0.375rem;
+}
+
+.searchSettingsContainer {
+    margin-left: 0.75rem;
 }

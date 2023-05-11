@@ -100,7 +100,40 @@ namespace Sentry.data.Core
             return searchHighlights.Select(x => x.ToDto()).ToList();
         }
 
+        public static void MergeFilterCategories(this List<FilterCategoryDto> filterCategories, List<FilterCategoryDto> mergeFilterCategories)
+        {
+            foreach (FilterCategoryDto filterCategory in mergeFilterCategories)
+            {
+                FilterCategoryDto existingFilterCategory = filterCategories.FirstOrDefault(x => x.CategoryName == filterCategory.CategoryName);
+
+                if (existingFilterCategory == null)
+                {
+                    filterCategories.Add(filterCategory);
+                }
+                else
+                {
+                    existingFilterCategory.CategoryOptions.MergeFilterCategoryOptions(filterCategory.CategoryOptions);
+                }
+            }
+        }
+
         #region Private Methods
+        private static void MergeFilterCategoryOptions(this List<FilterCategoryOptionDto> filterCategoryOptionDtos, List<FilterCategoryOptionDto> mergeFilterCategoryOptionDtos)
+        {
+            foreach (FilterCategoryOptionDto option in mergeFilterCategoryOptionDtos)
+            {
+                FilterCategoryOptionDto existingOption = filterCategoryOptionDtos.FirstOrDefault(x => x.OptionValue == option.OptionValue);
+                if (existingOption == null)
+                {
+                    filterCategoryOptionDtos.Add(option);
+                }
+                else
+                {
+                    existingOption.ResultCount += option.ResultCount;
+                }
+            }
+        }
+
         private static SearchHighlightDto ToDto(this SearchHighlight searchHighlight)
         {
             return new SearchHighlightDto
