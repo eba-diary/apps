@@ -17,7 +17,7 @@ namespace Sentry.data.Web.Tests
             {
                 TotalResults = 20,
                 PageNumber = 2,
-                PageSize = 15,
+                PageSize = 12,
                 FilterCategories = new List<FilterCategoryDto>()
                 {
                     new FilterCategoryDto()
@@ -37,7 +37,7 @@ namespace Sentry.data.Web.Tests
 
             Assert.AreEqual(20, model.TotalResults);
             Assert.AreEqual("2", model.PageItems.FirstOrDefault(x => x.IsActive).PageNumber);
-            Assert.AreEqual("15", model.PageSizeOptions.FirstOrDefault(x => x.Selected).Value);
+            Assert.AreEqual("12", model.PageSizeOptions.FirstOrDefault(x => x.Selected).Value);
             Assert.AreEqual("2", model.SortByOptions.FirstOrDefault(x => x.Selected).Value);
             Assert.AreEqual("1", model.LayoutOptions.FirstOrDefault(x => x.Selected).Value);
             Assert.AreEqual(2, model.FilterCategories.Count);

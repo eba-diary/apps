@@ -97,22 +97,22 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object, dataFeatures.Object);
 
-            SearchGlobalDatasetsResultDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
+            SearchGlobalDatasetsResultsDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
             Assert.AreEqual(2, results.GlobalDatasets.Count);
 
-            SearchGlobalDatasetResultDto result = results.GlobalDatasets[0];
+            SearchGlobalDatasetDto result = results.GlobalDatasets[0];
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);
             Assert.AreEqual("SAID", result.DatasetSaidAssetCode);
             Assert.AreEqual("Description", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(2, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
-            Assert.AreEqual("PROD", result.NamedEnvironments[1]);
+            Assert.AreEqual("PROD", result.NamedEnvironments[0]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[1]);
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/12", result.DatasetDetailPage);
+            Assert.AreEqual(12, result.TargetDatasetId);
 
             result = results.GlobalDatasets[1];
             Assert.AreEqual(2, result.GlobalDatasetId);
@@ -121,11 +121,11 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("Description 2", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(2, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
-            Assert.AreEqual("TEST", result.NamedEnvironments[1]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[0]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[1]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/22", result.DatasetDetailPage);
+            Assert.AreEqual(22, result.TargetDatasetId);
 
             mr.VerifyAll();
         }
@@ -151,7 +151,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, userService.Object, dataFeatures.Object);
 
-            SearchGlobalDatasetsResultDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
+            SearchGlobalDatasetsResultsDto results = await globalDatasetService.SearchGlobalDatasetsAsync(searchGlobalDatasetsDto);
 
             Assert.IsFalse(results.GlobalDatasets.Any());
 
@@ -159,22 +159,25 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
-        public async Task GetGlobalDatasetFiltersAsync_FilterSearchDto_FilterCategoryDtos()
+        public async Task GetGlobalDatasetFiltersAsync_GetGlobalDatasetFiltersDto_GetGlobalDatasetFiltersResultDto()
         {
             MockRepository mr = new MockRepository(MockBehavior.Strict);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = mr.Create<IGlobalDatasetProvider>();
 
-            FilterSearchDto filterSearchDto = new FilterSearchDto();
+            GetGlobalDatasetFiltersDto filtersDto = new GetGlobalDatasetFiltersDto();
             List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
 
-            globalDatasetProvider.Setup(x => x.GetGlobalDatasetFiltersAsync(filterSearchDto)).ReturnsAsync(filterCategories);
+            globalDatasetProvider.Setup(x => x.GetGlobalDatasetFiltersAsync(filtersDto)).ReturnsAsync(filterCategories);
 
-            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, null);
+            Mock<IDataFeatures> dataFeatures = mr.Create<IDataFeatures>();
+            dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
 
-            List<FilterCategoryDto> results = await globalDatasetService.GetGlobalDatasetFiltersAsync(filterSearchDto);
+            GlobalDatasetService globalDatasetService = new GlobalDatasetService(globalDatasetProvider.Object, null, dataFeatures.Object);
 
-            Assert.AreEqual(filterCategories, results);
+            GetGlobalDatasetFiltersResultDto results = await globalDatasetService.GetGlobalDatasetFiltersAsync(filtersDto);
+
+            Assert.AreEqual(filterCategories, results.FilterCategories);
 
             mr.VerifyAll();
         }

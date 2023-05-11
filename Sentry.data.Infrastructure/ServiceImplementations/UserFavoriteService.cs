@@ -87,7 +87,7 @@ namespace Sentry.data.Infrastructure
 
                         if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
                         {
-                            _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(legacyFavorite.DatasetId, legacyFavorite.UserId).Wait();
+                            _globalDatasetProvider.RemoveEnvironmentDatasetFavoriteUserIdAsync(legacyFavorite.DatasetId, legacyFavorite.UserId, false).Wait();
                         }
 
                         _datasetContext.SaveChanges();

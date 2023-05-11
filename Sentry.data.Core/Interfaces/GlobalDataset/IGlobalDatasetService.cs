@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public interface IGlobalDatasetService
     {
-        Task<SearchGlobalDatasetsResultDto> SearchGlobalDatasetsAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto);
-        Task<List<FilterCategoryDto>> GetGlobalDatasetFiltersAsync(FilterSearchDto filterSearchDto);
+        Task<SearchGlobalDatasetsResultsDto> SearchGlobalDatasetsAsync(SearchGlobalDatasetsDto searchGlobalDatasetsDto);
+        Task<GetGlobalDatasetFiltersResultDto> GetGlobalDatasetFiltersAsync(GetGlobalDatasetFiltersDto getGlobalDatasetFiltersDto);
     }
 }

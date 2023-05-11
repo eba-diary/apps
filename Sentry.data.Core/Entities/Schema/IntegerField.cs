@@ -10,7 +10,6 @@ namespace Sentry.data.Core
             {
                 return SchemaDatatypes.INTEGER;
             }
-            set => FieldType = SchemaDatatypes.INTEGER;
         }
 
         protected override JObject GetJsonTypeDefinition()

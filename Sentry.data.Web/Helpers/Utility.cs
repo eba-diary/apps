@@ -404,9 +404,9 @@ namespace Sentry.data.Web.Helpers
             {
                 new SelectListItem()
                 {
-                    Value = "15",
-                    Text = "15",
-                    Selected = selectedValue == "15"
+                    Value = "12",
+                    Text = "12",
+                    Selected = selectedValue == "12"
                 },
                 new SelectListItem()
                 {

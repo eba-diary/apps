@@ -250,7 +250,7 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            SearchGlobalDatasetResultDto result = globalDataset.ToSearchResult("082116");
+            SearchGlobalDatasetDto result = globalDataset.ToSearchResult("082116");
 
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);
@@ -258,12 +258,12 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Description - Prod", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(3, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
-            Assert.AreEqual("PROD", result.NamedEnvironments[1]);
-            Assert.AreEqual("TEST", result.NamedEnvironments[2]);
+            Assert.AreEqual("PROD", result.NamedEnvironments[0]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[1]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[2]);
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/12", result.DatasetDetailPage);
+            Assert.AreEqual(12, result.TargetDatasetId);
         }
 
         [TestMethod]
@@ -312,7 +312,7 @@ namespace Sentry.data.Core.Tests
                 }
             };
 
-            SearchGlobalDatasetResultDto result = globalDataset.ToSearchResult("000000");
+            SearchGlobalDatasetDto result = globalDataset.ToSearchResult("000000");
 
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);
@@ -320,12 +320,12 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("Description - Last", result.DatasetDescription);
             Assert.AreEqual("Category", result.CategoryCode);
             Assert.AreEqual(3, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[0]);
+            Assert.AreEqual("DEV", result.NamedEnvironments[2]);
             Assert.AreEqual("NRTEST", result.NamedEnvironments[1]);
-            Assert.AreEqual("TEST", result.NamedEnvironments[2]);
+            Assert.AreEqual("TEST", result.NamedEnvironments[0]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
-            Assert.AreEqual("/Dataset/Detail/13", result.DatasetDetailPage);
+            Assert.AreEqual(13, result.TargetDatasetId);
         }
 
         #region Helpers

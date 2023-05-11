@@ -278,6 +278,7 @@ namespace Sentry.data.Core
             public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
             public const string DATASET_SEARCH = "Datasets";
             public const string DATA_INVENTORY = "DataInventory";
+            public const string GLOBAL_DATASET = "GlobalDataset";
         }
 
         public static class StoragePrefixes
@@ -343,6 +344,7 @@ namespace Sentry.data.Core
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
+            public const string VARIANT = "VARIANT";
 
             public static class Defaults
             {                
@@ -599,6 +601,7 @@ namespace Sentry.data.Core
             public const string CONFLUENT_CONNECTOR_USERNAME = "ConfluentConnectorUserName";
             public const string CONFLUENT_CONNECTOR_PASSWORD = "ConfluentConnectorPassword";
             public const string CONFLUENT_CONNECTOR_FLUSH_SIZE = "ConfluentConnectorFlushSize";
+            public const string S3CONNECTOR_PROXY = "EdgeWebProxyUrl";
         }
 
         public static class DLPPEnvironments

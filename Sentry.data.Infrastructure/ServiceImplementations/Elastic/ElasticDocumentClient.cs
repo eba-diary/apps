@@ -96,7 +96,7 @@ namespace Sentry.data.Infrastructure
         private async Task<ElasticResult<T>> GetResponse<T>(Func<Task<ISearchResponse<T>>> request) where T : class
         {
             ISearchResponse<T> response = await request().ConfigureAwait(false);
-
+            
             return new ElasticResult<T>()
             {
                 SearchTotal = response.Total,

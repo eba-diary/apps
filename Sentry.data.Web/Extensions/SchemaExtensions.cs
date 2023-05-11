@@ -219,6 +219,9 @@ namespace Sentry.data.Web
                 case GlobalConstants.Datatypes.BIGINT:
                     fieldFactory = new BigIntFieldDtoFactory(row);
                     break;
+                case GlobalConstants.Datatypes.VARIANT:
+                    fieldFactory = new VariantFieldDtoFactory(row);
+                    break;
                 default:
                     fieldFactory = new VarcharFieldDtoFactory(row);
                     break;

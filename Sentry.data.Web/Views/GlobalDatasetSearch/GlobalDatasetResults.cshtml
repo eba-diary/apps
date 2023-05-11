@@ -1,0 +1,108 @@
+﻿@model GlobalDatasetResultsViewModel
+
+@{
+    ViewBag.Fluid = true;
+}
+
+<div class="tile-result-content">
+    <input type="hidden" id="result-count" value="@Model.GlobalDatasets.Count">
+
+    <div class="tile-result-options mt-4">
+        @* sort *@
+        <div class="mr-2">
+            @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Sort By</label>
+        </div>
+
+        @* layout *@
+        <div>
+            @Html.DropDownList("tile-result-layout", Model.LayoutOptions, new { @class = "mdb-select" })
+            <label class="mdb-main-label">Layout</label>
+        </div>
+    </div>
+
+    @* page size *@
+    <div class="mt-4">
+        @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
+        <label class="mdb-main-label">Page Size</label>
+    </div>
+
+    <div class="row mr-0 ml-0" id="tile-results">
+        @if (Model.GlobalDatasets?.Any() == true)
+        {
+            foreach (GlobalDatasetViewModel globalDataset in Model.GlobalDatasets)
+            {
+                <a class="m-0 p-0 tile-result" href="/Dataset/Detail/@globalDataset.TargetDatasetId">
+                    <div class="card m-1 card-hover">
+                        <!-- Card content -->
+                        <div class="card-body p-3">
+                            <!-- Favorite Icon -->
+                            <div class="activator waves-effect waves-light mr-3 card-favorite" data-id="@globalDataset.TargetDatasetId" title="Toggle favorite">
+                                <em class="@(globalDataset.IsFavorite ? "fas lt_gold" : "far gray") fa-star"></em>
+                            </div>
+
+                            <!-- Dataset Name and Category -->
+                            <div class="search-card-title">
+                                <h4 class="card-title pt-0 mb-0">@globalDataset.DatasetName</h4>
+                                @if (globalDataset.IsSecured)
+                                {
+                                    <em class="fas fa-lock ml-2 text-info" data-toggle="tooltip" data-placement="bottom" title="Secure"></em>
+                                }
+                            </div>
+
+                            <h6 class="card-title text-info pt-0 mb-0 search-card-subtitle">
+                                <span>@globalDataset.DatasetSaidAssetCode</span>
+                                <span>@globalDataset.CategoryCode</span>
+                            </h6>
+
+                            <hr class="my-2">
+
+                            <!-- Dataset Description -->
+                            <p class="card-text tile-description" title="@globalDataset.DatasetDescription"> @globalDataset.DatasetDescription </p>
+
+                            <div class="d-flex">
+                                @foreach (string environment in globalDataset.NamedEnvironments.Take(globalDataset.NamedEnvironments.Count <= 4 ? 4 : 3))
+                                {
+                                    <div class="chip @(environment.Contains("PROD") ? "blue" : "") lighten-4 chip-disabled environment-chip-sm">@environment</div>
+                                }
+
+                                @if (globalDataset.NamedEnvironments.Count > 4)
+                                {
+                                    <div class="chip lighten-4 chip-disabled environment-chip-sm">...</div>
+                                }
+                                <div class="d-flex justify-content-end view-details-spacing">
+                                    <h6 class="pt-0 mb-0">
+                                        View Details
+                                        <em class="fas fa-angle-double-right"></em>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            }
+        }
+    </div>
+
+    @if (Model.PageItems?.Any() == true)
+    {
+        <div class="mt-2">
+            <ul class="pagination pb-0">
+                <li class="page-item @(Model.PageItems.First().IsActive ? "disabled" : "")" id="tile-page-previous">
+                    <span class="page-link previous waves-effect" href="#" aria-label="Previous">Previous</span>
+                </li>
+
+                @foreach (PageItemModel item in Model.PageItems)
+                {
+                    <li class="page-item tile-page-number @(item.IsActive ? "active" : "") @(item.IsDisabled ? "disabled" : "")" data-page="@item.PageNumber">
+                        <span class="page-link waves-effect" href="#">@item.PageNumber</span>
+                    </li>
+                }
+
+                <li class="page-item @(Model.PageItems.Last().IsActive ? "disabled" : "")" id="tile-page-next">
+                    <span class="page-link next waves-effect" href="#" aria-label="Next">Next</span>
+                </li>
+            </ul>
+        </div>
+    }
+</div>

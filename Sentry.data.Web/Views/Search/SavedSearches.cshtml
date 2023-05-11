@@ -11,13 +11,13 @@
                 <div class="saved-search-option-container" id="saved_@option.SavedSearchId">
                     <a class="dropdown-item @(option.SavedSearchName == Model.ActiveSearchName ? "active" : "") saved-search-option-name" href="../../@option.SavedSearchUrl">@option.SavedSearchName</a>
                     
-                    <a class="@(option.IsFavorite ? "fas" : "far") fa-star saved-search-favorite saved-search-option-icon" id="savedFavorite_@option.SavedSearchId" data-id="@option.SavedSearchId"></a>
-                    <span class="spinner-border spinner-border-sm saved-search-option-spinner display-none" id="favoriteSpinner_@option.SavedSearchId"></span>
+                    <div class="@(option.IsFavorite ? "fas lt_gold" : "far gray") fa-star saved-search-favorite ml-2 p-2 clickable" id="savedFavorite_@option.SavedSearchId" data-id="@option.SavedSearchId"></div>
+                    <span class="spinner-border spinner-border-sm saved-search-option-spinner lt_gold ml-3 display-none" id="favoriteSpinner_@option.SavedSearchId"></span>
                     
-                    <a class="far fa-edit saved-search-option-icon saved-search-edit" data-id="@option.SavedSearchId" data-name="@option.SavedSearchName"></a>
+                    <div class="far fa-edit dsc-blue-text p-2 saved-search-edit clickable" data-id="@option.SavedSearchId" data-name="@option.SavedSearchName"></div>
                     
-                    <a class="icon-trash saved-search-option-icon saved-search-delete" id="savedDelete_@option.SavedSearchId" data-id="@option.SavedSearchId"></a>
-                    <span class="spinner-border spinner-border-sm saved-search-option-spinner display-none" id="deleteSpinner_@option.SavedSearchId"></span>
+                    <div class="icon-trash p-2 mr-2 text-danger saved-search-delete clickable" id="savedDelete_@option.SavedSearchId" data-id="@option.SavedSearchId"></div>
+                    <span class="spinner-border spinner-border-sm text-danger saved-search-option-spinner display-none" id="deleteSpinner_@option.SavedSearchId"></span>
                 </div>                
             }
         }

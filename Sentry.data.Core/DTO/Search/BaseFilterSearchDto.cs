@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class BaseFilterSearchDto
+    public abstract class BaseFilterSearchDto
     {
         public string SearchText { get; set; }
         public List<FilterCategoryDto> FilterCategories { get; set; } = new List<FilterCategoryDto>();

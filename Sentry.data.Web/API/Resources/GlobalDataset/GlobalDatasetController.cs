@@ -28,12 +28,26 @@ namespace Sentry.data.Web.API
         [ApiVersionBegin(WebAPI.Version.v20230315)]
         [SwaggerResponse(HttpStatusCode.OK, null, typeof(SearchGlobalDatasetsResponseModel))]
         [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.ServiceUnavailable)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public async Task<IHttpActionResult> SearchGlobalDatasets(SearchGlobalDatasetsRequestModel model)
         {
-            return await ProcessRequestAsync<SearchGlobalDatasetsRequestModel, SearchGlobalDatasetsDto, SearchGlobalDatasetsResultDto, SearchGlobalDatasetsResponseModel>(model, _globalDatasetService.SearchGlobalDatasetsAsync);
+            return await ProcessRequestAsync<SearchGlobalDatasetsRequestModel, SearchGlobalDatasetsDto, SearchGlobalDatasetsResultsDto, SearchGlobalDatasetsResponseModel>(model, _globalDatasetService.SearchGlobalDatasetsAsync);
+        }
+
+        /// <summary>
+        /// Aggregate search filters for global dataset search
+        /// </summary>
+        [HttpPost]
+        [Route("filters")]
+        [ApiVersionBegin(WebAPI.Version.v20230315)]
+        [SwaggerResponse(HttpStatusCode.OK, null, typeof(GetGlobalDatasetFiltersResponseModel))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(ValidationResponseModel))]
+        [SwaggerResponse(HttpStatusCode.ServiceUnavailable)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        public async Task<IHttpActionResult> GetGlobalDatasetFilters(GetGlobalDatasetFiltersRequestModel model)
+        {
+            return await ProcessRequestAsync<GetGlobalDatasetFiltersRequestModel, GetGlobalDatasetFiltersDto, GetGlobalDatasetFiltersResultDto, GetGlobalDatasetFiltersResponseModel>(model, _globalDatasetService.GetGlobalDatasetFiltersAsync);
         }
     }
 }
