@@ -17,7 +17,7 @@ namespace Sentry.data.Web
             return new DatasetSchemaDto()
             {
                 DatasetId = model.DatasetId,
-                DatasetCategoryIds = model.DatasetCategoryIds,
+                DatasetCategoryIds = new List<int> { model.DatasetCategoryId },
                 DatasetName = model.DatasetName,
                 ShortName = model.ShortName,
                 DatasetDesc = model.DatasetDesc,

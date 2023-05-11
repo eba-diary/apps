@@ -4,6 +4,7 @@ using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using System.Linq;
 
 namespace Sentry.data.Web
 {
@@ -26,6 +27,7 @@ namespace Sentry.data.Web
             DatasetNamedEnvironment = dto.NamedEnvironment;
             DatasetNamedEnvironmentType = dto.NamedEnvironmentType;
             ShortName = dto.ShortName;
+            DatasetCategoryId = dto.DatasetCategoryIds.FirstOrDefault();
         }
 
 

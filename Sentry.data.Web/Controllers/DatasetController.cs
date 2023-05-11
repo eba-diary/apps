@@ -246,7 +246,6 @@ namespace Sentry.data.Web.Controllers
 
             if (ModelState.IsValid)
             {
-
                 if (dto.DatasetId == 0)
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
@@ -263,7 +262,6 @@ namespace Sentry.data.Web.Controllers
                     return Json(new { Success = true, dataset_id = dto.DatasetId });
                     //return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
-
             }
 
             Utility.SetupLists(_datasetContext, model);

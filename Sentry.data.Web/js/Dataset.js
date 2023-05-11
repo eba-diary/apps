@@ -844,7 +844,7 @@ data.Dataset = {
 
         //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
         $(document).ready(function () {
-            $("#DatasetCategoryIds").materialSelect();
+            $("#DatasetCategoryId").materialSelect();
             $("#saidAsset").materialSelect();
             $("#OriginationID").materialSelect();
             $("#DataClassification").materialSelect();
