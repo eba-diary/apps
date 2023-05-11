@@ -142,12 +142,21 @@ data.GlobalDatasetSearch = {
             title: "Why do you see this dataset?",
             placement: "left",
             trigger: "hover click"
-        })
+        });
 
         data.GlobalDatasetSearch.setLayout();
     },
 
     initEvents: function () {
+        $(document).on("click", function (e) {
+            if ($('.popover').is(":visible")) {
+                //allow clicking away from popovers to hide them                
+                e.stopPropagation();
+                e.preventDefault();
+                $('.searchHighlights').popover('hide');
+            };
+        });
+
         $(document).on("click", ".tile-result", data.GlobalDatasetSearch.setPreviousSearch);
 
         //favorite click event
