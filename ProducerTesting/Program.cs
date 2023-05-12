@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
-using Sentry.Configuration;
-using System.Linq;
-using System.Text;
-using StructureMap;
-using Sentry.data.Infrastructure;
 using Sentry.data.Core;
-using Newtonsoft.Json;
 using Sentry.data.Core.Entities.S3;
+using Sentry.data.Infrastructure;
+using StructureMap;
 using System.Threading;
 
 namespace ProducerTesting
@@ -17,7 +12,7 @@ namespace ProducerTesting
     {
         static void Main(string[] args)
         {
-            Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
+            //Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
 
             //Call your bootstrapper to initialize your application
             Bootstrapper.Init();

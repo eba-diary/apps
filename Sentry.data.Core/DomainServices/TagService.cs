@@ -1,15 +1,17 @@
-﻿using Sentry.Common.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class TagService : ITagService
+    public class TagService : BaseDomainService<TagService>, ITagService
     {
         private readonly IDatasetContext _datasetContext;
 
-        public TagService(IDatasetContext datasetContext)
+        public TagService(IDatasetContext datasetContext, DomainServiceCommonDependency<TagService> commonDependency) : base (commonDependency)
         {
             _datasetContext = datasetContext;
         }
@@ -24,7 +26,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error saving tag - ", ex);
+                _logger.LogError(ex, "Error saving tag - ");
                 return false;
             }
 
@@ -43,7 +45,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error saving tag - ", ex);
+                _logger.LogError(ex, "Error saving tag - ");
                 return false;
             }
 

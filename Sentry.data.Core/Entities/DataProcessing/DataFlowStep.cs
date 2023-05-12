@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
-using Sentry.data.Core.Interfaces.DataProcessing;
-using Sentry.data.Core.Helpers;
-using System;
+﻿using Sentry.data.Core.Interfaces.DataProcessing;
 using System.Collections.Generic;
 using System.Text;
 

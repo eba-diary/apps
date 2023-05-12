@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
+using Sentry.data.Core;
+using Sentry.Web.Security.Obsidian;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using Sentry.Common.Logging;
-using StructureMap;
-using Hangfire;
-using Sentry.Web.Security.Obsidian;
-using Microsoft.Extensions.Logging;
 
 namespace Sentry.data.Goldeneye
 {
