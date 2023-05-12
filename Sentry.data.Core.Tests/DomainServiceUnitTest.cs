@@ -19,9 +19,7 @@ namespace Sentry.data.Core.Tests
         {
             TestInitialize(mockBehavior);
 
-            _testDependencies = new DomainServiceCommonDependency<T>();
-            _testDependencies._logger = new MockLoggingService<T>();
-            _testDependencies._dataFeatures = _container.GetInstance<IDataFeatures>();
+            _testDependencies = new DomainServiceCommonDependency<T>(new MockLoggingService<T>(), _container.GetInstance<IDataFeatures>());
         }
     }
 }

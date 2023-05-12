@@ -10,6 +10,10 @@ namespace Sentry.data.Goldeneye
         private Core _myCore;
         private readonly ILoggerFactory _loggerFactory;
 
+        /// <summary>
+        /// Service class constructor
+        /// </summary>
+        /// <param name="loggerFactory"></param>
         public Service(ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;

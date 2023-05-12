@@ -75,6 +75,12 @@
             Initialize the HangFire Scheuler server
             </summary>
         </member>
+        <member name="M:Sentry.data.Goldeneye.Service.#ctor(Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Service class constructor
+            </summary>
+            <param name="loggerFactory"></param>
+        </member>
         <member name="T:Sentry.data.Goldeneye.SpamFactory">
             <summary>
             

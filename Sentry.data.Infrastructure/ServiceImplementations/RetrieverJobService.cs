@@ -367,7 +367,7 @@ namespace Sentry.data.Infrastructure
 
                     if (objectList == null)
                     {
-                        //_job.JobLoggerMessage(_logger, "Info", "S3 Basic job detected 0 new files");
+                        _job.JobLoggerMessage(_logger, "Info", "S3 Basic job detected 0 new files");
                     }
                     else
                     {

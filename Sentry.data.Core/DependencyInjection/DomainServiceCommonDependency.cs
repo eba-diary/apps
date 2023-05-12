@@ -7,7 +7,5 @@ namespace Sentry.data.Core.DependencyInjection
         public DomainServiceCommonDependency(ILogger<T> logger, IDataFeatures dataFeatures) : base(logger, dataFeatures)
         {
         }
-
-        public DomainServiceCommonDependency() { }
     }
 }
