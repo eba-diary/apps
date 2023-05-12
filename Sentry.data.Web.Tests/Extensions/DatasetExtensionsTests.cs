@@ -32,7 +32,7 @@ namespace Sentry.data.Web.Tests
             DatasetModel model = new DatasetModel()
             {
                 DatasetId = 1,
-                DatasetCategoryIds = new List<int> { 2 },
+                DatasetCategoryId = 2,
                 DatasetName = "Dataset Name",
                 ShortName = "ShortName",
                 DatasetDesc = "Description",

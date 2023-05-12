@@ -3,20 +3,26 @@
 		
 		MERGE INTO Category AS Target 
 		USING (VALUES 
-									(1, 'Claim',				NULL, 'clcDkBlue',	'DS',	NULL),
-									(2, 'Industry',				NULL, 'clcDkBlue',	'DS',	NULL),
-									(3, 'Government',			NULL, 'clcDkBlue',	'DS',	NULL),
-									(4, 'Geographic',			NULL, 'clcDkBlue',	'DS',	NULL),
-									(5, 'Weather',				NULL, 'clcDkBlue',	'DS',	NULL),
-									(6, 'Sentry',				NULL, 'clcDkBlue',	'DS',	NULL),
-									(7, 'Commercial Lines',		NULL, 'blueGray',	'RPT',	'CL'),
-									(8, 'Personal Lines',		NULL, 'orange',		'RPT',	'PL'),
-									(9, 'Claims',				NULL, 'gold',		'RPT',	NULL),
-									(10, 'Corporate',			NULL, 'green',		'RPT',	NULL),
-									(11, 'IT',					NULL, 'plum',		'RPT',	NULL),
-									(12, 'Life and Annuities',	NULL, 'blue',		'RPT',	'LA'),
-									(13, 'Human Resources',		NULL, 'clcDkBlue',	'DS',	'HR'),
-									(14, 'Investment',			NULL, 'clcDkBlue',	'DS',	NULL)
+									(1, 'Claim',					NULL, 'clcDkBlue',	'DS',	NULL),
+									(2, 'Industry',					NULL, 'clcDkBlue',	'DS',	NULL),
+									(3, 'Government',				NULL, 'clcDkBlue',	'DS',	NULL),
+									(4, 'Geographic',				NULL, 'clcDkBlue',	'DS',	NULL),
+									(5, 'Weather',					NULL, 'clcDkBlue',	'DS',	NULL),
+									(6, 'Sentry',					NULL, 'clcDkBlue',	'DS',	NULL),
+									(7, 'Commercial Lines',			NULL, 'blueGray',	'RPT',	'CL'),
+									(8, 'Personal Lines',			NULL, 'orange',		'RPT',	'PL'),
+									(9, 'Claims',					NULL, 'gold',		'RPT',	NULL),
+									(10, 'Corporate',				NULL, 'green',		'RPT',	NULL),
+									(11, 'IT',						NULL, 'plum',		'RPT',	NULL),
+									(12, 'Life and Annuities',		NULL, 'blue',		'RPT',	'LA'),
+									(13, 'Human Resources',			NULL, 'clcDkBlue',	'DS',	'HR'),
+									(14, 'Investment',				NULL, 'clcDkBlue',	'DS',	NULL),
+									(15, 'Commercial Lines',		NULL, 'clcDkBlue',	'DS',	NULL),
+									(16, 'Customer Communication',	NULL, 'clcDkBlue',	'DS',	NULL),
+									(17, 'Enterprise',				NULL, 'clcDkBlue',	'DS',	NULL),
+									(18, 'Information Technology',	NULL, 'clcDkBlue',	'DS',	NULL),
+									(19, 'Personal Lines',			NULL, 'clcDkBlue',	'DS',	NULL),
+									(20, 'Web Portals',				NULL, 'clcDkBlue',	'DS',	NULL)
 								)
 								AS Source ([Id], [Name], ParentCategory, Color, Object_TYP, AbbreviatedName) 
 

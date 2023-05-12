@@ -62,24 +62,26 @@ namespace Sentry.data.Web.Helpers
         public static void SetupLists(IDatasetContext _datasetContext, DatasetModel model)
         {
             //Categories
-            var temp = GetCategoryList(_datasetContext).ToList();
+            var temp = GetCategoryList(_datasetContext).OrderBy(x => x.Text).ToList();
 
-            if(model.DatasetCategoryIds?.Count == 1 && model.DatasetCategoryIds[0] != 0)
+            if(model.DatasetCategoryId == 0)
             {
-                temp.First(x => x.Value == model.DatasetCategoryIds.First().ToString()).Selected = true;
-            }
-            else
-            {
-                temp.Add(new SelectListItem()
+                var pickCategoryList = new List<SelectListItem>
                 {
-                    Text = "Pick a Category",
-                    Value = "0",
-                    Selected = true,
-                    Disabled = true
-                });
+                    new SelectListItem()
+                    {
+                        Text = "Pick a Category",
+                        Value = "0",
+                        Selected = true,
+                        Disabled = true
+                    }
+                };
+
+                pickCategoryList.AddRange(temp);
+                temp = pickCategoryList;
             }
 
-            model.AllCategories = temp.OrderBy(x => x.Value);
+            model.AllCategories = temp;
 
             //Origination Codes
             temp = GetDatasetOriginationListItems().ToList();
