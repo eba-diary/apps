@@ -137,17 +137,26 @@ data.GlobalDatasetSearch = {
         $(".filter-search-categories-container").removeClass("search-blur");
 
         $('.searchHighlights').popover({
-            template: "<div class='popover'><div class='arrow highlightArrow'></div><h3 class='popover-header mt-1'></h3><div class='popover-body highlightBody pt-0'></div></div>",
+            template: "<div class='popover highlightsPopover'><div class='arrow highlightArrow'></div><h3 class='popover-header mt-1'></h3><div class='popover-body highlightBody pt-0'></div></div>",
             html: true,
             title: "Why do you see this dataset?",
             placement: "left",
             trigger: "hover click"
-        })
+        });
 
         data.GlobalDatasetSearch.setLayout();
     },
 
     initEvents: function () {
+        $(document).on("click", function (e) {
+            if ($('.highlightsPopover').is(":visible")) {
+                //allow clicking away from popovers to hide them                
+                e.stopPropagation();
+                e.preventDefault();
+                $('.searchHighlights').popover('hide');
+            };
+        });
+
         $(document).on("click", ".tile-result", data.GlobalDatasetSearch.setPreviousSearch);
 
         //favorite click event
