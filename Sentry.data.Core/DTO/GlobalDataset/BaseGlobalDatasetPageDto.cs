@@ -8,6 +8,7 @@ namespace Sentry.data.Core
         public int PageSize { get; set; }
         public int SortBy { get; set; }
         public int Layout { get; set; }
+        public bool ShouldSearchColumns { get; set; }
         public List<SearchGlobalDatasetDto> GlobalDatasets { get; set; }
     }
 }

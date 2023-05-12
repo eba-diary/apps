@@ -645,6 +645,7 @@
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetResponseModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsRequestModel.cs" />
     <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchGlobalDatasetsResponseModel.cs" />
+    <Compile Include="API\Resources\GlobalDataset\SearchGlobalDatasets\SearchHighlightModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestModel.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaRequestValidator.cs" />
     <Compile Include="API\Resources\Schema\AddSchema\AddSchemaResponseModel.cs" />
@@ -1326,6 +1327,7 @@
     <Content Include="Views\Config\DataSource\EditDataSource.cshtml" />
     <Content Include="Views\Migration\_MigrationHistoryDetail.cshtml" />
     <Content Include="Views\GlobalDatasetSearch\GlobalDatasetResults.cshtml" />
+    <Content Include="Views\GlobalDatasetSearch\SearchSettings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

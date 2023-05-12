@@ -78,7 +78,7 @@ namespace Sentry.data.Web
         public DateTime DatasetDtm { get; set; }
         [DisplayName("Last Modified")]
         public DateTime ChangedDtm { get; set; }
-        [Required]
+        
         [DisplayName("Category")]
         public List<int> DatasetCategoryIds { get; set; }
         public string TagIds { get; set; }

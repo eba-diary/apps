@@ -393,6 +393,7 @@
     <Compile Include="DTO\Retriever\DataSourceTokenDto.cs" />
     <Compile Include="DTO\Retriever\RequestVariableDto.cs" />
     <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
+    <Compile Include="DTO\SchemaField\SearchSchemaFieldsDto.cs" />
     <Compile Include="DTO\Schema\Fields\VariantFieldDto.cs" />
     <Compile Include="DTO\Schema\SchemaFlowDto.cs" />
     <Compile Include="DTO\Schema\DatasetFileDto.cs" />
@@ -416,6 +417,10 @@
     <Compile Include="DTO\Schema\SchemaRevisionFieldStructureDto.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionJsonStructureDto.cs" />
     <Compile Include="DTO\Search\BaseFilterSearchDto.cs" />
+    <Compile Include="DTO\Search\BaseSearchDto.cs" />
+    <Compile Include="DTO\Search\DocumentsFiltersDto.cs" />
+    <Compile Include="DTO\Search\SearchHighlightableDto.cs" />
+    <Compile Include="DTO\Search\SearchHighlightDto.cs" />
     <Compile Include="DTO\Search\TileSearchDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryDto.cs" />
     <Compile Include="DTO\Search\FilterCategoryOptionDto.cs" />
@@ -532,6 +537,7 @@
     <Compile Include="Entities\GlobalDataset\EnvironmentDataset.cs" />
     <Compile Include="Entities\GlobalDataset\EnvironmentSchema.cs" />
     <Compile Include="Entities\Schema\VariantField.cs" />
+    <Compile Include="Entities\Search\SearchHighlight.cs" />
     <Compile Include="Entities\Security\SecurablePermission.cs" />
     <Compile Include="Entities\Security\SecurablePermissionScope.cs" />
     <Compile Include="Entities\Search\SavedSearch.cs" />
@@ -652,6 +658,7 @@
     <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Helpers\WebHelper.cs" />
+    <Compile Include="Entities\Search\SearchHighlightable.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetSearchService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
@@ -710,6 +717,7 @@
     <Compile Include="Interfaces\IInstanceGenerator.cs" />
     <Compile Include="Interfaces\InfrastructureEventing\IInevService.cs" />
     <Compile Include="Interfaces\IJobScheduler.cs" />
+    <Compile Include="Interfaces\ISchemaFieldProvider.cs" />
     <Compile Include="Interfaces\ISchemaFlowService.cs" />
     <Compile Include="Interfaces\ISupportLinkService.cs" />
     <Compile Include="Interfaces\IPollyPolicy.cs" />

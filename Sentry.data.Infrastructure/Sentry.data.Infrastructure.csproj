@@ -617,6 +617,7 @@
     <Compile Include="ServiceImplementations\SAIDRestClient.cs" />
     <Compile Include="ServiceImplementations\SAIDService.cs" />
     <Compile Include="ServiceImplementations\GlobalDataset\GlobalDatasetProvider.cs" />
+    <Compile Include="ServiceImplementations\SchemaFieldProvider.cs" />
     <Compile Include="ServiceImplementations\SecBotProvider.cs" />
     <Compile Include="ServiceImplementations\SnowProvider.cs" />
     <Compile Include="ServiceImplementations\SupportLinkService.cs" />
@@ -707,7 +708,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
-      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
+      <Project>{EA9EE762-CE32-4410-B2B6-367A0985645B}</Project>
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">

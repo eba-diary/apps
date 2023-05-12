@@ -241,7 +241,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void TryGetSlectedOptionsWithNoResultsIn_FilterCategoryOptionDtos_True()
+        public void TryGetSelectedOptionsWithNoResultsIn_FilterCategoryOptionDtos_True()
         {
             List<FilterCategoryOptionDto> options = new List<FilterCategoryOptionDto>()
             {
@@ -268,6 +268,97 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(options.TryGetSelectedOptionsWithNoResults(newOptions, out List<FilterCategoryOptionDto> results));
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("Option", results.First().OptionValue);
+        }
+
+        [TestMethod]
+        public void MergeFilterCategories_NotExists()
+        {
+            List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>();
+
+            List<FilterCategoryDto> mergeCategories = new List<FilterCategoryDto>
+            {
+                new FilterCategoryDto
+                {
+                    CategoryName = "Name",
+                    CategoryOptions = new List<FilterCategoryOptionDto>
+                    {
+                        new FilterCategoryOptionDto
+                        {
+                            OptionValue = "Value",
+                            Selected = true
+                        }
+                    }
+                }
+            };
+
+            filterCategories.MergeFilterCategories(mergeCategories);
+
+            Assert.AreEqual(1, filterCategories.Count);
+
+            FilterCategoryDto category = filterCategories.First();
+            Assert.AreEqual("Name", category.CategoryName);
+            Assert.AreEqual(1, category.CategoryOptions.Count);
+
+            FilterCategoryOptionDto option = category.CategoryOptions[0];
+            Assert.AreEqual("Value", option.OptionValue);
+            Assert.IsTrue(option.Selected);
+        }
+
+        [TestMethod]
+        public void MergeFilterCategories_Exists()
+        {
+            List<FilterCategoryDto> filterCategories = new List<FilterCategoryDto>
+            {
+                new FilterCategoryDto
+                {
+                    CategoryName = "Name",
+                    CategoryOptions = new List<FilterCategoryOptionDto>
+                    {
+                        new FilterCategoryOptionDto
+                        {
+                            OptionValue = "Value",
+                            Selected = true
+                        }
+                    }
+                }
+            };
+
+            List<FilterCategoryDto> mergeCategories = new List<FilterCategoryDto>
+            {
+                new FilterCategoryDto
+                {
+                    CategoryName = "Name",
+                    CategoryOptions = new List<FilterCategoryOptionDto>
+                    {
+                        new FilterCategoryOptionDto
+                        {
+                            OptionValue = "Value",
+                            Selected = false
+                        },
+                        new FilterCategoryOptionDto
+                        {
+                            OptionValue = "Value 2",
+                            Selected = false
+                        }
+                    }
+                }
+            };
+
+            filterCategories.MergeFilterCategories(mergeCategories);
+
+            Assert.AreEqual(1, filterCategories.Count);
+
+            FilterCategoryDto category = filterCategories.First();
+            Assert.AreEqual("Name", category.CategoryName);
+            Assert.AreEqual(2, category.CategoryOptions.Count);
+
+            FilterCategoryOptionDto option = category.CategoryOptions[0];
+            Assert.AreEqual("Value", option.OptionValue);
+            Assert.IsTrue(option.Selected);
+
+            option = category.CategoryOptions[1];
+            Assert.AreEqual("Value 2", option.OptionValue);
+            Assert.IsFalse(option.Selected);
         }
 
         #region Helpers

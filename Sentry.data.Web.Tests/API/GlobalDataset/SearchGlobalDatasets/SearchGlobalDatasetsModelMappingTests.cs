@@ -44,12 +44,14 @@ namespace Sentry.data.Web.Tests.API
                             }
                         }
                     }
-                }
+                },
+                ShouldSearchColumns = true,
             };
 
             SearchGlobalDatasetsDto dto = _mapper.Map<SearchGlobalDatasetsDto>(request);
 
             Assert.AreEqual("search text", dto.SearchText);
+            Assert.IsTrue(dto.ShouldSearchColumns);
             Assert.AreEqual(2, dto.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = dto.FilterCategories[0];
@@ -61,13 +63,13 @@ namespace Sentry.data.Web.Tests.API
             FilterCategoryOptionDto optionDto = categoryDto.CategoryOptions[0];
             Assert.AreEqual("Option1", optionDto.OptionValue);
             Assert.AreEqual(0, optionDto.ResultCount);
-            Assert.IsNull(optionDto.ParentCategoryName);
+            Assert.AreEqual("Category1", optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
 
             optionDto = categoryDto.CategoryOptions[1];
             Assert.AreEqual("Option2", optionDto.OptionValue);
             Assert.AreEqual(0, optionDto.ResultCount);
-            Assert.IsNull(optionDto.ParentCategoryName);
+            Assert.AreEqual("Category1", optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
 
             categoryDto = dto.FilterCategories[1];
@@ -79,7 +81,7 @@ namespace Sentry.data.Web.Tests.API
             optionDto = categoryDto.CategoryOptions[0];
             Assert.AreEqual("P", optionDto.OptionValue);
             Assert.AreEqual(0, optionDto.ResultCount);
-            Assert.IsNull(optionDto.ParentCategoryName);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.ENVIRONMENT, optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
         }
 
@@ -100,7 +102,20 @@ namespace Sentry.data.Web.Tests.API
                         NamedEnvironments = new List<string> { "DEV" },
                         IsSecured = true,
                         IsFavorite = true,
-                        TargetDatasetId = 2
+                        TargetDatasetId = 2,
+                        SearchHighlights = new List<SearchHighlightDto>
+                        {
+                            new SearchHighlightDto
+                            {
+                                PropertyName = SearchDisplayNames.GlobalDataset.DATASETNAME,
+                                Highlights = new List<string> { "value", "value2" }
+                            },
+                            new SearchHighlightDto
+                            {
+                                PropertyName = SearchDisplayNames.GlobalDataset.SCHEMANAME,
+                                Highlights = new List<string> { "value" }
+                            }
+                        }
                     },
                     new SearchGlobalDatasetDto
                     {
@@ -112,7 +127,8 @@ namespace Sentry.data.Web.Tests.API
                         NamedEnvironments = new List<string> { "DEV", "TEST" },
                         IsSecured = false,
                         IsFavorite = false,
-                        TargetDatasetId = 1
+                        TargetDatasetId = 1,
+                        SearchHighlights = new List<SearchHighlightDto>()
                     }
                 }
             };
@@ -132,6 +148,18 @@ namespace Sentry.data.Web.Tests.API
             Assert.IsTrue(globalDataset.IsSecured);
             Assert.IsTrue(globalDataset.IsFavorite);
             Assert.AreEqual(2, globalDataset.TargetDatasetId);
+            Assert.AreEqual(2, globalDataset.SearchHighlights.Count);
+
+            SearchHighlightModel searchHighlight = globalDataset.SearchHighlights[0];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.DATASETNAME, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
+            Assert.AreEqual("value2", searchHighlight.Highlights[1]);
+
+            searchHighlight = globalDataset.SearchHighlights[1];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.SCHEMANAME, searchHighlight.PropertyName);
+            Assert.AreEqual(1, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
 
             globalDataset = model.GlobalDatasets[1];
             Assert.AreEqual(2, globalDataset.GlobalDatasetId);
@@ -145,6 +173,7 @@ namespace Sentry.data.Web.Tests.API
             Assert.IsFalse(globalDataset.IsSecured);
             Assert.IsFalse(globalDataset.IsFavorite);
             Assert.AreEqual(1, globalDataset.TargetDatasetId);
+            Assert.AreEqual(0, globalDataset.SearchHighlights.Count);
         }
     }
 }
