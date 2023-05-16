@@ -252,12 +252,14 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IBaseJobProvider> jobProvider = new Mock<IBaseJobProvider>();
-            jobProvider.Setup(x => x.Execute(It.IsAny<RetrieverJob>()));
+            Mock<IDataFeatures> featureFlags = repository.Create<IDataFeatures>();
+            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
+
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, featureFlags.Object);
 
             Mock<IBackgroundJobClient> backgroundClient = new Mock<IBackgroundJobClient>();
 
-            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object, backgroundClient.Object);
+            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, provider, backgroundClient.Object);
 
             motiveProvider.MotiveTokenBackfill(backfillToken);
 
@@ -278,8 +280,6 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("2023-03-04", job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
             Assert.AreEqual("2023-03-08", job2.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
             Assert.AreEqual("2023-03-10", job3.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
-
-            jobProvider.Verify(jp => jp.Execute(It.IsAny<RetrieverJob>()), Times.Exactly(3));
 
             repository.VerifyAll();
         }
@@ -410,12 +410,11 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IBaseJobProvider> jobProvider = new Mock<IBaseJobProvider>();
-            jobProvider.Setup(x => x.Execute(It.IsAny<RetrieverJob>()));
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, null);
 
             Mock<IBackgroundJobClient> backgroundClient = new Mock<IBackgroundJobClient>();
 
-            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, jobProvider.Object, backgroundClient.Object);
+            MotiveProvider motiveProvider = new MotiveProvider(null, datasetContext.Object, null, null, provider, backgroundClient.Object);
 
             motiveProvider.MotiveTokenBackfill(backfillToken);
 
@@ -436,8 +435,6 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("2023-03-04", job1.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue);
             Assert.AreEqual("2023-03-08", job2.RequestVariables.First(rv => rv.VariableName == "startValue").VariableValue);
             Assert.AreEqual("2023-03-10", job3.RequestVariables.First(rv => rv.VariableName == "endValue").VariableValue);
-
-            jobProvider.Verify(jp => jp.Execute(It.IsAny<RetrieverJob>()), Times.Exactly(1));
 
             repository.VerifyAll();
         }

@@ -201,6 +201,8 @@
     <Compile Include="SchemaFlowServiceTests.cs" />
     <Compile Include="MarkdownTests.cs" />
     <Compile Include="GlobalDatasetExtensionsTests.cs" />
+    <Compile Include="SearchHighlightTests.cs" />
+    <Compile Include="SearchHighlightableTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

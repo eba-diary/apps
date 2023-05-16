@@ -844,7 +844,7 @@ data.Dataset = {
 
         //CONFIGURE SAID ASSET PICKER on _DatasetCreateEdit.cshtml TO INCLUDE a filter box that comes up
         $(document).ready(function () {
-            $("#DatasetCategoryIds").materialSelect();
+            $("#DatasetCategoryId").materialSelect();
             $("#saidAsset").materialSelect();
             $("#OriginationID").materialSelect();
             $("#DataClassification").materialSelect();
@@ -2269,7 +2269,7 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
     },
 
     AddParameterToUrl(url, key) {
-        var value = localStorage.getItem(key);
+        let value = localStorage.getItem(key);
 
         if (value && value !== "") {
             url = data.Dataset.AddParamDivider(url);
@@ -2285,8 +2285,9 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         url = data.Dataset.AddParameterToUrl(url, "pageNumber");
         url = data.Dataset.AddParameterToUrl(url, "pageSize");
         url = data.Dataset.AddParameterToUrl(url, "layout");
+        url = data.Dataset.AddParameterToUrl(url, "searchColumns");
 
-        var filters = JSON.parse(localStorage.getItem("filters"));
+        let filters = JSON.parse(localStorage.getItem("filters"));
         if (filters && filters.length) {
             url = data.Dataset.AddParamDivider(url);
 

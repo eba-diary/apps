@@ -42,6 +42,7 @@ namespace Sentry.data.Infrastructure
                 SortBy = globalDatasetPageRequestDto.SortBy,
                 Layout = globalDatasetPageRequestDto.Layout,
                 TotalResults = globalDatasetPageRequestDto.GlobalDatasets.Count,
+                ShouldSearchColumns = globalDatasetPageRequestDto.ShouldSearchColumns,
                 GlobalDatasets = globalDatasetEnumerable.ToList()
             };
 
