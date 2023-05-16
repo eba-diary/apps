@@ -543,6 +543,7 @@
     <Compile Include="API\Resources\Dataset\AddDataset\AddDatasetRequestValidator.cs" />
     <Compile Include="API\Resources\Dataset\BaseDatasetModel.cs" />
     <Compile Include="API\Resources\Dataset\BaseDatasetResponseModel.cs" />
+    <Compile Include="API\Resources\Dataset\GetDataset\GetDatasetResponseModel.cs" />
     <Compile Include="API\Resources\Dataset\UpdateDataset\UpdateDatasetRequestModel.cs" />
     <Compile Include="API\Resources\Dataset\UpdateDataset\UpdateDatasetRequestValidator.cs" />
     <Compile Include="API\Resources\Dataset\UpdateDataset\UpdateDatasetResponseModel.cs" />
