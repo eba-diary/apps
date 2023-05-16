@@ -17,9 +17,9 @@ namespace Sentry.data.Core
             _s3ServiceProvider = s3ServiceProvider;
         }
 
-        public List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime timeCreated)
+        public List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime startTime, DateTime endTime)
         {
-            List<DeadSparkJob> deadSparkJobList = _deadJobProvider.GetDeadSparkJobs(timeCreated);
+            List<DeadSparkJob> deadSparkJobList = _deadJobProvider.GetDeadSparkJobs(startTime, endTime);
 
             return MapToDtoList(deadSparkJobList);
         }
