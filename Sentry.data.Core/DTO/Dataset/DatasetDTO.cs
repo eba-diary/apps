@@ -1,5 +1,4 @@
 ﻿using Sentry.data.Core.GlobalEnums;
-using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -14,8 +13,5 @@ namespace Sentry.data.Core
         public NamedEnvironmentType NamedEnvironmentType { get; set; }
         public string ShortName { get; set; }
         public int? GlobalDatasetId { get; set; }
-        public string SnowflakeWarehouse { get; set; }
-        public List<string> SnowflakeDatabases { get; set; }
-        public string SnowflakeSchema { get; set; }
     }
 }

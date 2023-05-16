@@ -63,20 +63,6 @@ namespace Sentry.data.Web.API
             CreateMap<DatasetResultDto, AddDatasetResponseModel>(MemberList.Destination);
 
             CreateMap<DatasetResultDto, UpdateDatasetResponseModel>(MemberList.Destination);
-
-            CreateMap<DatasetDto, GetDatasetResponseModel>(MemberList.Destination)
-                .ForMember(dest => dest.CategoryCode, x => x.MapFrom(src => src.CategoryName))
-                .ForMember(dest => dest.CreateDateTime, x => x.MapFrom(src => src.DatasetDtm))
-                .ForMember(dest => dest.UpdateDateTime, x => x.MapFrom(src => src.ChangedDtm))
-                .ForMember(dest => dest.SaidAssetCode, x => x.MapFrom(src => src.SAIDAssetKeyCode))
-                .ForMember(dest => dest.ObjectStatusCode, x => x.MapFrom(src => src.ObjectStatus.ToString()))
-                .ForMember(dest => dest.DatasetDescription, x => x.MapFrom(src => src.DatasetDesc))
-                .ForMember(dest => dest.UsageInformation, x => x.MapFrom(src => src.DatasetInformation))
-                .ForMember(dest => dest.OriginalCreator, x => x.MapFrom(src => src.CreationUserId))
-                .ForMember(dest => dest.NamedEnvironmentTypeCode, x => x.MapFrom(src => src.NamedEnvironmentType.ToString()))
-                .ForMember(dest => dest.DataClassificationTypeCode, x => x.MapFrom(src => src.DataClassification.ToString()))
-                .ForMember(dest => dest.OriginationCode, x => x.MapFrom(src => Enum.GetName(typeof(DatasetOriginationCode), src.OriginationId)))
-                .IncludeAllDerived();
         }
     }
 }
