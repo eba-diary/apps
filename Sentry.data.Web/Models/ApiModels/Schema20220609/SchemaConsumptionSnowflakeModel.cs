@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Sentry.data.Core;
+using System;
 
 namespace Sentry.data.Web.Models.ApiModels.Schema20220609
 {
@@ -14,6 +15,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema20220609
         public string SnowflakeSchema { get; set; }
         public string SnowflakeTable { get; set; }
         public string SnowflakeStatus { get; set; }
+        public DateTime LastChanged { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public SnowflakeConsumptionType SnowflakeType { get; set; }

@@ -1596,7 +1596,8 @@ namespace Sentry.data.Core
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet,
+                    LastChanged = DateTime.Now
                 },
                 new SchemaConsumptionSnowflake()
                 {
@@ -1607,7 +1608,8 @@ namespace Sentry.data.Core
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery,
+                    LastChanged = DateTime.Now
                 },
                 new SchemaConsumptionSnowflake()
                 {
@@ -1618,7 +1620,8 @@ namespace Sentry.data.Core
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw,
+                    LastChanged = DateTime.Now
                 }
             });
 

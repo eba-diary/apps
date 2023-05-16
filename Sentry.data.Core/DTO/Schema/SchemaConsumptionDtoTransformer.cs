@@ -17,7 +17,8 @@
                 SnowflakeStage = consumptionDetails.SnowflakeStage,
                 SnowflakeStatus = consumptionDetails.SnowflakeStatus,
                 SnowflakeTable = consumptionDetails.SnowflakeTable,
-                SnowflakeType = consumptionDetails.SnowflakeType
+                SnowflakeType = consumptionDetails.SnowflakeType,
+                LastChanged = consumptionDetails.LastChanged
             };
         }
     }

@@ -135,7 +135,6 @@ namespace Sentry.data.Infrastructure
                 catch (Exception e) //Catch error here so we continue on to restore tokens. 
                 {
                     Common.Logging.Logger.Error($"Backfill on token {tokenToBackfill.TokenName} failed running the jobs.", e);
-                    throw;
                 }
                 finally
                 {

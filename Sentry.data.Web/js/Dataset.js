@@ -62,7 +62,7 @@ data.Dataset = {
         self.CronJobs = ko.observableArray();
         self.Views = ko.observable();
         self.Downloads = ko.observable();
-        self.FullyQualifiedSnowflakeViews = ko.observableArray();
+        self.ConsumptionLayers = ko.observableArray();
         self.RenderDataFlows = ko.computed(function () {
             return !(self.DataFlows == undefined || self.DataFlows().length == 0);
         });
@@ -137,6 +137,24 @@ data.Dataset = {
         });
 
 
+    },
+
+    ConsumptionLayer: function (fullyQualifiedName, status, lastChanged) {
+        let self = this;
+        self.FullyQualifiedName = fullyQualifiedName;
+        let displayStatus;
+        switch (status) { //special handling for a couple status for formatting
+            case "NameReserved":
+                displayStatus = "Name Reserved";
+                break;
+            case "RequestFailed":
+                displayStatus = "Failed - Contact DSC Support";
+                break;
+            default:
+                displayStatus = status;
+        }
+        self.Status = displayStatus;
+        self.LastChanged = new Date(lastChanged).toString();
     },
 
     // #region DELROY FUNCTIONS
@@ -563,16 +581,17 @@ data.Dataset = {
     },
 
     UpdateConsumptionLayers: function () {
-        var schemaUrl = "/api/" + data.GetApiVersion() + "/metadata/dataset/" + $('#RequestAccessButton').attr("data-id") + "/schema/" + self.vm.SchemaId;
-        self.vm.FullyQualifiedSnowflakeViews.removeAll();
+        let schemaUrl = "/api/" + data.GetApiVersion() + "/metadata/dataset/" + $('#RequestAccessButton').attr("data-id") + "/schema/" + self.vm.SchemaId;
+        self.vm.ConsumptionLayers.removeAll();
         $.get(schemaUrl, function (result) {
-            var currentView = result.CurrentView;
+            let currentView = result.CurrentView;
             $.each(result.ConsumptionDetails, function (arrayPosition, consumptionDetail) {
-                if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet" || consumptionDetail.SnowflakeType == "CategorySchemaParquet") {
-                    var layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
-                    self.vm.FullyQualifiedSnowflakeViews.push(layer);
+                console.log(consumptionDetail);
+                if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet") {
+                    let layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
+                    self.vm.ConsumptionLayers.push(new data.Dataset.ConsumptionLayer(layer, consumptionDetail.SnowflakeStatus, consumptionDetail.LastChanged));
                     if (currentView) {
-                        self.vm.FullyQualifiedSnowflakeViews.push(layer + "_CUR");
+                        self.vm.ConsumptionLayers.push(new data.Dataset.ConsumptionLayer(layer + "_CUR", consumptionDetail.SnowflakeStatus, consumptionDetail.LastChanged));
                     }
                 }
             });

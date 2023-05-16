@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sentry.data.Core
@@ -50,6 +51,7 @@ namespace Sentry.data.Core
                     originalConsumptionItem.SnowflakeDatabase = newConsumptionLayerMetadata.SnowflakeDatabase;
                     originalConsumptionItem.SnowflakeSchema = newConsumptionLayerMetadata.SnowflakeSchema;
                     originalConsumptionItem.SnowflakeTable = newConsumptionLayerMetadata.SnowflakeTable;
+                    originalConsumptionItem.LastChanged = DateTime.Now;
                 }
             }
         }        
