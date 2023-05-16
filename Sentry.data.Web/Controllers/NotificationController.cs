@@ -11,7 +11,6 @@ using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
 {
-    [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW)]
     public class NotificationController : BaseController
     {
 
