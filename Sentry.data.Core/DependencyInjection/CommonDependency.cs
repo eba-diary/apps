@@ -14,8 +14,6 @@ namespace Sentry.data.Core.DependencyInjection
         }
 
         public ILogger<T> Logger { get { return _logger; } }
-        public IDataFeatures DataFeatures { get { return _dataFeatures; } }
-        
-        public CommonDependency() { }
+        public IDataFeatures DataFeatures { get { return _dataFeatures; } }        
     }
 }

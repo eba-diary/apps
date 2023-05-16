@@ -12,7 +12,7 @@ namespace ProducerTesting
     {
         static void Main(string[] args)
         {
-            //Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
+            //Wire up logging here if needed
 
             //Call your bootstrapper to initialize your application
             Bootstrapper.Init();
