@@ -127,6 +127,7 @@ namespace Sentry.data.Core.Tests
             Mock<IEmailService> emailSrvc = new Mock<IEmailService>();
             Mock<ISecurityService> securitySrvc = new Mock<ISecurityService>();
             Mock<IS3ServiceProvider> s3ServiceProvider = new Mock<IS3ServiceProvider>();
+            var logger = new Mock<MockLoggingService<BusinessIntelligenceService>>();
 
             _container.Inject(dsContext.Object);
             _container.Inject(emailSrvc.Object);
@@ -135,6 +136,7 @@ namespace Sentry.data.Core.Tests
             _container.Inject(extUsrInfoProvider.Object);
             _container.Inject(currUsrIdProvider.Object);
             _container.Inject(s3ServiceProvider.Object);
+            _container.Inject(logger.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -175,6 +177,7 @@ namespace Sentry.data.Core.Tests
             var daContext = new Mock<IDataAssetContext>();
             var emailSrvc = new Mock<IEmailService>();
             var s3ServiceProvider = new Mock<IS3ServiceProvider>();
+            var logger = new Mock<MockLoggingService<BusinessIntelligenceService>>();
 
             _container.Inject(dsContext.Object);
             _container.Inject(emailSrvc.Object);
@@ -183,6 +186,7 @@ namespace Sentry.data.Core.Tests
             _container.Inject(currUsrIdProvider.Object);
             _container.Inject(securitySrvc.Object);
             _container.Inject(s3ServiceProvider.Object);
+            _container.Inject(logger.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -301,6 +305,7 @@ namespace Sentry.data.Core.Tests
             var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
             var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
             var s3ServiceProvider = new Mock<IS3ServiceProvider>();
+            var logger = new Mock<MockLoggingService<BusinessIntelligenceService>>();
 
             _container.Inject(dsContext.Object);
             _container.Inject(emailSrvc.Object);
@@ -309,6 +314,7 @@ namespace Sentry.data.Core.Tests
             _container.Inject(extUsrInfoProvider.Object);
             _container.Inject(currUsrIdProvider.Object);
             _container.Inject(s3ServiceProvider.Object);
+            _container.Inject(logger.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -334,6 +340,7 @@ namespace Sentry.data.Core.Tests
             var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
             var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
             var s3ServiceProvider = new Mock<IS3ServiceProvider>();
+            var logger = new Mock<MockLoggingService<BusinessIntelligenceService>>();
 
 
             _container.Inject(dsContext.Object);
@@ -343,6 +350,7 @@ namespace Sentry.data.Core.Tests
             _container.Inject(extUsrInfoProvider.Object);
             _container.Inject(currUsrIdProvider.Object);
             _container.Inject(s3ServiceProvider.Object);
+            _container.Inject(logger.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -366,6 +374,7 @@ namespace Sentry.data.Core.Tests
             var extUsrInfoProvider = new Mock<IExtendedUserInfoProvider>();
             var currUsrIdProvider = new Mock<ICurrentUserIdProvider>();
             var s3ServiceProvider = new Mock<IS3ServiceProvider>();
+            var logger = new Mock<MockLoggingService<BusinessIntelligenceService>>();
 
             _container.Inject(dsContext.Object);
             _container.Inject(emailSrvc.Object);
@@ -374,6 +383,7 @@ namespace Sentry.data.Core.Tests
             _container.Inject(extUsrInfoProvider.Object);
             _container.Inject(currUsrIdProvider.Object);
             _container.Inject(s3ServiceProvider.Object);
+            _container.Inject(logger.Object);
 
             var biSrvc = _container.GetInstance<IBusinessIntelligenceService>();
 
@@ -927,6 +937,7 @@ namespace Sentry.data.Core.Tests
             var daContext = new Mock<IDataAssetContext>();
             var emailSrvc = new Mock<IEmailService>();
             var s3ServiceProvider = new Mock<IS3ServiceProvider>();
+            var logger = new Mock<MockLoggingService<BusinessIntelligenceService>>();
 
             _container.Inject(dsContext.Object);
             _container.Inject(emailSrvc.Object);
@@ -935,6 +946,7 @@ namespace Sentry.data.Core.Tests
             _container.Inject(currUsrIdProvider.Object);
             _container.Inject(securitySrvc.Object);
             _container.Inject(s3ServiceProvider.Object);
+            _container.Inject(logger.Object);
         }
 
         private BusinessIntelligenceDto BuildMockBusinessIntelligenceDto()

@@ -12,14 +12,21 @@ namespace Sentry.data.Core.Tests
     public class BaseCoreUnitTest
     {
         protected static IContainer _container;
+        protected MockRepository _mockRepository;
 
+        protected Mock<ISecurityService> _securityService;
+        protected Mock<IDatasetContext> _datasetContext;
+        protected Mock<IDataFeatures> _dataFeatures;
+        protected Mock<IQuartermasterService> _quartermasterService;
 
-        protected ISecurityService _securityService;
-        protected IDatasetContext _datasetContext;
-
-        public virtual void TestInitialize()
+        public virtual void TestInitialize(MockBehavior mockBehavior = MockBehavior.Loose)
         {
             StructureMap.Registry registry = new StructureMap.Registry();
+            _mockRepository = new MockRepository(mockBehavior);
+            _dataFeatures = _mockRepository.Create<IDataFeatures>();
+            _datasetContext = _mockRepository.Create<IDatasetContext>();
+            _securityService = _mockRepository.Create<ISecurityService>();
+            _quartermasterService = _mockRepository.Create<IQuartermasterService>();
 
             //this should can all core assembly for implementations
             registry.Scan((scanner) =>
@@ -28,16 +35,20 @@ namespace Sentry.data.Core.Tests
                 scanner.WithDefaultConventions();
             });
 
+
+
+
             //add in the infrastructure implementations using MockRepository so we don't actually initalize contexts or services.
-            registry.For<IDatasetContext>().Use(() => new Mock<IDatasetContext>().Object);
+            registry.For<IDatasetContext>().Use(() => _datasetContext.Object);
             registry.For<ITicketProvider>().Use(() => new Mock<ICherwellProvider>().Object);
-            registry.For<IDataFeatures>().Use(new MockDataFeatures());
+            registry.For<IDataFeatures>().Use(_dataFeatures.Object);
             registry.For<IInevService>().Use(() => new Mock<IInevService>().Object);
-            registry.For<IQuartermasterService>().Use(() => new Mock<IQuartermasterService>().Object);
+            registry.For<IQuartermasterService>().Use(() => _quartermasterService.Object);
             registry.For<IJiraService>().Use(() => new Mock<IJiraService>().Object);
             registry.For<Hangfire.IBackgroundJobClient>().Use(() => new Mock<Hangfire.IBackgroundJobClient>().Object);
             registry.For<IObsidianService>().Use(() => new Mock<IObsidianService>().Object);
             registry.For<IAdSecurityAdminProvider>().Use(() => new Mock<IAdSecurityAdminProvider>().Object);
+            registry.For<ISecurityService>().Use(() => _securityService.Object);
 
             //set the container
             _container = new StructureMap.Container(registry);

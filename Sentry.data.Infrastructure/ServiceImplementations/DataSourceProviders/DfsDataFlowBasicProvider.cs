@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Microsoft.Extensions.Logging;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using StructureMap;
 using System;
@@ -14,6 +15,12 @@ namespace Sentry.data.Infrastructure
     public class DfsDataFlowBasicProvider : BaseJobProvider
     {
         private string _filePath;
+        private readonly ILogger<DfsDataFlowBasicProvider> _logger;
+
+        public DfsDataFlowBasicProvider(ILogger<DfsDataFlowBasicProvider> logger)
+        {
+            _logger = logger;
+        }
 
         public override void ConfigureProvider(RetrieverJob job)
         {
@@ -33,7 +40,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                _job.JobLoggerMessage("Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+                _job.JobLoggerMessage(_logger, "Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
 
                 //Set directory search
                 var dirSearchCriteria = (String.IsNullOrEmpty(_filePath)) ? "*" : _filePath;
@@ -49,12 +56,12 @@ namespace Sentry.data.Infrastructure
                     //find target s3 drop location
                     string targetPrefix = targetS3DropStep.TriggerKey;
 
-                    _job.JobLoggerMessage("Debug", $"directory:{_job.GetUri().LocalPath} searchcriteria:{dirSearchCriteria}");
+                    _job.JobLoggerMessage(_logger, "Debug", $"directory:{_job.GetUri().LocalPath} searchcriteria:{dirSearchCriteria}");
 
                     // Only search top directory and source files not locked and does not start with two exclamaition points !!
                     string[] files = Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w)).ToArray();
 
-                    _job.JobLoggerMessage("Debug", $"found {files.Length.ToString()}");
+                    _job.JobLoggerMessage(_logger, "Debug", $"found {files.Length.ToString()}");
 
                     try
                     {
@@ -72,7 +79,7 @@ namespace Sentry.data.Infrastructure
                         foreach (var ex in ae.Flatten().InnerExceptions)
                         {
                             if (ex is Exception)
-                                _job.JobLoggerMessage("Error","dfsdataflowbasicprovider-execute failed sending file(s)", ex);
+                                _job.JobLoggerMessage(_logger, "Error", "dfsdataflowbasicprovider-execute failed sending file(s)", ex);
                             else
                                 ignoredExceptions.Add(ex);
                         }
@@ -84,21 +91,21 @@ namespace Sentry.data.Infrastructure
                     }
                     catch(Exception ex)
                     {
-                        _job.JobLoggerMessage("Error", "dfsdataflowbasicprovider-execute processfilesinparallel failed", ex);
+                        _job.JobLoggerMessage(_logger, "Error", "dfsdataflowbasicprovider-execute processfilesinparallel failed", ex);
                     }
                 }
 
-                _job.JobLoggerMessage("Debug", $"end method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+                _job.JobLoggerMessage(_logger, "Debug", $"end method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "dfsdataflowbasicprovider-execute failed", ex);
+                _job.JobLoggerMessage(_logger, "Error", "dfsdataflowbasicprovider-execute failed", ex);
             }
         }
 
         private void ProcessFilesInParallel(string[] fileArray, string targetBucket, string targetPrefix)
         {
-            _job.JobLoggerMessage("Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            _job.JobLoggerMessage(_logger, "Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
             // Use ConcurrentQueue to enable safe enqueueing from multiple threads.
             var exceptions = new ConcurrentQueue<Exception>();
             
@@ -120,7 +127,7 @@ namespace Sentry.data.Infrastructure
                         }
                         catch (Exception ex)
                         {
-                            _job.JobLoggerMessage("Error", $"Failed Deleting File from drop location : ({item})", ex);
+                            _job.JobLoggerMessage(_logger, "Error", $"Failed Deleting File from drop location : ({item})", ex);
                         }
                     }   
                 }
@@ -130,7 +137,7 @@ namespace Sentry.data.Infrastructure
                 }
             });
 
-            _job.JobLoggerMessage("Debug", $"end method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            _job.JobLoggerMessage(_logger, "Debug", $"end method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
 
         }
 
@@ -141,7 +148,7 @@ namespace Sentry.data.Infrastructure
 
         private bool IsFileLocked(string filePath)
         {
-            _job.JobLoggerMessage("Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            _job.JobLoggerMessage(_logger, "Debug", $"start method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
             try
             {
                 using (File.Open(filePath, FileMode.Open))
@@ -156,7 +163,7 @@ namespace Sentry.data.Infrastructure
                 return errorCode == 32 || errorCode == 33;
             }
 
-            _job.JobLoggerMessage("Debug", $"end method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
+            _job.JobLoggerMessage(_logger, "Debug", $"end method {System.Reflection.MethodBase.GetCurrentMethod().Name}");
             return false;
         }
     }

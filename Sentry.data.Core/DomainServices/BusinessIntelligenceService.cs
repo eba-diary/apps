@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Core
 {
@@ -17,16 +15,19 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly ILogger<BusinessIntelligenceService> _logger;
 
         public BusinessIntelligenceService(IDatasetContext datasetContext,
             IEmailService emailService, ISecurityService securityService,
-            UserService userService, IS3ServiceProvider s3ServiceProvider)
+            UserService userService, IS3ServiceProvider s3ServiceProvider,
+            ILogger<BusinessIntelligenceService> logger)
         {
             _datasetContext = datasetContext;
             _emailService = emailService;
             _userService = userService;
             _securityService = securityService;
             _s3ServiceProvider = s3ServiceProvider;
+            _logger = logger;
         }
 
         #region "Public Functions"
@@ -76,7 +77,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error saving business intelligence - ", ex);
+                _logger.LogError(ex, "Error saving business intelligence - ");
                 return false;
             }
             return true;
@@ -111,7 +112,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error saving business intelligence - ", ex);
+                _logger.LogError(ex, "Error saving business intelligence - ");
                 return false;
             }
             return true;
@@ -228,11 +229,11 @@ namespace Sentry.data.Core
                         }
                         else if (ex.Message.Contains("because it is being used by another process"))
                         {
-                            Logger.Error("Exhibit validation OpenRead test could be executed, file in use", ex);
+                            _logger.LogError(ex, "Exhibit validation OpenRead test could be executed, file in use");
                         }
                         else
                         {
-                            Logger.Error($"Exhibit Validation Exception - Creator:{dto.CreationUserId} ExhibitName:{dto.DatasetName}", ex);
+                            _logger.LogError(ex, $"Exhibit Validation Exception - Creator:{dto.CreationUserId} ExhibitName:{dto.DatasetName}");
                             errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
                         }
                     }
@@ -281,7 +282,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Exhibit Temp image upload failure", ex);
+                _logger.LogError(ex, "Exhibit Temp image upload failure");
                 return false;
             }
 
@@ -305,15 +306,15 @@ namespace Sentry.data.Core
         {
             ObjectKeyVersion version = null;
 
-            Logger.Info($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
+            _logger.LogInformation($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
             try
             {
                 version = _s3ServiceProvider.MarkDeleted(img.StorageKey);
-                Logger.Info($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
+                _logger.LogInformation($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}", ex);
+                _logger.LogError(ex, $"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}");
             }
         }
 
@@ -325,15 +326,15 @@ namespace Sentry.data.Core
         {
             ObjectKeyVersion version = null;
 
-            Logger.Info($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
+            _logger.LogInformation($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
             try
             {
                 version = _s3ServiceProvider.MarkDeleted(img.StorageKey);
-                Logger.Info($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
+                _logger.LogInformation($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}", ex);
+                _logger.LogError(ex, $"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}");
             }
         }
 

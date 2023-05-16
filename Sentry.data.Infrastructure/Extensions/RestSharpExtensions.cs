@@ -1,10 +1,4 @@
-﻿using System.Linq;
-using Sentry.Common.Logging;
-using System.Net.Mime;
-using Sentry.data.Core;
-using StructureMap;
-
-namespace Sentry.data.Infrastructure
+﻿namespace Sentry.data.Infrastructure
 {
     public static class RestSharpExtensions
     {

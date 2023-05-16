@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
-using Sentry.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

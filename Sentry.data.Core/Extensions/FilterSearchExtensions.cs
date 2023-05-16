@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -175,7 +174,8 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Error creating filter for {propertyInfo.Name}", ex);
+                    // These extensions will be removed after new elastic based dataset search page is live
+                    //Logger.Error($"Error creating filter for {propertyInfo.Name}", ex);
                 }
 
                 return categoryDto;

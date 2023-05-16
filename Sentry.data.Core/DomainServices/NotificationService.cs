@@ -1,28 +1,28 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
+using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sentry.Core;
-using Sentry.data.Core.GlobalEnums;
-using Sentry.Common.Logging;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class NotificationService : INotificationService
+    public class NotificationService : BaseDomainService<NotificationService>, INotificationService
     {
         private readonly IDatasetContext _domainContext;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
         private readonly IEventService _eventService;
-        private readonly IDataFeatures _featureFlags;
 
-        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService, IEventService eventService, IDataFeatures dataFeatures)
+        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, 
+            UserService userService, IEventService eventService, DomainServiceCommonDependency<NotificationService> commonDependency) : base(commonDependency)
         {
             _domainContext = domainContext;
             _securityService = securityService;
             _userService = userService;
             _eventService = eventService;
-            _featureFlags = dataFeatures;
         }
 
 
@@ -108,7 +108,7 @@ namespace Sentry.data.Core
 
                 //NOTE: I tried to use Ternary Operators but i got an error that target-typed conditional expression' is not available in C# 7.3. Please use language version 9.0 or greater
                 if (    dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_RELEASE_NOTES
-                        && _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
+                        && _dataFeatures.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
                 )
                 {
                     notification.NotificationSubCategoryReleaseNotes = dto.NotificationSubCategoryReleaseNotes;
@@ -120,7 +120,7 @@ namespace Sentry.data.Core
 
 
                 if (    dto.NotificationCategory.GetDescription() == GlobalConstants.EventType.NOTIFICATION_DSC_NEWS
-                        && _featureFlags.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
+                        && _dataFeatures.CLA3882_DSC_NOTIFICATION_SUBCATEGORY.GetValue()                                            //REMOVE THIS LINE ONLY WHEN FEATURE FLAG IS NA
                 )
                 {
                     notification.NotificationSubCategoryNews = dto.NotificationSubCategoryNews;
@@ -208,7 +208,7 @@ namespace Sentry.data.Core
                         eventTypeDescription = addNotification ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
                         break;
                     default:
-                        Logger.Error("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
+                        _logger.LogError("Notification Severity Not Found to log EventType of " + notification.MessageSeverity.ToString() + " for NotificationId = " + notification.NotificationId.ToString());
                         break;
                 }
             }

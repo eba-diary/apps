@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Polly;
 using RestSharp;
 using Sentry.Common.Logging;
@@ -7,9 +8,7 @@ using Sentry.data.Core.Entities.DataProcessing;
 using StructureMap;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 
 namespace Sentry.data.Infrastructure
@@ -28,17 +27,20 @@ namespace Sentry.data.Infrastructure
         protected IAsyncPolicy _providerPolicyAsync;
         protected ISyncPolicy _providerPolicy;
         protected readonly IDataFeatures _dataFeatures;
+        protected readonly ILogger<BaseHttpsProvider> _logger;
         #endregion
 
         protected BaseHttpsProvider(Lazy<IDatasetContext> datasetContext, 
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService,
-            RestClient restClient, IDataFeatures dataFeatures)
+            RestClient restClient, IDataFeatures dataFeatures,
+            ILogger<BaseHttpsProvider> logger)
         {
             _dsContext = datasetContext;
             _configService = configService;
             _encryptionService = encryptionService;
             _client = restClient;
             _dataFeatures = dataFeatures;
+            _logger = logger;
         }
 
         protected IDatasetContext DatasetContext
@@ -106,7 +108,7 @@ namespace Sentry.data.Infrastructure
 
         public abstract RestResponse SendRequest();
 
-        public static string ParseContentType(string contentType)
+        public string ParseContentType(string contentType)
         {
             //Mime types
             //https://technet.microsoft.com/en-us/library/cc995276.aspx
@@ -124,11 +126,11 @@ namespace Sentry.data.Infrastructure
 
                 if (extensions == null)
                 {
-                    Logger.Warn($"Detected new MediaType ({content.MediaType}), defaulting to txt");
+                    _logger.LogWarning($"Detected new MediaType ({content.MediaType}), defaulting to txt");
                     return "txt";
                 }
 
-                Logger.Info($"detected_mediatype - {extensions.Value}");
+                _logger.LogInformation($"detected_mediatype - {extensions.Value}");
                 return extensions.Value;
             }
         }

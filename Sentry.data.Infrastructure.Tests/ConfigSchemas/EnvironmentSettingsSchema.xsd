@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by ﻿Sentry Insurance (Sentry Insurance) -->
+<xs:schema xmlns:tns="urn:Sentry.Configuration" elementFormDefault="qualified" targetNamespace="urn:Sentry.Configuration" xmlns:xs="http://www.w3.org/2001/XMLSchema" id="EnvironmentSettingsSchema">
+	<xs:element name="EnvironmentSettings" type="tns:cdtEnvironmentSettings"/>
+	<xs:complexType name="cdtEnvironmentSettings">
+		<xs:sequence>
+			<xs:element name="importSettings" type="tns:cdtImportSettings" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="defaultEnvironmentList" type="tns:cdtDefaultEnvironmentList" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="config" type="tns:cdtConfig" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="hostOverride" type="xs:string" use="optional"/>
+		<xs:attribute name="defaultDomain" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="cdtImportSettings">
+		<xs:attribute name="path" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="cdtDefaultEnvironmentList">
+		<xs:sequence>
+			<xs:element name="env" type="tns:cdtDefaultEnvironment" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cdtDefaultEnvironment">
+		<xs:sequence>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="webHost">
+					<xs:complexType>						
+						<xs:attribute name="name" type="xs:string"/>
+						<xs:attribute name="nameRegex" type="xs:string"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="machine">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string"/>
+						<xs:attribute name="nameRegex" type="xs:string"/>
+						<xs:attribute name="executablePathRegex" type="xs:string" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="cdtConfig">
+		<xs:sequence>
+			<xs:element name="environmentList" type="tns:cdtEnvironmentList" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="settingList" type="tns:cdtSettingList" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="key" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="cdtEnvironmentList">
+		<xs:sequence>
+			<xs:element name="env" type="tns:cdtEnv" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cdtSettingList">
+		<xs:sequence>
+			<xs:element name="setting" type="tns:cdtSetting" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cdtEnv">
+		<xs:attribute name="host" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="cdtSetting">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="value" type="xs:string"/>
+		<xs:attribute name="externalValueFile" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

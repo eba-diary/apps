@@ -1,4 +1,5 @@
-﻿using Polly.Registry;
+﻿using Microsoft.Extensions.Logging;
+using Polly.Registry;
 using RestSharp;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -9,12 +10,14 @@ namespace Sentry.data.Infrastructure
     public class GoogleAPIDataFlowProvider : GoogleApiProvider
     {
         private readonly IDataFlowService _dataFlowService;
+        private readonly ILogger<GoogleAPIDataFlowProvider> _logger;
 
         public GoogleAPIDataFlowProvider(Lazy<IDatasetContext> datasetContext, Lazy<IConfigService> configService, 
                 Lazy<IEncryptionService> encryptionService, Lazy<IJobService> jobService, IDataFlowService dataFlowService,
-                IReadOnlyPolicyRegistry<string> policyRegistry, RestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures)
+                IReadOnlyPolicyRegistry<string> policyRegistry, RestClient restClient, IDataFeatures dataFeatures, ILogger<GoogleAPIDataFlowProvider> logger) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures, logger)
         {
             _dataFlowService = dataFlowService;
+            _logger = logger;
         }
 
         protected override void FindTargetJob()
@@ -31,7 +34,7 @@ namespace Sentry.data.Infrastructure
 
             if (_targetStep == null)
             {
-                _job.JobLoggerMessage("Error", "find_targetstep_failure");
+                _job.JobLoggerMessage(_logger, "Error", "find_targetstep_failure");
                 throw new Exception("Did not find target producers3drop data flow step");
             }
 
@@ -46,7 +49,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "targetstep_gettargetpath_failure", ex);
+                _job.JobLoggerMessage(_logger, "Error", "targetstep_gettargetpath_failure", ex);
                 throw;
             }
         }

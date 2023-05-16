@@ -583,11 +583,6 @@ namespace Sentry.data.Web.Controllers
                     output.AddRange(fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
                     break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    List<DataSource> sfTpList = _dataFlowService.GetDataSources().Where(x => x is SFtpSource).ToList();
-                    output.AddRange(sfTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id.ToString() }).ToList());
-                    break;
                 case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                     List<DataSource> dfsBasicList = _dataFlowService.GetDataSources().Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v

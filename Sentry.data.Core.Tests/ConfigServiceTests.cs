@@ -37,7 +37,9 @@ namespace Sentry.data.Core.Tests
             Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
             securityService.Setup(s => s.GetUserSecurity(dfc.ParentDataset, user.Object));
 
-            var configService = new ConfigService(context.Object,null,null,null,null,null,null,null,null,null,null,null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object,null,null,null,null,null,null,null,null,null,null,null, null, logger.Object);
 
             //Act
             configService.Delete(dfc.ConfigId, user.Object, true);
@@ -63,7 +65,9 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, true);
@@ -91,7 +95,9 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             // Act
             configService.Delete(dfc.ConfigId, user.Object, true);
@@ -117,7 +123,9 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, false);
@@ -144,7 +152,9 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.GetById<DatasetFileConfig>(dfc.ConfigId)).Returns(dfc);
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             // Act
             bool IsSuccessful = configService.Delete(dfc.ConfigId, user.Object, false);
@@ -191,7 +201,9 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
             dataFlowService.Setup(s => s.GetDataFlowNameForFileSchema(It.IsAny<FileSchema>())).Returns("DataflowName");
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null, null, logger.Object);
 
             // Act
             configService.Delete(dfc.ConfigId, user.Object, false);
@@ -236,7 +248,9 @@ namespace Sentry.data.Core.Tests
             dataFlowService.Setup(s => s.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>())).Returns(true);
             dataFlowService.Setup(s => s.GetDataFlowNameForFileSchema(It.IsAny<FileSchema>())).Returns("DataflowName");
 
-            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            var configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, dataFlowService.Object, null, null, null, logger.Object);
 
             // Act
             configService.Delete(dfc.ConfigId, null, false);
@@ -260,7 +274,9 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Add(It.IsAny<DatasetFileConfig>()));
             context.Setup(s => s.GetById<Dataset>(It.IsAny<int>())).Returns(mockDataset);
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             //Act
             _ = configService.Create(dto);
@@ -272,9 +288,9 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void CreateAndSaveNewDataSource_DataSourceDto_True()
         {
-            MockRepository mock = new MockRepository(MockBehavior.Strict);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
 
             AuthenticationType authType = new OAuthAuthentication();
             datasetContext.Setup(x => x.GetById<AuthenticationType>(2)).Returns(authType);
@@ -289,7 +305,7 @@ namespace Sentry.data.Core.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = mr.Create<IEncryptionService>();
             encryptionService.Setup(x => x.GenerateNewIV()).Returns("IVKey");
             encryptionService.Setup(x => x.EncryptString("DecryptedClientPrivateId", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedClientPrivateId", ""));
             encryptionService.Setup(x => x.IsEncrypted("DecryptedCurrentToken")).Returns(false);
@@ -297,13 +313,15 @@ namespace Sentry.data.Core.Tests
             encryptionService.Setup(x => x.IsEncrypted("DecryptedRefreshToken")).Returns(false);
             encryptionService.Setup(x => x.EncryptString("DecryptedRefreshToken", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedRefreshToken", ""));
 
-            Mock<IUserService> userService = mock.Create<IUserService>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000000");
 
-            Mock<IEventService> eventService = mock.Create<IEventService>();
+            Mock<IEventService> eventService = mr.Create<IEventService>();
             eventService.Setup(x => x.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, "DataFlowName was created.", null)).Returns<Task>(null);
 
-            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null, null, logger.Object);
 
             DataSourceDto dataSourceDto = new DataSourceDto
             {
@@ -407,19 +425,21 @@ namespace Sentry.data.Core.Tests
 
             Assert.AreEqual("this error is ok", http.AcceptableErrors["error"]);
 
-            mock.VerifyAll();
+            mr.VerifyAll();
         }
 
         [TestMethod]
         public void CreateAndSaveNewDataSource_ThrowsException_False()
         {
-            MockRepository mock = new MockRepository(MockBehavior.Strict);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.Setup(x => x.GetById<AuthenticationType>(2)).Throws<Exception>();
             datasetContext.Setup(x => x.Clear());
 
-            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
             
             DataSourceDto dataSourceDto = new DataSourceDto { AuthID = "2" };
 
@@ -427,15 +447,15 @@ namespace Sentry.data.Core.Tests
 
             Assert.IsFalse(result);
 
-            mock.VerifyAll();
+            mr.VerifyAll();
         }
 
         [TestMethod]
         public void UpdateAndSaveDataSource_DataSourceDto_True()
         {
-            MockRepository mock = new MockRepository(MockBehavior.Strict);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
 
             DataSource dataSource = new HTTPSSource()
             {
@@ -491,7 +511,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.Add(It.Is<OAuthClaim>(c => c.Type == OAuthClaims.aud && c.Value == "https://www.token2.com")));
             datasetContext.Setup(x => x.Add(It.Is<OAuthClaim>(c => c.Type == OAuthClaims.exp)));
 
-            Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = mr.Create<IEncryptionService>();
             encryptionService.Setup(x => x.IsEncrypted("DecryptedClientPrivateId")).Returns(false);
             encryptionService.Setup(x => x.EncryptString("DecryptedClientPrivateId", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedClientPrivateIdUpdate", ""));
             encryptionService.Setup(x => x.IsEncrypted("DecryptedCurrentToken")).Returns(false);
@@ -502,13 +522,15 @@ namespace Sentry.data.Core.Tests
             encryptionService.Setup(x => x.IsEncrypted("DecryptedRefreshToken2")).Returns(false);
             encryptionService.Setup(x => x.EncryptString("DecryptedRefreshToken2", "ENCRYPT", "IVKey")).Returns(Tuple.Create("EncryptedRefreshToken2", ""));
 
-            Mock<IEventService> eventService = mock.Create<IEventService>();
+            Mock<IEventService> eventService = mr.Create<IEventService>();
             eventService.Setup(x => x.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASOURCE, "DataSourceNameUpdate was updated.", null)).Returns<Task>(null);
 
-            Mock<IUserService> userService = mock.Create<IUserService>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser().AssociateId).Returns("000001");
 
-            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, eventService.Object, null, encryptionService.Object, null, null, null, null, null, null, null, null, logger.Object);
 
             DataSourceDto dataSourceDto = new DataSourceDto
             {
@@ -654,19 +676,21 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual(OAuthClaims.scope, claim.Type);
             Assert.AreEqual("token.scope2", claim.Value);
 
-            mock.VerifyAll();
+            mr.VerifyAll();
         }
 
         [TestMethod]
         public void UpdateAndSaveDataSource_ThrowsException_False()
         {
-            MockRepository mock = new MockRepository(MockBehavior.Strict);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
             datasetContext.Setup(x => x.GetById<DataSource>(1)).Throws<Exception>();
             datasetContext.Setup(x => x.Clear());
 
-            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             DataSourceDto dataSourceDto = new DataSourceDto { OriginatingId = 1 };
 
@@ -674,15 +698,15 @@ namespace Sentry.data.Core.Tests
 
             Assert.IsFalse(result);
 
-            mock.VerifyAll();
+            mr.VerifyAll();
         }
 
         [TestMethod]
         public void GetDataSourceDto_1_DataSourceDto()
         {
-            MockRepository mock = new MockRepository(MockBehavior.Strict);
+            MockRepository mr = new MockRepository(MockBehavior.Strict);
 
-            Mock<IDatasetContext> datasetContext = mock.Create<IDatasetContext>();
+            Mock<IDatasetContext> datasetContext = mr.Create<IDatasetContext>();
 
             DataSource httpsSource = new HTTPSSource()
             {
@@ -730,28 +754,30 @@ namespace Sentry.data.Core.Tests
             };
             datasetContext.Setup(x => x.GetById<DataSource>(1)).Returns(httpsSource);
 
-            Mock<IApplicationUser> appUser = mock.Create<IApplicationUser>();
+            Mock<IApplicationUser> appUser = mr.Create<IApplicationUser>();
             appUser.SetupGet(x => x.AssociateId).Returns("000001");
             appUser.SetupGet(x => x.DisplayName).Returns("User Name");
             appUser.SetupGet(x => x.EmailAddress).Returns("username@sentry.com");
 
-            Mock<IApplicationUser> appUser2 = mock.Create<IApplicationUser>();
+            Mock<IApplicationUser> appUser2 = mr.Create<IApplicationUser>();
 
-            Mock<IUserService> userService = mock.Create<IUserService>();
+            Mock<IUserService> userService = mr.Create<IUserService>();
             userService.Setup(x => x.GetByAssociateId("000001")).Returns(appUser.Object);
             userService.Setup(x => x.GetCurrentUser()).Returns(appUser2.Object);
 
-            Mock<ISecurityService> securityService = mock.Create<ISecurityService>();
+            Mock<ISecurityService> securityService = mr.Create<ISecurityService>();
 
             UserSecurity userSecurity = new UserSecurity();
             securityService.Setup(x => x.GetUserSecurity(It.IsAny<DataSource>(), appUser2.Object)).Returns(userSecurity);
 
-            Mock<IEncryptionService> encryptionService = mock.Create<IEncryptionService>();
+            Mock<IEncryptionService> encryptionService = mr.Create<IEncryptionService>();
             encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedClientPrivateId")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
             encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedCurrentToken")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
             encryptionService.Setup(x => x.PrepEncryptedForDisplay("EncryptedRefreshToken")).Returns<string>(x => Indicators.ENCRYPTIONINDICATOR + x + Indicators.ENCRYPTIONINDICATOR);
 
-            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, null, null, encryptionService.Object, securityService.Object, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(datasetContext.Object, userService.Object, null, null, encryptionService.Object, securityService.Object, null, null, null, null, null, null, null, logger.Object);
 
             DataSourceDto dataSource = configService.GetDataSourceDto(1);
 
@@ -794,7 +820,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("https://www.token.com", dataSourceToken.TokenUrl);
             Assert.AreEqual("token.scope", dataSourceToken.Scope);
 
-            mock.VerifyAll();
+            mr.VerifyAll();
         }
 
         [TestMethod]
@@ -826,7 +852,9 @@ namespace Sentry.data.Core.Tests
             FileExtension fileType = new FileExtension { Id = 2 };
             datasetContext.Setup(x => x.GetById<FileExtension>(2)).Returns(fileType);
 
-            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(datasetContext.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             configService.UpdateDatasetFileConfig(dto, fileConfig);
 
