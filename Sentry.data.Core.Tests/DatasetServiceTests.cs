@@ -1528,7 +1528,11 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetGroupAccessCount(dataset)).Returns(1);
             securityService.Setup(x => x.GetUserSecurity(dataset, applicationUser4)).Returns(userSecurity);
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null, null, null);
+            Mock<ISchemaService> schemaService = _mockRepository.Create<ISchemaService>();
+            schemaService.Setup(x => x.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowDatabase");
+            schemaService.Setup(x => x.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowSchema");
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, schemaService.Object, null, null, null, null, null, null);
 
             DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
 
@@ -1713,7 +1717,11 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetGroupAccessCount(dataset)).Returns(1);
             securityService.Setup(x => x.GetUserSecurity(dataset, applicationUser4)).Returns(userSecurity);
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null, null, null);
+            Mock<ISchemaService> schemaService = _mockRepository.Create<ISchemaService>();
+            schemaService.Setup(x => x.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowDatabase");
+            schemaService.Setup(x => x.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowSchema");
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, schemaService.Object, null, null, null, null, null, null);
 
             DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
 
@@ -1856,7 +1864,11 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetGroupAccessCount(dataset)).Returns(1);
             securityService.Setup(x => x.GetUserSecurity(dataset, applicationUser4)).Returns(userSecurity);
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null, null, null);
+            Mock<ISchemaService> schemaService = _mockRepository.Create<ISchemaService>();
+            schemaService.Setup(x => x.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowDatabase");
+            schemaService.Setup(x => x.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowSchema");
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, schemaService.Object, null, null, null, null, null, null);
 
             DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
 
@@ -1999,7 +2011,11 @@ namespace Sentry.data.Core.Tests
             securityService.Setup(x => x.GetGroupAccessCount(dataset)).Returns(1);
             securityService.Setup(x => x.GetUserSecurity(dataset, applicationUser4)).Returns(userSecurity);
 
-            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, null, null, null, null, null, null, null);
+            Mock<ISchemaService> schemaService = _mockRepository.Create<ISchemaService>();
+            schemaService.Setup(x => x.GetSnowflakeDatabaseName(It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowDatabase");
+            schemaService.Setup(x => x.GetSnowflakeSchemaName(It.IsAny<Dataset>(), It.IsAny<SnowflakeConsumptionType>())).Returns("SnowSchema");
+
+            DatasetService datasetService = new DatasetService(datasetContext.Object, securityService.Object, userService.Object, null, schemaService.Object, null, null, null, null, null, null);
 
             DatasetDetailDto dto = datasetService.GetDatasetDetailDto(1);
 
