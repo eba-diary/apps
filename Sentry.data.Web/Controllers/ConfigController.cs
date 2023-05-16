@@ -619,6 +619,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     token.ShouldShowBackfillButton = !token.BackFillComplete && isMotive;
                 }
+                model.Tokens = model.Tokens.OrderBy(t => t.TokenName).ToList();
                 EditSourceDropDown(model);
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
