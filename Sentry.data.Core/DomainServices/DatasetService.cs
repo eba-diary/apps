@@ -379,6 +379,18 @@ namespace Sentry.data.Core
             }
         }
 
+        public async Task<DatasetDto> GetDatasetAsync(int id)
+        {
+            Dataset dataset = await _datasetContext.GetByIdAsync<Dataset>(id);
+            if(dataset != null)
+            {
+                var dto = new DatasetDto();
+                MapToDto(dataset, dto);
+                return dto;
+            }
+            throw new ResourceNotFoundException("GetDataset", id);
+        }
+
         public int Create(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
@@ -1047,8 +1059,16 @@ namespace Sentry.data.Core
             dto.NamedEnvironment = ds.NamedEnvironment;
             dto.NamedEnvironmentType = ds.NamedEnvironmentType;
             dto.AlternateContactEmail = ds.AlternateContactEmail;
+            dto.SnowflakeDatabases = new List<string>()
+            {
+                _schemaService.GetSnowflakeDatabaseName(ds.IsHumanResources, ds.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaParquet),
+                _schemaService.GetSnowflakeDatabaseName(ds.IsHumanResources, ds.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaRaw),
+                _schemaService.GetSnowflakeDatabaseName(ds.IsHumanResources, ds.NamedEnvironmentType.ToString(), SnowflakeConsumptionType.DatasetSchemaRawQuery)
+            };
+            dto.SnowflakeSchema = _schemaService.GetSnowflakeSchemaName(ds, SnowflakeConsumptionType.DatasetSchemaParquet);
+            dto.SnowflakeWarehouse = SnowflakeWarehouse.WAREHOUSE_NAME;
         }
-        
+
         private void MapToDto(Dataset ds, DatasetSchemaDto dto)
         {
             //Map DatasetDto properties
