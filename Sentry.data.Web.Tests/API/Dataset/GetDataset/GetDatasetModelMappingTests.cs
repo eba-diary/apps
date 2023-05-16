@@ -12,7 +12,7 @@ namespace Sentry.data.Web.Tests.API
     public class GetDatasetModelMappingTests : BaseModelMappingTests
     {
         [TestMethod]
-        public void Map_DatasetResultDto_To_AddDatasetResponseModel()
+        public void Map_DatasetDto_To_GetDatasetResponseModel()
         {
             DateTime now = DateTime.Now;
 
