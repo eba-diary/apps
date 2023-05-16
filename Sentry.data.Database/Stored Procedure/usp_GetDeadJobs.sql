@@ -65,7 +65,7 @@ Argument_Metadata.[Schema_ID],
 CASE
     WHEN Submission.Created > '2023-03-31 17:05:00' THEN REVERSE(SUBSTRING(REVERSE(Argument_Metadata.TargetKey),0,16))
     ELSE REVERSE(SUBSTRING(REVERSE(Argument_Metadata.TargetKey),0,35))
-END as 'FileNameSnippetValidator',  /* The case statement is needed due to flowexecutionguid being prefixed vs suffixed on file name after 2023-03-31 17:05:00*/
+END as 'FileNameSnippetValidator',  -- The case statement is needed due to flowexecutionguid being prefixed vs suffixed on file name after 2023-03-31 17:05:00
 JobHistory.*
 into #tempSubmissionDetails
 from Submission

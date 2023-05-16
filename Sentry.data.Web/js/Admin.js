@@ -154,7 +154,6 @@ data.Admin = {
 
                 if (startDate != '' && endDate != '')
                 {
-                    var test = true;
                     var formattedStart = moment(startDate);
                     var formattedEnd = moment(endDate);
 
