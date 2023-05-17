@@ -110,6 +110,8 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA4993_JSMTicketProvider => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA3214_VariantDataType => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA4553_PlatformActivity => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA5112_PlatformActivity_TotalFiles_ViewPage => new MockBooleanFeatureFlag(true);
         }
     }
 }

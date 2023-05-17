@@ -4,25 +4,53 @@
 
 
 data.Admin = {
+
+    // #region REGION FUNCTIONS
+
+    //****************************************************************************************************
+    //API URL FUNCTIONS
+    //****************************************************************************************************
+
+    //****************************************************************************************************
+    //END API URL FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
+
+    // #region ADMIN UTIL FUNCTIONS
+
+    //****************************************************************************************************
+    // ADMIN UTIL FUNCTIONS
+    //****************************************************************************************************
+
     // Approve.vbhtml
-    ApproveInit: function () {
-        $("[id^='Approve_']").on("click", function () {
+    ApproveInit: function ()
+    {
+        $("[id^='Approve_']").on("click", function ()
+        {
             data.Admin.ApproveAsset($(this).data("id"));
         });
     },
 
-    ApproveAsset: function (id) {
-        $.post("/Admin/Approve/" + id, {}, function () {
+    ApproveAsset: function (id)
+    {
+        $.post("/Admin/Approve/" + id, {}, function ()
+        {
             $("#approve-row-" + id).hide("slow");
-        }).fail(function () {
+        }).fail(function ()
+        {
             alert("An error occurred approving this asset.");
         });
     },
 
     // Complete.vbhtml
 
-    CompleteInit: function () {
-        $("[id^='Complete_']").on("click", function () {
+    CompleteInit: function ()
+    {
+        $("[id^='Complete_']").on("click", function ()
+        {
             data.Admin.CompleteAuction($(this).data("id"));
         });
     },
@@ -36,16 +64,19 @@ data.Admin = {
 
         // Selects nav bar item that matches the current page title and sets the link to bold + blue font
         $("#sideNav").find(`[data-nav-id='${navID}']`).addClass("font-weight-bold text-primary");
-        
+
     },
 
     // Reduce and group json fields by the specified key
-    JsonReduce: function (jsonObject, groupKey, itemsKey) {    
-        
-        return jsonObject.reduce(function (returnedObject, iterationVariable) {
+    JsonReduce: function (jsonObject, groupKey, itemsKey)
+    {
+
+        return jsonObject.reduce(function (returnedObject, iterationVariable)
+        {
 
             // Checks if the current iteration variable object already exists inside of the returnedObject
-            if (!returnedObject[iterationVariable[groupKey]]) {
+            if (!returnedObject[iterationVariable[groupKey]])
+            {
 
                 // If it does not, create a new new object inside of the returnedObject
                 returnedObject[iterationVariable[groupKey]] = [];
@@ -61,8 +92,272 @@ data.Admin = {
 
     },
 
+    // makeToast config
+    makeToast: function (severity, message)
+    {
+
+        if (severity === 'success')
+        {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+        else
+        {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-full-width",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "0",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+
+        toastr[severity](message);
+    },
+
+    //****************************************************************************************************
+    //END Admin Util FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
+
+    // #region PROCESS ACTIVITY FUNCTIONS
+
+    //****************************************************************************************************
+    // PROCESS ACTIVITY FUNCTIONS
+    //****************************************************************************************************
+
+    // intial call of process activity view 
+    ProcessActivityInit: function ()
+    {
+        $("#ProcessActivityResultsSpinner").show();
+
+        $.ajax({
+            type: "GET",
+            url: "GetProcessActivityTable",
+            contentType: "html",
+            success: function (result)
+            {
+                $("#ProcessActivityResults").html(result);
+                data.Admin.ProcessActivityDatasetConfig();
+            },
+            error: function (msg)
+            {
+                alert(msg);
+            },
+            complete: function ()
+            {
+                $("#ProcessActivityResultsSpinner").hide();
+            }
+        });
+    },
+
+    // dynamic data table intializer for process activity
+    ProcessActivityTableInit: function (columnsObj, orderObj, ajaxUrl)
+    {
+        if ($.fn.DataTable.isDataTable("#processActivityResultsTable"))
+        {
+            table.destroy();
+            $("#processActivityResultsTable").empty();
+        }
+
+        data.Admin.ProcessActivityTable = $("#processActivityResultsTable").DataTable({
+            ajax: {
+                url: ajaxUrl,
+                type: "POST"
+            },
+            searching: true,
+            paging: true,
+            stateSave: true,
+            orderCellsTop: true,
+            iDisplayLength: 10,
+            aLengthMenu: [
+                [10, 25, 50, 100, 200, 1000],
+                [10, 25, 50, 100, 200, 1000]
+            ],
+            columns: columnsObj,
+            order: orderObj,
+        });
+    },
+
+    // used to create dataset json column configuration for ProcessActivityTableInit
+    ProcessActivityDatasetConfig: function ()
+    {
+        var activityType = $("#ActivityType").val();
+
+        $("#ProcessActivityBreadcrumbs").append('<a href="#" id="dataset-breadcrumb">Home</a>');
+
+        var columnObj = [
+            {
+                data: "DatasetName", title: "Dataset Name", className: "dataset-deeplink",
+                "render": function (data, type, row, meta)
+                {
+                    if (type === 'display')
+                    {
+                        data = '<a style="cursor:pointer !important;" data-dataset-id="' + row["DatasetId"] + '" href="#">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            { data: "FileCount", title: "File Count", className: "fileCount" },
+            { data: "RecentRun", title: "Most Recent Run", className: "RecentRun", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
+        ];
+
+        var orderObj = [1, 'desc'];
+
+        var ajaxUrl = data.Admin.GetProcessActivityDatasetUrl(activityType)
+
+        data.Admin.ProcessActivityTableInit(columnObj, orderObj,  ajaxUrl);
+
+        data.Admin.ProcessActivityDatasetEvents();
+    },
+
+    // attach events for dataset process activity table
+    ProcessActivityDatasetEvents: function ()
+    {
+        $("#dataset-breadcrumb").click(function ()
+        {
+            $("#ProcessActivityBreadcrumbs").html("");
+            data.Admin.ProcessActivityDatasetConfig();
+
+            return false;
+        });
+
+        // Set dataset granular link
+        $('#processActivityResultsTable tbody').on('click', 'td.dataset-deeplink', function ()
+        {
+            var datasetId = $(this).find("a").data("dataset-id");
+
+            data.Admin.ProcessActivitySchemaConfig($(this).html(), datasetId);
+
+            return false;
+        });
+    },
+
+    // used to create schema json column configuration for ProcessActivityTableInit
+    ProcessActivitySchemaConfig: function (datasetName, datasetId)
+    {
+        let activityType = $("#ActivityType").val();
+
+        $("#ProcessActivityBreadcrumbs").append('<span id="schema-breadcrumb"> 〉<a href="#">' + datasetName + '</a></span>');
+
+        var columnObj = [
+            {
+                data: "SchemaName", title: "Schema", className: "schema-deeplink",
+                "render": function (data, type, row, meta)
+                {
+                    if (type === 'display')
+                    {
+                        data = '<a style="cursor:pointer" data-schema-id="' + row["SchemaId"] +'" !important;" href="#">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            { data: "FileCount", title: "File Count", className: "fileCount" },
+            { data: "RecentRun", title: "Most Recent Run", className: "RecentRun", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
+        ];
+
+        var orderObj = [1, 'desc'];
+
+        var ajaxUrl = data.Admin.GetProcessActivitySchemaUrl(activityType, datasetId)
+
+        data.Admin.ProcessActivityTableInit(columnObj, orderObj, ajaxUrl);
+
+        data.Admin.ProcessActivitySchemaEvents(datasetName, datasetId);
+    },
+
+    // attach events for schema process activity table
+    ProcessActivitySchemaEvents: function (datasetName, datasetId)
+    {
+        $("#schema-breadcrumb").click(function ()
+        {
+            $("#schema-breadcrumb").remove();
+            if ($("#dataset-file-breadcrumb"))
+            {
+                $("#dataset-file-breadcrumb").remove();
+            }
+
+            data.Admin.ProcessActivitySchemaConfig(datasetName, datasetId);
+
+            return false;
+        });
+
+        // Set dataset granular link
+        $('#processActivityResultsTable tbody').on('click', 'td.schema-deeplink', function ()
+        {
+            var schemaId = $(this).find("a").data("schema-id");
+
+            data.Admin.ProcessActivityDatasetFileConfig($(this).text(), schemaId, datasetId);
+
+            return false;
+        });
+    },
+
+    // used to create dataset file json column configuration for ProcessActivityTableInit
+    ProcessActivityDatasetFileConfig: function (schemaName, schemaId, datasetId)
+    {
+        var activityType = $("#ActivityType").val();
+
+        $("#ProcessActivityBreadcrumbs").append('<span id="dataset-file-breadcrumb"> 〉' + schemaName + '</span>');
+
+        var columnObj = [
+            { data: "FileName", title: "Orig Name", className: "FileName" },
+            { data: "FlowExecutionGuid", title: "Guid", className: "Guid" },
+            { data: "LastFlowStep", title: "Last Flow Step", className: "LastFlowStep" },
+            { data: "LastEventTime", title: "Last Event Timesamp", className: "LastEventTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
+        ];
+
+        var orderObj = [3, 'desc'];
+
+        var ajaxUrl = data.Admin.GetProcessActivityDatasetFileUrl(activityType, schemaId, datasetId)
+
+        data.Admin.ProcessActivityTableInit(columnObj, orderObj, ajaxUrl);
+    },
+
+    //****************************************************************************************************
+    //END PROCESS ACTIVITY FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
+
+    // #region DEAD JOB FUNCTIONS
+
+    //****************************************************************************************************
+    //DEAD JOB FUNCTIONS
+    //****************************************************************************************************
+
     // load and initialize dead job data table
-    DeadJobTableInit: function (selectedDate) {
+    DeadJobTableInit: function (selectedDate)
+    {
         data.Admin.DeadJobTable = $('#deadJobs').DataTable({
             ajax: {
                 url: data.Admin.GetDeadJobResultsUrl(selectedDate),
@@ -82,7 +377,7 @@ data.Admin = {
                 { data: null, name: "jobSelect", className: "jobSelect text-center", render: (d) => data.Admin.renderDeadJobSelectOptions(d), searchable: false, orderable: false },
                 { data: "SubmissionTime", type: "date", className: "submissionTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "DatasetName", className: "datasetName" },
-                { data: "ReprocessingRequired", className: "reprocessingRequired"},
+                { data: "ReprocessingRequired", className: "reprocessingRequired" },
                 { data: "SchemaName", className: "sourceName" },
                 { data: "SourceKey", className: "sourceKey" },
                 { data: "FlowExecutionGuid", className: "flowexecutionGuid" }
@@ -92,7 +387,8 @@ data.Admin = {
                 if (data.ReprocessingRequired)
                 {
                     $('td:eq(4)', row).text("True").addClass('text-danger');
-                } else {
+                } else
+                {
                     $('td:eq(4)', row).text("False").addClass('text-success');
                 }
             },
@@ -207,7 +503,7 @@ data.Admin = {
     {
         // `d` is the original data object for the row
         var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
-        
+
         table +=
             '<tr>' +
             '<td><b>Dataset File ID</b>: </td>' +
@@ -243,17 +539,34 @@ data.Admin = {
         return table;
     },
 
+    //****************************************************************************************************
+    //END DEAD JOB FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
+
+    // #region API URL FUNCTIONS
+
+    //****************************************************************************************************
+    //API URL FUNCTIONS
+    //****************************************************************************************************
+
     // creates url for ajax call to get schema associated with selected dataset
-    GetSchemaUrl: function (datasetId) {
+    GetSchemaUrl: function (datasetId)
+    {
         return "../../api/" + data.GetApiVersion() + "/metadata/dataset/" + datasetId + "/schema";
     },
 
-    GetFileUrl: function (datasetId, schemaId) {
-    // creates url for Ajax call to get data files
+    GetFileUrl: function (datasetId, schemaId)
+    {
+        // creates url for Ajax call to get data files
         return "../../api/" + data.GetApiVersion() + "/datafile/dataset/" + datasetId + "/schema/" + schemaId + "?pageNumber=1&pageSize=1000&sortDesc=true";
     },
 
-    GetFlowStepUrl: function (schemaId) {
+    GetFlowStepUrl: function (schemaId)
+    {
         return "../../api/" + data.GetApiVersion() + "/dataflow?schemaId=" + schemaId;
     },
 
@@ -262,6 +575,202 @@ data.Admin = {
     {
         return "GetDeadJobsForGrid?selectedDate=" + encodeURIComponent(selectedDate);
     },
+
+    GetProcessActivityDatasetUrl: function (activityType)
+    {
+        return "GetDatasetProcessingActivityForGrid?activityType=" + activityType;
+    },
+
+    GetProcessActivitySchemaUrl: function (activityType, datasetId)
+    {
+        return "GetSchemaProcessingActivityForGrid?activityType=" + activityType + "&datasetId=" + datasetId;
+    },
+
+    GetProcessActivityDatasetFileUrl: function (activityType, schemaId, datasetId)
+    {
+        return "GetDatasetFileProcessingActivityForGrid?activityType=" + activityType + "&schemaId=" + schemaId+ "&datasetId=" + datasetId;
+    },
+
+    //****************************************************************************************************
+    //END API URL FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
+
+    // #region DROPDOWN CREATION UTILITY FUNCTIONS
+
+    //****************************************************************************************************
+    //DROPDOWN CREATION UTILITY FUNCTIONS
+    //****************************************************************************************************
+
+    // creates schema dropdown for selected dataset
+    GetSchemaDropdown: function (url)
+    {
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function (schemaApiResponse)
+            {
+                // reduces api json response to only active schemas
+                schemaApiResponse = schemaApiResponse.filter(function (jsonObject)
+                {
+                    return jsonObject.ObjectStatus === 'ACTIVE';
+                });
+
+                // sort schema results alphabetically
+                schemaApiResponse.sort(function (a, b)
+                {
+                    if (a.Name < b.Name)
+                    {
+                        return -1;
+                    }
+                    else if (a.Name > b.Name)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                });
+
+
+                var schemaDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
+
+                for (let schema of schemaApiResponse)
+                {
+                    schemaDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
+                }
+
+
+                $("#AllSchemas").materialSelect({ destroy: true });
+
+                $("#AllSchemas").html(schemaDropdown);
+                $("#defaultSchemaSelection").prop("disabled", true);
+
+                $("#AllSchemas").materialSelect();
+            },
+            //upon error of a schema response, a blank drop down is createed, to ensure that a previous schema dropdown does not persist
+            error: function (msg)
+            {
+                var schemaDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
+
+
+                $("#schemaDropdown").materialSelect({ destroy: true });
+
+                $("#schemaDropdown").html(schemaDropdown);
+                $("#defaultSchemaSelection").prop("disabled", true);
+
+                $("#schemaDropdown").materialSelect();
+
+                data.Admin.DatasetDropdownScrollToTop();
+            },
+            complete: function ()
+            {
+                data.Admin.DatasetDropdownScrollToTop();
+                data.Admin.ActivateDeactivateAuditSearchButton();
+            }
+        });
+    },
+
+    GetFileDropdown: function (isApiInit, url)
+    {
+
+        // clear file dropdown menu
+        $("#fileDropdown").empty();
+
+        if (isApiInit)
+        {
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "Json",
+                dataSrc: "Records",
+                success: function (fileApiResponse)
+                {
+                    let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">Please Select a File</option>';
+                    fileDropdown += '<option value="0" data-datasetIds="[-1]">All Files</option>';
+
+                    // groups dataset file id's by shared file names and store them in a JSON object
+                    var groupedFiles = data.Admin.JsonReduce(fileApiResponse.Records, "FileName", "DatasetFileId");
+
+                    for (let file in groupedFiles)
+                    {
+                        fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
+                    }
+
+
+                    $("#fileDropdown").materialSelect({ destroy: true });
+
+                    $("#fileDropdown").html(fileDropdown);
+                    $("#defaultFileSelection").prop("disabled", true);
+
+                    $("#fileDropdown").materialSelect();
+                },
+                complete: function ()
+                {
+                    data.Admin.DatasetDropdownScrollToTop();
+                }
+            });
+        } else
+        {
+            let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">No Files</option>';
+
+            $("#fileDropdown").materialSelect({ destroy: true });
+
+            $("#fileDropdown").html(fileDropdown);
+            $("#defaultFileSelection").prop("disabled", true);
+
+            $("#fileDropdown").materialSelect();
+        }
+    },
+
+    // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
+    GetFlowStepDropdown: function (url)
+    {
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function (flowStepApiResponse)
+            {
+                var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
+                for (let flowStep of flowStepApiResponse[0].steps)
+                {
+                    if (flowStep.ActionName == "Raw Storage")
+                    {
+                        flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
+                    }
+                }
+
+                $("#flowStepsDropdown").materialSelect({ destroy: true });
+                $("#flowStepsDropdown").html(flowStepDropDown);
+                $("#flowStepsDropdown").materialSelect();
+            },
+            complete: function ()
+            {
+                data.Admin.DatasetDropdownScrollToTop();
+            }
+        });
+    },
+
+    // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
+    ResetFlowStepDropdown: function ()
+    {
+        var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
+        $("#flowStepsDropdown").materialSelect({ destroy: true });
+        $("#flowStepsDropdown").html(flowStepDropDown);
+        $("#flowStepsDropdown").materialSelect();
+    },
+
+    //****************************************************************************************************
+    //DROPDOWN CREATION UTILITY FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
 
     /**
     * generates table with datafiles from selected dataset and schema
@@ -301,146 +810,6 @@ data.Admin = {
 
     ResetDataFileReprocessTable: function () {
         $("#dataFileTableResults").DataTable().clear().draw();
-    },
-
-    // creates schema dropdown for selected dataset
-    GetSchemaDropdown: function (url) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (schemaApiResponse)
-            {
-                // reduces api json response to only active schemas
-                schemaApiResponse = schemaApiResponse.filter(function (jsonObject)
-                {
-                    return jsonObject.ObjectStatus === 'ACTIVE';
-                });
-
-                // sort schema results alphabetically
-                schemaApiResponse.sort(function (a, b) {
-                    if (a.Name < b.Name) {
-                        return -1;
-                    }
-                    else if (a.Name > b.Name) {
-                        return 1;
-                    }
-                    else {
-                        return 0;
-                    }
-                });
-
-
-                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
-
-                for (let schema of schemaApiResponse)
-                {
-                    scheamDropdown += '<option value="' + schema.SchemaId + '">' + schema.Name + '</option>';
-                }
-
-
-                $("#AllSchemas").materialSelect({ destroy: true });
-
-                $("#AllSchemas").html(scheamDropdown);
-                $("#defaultSchemaSelection").prop("disabled", true);
-
-                $("#AllSchemas").materialSelect();
-            },
-            //upon error of a schema response, a blank drop down is createed, to ensure that a previous schema dropdown does not persist
-            error: function (msg) {
-                var scheamDropdown = '<option id="defaultSchemaSelection" selected value="-1">Please Select a Schema</option>';
-
-
-                $("#schemaDropdown").materialSelect({ destroy: true });
-
-                $("#schemaDropdown").html(scheamDropdown);
-                $("#defaultSchemaSelection").prop("disabled", true);
-
-                $("#schemaDropdown").materialSelect();
-
-                data.Admin.DatasetDropdownScrollToTop();
-            },
-            complete: function () {
-                data.Admin.DatasetDropdownScrollToTop();
-                data.Admin.ActivateDeactivateAuditSearchButton();
-            }
-        });
-    },
-
-    GetFileDropdown: function (isApiInit, url) {
-
-        // clear file dropdown menu
-        $("#fileDropdown").empty();
-
-        if (isApiInit) {
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "Json",
-                dataSrc: "Records",
-                success: function (fileApiResponse) {
-                    let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">Please Select a File</option>';
-                    fileDropdown += '<option value="0" data-datasetIds="[-1]">All Files</option>';
-
-                    // groups dataset file id's by shared file names and store them in a JSON object
-                    var groupedFiles = data.Admin.JsonReduce(fileApiResponse.Records, "FileName", "DatasetFileId");
-
-                    for (let file in groupedFiles) {
-                        fileDropdown += '<option data-datasetIds=\'[' + groupedFiles[file] + ']\'>' + file + '</option>'
-                    }
-
-
-                    $("#fileDropdown").materialSelect({ destroy: true });
-
-                    $("#fileDropdown").html(fileDropdown);
-                    $("#defaultFileSelection").prop("disabled", true);
-
-                    $("#fileDropdown").materialSelect();
-                },
-                complete: function () {
-                    data.Admin.DatasetDropdownScrollToTop();
-                }
-            });
-        } else { 
-            let fileDropdown = '<option id="defaultFileSelection" selected value="-1" data-datasetIds="[-1]">No Files</option>';
-
-            $("#fileDropdown").materialSelect({ destroy: true });
-
-            $("#fileDropdown").html(fileDropdown);
-            $("#defaultFileSelection").prop("disabled", true);
-
-            $("#fileDropdown").materialSelect();
-        }
-    },
-
-    // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
-    GetFlowStepDropdown: function (url) {
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (flowStepApiResponse) {
-                var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
-                for (let flowStep of flowStepApiResponse[0].steps) {
-                    if (flowStep.ActionName == "Raw Storage") {
-                        flowStepDropDown += '<option value="' + flowStep.Id + '">' + flowStep.ActionName + '</option>';
-                    }
-                }
-
-                $("#flowStepsDropdown").materialSelect({ destroy: true });
-                $("#flowStepsDropdown").html(flowStepDropDown);
-                $("#flowStepsDropdown").materialSelect();
-            },
-            complete: function () {
-                data.Admin.DatasetDropdownScrollToTop();
-            }
-        });
-    },
-
-    // creates dropdown menu for flowsteps based on selected dataset and schema ***unfinished and unimplemented***
-    ResetFlowStepDropdown: function () {
-        var flowStepDropDown = '<option value="-1">Please Select a Flow Step</option>';
-        $("#flowStepsDropdown").materialSelect({ destroy: true });
-        $("#flowStepsDropdown").html(flowStepDropDown);
-        $("#flowStepsDropdown").materialSelect();
     },
 
     // activate or deactivate reprocess button based on input list of checked boxes
@@ -737,7 +1106,6 @@ data.Admin = {
 
         data.Admin.DataFileSelectAll();
     },
-
 
     ReprocessJobDateRangeCheck: function (selectedDate, rangeMax) {
         // Calculate hours between current date and selected date
@@ -1105,48 +1473,4 @@ data.Admin = {
             })
         })
     },
-    // makeToast config
-    makeToast: function (severity, message) {
-
-        if (severity === 'success') {
-            toastr.options = {
-                "closeButton": false,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "5000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            };
-        }
-        else {
-            toastr.options = {
-                "closeButton": true,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-full-width",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "0",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            };
-        }
-
-        toastr[severity](message);
-    }
 }
