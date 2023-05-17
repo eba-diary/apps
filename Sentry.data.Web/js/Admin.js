@@ -476,7 +476,10 @@ data.Admin = {
         $("#auditSearchButton").prop("disabled", searchStatus);
     },
 
-    RetrieveDeadSparkJobListButton: function () {
+    RetrieveDeadSparkJobListButton: function ()
+    {
+        $("#dead-job-end-filter").hide();
+        $("#tab-spinner").hide();
 
         $("#add-end-filter").click(function (){
             $("#dead-job-end-filter").show(500);

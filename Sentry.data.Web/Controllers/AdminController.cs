@@ -122,19 +122,12 @@ namespace Sentry.data.Web.Controllers
         public JsonResult GetDeadJobsForGrid(string startDate, string endDate)
         {
             // Convert selectedDate string to a DateTime object
-            DateTime startDateParsed = DateTime.ParseExact(startDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime startDateTimeParsed = DateTime.ParseExact(startDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
-            DateTime endDateParsed;
+            // If the end date is empty, set to the current DateTime.
+            DateTime endDateTimeParsed = endDate != "" ? DateTime.ParseExact(endDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture) : DateTime.Now;
 
-            if (endDate != "")
-            {
-                endDateParsed = DateTime.ParseExact(endDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
-            } else
-            {
-                endDateParsed = DateTime.Now;
-            }
-
-            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(startDateParsed, endDateParsed);
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(startDateTimeParsed, endDateTimeParsed);
 
             List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
 

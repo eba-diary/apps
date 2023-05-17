@@ -13,7 +13,7 @@ namespace Sentry.data.Infrastructure
             throw new System.NotSupportedException();
         }
 
-        public DataTable ExecuteQuery(DateTime startDate, DateTime endDate)
+        public DataTable ExecuteQuery(DateTime startDateTime, DateTime endDateTime)
         {
             //connect to database
             using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DatabaseConnectionString")))
@@ -27,8 +27,8 @@ namespace Sentry.data.Infrastructure
                 cmd.CommandTimeout = 300;
 
                 //add parameter for time window of jobs created
-                cmd.Parameters.Add(new SqlParameter("StartDate", startDate));
-                cmd.Parameters.Add(new SqlParameter("endDate", endDate));
+                cmd.Parameters.Add(new SqlParameter("StartDate", startDateTime));
+                cmd.Parameters.Add(new SqlParameter("endDate", endDateTime));
 
                 DataTable dataTable = new DataTable();
 

@@ -8,6 +8,6 @@ namespace Sentry.data.Core
     public interface IDbExecuter
     {
         void ExecuteCommand(object parameter);
-        DataTable ExecuteQuery(DateTime startDate, DateTime endDate);
+        DataTable ExecuteQuery(DateTime startDateTime, DateTime endDateTime);
     }
 }

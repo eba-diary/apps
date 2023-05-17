@@ -92,7 +92,6 @@ order by Submission.Created DESC, JobHistory.History_Id DESC
 select 
 ROW_NUMBER() OVER(PARTITION BY Dataset_ID,Schema_ID,BatchId ORDER BY History_Id DESC) AS RowNumber,
 *,
---REVERSE(SUBSTRING(REVERSE(TargetKey), CHARINDEX('.',REVERSE(TargetKey),0) + 1, 17)) as 'ExecutionGuid'
 CASE
     WHEN sub_Created > '2023-03-31 17:05:00' THEN SUBSTRING(REVERSE(SUBSTRING(REVERSE(TargetKey),0,CHARINDEX('/',REVERSE(TargetKey),0))),0,18)
     ELSE REVERSE(SUBSTRING(REVERSE(TargetKey), CHARINDEX('.',REVERSE(TargetKey),0) + 1, 17))

@@ -22,7 +22,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public DataTable ExecuteQuery(DateTime startDate, DateTime endDate)
+        public DataTable ExecuteQuery(DateTime startDateTime, DateTime endDateTime)
         {
             throw new System.NotSupportedException();
         }

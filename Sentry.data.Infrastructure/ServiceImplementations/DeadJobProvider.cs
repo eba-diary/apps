@@ -21,9 +21,9 @@ namespace Sentry.data.Infrastructure
             _dbExecuter = dbExecuter;
         }
 
-        public List<DeadSparkJob> GetDeadSparkJobs(DateTime startDate, DateTime endDate)
+        public List<DeadSparkJob> GetDeadSparkJobs(DateTime startDateTime, DateTime endDateTime)
         {
-            DataTable dataTable = _dbExecuter.ExecuteQuery(startDate, endDate);
+            DataTable dataTable = _dbExecuter.ExecuteQuery(startDateTime, endDateTime);
 
             return MapToEntity(dataTable);
         }
