@@ -24,7 +24,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3329_Expose_HR_Category { get; }
         public IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
         public IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
-        public IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         public IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         public IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
         public IFeatureFlag<bool> CLA3882_DSC_NOTIFICATION_SUBCATEGORY { get; }
@@ -62,7 +61,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3329_Expose_HR_Category = new BooleanFeatureFlagAmbientContext("CLA3329_Expose_HR_Category", false, _ldClient, () => LdUser);
             CLA2838_DSC_ANOUNCEMENTS = new BooleanFeatureFlagAmbientContext("CLA2838_DSC_ANOUNCEMENTS", false, _ldClient, () => LdUser);
             CLA3550_DATA_INVENTORY_NEW_COLUMNS = new BooleanFeatureFlagAmbientContext("CLA3550_DATA_INVENTORY_NEW_COLUMNS", false, _ldClient, () => LdUser);
-            CLA3605_AllowSchemaParquetUpdate = new BooleanFeatureFlagAmbientContext("CLA3605_AllowSchemaParquetUpdate", false, _ldClient, () => LdUser);
             CLA3637_EXPOSE_INV_CATEGORY = new BooleanFeatureFlagAmbientContext("CLA3637_EXPOSE_INV_CATEGORY", false, _ldClient, () => LdUser);
             CLA3553_SchemaSearch = new BooleanFeatureFlagAmbientContext("CLA3553_SchemaSearch", false, _ldClient, () => LdUser);
             CLA3882_DSC_NOTIFICATION_SUBCATEGORY = new BooleanFeatureFlagAmbientContext("CLA3882_DSC_NOTIFICATION_SUBCATEGORY", false, _ldClient, () => LdUser);
