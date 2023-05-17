@@ -67,9 +67,10 @@ namespace Sentry.data.Infrastructure.Tests
                 2, 2, 2, 2);
 
 
-            mockExecuter.Setup(e => e.ExecuteQuery(DateTime.Today, DateTime.Now)).Returns(dataTable);
+
 
             //Act
+            mockExecuter.Setup(e => e.ExecuteQuery(It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(dataTable);
             List<DeadSparkJob> deadSparkJobList = deadJobProvider.GetDeadSparkJobs(DateTime.Today, DateTime.Now);
 
             //Assert
@@ -151,9 +152,8 @@ namespace Sentry.data.Infrastructure.Tests
                 1, 1, 1, 1);
 
 
-            mockExecuter.Setup(e => e.ExecuteQuery(DateTime.Today, DateTime.Now)).Returns(dataTable);
+            mockExecuter.Setup(e => e.ExecuteQuery(It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(dataTable);
             
-
             //Act
             List<DeadSparkJob> deadSparkJobList = deadJobProvider.GetDeadSparkJobs(DateTime.Today, DateTime.Now);
 
