@@ -330,6 +330,7 @@
   <ItemGroup>
     <Compile Include="API\Dataset\AddDataset\AddDatasetModelMappingTests.cs" />
     <Compile Include="API\BaseModelMappingTests.cs" />
+    <Compile Include="API\Dataset\GetDataset\GetDatasetModelMappingTests.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetRequestValidatorTests.cs" />
     <Compile Include="API\Dataset\UpdateDataset\UpdateDatasetModelMappingTests.cs" />
     <Compile Include="API\GlobalDatasetAdmin\IndexGlobalDatasets\IndexGlobalDatasetsModelMappingTests.cs" />

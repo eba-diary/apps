@@ -20,5 +20,6 @@ namespace Sentry.data.Core
         public string AlternateContactEmail { get; set; }
         public DatasetOriginationCode OriginationCode { get; set; }
         public string OriginalCreator { get; set; }
+        
     }
 }
