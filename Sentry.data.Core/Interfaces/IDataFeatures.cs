@@ -15,7 +15,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA1656_DataFlowEdit_SubmitEditPage { get; }
         IFeatureFlag<bool> CLA2838_DSC_ANOUNCEMENTS { get; }
         IFeatureFlag<bool> CLA3550_DATA_INVENTORY_NEW_COLUMNS { get; }
-        IFeatureFlag<bool> CLA3605_AllowSchemaParquetUpdate { get; }
         IFeatureFlag<bool> CLA3637_EXPOSE_INV_CATEGORY { get; }
         IFeatureFlag<bool> CLA3553_SchemaSearch { get; }
         IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; }
