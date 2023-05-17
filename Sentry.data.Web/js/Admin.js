@@ -61,6 +61,13 @@ data.Admin = {
 
     },
 
+    // load and initialize dead job page
+    DeadJobPageInit: function ()
+    {
+        data.Admin.SideBarUtility();
+        data.Admin.RetrieveDeadSparkJobListButton();
+    },
+
     // load and initialize dead job data table
     DeadJobTableInit: function (startDate, endDate)
     {
