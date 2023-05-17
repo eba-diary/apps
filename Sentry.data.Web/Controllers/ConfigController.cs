@@ -619,6 +619,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     token.ShouldShowBackfillButton = !token.BackFillComplete && isMotive;
                 }
+                model.Tokens = model.Tokens.OrderBy(t => t.TokenName).ToList();
                 EditSourceDropDown(model);
 
                 _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, "Viewed Data Source Edit Page");
@@ -1410,11 +1411,6 @@ namespace Sentry.data.Web.Controllers
                     output.AddRange(fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
-                    output.AddRange(sfTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
-                    break;
                 case DataSourceDiscriminator.DEFAULT_DROP_LOCATION:
                     List<DataSource> dfsBasicList = _datasetContext.DataSources.Where(x => x is DfsBasic).ToList();
                     output.AddRange(dfsBasicList.Select(v
@@ -1557,9 +1553,6 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case Dataset.ValidationErrors.datasetDateRequired:
                         ModelState.AddModelError("DatasetDate", vr.Description);
-                        break;
-                    case SFtpSource.SftpValidationErrors.portNumberValueNonZeroValue:
-                        ModelState.AddModelError("PortNumber", vr.Description);
                         break;
                     default:
                         ModelState.AddModelError(vr.Id, vr.Description);

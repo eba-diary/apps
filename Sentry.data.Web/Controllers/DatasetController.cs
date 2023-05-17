@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using Sentry.Common.Logging;
+using Microsoft.Extensions.Logging;
 using Sentry.Core;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities;
@@ -43,6 +43,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IElasticDocumentClient _elasticDocumentClient;
         private readonly Lazy<IDataApplicationService> _dataApplicationService;
         private readonly IDatasetFileService _datasetFileService;
+        private readonly ILogger<DatasetController> _logger;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -59,7 +60,8 @@ namespace Sentry.data.Web.Controllers
             NamedEnvironmentBuilder namedEnvironmentBuilder,
             IElasticDocumentClient elasticDocumentClient,
             Lazy<IDataApplicationService> dataApplicationService,
-            IDatasetFileService datasetFileService)
+            IDatasetFileService datasetFileService,
+            ILogger<DatasetController> logger)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -76,6 +78,7 @@ namespace Sentry.data.Web.Controllers
             _elasticDocumentClient = elasticDocumentClient;
             _dataApplicationService = dataApplicationService;
             _datasetFileService = datasetFileService;
+            _logger = logger;
         }
 
         private IDataApplicationService DataApplicationService
@@ -157,7 +160,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+                _logger.LogError(ex, $"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}");
                 return Json(new { Success = false, Message = "We failed to delete the dataset.  Please try again later.  Please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
             }
         }
@@ -246,7 +249,6 @@ namespace Sentry.data.Web.Controllers
 
             if (ModelState.IsValid)
             {
-
                 if (dto.DatasetId == 0)
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
@@ -263,7 +265,6 @@ namespace Sentry.data.Web.Controllers
                     return Json(new { Success = true, dataset_id = dto.DatasetId });
                     //return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
-
             }
 
             Utility.SetupLists(_datasetContext, model);
@@ -562,7 +563,7 @@ namespace Sentry.data.Web.Controllers
             DataTablesResponse dataTablesResponse = dtqa.GetDataTablesResponse();
 
             sw.Stop();
-            Logger.Info($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
+            _logger.LogInformation($"GetDatasetFileInfoForGrid - Id: {Id} - Time to get data tables response: {sw.ElapsedMilliseconds}");
 
             return Json(dataTablesResponse, JsonRequestBehavior.AllowGet);
         }
@@ -680,7 +681,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error("Failure to submit access request", ex);
+                _logger.LogError(ex, "Failure to submit access request");
             }
 
             if (string.IsNullOrEmpty(ticketId))
@@ -706,7 +707,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error("Failure to submit access request", ex);
+                _logger.LogError(ex, "Failure to submit access request");
             }
 
             if (string.IsNullOrEmpty(ticketId))
@@ -743,7 +744,8 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error("Failure to submit inheritance request", ex);
+                _logger.LogError(ex, "Failure to submit inheritance request");
+
             }
 
             if (string.IsNullOrEmpty(ticketId))
@@ -769,7 +771,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error("Failure to submit remove permission request", ex);
+                _logger.LogError(ex, "Failure to submit remove permission request");
             }
 
             if (string.IsNullOrEmpty(ticketId))
@@ -841,7 +843,7 @@ namespace Sentry.data.Web.Controllers
 
                 var datasetId = df.Dataset != null ? df.Dataset.DatasetId.ToString() : "HUGE PROBLEM.  NO DATASET FOUND.";
 
-                Logger.Fatal($"S3 Data File Not Found - DatasetID:{datasetId} DatasetFile_ID:{id}", ex);
+                _logger.LogCritical(ex, $"S3 Data File Not Found - DatasetID:{datasetId} DatasetFile_ID:{id}");                
                 return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
             }
 
@@ -904,9 +906,9 @@ namespace Sentry.data.Web.Controllers
                         UploadDatasetFileDto dto = uploadModel.ToDto();
                         _datasetFileService.UploadDatasetFileToS3(dto);
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Logger.Error("Error uploading file to S3", e);
+                        _logger.LogError(ex, "Error uploading file to S3");
                         throw;
                     }
                     
@@ -934,7 +936,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error Enqueing Retriever Job ({id}).", ex);
+                _logger.LogError(ex, $"Error Enqueing Retriever Job ({id}).");
                 return Json(new { Success = false, Message = "Failed to queue job, please try later! Contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
             }
 
@@ -953,7 +955,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error disabling retriever job ({id}).", ex);
+                _logger.LogError(ex, $"Error disabling retriever job ({id}).");
                 return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
             }
         }
@@ -968,7 +970,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error enabling retriever job ({id}).", ex);
+                _logger.LogError(ex, $"Error enabling retriever job ({id}).");
                 return Json(new { Success = false, Message = "Failed enabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
             }
 

@@ -1,13 +1,9 @@
 ﻿using Nest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core.Entities.Schema.Elastic
 {
-    public class ElasticSchemaField
+    public class ElasticSchemaField : SearchHighlightable
     {
         public ElasticSchemaField()
         {
@@ -33,6 +29,7 @@ namespace Sentry.data.Core.Entities.Schema.Elastic
         [PropertyName("FieldGuid")]
         string FieldGuid { get; set; }
         [PropertyName("Name")]
+        [GlobalSearchField(SearchDisplayNames.SchemaField.COLUMNNAME)]
         public string Name { get; set; }
         [PropertyName("CreateDTM")]
         string CreateDTM { get; set; }

@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
-using Sentry.data.Core.Interfaces;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -13,7 +13,7 @@ using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class DataSourceService : IDataSourceService
+    public class DataSourceService : BaseDomainService<DataSourceService>, IDataSourceService
     {
         #region Fields
         private readonly IDatasetContext _datasetContext;
@@ -21,7 +21,6 @@ namespace Sentry.data.Core
         private readonly IMotiveProvider _motiveProvider;
         private readonly HttpClient client;
         private readonly IEmailService _emailService;
-        private readonly IDataFeatures _featureFlags;
         #endregion
 
         #region Constructor
@@ -29,14 +28,13 @@ namespace Sentry.data.Core
                             IEncryptionService encryptionService,
                             HttpClient httpClient,
                             IMotiveProvider motiveProvider,
-                            IEmailService emailService, IDataFeatures featureFlags)
+                            IEmailService emailService, DomainServiceCommonDependency<DataSourceService> commonDependencies) : base(commonDependencies)
         {
             _datasetContext = datasetContext;
             _encryptionService = encryptionService;
             client = httpClient;
             _motiveProvider = motiveProvider;
             _emailService = emailService;
-            _featureFlags = featureFlags;
         }
         #endregion
 
@@ -46,7 +44,6 @@ namespace Sentry.data.Core
             List<string> dropdownTypes = new List<string>
             {
                 DataSourceDiscriminator.FTP_SOURCE,
-                DataSourceDiscriminator.SFTP_SOURCE,
                 DataSourceDiscriminator.DFS_CUSTOM,
                 DataSourceDiscriminator.HTTPS_SOURCE,
                 DataSourceDiscriminator.GOOGLE_API_SOURCE,
@@ -68,9 +65,6 @@ namespace Sentry.data.Core
             {
                 case DataSourceDiscriminator.FTP_SOURCE:
                     validAuthTypes = new FtpSource().ValidAuthTypes;
-                    break;
-                case DataSourceDiscriminator.SFTP_SOURCE:
-                    validAuthTypes = new SFtpSource().ValidAuthTypes;
                     break;
                 case DataSourceDiscriminator.DFS_CUSTOM:
                     validAuthTypes = new DfsCustom().ValidAuthTypes;
@@ -107,19 +101,19 @@ namespace Sentry.data.Core
             var jsonContent = JsonConvert.SerializeObject(content);
             var jsonPostContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             var stringContent = jsonContent.ToString();
-            Sentry.Common.Logging.Logger.Info($"Attempting to add token {authToken} to datasource {dataSource.Name} with payload: {stringContent}");
+            _logger.LogInformation($"Attempting to add token {authToken} to datasource {dataSource.Name} with payload: {stringContent}");
             try
             {
                 using (var response = await client.PostAsync("https://api.gomotive.com/oauth/token", jsonPostContent))
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    Sentry.Common.Logging.Logger.Info($"Response {response.StatusCode}: {responseContent}");
+                    _logger.LogInformation($"Response {response.StatusCode}: {responseContent}");
                     JObject responseAsJson = JObject.Parse(responseContent);
                     string accessToken = responseAsJson.Value<string>("access_token");
                     string refreshToken = responseAsJson.Value<string>("refresh_token");
                     if(String.IsNullOrEmpty(accessToken) || String.IsNullOrEmpty(refreshToken))
                     {
-                        Sentry.Common.Logging.Logger.Error($"Unable to parse response tokens from JSON: {responseContent}");
+                        _logger.LogError($"Unable to parse response tokens from JSON: {responseContent}");
                         return false;
                     }
 
@@ -136,19 +130,19 @@ namespace Sentry.data.Core
 
                     try
                     {
-                        Sentry.Common.Logging.Logger.Info("Attempting to onboard new token.");
+                        _logger.LogInformation("Attempting to onboard new token.");
                         await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, newToken);
                     }
                     catch (Exception e)
                     {
-                        Sentry.Common.Logging.Logger.Error("Onboarding new token failed with message.", e);
+                        _logger.LogError(e, "Onboarding new token failed with message.");
                     }
 
                     ((HTTPSSource)dataSource).AllTokens.Add(newToken);
                     _datasetContext.SaveChanges();
-                    Sentry.Common.Logging.Logger.Info($"Successfully saved new token.");
+                    _logger.LogInformation($"Successfully saved new token.");
 
-                    if (_featureFlags.CLA4931_SendMotiveEmail.GetValue())
+                    if (_dataFeatures.CLA4931_SendMotiveEmail.GetValue())
                     {
                         _emailService.SendNewMotiveTokenAddedEmail(newToken);
                     }
@@ -156,7 +150,7 @@ namespace Sentry.data.Core
             }
             catch (Exception e)
             {
-                Logger.Fatal($"Token exchanged failed with Auth Token {authToken}.", e);
+                _logger.LogCritical(e, $"Token exchanged failed with Auth Token {authToken}.");
                 return false;
             }
             return true;
@@ -173,7 +167,7 @@ namespace Sentry.data.Core
         {
             try
             {
-                Sentry.Common.Logging.Logger.Info("Attempting to onboard token.");
+                _logger.LogInformation("Attempting to onboard token.");
                 var dataSource = _datasetContext.DataSources.FirstOrDefault(ds => ds.Id == int.Parse(Configuration.Config.GetHostSetting("MotiveDataSourceId")));
                 var token = ((HTTPSSource)dataSource).AllTokens.First(t => t.Id == tokenId);
                 await _motiveProvider.MotiveOnboardingAsync((HTTPSSource)dataSource, token);
@@ -181,7 +175,7 @@ namespace Sentry.data.Core
             }
             catch (Exception e)
             {
-                Sentry.Common.Logging.Logger.Error("Onboarding token failed with message.", e);
+                _logger.LogError(e, "Onboarding token failed with message.");
                 return false;
             }
         }
@@ -196,7 +190,7 @@ namespace Sentry.data.Core
             }
             catch (Exception e)
             {
-                Sentry.Common.Logging.Logger.Error($"Backfilling token {tokenId} failed with message.", e);
+                _logger.LogError(e, $"Backfilling token {tokenId} failed with message.");
                 return false;
             }
         }

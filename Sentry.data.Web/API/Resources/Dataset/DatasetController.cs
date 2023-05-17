@@ -50,5 +50,20 @@ namespace Sentry.data.Web.API
         {
             return await ProcessRequestAsync<UpdateDatasetRequestModel, DatasetDto, DatasetResultDto, UpdateDatasetResponseModel>(id, model, _datasetService.UpdateDatasetAsync);
         }
+        
+        /// <summary>
+        /// Update existing dataset
+        /// </summary>
+        [HttpGet]
+        [Route("{id}")]
+        [ApiVersionBegin(WebAPI.Version.v20230315)]
+        [SwaggerResponse(HttpStatusCode.OK, null, typeof(GetDatasetResponseModel))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        public async Task<IHttpActionResult> GetDataset(int id)
+        {
+            return await ProcessRequestAsync<DatasetDto, GetDatasetResponseModel>(id, _datasetService.GetDatasetAsync);
+        }
     }
 }

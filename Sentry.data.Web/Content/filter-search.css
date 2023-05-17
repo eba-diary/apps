@@ -114,10 +114,11 @@
     font-size: 12px;
 }
 
-.filter-search-active-options-container {
+.filter-search-active-options {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    padding-bottom: 0.125rem;
 }
 
 .active-option-category-label {
@@ -246,5 +247,5 @@
 }
 
 .filter-search-chip {
-    margin: 0.125rem 0.125rem 0.125rem 0;
+    margin: 0.125rem 0.125rem 0 0;
 }

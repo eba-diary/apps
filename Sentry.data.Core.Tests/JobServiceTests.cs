@@ -36,7 +36,9 @@ namespace Sentry.data.Core.Tests
             Mock<IRecurringJobManager> jobManager = mr.Create<IRecurringJobManager>();
             jobManager.Setup(x => x.RemoveIfExists(It.IsAny<string>()));
 
-            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null, logger.Object);
 
             // Act
             JobService.Delete(job.Id, user.Object, true);
@@ -60,7 +62,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(job.Id)).Returns(job);
 
-            var JobService = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             // Act
             bool isSuccessfull = JobService.Delete(job.Id, user.Object, false);
@@ -85,7 +89,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(job.Id)).Returns(job);
 
-            var JobService = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             // Act
             bool isSuccessfull = JobService.Delete(job.Id, user.Object, true);
@@ -110,7 +116,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(It.IsAny<int>())).Returns((RetrieverJob)null);
 
-            var JobService = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             // Act
             bool isSuccessfull = JobService.Delete(1, user.Object, true);
@@ -135,7 +143,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<RetrieverJob>(It.IsAny<int>())).Returns((RetrieverJob)null);
 
-            var JobService = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             // Act
             bool isSuccessfull = JobService.Delete(1, user.Object, false);
@@ -162,7 +172,9 @@ namespace Sentry.data.Core.Tests
             Mock<IRecurringJobManager> jobManager = mr.Create<IRecurringJobManager>();
             jobManager.Setup(x => x.RemoveIfExists(It.IsAny<string>()));
 
-            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null, logger.Object);
 
             // Act
             JobService.Delete(job.Id, user.Object, true);
@@ -189,7 +201,9 @@ namespace Sentry.data.Core.Tests
             Mock<IRecurringJobManager> jobManager = mr.Create<IRecurringJobManager>();
             jobManager.Setup(x => x.RemoveIfExists(It.IsAny<string>()));
 
-            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            var JobService = new JobService(context.Object, null, jobManager.Object, null, null, null, logger.Object);
 
             // Act
             JobService.Delete(job.Id, user.Object, false);
@@ -234,7 +248,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<DataFlow>(3)).Returns(new DataFlow() { Id = 31 });
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -327,7 +341,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -380,7 +394,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -432,7 +446,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -495,7 +509,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -558,7 +572,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -621,7 +635,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -684,7 +698,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -753,7 +767,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -806,7 +820,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -859,7 +873,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -912,7 +926,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -947,7 +961,7 @@ namespace Sentry.data.Core.Tests
             datasetContext.Setup(x => x.GetById<DataFlow>(3)).Returns(dataFlow);
             datasetContext.Setup(x => x.Add(It.IsAny<RetrieverJob>())).Callback<RetrieverJob>(x => x.Id = 4);
 
-            JobService service = new JobService(datasetContext.Object, null, null, null, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, null, null, null, null);
 
             RetrieverJob job = service.CreateRetrieverJob(dto);
 
@@ -998,7 +1012,7 @@ namespace Sentry.data.Core.Tests
             string newValue = "newValue";
             string defaultValue = "defaultValue";
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder_newValue, elName, newValue, defaultValue);
@@ -1020,7 +1034,7 @@ namespace Sentry.data.Core.Tests
             string newValue = null;
             string defaultValue = "defaultValue";
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder, elName, newValue, defaultValue);
@@ -1041,7 +1055,7 @@ namespace Sentry.data.Core.Tests
             int newValue = 1;
             int defaultValue = 99;
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder_newValue, elName, newValue, defaultValue);
@@ -1063,7 +1077,7 @@ namespace Sentry.data.Core.Tests
             int newValue = 1;
             int defaultValue = 99;
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             //Act
             jobService.AddElement(builder, elName, newValue, defaultValue);
@@ -1083,7 +1097,7 @@ namespace Sentry.data.Core.Tests
             string[] argsNewValue = new string[] { "\"type\":\"alpha\"", "\"count\":5678" };
             string[] argsDefaultValue = new string[] { "\"abc\":\"zyz\"", "\"123\":9999" };
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             //Act
             jobService.AddLivyArgumentsElement(builder_newValue, argsNewValue, argsDefaultValue);
@@ -1101,7 +1115,6 @@ namespace Sentry.data.Core.Tests
             //Arrange
             Mock<IDataFeatures> features = new Mock<IDataFeatures>();
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
-            features.Setup(s => s.CLA3497_UniqueLivySessionName.GetValue()).Returns(true);
 
             var javaOptionsOverrideDto = new JavaOptionsOverrideDto()
             {
@@ -1146,13 +1159,14 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<JavaAppSource>(It.IsAny<int>())).Returns(DataSource);
 
-            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null, null) { CallBase = true };
+            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null, null, null) { CallBase = true };
             service.Setup(s => s.GenerateUniqueLivySessionName(DataSource)).Returns("session_name");
 
             //Act
-            var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
+            (var result, var sessionName) = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
 
             //Assert
+            Assert.AreEqual("session_name", sessionName);
             Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"22GB\", \"driverCores\": 22, \"executorMemory\": \"88GB\", \"executorCores\": 88, \"numExecutors\": 9999, \"conf\":\"Override parameters\", \"args\": [\"\"123\":7777\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
         }
 
@@ -1163,7 +1177,6 @@ namespace Sentry.data.Core.Tests
             //Arrange
             Mock<IDataFeatures> features = new Mock<IDataFeatures>();
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
-            features.Setup(s => s.CLA3497_UniqueLivySessionName.GetValue()).Returns(true);
 
 
             var javaOptionsOverrideDto = new JavaOptionsOverrideDto()
@@ -1209,13 +1222,14 @@ namespace Sentry.data.Core.Tests
 
             context.Setup(s => s.GetById<JavaAppSource>(It.IsAny<int>())).Returns(DataSource);
 
-            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null, null) { CallBase = true };
+            Mock<JobService> service = new Mock<JobService>(context.Object, null, null, features.Object, null, null, null) { CallBase = true };
             service.Setup(s => s.GenerateUniqueLivySessionName(DataSource)).Returns("session_name");
 
             //Act
-            var result = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
+            (var result, var sessionName) = service.Object.BuildLivyPostContent(javaOptionsOverrideDto, retrieverJob);
 
             //Assert
+            Assert.AreEqual("session_name", sessionName);
             Assert.AreEqual("{\"file\": \"com.something.file\", \"className\": \"awesome_class_name\", \"name\": \"session_name\", \"driverMemory\": \"1MB\", \"driverCores\": 1, \"executorMemory\": \"99MB\", \"executorCores\": 99, \"numExecutors\": 12345, \"conf\":\"config parameters\", \"args\": [\"\"abc\":\"zyz\"\"], \"jars\": [\"jar1\",\"anotherjar2\"]}", result);
         }
 
@@ -1236,7 +1250,7 @@ namespace Sentry.data.Core.Tests
                 JobGuid = Guid.Parse("ADBB3009-2B71-4A20-B416-8858C77C216E"),
             };
 
-            JobService service = new JobService(null, null, null, null, null, null);
+            JobService service = new JobService(null, null, null, null, null, null, null);
 
             //Act
             var result = service.MapToSubmission(retrieverJob, javaOptionsOverrideDto);
@@ -1295,10 +1309,11 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Add(It.IsAny<JobHistory>()));
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null) { CallBase = true };
-            jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
-            jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
+            Mock<MockLoggingService<JobService>> logger = new Mock<MockLoggingService<JobService>>();
 
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null, logger.Object) { CallBase = true };
+            jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns(("content", "session_name"));
+            jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
 
             Times jobHistoryAddCount = Times.Once();
             Times saveChancesCount = Times.Exactly(2);
@@ -1360,8 +1375,10 @@ namespace Sentry.data.Core.Tests
             context.Setup(s => s.Add(It.IsAny<JobHistory>()));
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null) { CallBase = true };
-            jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns("content");
+            Mock<MockLoggingService<JobService>> logger = new Mock<MockLoggingService<JobService>>();
+
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null, logger.Object) { CallBase = true };
+            jobService.Setup(s => s.BuildLivyPostContent(dto, job)).Returns(("content", "session_name"));
             jobService.Setup(s => s.GetClusterUrl(It.IsAny<JavaOptionsOverrideDto>())).Returns("http://awe-t-apspml-01:8999");
 
 
@@ -1388,7 +1405,7 @@ namespace Sentry.data.Core.Tests
                 Name = "JavaSrc"
             };
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             //Act
             string result = jobService.GenerateUniqueLivySessionName(javaAppSource);
@@ -1437,7 +1454,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = new Mock<IDatasetContext>();
             context.Setup(s => s.SaveChanges(It.IsAny<bool>()));
 
-            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null) { CallBase = true };
+            Mock<MockLoggingService<JobService>> logger = new Mock<MockLoggingService<JobService>>();
+
+            Mock<JobService> jobService = new Mock<JobService>(context.Object, null, null, null, apacheProvider.Object, null, logger.Object) { CallBase = true };
             jobService.Setup(s => s.GetClusterUrl(It.IsAny<JobHistory>())).Returns("abc.com");
 
             _ = await jobService.Object.GetApacheLivyBatchStatusAsync(jobHistory);
@@ -1456,7 +1475,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.JobHistory).Returns(jobHistoryRecords.AsQueryable());
 
-            JobService jobService = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            JobService jobService = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             _ = await jobService.GetApacheLivyBatchStatusAsync(1, 1);
 
@@ -1474,7 +1495,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.JobHistory).Returns(jobHistoryRecords.AsQueryable());
 
-            JobService jobService = new JobService(context.Object, null, null, null, null, null);
+            JobService jobService = new JobService(context.Object, null, null, null, null, null, null);
 
             _ = await jobService.GetApacheLivyBatchStatusAsync(0, 1);
 
@@ -1494,7 +1515,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.JobHistory).Returns(jobHistoryRecords.AsQueryable());
 
-            JobService jobService = new JobService(context.Object, null, null, null, null, null);
+            JobService jobService = new JobService(context.Object, null, null, null, null, null, null);
 
             _ = await jobService.GetApacheLivyBatchStatusAsync(1, 0);
 
@@ -1553,7 +1574,7 @@ namespace Sentry.data.Core.Tests
 
             var lr = JsonConvert.DeserializeObject<LivyReply>(livyResponse);
 
-            JobService jobService = new JobService(null, null, null, null, null, null);
+            JobService jobService = new JobService(null, null, null, null, null, null, null);
 
             JobHistory result = jobService.MapToJobHistory(jobHistory, lr);
 
@@ -1594,7 +1615,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> datasetContext = mockRepository.Create<IDatasetContext>();
             datasetContext.SetupGet(x => x.RetrieverJob).Returns(jobs.AsQueryable());
 
-            JobService service = new JobService(datasetContext.Object, null, null, dataFeatures.Object, null, null);
+            JobService service = new JobService(datasetContext.Object, null, null, dataFeatures.Object, null, null, null);
 
             List<DfsMonitorDto> results = service.GetDfsRetrieverJobs(null);
 
@@ -1634,7 +1655,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
             dfsRetrieverJobProvider.Setup(x => x.GetDfsRetrieverJobs(null)).Returns(jobs);
 
-            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object, null);
 
             List<DfsMonitorDto> results = service.GetDfsRetrieverJobs(null);
 
@@ -1679,7 +1700,7 @@ namespace Sentry.data.Core.Tests
             dfsRetrieverJobProvider.Setup(x => x.GetDfsRetrieverJobs("DEV")).Returns(jobs);
             dfsRetrieverJobProvider.SetupGet(x => x.AcceptedNamedEnvironments).Returns(new List<string>() { "DEV" });
 
-            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object, null);
 
             List<DfsMonitorDto> results = service.GetDfsRetrieverJobs("DEV");
 
@@ -1707,7 +1728,7 @@ namespace Sentry.data.Core.Tests
             Mock<IDfsRetrieverJobProvider> dfsRetrieverJobProvider = mockRepository.Create<IDfsRetrieverJobProvider>();
             dfsRetrieverJobProvider.SetupGet(x => x.AcceptedNamedEnvironments).Returns(new List<string>() { "TEST", "NRTEST" });
 
-            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object);
+            JobService service = new JobService(null, null, null, dataFeatures.Object, null, dfsRetrieverJobProvider.Object, null);
 
             Assert.ThrowsException<DfsRetrieverJobException>(() => service.GetDfsRetrieverJobs("DEV"), "The requesting named environment 'DEV' is not an accepted named environment (TEST, NRTEST).");
 
@@ -1722,7 +1743,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            JobService service = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             DataFlow dataFlow = new DataFlow()
             {
@@ -1748,7 +1771,9 @@ namespace Sentry.data.Core.Tests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(s => s.Add(It.IsAny<RetrieverJob>()));
 
-            JobService service = new JobService(context.Object, null, null, null, null, null);
+            Mock<MockLoggingService<JobService>> logger = mr.Create<MockLoggingService<JobService>>();
+
+            JobService service = new JobService(context.Object, null, null, null, null, null, logger.Object);
 
             DataFlow dataFlow = new DataFlow()
             {

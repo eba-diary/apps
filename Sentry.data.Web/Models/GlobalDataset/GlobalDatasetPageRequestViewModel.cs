@@ -8,6 +8,7 @@ namespace Sentry.data.Web
         public int PageSize { get; set; }
         public int SortBy { get; set; }
         public int Layout { get; set; }
+        public bool ShouldSearchColumns { get; set; }
         public List<GlobalDatasetViewModel> GlobalDatasets { get; set; }
     }
 }

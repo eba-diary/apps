@@ -1,14 +1,12 @@
 ﻿using Hangfire;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sentry.Common.Logging;
 using Sentry.Core;
-using Sentry.data.Core;
 using Sentry.data.Core.DTO.Job;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
-using Sentry.data.Core.Interfaces.QuartermasterRestClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +26,12 @@ namespace Sentry.data.Core
         private readonly IDataFeatures _dataFeatures;
         private readonly IApacheLivyProvider _apacheLivyProvider;
         private readonly IDfsRetrieverJobProvider _environmentRetrieverJobProvider;
+        private readonly ILogger<JobService> _logger;
 
         public JobService(IDatasetContext datasetContext, IUserService userService,
             IRecurringJobManager recurringJobManager, IDataFeatures dataFeatures,
-            IApacheLivyProvider apacheLivyProvider, IDfsRetrieverJobProvider environmentRetrieverJobProvider)
+            IApacheLivyProvider apacheLivyProvider, IDfsRetrieverJobProvider environmentRetrieverJobProvider,
+            ILogger<JobService> logger)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -39,6 +39,7 @@ namespace Sentry.data.Core
             _dataFeatures = dataFeatures;
             _apacheLivyProvider = apacheLivyProvider;
             _environmentRetrieverJobProvider = environmentRetrieverJobProvider;
+            _logger = logger;
         }
 
         public JobHistory GetLastExecution(RetrieverJob job)
@@ -147,12 +148,12 @@ namespace Sentry.data.Core
 
             if (basicJob == null)
             {
-                job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
+                job.JobLoggerMessage(_logger, "Info", "No S3Basic job found for Schema... Finding DfsBasic job");
                 basicJob = _datasetContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == job.DatasetConfig.ConfigId && w.DataSource is DfsBasic).FetchAllConfiguration(_datasetContext).SingleOrDefault();
 
                 if (basicJob == null)
                 {
-                    job.JobLoggerMessage("Fatal", "Failed to find basic job");
+                    job.JobLoggerMessage(_logger, "Fatal", "Failed to find basic job");
                     throw new NotImplementedException("Failed to find generic Basic job");
                 }
             }
@@ -170,7 +171,7 @@ namespace Sentry.data.Core
 
         public RetrieverJob CreateDfsRetrieverJob(DataFlow df, DataSource dataSource)
         {
-            Logger.Info($"InstantiateJobsForCreation Method Start");
+            _logger.LogInformation($"InstantiateJobsForCreation Method Start");
 
             RetrieverJob rj = new RetrieverJob()
             {
@@ -222,7 +223,7 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(rj);
 
-            Logger.Info($"InstantiateJobsForCreation Method End");
+            _logger.LogInformation($"InstantiateJobsForCreation Method End");
 
             return rj;
         }
@@ -273,7 +274,7 @@ namespace Sentry.data.Core
 
         public void CreateDropLocation(RetrieverJob job)
         {
-            Logger.Info($"CreateDropLocation Method Start");
+            _logger.LogInformation($"CreateDropLocation Method Start");
 
             try
             {
@@ -292,23 +293,23 @@ namespace Sentry.data.Core
                 errmsg.AppendLine("Failed to Create Drop Location:");
                 errmsg.AppendLine($"DropLocation: {job.GetUri().LocalPath}");
 
-                Logger.Error(errmsg.ToString(), e);
+                _logger.LogError(e, errmsg.ToString());
             }
 
-            Logger.Info($"CreateDropLocation Method End");
+            _logger.LogInformation($"CreateDropLocation Method End");
         }
 
         public void DisableJob(int id)
         {
             string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
-            Logger.Debug($"Start method <{methodName}>");
+            _logger.LogDebug($"Start method <{methodName}>");
             try
             {
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
                 if (job != null)
                 {
-                    Logger.Debug($"disabling job - jobid:{job.Id}:::datasource:{job.DataSource.Name}");
+                    _logger.LogDebug($"disabling job - jobid:{job.Id}:::datasource:{job.DataSource.Name}");
 
                     job.IsEnabled = false;
                     job.Modified = DateTime.Now;
@@ -318,38 +319,38 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    Logger.Debug($"job not found - jobid:{id.ToString()}");
+                    _logger.LogDebug($"job not found - jobid:{id.ToString()}");
                 }
                 
             } catch (Exception ex)
             {
-                Logger.Error($"{methodName} - failed to disable job - jobid:{id}", ex);
+                _logger.LogError(ex, $"{methodName} - failed to disable job - jobid:{id}");
                 throw;
             }
-            Logger.Debug($"End method <{methodName}>");
+            _logger.LogDebug($"End method <{methodName}>");
         }
 
         public void EnableJob(int id)
         {
             string methodName = MethodBase.GetCurrentMethod().Name.ToLower();
-            Logger.Debug($"Start method <{methodName}>");
+            _logger.LogDebug($"Start method <{methodName}>");
             try
             {
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
 
                 if (job == null)
                 {
-                    Logger.Debug($"job not found - jobid:{id}");
+                    _logger.LogDebug($"job not found - jobid:{id}");
                     return;
                 }
 
                 if (job.ObjectStatus != GlobalEnums.ObjectStatusEnum.Disabled)
                 {
-                    Logger.Debug($"{methodName} - job has status of DELETED, will not be enabled - jobid:{id}");
+                    _logger.LogDebug($"{methodName} - job has status of DELETED, will not be enabled - jobid:{id}");
                     throw new InvalidOperationException("Cannot enable DELETED job");
                 }
 
-                Logger.Debug($"enabling job - jobid:{id}:::datasource:{job.DataSource.Name}");
+                _logger.LogDebug($"enabling job - jobid:{id}:::datasource:{job.DataSource.Name}");
 
                 job.IsEnabled = true;
                 job.Modified = DateTime.Now;
@@ -360,11 +361,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} - failed to enable job - jobid:{id}", ex);
+                _logger.LogError(ex, $"{methodName} - failed to enable job - jobid:{id}");
                 throw;
             }
 
-            Logger.Debug($"End method <{methodName}>");
+            _logger.LogDebug($"End method <{methodName}>");
         }
 
         public bool Delete(List<int> idList, IApplicationUser user, bool logicalDelete)
@@ -395,7 +396,7 @@ namespace Sentry.data.Core
         public bool Delete(int id, IApplicationUser user, bool logicalDelete)
         {
             string methodName = $"{nameof(JobService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Debug($"{methodName} Start Method");
+            _logger.LogDebug($"{methodName} Start Method");
 
             bool returnResult = true;
             bool isAlreadyDeleted = false;
@@ -407,7 +408,7 @@ namespace Sentry.data.Core
                 //return false if job id not found
                 if (job == null)
                 {
-                    Logger.Warn($"{methodName} job not found (id:{id}");
+                    _logger.LogWarning($"{methodName} job not found (id:{id}");
                     return false;
                 }
 
@@ -421,7 +422,7 @@ namespace Sentry.data.Core
 
                 if (isAlreadyDeleted)
                 {
-                    Logger.Debug($"{methodName} retiever job already deleted (jobid:{job.Id})");
+                    _logger.LogDebug($"{methodName} retiever job already deleted (jobid:{job.Id})");
                 }
                 else if (logicalDelete)
                 {
@@ -466,12 +467,12 @@ namespace Sentry.data.Core
                     }
                 }
 
-                Logger.Debug($"{methodName} End Method");
+                _logger.LogDebug($"{methodName} End Method");
                 return returnResult;
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} - failed - jobid:{id}", ex);
+                _logger.LogError(ex, $"{methodName} - failed - jobid:{id}");
                 throw;
             }
         }
@@ -548,13 +549,13 @@ namespace Sentry.data.Core
 
         public Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusAsync(JobHistory historyRecord)
         {
-            Logger.Debug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method Start");
+            _logger.LogDebug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method Start");
             if (historyRecord == null)
             {
                 throw new ArgumentNullException(nameof(historyRecord), "History Record Required");
             }
 
-            Logger.Debug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method End");
+            _logger.LogDebug($"{nameof(GetApacheLivyBatchStatusAsync)} - Method End");
             return GetApacheLivyBatchStatusInternalAsync(historyRecord);
         }
 
@@ -573,7 +574,7 @@ namespace Sentry.data.Core
 
             if (hr == null)
             {
-                Logger.Info($"{nameof(GetApacheLivyBatchStatusAsync)} - No history record returned.");
+                _logger.LogInformation($"{nameof(GetApacheLivyBatchStatusAsync)} - No history record returned.");
                 return Task.FromResult(default(System.Net.Http.HttpResponseMessage));
             }
                 
@@ -583,62 +584,59 @@ namespace Sentry.data.Core
         #region Private Methods
         private async Task<System.Net.Http.HttpResponseMessage> GetApacheLivyBatchStatusInternalAsync(JobHistory historyRecord)
         {
-            Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
-            /*
-            * Add flowexecutionguid context variable
-            */
+            _logger.LogDebug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method Start");
+            
             string flowExecutionGuid = (historyRecord.Submission != null && historyRecord.Submission.FlowExecutionGuid != null) ? historyRecord.Submission.FlowExecutionGuid : "00000000000000000";
-            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-
-            /*
-             * Add runinstanceguid context variable
-             */
             string runInstanceGuid = (historyRecord.Submission != null && historyRecord.Submission.RunInstanceGuid != null) ? historyRecord.Submission.RunInstanceGuid : "00000000000000000";
-            Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
 
-            string clusterUrl = GetClusterUrl(historyRecord);
+            System.Net.Http.HttpResponseMessage response;
 
-            Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
-
-            _apacheLivyProvider.SetBaseUrl(clusterUrl);
-
-            System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
-
-            string result = await response.Content.ReadAsStringAsync();
-            string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
-
-            Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
-
-            LivyReply lr = null;
-
-            if (response.IsSuccessStatusCode)
+            using (_logger.BeginScope(new TextVariable("flowexecutionguid", flowExecutionGuid), new TextVariable("runinstanceguid", runInstanceGuid)))
             {
-                if (result == $"Session '{historyRecord.BatchId}' not found.")
+                string clusterUrl = GetClusterUrl(historyRecord);
+
+                _logger.LogInformation($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - pull batch metadata: batchId:{historyRecord.BatchId} apacheLivyUrl:{clusterUrl}/batches/{historyRecord.BatchId}");
+
+                _apacheLivyProvider.SetBaseUrl(clusterUrl);
+
+                response = await _apacheLivyProvider.GetRequestAsync($"/batches/{historyRecord.BatchId}").ConfigureAwait(false);
+
+                string result = await response.Content.ReadAsStringAsync();
+                string sendresult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+                _logger.LogInformation($"{nameof(GetApacheLivyBatchStatusInternalAsync).ToLower()} - getbatchstate_livyresponse batchId:{historyRecord.BatchId} statuscode:{response.StatusCode}:::result:{sendresult}");
+
+                LivyReply lr = null;
+
+                if (response.IsSuccessStatusCode)
                 {
-                    Logger.Info($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Session not found");
+                    if (result == $"Session '{historyRecord.BatchId}' not found.")
+                    {
+                        _logger.LogInformation($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Session not found");
+                    }
+                    else
+                    {
+                        lr = JsonConvert.DeserializeObject<LivyReply>(result);
+                    }
                 }
-                else
+
+                if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    lr = JsonConvert.DeserializeObject<LivyReply>(result);
+                    JobHistory newHistoryRecord = MapToJobHistory(historyRecord, lr);
+
+                    if (string.IsNullOrEmpty(newHistoryRecord.ClusterUrl)) { newHistoryRecord.ClusterUrl = clusterUrl; }
+
+                    _datasetContext.Add(newHistoryRecord);
+
+                    //set previous active record to inactive
+                    historyRecord.Modified = DateTime.Now;
+                    historyRecord.Active = false;
+
+                    _datasetContext.SaveChanges();
                 }
+
+                _logger.LogDebug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
             }
-
-            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                JobHistory newHistoryRecord = MapToJobHistory(historyRecord, lr);
-
-                if (string.IsNullOrEmpty(newHistoryRecord.ClusterUrl)) { newHistoryRecord.ClusterUrl = clusterUrl; }
-
-                _datasetContext.Add(newHistoryRecord);
-
-                //set previous active record to inactive
-                historyRecord.Modified = DateTime.Now;
-                historyRecord.Active = false;
-
-                _datasetContext.SaveChanges();
-            }
-
-            Logger.Debug($"{nameof(GetApacheLivyBatchStatusInternalAsync)} - Method End");
             return response;
         }
 
@@ -686,47 +684,52 @@ namespace Sentry.data.Core
 
         internal async Task<System.Net.Http.HttpResponseMessage> SubmitApacheLivyJobInternalAsync(RetrieverJob job, Guid JobGuid, JavaOptionsOverrideDto dto)
         {
-            string postContent = BuildLivyPostContent(dto, job);
+            (string postContent, string livySessionName) = BuildLivyPostContent(dto, job);
 
-            string clusterUrl = GetClusterUrl(dto);
+            System.Net.Http.HttpResponseMessage response;
 
-            _apacheLivyProvider.SetBaseUrl(clusterUrl);
-
-            System.Net.Http.HttpResponseMessage response = await _apacheLivyProvider.PostRequestAsync("batches", postContent);
-
-            string result = await response.Content.ReadAsStringAsync();
-            string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
-
-            Logger.Debug($"postbatches_livyresponse statuscode:{response.StatusCode}:::result:{postResult}");
-
-            //Record submission regardless if target deems it a bad request.
-            Submission sub = MapToSubmission(job, dto);
-            sub.Serialized_Job_Options = postContent;
-            sub.ClusterUrl = clusterUrl;
-
-            _datasetContext.Add(sub);
-            _datasetContext.SaveChanges();
-
-            if (response.IsSuccessStatusCode)
+            using (_logger.BeginScope(new TextVariable("livysessionname", livySessionName))) 
             {
-                LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);
+                string clusterUrl = GetClusterUrl(dto);
 
-                JobHistory histRecord = new JobHistory()
-                {
-                    JobId = job,
-                    BatchId = batchResult.Id,
-                    JobGuid = JobGuid,
-                    State = batchResult.State,
-                    LivyAppId = batchResult.Appid,
-                    LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                    LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
-                    Active = true,
-                    Submission = sub,
-                    ClusterUrl = clusterUrl
-                };
+                _apacheLivyProvider.SetBaseUrl(clusterUrl);
 
-                _datasetContext.Add(histRecord);
+                response = await _apacheLivyProvider.PostRequestAsync("batches", postContent);
+
+                string result = await response.Content.ReadAsStringAsync();
+                string postResult = (string.IsNullOrEmpty(result)) ? "noresultsupplied" : result;
+
+                _logger.LogDebug($"postbatches_livyresponse statuscode:{response.StatusCode}:::result:{postResult}");
+
+                //Record submission regardless if target deems it a bad request.
+                Submission sub = MapToSubmission(job, dto);
+                sub.Serialized_Job_Options = postContent;
+                sub.ClusterUrl = clusterUrl;
+
+                _datasetContext.Add(sub);
                 _datasetContext.SaveChanges();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);
+
+                    JobHistory histRecord = new JobHistory()
+                    {
+                        JobId = job,
+                        BatchId = batchResult.Id,
+                        JobGuid = JobGuid,
+                        State = batchResult.State,
+                        LivyAppId = batchResult.Appid,
+                        LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                        LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                        Active = true,
+                        Submission = sub,
+                        ClusterUrl = clusterUrl
+                    };
+
+                    _datasetContext.Add(histRecord);
+                    _datasetContext.SaveChanges();
+                }
             }
 
             return response;
@@ -755,7 +758,7 @@ namespace Sentry.data.Core
             return submission;
         }
 
-        internal virtual string BuildLivyPostContent(JavaOptionsOverrideDto dto, RetrieverJob job)
+        internal virtual (string postContent, string livySessionName) BuildLivyPostContent(JavaOptionsOverrideDto dto, RetrieverJob job)
         {
             JavaAppSource dsrc = _datasetContext.GetById<JavaAppSource>(job.DataSource.Id);
 
@@ -764,16 +767,8 @@ namespace Sentry.data.Core
 
             AddElement(json, "className", dsrc.Options.ClassName, null);
 
-            if (_dataFeatures.CLA3497_UniqueLivySessionName.GetValue())
-            {
-                string livySessionName = GenerateUniqueLivySessionName(dsrc);
-                AddElement(json, "name", livySessionName, null);
-                Logger.AddContextVariable(new TextVariable("livysessionname", livySessionName));
-            }
-            else
-            {
-                json.Append($", \"name\": \"{dsrc.Name}\"");
-            }
+            string livySessionName = GenerateUniqueLivySessionName(dsrc);
+            AddElement(json, "name", livySessionName, null);
 
             if (dto != null)
             {
@@ -818,7 +813,7 @@ namespace Sentry.data.Core
             //DO NOT KILL THIS
             json.Append("}");
 
-            return json.ToString();
+            return (json.ToString(), livySessionName);
         }
 
         internal virtual string GenerateUniqueLivySessionName(JavaAppSource dsrc)
@@ -980,7 +975,7 @@ namespace Sentry.data.Core
 
         private void DeleteDFSDropLocation(RetrieverJob job)
         {
-            Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method Start");
+            _logger.LogDebug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method Start");
             //For DFS type jobs, remove drop folder from network location
             if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsBasicHsz>() || job.DataSource.Is<DfsDataFlowBasic>() || job.DataSource.Is<DfsEnvironmentSource>())
             {
@@ -988,27 +983,27 @@ namespace Sentry.data.Core
 
                 if (System.IO.Directory.Exists(dfsPath))
                 {
-                    Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} - JobId:{job.Id}");
+                    _logger.LogDebug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} - JobId:{job.Id}");
                     List<string> files = System.IO.Directory.EnumerateFiles(dfsPath).ToList();
                     if (files.Any())
                     {
-                        Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} dfs-directory-file-detected - deleteing {files.Count} file(s) from {dfsPath} - JobId:{job.Id}");
+                        _logger.LogDebug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} dfs-directory-file-detected - deleteing {files.Count} file(s) from {dfsPath} - JobId:{job.Id}");
                         foreach (string file in files)
                         {
                             System.IO.File.Delete(file);
                         }
                     }
 
-                    Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} dfs-directory-delete path:{dfsPath} - JobId:{job.Id}");
+                    _logger.LogDebug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} dfs-directory-delete path:{dfsPath} - JobId:{job.Id}");
                     System.IO.Directory.Delete(dfsPath);
                 }
                 else
                 {
-                    Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} - dfs-directory-not-detected - JobId:{job.Id}");
+                    _logger.LogDebug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} - dfs-directory-not-detected - JobId:{job.Id}");
                 }
             }
 
-            Logger.Debug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method End");
+            _logger.LogDebug($"{nameof(JobService).ToLower()}_{nameof(DeleteDFSDropLocation).ToLower()} Method End");
         }
 #endregion
     }

@@ -2,5 +2,6 @@
 {
     public class GetGlobalDatasetFiltersDto : BaseFilterSearchDto
     {
+        public bool ShouldSearchColumns { get; set; }
     }
 }

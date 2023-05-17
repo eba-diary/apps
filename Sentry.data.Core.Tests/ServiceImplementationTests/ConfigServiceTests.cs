@@ -20,7 +20,10 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
 
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             //Act
             bool IsSuccessful = configService.Delete(config.ConfigId, null, true);
@@ -42,7 +45,10 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             //Act
             configService.Delete(config.ConfigId, null, true);
@@ -73,7 +79,9 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(x => x.Delete(It.IsAny<int>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null, null, logger.Object);
 
             //Act
             configService.Delete(config.ConfigId, null, true);
@@ -96,7 +104,9 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDatasetContext> context = mr.Create<IDatasetContext>();
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             //Act
             bool IsSuccessful = configService.Delete(config.ConfigId, null, true);
@@ -119,7 +129,9 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             context.Setup(x => x.GetById<DatasetFileConfig>(config.ConfigId)).Returns(config);
             context.Setup(x => x.SaveChanges(It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, null, null, null, null, null, null, null, logger.Object);
 
             //Act
             configService.Delete(config.ConfigId, null, true);
@@ -148,7 +160,9 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null, null, logger.Object);
 
             //Act
             configService.Delete(config.ConfigId, null, false);
@@ -178,7 +192,9 @@ namespace Sentry.data.Core.Tests.ServiceImplementationTests
             Mock<IDataFlowService> dataFlowService = mr.Create<IDataFlowService>();
             dataFlowService.Setup(x => x.Delete(It.IsAny<List<int>>(), It.IsAny<IApplicationUser>(), It.IsAny<bool>()));
 
-            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null, null);
+            Mock<MockLoggingService<ConfigService>> logger = mr.Create<MockLoggingService<ConfigService>>();
+
+            ConfigService configService = new ConfigService(context.Object, null, null, null, null, null, jobService.Object, null, null, dataFlowService.Object, null, null, null, logger.Object);
 
             //Act
             bool IsSuccessful = configService.Delete(config.ConfigId, null, false);

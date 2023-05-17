@@ -1,25 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
-using Sentry.Configuration;
-using Sentry.data.Core.Entities;
-using Sentry.data.Core.Entities.DataProcessing;
-using Sentry.data.Core.Exceptions;
-using Sentry.data.Core.Interfaces;
-using System;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class ConnectorService : IKafkaConnectorService
+    public class ConnectorService : BaseDomainService<ConnectorService>, IKafkaConnectorService
     {
         private readonly IKafkaConnectorProvider _connectorProvider;
         
-        public ConnectorService(IKafkaConnectorProvider connectorProvider)
+        public ConnectorService(IKafkaConnectorProvider connectorProvider, DomainServiceCommonDependency<ConnectorService> commonDepenencies) : base(commonDepenencies)
         {
             _connectorProvider = connectorProvider;
         }
@@ -80,7 +75,7 @@ namespace Sentry.data.Core
                 ReasonPhrase = httpResponse.ReasonPhrase
             };
 
-            Logger.Info($"Method <CreateS3SinkConnectorAsync> STATUS={responseDto.SuccessStatusCodeDescription} Creating: {requestJSON} ");
+            _logger.LogInformation($"Method <CreateS3SinkConnectorAsync> STATUS={responseDto.SuccessStatusCodeDescription} Creating: {requestJSON} ");
             return responseDto;
         }
     }

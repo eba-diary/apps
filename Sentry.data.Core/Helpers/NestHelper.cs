@@ -23,7 +23,7 @@ namespace Sentry.data.Core
             return aggregations;
         }
 
-        public static BoolQuery ToSearchQuery<T>(this BaseFilterSearchDto filterSearchDto) where T : class
+        public static BoolQuery ToSearchQuery<T>(this BaseSearchDto filterSearchDto) where T : class
         {
             BoolQuery searchQuery = new BoolQuery();
 
@@ -35,6 +35,13 @@ namespace Sentry.data.Core
                 searchQuery.Should = GetShouldQueries<T>(terms);
                 searchQuery.MinimumShouldMatch = searchQuery.Should.Any() ? 1 : 0;
             }
+
+            return searchQuery;
+        }
+
+        public static BoolQuery ToSearchQuery<T>(this BaseFilterSearchDto filterSearchDto) where T : class
+        {
+            BoolQuery searchQuery = ((BaseSearchDto)filterSearchDto).ToSearchQuery<T>();
 
             if (filterSearchDto.FilterCategories?.Any() == true)
             {

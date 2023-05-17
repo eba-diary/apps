@@ -14,15 +14,15 @@ namespace Sentry.data.Core
         public string DatasetDescription { get; set; }
 
         [PropertyName("categorycode")]
-        [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, defaultOpen: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.CATEGORY, isPinnedFilter: true)]
         public string CategoryCode { get; set; }
 
         [PropertyName("namedenvironment")]
-        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENT, hideResultCounts: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENT, hideResultCounts: true, isPinnedFilter: true)]
         public string NamedEnvironment { get; set; }
 
         [PropertyName("namedenvironmenttype")]
-        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, defaultOpen: true, hideResultCounts: true)]
+        [FilterSearchField(FilterCategoryNames.Dataset.ENVIRONMENTTYPE, hideResultCounts: true)]
         public string NamedEnvironmentType { get; set; }
 
         [PropertyName("originationcode")]

@@ -10,7 +10,7 @@ namespace Sentry.data.Web.Tests.API
     public class GetGlobalDatasetFiltersModelMappingTests : BaseModelMappingTests
     {
         [TestMethod]
-        public void Map_GetGlobalDatasetFiltersRequestModel_BaseFilterSearchDto()
+        public void Map_GetGlobalDatasetFiltersRequestModel_SearchGlobalDatasetsDto()
         {
             GetGlobalDatasetFiltersRequestModel request = new GetGlobalDatasetFiltersRequestModel
             {
@@ -43,12 +43,14 @@ namespace Sentry.data.Web.Tests.API
                             }
                         }
                     }
-                }
+                },
+                ShouldSearchColumns = true
             };
 
-            BaseFilterSearchDto dto = _mapper.Map<BaseFilterSearchDto>(request);
+            GetGlobalDatasetFiltersDto dto = _mapper.Map<GetGlobalDatasetFiltersDto>(request);
 
             Assert.AreEqual("search text", dto.SearchText);
+            Assert.IsTrue(dto.ShouldSearchColumns);
             Assert.AreEqual(2, dto.FilterCategories.Count);
 
             FilterCategoryDto categoryDto = dto.FilterCategories[0];
@@ -60,13 +62,13 @@ namespace Sentry.data.Web.Tests.API
             FilterCategoryOptionDto optionDto = categoryDto.CategoryOptions[0];
             Assert.AreEqual("Option1", optionDto.OptionValue);
             Assert.AreEqual(0, optionDto.ResultCount);
-            Assert.IsNull(optionDto.ParentCategoryName);
+            Assert.AreEqual("Category1", optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
 
             optionDto = categoryDto.CategoryOptions[1];
             Assert.AreEqual("Option2", optionDto.OptionValue);
             Assert.AreEqual(0, optionDto.ResultCount);
-            Assert.IsNull(optionDto.ParentCategoryName);
+            Assert.AreEqual("Category1", optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
 
             categoryDto = dto.FilterCategories[1];
@@ -78,7 +80,7 @@ namespace Sentry.data.Web.Tests.API
             optionDto = categoryDto.CategoryOptions[0];
             Assert.AreEqual("P", optionDto.OptionValue);
             Assert.AreEqual(0, optionDto.ResultCount);
-            Assert.IsNull(optionDto.ParentCategoryName);
+            Assert.AreEqual(FilterCategoryNames.DataInventory.ENVIRONMENT, optionDto.ParentCategoryName);
             Assert.IsTrue(optionDto.Selected);
         }
 

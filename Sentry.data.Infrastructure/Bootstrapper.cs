@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using LaunchDarkly.Sdk.Server.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using NHibernate;
@@ -79,6 +80,7 @@ namespace Sentry.data.Infrastructure
 
             //Wire up the Infrastructure implementations to the interfaces that are in the Core
             StructureMap.Registry registry = new StructureMap.Registry();
+
             registry.Scan((scanner) =>
             {
                 scanner.AssemblyContainingType<DataAssetContext>();

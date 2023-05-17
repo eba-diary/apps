@@ -140,7 +140,6 @@ namespace Sentry.data.Core
             public const string DEFAULT_S3_DROP_LOCATION = "S3Basic";
             public const string FTP_SOURCE = "FTP";
             public const string S3_SOURCE = "S3";
-            public const string SFTP_SOURCE = "SFTP";
             public const string HTTPS_SOURCE = "HTTPS";
             public const string JAVA_APP_SOURCE = "JavaApp";
             public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
@@ -514,6 +513,11 @@ namespace Sentry.data.Core
                 public const string SCHEMANAME = "Schema Name";
                 public const string SCHEMADESCRIPTION = "Schema Description";
             }
+
+            public static class SchemaField
+            {
+                public const string COLUMNNAME = "Column Name";
+            }
         }
 
         public static class FilterCategoryOptions
@@ -585,6 +589,7 @@ namespace Sentry.data.Core
             public const string PAGENUMBER = "PageNumber";
             public const string PAGESIZE = "PageSize";
             public const string LAYOUT = "Layout";
+            public const string SEARCHCOLUMNS = "ShouldSearchColumns";
         }
 
         public static class ExecutionParameterKeys
@@ -654,6 +659,15 @@ namespace Sentry.data.Core
         public static class MigrationHistoryNamedEnvFilter
         {
             public const string ALL_NAMED_ENV = "ALL";
+        }
+
+        public static class ElasticQueryValues
+        {
+            public static class Size
+            {
+                public const int MAX = 10000;
+                public const int ZERO = 0;
+            }
         }
     }
 }
