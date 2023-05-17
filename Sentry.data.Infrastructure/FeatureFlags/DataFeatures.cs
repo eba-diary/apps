@@ -50,6 +50,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4993_JSMTicketProvider { get; }
         public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability { get; }
         public IFeatureFlag<bool> CLA3214_VariantDataType { get; }
+        public IFeatureFlag<bool> CLA5211_SendNewSnowflakeEvents { get; }
 
         public DataFeatures(IUserService userService, ILdClient ldClient)
         {
@@ -88,6 +89,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4993_JSMTicketProvider = new BooleanFeatureFlagAmbientContext("CLA4993_JSMTicketProvider", false, _ldClient, () => LdUser);
             CLA4789_ImprovedSearchCapability = new BooleanFeatureFlagAmbientContext("CLA4789_ImprovedSearchCapability", false, _ldClient, () => LdUser);
             CLA3214_VariantDataType = new BooleanFeatureFlagAmbientContext("CLA3214_VariantDataType", false, _ldClient, () => LdUser);
+            CLA5211_SendNewSnowflakeEvents = new BooleanFeatureFlagAmbientContext("CLA5211_SendNewSnowflakeEvents", false, _ldClient, () => LdUser);
         }
 
         /// <summary>

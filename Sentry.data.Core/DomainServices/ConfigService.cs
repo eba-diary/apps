@@ -685,7 +685,14 @@ namespace Sentry.data.Core
                 //We do not want to fail the delete due to events not being sent
                 try
                 {
-                    GenerateConsumptionLayerDeleteEvent(dfc);
+                    if (_featureFlags.CLA5211_SendNewSnowflakeEvents.GetValue())
+                    {
+                        _schemaService.PublishSnowflakeConsumptionDeleteRequest(scm);
+                    }
+                    else
+                    {
+                        GenerateConsumptionLayerDeleteEvent(dfc);
+                    }
                 }
                 catch (AggregateException agEx)
                 {

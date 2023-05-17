@@ -894,6 +894,8 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
+            GenerateSnowSchemaDeleteForDataset(ds);
+
             ds.CanDisplay = false;
             ds.DeleteInd = true;
             ds.DeleteIssuer = (user == null)? _userService.GetCurrentUser().AssociateId : user.AssociateId;
@@ -1106,32 +1108,92 @@ namespace Sentry.data.Core
             JObject datasetCreatedChangeInd = new JObject();
             datasetCreatedChangeInd.Add("dataset", "added");
 
-            //Always generate snowflake table create event
-            SnowSchemaCreateModel snowModel = new SnowSchemaCreateModel()
+            int datasetId = dataset.DatasetId;
+            string jsonPayload;
+
+            if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
             {
-                DatasetID = dataset.DatasetId,
-                InitiatorID = _userService.GetCurrentUser().AssociateId,
-                ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
-            };
+                SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+                {
+                    EventType = GlobalConstants.SnowConsumptionMessageTypes.CREATE_REQUEST,
+                    SchemaID = 0,
+                    RevisionID = 0,
+                    DatasetID = datasetId,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId,
+                    ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
+                };
+                jsonPayload = JsonConvert.SerializeObject(snowModel);
+            }
+            else
+            {
+                SnowSchemaCreateModel snowModel = new SnowSchemaCreateModel()
+                {
+                    DatasetID = datasetId,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId,
+                    ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
+                };
+                jsonPayload = JsonConvert.SerializeObject(snowModel);
+            }
 
             try
             {
-                _logger.LogInformation($"<GenerateSnowSchemaCreateForDataset> sending event: {JsonConvert.SerializeObject(snowModel)}");
+                _logger.LogInformation($"<GenerateSnowSchemaCreateForDataset> sending event: {jsonPayload}");
 
                 string topicName = null;
                 if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
                     topicName = new DscEventTopicHelper().GetDSCTopic(dataset);
-                    _messagePublisher.Publish(topicName, snowModel.DatasetID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    _messagePublisher.Publish(topicName, datasetId.ToString(), jsonPayload);
                 }
                 else
                 {
-                    _messagePublisher.PublishDSCEvent(snowModel.DatasetID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                    _messagePublisher.PublishDSCEvent(datasetId.ToString(), jsonPayload, topicName);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
+                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {jsonPayload}");
+            }
+        }
+        
+        private void GenerateSnowSchemaDeleteForDataset(Dataset dataset)
+        {
+            JObject datasetDeletedChangeInd = new JObject();
+            datasetDeletedChangeInd.Add("dataset", "deleted");
+
+            int datasetId = dataset.DatasetId;
+            string jsonPayload;
+
+            //Always generate snowflake table create event
+            SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+            {
+                EventType = GlobalConstants.SnowConsumptionMessageTypes.DELETE_REQUEST,
+                SchemaID = 0,
+                RevisionID = 0,
+                DatasetID = datasetId,
+                InitiatorID = _userService.GetCurrentUser().AssociateId,
+                ChangeIND = datasetDeletedChangeInd.ToString(Formatting.None)
+            };
+            jsonPayload = JsonConvert.SerializeObject(snowModel);
+
+            try
+            {
+                _logger.LogInformation($"Sending event: {jsonPayload}");
+
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = new DscEventTopicHelper().GetDSCTopic(dataset);
+                    _messagePublisher.Publish(topicName, datasetId.ToString(), jsonPayload);
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(datasetId.ToString(), jsonPayload, topicName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {jsonPayload}");
             }
         }
         #endregion

@@ -98,7 +98,7 @@ namespace Sentry.data.Infrastructure
                             case "SKIPPED":
                                 de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString());
                                 break;
-                            case "FAILED":
+                            case "FAILEzD":
                                 de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString());
                                 break;
                             default:

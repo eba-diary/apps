@@ -192,5 +192,19 @@ namespace Sentry.data.Core
 
         (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName);
         void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList);
+
+        /// <summary>
+        /// Checks if we should create / update the consumption layers. 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="propertyDeltaList"></param>
+        /// <param name="forceGenerate"></param>
+        void TryGenerateSnowflakeConsumptionCreateEvent(FileSchema schema, JObject propertyDeltaList, bool forceGenerate);
+
+        /// <summary>
+        /// Publishes event to delete consumption layer for schema. 
+        /// </summary>
+        /// <param name="schema"></param>
+        void PublishSnowflakeConsumptionDeleteRequest(Schema schema);
     }
 }
