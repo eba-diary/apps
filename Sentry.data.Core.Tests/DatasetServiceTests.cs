@@ -2133,6 +2133,7 @@ namespace Sentry.data.Core.Tests
             configService.Setup(x => x.CreateAndSaveDatasetFileConfig(It.IsAny<DatasetFileConfigDto>())).Returns(true);
 
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA5211_SendNewSnowflakeEvents.GetValue()).Returns(true);
             
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateGlobalDatasetAsync(It.IsAny<GlobalDataset>())).Returns(Task.CompletedTask).Callback<GlobalDataset>(x =>
@@ -2244,6 +2245,7 @@ namespace Sentry.data.Core.Tests
             _datasetContext.SetupGet(x => x.Assets).Returns(new List<Asset>{ asset }.AsQueryable());
 
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA5211_SendNewSnowflakeEvents.GetValue()).Returns(true);
 
             Category category = new Category { Name = "Category" };
             _datasetContext.SetupGet(x => x.Categories).Returns(new List<Category> { category }.AsQueryable());
@@ -2563,6 +2565,7 @@ namespace Sentry.data.Core.Tests
         public void CreateExternalDependencies_1_Success()
         {
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA5211_SendNewSnowflakeEvents.GetValue()).Returns(true);
 
             _securityService.Setup(x => x.EnqueueCreateDefaultSecurityForDataset(1));
 
