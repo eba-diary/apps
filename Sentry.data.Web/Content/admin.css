@@ -124,10 +124,9 @@ table#metricGroupsTable td.metric-detail-control {
 }
 
 .processingActivityDiv {
-    padding: 40px;
+    padding: 40px 25px 40px 40px;
     width: 90%;
     right: auto;
-    padding-right: 25px;
 }
 
 .partialContainer {
