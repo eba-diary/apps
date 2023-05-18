@@ -55,7 +55,7 @@
                 type: "POST",
                 data: data.FilterSearch.buildSearchRequest,
                 error: function () {
-                    data.FilterSearch.showToast("error", "There was an error loading Data Inventory. Trying narrowing your search to get results or reach out to DSCSupport@sentry.com");
+                    data.FilterSearch.showToast("error", "There was an error loading Data Inventory. Trying narrowing your search to get results or reach out to DSCSupport@sentry.com.");
 
                     let errorResult = {
                         visibleColumns: null,
