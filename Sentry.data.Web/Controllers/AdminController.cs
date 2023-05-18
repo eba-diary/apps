@@ -122,14 +122,17 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_DeadJobTable");
         }
 
-        [Route("Admin/GetDeadJobsForGrid/{selectedDate?}")]
+        [Route("Admin/GetDeadJobsForGrid/{startDate?}/{endDate?}")]
         [HttpPost]
-        public JsonResult GetDeadJobsForGrid(string selectedDate)
+        public JsonResult GetDeadJobsForGrid(string startDate, string endDate)
         {
             // Convert selectedDate string to a DateTime object
-            DateTime date = DateTime.ParseExact(selectedDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime startDateTimeParsed = DateTime.ParseExact(startDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
-            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(date);
+            // If the end date is empty, set to the current DateTime.
+            DateTime endDateTimeParsed = endDate != "" ? DateTime.ParseExact(endDate, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture) : DateTime.Now;
+
+            List<DeadSparkJobDto> deadSparkJobDtoList = _deadSparkJobService.GetDeadSparkJobDtos(startDateTimeParsed, endDateTimeParsed);
 
             List<DeadSparkJobModel> deadSparkJobModelList = deadSparkJobDtoList.MapToModelList();
 

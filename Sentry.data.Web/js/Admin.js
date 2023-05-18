@@ -355,12 +355,27 @@ data.Admin = {
     //DEAD JOB FUNCTIONS
     //****************************************************************************************************
 
-    // load and initialize dead job data table
-    DeadJobTableInit: function (selectedDate)
+    // load and initialize dead job page
+    DeadJobPageInit: function ()
     {
+        $("#dead-job-end-filter").hide();
+
+        $("#tab-spinner").hide();
+
+        data.Admin.SideBarUtility();
+
+        data.Admin.RetrieveDeadSparkJobListButton();
+    },
+
+    // load and initialize dead job data table
+    DeadJobTableInit: function (startDate, endDate)
+    {
+        // On it init of the table, ensure that all filters are removed
+        $.fn.dataTable.ext.search.pop();
+
         data.Admin.DeadJobTable = $('#deadJobs').DataTable({
             ajax: {
-                url: data.Admin.GetDeadJobResultsUrl(selectedDate),
+                url: data.Admin.GetDeadJobResultsUrl(startDate, endDate),
                 type: "POST"
             },
             searching: true,
@@ -571,9 +586,9 @@ data.Admin = {
     },
 
     // creates url for ajax call to get all dead jobs succeeding the selected date
-    GetDeadJobResultsUrl: function (selectedDate)
+    GetDeadJobResultsUrl: function (startDate, endDate)
     {
-        return "GetDeadJobsForGrid?selectedDate=" + encodeURIComponent(selectedDate);
+        return "GetDeadJobsForGrid?startDate=" + encodeURIComponent(startDate) + "&endDate=" + encodeURIComponent(endDate);
     },
 
     GetProcessActivityDatasetUrl: function (activityType)
@@ -841,7 +856,18 @@ data.Admin = {
         $("#auditSearchButton").prop("disabled", searchStatus);
     },
 
-    RetrieveDeadSparkJobListButton: function () {
+    RetrieveDeadSparkJobListButton: function ()
+    {
+        $("#add-end-filter").click(function (){
+            $("#dead-job-end-filter").show(500);
+            $("#add-end-filter").hide();
+        })
+
+        $("#close-end-filter").click(function ()
+        {
+            $("#dead-job-end-filter").hide();
+            $("#add-end-filter").show();
+        })
 
         // Get all dead spark jobs within chosen time span
         $("#timeCheck").click(function () {
@@ -849,32 +875,50 @@ data.Admin = {
             // Ensure table parent div is empty
             $("#deadJobTable").html("");
 
-            // Show spinner 
-            $("#tab-spinner").show();
-
             // Retrieve seleced date
-            var selectedDate = moment(new Date($('#datetime-picker').val())).format("YYYY-MM-DDThh:mm:ss");
+            var startDate = moment(new Date($('#dead-job-start-filter .datetime-picker').val())).format("YYYY-MM-DDThh:mm:ss");
 
             // Determine if the time is within 30 day (720 hrs)
-            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(selectedDate, 720);
+            var timeCheck = data.Admin.ReprocessJobDateRangeCheck(startDate, 720);
+
+            var endDate = "";
+
+            // Check if the end date filter has been selected
+            if ($("#dead-job-end-filter").is(":visible"))
+            {
+                endDate = moment(new Date($('#dead-job-end-filter .datetime-picker').val())).format("YYYY-MM-DDThh:mm:ss");
+
+                // If the end filter has been selected, check to see if the start date preceds the end date
+                if (startDate >= endDate)
+                {
+                    timeCheck = false;
+                    data.Dataset.makeToast("error", `Ensure that the date selected in the start date filter precedes the one in the end date filter`);
+                }
+            }
 
             // Check if selected date is within a month (720hrs) of current date
-            if (timeCheck) {
+            if (timeCheck)
+            {
+                // Show spinner 
+                $("#tab-spinner").show();
+
                 $.ajax({
                     type: "GET",
                     url: "DeadJobTable",
                     dataType: "html",
-                    success: function (view) {
+                    success: function (view)
+                    {
                         // Append table to parent div
                         $("#tab-spinner").hide();
                         $("#deadJobTable").html(view);
                     },
-                    error: function (msg) {
+                    error: function (msg)
+                    {
                         alert(msg);
                     },
-                    complete: function (msg) {
-                        // Hide spinner
-                        data.Admin.DeadJobTableInit(selectedDate);
+                    complete: function (msg)
+                    {
+                        data.Admin.DeadJobTableInit(startDate, endDate);
                     }
                 });
             }
