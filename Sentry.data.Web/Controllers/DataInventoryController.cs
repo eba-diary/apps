@@ -1,11 +1,6 @@
-﻿using Nest;
-using Newtonsoft.Json;
-using Sentry.Common.Logging;
+﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
