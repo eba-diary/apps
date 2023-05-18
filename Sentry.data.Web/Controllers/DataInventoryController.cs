@@ -1,6 +1,11 @@
-﻿using Sentry.Common.Logging;
+﻿using Nest;
+using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -76,11 +81,20 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
-            return Json(new { 
-                data = resultDto.DataInventoryResults.ToWeb(),
-                searchTotal = resultDto.SearchTotal,
-                visibleColumns
-            });
+            JsonResult jsonResult = new JsonResult
+            {
+                Data = new
+                {
+                    data = resultDto.DataInventoryResults.ToWeb(),
+                    searchTotal = resultDto.SearchTotal,
+                    visibleColumns
+                },
+                ContentType = "application/json",
+                JsonRequestBehavior = JsonRequestBehavior.DenyGet,
+                //MaxJsonLength = 10485760 //10MB
+            };
+
+            return jsonResult;
         }
 
         [HttpPost]

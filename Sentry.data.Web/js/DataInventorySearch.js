@@ -53,7 +53,17 @@
             ajax: {
                 url: "/DataInventory/SearchResult/",
                 type: "POST",
-                data: data.FilterSearch.buildSearchRequest
+                data: data.FilterSearch.buildSearchRequest,
+                error: function () {
+                    data.FilterSearch.showToast("error", "There was an error loading Data Inventory. Trying narrowing your search to get results or reach out to DSCSupport@sentry.com");
+
+                    let errorResult = {
+                        visibleColumns: null,
+                        searchTotal: 0,
+                        data: []
+                    };
+                    data.DataInventorySearch.completeDataInventorySearch(errorResult)
+                }
             },
             columns: [
                 {
@@ -156,7 +166,7 @@
     completeDataInventorySearch: function (json) {
         $(".dataTables_length_select").select2({
             minimumResultsForSearch: -1
-        });
+        });        
 
         var table = $("#di-result-table").DataTable();
         var tableInfo = table.page.info();
