@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sentry.data.Core;
+using Sentry.data.Web.API;
 using Sentry.data.Web.Tests.API;
 using System.Collections.Generic;
 using System.Linq;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Web.Tests
 {
@@ -30,7 +32,20 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "DEV", "TEST" },
                         IsFavorite = true,
                         IsSecured = true,
-                        TargetDatasetId = 1
+                        TargetDatasetId = 1,
+                        SearchHighlights = new List<SearchHighlightModel>
+                        {
+                            new SearchHighlightModel
+                            {
+                                PropertyName = SearchDisplayNames.GlobalDataset.DATASETNAME,
+                                Highlights = new List<string> { "value", "value2" }
+                            },
+                            new SearchHighlightModel
+                            {
+                                PropertyName = SearchDisplayNames.GlobalDataset.SCHEMANAME,
+                                Highlights = new List<string> { "value" }
+                            }
+                        }
                     },
                     new GlobalDatasetViewModel
                     {
@@ -42,7 +57,8 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "NRTEST" },
                         IsFavorite = false,
                         IsSecured = false,
-                        TargetDatasetId = 2
+                        TargetDatasetId = 2,
+                        SearchHighlights = new List<SearchHighlightModel>()
                     }
                 }
             };
@@ -67,6 +83,18 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(globalDataset.IsFavorite);
             Assert.IsTrue(globalDataset.IsSecured);
             Assert.AreEqual(1, globalDataset.TargetDatasetId);
+            Assert.AreEqual(2, globalDataset.SearchHighlights.Count);
+
+            SearchHighlightDto searchHighlight = globalDataset.SearchHighlights[0];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.DATASETNAME, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
+            Assert.AreEqual("value2", searchHighlight.Highlights[1]);
+
+            searchHighlight = globalDataset.SearchHighlights[1];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.SCHEMANAME, searchHighlight.PropertyName);
+            Assert.AreEqual(1, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
 
             globalDataset = dto.GlobalDatasets[1];
             Assert.AreEqual(2, globalDataset.GlobalDatasetId);
@@ -79,6 +107,7 @@ namespace Sentry.data.Web.Tests
             Assert.IsFalse(globalDataset.IsFavorite);
             Assert.IsFalse(globalDataset.IsSecured);
             Assert.AreEqual(2, globalDataset.TargetDatasetId);
+            Assert.AreEqual(0, globalDataset.SearchHighlights.Count);
         }
 
         [TestMethod]
@@ -102,7 +131,20 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "DEV", "TEST" },
                         IsFavorite = true,
                         IsSecured = true,
-                        TargetDatasetId = 1
+                        TargetDatasetId = 1,
+                        SearchHighlights = new List<SearchHighlightDto>
+                        {
+                            new SearchHighlightDto
+                            {
+                                PropertyName = SearchDisplayNames.GlobalDataset.DATASETNAME,
+                                Highlights = new List<string> { "value", "value2" }
+                            },
+                            new SearchHighlightDto
+                            {
+                                PropertyName = SearchDisplayNames.GlobalDataset.SCHEMANAME,
+                                Highlights = new List<string> { "value" }
+                            }
+                        }
                     },
                     new SearchGlobalDatasetDto
                     {
@@ -114,7 +156,8 @@ namespace Sentry.data.Web.Tests
                         NamedEnvironments = new List<string> { "NRTEST" },
                         IsFavorite = false,
                         IsSecured = false,
-                        TargetDatasetId = 2
+                        TargetDatasetId = 2,
+                        SearchHighlights = new List<SearchHighlightDto>()
                     }
                 },
                 TotalResults = 2
@@ -147,6 +190,18 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(globalDataset.IsFavorite);
             Assert.IsTrue(globalDataset.IsSecured);
             Assert.AreEqual(1, globalDataset.TargetDatasetId);
+            Assert.AreEqual(2, globalDataset.SearchHighlights.Count);
+
+            SearchHighlightModel searchHighlight = globalDataset.SearchHighlights[0];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.DATASETNAME, searchHighlight.PropertyName);
+            Assert.AreEqual(2, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
+            Assert.AreEqual("value2", searchHighlight.Highlights[1]);
+
+            searchHighlight = globalDataset.SearchHighlights[1];
+            Assert.AreEqual(SearchDisplayNames.GlobalDataset.SCHEMANAME, searchHighlight.PropertyName);
+            Assert.AreEqual(1, searchHighlight.Highlights.Count);
+            Assert.AreEqual("value", searchHighlight.Highlights[0]);
 
             globalDataset = viewModel.GlobalDatasets[1];
             Assert.AreEqual(2, globalDataset.GlobalDatasetId);
@@ -159,6 +214,7 @@ namespace Sentry.data.Web.Tests
             Assert.IsFalse(globalDataset.IsFavorite);
             Assert.IsFalse(globalDataset.IsSecured);
             Assert.AreEqual(2, globalDataset.TargetDatasetId);
+            Assert.AreEqual(0, globalDataset.SearchHighlights.Count);
         }
     }
 }

@@ -93,7 +93,13 @@ namespace Sentry.data.Core
             };
         }
 
-        public static SearchGlobalDatasetDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
+        public static List<SearchGlobalDatasetDto> ToSearchResults(this List<GlobalDataset> globalDatasets, string userId = null)
+        {
+            return globalDatasets.Select(x => x.ToSearchResult(userId)).ToList();
+        }
+
+        #region Private
+        private static SearchGlobalDatasetDto ToSearchResult(this GlobalDataset globalDataset, string userId = null)
         {
             //use first prod environment dataset for display fields
             EnvironmentDataset targetEnvironmentDataset = globalDataset.EnvironmentDatasets.FirstOrDefault(x => x.NamedEnvironmentType == NamedEnvironmentType.Prod.ToString());
@@ -115,8 +121,10 @@ namespace Sentry.data.Core
                 NamedEnvironments = globalDataset.EnvironmentDatasets.OrderByDescending(x => x.NamedEnvironmentType).Select(x => x.NamedEnvironment).ToList(),
                 IsSecured = targetEnvironmentDataset.IsSecured,
                 IsFavorite = globalDataset.EnvironmentDatasets.Any(x => x.FavoriteUserIds.Contains(userId)),
-                TargetDatasetId = targetEnvironmentDataset.DatasetId
+                TargetDatasetId = targetEnvironmentDataset.DatasetId,
+                SearchHighlights = globalDataset.SearchHighlights.ToDtos()
             };
         }
+        #endregion
     }
 }

@@ -6,5 +6,6 @@ namespace Sentry.data.Web.API
     {
         public string SearchText { get; set; }
         public List<FilterCategoryRequestModel> FilterCategories { get; set; }
+        public bool ShouldSearchColumns { get; set; }
     }
 }

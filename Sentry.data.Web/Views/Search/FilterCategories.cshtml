@@ -18,10 +18,10 @@
 {
     foreach (FilterCategoryOptionModel option in options.ToList())
     {
-        <li class="filter-search-category-option" title="@option.OptionValue">
+        <li class="filter-search-category-option" @(option.OptionValue.Length > 25 ? $"title={option.OptionValue} data-toggle=tooltip data-placement=right" : "")>
             <div class="form-group mb-0">
                 <input type="checkbox" id="@option.OptionId" class="form-check-input filter-search-category-option-checkbox" value="@option.OptionValue" data-category="@option.ParentCategoryName" checked="@option.Selected">
-                <label for="@option.OptionId" class="form-check-label filter-search-category-option-label">
+                <label for="@option.OptionId" class="form-check-label filter-search-category-option-label") >
                     @SafeValue(option.OptionValue)
                     @if (!hideCounts)
                     {
@@ -33,60 +33,62 @@
     }
 }
 
-<div class="filter-search-active-options-container bottom-border @(allOptions.Any(x => x.Selected) ? "" : "display-none")">
-    @foreach (FilterCategoryOptionModel option in allOptions)
-    {
-        <div class="chip filter-search-chip display-none" id="clearOption_@option.OptionId" title="@option.ParentCategoryName">
-            @SafeValue(option.OptionValue)
-            <em class="close filter-search-chip-close fas fa-times"></em>
-        </div>
-    }
+<div class="filter-search-active-options-container @(allOptions.Any(x => x.Selected) ? "" : "display-none")">
+    <div class="filter-search-active-options bottom-border w-100">
+        @foreach (FilterCategoryOptionModel option in allOptions)
+        {
+            <div class="chip filter-search-chip display-none" id="clearOption_@option.OptionId" data-toggle="tooltip" data-placement="top" title="@option.ParentCategoryName">
+                @SafeValue(option.OptionValue)
+                <em class="close filter-search-chip-close fas fa-times"></em>
+            </div>
+        }
+    </div>
 </div>
 
 <div class="filter-search-categories">
     @if (orderedModel.Any())
+    {
+        foreach (FilterCategoryModel category in orderedModel)
         {
-            foreach (FilterCategoryModel category in orderedModel)
-            {
-                string safeName = category.CategoryName.Replace(" ", "_").Replace("/", "_");
-        string categoryTypeId = "categoryType_" + safeName;
-        string categoryMoreId = "categoryMore_" + safeName;
-        int visibleOptionCount = 8;
+            string safeName = category.CategoryName.Replace(" ", "_").Replace("/", "_");
+            string categoryTypeId = "categoryType_" + safeName;
+            string categoryMoreId = "categoryMore_" + safeName;
+            int visibleOptionCount = 8;
 
-        <div class="filter-search-category-container bottom-border">
-            <div class="filter-search-category-head" id="@categoryTypeId">
-                <span class="filter-search-category-head-name">@category.CategoryName</span>
-                <em class="filter-search-category-head-icon fas fa-chevron-@(category.DefaultCategoryOpen ? "up" : "down")" id="icon_@categoryTypeId"></em>
+            <div class="filter-search-category-container bottom-border">
+                <div class="filter-search-category-head" id="@categoryTypeId">
+                    <span class="filter-search-category-head-name">@category.CategoryName</span>
+                    <em class="filter-search-category-head-icon fas fa-chevron-@(category.DefaultCategoryOpen ? "up" : "down")" id="icon_@categoryTypeId"></em>
+                </div>
+
+                <div class="filter-search-category-options @(category.DefaultCategoryOpen ? "" : "display-none")" id="hide_@categoryTypeId">
+                    <ul class="list-unstyled">
+                        @DisplayCategoryOptions(category.CategoryOptions.Take(visibleOptionCount), category.HideResultCounts)
+
+                        <li class="display-none" id="hidden_@categoryMoreId">
+                            <ul class="list-unstyled">
+                                @DisplayCategoryOptions(category.CategoryOptions.Skip(visibleOptionCount), category.HideResultCounts)
+                            </ul>
+                        </li>
+                    </ul>
+
+                    @if (category.CategoryOptions.Count > 15)
+                    {
+                        <a href="#" class="filter-search-category-more" id="@("categoryAll_" + safeName)" data-toggle="modal" data-target="#categoryModal_@safeName">See All</a>
+                    }
+                    else if (category.CategoryOptions.Count > visibleOptionCount)
+                    {
+                        <a href="#" class="filter-search-category-more" id="@categoryMoreId">Show More</a>
+                    }
+                </div>
             </div>
-
-            <div class="filter-search-category-options @(category.DefaultCategoryOpen ? "" : "display-none")" id="hide_@categoryTypeId">
-                <ul class="list-unstyled">
-                    @DisplayCategoryOptions(category.CategoryOptions.Take(visibleOptionCount), category.HideResultCounts)
-
-                    <li class="display-none" id="hidden_@categoryMoreId">
-                        <ul class="notNested">
-                            @DisplayCategoryOptions(category.CategoryOptions.Skip(visibleOptionCount), category.HideResultCounts)
-                        </ul>
-                    </li>
-                </ul>
-
-                @if (category.CategoryOptions.Count > 15)
-                                    {
-                <a href="#" class="filter-search-category-more" id="@("categoryAll_" + safeName)" data-toggle="modal" data-target="#categoryModal_@safeName">See All</a>
-                                    }
-                                    else if (category.CategoryOptions.Count > visibleOptionCount)
-{
-                    <a href="#" class="filter-search-category-more" id="@categoryMoreId">Show More</a>
-}
-            </div>
+        }
+    }
+    else
+    {
+        <div class="filter-search-categories-none">
+            <span class="fas fa-exclamation-triangle"></span>
+            <div>No filters available for current search</div>
         </div>
-                }
-            }
-            else
-{
-            <div class="filter-search-categories-none">
-                <span class="fas fa-exclamation-triangle"></span>
-                <div>No filters available for current search</div>
-            </div>
-}
+    }
 </div>

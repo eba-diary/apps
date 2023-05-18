@@ -13,5 +13,6 @@ namespace Sentry.data.Web.API
         public bool IsSecured { get; set; }
         public bool IsFavorite { get; set; }
         public int TargetDatasetId { get; set; }
+        public List<SearchHighlightModel> SearchHighlights { get; set; }
     }
 }

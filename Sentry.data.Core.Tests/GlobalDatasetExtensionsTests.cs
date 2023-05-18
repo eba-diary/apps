@@ -207,50 +207,109 @@ namespace Sentry.data.Core.Tests
         [TestMethod]
         public void ToSearchResult_GlobalDataset_SearchGlobalDatasetResultDto_ProdEnvironment()
         {
-            GlobalDataset globalDataset = new GlobalDataset
+            List<GlobalDataset> globalDatasets = new List<GlobalDataset>
             {
-                GlobalDatasetId = 1,
-                DatasetName = "Name",
-                DatasetSaidAssetCode = "SAID",
-                EnvironmentDatasets = new List<EnvironmentDataset>
+                new GlobalDataset
                 {
-                    new EnvironmentDataset
+                    GlobalDatasetId = 1,
+                    DatasetName = "Name",
+                    DatasetSaidAssetCode = "SAID",
+                    EnvironmentDatasets = new List<EnvironmentDataset>
                     {
-                        DatasetId = 11,
-                        DatasetDescription = "Description",
-                        CategoryCode = "Category",
-                        NamedEnvironment = "DEV",
-                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
-                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
-                        IsSecured = true,
-                        FavoriteUserIds = new List<string> { "082116" }
+                        new EnvironmentDataset
+                        {
+                            DatasetId = 11,
+                            DatasetDescription = "Description",
+                            CategoryCode = "Category",
+                            NamedEnvironment = "DEV",
+                            NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                            OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                            IsSecured = true,
+                            FavoriteUserIds = new List<string> { "082116" }
+                        },
+                        new EnvironmentDataset
+                        {
+                            DatasetId = 12,
+                            DatasetDescription = "Description - Prod",
+                            CategoryCode = "Category",
+                            NamedEnvironment = "PROD",
+                            NamedEnvironmentType = NamedEnvironmentType.Prod.ToString(),
+                            OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                            IsSecured = true,
+                            FavoriteUserIds = new List<string>()
+                        },
+                        new EnvironmentDataset
+                        {
+                            DatasetId = 13,
+                            DatasetDescription = "Description",
+                            CategoryCode = "Category",
+                            NamedEnvironment = "TEST",
+                            NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                            OriginationCode = DatasetOriginationCode.Internal.ToString(),
+                            IsSecured = true,
+                            FavoriteUserIds = new List<string>()
+                        }
                     },
-                    new EnvironmentDataset
+                    SearchHighlights = new List<SearchHighlight>
                     {
-                        DatasetId = 12,
-                        DatasetDescription = "Description - Prod",
-                        CategoryCode = "Category",
-                        NamedEnvironment = "PROD",
-                        NamedEnvironmentType = NamedEnvironmentType.Prod.ToString(),
-                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
-                        IsSecured = true,
-                        FavoriteUserIds = new List<string>()
+                        new SearchHighlight
+                        {
+                            PropertyName = "DatasetName",
+                            Highlights = new List<string> { "Name" }
+                        },
+                        new SearchHighlight
+                        {
+                            PropertyName = "DatasetDescription",
+                            Highlights = new List<string> { "Description", "Description - Prod" }
+                        }
+                    }
+                },
+                new GlobalDataset
+                {
+                    GlobalDatasetId = 2,
+                    DatasetName = "Name 2",
+                    DatasetSaidAssetCode = "DATA",
+                    EnvironmentDatasets = new List<EnvironmentDataset>
+                    {
+                        new EnvironmentDataset
+                        {
+                            DatasetId = 14,
+                            DatasetDescription = "Description 2",
+                            CategoryCode = "Category 2",
+                            NamedEnvironment = "QUAL",
+                            NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                            OriginationCode = DatasetOriginationCode.External.ToString(),
+                            IsSecured = false,
+                            FavoriteUserIds = new List<string>()
+                        },
+                        new EnvironmentDataset
+                        {
+                            DatasetId = 15,
+                            DatasetDescription = "Description 2",
+                            CategoryCode = "Category 2",
+                            NamedEnvironment = "TEST",
+                            NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
+                            OriginationCode = DatasetOriginationCode.External.ToString(),
+                            IsSecured = false,
+                            FavoriteUserIds = new List<string>()
+                        }
                     },
-                    new EnvironmentDataset
+                    SearchHighlights = new List<SearchHighlight>
                     {
-                        DatasetId = 13,
-                        DatasetDescription = "Description",
-                        CategoryCode = "Category",
-                        NamedEnvironment = "TEST",
-                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
-                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
-                        IsSecured = true,
-                        FavoriteUserIds = new List<string>()
+                        new SearchHighlight
+                        {
+                            PropertyName = "DatasetDescription",
+                            Highlights = new List<string> { "Description 2"}
+                        }
                     }
                 }
             };
 
-            SearchGlobalDatasetDto result = globalDataset.ToSearchResult("082116");
+            List<SearchGlobalDatasetDto> results = globalDatasets.ToSearchResults("082116");
+
+            Assert.AreEqual(2, results.Count);
+
+            SearchGlobalDatasetDto result = results.First();
 
             Assert.AreEqual(1, result.GlobalDatasetId);
             Assert.AreEqual("Name", result.DatasetName);
@@ -264,68 +323,38 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(result.IsSecured);
             Assert.IsTrue(result.IsFavorite);
             Assert.AreEqual(12, result.TargetDatasetId);
-        }
+            Assert.AreEqual(2, result.SearchHighlights.Count);
 
-        [TestMethod]
-        public void ToSearchResult_GlobalDataset_SearchGlobalDatasetResultDto_NonProdEnvironment()
-        {
-            GlobalDataset globalDataset = new GlobalDataset
-            {
-                GlobalDatasetId = 1,
-                DatasetName = "Name",
-                DatasetSaidAssetCode = "SAID",
-                EnvironmentDatasets = new List<EnvironmentDataset>
-                {
-                    new EnvironmentDataset
-                    {
-                        DatasetId = 11,
-                        DatasetDescription = "Description",
-                        CategoryCode = "Category",
-                        NamedEnvironment = "DEV",
-                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
-                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
-                        IsSecured = false,
-                        FavoriteUserIds = new List<string> { "082116" }
-                    },
-                    new EnvironmentDataset
-                    {
-                        DatasetId = 12,
-                        DatasetDescription = "Description",
-                        CategoryCode = "Category",
-                        NamedEnvironment = "NRTEST",
-                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
-                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
-                        IsSecured = false,
-                        FavoriteUserIds = new List<string>()
-                    },
-                    new EnvironmentDataset
-                    {
-                        DatasetId = 13,
-                        DatasetDescription = "Description - Last",
-                        CategoryCode = "Category",
-                        NamedEnvironment = "TEST",
-                        NamedEnvironmentType = NamedEnvironmentType.NonProd.ToString(),
-                        OriginationCode = DatasetOriginationCode.Internal.ToString(),
-                        IsSecured = false,
-                        FavoriteUserIds = new List<string>()
-                    }
-                }
-            };
+            SearchHighlightDto highlight = result.SearchHighlights.First();
+            Assert.AreEqual("DatasetName", highlight.PropertyName);
+            Assert.AreEqual(1, highlight.Highlights.Count);
+            Assert.AreEqual("Name", highlight.Highlights.First());
 
-            SearchGlobalDatasetDto result = globalDataset.ToSearchResult("000000");
+            highlight = result.SearchHighlights.Last();
+            Assert.AreEqual("DatasetDescription", highlight.PropertyName);
+            Assert.AreEqual(2, highlight.Highlights.Count);
+            Assert.AreEqual("Description", highlight.Highlights.First());
+            Assert.AreEqual("Description - Prod", highlight.Highlights.Last());
 
-            Assert.AreEqual(1, result.GlobalDatasetId);
-            Assert.AreEqual("Name", result.DatasetName);
-            Assert.AreEqual("SAID", result.DatasetSaidAssetCode);
-            Assert.AreEqual("Description - Last", result.DatasetDescription);
-            Assert.AreEqual("Category", result.CategoryCode);
-            Assert.AreEqual(3, result.NamedEnvironments.Count);
-            Assert.AreEqual("DEV", result.NamedEnvironments[2]);
-            Assert.AreEqual("NRTEST", result.NamedEnvironments[1]);
+            result = results.Last();
+
+            Assert.AreEqual(2, result.GlobalDatasetId);
+            Assert.AreEqual("Name 2", result.DatasetName);
+            Assert.AreEqual("DATA", result.DatasetSaidAssetCode);
+            Assert.AreEqual("Description 2", result.DatasetDescription);
+            Assert.AreEqual("Category 2", result.CategoryCode);
+            Assert.AreEqual(2, result.NamedEnvironments.Count);
             Assert.AreEqual("TEST", result.NamedEnvironments[0]);
+            Assert.AreEqual("QUAL", result.NamedEnvironments[1]);
             Assert.IsFalse(result.IsSecured);
             Assert.IsFalse(result.IsFavorite);
-            Assert.AreEqual(13, result.TargetDatasetId);
+            Assert.AreEqual(15, result.TargetDatasetId);
+            Assert.AreEqual(1, result.SearchHighlights.Count);
+
+            highlight = result.SearchHighlights.First();
+            Assert.AreEqual("DatasetDescription", highlight.PropertyName);
+            Assert.AreEqual(1, highlight.Highlights.Count);
+            Assert.AreEqual("Description 2", highlight.Highlights.First());
         }
 
         #region Helpers
