@@ -91,7 +91,7 @@ namespace Sentry.data.Web.Controllers
                 },
                 ContentType = "application/json",
                 JsonRequestBehavior = JsonRequestBehavior.DenyGet,
-                //MaxJsonLength = 10485760 //10MB
+                MaxJsonLength = 10485760 //10MB
             };
 
             return jsonResult;
