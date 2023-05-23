@@ -2334,7 +2334,6 @@ namespace Sentry.data.Core.Tests
 
             //mock features
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
@@ -2424,7 +2423,6 @@ namespace Sentry.data.Core.Tests
 
             //mock features
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
@@ -2508,7 +2506,6 @@ namespace Sentry.data.Core.Tests
 
             //mock features
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
@@ -2590,7 +2587,6 @@ namespace Sentry.data.Core.Tests
 
             //mock features
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
@@ -2678,7 +2674,6 @@ namespace Sentry.data.Core.Tests
 
             //mock features
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
@@ -2761,7 +2756,6 @@ namespace Sentry.data.Core.Tests
 
             //mock features
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(true);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(2, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
@@ -2930,7 +2924,6 @@ namespace Sentry.data.Core.Tests
 
         [TestMethod]
         [DataRow(true)]
-        [DataRow(false)]
         public void UpdateSchema_SnowflakeStage(bool AllowUpdateFlag)
         {
             FileSchemaDto dto = new FileSchemaDto()
@@ -2951,8 +2944,6 @@ namespace Sentry.data.Core.Tests
 
             Mock<IUserService> userService = _mockRepository.Create<IUserService>();
             userService.Setup(x => x.GetCurrentUser()).Returns(appUser.Object).Verifiable();
-
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(AllowUpdateFlag);
 
             _datasetContext.Setup(x => x.GetById<FileExtension>(It.IsAny<int>())).Returns(new FileExtension() { Id = 1 });
             _datasetContext.Setup(x => x.GetById<Dataset>(It.IsAny<int>())).Returns(new Dataset() { DatasetId = 1 });
@@ -3380,7 +3371,6 @@ namespace Sentry.data.Core.Tests
                 ShortName = "Short"
             };
 
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(false);
 
             FileExtension fileType = new FileExtension { Name = ExtensionNames.CSV };
             _datasetContext.SetupGet(x => x.FileExtensions).Returns(new List<FileExtension> { fileType }.AsQueryable());
@@ -3450,8 +3440,6 @@ namespace Sentry.data.Core.Tests
                 NamedEnvironment = "DEV",
                 ShortName = "Short"
             };
-
-            _dataFeatures.Setup(x => x.CLA3605_AllowSchemaParquetUpdate.GetValue()).Returns(false);
 
             _datasetContext.Setup(x => x.GetById<Dataset>(1)).Returns(dataset);
 

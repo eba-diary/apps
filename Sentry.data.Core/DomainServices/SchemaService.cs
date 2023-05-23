@@ -767,38 +767,35 @@ namespace Sentry.data.Core
 
         private void SchemaParquetUpdate(FileSchema schema, FileSchemaDto dto, List<bool> changes, JObject whatPropertiesChanged)
         {
-            if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
-            {
-                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
-                    (x) =>
-                    {
-                        schema.ParquetStorageBucket = x;
-                        whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
-                    }));
-                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
-                    (x) =>
-                    {
-                        schema.ParquetStoragePrefix = x;
-                        whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
-                    }));
-
-                if (dto.ConsumptionDetails != null)
+            changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
+                (x) =>
                 {
-                    foreach (var consumptionDetailDto in dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
+                    schema.ParquetStorageBucket = x;
+                    whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                }));
+            changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
+                (x) =>
+                {
+                    schema.ParquetStoragePrefix = x;
+                    whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                }));
+
+            if (dto.ConsumptionDetails != null)
+            {
+                foreach (var consumptionDetailDto in dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
+                {
+                    SchemaConsumptionSnowflake consumptionDetail;
+                    if (consumptionDetailDto.SchemaConsumptionId == 0)
                     {
-                        SchemaConsumptionSnowflake consumptionDetail;
-                        if (consumptionDetailDto.SchemaConsumptionId == 0)
-                        {
-                            //this is logic to account for the fact that we're still supporting the v2 API that doesn't provide a SchemaConsumptionId
-                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SnowflakeType == consumptionDetailDto.SnowflakeType);
-                        }
-                        else
-                        {
-                            //this is how the logic should work for the v20220609 API
-                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
-                        }
-                        changes.Add(TryUpdate(() => consumptionDetail.SnowflakeStage, () => consumptionDetailDto.SnowflakeStage, (x) => consumptionDetail.SnowflakeStage = x));
+                        //this is logic to account for the fact that we're still supporting the v2 API that doesn't provide a SchemaConsumptionId
+                        consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SnowflakeType == consumptionDetailDto.SnowflakeType);
                     }
+                    else
+                    {
+                        //this is how the logic should work for the v20220609 API
+                        consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
+                    }
+                    changes.Add(TryUpdate(() => consumptionDetail.SnowflakeStage, () => consumptionDetailDto.SnowflakeStage, (x) => consumptionDetail.SnowflakeStage = x));
                 }
             }
         }
@@ -1419,7 +1416,7 @@ namespace Sentry.data.Core
         /// <param name="consumptionLayerType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal virtual string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
+        public virtual string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
         {
             switch (consumptionLayerType)
             {
@@ -1481,7 +1478,7 @@ namespace Sentry.data.Core
         /// <param name="consumptionType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal virtual string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
+        public virtual string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
         {
             switch (consumptionType)
             {

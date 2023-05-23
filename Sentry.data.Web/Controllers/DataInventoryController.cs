@@ -76,11 +76,20 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
-            return Json(new { 
-                data = resultDto.DataInventoryResults.ToWeb(),
-                searchTotal = resultDto.SearchTotal,
-                visibleColumns
-            });
+            JsonResult jsonResult = new JsonResult
+            {
+                Data = new
+                {
+                    data = resultDto.DataInventoryResults.ToWeb(),
+                    searchTotal = resultDto.SearchTotal,
+                    visibleColumns
+                },
+                ContentType = "application/json",
+                JsonRequestBehavior = JsonRequestBehavior.DenyGet,
+                MaxJsonLength = 10485760 //10MB
+            };
+
+            return jsonResult;
         }
 
         [HttpPost]
