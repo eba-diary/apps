@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure
         {
             Logger.Info($"Start method <snowflakeeventhandler-handle>");
             BaseEventMessage baseEvent = null;
-            FileSchema de = null;
+            FileSchema schema = null;
 
             try
             {
@@ -52,27 +52,27 @@ namespace Sentry.data.Infrastructure
                         SnowTableCreateModel snowRequestedEvent = JsonConvert.DeserializeObject<SnowTableCreateModel>(msg);
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowRequestedEvent)}");
 
-                        de = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
-                        de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString());
+                        schema = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
+                        UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Requested);
                         _dsContext.SaveChanges();
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-CREATE-COMPLETED":
                         SnowTableCreateModel snowCompletedEvent = JsonConvert.DeserializeObject<SnowTableCreateModel>(msg);
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowCompletedEvent)}");
-                        de = _dsContext.GetById<FileSchema>(snowCompletedEvent.SchemaID);
+                        schema = _dsContext.GetById<FileSchema>(snowCompletedEvent.SchemaID);
 
                         switch (snowCompletedEvent.SnowStatus.ToUpper())
                         {
                             case "CREATED":
                             case "EXISTED":
-                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString());
+                                UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Available);
                                 break;
                             case "FAILED":
-                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString());
+                                UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.RequestFailed);
                                 break;
                             default:
-                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
+                                UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Pending);
                                 break;
                         }
 
@@ -82,27 +82,27 @@ namespace Sentry.data.Infrastructure
                     case "SNOW-TABLE-DELETE-REQUESTED":
                         SnowTableDeleteModel snowDeleteEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowDeleteEvent)}");
-                        de = _dsContext.GetById<FileSchema>(snowDeleteEvent.SchemaID);
-                        de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString());
+                        schema = _dsContext.GetById<FileSchema>(snowDeleteEvent.SchemaID);
+                        UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.DeleteRequested);
                         _dsContext.SaveChanges();
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case "SNOW-TABLE-DELETE-COMPLETED":
                         SnowTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<SnowTableDeleteModel>(msg);
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
-                        de = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaID);
+                        schema = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaID);
 
                         switch (deleteCompletedEvent.SnowStatus.ToUpper())
                         {
                             case "DELETED":
                             case "SKIPPED":
-                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString()); 
+                                UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Deleted);
                                 break;
                             case "FAILED":
-                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString());
+                                UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.DeleteFailed);
                                 break;
                             default:
-                                de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
+                                UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Pending);
                                 break;
                         }
 
