@@ -359,7 +359,7 @@ namespace Sentry.data.Core
                 await _datasetContext.AddAsync(dataset);
                 await _datasetContext.SaveChangesAsync();
 
-                GenerateSnowSchemaCreateForDataset(dataset);
+                GenerateSnowSchemaEventForDataset(dataset, false);
 
                 // Create a Hangfire job that will setup the default security groups for this new dataset
                 _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
@@ -391,7 +391,7 @@ namespace Sentry.data.Core
             Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
 
             // Publish a message to create the Schema in Snowflake 
-            GenerateSnowSchemaCreateForDataset(dataset);
+            GenerateSnowSchemaEventForDataset(dataset, false);
 
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
@@ -419,7 +419,7 @@ namespace Sentry.data.Core
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
-            GenerateSnowSchemaCreateForDataset(ds);
+            GenerateSnowSchemaEventForDataset(ds, false);
 
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
@@ -894,7 +894,7 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
-            GenerateSnowSchemaDeleteForDataset(ds);
+            GenerateSnowSchemaEventForDataset(ds, true);
 
             ds.CanDisplay = false;
             ds.DeleteInd = true;
@@ -1103,10 +1103,10 @@ namespace Sentry.data.Core
             return $"{Configuration.Config.GetHostSetting("SentryDataBaseUrl")}/Dataset/Detail/{datasetId}";
         }
 
-        private void GenerateSnowSchemaCreateForDataset(Dataset dataset)
+        private void GenerateSnowSchemaEventForDataset(Dataset dataset, bool isDelete)
         {
             JObject datasetCreatedChangeInd = new JObject();
-            datasetCreatedChangeInd.Add("dataset", "added");
+            datasetCreatedChangeInd.Add("dataset", isDelete ? "deleted" : "added");
 
             int datasetId = dataset.DatasetId;
             string jsonPayload;
@@ -1115,7 +1115,7 @@ namespace Sentry.data.Core
             {
                 SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
                 {
-                    EventType = GlobalConstants.SnowConsumptionMessageTypes.CREATE_REQUEST,
+                    EventType = isDelete ? SnowConsumptionMessageTypes.DELETE_REQUEST : SnowConsumptionMessageTypes.CREATE_REQUEST,
                     SchemaID = 0,
                     RevisionID = 0,
                     DatasetID = datasetId,
@@ -1137,7 +1137,7 @@ namespace Sentry.data.Core
 
             try
             {
-                _logger.LogInformation($"<GenerateSnowSchemaCreateForDataset> sending event: {jsonPayload}");
+                _logger.LogInformation($"{nameof(GenerateSnowSchemaEventForDataset)} sending event: {jsonPayload}");
 
                 string topicName = null;
                 if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
@@ -1152,50 +1152,10 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {jsonPayload}");
+                _logger.LogError(ex, $"{nameof(GenerateSnowSchemaEventForDataset)} failed sending event: {jsonPayload}");
             }
         }
         
-        private void GenerateSnowSchemaDeleteForDataset(Dataset dataset)
-        {
-            JObject datasetDeletedChangeInd = new JObject();
-            datasetDeletedChangeInd.Add("dataset", "deleted");
-
-            int datasetId = dataset.DatasetId;
-            string jsonPayload;
-
-            //Always generate snowflake table create event
-            SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
-            {
-                EventType = GlobalConstants.SnowConsumptionMessageTypes.DELETE_REQUEST,
-                SchemaID = 0,
-                RevisionID = 0,
-                DatasetID = datasetId,
-                InitiatorID = _userService.GetCurrentUser().AssociateId,
-                ChangeIND = datasetDeletedChangeInd.ToString(Formatting.None)
-            };
-            jsonPayload = JsonConvert.SerializeObject(snowModel);
-
-            try
-            {
-                _logger.LogInformation($"Sending event: {jsonPayload}");
-
-                string topicName = null;
-                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
-                {
-                    topicName = new DscEventTopicHelper().GetDSCTopic(dataset);
-                    _messagePublisher.Publish(topicName, datasetId.ToString(), jsonPayload);
-                }
-                else
-                {
-                    _messagePublisher.PublishDSCEvent(datasetId.ToString(), jsonPayload, topicName);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {jsonPayload}");
-            }
-        }
         #endregion
 
     }
