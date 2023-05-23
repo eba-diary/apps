@@ -1,14 +1,13 @@
-﻿using Hangfire;
-using Nest;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
 using Sentry.Configuration;
 using Sentry.Core;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.Schema.Elastic;
 using Sentry.data.Core.Exceptions;
-using Sentry.FeatureFlags;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,18 +15,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Core
 {
-    public class SchemaService : ISchemaService
+    public class SchemaService : BaseDomainService<SchemaService>, ISchemaService
     {
         public readonly IDataFlowService _dataFlowService;
         public readonly IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly ISecurityService _securityService;
-        private readonly IDataFeatures _dataFeatures;
         private readonly IMessagePublisher _messagePublisher;
         private readonly ISnowProvider _snowProvider;
         private readonly IEventService _eventService;
@@ -40,15 +37,16 @@ namespace Sentry.data.Core
 
         public SchemaService(IDatasetContext dsContext, IUserService userService,
             IDataFlowService dataFlowService, IJobService jobService, ISecurityService securityService,
-            IDataFeatures dataFeatures, IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
-            IEventService eventService, IElasticDocumentClient elasticDocumentClient, IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider)
+            IMessagePublisher messagePublisher, ISnowProvider snowProvider, 
+            IEventService eventService, IElasticDocumentClient elasticDocumentClient, 
+            IDscEventTopicHelper dscEventTopicHelper, IGlobalDatasetProvider globalDatasetProvider,
+            DomainServiceCommonDependency<SchemaService> commonDependency) : base(commonDependency)
         {
             _datasetContext = dsContext;
             _userService = userService;
             _dataFlowService = dataFlowService;
             _jobService = jobService;
             _securityService = securityService;
-            _dataFeatures = dataFeatures;
             _messagePublisher = messagePublisher;
             _snowProvider = snowProvider;
             _eventService = eventService;
@@ -93,7 +91,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("schemaservice-createandsaveschema", ex);
+                _logger.LogError(ex, "schemaservice-createandsaveschema");
                 throw;
             }
 
@@ -140,18 +138,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access", ex);
+                        _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -190,8 +188,15 @@ namespace Sentry.data.Core
 
                     DeleteElasticIndexForSchema(schemaId);
                     IndexElasticFieldsForSchema(schemaId, ds.DatasetId, revision.Fields);
-                    GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
-                                        
+                    if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+                    {
+                        TryGenerateSnowflakeConsumptionCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+                    }
+                    else
+                    {
+                        GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+                    }
+
                     return revision.SchemaRevision_Id;
                 }
             }
@@ -200,12 +205,12 @@ namespace Sentry.data.Core
                 var flatArgExs = agEx.Flatten().InnerExceptions;
                 foreach(var ex in flatArgExs)
                 {
-                    Logger.Error("Failed generating consumption layer event", ex);
+                    _logger.LogError(ex, "Failed generating consumption layer event");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to add revision", ex);
+                _logger.LogError(ex, "Failed to add revision");
             }
 
             return 0;
@@ -228,18 +233,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access", ex);
+                        _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"{nameof(SchemaService).ToLower()}-{nameof(CreateAndSaveSchemaRevision).ToLower()} failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -282,13 +287,13 @@ namespace Sentry.data.Core
                 var flatArgExs = agEx.Flatten().InnerExceptions;
                 foreach (var ex in flatArgExs)
                 {
-                    Logger.Error("Failed generating consumption layer event", ex);
+                    _logger.LogError(ex, "Failed generating consumption layer event");
                 }
                 throw;
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to add revision", ex);
+                _logger.LogError(ex, "Failed to add revision");
                 throw;
             }
 
@@ -308,13 +313,20 @@ namespace Sentry.data.Core
         {
             DeleteElasticIndexForSchema(revision.ParentSchema.SchemaId);
             IndexElasticFieldsForSchema(revision.ParentSchema.SchemaId, datasetId, revision.Fields);
-            GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+            if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+            {
+                TryGenerateSnowflakeConsumptionCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+            }
+            else
+            {
+                GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+            }
         }
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             MethodBase m = MethodBase.GetCurrentMethod();
-            Logger.Info($"startmethod <{m.ReflectedType.Name}>");
+            _logger.LogInformation($"startmethod <{m.ReflectedType.Name}>");
 
             DatasetFileConfig fileConfig = GetDatasetFileConfig(schemaDto.ParentDatasetId, schemaDto.SchemaId, x => x.CanManageSchema);
 
@@ -323,7 +335,7 @@ namespace Sentry.data.Core
             try
             {
                 whatPropertiesChanged = UpdateSchema(schemaDto, fileConfig.Schema);
-                Logger.Info($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
+                _logger.LogInformation($"<{m.ReflectedType.Name.ToLower()}> Changes detected for {fileConfig.ParentDataset.DatasetName}\\{fileConfig.Schema.Name} | {whatPropertiesChanged}");
                 _datasetContext.SaveChanges();
 
                 if (_dataFeatures.CLA4789_ImprovedSearchCapability.GetValue())
@@ -341,7 +353,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed schema save", ex);
+                _logger.LogError(ex, $"<{m.ReflectedType.Name.ToLower()}> Failed schema save");
                 return false;
             }
 
@@ -356,7 +368,14 @@ namespace Sentry.data.Core
             */
             try
             {
-                GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
+                if(_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+                {
+                    TryGenerateSnowflakeConsumptionCreateEvent(fileConfig.Schema, whatPropertiesChanged);
+                }
+                else
+                {
+                    GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
+                }
             }
             catch (Exception ex)
             {
@@ -368,10 +387,10 @@ namespace Sentry.data.Core
             */
             if (exceptions.Count > 0)
             {
-                Logger.Error($"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events", new AggregateException(exceptions));
+                _logger.LogError(new AggregateException(exceptions), $"<{m.ReflectedType.Name.ToLower()}> Failed sending downstream notifications or events");
             }
 
-            Logger.Info($"endmethod <{m.ReflectedType.Name}>");
+            _logger.LogInformation($"endmethod <{m.ReflectedType.Name}>");
             return true;
         }
 
@@ -452,6 +471,123 @@ namespace Sentry.data.Core
             return (schemaId, (schemaId != 0));
         }
 
+        private bool ShouldGenerateSnowConsumptionCreateRequest(SchemaRevision schemaRevision, JObject propertyDeltaList)
+        {
+            //Do nothing if there is no revision associated with schema
+            if (schemaRevision == null)
+            {
+                return false;
+            }
+
+            /* schema column updates trigger, this will trigger for initial schema column add along with any updates there after */
+            if (propertyDeltaList.ContainsKey("revision") && propertyDeltaList.GetValue("revision").ToString().ToLower() == "added")
+            {
+                return true;
+            }
+            /* schema configuration trigger for createCurrentView regardless true\false */
+            else if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void TryGenerateSnowflakeConsumptionCreateEvent(FileSchema schema, JObject propertyDeltaList)
+        {
+            SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
+            if (ShouldGenerateSnowConsumptionCreateRequest(latestRevision, propertyDeltaList))
+            {
+                PublishSnowflakeConsumptionCreateRequest(latestRevision, propertyDeltaList);
+            }
+        }
+        
+        public void TryGenerateSnowflakeConsumptionCreateEvent(SchemaRevision latestRevision, JObject propertyDeltaList)
+        {
+            if (ShouldGenerateSnowConsumptionCreateRequest(latestRevision, propertyDeltaList))
+            {
+                PublishSnowflakeConsumptionCreateRequest(latestRevision, propertyDeltaList);
+            }
+        }
+        
+        public void TryGenerateSnowflakeConsumptionCreateEvent(FileSchema schema, JObject propertyDeltaList, bool forceGenerate)
+        {
+            SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
+            if (ShouldGenerateSnowConsumptionCreateRequest(latestRevision, propertyDeltaList) || forceGenerate)
+            {
+                PublishSnowflakeConsumptionCreateRequest(latestRevision, propertyDeltaList);
+            }
+        }
+
+        private void PublishSnowflakeConsumptionCreateRequest(SchemaRevision schemaRevision, JObject propertyDeltaList)
+        {
+            int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaRevision.ParentSchema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
+
+            SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+            {
+                EventType = GlobalConstants.SnowConsumptionMessageTypes.CREATE_REQUEST,
+                DatasetID = dsId,
+                SchemaID = schemaRevision.ParentSchema.SchemaId,
+                RevisionID = schemaRevision.SchemaRevision_Id,
+                InitiatorID = _userService.GetCurrentUser().AssociateId,
+                ChangeIND = propertyDeltaList.ToString(Formatting.None)
+            };
+
+            try
+            {
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = GetDSCEventTopic(dsId);
+                    _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"failed sending event: {snowModel}");
+            }
+        }
+        
+        public void PublishSnowflakeConsumptionDeleteRequest(Schema schema)
+        {
+            int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
+
+            JObject schemaDeletedChangeInd = new JObject();
+            schemaDeletedChangeInd.Add("schema", "deleted");
+
+            SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+            {
+                EventType = GlobalConstants.SnowConsumptionMessageTypes.DELETE_REQUEST,
+                DatasetID = dsId,
+                SchemaID = schema.SchemaId,
+                RevisionID = 0,
+                InitiatorID = _userService.GetCurrentUser().AssociateId,
+                ChangeIND = schemaDeletedChangeInd.ToString(Formatting.None)
+            };
+
+            try
+            {
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = GetDSCEventTopic(dsId);
+                    _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"failed sending event: {snowModel}");
+            }
+        }
+
         public void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
         {
             /*Generate *-CREATE-TABLE-REQUESTED event when:
@@ -477,7 +613,7 @@ namespace Sentry.data.Core
             //Do nothing if there is no revision associated with schema
             if (schemaRevision == null)
             {
-                Logger.Debug($"<{methodName}> - consumption layer event not generated - no schema revision");
+               _logger.LogDebug($"<{methodName}> - consumption layer event not generated - no schema revision");
                 return;
             }
                         
@@ -511,7 +647,7 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Debug($"<{methodName}> sending {hiveCreate.EventType.ToLower()} event...");
+                   _logger.LogDebug($"<{methodName}> sending {hiveCreate.EventType.ToLower()} event...");
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
@@ -523,11 +659,11 @@ namespace Sentry.data.Core
                         _messagePublisher.PublishDSCEvent(schemaRevision.ParentSchema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate), topicName);
                     }
 
-                    Logger.Debug($"<{methodName}> sent {hiveCreate.EventType.ToLower()} event");
+                   _logger.LogDebug($"<{methodName}> sent {hiveCreate.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<{methodName}> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
+                    _logger.LogError(ex, $"<{methodName}> failed sending event: {JsonConvert.SerializeObject(hiveCreate)}");
                     exceptionList.Add(ex);
                 }
 
@@ -543,7 +679,7 @@ namespace Sentry.data.Core
 
                 try
                 {
-                    Logger.Info($"<{methodName}> sending {snowModel.EventType.ToLower()} event...");
+                    _logger.LogInformation($"<{methodName}> sending {snowModel.EventType.ToLower()} event...");
                     string topicName = null;
                     if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                     {
@@ -554,11 +690,11 @@ namespace Sentry.data.Core
                     {
                         _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
                     }
-                    Logger.Info($"<{methodName}> sent {snowModel.EventType.ToLower()} event");
+                    _logger.LogInformation($"<{methodName}> sent {snowModel.EventType.ToLower()} event");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"<{methodName}> failed sending event: {snowModel}");
+                    _logger.LogError(ex, $"<{methodName}> failed sending event: {snowModel}");
                     exceptionList.Add(ex);
                 }
 
@@ -631,38 +767,35 @@ namespace Sentry.data.Core
 
         private void SchemaParquetUpdate(FileSchema schema, FileSchemaDto dto, List<bool> changes, JObject whatPropertiesChanged)
         {
-            if (_dataFeatures.CLA3605_AllowSchemaParquetUpdate.GetValue())
-            {
-                changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
-                    (x) =>
-                    {
-                        schema.ParquetStorageBucket = x;
-                        whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
-                    }));
-                changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
-                    (x) =>
-                    {
-                        schema.ParquetStoragePrefix = x;
-                        whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
-                    }));
-
-                if (dto.ConsumptionDetails != null)
+            changes.Add(TryUpdate(() => schema.ParquetStorageBucket, () => dto.ParquetStorageBucket,
+                (x) =>
                 {
-                    foreach (var consumptionDetailDto in dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
+                    schema.ParquetStorageBucket = x;
+                    whatPropertiesChanged.Add("parquetstoragebucket", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                }));
+            changes.Add(TryUpdate(() => schema.ParquetStoragePrefix, () => dto.ParquetStoragePrefix,
+                (x) =>
+                {
+                    schema.ParquetStoragePrefix = x;
+                    whatPropertiesChanged.Add("parquetstorageprefix", string.IsNullOrEmpty(x) ? null : x.ToLower());
+                }));
+
+            if (dto.ConsumptionDetails != null)
+            {
+                foreach (var consumptionDetailDto in dto.ConsumptionDetails.OfType<SchemaConsumptionSnowflakeDto>())
+                {
+                    SchemaConsumptionSnowflake consumptionDetail;
+                    if (consumptionDetailDto.SchemaConsumptionId == 0)
                     {
-                        SchemaConsumptionSnowflake consumptionDetail;
-                        if (consumptionDetailDto.SchemaConsumptionId == 0)
-                        {
-                            //this is logic to account for the fact that we're still supporting the v2 API that doesn't provide a SchemaConsumptionId
-                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SnowflakeType == consumptionDetailDto.SnowflakeType);
-                        }
-                        else
-                        {
-                            //this is how the logic should work for the v20220609 API
-                            consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
-                        }
-                        changes.Add(TryUpdate(() => consumptionDetail.SnowflakeStage, () => consumptionDetailDto.SnowflakeStage, (x) => consumptionDetail.SnowflakeStage = x));
+                        //this is logic to account for the fact that we're still supporting the v2 API that doesn't provide a SchemaConsumptionId
+                        consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SnowflakeType == consumptionDetailDto.SnowflakeType);
                     }
+                    else
+                    {
+                        //this is how the logic should work for the v20220609 API
+                        consumptionDetail = schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().First(cd => cd.SchemaConsumptionId == consumptionDetailDto.SchemaConsumptionId);
+                    }
+                    changes.Add(TryUpdate(() => consumptionDetail.SnowflakeStage, () => consumptionDetailDto.SnowflakeStage, (x) => consumptionDetail.SnowflakeStage = x));
                 }
             }
         }
@@ -734,18 +867,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"schemacontroller-fetSchemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"schemacontroller-fetSchemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("schemacontroller-fetSchemarevisiondtobyschema unauthorized_access", ex);
+                        _logger.LogError(ex, "schemacontroller-fetSchemarevisiondtobyschema unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-fetSchemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"schemacontroller-fetSchemarevisiondtobyschema failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -784,18 +917,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access", ex);
+                        _logger.LogError(ex, "schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-getlatestschemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"schemacontroller-getlatestschemarevisiondtobyschema failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -896,18 +1029,18 @@ namespace Sentry.data.Core
                     try
                     {
                         IApplicationUser user = _userService.GetCurrentUser();
-                        Logger.Info($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access: Id:{user.AssociateId}");
+                        _logger.LogInformation($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access: Id:{user.AssociateId}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access", ex);
+                        _logger.LogError(ex, $"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} unauthorized_access");
                     }
                     throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} failed to retrieve UserSecurity object", ex);
+                _logger.LogError(ex, $"schemacontroller-{System.Reflection.MethodBase.GetCurrentMethod().Name.ToLower()} failed to retrieve UserSecurity object");
                 throw new SchemaUnauthorizedAccessException();
             }
 
@@ -955,19 +1088,19 @@ namespace Sentry.data.Core
         {
             if (objectKey == null)
             {
-                Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
+               _logger.LogDebug($"schemaservice-registerrawfile no-objectkey-input");
                 throw new ArgumentException("schemaservice-registerrawfile no-objectkey-input");
             }
 
             if (schema == null)
             {
-                Logger.Debug($"schemaservice-registerrawfile no-schema-input");
+               _logger.LogDebug($"schemaservice-registerrawfile no-schema-input");
                 throw new ArgumentException("schemaservice-registerrawfile no-schema-input");
             }
 
             if (stepEvent == null)
             {
-                Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+               _logger.LogDebug($"schemaservice-registerrawfile no-stepevent-input");
                 throw new ArgumentException("schemaservice-registerrawfile no-stepevent-input");
             }
 
@@ -987,7 +1120,7 @@ namespace Sentry.data.Core
 
                     if (previousFileList.Any())
                     {
-                        Logger.Debug($"schemaservice-registerrawfile setting-parentdatasetfileid detected {previousFileList.Count} file(s) to be updated");
+                       _logger.LogDebug($"schemaservice-registerrawfile setting-parentdatasetfileid detected {previousFileList.Count} file(s) to be updated");
                     }
 
                     foreach (DatasetFile item in previousFileList)
@@ -1000,7 +1133,7 @@ namespace Sentry.data.Core
             }
             catch(Exception ex)
             {
-                Logger.Error($"schemaservice-registerrawfile-failed", ex);
+                _logger.LogError(ex, $"schemaservice-registerrawfile-failed");
                 throw;
             }
         }
@@ -1100,11 +1233,11 @@ namespace Sentry.data.Core
                     return;
                 }
 
-                Logger.Info($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
+                _logger.LogInformation($"schmeacontroller-checkdatasetpermission unauthorized_access for {user.AssociateId}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"schemacontroller-checkdatasetpermission failed to check access", ex);
+                _logger.LogError(ex, $"schemacontroller-checkdatasetpermission failed to check access");
             }
 
             throw new SchemaUnauthorizedAccessException();
@@ -1283,7 +1416,7 @@ namespace Sentry.data.Core
         /// <param name="consumptionLayerType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal virtual string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
+        public virtual string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType)
         {
             switch (consumptionLayerType)
             {
@@ -1345,7 +1478,7 @@ namespace Sentry.data.Core
         /// <param name="consumptionType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        internal virtual string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
+        public virtual string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType)
         {
             switch (consumptionType)
             {
@@ -1516,7 +1649,7 @@ namespace Sentry.data.Core
         public void ValidateCleanedFields(int schemaId, List<BaseFieldDto> fieldDtoList)
         {
             MethodBase mBase = System.Reflection.MethodBase.GetCurrentMethod();
-            Logger.Debug($"schemaservice start method <{mBase.Name.ToLower()}>");
+           _logger.LogDebug($"schemaservice start method <{mBase.Name.ToLower()}>");
 
             FileSchema schema = _datasetContext.GetById<FileSchema>(schemaId);
 
@@ -1527,7 +1660,7 @@ namespace Sentry.data.Core
                 throw new ValidationException(errors);
             }
 
-            Logger.Debug($"schemaservice end method <{mBase.Name.ToLower()}>");
+           _logger.LogDebug($"schemaservice end method <{mBase.Name.ToLower()}>");
         }
 
         private ValidationResults ValidateCleanedFields(string extensionName, List<BaseFieldDto> fieldDtoList)

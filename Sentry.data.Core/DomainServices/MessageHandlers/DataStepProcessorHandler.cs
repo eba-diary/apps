@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Sentry.Messaging.Common;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using StructureMap;
-using Sentry.data.Core;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using Sentry.Messaging.Common;
+using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {

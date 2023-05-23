@@ -50,7 +50,9 @@ namespace Sentry.data.Web.API
             foreach (BaseFilterCategoryOptionModel optionModel in source.CategoryOptions)
             {
                 optionModel.OptionValue = FilterCategoryOptionNormalizer.Denormalize(source.CategoryName, optionModel.OptionValue);
-                destMember.Add(context.Mapper.Map<FilterCategoryOptionDto>(optionModel));
+                FilterCategoryOptionDto optionDto = context.Mapper.Map<FilterCategoryOptionDto>(optionModel);
+                optionDto.ParentCategoryName = source.CategoryName;
+                destMember.Add(optionDto);
             }
 
             return destMember;

@@ -1,6 +1,6 @@
 ﻿using Hangfire.Common;
 using Hangfire.Server;
-using Sentry.Common.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Text;
 
@@ -15,6 +15,7 @@ namespace Sentry.data.Core
     public class SkipConcurrentExecutionAttribute : JobFilterAttribute, IServerFilter
 	{
 		private readonly int _timeoutInSeconds;
+		private static ILogger<SkipConcurrentExecutionAttribute> _logger = Logging.LoggerFactory.CreateLogger<SkipConcurrentExecutionAttribute>();
 
 		public SkipConcurrentExecutionAttribute(int timeoutInSeconds)
 		{
@@ -39,7 +40,7 @@ namespace Sentry.data.Core
 			catch (Exception)
 			{
 				filterContext.Canceled = true;
-				Logger.Warn(($"Cancelling run for {resource} job, id: {filterContext.BackgroundJob.Id}"));
+				_logger.LogWarning(($"Cancelling run for {resource} job, id: {filterContext.BackgroundJob.Id}"));
 			}
 		}
 

@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using Microsoft.Extensions.Logging;
+using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure
 {

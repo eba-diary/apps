@@ -1,4 +1,4 @@
-﻿using Sentry.Common.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Sentry.data.Core;
 using StructureMap;
 using System;
@@ -10,6 +10,13 @@ namespace Sentry.data.Infrastructure
 {
     public class TicketMonitorService : ITicketMonitorService
     {
+        private readonly ILogger<TicketMonitorService> _logger;
+
+        public TicketMonitorService(ILogger<TicketMonitorService> logger)
+        {
+            _logger = logger;
+        }
+
         public async Task CheckTicketStatus()
         {
             using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
@@ -58,7 +65,7 @@ namespace Sentry.data.Infrastructure
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error("Failure while checking ticket status", ex);
+                            _logger.LogError(ex, "Failure while checking ticket status");
                         }
                     }                    
                 }

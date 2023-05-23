@@ -194,11 +194,11 @@
     },
 
     handleClearAll: function () {
-        data.FilterSearch.hideBadgeContainer(true);
-
         $("[id^='clearOption_']:visible").each(function () {
             $(this).addClass("display-none");
         });
+
+        data.FilterSearch.hideBadgeContainer(true);
 
         $('.filter-search-category-option-checkbox:checkbox:checked').each(function () {
             $(this).prop('checked', false);
@@ -285,6 +285,7 @@
         $(".filter-search-start").addClass("display-none");
         $(".filter-search-results-none").addClass("display-none");
         $(".filter-search-result-count-container").addClass("display-none");
+        $(".searchSettingsContainer").addClass("display-none");
 
         $(".filter-search-result-progress").removeClass("display-none");
     },
@@ -297,6 +298,7 @@
 
         $(".icon-search").removeClass("display-none");
         $(".filter-search-save-search-container").removeClass("display-none");
+        $(".searchSettingsContainer").removeClass("display-none");
 
         if (totalResultCount > 0) {
             $(".filter-search-results-none").addClass("display-none");
@@ -361,6 +363,14 @@
             //show selected option badges
             selectedOptions.each(function () {
                 $('#clearOption_' + $.escapeSelector(this.id)).removeClass("display-none");
+            });
+
+            $('.filter-search-chip').tooltip({
+                template: '<div class="tooltip md-tooltip"><div class="tooltip-arrow md-arrow"></div><div class="tooltip-inner md-inner"></div></div>'
+            });
+
+            $('.filter-search-category-option').tooltip({
+                template: '<div class="tooltip md-tooltip-main"><div class="tooltip-arrow md-arrow"></div><div class="tooltip-inner md-inner-main"></div></div>'
             });
 
             //show active options container if there are active options

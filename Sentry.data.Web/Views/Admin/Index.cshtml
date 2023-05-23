@@ -1,4 +1,5 @@
-﻿@{
+﻿@model AdminElasticFileModel
+@{
     ViewBag.Title = "Admin";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewBag.Fluid = true;
@@ -7,15 +8,54 @@
 <!DOCTYPE html>
 
 <html>
-    <body>
-        <h1>Welcome to the Admin Page</h1>
-        <h4>There's plenty of space here for anything else you want.</h4>
-    </body>
-</html>
-
-<script>
-    $(function ()
+<body>
+    @if (Model.CLA4553_FeatureFlag)
     {
-        data.Admin.SideBarUtility();
-    });
-</script>
+        <div id="dashboard">
+
+            <div>
+                <h1>Welcome to the Admin Page</h1>
+            </div>
+            <div class="processingActivityDiv">
+                <h3>Processing Activity</h3>
+                <br />
+                <div class="row">
+                    @if (Model.CLA5112_FeatureFlag)
+                    {
+                    <div class="column">
+                        <div class="activity-container">
+                            <h5>Total Files Today</h5>
+                            <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { activityType = "TotalFiles" })">View</a>
+                            <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
+                        </div>
+
+                    </div>
+                    }
+
+                   @* Commented out could will be used in future development and future versions of this page
+
+                   <div class="column">
+                        <div class="container">
+                            <h5>Files In-Flight</h5>
+                            <button id="buttonInFlightFiles"><strong class="num_style">@Model.InFlightFiles</strong></button>
+                        </div>
+
+                    </div>
+                    <div class="column">
+                        <div class="container">
+                            <h5>File Failures</h5>
+                            <button id="buttonFailedFiles"><strong class="failure_style">@Model.FailedFiles</strong></button>
+                        </div>
+
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <h1>You do not have the right permissions to see this page</h1>
+    }
+
+</body>
+</html>

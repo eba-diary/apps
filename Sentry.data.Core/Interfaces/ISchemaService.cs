@@ -192,5 +192,37 @@ namespace Sentry.data.Core
 
         (int schemaId, bool schemaExistsInTargetDataset) SchemaExistsInTargetDataset(int targetDatasetId, string schemaName);
         void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList);
+
+        /// <summary>
+        /// Generates the snowflake database name.
+        /// </summary>
+        /// <param name="isHumanResources"></param>
+        /// <param name="datasetNamedEnvironmentType"></param>
+        /// <param name="consumptionLayerType"></param>
+        /// <returns></returns>
+        string GetSnowflakeDatabaseName(bool isHumanResources, string datasetNamedEnvironmentType, SnowflakeConsumptionType consumptionLayerType);
+
+        /// <summary>
+        /// Generates the snowflake schema name from the dataset. 
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <param name="consumptionType"></param>
+        /// <returns></returns>
+        string GetSnowflakeSchemaName(Dataset dataset, SnowflakeConsumptionType consumptionType);
+
+
+        /// <summary>
+        /// Checks if we should create / update the consumption layers. 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="propertyDeltaList"></param>
+        /// <param name="forceGenerate"></param>
+        void TryGenerateSnowflakeConsumptionCreateEvent(FileSchema schema, JObject propertyDeltaList, bool forceGenerate);
+
+        /// <summary>
+        /// Publishes event to delete consumption layer for schema. 
+        /// </summary>
+        /// <param name="schema"></param>
+        void PublishSnowflakeConsumptionDeleteRequest(Schema schema);
     }
 }

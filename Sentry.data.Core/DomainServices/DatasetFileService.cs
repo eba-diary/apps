@@ -1,7 +1,9 @@
 ﻿using Hangfire;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Helpers;
@@ -16,7 +18,7 @@ using System.Text;
 namespace Sentry.data.Core
 {
 
-    public class DatasetFileService : IDatasetFileService
+    public class DatasetFileService : BaseDomainService<DatasetFileService>, IDatasetFileService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
@@ -25,11 +27,10 @@ namespace Sentry.data.Core
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IEventService _eventService;
         private readonly IJobScheduler _jobScheduler;
-        private readonly IDataFeatures _dataFeatures;
 
         public DatasetFileService(IDatasetContext datasetContext, ISecurityService securityService, 
             IUserService userService, IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
-            IEventService eventService, IJobScheduler jobScheduler, IDataFeatures dataFeatures)
+            IEventService eventService, IJobScheduler jobScheduler, DomainServiceCommonDependency<DatasetFileService> commonDepenencies) : base(commonDepenencies)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -38,7 +39,6 @@ namespace Sentry.data.Core
             _s3ServiceProvider = s3ServiceProvider;
             _eventService = eventService;
             _jobScheduler = jobScheduler;
-            _dataFeatures = dataFeatures;
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace Sentry.data.Core
         public PagedList<DatasetFileDto> GetActiveDatasetFileDtoBySchema(int schemaId, PageParameters pageParameters)
         {
             IQueryable<DatasetFile> datasetFileQueryable = _datasetContext.DatasetFileStatusAll.Where(x => x.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active);
-
             return GetDatasetFileDtoBySchema(schemaId, pageParameters, datasetFileQueryable);
+            
         }
 
         /// <summary>
@@ -141,6 +141,7 @@ namespace Sentry.data.Core
 
         public string Delete(int datasetId, int schemaId, DeleteFilesParamDto dto)
         {
+            _logger.LogInformation($"Started {nameof(DatasetFileService).ToLower()}-{nameof(Delete).ToLower()} method");
             string error = ValidateDeleteDataFilesParams(datasetId, schemaId, dto);
             if(error != null)
             {
@@ -194,7 +195,7 @@ namespace Sentry.data.Core
 
             if (!string.IsNullOrEmpty(errorMessage))
             {
-                Logger.Warn(errorMessage);
+                _logger.LogWarning(errorMessage);
                 throw new DataFlowNotFound(errorMessage);
             }
         }
@@ -257,7 +258,7 @@ namespace Sentry.data.Core
                     else
                     {                        
                         foreach (int id in batch)
-                        {
+                        {                            
                             _jobScheduler.Schedule<DatasetFileService>((d) => d.ReprocessDatasetFile(stepId, id), TimeSpan.FromSeconds(timeDelay));
                         }
                     }
@@ -265,7 +266,7 @@ namespace Sentry.data.Core
                 } catch (Exception ex)
                 {
                     submittedSuccessful = false;
-                    Logger.Error("Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId, ex); 
+                    _logger.LogError(ex, "Scheduling Reprocesing with datasetFileId: " + tempDatasetFileId); 
                 }
                 counter++;    
                 batch = datasetFileIds.Skip(batchSize * (counter - 1)).ToList();
@@ -321,7 +322,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Reprocessig failed ", ex);
+                _logger.LogError(ex, "Reprocessig failed ");
                 throw; // this will be caught in hangfire indicating failed job
             }
 
@@ -414,6 +415,7 @@ namespace Sentry.data.Core
 
         private void DeleteByDatasetFileList(int datasetId, int schemaId, List<DatasetFile> dbList)
         {
+            _logger.LogInformation($"Started {nameof(DatasetFileService).ToLower()}-{nameof(DeleteByDatasetFileList).ToLower()} method");
             DeleteS3(datasetId, schemaId, dbList);
             UpdateObjectStatus(dbList, Core.GlobalEnums.ObjectStatusEnum.Pending_Delete);
         }
@@ -467,7 +469,7 @@ namespace Sentry.data.Core
                 string errorMsg = "Error trying to call _messagePublisher.PublishDSCEvent: " + 
                             JsonConvert.SerializeObject(CreateDeleteFilesRequestModel(datasetId, schemaId, idList));
                 
-                Logger.Error(errorMsg, ex);
+                _logger.LogError(ex, errorMsg);
                 throw;
             }
         }
@@ -489,7 +491,7 @@ namespace Sentry.data.Core
             catch (System.Exception ex)
             {
                 string msg = "Error marking DatasetFile rows as Deleted";
-                Logger.Error(msg, ex);
+                _logger.LogError(ex, msg);
                 throw;
             }
         }
@@ -508,7 +510,7 @@ namespace Sentry.data.Core
             catch (System.Exception ex)
             {
                 string msg = "Error marking DatasetFile row as " + status.GetDescription();
-                Logger.Error(msg, ex);
+                _logger.LogError(ex, msg);
                 throw;
             }
         }

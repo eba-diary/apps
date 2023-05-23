@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
-using System;
 using Sentry.Common.Logging;
+using System;
 
 namespace Sentry.data.Infrastructure
 {

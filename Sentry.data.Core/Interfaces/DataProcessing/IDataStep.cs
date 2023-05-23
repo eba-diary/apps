@@ -1,6 +1,4 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.DataProcessing;
-using System;
+﻿using Sentry.data.Core.Entities.DataProcessing;
 using System.Collections.Generic;
 
 namespace Sentry.data.Core.Interfaces.DataProcessing

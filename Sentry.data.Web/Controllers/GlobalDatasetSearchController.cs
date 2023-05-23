@@ -21,7 +21,7 @@ namespace Sentry.data.Web.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult Search(string searchText = null, int sortBy = -1, int pageNumber = 1, int pageSize = 12, int layout = 0, List<string> filters = null, string savedSearch = null)
+        public ActionResult Search(string searchText = null, int sortBy = -1, int pageNumber = 1, int pageSize = 12, int layout = 0, List<string> filters = null, string savedSearch = null, bool searchColumns = false)
         {
             if (TryGetSavedSearch(SearchType.GLOBAL_DATASET, savedSearch, out SavedSearchDto savedSearchDto))
             {
@@ -69,7 +69,8 @@ namespace Sentry.data.Web.Controllers
                     { TileResultParameters.SORTBY, sortBy.ToString() },
                     { TileResultParameters.PAGENUMBER, pageNumber.ToString() },
                     { TileResultParameters.PAGESIZE, pageSize.ToString() },
-                    { TileResultParameters.LAYOUT, layout.ToString() }
+                    { TileResultParameters.LAYOUT, layout.ToString() },
+                    { TileResultParameters.SEARCHCOLUMNS, searchColumns.ToString() }
                 };
 
             return GetFilterSearchView(model, resultParameters);
@@ -91,7 +92,8 @@ namespace Sentry.data.Web.Controllers
                 },
                 PageSizeOptions = Utility.BuildTilePageSizeOptions(parameters[TileResultParameters.PAGESIZE]),
                 SortByOptions = Utility.BuildSelectListFromEnum<GlobalDatasetSortByOption>(int.Parse(parameters[TileResultParameters.SORTBY])),
-                LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(int.Parse(parameters[TileResultParameters.LAYOUT]))
+                LayoutOptions = Utility.BuildSelectListFromEnum<LayoutOption>(int.Parse(parameters[TileResultParameters.LAYOUT])),
+                ShouldSearchColumns = bool.Parse(parameters[TileResultParameters.SEARCHCOLUMNS])
             };
 
             return PartialView("GlobalDatasetResults", resultsViewModel);
@@ -109,13 +111,19 @@ namespace Sentry.data.Web.Controllers
             return PartialView(resultsViewModel);
         }
 
+        public ActionResult SearchSettings(Dictionary<string, string> parameters)
+        {
+            return PartialView(bool.Parse(parameters[TileResultParameters.SEARCHCOLUMNS]));
+        }
+
         protected override FilterSearchConfigModel GetFilterSearchConfigModel(FilterSearchModel searchModel)
         {
             return new FilterSearchConfigModel()
             {
                 PageTitle = "Datasets",
                 SearchType = SearchType.GLOBAL_DATASET,
-                DefaultSearch = searchModel
+                DefaultSearch = searchModel,
+                HasSearchSettings = true
             };
         }
     }

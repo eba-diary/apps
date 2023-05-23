@@ -7,7 +7,7 @@
 <div class="tile-result-content">
     <input type="hidden" id="result-count" value="@Model.GlobalDatasets.Count">
 
-    <div class="tile-result-options mt-4">
+    <div class="d-flex mt-4 mr-1">
         @* sort *@
         <div class="mr-2">
             @Html.DropDownList("tile-result-sort", Model.SortByOptions, new { @class = "mdb-select" })
@@ -22,7 +22,7 @@
     </div>
 
     @* page size *@
-    <div class="mt-4">
+    <div class="ml-1 mt-4">
         @Html.DropDownList("tile-result-page-size", Model.PageSizeOptions, new { @class = "mdb-select" })
         <label class="mdb-main-label">Page Size</label>
     </div>

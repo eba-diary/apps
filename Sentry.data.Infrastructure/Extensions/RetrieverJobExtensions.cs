@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Sentry.data.Core;
-using Sentry.Core;
-using Sentry.Common.Logging;
+﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using System;
 using System.IO;
-using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Infrastructure
 {

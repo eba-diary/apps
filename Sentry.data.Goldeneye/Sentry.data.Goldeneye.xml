@@ -9,6 +9,12 @@
             This class represents where you should run your application logic
             </summary>
         </member>
+        <member name="M:Sentry.data.Goldeneye.Core.#ctor(Microsoft.Extensions.Logging.ILogger{Sentry.data.Goldeneye.Core})">
+            <summary>
+            Constructor used for DI
+            </summary>
+            <param name="logger">A logger to use for this class</param>
+        </member>
         <member name="M:Sentry.data.Goldeneye.Core.OnStart">
             <summary>
             Start the core worker
@@ -59,9 +65,40 @@
             to include "-console" so that you can debug your service.
             </remarks>
         </member>
+        <member name="M:Sentry.data.Goldeneye.Program.ConfigureLogger">
+            <summary>
+            Wire up logging to use Sentry.Common.Logging
+            </summary>
+        </member>
         <member name="M:Sentry.data.Goldeneye.Scheduler.#ctor">
             <summary>
             Initialize the HangFire Scheuler server
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Service.#ctor(Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Service class constructor
+            </summary>
+            <param name="loggerFactory"></param>
+        </member>
+        <member name="T:Sentry.data.Goldeneye.SpamFactory">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.SpamFactory.#ctor(Microsoft.Extensions.Logging.ILogger{Sentry.data.Goldeneye.SpamFactory},Sentry.data.Core.IDatasetContext,Sentry.data.Core.IAssociateInfoProvider,Sentry.data.Core.INotificationService,Sentry.data.Core.IEmailService)">
+            <summary>
+            
+            </summary>
+            <param name="logger"></param>
+            <param name="datasetContext"></param>
+            <param name="associateInfoProvider"></param>
+            <param name="notificationService"></param>
+            <param name="emailService"></param>
+        </member>
+        <member name="T:Sentry.data.Goldeneye.SpamFactory.UserEvent">
+            <summary>
+            
             </summary>
         </member>
         <member name="T:SentryWindowsServiceTemplateCSharp.Resources">

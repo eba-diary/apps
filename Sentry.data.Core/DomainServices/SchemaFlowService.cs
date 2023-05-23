@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-using Sentry.Common.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using Sentry.data.Core.DependencyInjection;
+using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
 using System;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class SchemaFlowService : ISchemaFlowService
+    public class SchemaFlowService : BaseDomainService<SchemaFlowService>, ISchemaFlowService
     {
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
@@ -18,7 +20,6 @@ namespace Sentry.data.Core
         private readonly IUserService _userService;
         private readonly ISecurityService _securityService;
         private readonly IGlobalDatasetProvider _globalDatasetProvider;
-        private readonly IDataFeatures _dataFeatures;
 
         public SchemaFlowService(IConfigService configService,
             ISchemaService schemaService,
@@ -27,7 +28,7 @@ namespace Sentry.data.Core
             IUserService userService,
             ISecurityService securityService,
             IGlobalDatasetProvider globalDatasetProvider,
-            IDataFeatures dataFeatures)
+            DomainServiceCommonDependency<SchemaFlowService> commonDependency) : base(commonDependency)
         {
             _configService = configService;
             _schemaService = schemaService;
@@ -36,7 +37,6 @@ namespace Sentry.data.Core
             _userService = userService;
             _securityService = securityService;
             _globalDatasetProvider = globalDatasetProvider;
-            _dataFeatures = dataFeatures;
         }
 
         public async Task<SchemaResultDto> AddSchemaAsync(SchemaFlowDto dto)
@@ -178,7 +178,14 @@ namespace Sentry.data.Core
             if (currentViewChanged)
             {
                 JObject changedProperty = new JObject { { "createcurrentview", schema.CreateCurrentView } };
-                _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
+                if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+                {
+                    _schemaService.TryGenerateSnowflakeConsumptionCreateEvent(schema, changedProperty, false);
+                }
+                else
+                {
+                    _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
+                }
             }
         }
 
@@ -256,18 +263,18 @@ namespace Sentry.data.Core
         {
             if (schema == null)
             {
-                Logger.Warn($"No active {nameof(FileSchema)} exists for {nameof(FileSchema.SchemaId)} {schemaId}");
+                _logger.LogWarning($"No active {nameof(FileSchema)} exists for {nameof(FileSchema.SchemaId)} {schemaId}");
             }
             else
             {
                 if (config == null)
                 {
-                    Logger.Warn($"No active {nameof(DatasetFileConfig)} exists for {nameof(FileSchema.SchemaId)} {schemaId}");
+                    _logger.LogWarning($"No active {nameof(DatasetFileConfig)} exists for {nameof(FileSchema.SchemaId)} {schemaId}");
                 }
 
                 if (dataFlow == null)
                 {
-                    Logger.Warn($"No active {nameof(DataFlow)} exists for {nameof(FileSchema.SchemaId)} {schemaId}");
+                    _logger.LogWarning($"No active {nameof(DataFlow)} exists for {nameof(FileSchema.SchemaId)} {schemaId}");
                 }
             }
         }

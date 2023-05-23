@@ -165,14 +165,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         }
     }
 
-    public class SFtpSourceMapping : SubclassMapping<SFtpSource>
-    {
-        public SFtpSourceMapping()
-        {
-            DiscriminatorValue(GlobalConstants.DataSourceDiscriminator.SFTP_SOURCE);
-        }
-    }
-
     public class HTTPSSourceMapping : SubclassMapping<HTTPSSource>
     {
         public HTTPSSourceMapping()

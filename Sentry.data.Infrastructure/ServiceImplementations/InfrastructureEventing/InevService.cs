@@ -1,5 +1,5 @@
-﻿using RestSharp;
-using RestSharp.Authenticators;
+﻿using Microsoft.Extensions.Logging;
+using RestSharp;
 using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.GlobalEnums;
@@ -21,6 +21,7 @@ namespace Sentry.data.Infrastructure
     {
         private readonly RestClient _restClient;
         private readonly IClient _inevClient;
+        private readonly ILogger<InevService> _logger;
 
         private readonly IDatasetContext _datasetContext;
 
@@ -36,11 +37,12 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Public constructor
         /// </summary>
-        public InevService(RestClient restClient, IClient inevClient, IDatasetContext datasetContext)
+        public InevService(RestClient restClient, IClient inevClient, IDatasetContext datasetContext, ILogger<InevService> logger)
         {
             _restClient = restClient;
             _inevClient = inevClient;
             _datasetContext = datasetContext;
+            _logger = logger;
         }
 
         /// <summary>
@@ -80,11 +82,11 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                Sentry.Common.Logging.Logger.Info("Checking for Infrastructure Events to Consume: ");
+                _logger.LogInformation("Checking for Infrastructure Events to Consume: ");
 
                 var addedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_ADDED, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info($"Found {addedMessages.Count} DBA Portal Added Events to Consume");
+                _logger.LogInformation($"Found {addedMessages.Count} DBA Portal Added Events to Consume");
 
                 foreach (var message in addedMessages)
                 {
@@ -93,7 +95,7 @@ namespace Sentry.data.Infrastructure
 
                 var approvedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_APPROVED, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info($"Found {approvedMessages.Count} DBA Portal Approved Events to Consume");
+                _logger.LogInformation($"Found {approvedMessages.Count} DBA Portal Approved Events to Consume");
 
                 foreach (var message in approvedMessages)
                 {
@@ -102,7 +104,7 @@ namespace Sentry.data.Infrastructure
 
                 var completedMessages = _inevClient.ConsumeGroupUsingGETAsync(INEV_TOPIC_DBA_PORTAL_COMPLETE, INEV_GROUP_DSC_CONSUMER, 20).Result.Messages.ToList();
 
-                Sentry.Common.Logging.Logger.Info($"Found {completedMessages.Count} DBA Portal Completed Events to Consume");
+                _logger.LogInformation($"Found {completedMessages.Count} DBA Portal Completed Events to Consume");
 
                 foreach (var message in completedMessages)
                 {
@@ -113,7 +115,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception e)
             {
-                Sentry.Common.Logging.Logger.Fatal("Error while trying to consume events.", e);
+                _logger.LogCritical(e, "Error while trying to consume events.");
             }
         }
 
@@ -400,7 +402,7 @@ namespace Sentry.data.Infrastructure
             {
                 throw new InfrastructureEventingException($"Error publishing '{eventType}' to Infrastructure Eventing for ID '{id}'. StatusCode={response.StatusCode}, ResponseStatus={response.ResponseStatus}", response.ErrorException);
             }
-            Common.Logging.Logger.Debug($"'{eventType}' Infrastructure Event published for ID '{id}'. Response: {response.Content}");
+            _logger.LogDebug($"'{eventType}' Infrastructure Event published for ID '{id}'. Response: {response.Content}");
         }
     }
 }

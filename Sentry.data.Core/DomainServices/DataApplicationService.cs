@@ -1,6 +1,6 @@
 ﻿using Hangfire;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Extensions;
@@ -32,13 +32,15 @@ namespace Sentry.data.Core
         private readonly Lazy<ISchemaService> _schemaService;
         private readonly Lazy<IJobService> _jobService;
         private readonly Lazy<IQuartermasterService> _quartermasterService;
+        private readonly ILogger<DataApplicationService> _logger;
 
         public DataApplicationService(IDatasetContext datasetContext,
             Lazy<IDatasetService> datasetService, Lazy<IConfigService> configService,
             Lazy<IDataFlowService> dataFlowService, Lazy<IBackgroundJobClient> hangfireBackgroundJobClient,
             Lazy<IUserService> userService, Lazy<IDataFeatures> dataFeatures,
             Lazy<ISecurityService> securityService, Lazy<ISchemaService> schemaService,
-            Lazy<IJobService> jobService, Lazy<IQuartermasterService> quartermasterService)
+            Lazy<IJobService> jobService, Lazy<IQuartermasterService> quartermasterService,
+            ILogger<DataApplicationService> logger)
         {
             _datasetContext = datasetContext;
             _datasetService = datasetService;
@@ -51,6 +53,7 @@ namespace Sentry.data.Core
             _schemaService = schemaService;
             _jobService = jobService;
             _quartermasterService = quartermasterService;
+            _logger = logger;
         }
 
         #region Private Properties
@@ -100,40 +103,40 @@ namespace Sentry.data.Core
         public bool DeleteDataset(List<int> deleteIdList, IApplicationUser user, bool forceDelete = false)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(DeleteDataset).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             bool result = Delete(deleteIdList, user, DatasetService, forceDelete);
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return result;
         }
 
         public bool DeleteDatasetFileConfig(List<int> deleteIdList, IApplicationUser user, bool forceDelete = false)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(DeleteDatasetFileConfig).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             bool result = Delete(deleteIdList, user, ConfigService, forceDelete);
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return result;
         }
 
         public bool DeleteDataflow(List<int> deleteIdList, IApplicationUser user, bool forceDelete = false)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(DeleteDataflow).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             bool result = Delete(deleteIdList, user, DataFlowService, forceDelete);
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return result;
         }
 
         public bool DeleteDataflow(List<int> deleteIdList, string userId, bool forceDelete = false)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             //get user
             IApplicationUser user = UserService.GetByAssociateId(userId);
@@ -141,14 +144,14 @@ namespace Sentry.data.Core
             //pass to private delete
             bool isSuccessful = Delete(deleteIdList, user, DataFlowService, forceDelete);
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return isSuccessful;
         }
 
         public bool DeleteDataFlow_Queue(List<int> deleteIdList, string userId, bool forceDelete = false)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(DeleteDataFlow_Queue).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             bool successfullySubmitted = true;
             try
             {
@@ -159,11 +162,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} hangfire submission failure", ex);
+                _logger.LogError(ex, $"{methodName} hangfire submission failure");
                 successfullySubmitted = false;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return successfullySubmitted;
         }
 
@@ -171,8 +174,8 @@ namespace Sentry.data.Core
         public async Task<DatasetMigrationRequestResponse> MigrateDataset(DatasetMigrationRequest migrationRequest)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateDataset).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
-            Logger.Info($"{methodName} {JsonConvert.SerializeObject(migrationRequest)}");
+            _logger.LogInformation($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} {JsonConvert.SerializeObject(migrationRequest)}");
 
             if (!DataFeatures.CLA1797_DatasetSchemaMigration.GetValue())
             {
@@ -264,13 +267,13 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"{methodName} - Failed creating external dependencies", ex);
+                    _logger.LogError(ex, $"{methodName} - Failed creating external dependencies");
 
                     // Rollback newly created objects
-                    Logger.Info($"{methodName} - Rollback initiated");
+                    _logger.LogInformation($"{methodName} - Rollback initiated");
                     RollbackDatasetMigration(response);
                     _datasetContext.SaveChanges();
-                    Logger.Info($"{methodName} - Rollback completed");
+                    _logger.LogInformation($"{methodName} - Rollback completed");
                     throw;
                 }
 
@@ -279,12 +282,12 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} Failed to perform migration", ex);
+                _logger.LogError(ex, $"{methodName} Failed to perform migration");
                 _datasetContext.Clear();                
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return response;
         }
 
@@ -321,7 +324,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(AddMigrationHistory)} Failed to migrate history", ex);
+                _logger.LogError(ex, "{nameof(AddMigrationHistory)} Failed to migrate history");
                 _datasetContext.Clear();
                 throw;
             }
@@ -352,7 +355,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(AddMigrationHistoryDetailDataset)} Failed to migrate history", ex);
+                _logger.LogError(ex, $"{nameof(AddMigrationHistoryDetailDataset)} Failed to migrate history");
                 _datasetContext.Clear();
                 throw;
             }
@@ -397,7 +400,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{nameof(AddMigrationHistoryDetailSchemas)} Failed to migrate history", ex);
+                _logger.LogError(ex, $"{nameof(AddMigrationHistoryDetailSchemas)} Failed to migrate history");
                 _datasetContext.Clear();
                 throw;
             }
@@ -424,7 +427,7 @@ namespace Sentry.data.Core
         internal int Create(DatasetDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newDatasetId;
             try
             {
@@ -433,7 +436,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to save Dataset", ex);
+                _logger.LogWarning($"{methodName} - Failed to save Dataset", ex);
                 _datasetContext.Clear();
                 throw;
             }
@@ -444,10 +447,10 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to create external dependencies for dataflow", ex);
+                _logger.LogWarning($"{methodName} - Failed to create external dependencies for dataflow", ex);
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newDatasetId;
         }
         /// <summary>
@@ -458,7 +461,7 @@ namespace Sentry.data.Core
         internal int Create(DatasetFileConfigDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newDatasetFileConfigId;
             try
             {
@@ -467,12 +470,12 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to save DatasetFileConfig", ex);
+                _logger.LogWarning($"{methodName} - Failed to save DatasetFileConfig", ex);
                 _datasetContext.Clear();
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newDatasetFileConfigId;
         }
         /// <summary>
@@ -484,7 +487,7 @@ namespace Sentry.data.Core
         internal int Create(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newDataFlowId;
             try
             {
@@ -493,7 +496,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to save DataFlow", ex);
+                _logger.LogWarning($"{methodName} - Failed to save DataFlow", ex);
                 _datasetContext.Clear();
                 throw;
             }
@@ -504,11 +507,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to create external dependencies for dataflow", ex);
+                _logger.LogWarning($"{methodName} - Failed to create external dependencies for dataflow", ex);
             }
 
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newDataFlowId;
         }
         /// <summary>
@@ -519,7 +522,7 @@ namespace Sentry.data.Core
         internal int Create(FileSchemaDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Create).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newFileSchemaId;
             try
             {
@@ -528,12 +531,12 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to save FileSchema", ex);
+                _logger.LogWarning($"{methodName} - Failed to save FileSchema", ex);
                 _datasetContext.Clear();
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newFileSchemaId;
         }
 
@@ -546,7 +549,7 @@ namespace Sentry.data.Core
         internal virtual int CreateWithoutSave(DatasetDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newDatasetId;
             try
             {
@@ -554,11 +557,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to create Dataset", ex);
+                _logger.LogWarning($"{methodName} - Failed to create Dataset", ex);
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newDatasetId;
         }
         /// <summary>
@@ -570,7 +573,7 @@ namespace Sentry.data.Core
         internal virtual int CreateWithoutSave(DatasetFileConfigDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newConfigId;
             try
             {
@@ -578,11 +581,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to create DatasetFileConfig", ex);
+                _logger.LogWarning($"{methodName} - Failed to create DatasetFileConfig", ex);
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newConfigId;
         }
         /// <summary>
@@ -594,7 +597,7 @@ namespace Sentry.data.Core
         internal virtual int CreateWithoutSave(DataFlowDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             DataFlow newDataFlow;
             try
             {
@@ -618,10 +621,10 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to create DataFlow", ex);
+                _logger.LogWarning($"{methodName} - Failed to create DataFlow", ex);
                 throw;
             }
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newDataFlow.Id;
         }
         /// <summary>
@@ -632,7 +635,7 @@ namespace Sentry.data.Core
         internal virtual int CreateWithoutSave(FileSchemaDto dto)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(CreateWithoutSave).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             int newFileSchemaId;
             try
             {
@@ -640,11 +643,11 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Warn($"{methodName} - Failed to create FileSchema", ex);
+                _logger.LogWarning($"{methodName} - Failed to create FileSchema", ex);
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return newFileSchemaId;
         }
         internal virtual int CreateWithoutSave(SchemaRevisionFieldStructureDto dto)
@@ -697,8 +700,8 @@ namespace Sentry.data.Core
         internal SchemaMigrationRequestResponse MigrateSchemaWithoutSave_Internal(SchemaMigrationRequest request)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateSchemaWithoutSave_Internal).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
-            Logger.Info($"{methodName} Processing : {JsonConvert.SerializeObject(request)}");
+            _logger.LogInformation($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Processing : {JsonConvert.SerializeObject(request)}");
 
             SchemaMigrationRequestResponse migrationResponse =  new SchemaMigrationRequestResponse();
             migrationResponse.SourceSchemaId = request.SourceSchemaId;      //add sourceSchemaId because migration history will need it and its easier to decorate here then figure it out on backend
@@ -793,16 +796,16 @@ namespace Sentry.data.Core
             }
             catch (SchemaUnauthorizedAccessException)
             {
-                Logger.Info($"User unauthorized to migrate schema");
+                _logger.LogInformation($"User unauthorized to migrate schema");
                 throw;
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} - Failed to migrate schema.", ex);
+                _logger.LogError(ex, $"{methodName} - Failed to migrate schema.");
                 throw;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
 
             return migrationResponse;
         }
@@ -811,7 +814,7 @@ namespace Sentry.data.Core
         private (int newDataFlowId, bool wasDataFlowMigrated) MigrateDataFlowWihtoutSave_Internal(int newSchemaId, int sourceSchemaId, bool sourceSchemaHasDataFlow, int targetDatasetId)
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(MigrateSchemaWithoutSave_Internal).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
 
             //Do not migrate DataFlow configuration if already exists in target
             int targetDataFlowId = 0;
@@ -844,10 +847,10 @@ namespace Sentry.data.Core
             {
                 targetDataFlowId = existingTargetDataflowId;
                 string message = (sourceSchemaHasDataFlow) ? "Target dataflow metadata already exists" : "Source schema is not associcated with dataflow";
-                Logger.Info($"{methodName} {message}");
+                _logger.LogInformation($"{methodName} {message}");
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return (targetDataFlowId, migratedDataflow);
         }
 
@@ -894,13 +897,13 @@ namespace Sentry.data.Core
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"{methodName} - Failed creating external dependencies", ex);
+                    _logger.LogError(ex, $"{methodName} - Failed creating external dependencies");
 
                     // Rollback newly created objects
-                    Logger.Info($"{methodName} - Rollback initiated");
+                    _logger.LogInformation($"{methodName} - Rollback initiated");
                     RollbackSchemaMigration(response);
                     _datasetContext.SaveChanges();
-                    Logger.Info($"{methodName} - Rollback completed");
+                    _logger.LogInformation($"{methodName} - Rollback completed");
                     throw;
                 }
 
@@ -908,7 +911,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error($"{methodName} Failed to perform migration", ex);
+                _logger.LogError(ex, $"{methodName} Failed to perform migration");
                 _datasetContext.Clear();
                 throw;
             }
@@ -1188,7 +1191,7 @@ namespace Sentry.data.Core
         private bool Delete<T>(List<int> deleteIdList, IApplicationUser user, T instance, bool forceDelete = false) where T : IEntityService
         {
             string methodName = $"{nameof(DataApplicationService).ToLower()}_{nameof(Delete).ToLower()}";
-            Logger.Info($"{methodName} Method Start");
+            _logger.LogInformation($"{methodName} Method Start");
             bool IsSuccessful = true;
 
             try
@@ -1209,18 +1212,18 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    Logger.Warn($"Delete failed for Ids :{string.Join(":::", deleteIdList)}");
+                    _logger.LogWarning($"Delete failed for Ids :{string.Join(":::", deleteIdList)}");
                     _datasetContext.Clear();
                 }
             }
             catch(Exception Ex)
             {
-                Logger.Error($"Delete Failed", Ex);
+                _logger.LogError(Ex, $"Delete Failed");
                 _datasetContext.Clear();
                 IsSuccessful = false;
             }
 
-            Logger.Info($"{methodName} Method End");
+            _logger.LogInformation($"{methodName} Method End");
             return IsSuccessful;
         }
         #endregion
