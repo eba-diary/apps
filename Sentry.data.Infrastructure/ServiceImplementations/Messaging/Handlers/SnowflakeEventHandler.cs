@@ -34,8 +34,6 @@ namespace Sentry.data.Infrastructure
         {
             Logger.Info($"Start method <snowflakeeventhandler-handle>");
             BaseEventMessage baseEvent = null;
-            FileSchema de = null;
-            List<SchemaConsumptionSnowflake> consumptionDetails = null;
             FileSchema schema = null;
 
             try
@@ -57,14 +55,6 @@ namespace Sentry.data.Infrastructure
 
                         schema = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
                         UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Requested);
-                        de = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
-                        consumptionDetails = de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList();
-
-                        foreach(var consumption in consumptionDetails)
-                        {
-                            consumption.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString();
-                            consumption.LastChanged = DateTime.Now;
-                        }
 
                         _dsContext.SaveChanges();
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
@@ -73,32 +63,19 @@ namespace Sentry.data.Infrastructure
                         SnowTableCreateModel snowCompletedEvent = JsonConvert.DeserializeObject<SnowTableCreateModel>(msg);
                         Logger.Info($"snowflakeeventhandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(snowCompletedEvent)}");
                         schema = _dsContext.GetById<FileSchema>(snowCompletedEvent.SchemaID);
-                        de = _dsContext.GetById<FileSchema>(snowCompletedEvent.SchemaID);
-                        string newSnowStatus;
 
                         switch (snowCompletedEvent.SnowStatus.ToUpper())
                         {
                             case "CREATED":
                             case "EXISTED":
                                 UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Available);
-                                newSnowStatus = ConsumptionLayerTableStatusEnum.Available.ToString();
                                 break;
                             case "FAILED":
                                 UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.RequestFailed);
-                                newSnowStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString();
                                 break;
                             default:
                                 UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Pending);
-                                newSnowStatus = ConsumptionLayerTableStatusEnum.Pending.ToString();
                                 break;
-                        }
-
-                        consumptionDetails = de.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList();
-
-                        foreach (var consumption in consumptionDetails)
-                        {
-                            consumption.SnowflakeStatus = newSnowStatus;
-                            consumption.LastChanged = DateTime.Now;
                         }
 
                         _dsContext.SaveChanges();
@@ -229,7 +206,7 @@ namespace Sentry.data.Infrastructure
 
         private void UpdateSchemaConsumptionDetailsStatus(FileSchema schema, ConsumptionLayerTableStatusEnum status)
         {
-            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = status.ToString());
+            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => { c.SnowflakeStatus = status.ToString(); c.LastChanged = DateTime.Now; });
         }
     }
 }
