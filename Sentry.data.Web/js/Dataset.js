@@ -145,7 +145,7 @@ data.Dataset = {
         let displayStatus;
         switch (status) { //special handling for a couple status for formatting
             case "NameReserved":
-                displayStatus = "Name Reserved";
+                displayStatus = "Request Pending";
                 break;
             case "RequestFailed":
                 displayStatus = "Failed - Contact DSC Support";
@@ -154,7 +154,8 @@ data.Dataset = {
                 displayStatus = status;
         }
         self.Status = displayStatus;
-        self.LastChanged = new Date(lastChanged).toString();
+        let date = new Date(lastChanged);
+        self.LastChanged = date.toLocaleString('default', { month: 'long' }) + " " + date.getDate() + ", " + date.getFullYear();
     },
 
     // #region DELROY FUNCTIONS
@@ -586,7 +587,6 @@ data.Dataset = {
         $.get(schemaUrl, function (result) {
             let currentView = result.CurrentView;
             $.each(result.ConsumptionDetails, function (arrayPosition, consumptionDetail) {
-                console.log(consumptionDetail);
                 if (consumptionDetail.SnowflakeType == "DatasetSchemaParquet") {
                     let layer = consumptionDetail.SnowflakeDatabase + "." + consumptionDetail.SnowflakeSchema + ".VW_" + consumptionDetail.SnowflakeTable;
                     self.vm.ConsumptionLayers.push(new data.Dataset.ConsumptionLayer(layer, consumptionDetail.SnowflakeStatus, consumptionDetail.LastChanged));

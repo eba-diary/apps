@@ -321,6 +321,43 @@ namespace Sentry.data.Infrastructure
             _emailClient.Send(myMail);
         }
 
+        public void SendConsumptionLayerStaleEmail(IList<SchemaConsumptionSnowflake> staleConsumptionLayers)
+        {
+            string toString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.STALECONSUMPTIONEMAILTO);
+            string fromString = Configuration.Config.GetHostSetting(GlobalConstants.HostSettings.DATASETEMAIL);
+            if (String.IsNullOrWhiteSpace(toString) || String.IsNullOrWhiteSpace(fromString))
+            {
+                Logger.Error("Tried to send stale consumption email with incomplete sender/recipient.");
+                return;
+            }
+            StringBuilder bodyContent = new StringBuilder();
+
+            bodyContent.Append("<table cellpadding='0' cellspacing='0' border='0' width='100%' style='background-color: aliceblue;'><tr bgcolor='00A3E0' style='float: left'><th>Consumption Layer</th><th>Status</th><th>Last Changed</th></tr>");
+
+            foreach(var staleLayer in staleConsumptionLayers)
+            {
+                bodyContent.Append($"<tr style='vertical-align: top; padding-top:10px;'><td>{staleLayer.SnowflakeDatabase}.{staleLayer.SnowflakeSchema}.{staleLayer.SnowflakeTable}</td><td>{staleLayer.SnowflakeStatus}</td><td>{staleLayer.LastChanged}</td></tr>");
+            }
+
+            bodyContent.Append("</table>");
+
+            MailAddress mailAddress = new MailAddress(fromString);
+            MailMessage myMail = new MailMessage()
+            {
+                From = mailAddress,
+                Subject = $"{staleConsumptionLayers.Count} Stale Consumption Layers Found",
+                IsBodyHtml = true,
+                Body = bodyContent.ToString()
+            };
+
+            foreach (var address in toString.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }
+
+            _emailClient.Send(myMail);
+        }
+
         //GET BODY OF S3 SINK EMAIL
         private string GetS3SinkConnectorEmailBody(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto)
         {

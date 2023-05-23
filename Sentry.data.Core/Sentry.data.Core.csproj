@@ -547,6 +547,7 @@
     <Compile Include="Interfaces\Entities\IFavorable.cs" />
     <Compile Include="Interfaces\IAuthorizationProvider.cs" />
     <Compile Include="Interfaces\IAuthorizationSigner.cs" />
+    <Compile Include="Interfaces\IMetadataMonitorService.cs" />
     <Compile Include="Interfaces\IMigrationService.cs" />
     <Compile Include="Interfaces\IDataSourceService.cs" />
     <Compile Include="Interfaces\IDscEventTopicHelper.cs" />
