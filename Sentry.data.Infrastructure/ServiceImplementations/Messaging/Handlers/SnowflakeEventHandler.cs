@@ -14,13 +14,15 @@ namespace Sentry.data.Infrastructure
         #region Declarations
         private readonly IDatasetContext _dsContext;
         private readonly ISchemaService _schemaService;
+        private readonly IDataFeatures _dataFeatures;
         #endregion
 
         #region Constructor
-        public SnowflakeEventHandler(IDatasetContext dsContext, ISchemaService schemaService)
+        public SnowflakeEventHandler(IDatasetContext dsContext, ISchemaService schemaService, IDataFeatures dataFeatures)
         {
             _dsContext = dsContext;
             _schemaService = schemaService;
+            _dataFeatures = dataFeatures;
         }
         #endregion
 
@@ -110,73 +112,13 @@ namespace Sentry.data.Infrastructure
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
                     case GlobalConstants.SnowConsumptionMessageTypes.CREATE_REQUEST:
-                        SnowConsumptionMessageModel snowConsumptionCreateRequest = JsonConvert.DeserializeObject<SnowConsumptionMessageModel>(msg);
-                        if(snowConsumptionCreateRequest.SchemaID == 0)
-                        {
-                            break; //dataset snowflake schema, nothing to update
-                        }
-                        schema = _dsContext.GetById<FileSchema>(snowConsumptionCreateRequest.SchemaID);
-                        schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString());
-                        _dsContext.SaveChanges();
-                        break;
                     case GlobalConstants.SnowConsumptionMessageTypes.CREATE_RESPONSE:
-                        SnowConsumptionMessageModel snowConsumptionCreateResponse = JsonConvert.DeserializeObject<SnowConsumptionMessageModel>(msg);
-
-                        if(snowConsumptionCreateResponse.SchemaID == 0)
-                        {
-                            break;
-                        }
-                        schema = _dsContext.GetById<FileSchema>(snowConsumptionCreateResponse.SchemaID);
-
-                        switch (snowConsumptionCreateResponse.SnowStatus.ToUpper())
-                        {
-                            case "SUCCESS":
-                                schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString());
-                                break;
-                            case "FAILURE":
-                                schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString());
-                                break;
-                            default:
-                                schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
-                                break;
-                        }
-
-                        _dsContext.SaveChanges();
-                        break;
                     case GlobalConstants.SnowConsumptionMessageTypes.DELETE_REQUEST:
-                        SnowConsumptionMessageModel snowConsumptionDelete = JsonConvert.DeserializeObject<SnowConsumptionMessageModel>(msg);
-                        if(snowConsumptionDelete.SchemaID == 0)
-                        {
-                            break;
-                        }
-                        schema = _dsContext.GetById<FileSchema>(snowConsumptionDelete.SchemaID);
-                        schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString());
-                        _dsContext.SaveChanges();
-                        break;
                     case GlobalConstants.SnowConsumptionMessageTypes.DELETE_RESPONSE:
-                        SnowConsumptionMessageModel snowConsumptionDeleteResponse = JsonConvert.DeserializeObject<SnowConsumptionMessageModel>(msg);
-
-                        if(snowConsumptionDeleteResponse.SchemaID == 0)
+                        if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue()) //When we remove CLA5211 feature flag, the above switch statement can be removed, the following function handles it 
                         {
-                            break;
+                            HandleSnowConsumptionMessage(msg);
                         }
-
-                        schema = _dsContext.GetById<FileSchema>(snowConsumptionDeleteResponse.SchemaID);
-
-                        switch (snowConsumptionDeleteResponse.SnowStatus.ToUpper())
-                        {
-                            case "SUCCESS":
-                                schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString());
-                                break;
-                            case "FAILURE":
-                                schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString());
-                                break;
-                            default:
-                                schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
-                                break;
-                        }
-
-                        _dsContext.SaveChanges();
                         break;
                     default:
                         Logger.Info($"snowflakeeventhandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
@@ -186,7 +128,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"snowflakeeventhandler failed to process message: EventType:{baseEvent.EventType.ToUpper()} - Msg:({msg})", ex);
+                Logger.Error($"{nameof(SnowflakeEventHandler)} failed to process message: EventType:{baseEvent.EventType.ToUpper()} - Msg:({msg})", ex);
             }
             Logger.Info($"End method <snowflakeeventhandler-handle>");
         }
@@ -200,6 +142,66 @@ namespace Sentry.data.Infrastructure
         void IMessageHandler<string>.Init()
         {
             Logger.Info("DfsEventHandlerInitialized");
+        }
+
+        private void HandleSnowConsumptionMessage(string message)
+        {
+            SnowConsumptionMessageModel snowConsumptionMessage = GetSnowConsumptionMessageModelFromMessage(message);
+
+            if (snowConsumptionMessage.SchemaID == 0)
+            {
+                return; //dataset snowflake schema, nothing to update
+            }
+
+            FileSchema schema = _dsContext.GetById<FileSchema>(snowConsumptionMessage.SchemaID);
+
+            switch (snowConsumptionMessage.EventType)
+            {
+                case (GlobalConstants.SnowConsumptionMessageTypes.CREATE_REQUEST):
+                    schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Requested.ToString());
+                    break;                
+                case (GlobalConstants.SnowConsumptionMessageTypes.CREATE_RESPONSE):
+                    switch (snowConsumptionMessage.SnowStatus.ToUpper())
+                    {
+                        case "SUCCESS":
+                            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Available.ToString());
+                            break;
+                        case "FAILURE":
+                            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.RequestFailed.ToString());
+                            break;
+                        default:
+                            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
+                            break;
+                    }
+                    break;                
+                case (GlobalConstants.SnowConsumptionMessageTypes.DELETE_REQUEST):
+                    schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteRequested.ToString());
+                    break;                
+                case (GlobalConstants.SnowConsumptionMessageTypes.DELETE_RESPONSE):
+                    switch (snowConsumptionMessage.SnowStatus.ToUpper())
+                    {
+                        case "SUCCESS":
+                            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Deleted.ToString());
+                            break;
+                        case "FAILURE":
+                            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.DeleteFailed.ToString());
+                            break;
+                        default:
+                            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = ConsumptionLayerTableStatusEnum.Pending.ToString());
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            _dsContext.SaveChanges();
+
+        }
+
+        private SnowConsumptionMessageModel GetSnowConsumptionMessageModelFromMessage(string message)
+        {
+            return JsonConvert.DeserializeObject<SnowConsumptionMessageModel>(message);
         }
     }
 }
