@@ -184,7 +184,7 @@ data.Admin = {
     {
         if ($.fn.DataTable.isDataTable("#processActivityResultsTable"))
         {
-            table.destroy();
+            $("#processActivityResultsTable").DataTable().destroy();
             $("#processActivityResultsTable").empty();
         }
 
