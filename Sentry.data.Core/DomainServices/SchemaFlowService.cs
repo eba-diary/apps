@@ -178,7 +178,14 @@ namespace Sentry.data.Core
             if (currentViewChanged)
             {
                 JObject changedProperty = new JObject { { "createcurrentview", schema.CreateCurrentView } };
-                _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
+                if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+                {
+                    _schemaService.TryGenerateSnowflakeConsumptionCreateEvent(schema, changedProperty, false);
+                }
+                else
+                {
+                    _schemaService.GenerateConsumptionLayerEvents(schema, changedProperty);
+                }
             }
         }
 

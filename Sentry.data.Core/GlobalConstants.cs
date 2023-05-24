@@ -461,6 +461,14 @@ namespace Sentry.data.Core
             public const string RAWQUERY_PREFIX = "RAWQUERY_";
         }
 
+        public static class SnowConsumptionMessageTypes
+        {
+            public const string CREATE_REQUEST = "SNOW_CONSUMPTION_CREATE_REQUEST";
+            public const string CREATE_RESPONSE = "SNOW_CONSUMPTION_CREATE_RESPONSE";
+            public const string DELETE_REQUEST = "SNOW_CONSUMPTION_DELETE_REQUEST";
+            public const string DELETE_RESPONSE = "SNOW_CONSUMPTION_DELETE_RESPONSE";
+        }
+
         public static class ElasticAliases
         {
             public const string DATA_INVENTORY = "data-inventory";

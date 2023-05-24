@@ -323,6 +323,7 @@ namespace Sentry.data.Core.Tests
             _securityService.Setup(x => x.GetUserSecurity(fileConfig.ParentDataset, user.Object)).Returns(userSecurity);
 
             _dataFeatures.Setup(x => x.CLA4789_ImprovedSearchCapability.GetValue()).Returns(true);
+            _dataFeatures.Setup(x => x.CLA5211_SendNewSnowflakeEvents.GetValue()).Returns(false);
 
             Mock<IGlobalDatasetProvider> globalDatasetProvider = _mockRepository.Create<IGlobalDatasetProvider>();
             globalDatasetProvider.Setup(x => x.AddUpdateEnvironmentSchemaAsync(1, It.IsAny<EnvironmentSchema>())).Returns(Task.CompletedTask).Callback<int, EnvironmentSchema>((id, x) =>
