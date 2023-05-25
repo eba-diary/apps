@@ -339,6 +339,7 @@
     <Compile Include="ApacheLivyProviderTests.cs" />
     <Compile Include="DataFlowMetricServiceTests.cs" />
     <Compile Include="Helpers\MockLoggingService.cs" />
+    <Compile Include="MetadataMonitorServiceTests.cs" />
     <Compile Include="MockClasses.cs" />
     <Compile Include="MockClasses\MockJobStorage.cs" />
     <Compile Include="MotiveProviderTests.cs" />
