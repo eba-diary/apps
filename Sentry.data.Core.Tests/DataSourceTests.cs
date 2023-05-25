@@ -583,24 +583,6 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
-        public void SFtpSource_CalcRelativeUri()
-        {
-            RetrieverJob job = new RetrieverJob()
-            {
-                RelativeUri = "parent/child"
-            };
-
-            SFtpSource dataSource = new SFtpSource()
-            {
-                BaseUri = new Uri("c:/tmp")
-            };
-
-            Uri result = dataSource.CalcRelativeUri(job);
-
-            Assert.AreEqual("file:///c:/tmp/parent/child", result.ToString());
-        }
-
-        [TestMethod]
         public void DfsBasicHsz_CalcRelativeUri()
         {
             RetrieverJob job = new RetrieverJob()

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces.InfrastructureEventing;
@@ -6,7 +7,7 @@ using Sentry.data.Infrastructure.InfrastructureEvents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Sentry.data.Infrastructure.Tests.Helpers;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -296,7 +297,9 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
             mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
 
-            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
+            Mock<MockLoggingService<InevService>> logger = repository.Create<MockLoggingService<InevService>>();
+
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object, logger.Object);
 
             inevService.CheckDbaPortalEvents();
 
@@ -339,7 +342,9 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
             mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
 
-            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
+            Mock<MockLoggingService<InevService>> logger = repository.Create<MockLoggingService<InevService>>();
+
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object, logger.Object);
 
             inevService.CheckDbaPortalEvents();
 
@@ -389,7 +394,9 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IDatasetContext> mockDatasetContext = repository.Create<IDatasetContext>(MockBehavior.Loose);
             mockDatasetContext.SetupGet(x => x.SecurityTicket).Returns(new List<SecurityTicket>() { mockTicket }.AsQueryable());
 
-            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object);
+            Mock<MockLoggingService<InevService>> logger = repository.Create<MockLoggingService<InevService>>();
+
+            InevService inevService = new InevService(null, mockInevClient.Object, mockDatasetContext.Object, logger.Object);
 
             inevService.CheckDbaPortalEvents();
 

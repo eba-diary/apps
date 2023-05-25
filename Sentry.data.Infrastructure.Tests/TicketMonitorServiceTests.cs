@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core;
 using StructureMap;
@@ -52,9 +53,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IContainer> container = mr.Create<IContainer>();
             container.Setup(x => x.GetNestedContainer()).Returns(nestedContainer.Object);
 
+            Mock<ILogger<TicketMonitorService>> logger = mr.Create<ILogger<TicketMonitorService>>();
+
             Bootstrapper.InitForUnitTest(container.Object);
 
-            TicketMonitorService ticketMonitorService = new TicketMonitorService();
+            TicketMonitorService ticketMonitorService = new TicketMonitorService(logger.Object);
 
             await ticketMonitorService.CheckTicketStatus();
             
@@ -102,9 +105,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IContainer> container = mr.Create<IContainer>();
             container.Setup(x => x.GetNestedContainer()).Returns(nestedContainer.Object);
 
+            Mock<ILogger<TicketMonitorService>> logger = mr.Create<ILogger<TicketMonitorService>>();
+
             Bootstrapper.InitForUnitTest(container.Object);
 
-            TicketMonitorService ticketMonitorService = new TicketMonitorService();
+            TicketMonitorService ticketMonitorService = new TicketMonitorService(logger.Object);
 
             await ticketMonitorService.CheckTicketStatus();
 
@@ -151,9 +156,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IContainer> container = mr.Create<IContainer>();
             container.Setup(x => x.GetNestedContainer()).Returns(nestedContainer.Object);
 
+            Mock<ILogger<TicketMonitorService>> logger = mr.Create<ILogger<TicketMonitorService>>();
+
             Bootstrapper.InitForUnitTest(container.Object);
 
-            TicketMonitorService ticketMonitorService = new TicketMonitorService();
+            TicketMonitorService ticketMonitorService = new TicketMonitorService(logger.Object);
 
             await ticketMonitorService.CheckTicketStatus();
 
@@ -197,9 +204,11 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IContainer> container = mr.Create<IContainer>();
             container.Setup(x => x.GetNestedContainer()).Returns(nestedContainer.Object);
 
+            Mock<ILogger<TicketMonitorService>> logger = mr.Create<ILogger<TicketMonitorService>>();
+
             Bootstrapper.InitForUnitTest(container.Object);
 
-            TicketMonitorService ticketMonitorService = new TicketMonitorService();
+            TicketMonitorService ticketMonitorService = new TicketMonitorService(logger.Object);
 
             await ticketMonitorService.CheckTicketStatus();
 

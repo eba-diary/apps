@@ -1,5 +1,4 @@
-﻿using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.DataProcessing;
+﻿using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.GlobalEnums;
 using System.Linq;
@@ -21,9 +20,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public static T GetAction<T>(this IQueryable<T> query, IDataFeatures dataFeatures, bool isHumanResources, NamedEnvironmentType namedEnvironmentType, bool checkNamedEnvironmentType) where T : BaseAction
         {
-            Logger.Info("Method <GetAction> Started");
-
-            
             T result;
             if (string.IsNullOrWhiteSpace(dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue())
                     && checkNamedEnvironmentType && namedEnvironmentType == NamedEnvironmentType.NonProd)
@@ -35,15 +31,12 @@ namespace Sentry.data.Core
                 result = isHumanResources ? query.GetHrAction() : query.GetDlstAction();
             }
 
-            Logger.Info("Method <GetAction> Ended");
             return result;
         }
 
         #region Private Methods
         private static T GetHrActionNp<T>(this IQueryable<T> query) where T : BaseAction
         {
-            Logger.Info("Method <GetHrAction> Started");
-
             int actionId;
 
             if (query is IQueryable<ProducerS3DropAction>)
@@ -89,8 +82,6 @@ namespace Sentry.data.Core
             {
                 string actionType = query.First().GetType().Name;
                 DataFlowStepNotImplementedException ex = new DataFlowStepNotImplementedException($"HR action not found for {actionType} nonprod action type");
-                Logger.Warn($"DataFlowStep ({actionType}) not implmented for use wth HR category", ex);
-                Logger.Info("Method <GetHrAction> Ended");
                 throw ex;
             }
             return result;
@@ -99,8 +90,6 @@ namespace Sentry.data.Core
 
         private static T GetHrAction<T>(this IQueryable<T> query) where T: BaseAction
         {
-            Logger.Info("Method <GetHrAction> Started");
-
             int actionId;
 
             if (query is IQueryable<ProducerS3DropAction>)
@@ -146,19 +135,14 @@ namespace Sentry.data.Core
             {
                 string actionType = query.First().GetType().Name;
                 DataFlowStepNotImplementedException ex = new DataFlowStepNotImplementedException($"HR action not found for {actionType} action type");
-                Logger.Warn($"DataFlowStep ({actionType}) not implmented for use wth HR category", ex);
-                Logger.Info("Method <GetHrAction> Ended");
                 throw ex;
             }
 
-            
             return result;
         }
 
         private static T GetDlstActionNp<T>(this IQueryable<T> query) where T : BaseAction
         {
-            Logger.Info("Method <GetDlstAction> Started");
-
             int actionId;
 
             if (query is IQueryable<ProducerS3DropAction>)
@@ -232,19 +216,13 @@ namespace Sentry.data.Core
             {
                 string actionType = query.First().GetType().Name;
                 DataFlowStepNotImplementedException ex = new DataFlowStepNotImplementedException($"NonProd Action (type:{actionType}) not found for use with DLST bucket");
-                Logger.Warn($"DataFlowStep (type:{actionType}) not implmented for use with DLST bucket", ex);
-                Logger.Info("Method <GetHrAction> Ended");
                 throw ex;
             }
-
-            Logger.Info("Method <GetDlstAction> Ended");
             return result;
         }
 
         private static T GetDlstAction<T>(this IQueryable<T> query) where T: BaseAction
         {
-            Logger.Info("Method <GetDlstAction> Started");
-
             int actionId;
 
             if (query is IQueryable<ProducerS3DropAction>)
@@ -318,12 +296,8 @@ namespace Sentry.data.Core
             {
                 string actionType = query.First().GetType().Name;
                 DataFlowStepNotImplementedException ex = new DataFlowStepNotImplementedException($"Action (type:{actionType}) not found for use with DLST bucket");
-                Logger.Warn($"DataFlowStep (type:{actionType}) not implmented for use with DLST bucket", ex);
-                Logger.Info("Method <GetHrAction> Ended");
                 throw ex;
             }
-
-            Logger.Info("Method <GetDlstAction> Ended");
             return result;
         }
 

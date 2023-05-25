@@ -13,23 +13,26 @@ namespace Sentry.data.Infrastructure
             throw new System.NotSupportedException();
         }
 
-        public DataTable ExecuteQuery(DateTime timeCreated)
+        public DataTable ExecuteQuery(DateTime startDateTime, DateTime endDateTime)
         {
             //connect to database
             using (SqlConnection connection = new SqlConnection(Configuration.Config.GetHostSetting("DatabaseConnectionString")))
             {
                 connection.Open();
 
-                SqlCommand command = new SqlCommand("exec usp_GetDeadJobs @TimeCreated", connection);
-                command.CommandTimeout = 300;
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = "usp_GetDeadJobs";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Connection = connection;
+                cmd.CommandTimeout = 300;
 
-                //add parameter for time window of jobs created (@TimeCreated) 
-                command.Parameters.AddWithValue("@TimeCreated", System.Data.SqlDbType.DateTime);
-                command.Parameters["@TimeCreated"].Value = timeCreated;
+                //add parameter for time window of jobs created
+                cmd.Parameters.Add(new SqlParameter("StartDate", startDateTime));
+                cmd.Parameters.Add(new SqlParameter("endDate", endDateTime));
 
                 DataTable dataTable = new DataTable();
 
-                SqlDataAdapter adapter = new SqlDataAdapter(command);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
                 adapter.Fill(dataTable);
 

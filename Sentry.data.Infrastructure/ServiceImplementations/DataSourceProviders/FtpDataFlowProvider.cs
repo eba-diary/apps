@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Exceptions;
@@ -17,18 +18,21 @@ namespace Sentry.data.Infrastructure
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFlowService _dataFlowService;
         private Submission _submission;
+        private readonly ILogger<FtpDataFlowProvider> _logger;
 
         public FtpDataFlowProvider(IFtpProvider ftpProvider, IJobService jobService, 
-            IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService)
+            IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService,
+            ILogger<FtpDataFlowProvider> logger)
         {
             _ftpProvider = ftpProvider;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
             _dataFlowService = dataFlowService;
+            _logger = logger;
         }
         public override void ConfigureProvider(RetrieverJob job)
         {
-            job.JobLoggerMessage("Info", $"ftpdataflowprovider-configureprovider init ftp.job.options - ftppatter:{job.JobOptions.FtpPattern.ToString()} isregexsearch:{job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{job.JobOptions.SearchCriteria}");
+            job.JobLoggerMessage(_logger,"Info", $"ftpdataflowprovider-configureprovider init ftp.job.options - ftppatter:{job.JobOptions.FtpPattern.ToString()} isregexsearch:{job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{job.JobOptions.SearchCriteria}");
             _submission = _jobService.SaveSubmission(job, "");
             _ftpProvider.SetCredentials(job.DataSource.SourceAuthType.GetCredentials(job));
         }
@@ -60,7 +64,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                _job.JobLoggerMessage(_logger,"Error", $"Retriever Job Failed", ex);
                 _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE);
             }
         }
@@ -88,7 +92,7 @@ namespace Sentry.data.Infrastructure
             //Find the target prefix (s3) from S3DropAction on the DataFlow attached to RetrieverJob
             DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(_job.DataFlow.Id, DataActionType.ProducerS3Drop);
 
-            _job.JobLoggerMessage("Info", "Sending file to Temp location");
+            _job.JobLoggerMessage(_logger,"Info", "Sending file to Temp location");
 
             try
             {
@@ -102,8 +106,8 @@ namespace Sentry.data.Infrastructure
             }
             catch(RetrieverJobProcessingException ex)
             {
-                _job.JobLoggerMessage("Error", "", ex);
-                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+                _job.JobLoggerMessage(_logger,"Error", "", ex);
+                _job.JobLoggerMessage(_logger,"Info", "Performing FTP post-failure cleanup.");
 
                 //Cleanup temp file if exists
                 if (File.Exists(tempFile))
@@ -114,8 +118,8 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "Retriever job failed streaming to temp location.", ex);
-                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+                _job.JobLoggerMessage(_logger,"Error", "Retriever job failed streaming to temp location.", ex);
+                _job.JobLoggerMessage(_logger,"Info", "Performing FTP post-failure cleanup.");
 
                 //Cleanup temp file if exists
                 if (File.Exists(tempFile))
@@ -126,7 +130,7 @@ namespace Sentry.data.Infrastructure
                 throw;
             }
 
-            _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+            _job.JobLoggerMessage(_logger,"Info", "Sending file to S3 drop location");
 
             string targetkey = $"{s3DropStep.TriggerKey}{Path.GetFileName(absoluteUri)}";
 
@@ -135,7 +139,7 @@ namespace Sentry.data.Infrastructure
             ******************************************************************************/
             var versionId = _s3ServiceProvider.UploadDataFile(tempFile, s3DropStep.TriggerBucket, targetkey);
 
-            _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{s3DropStep.TargetBucket + "/" + targetkey} | VersionId:{versionId})");
+            _job.JobLoggerMessage(_logger,"Info", $"File uploaded to S3 Drop Location  (Key:{s3DropStep.TargetBucket + "/" + targetkey} | VersionId:{versionId})");
         }
 
         private void ProcessRegexFileNoDelete()
@@ -145,18 +149,18 @@ namespace Sentry.data.Infrastructure
             string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
             if (fileName != "")
             {
-                _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                _job.JobLoggerMessage(_logger,"Error", "Job terminating - Uri does not end with forward slash.");
                 return;
             }
 
             IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
-            _job.JobLoggerMessage("Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
-            _job.JobLoggerMessage("Info", $"specificfile.search source.directory.count {resultList.Count.ToString()}");
+            _job.JobLoggerMessage(_logger,"Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+            _job.JobLoggerMessage(_logger,"Info", $"specificfile.search source.directory.count {resultList.Count.ToString()}");
 
             if (resultList.Any())
             {
-                _job.JobLoggerMessage("Info", $"specificfile.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                _job.JobLoggerMessage(_logger,"Info", $"specificfile.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
             }
 
             var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
@@ -164,12 +168,12 @@ namespace Sentry.data.Infrastructure
             List<RemoteFile> matchList = new List<RemoteFile>();
             matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
 
-            _job.JobLoggerMessage("Info", $"specificfile.search match.count {matchList.Count}");
-            _job.JobLoggerMessage("Info", $"specificfile.search matchlist.content {JsonConvert.SerializeObject(matchList)}");
+            _job.JobLoggerMessage(_logger,"Info", $"specificfile.search match.count {matchList.Count}");
+            _job.JobLoggerMessage(_logger,"Info", $"specificfile.search matchlist.content {JsonConvert.SerializeObject(matchList)}");
 
             foreach (RemoteFile file in matchList)
             {
-                _job.JobLoggerMessage("Info", $"specificfile.search.processing.file {file.Name}");
+                _job.JobLoggerMessage(_logger,"Info", $"specificfile.search.processing.file {file.Name}");
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFtpFile(remoteUrl);
             }
@@ -185,18 +189,18 @@ namespace Sentry.data.Infrastructure
 
             if (fileName != "")
             {
-                _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                _job.JobLoggerMessage(_logger,"Error", "Job terminating - Uri does not end with forward slash.");
                 return;
             }
 
             IList<RemoteFile> resultList = new List<RemoteFile>();
             resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
-            _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.count {resultList.Count.ToString()}");
+            _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search source.directory.count {resultList.Count.ToString()}");
 
             if (resultList.Any())
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
             }
 
             var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
@@ -205,25 +209,25 @@ namespace Sentry.data.Infrastructure
 
             if (lastExecution != null)
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToString("s")} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToString("s")} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
                 matchList = resultList.Where(w => rx.IsMatch(w.Name) && w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
             }
             else
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:noexecutionhistory search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search executiontime:noexecutionhistory search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
                 matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
             }
 
-            _job.JobLoggerMessage("Info", $"regexlastexecution.search match.count {matchList.Count}");
+            _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search match.count {matchList.Count}");
 
             if (matchList.Any())
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
+                _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
             }
 
             foreach (RemoteFile file in matchList)
             {
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search processing.file {file.Name}");
+                _job.JobLoggerMessage(_logger,"Info", $"regexlastexecution.search processing.file {file.Name}");
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFtpFile(remoteUrl);
             }
@@ -241,42 +245,42 @@ namespace Sentry.data.Infrastructure
 
             if (fileName != "")
             {
-                _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                _job.JobLoggerMessage(_logger,"Error", "Job terminating - Uri does not end with forward slash.");
                 return;
             }
             IList<RemoteFile> resultList = new List<RemoteFile>();
             resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
-            _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.count {resultList.Count.ToString()}");
+            _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search source.directory.count {resultList.Count.ToString()}");
 
             if (resultList.Any())
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
             }
 
             List<RemoteFile> matchList = new List<RemoteFile>();
 
             if (lastExecution != null)
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
                 matchList = resultList.Where(w => w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
             }
             else
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_job.GetUri().AbsoluteUri}");
                 matchList = resultList.ToList();
             }
 
-            _job.JobLoggerMessage("Info", $"newfileslastexecution.search match.count {matchList.Count}");
+            _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search match.count {matchList.Count}");
 
             if (matchList.Any())
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
+                _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
             }
 
             foreach (RemoteFile file in matchList)
             {
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search processing.file {file.Name}");
+                _job.JobLoggerMessage(_logger,"Info", $"newfileslastexecution.search processing.file {file.Name}");
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFtpFile(remoteUrl);
             }

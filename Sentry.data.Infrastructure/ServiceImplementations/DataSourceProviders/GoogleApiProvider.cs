@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -6,7 +7,6 @@ using Org.BouncyCastle.Security;
 using Polly;
 using Polly.Registry;
 using RestSharp;
-using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
 using System;
@@ -23,11 +23,12 @@ namespace Sentry.data.Infrastructure
         private readonly string _nextVal = "0";
         protected bool _IsTargetS3;
         protected string _targetPath;
+        protected readonly ILogger<GoogleApiProvider> _logger;
 
         public GoogleApiProvider(Lazy<IDatasetContext> datasetContext,
             Lazy<IConfigService> configService, Lazy<IEncryptionService> encryptionService, 
             Lazy<IJobService> jobService, IReadOnlyPolicyRegistry<string> policyRegistry,
-            RestClient restClient, IDataFeatures dataFeatures) : base(datasetContext, configService, encryptionService, restClient, dataFeatures)
+            RestClient restClient, IDataFeatures dataFeatures, ILogger<GoogleApiProvider> logger) : base(datasetContext, configService, encryptionService, restClient, dataFeatures, logger)
         {
             _jobService = jobService;
             _providerPolicy = policyRegistry.Get<ISyncPolicy>(PollyPolicyKeys.GoogleAPiProviderPolicy);
@@ -41,7 +42,7 @@ namespace Sentry.data.Infrastructure
         protected override void ConfigureClient()
         {
             string methodName = $"{nameof(GoogleApiProvider).ToLower()}_{nameof(ConfigureClient).ToLower()}";
-            Logger.Debug($"{methodName} Method Start");
+            _logger.LogDebug($"{methodName} Method Start");
 
             string baseUri = _job.DataSource.BaseUri.ToString();
 
@@ -62,7 +63,7 @@ namespace Sentry.data.Infrastructure
 
             _client = new RestClient(clientOptions);
 
-            Logger.Debug($"{methodName} Method End");
+            _logger.LogDebug($"{methodName} Method End");
         }
 
         protected override void ConfigureRequest()
@@ -123,7 +124,7 @@ namespace Sentry.data.Infrastructure
 
             if (_IsTargetS3)
             {
-                _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+                _job.JobLoggerMessage(_logger, "Info", "Sending file to S3 drop location");
 
                 try
                 {
@@ -134,8 +135,8 @@ namespace Sentry.data.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
-                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    _job.JobLoggerMessage(_logger, "Error", "Retriever job failed streaming temp location.", ex);
+                    _job.JobLoggerMessage(_logger, "Info", "Performing HTTPS post-failure cleanup.");
 
                     //Cleanup temp file if exists
                     if (File.Exists(tempFile))
@@ -155,7 +156,7 @@ namespace Sentry.data.Infrastructure
                 //   Utilizing Trigger bucket since we want to trigger the targetStep identified
                 versionId = _targetStep != null ? s3Service.UploadDataFile(tempFile, _targetStep.TriggerBucket, targetkey) : s3Service.UploadDataFile(tempFile, targetkey);
 
-                _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                _job.JobLoggerMessage(_logger, "Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
                 //Cleanup temp file if exists
                 if (File.Exists(tempFile))
@@ -165,7 +166,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
+                _job.JobLoggerMessage(_logger, "Info", "Sending file to DFS drop location");
 
                 try
                 {
@@ -176,8 +177,8 @@ namespace Sentry.data.Infrastructure
                 }
                 catch (WebException ex)
                 {
-                    _job.JobLoggerMessage("Error", "Web request return error", ex);
-                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    _job.JobLoggerMessage(_logger, "Error", "Web request return error", ex);
+                    _job.JobLoggerMessage(_logger, "Info", "Performing HTTPS post-failure cleanup.");
 
                     //Cleanup target file if exists
                     if (File.Exists(_targetPath))
@@ -187,8 +188,8 @@ namespace Sentry.data.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    _job.JobLoggerMessage(_logger, "Error", "Retriever job failed streaming external file.", ex);
+                    _job.JobLoggerMessage(_logger, "Info", "Performing HTTPS post-failure cleanup.");
 
                     //Cleanup target file if exists
                     if (File.Exists(_targetPath))
@@ -229,7 +230,7 @@ namespace Sentry.data.Infrastructure
 
             if (resp.StatusCode != HttpStatusCode.OK)
             {
-                _job.JobLoggerMessage("Error", "failed_request", resp.ErrorException);
+                _job.JobLoggerMessage(_logger, "Error", "failed_request", resp.ErrorException);
                 throw new RetrieverJobProcessingException($"Failed processing https request - response:{resp.Content}");
             }
 
@@ -249,7 +250,7 @@ namespace Sentry.data.Infrastructure
         protected override string GetOAuthAccessToken(HTTPSSource source)
         {
             string methodName = $"{nameof(GoogleApiProvider).ToLower()}_{nameof(GetOAuthAccessToken).ToLower()}";
-            Logger.Debug($"{methodName} Method Start");
+            _logger.LogDebug($"{methodName} Method Start");
 
             string oAuthToken;
 
@@ -274,7 +275,7 @@ namespace Sentry.data.Infrastructure
                 var expires_in = responseAsJson.GetValue("expires_in");
                 var token_type = responseAsJson.GetValue("token_type");
 
-                Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
+                _logger.LogInformation($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
 
                 DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
                 _ = ConfigService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
@@ -286,7 +287,7 @@ namespace Sentry.data.Infrastructure
                 oAuthToken = EncryptionService.DecryptString(source.AllTokens[0].CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
 
-            Logger.Debug($"{methodName} Method End");
+            _logger.LogDebug($"{methodName} Method End");
             return oAuthToken;
         }
 
@@ -409,7 +410,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "targetjob_gettargetpath_failure", ex);
+                _job.JobLoggerMessage(_logger, "Error", "targetjob_gettargetpath_failure", ex);
                 throw;
             }
         }

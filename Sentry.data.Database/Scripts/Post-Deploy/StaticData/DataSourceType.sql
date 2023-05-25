@@ -9,7 +9,6 @@
 									('Custom DFS', 'DFS drop location controlled by external team\system', 'DFSCustom'),
 									('FTP', 'Retrieves data files from a FTP source', 'FTP'),
 									('HTTPS', 'Retrieves data from HTTPS sources', 'HTTPS'),
-									('SFTP', 'Retrieves data files from SFTP sources', 'SFTP'),
 									('Spark Java Application', 'Java application to run on Spark Cluster', 'JavaApp'),
 									('GoogleApi', 'Google Api (v3)', 'GOOGLEAPI'),
 									('Basic DataFlow DFS', 'DFS drop location controlled by data.sentry.com', 'DFSDataFlowBasic'),

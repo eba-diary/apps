@@ -3,23 +3,37 @@ using Moq;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
+using Sentry.data.Core.DependencyInjection;
 
 namespace Sentry.data.Core.Tests
 {
     [TestClass]
-    public class ConnectorServiceTests : BaseCoreUnitTest
+    public class ConnectorServiceTests : DomainServiceUnitTest<ConnectorService>
     {
+        [TestInitialize]
+        public void MyTestInitialize()
+        {
+            DomainServiceTestInitialize();
+        }
+
+        [TestCleanup]
+        public void MyTestCleanup()
+        {
+            TestCleanup();
+        }
+
         [TestMethod]
         public async Task GetS3ConnectorConfigJSONAsync_RemoveS3Password()
         {
             //Arrange
+
             Mock<IKafkaConnectorProvider> mockProvider = new Mock<IKafkaConnectorProvider>();
 
             JObject connectorStatusJObject = GetData("ConfluentConnector_Config.json");
 
             mockProvider.Setup(x=>x.GetS3ConnectorConfigAsync(It.IsAny<string>())).ReturnsAsync(connectorStatusJObject);
 
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, TestDependencies);
 
             //Act
             JObject configJObj = await mockService.GetS3ConnectorConfigJSONAsync(It.IsAny<string>());
@@ -40,7 +54,8 @@ namespace Sentry.data.Core.Tests
                 ReasonPhrase = "Created",
             };
             mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, TestDependencies);
 
 
             ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
@@ -64,7 +79,8 @@ namespace Sentry.data.Core.Tests
                 ReasonPhrase = "Not Found",
             };
             mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, TestDependencies);
 
 
             ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();
@@ -88,7 +104,8 @@ namespace Sentry.data.Core.Tests
                 ReasonPhrase = "Not Found",
             };
             mockProvider.Setup(x => x.CreateS3SinkConnectorAsync(It.IsAny<string>())).ReturnsAsync(httpResponse);
-            ConnectorService mockService = new ConnectorService(mockProvider.Object);
+
+            ConnectorService mockService = new ConnectorService(mockProvider.Object, TestDependencies);
 
 
             ConnectorCreateRequestDto requestDto = MockClasses.MockConnectorCreateRequestDto();

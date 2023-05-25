@@ -107,3 +107,4 @@ DECLARE @ErrorState INT;
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_20\CLA-4921-RemoveStandardizeOnUTCTime.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_24\CLA-4975_Enable_Existing_Tokens.sql
 :r ..\Post-Deploy\SupportingScripts\Release_03_02_29\CLA-5076_SetGlobalDatasetId.sql
+:r ..\Post-Deploy\SupportingScripts\Release_03_02_35\CLA-5178_UpdateDatasetCategories.sql

@@ -1,12 +1,12 @@
 ﻿using Polly;
 using Polly.Registry;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Interfaces;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Sentry.Common.Logging;
-using System;
 
 namespace Sentry.data.Infrastructure
 {

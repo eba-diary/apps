@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Polly;
 using Polly.Registry;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.GlobalEnums;
@@ -11,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {

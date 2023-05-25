@@ -5,6 +5,6 @@ namespace Sentry.data.Core
 {
     public interface IDeadSparkJobService
     {
-        List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime timeCreated);
+        List<DeadSparkJobDto> GetDeadSparkJobDtos(DateTime startDateTime, DateTime endDateTime);
     }
 }

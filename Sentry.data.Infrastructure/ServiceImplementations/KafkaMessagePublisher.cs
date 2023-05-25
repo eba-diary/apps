@@ -1,14 +1,13 @@
 ﻿using Confluent.Kafka;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Sentry.data.Infrastructure.Helpers;
 using System.Threading.Tasks;
-using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Infrastructure
 {

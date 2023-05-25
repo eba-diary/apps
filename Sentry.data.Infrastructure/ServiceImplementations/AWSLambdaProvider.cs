@@ -2,10 +2,10 @@
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
 using Sentry.Common.Logging;
-using System;
-using System.Text;
 using Sentry.data.Core;
 using Sentry.data.Core.Exceptions;
+using System;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {

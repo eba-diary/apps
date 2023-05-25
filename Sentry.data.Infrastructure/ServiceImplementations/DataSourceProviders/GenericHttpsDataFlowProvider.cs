@@ -1,4 +1,5 @@
-﻿using Polly.Registry;
+﻿using Microsoft.Extensions.Logging;
+using Polly.Registry;
 using RestSharp;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
@@ -12,7 +13,8 @@ namespace Sentry.data.Infrastructure
 
         public GenericHttpsDataFlowProvider(Lazy<IDatasetContext> datasetContext, Lazy<IConfigService> configService,
                 Lazy<IEncryptionService> encryptionService, Lazy<IJobService> jobService, IDataFlowService dataFlowService,
-                RestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures, authorizationProvider)
+                RestClient restClient, IReadOnlyPolicyRegistry<string> policyRegistry, IDataFeatures dataFeatures, IAuthorizationProvider authorizationProvider,
+                ILogger<GenericHttpsDataFlowProvider> logger) : base(datasetContext, configService, encryptionService, jobService, policyRegistry, restClient, dataFeatures, authorizationProvider, logger)
         {
             _dataFlowService = dataFlowService;
         }
@@ -31,7 +33,7 @@ namespace Sentry.data.Infrastructure
 
             if (_targetStep == null)
             {
-                _job.JobLoggerMessage("Error", "find_targetstep_failure");
+                _job.JobLoggerMessage(_logger, "Error", "find_targetstep_failure");
                 throw new Exception("Did not find target producers3drop data flow step");
             }
 
@@ -46,7 +48,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "targetstep_gettargetpath_failure", ex);
+                _job.JobLoggerMessage(_logger, "Error", "targetstep_gettargetpath_failure", ex);
                 throw;
             }
         }

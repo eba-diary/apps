@@ -1,20 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hangfire;
+using Microsoft.Extensions.Logging;
 using Sentry.data.Core;
 using StructureMap;
-using Sentry.Common.Logging;
-using Hangfire;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
     [Queue("jawsservice")]
     public class JawsService
     {
+        private readonly ILogger<JawsService> _logger;
+
+        public JawsService(ILogger<JawsService> logger)
+        {
+            _logger = logger;
+        }
+
         private RetrieverJob _job;
 
         private IContainer Container { get; set; }
@@ -23,7 +29,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                Logger.Info($"Starting JawsService for Job Id : {jobId}");
+                _logger.LogInformation($"Starting JawsService for Job Id : {jobId}");
 
                 using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
@@ -31,8 +37,8 @@ namespace Sentry.data.Infrastructure
 
                     _job = _requestContext.RetrieverJob.FirstOrDefault(w => w.Id == jobId);
 
-                    _job.JobLoggerMessage("Info", "Jaws processing triggered");
-                    _job.JobLoggerMessage("Info", $"uncompressretrieverjob incomingfile:{filePath}");
+                    _job.JobLoggerMessage(_logger, "Info", "Jaws processing triggered");
+                    _job.JobLoggerMessage(_logger, "Info", $"uncompressretrieverjob incomingfile:{filePath}");
 
                     //This can be triggered by various jobs, we need to pick the drop location to move the uncompressed files too.
                     // Since GoleneEye will be running on AWS and Jaw decompression takes place on a local directory of the EC2 instance,
@@ -45,17 +51,17 @@ namespace Sentry.data.Infrastructure
                     defaultjob = genericJobs.FirstOrDefault(w => w.DataSource.Is<S3Basic>());
                     if (defaultjob == null)
                     {
-                        _job.JobLoggerMessage("Info", "S3Basic job not found, finding DfsBasic job");
+                        _job.JobLoggerMessage(_logger, "Info", "S3Basic job not found, finding DfsBasic job");
                         defaultjob = genericJobs.FirstOrDefault(w => w.DataSource.Is<DfsBasic>());
                         if (defaultjob == null)
                         {
-                            _job.JobLoggerMessage("Error", "No Default jobs were found");
+                            _job.JobLoggerMessage(_logger, "Error", "No Default jobs were found");
                             throw new NotImplementedException("No Default jobs (DfsBasic or S3Basic) where found for schema");
                         }
                     }
                     else
                     {
-                        _job.JobLoggerMessage("Info", "S3Basic job found");
+                        _job.JobLoggerMessage(_logger, "Info", "S3Basic job found");
                     }
 
 
@@ -64,7 +70,7 @@ namespace Sentry.data.Infrastructure
                     {
                         try
                         {
-                            _job.JobLoggerMessage("Info", "uncompressretrieverjob detected_zip_compression");
+                            _job.JobLoggerMessage(_logger, "Info", "uncompressretrieverjob detected_zip_compression");
                             if (defaultjob.DataSource.Is<S3Basic>())
                             {
                                 S3ServiceProvider s3Service = new S3ServiceProvider();
@@ -79,7 +85,7 @@ namespace Sentry.data.Infrastructure
                                     Directory.CreateDirectory(extractPath);
                                 }
 
-                                _job.JobLoggerMessage("Info", $"uncompressedretrieverjob extractpath:{extractPath}");
+                                _job.JobLoggerMessage(_logger, "Info", $"uncompressedretrieverjob extractpath:{extractPath}");
 
                                 try
                                 {
@@ -91,24 +97,24 @@ namespace Sentry.data.Infrastructure
                                     //Upload all extracted files to S3 drop location
                                     foreach (string file in extractedFileList)
                                     {
-                                        _job.JobLoggerMessage("Info", $"uncompressretrieverjob preparing_file_upload file:{Path.GetFileName(file)}");
+                                        _job.JobLoggerMessage(_logger, "Info", $"uncompressretrieverjob preparing_file_upload file:{Path.GetFileName(file)}");
 
                                         //Adding parent directory to targetkey to ensure concurrent processing of extracted files with same name
                                         // an additional parent folder named with a GUID is added to ensure concurrent processing of same zip file name
                                         string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{Guid.NewGuid().ToString()}/{Directory.GetParent(file).Name}/{_job.GetTargetFileName(Path.GetFileName(file))}";
                                         var versionId = s3Service.UploadDataFile(file, targetkey);
-                                        _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
+                                        _job.JobLoggerMessage(_logger, "Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
                                     }
 
-                                    _job.JobLoggerMessage("Info", "uncompressretrieverjob completed_extraction");
+                                    _job.JobLoggerMessage(_logger, "Info", "uncompressretrieverjob completed_extraction");
                                 }
                                 catch (Exception ex)
                                 {
-                                    _job.JobLoggerMessage("Error", "Jaws failed extracting and uploading to S3 drop location", ex);
+                                    _job.JobLoggerMessage(_logger, "Error", "Jaws failed extracting and uploading to S3 drop location", ex);
                                 }
                                 finally
                                 {
-                                    _job.JobLoggerMessage("Info", $"Deleting all files in extract directory ({extractPath})");
+                                    _job.JobLoggerMessage(_logger, "Info", $"Deleting all files in extract directory ({extractPath})");
 
                                     //cleanup local extracts
                                     //  Need to send the parent directory since we generate an additional layer, to support
@@ -135,7 +141,7 @@ namespace Sentry.data.Infrastructure
                         }
                         catch (System.IO.InvalidDataException ex)
                         {
-                            _job.JobLoggerMessage("Error", $"Jaws could not decompress file ({Path.GetFileName(filePath)}), 1) corrupt file, 2) is not .zip archive, or 3) there is more than 1 part to the archive (multi part zip).", ex);
+                            _job.JobLoggerMessage(_logger, "Error", $"Jaws could not decompress file ({Path.GetFileName(filePath)}), 1) corrupt file, 2) is not .zip archive, or 3) there is more than 1 part to the archive (multi part zip).", ex);
 
                             //throw exeption to ensure HangFire job is failed
                             throw new InvalidDataException($"Jaws could not decompress job ({_job.Id}) file ({Path.GetFileName(filePath)}), 1) corrupt file, 2) is not .zip archive, or 3) there is more than 1 part to the archive.", ex);
@@ -143,13 +149,13 @@ namespace Sentry.data.Infrastructure
                         catch (Exception ex)
                         {
                             //throw exeption to ensure HangFire job is failed
-                            _job.JobLoggerMessage("Error", $"Jaw could not decompress file ({Path.GetFileName(filePath)})", ex);
+                            _job.JobLoggerMessage(_logger, "Error", $"Jaw could not decompress file ({Path.GetFileName(filePath)})", ex);
                         }
                     }
                     //Check for gzip extension
                     else if (Convert.ToInt32(_job.JobOptions.CompressionOptions.CompressionType) == (int)CompressionTypes.GZIP)
                     {
-                        _job.JobLoggerMessage("Info", "uncompressretrieverjob detected_gzip_compression");
+                        _job.JobLoggerMessage(_logger, "Info", "uncompressretrieverjob detected_gzip_compression");
                         string tempfile = null;
 
                         try
@@ -180,23 +186,23 @@ namespace Sentry.data.Infrastructure
                                 S3ServiceProvider s3Service = new S3ServiceProvider();
                                 string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath))}";
                                 var versionId = s3Service.UploadDataFile(tempfile, targetkey);
-                                _job.JobLoggerMessage("Info", $"Extracted File to S3 Drop Location (Key:{targetkey} VersionId:{versionId}");
+                                _job.JobLoggerMessage(_logger, "Info", $"Extracted File to S3 Drop Location (Key:{targetkey} VersionId:{versionId}");
                             }
                             else if (defaultjob.DataSource.Is<DfsBasic>())
                             {
                                 string target = Path.Combine(defaultjob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath)));
                                 File.Move(tempfile, target);
-                                _job.JobLoggerMessage("Info", $"Extracted File to DFS Drop Location ({target})");
+                                _job.JobLoggerMessage(_logger, "Info", $"Extracted File to DFS Drop Location ({target})");
                             }
                             else
                             {
-                                _job.JobLoggerMessage("Error", $"The Schema does not have DFS or S3 basic job defined");
+                                _job.JobLoggerMessage(_logger, "Error", $"The Schema does not have DFS or S3 basic job defined");
                                 throw new NotImplementedException($"The Dataset config ({_job.DatasetConfig.ConfigId}) does not have a generic DFS or S3 basic job defined.");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _job.JobLoggerMessage("Error", $"Jaws could not decompress file ({Path.GetFileName(filePath)})", ex);
+                            _job.JobLoggerMessage(_logger, "Error", $"Jaws could not decompress file ({Path.GetFileName(filePath)})", ex);
 
                             //throw exeption to ensure HangFire job is failed
                             throw new InvalidDataException($"Jaws could not decompress job ({_job.Id}) file ({Path.GetFileName(filePath)}).", ex);
@@ -206,13 +212,13 @@ namespace Sentry.data.Infrastructure
                             //cleanup extracted files from work directory
                             try
                             {
-                                _job.JobLoggerMessage("Info", $"Cleaning up extracted files");
+                                _job.JobLoggerMessage(_logger, "Info", $"Cleaning up extracted files");
                                 File.Delete(tempfile);
                             }
                             catch (Exception ex)
                             {
                                 // Log error but allow process to continue successfully
-                                _job.JobLoggerMessage("Error", $"Failed Deleting Extracted file from temp directory", ex);
+                                _job.JobLoggerMessage(_logger, "Error", $"Failed Deleting Extracted file from temp directory", ex);
                             }
                         }
 
@@ -226,11 +232,11 @@ namespace Sentry.data.Infrastructure
                     }
                 }
 
-                Logger.Info($"Completed JawsService for Job Id : {jobId}");
+                _logger.LogInformation($"Completed JawsService for Job Id : {jobId}");
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "uncompressretrieverjob failed", ex);
+                _job.JobLoggerMessage(_logger, "Error", "uncompressretrieverjob failed", ex);
             }            
         }
 
@@ -241,11 +247,11 @@ namespace Sentry.data.Infrastructure
 
             if (fcount == 0)
             {
-                _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
+                _job.JobLoggerMessage(_logger, "Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
             }
             else
             {
-                _job.JobLoggerMessage("Debug", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
+                _job.JobLoggerMessage(_logger, "Debug", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"uncompressretrieverjob uncompress_dir_content: {extractPath}");
@@ -254,7 +260,7 @@ namespace Sentry.data.Infrastructure
                     FileInfo fi = new FileInfo(f);
                     sb.AppendLine($"name:{f}\tsize:{fi.Length}");
                 }
-                _job.JobLoggerMessage("Debug", sb.ToString());
+                _job.JobLoggerMessage(_logger, "Debug", sb.ToString());
             }
         }
 
@@ -262,24 +268,24 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                _job.JobLoggerMessage("Info", "uncompresszipfile starting_extraction");
+                _job.JobLoggerMessage(_logger, "Info", "uncompresszipfile starting_extraction");
                 //Do we need to exclude any files from zip archive?  If not extract all files to target directory
                 if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
                 {
 
                     List<string> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
 
-                    _job.JobLoggerMessage("Info", $"uncompresszipfile filenameexclusions_detected  count:{ExclusionList.Count}");
+                    _job.JobLoggerMessage(_logger, "Info", $"uncompresszipfile filenameexclusions_detected  count:{ExclusionList.Count}");
 
                     using (ZipArchive archive = ZipFile.OpenRead(filePath))
                     {
                         foreach (ZipArchiveEntry entry in archive.Entries)
                         {
                             //Exclude file if name exists in ExclusionList or does not match job search criteria
-                            if (!ListContainsValue(ExclusionList, Path.GetFileName(entry.FullName)) && !_job.FilterIncomingFile(entry.FullName))
+                            if (!ListContainsValue(ExclusionList, Path.GetFileName(entry.FullName)) && !_job.FilterIncomingFile(_logger, entry.FullName))
                             {
                                 //extract to local work directory, overrwrite file if exists
-                                _job.JobLoggerMessage("Debug", $"uncompresszipfile extractfile entry:{entry.FullName} to:{Path.Combine(extractPath, Path.GetFileName(entry.FullName))}");
+                                _job.JobLoggerMessage(_logger, "Debug", $"uncompresszipfile extractfile entry:{entry.FullName} to:{Path.Combine(extractPath, Path.GetFileName(entry.FullName))}");
                                 entry.ExtractToFile(Path.Combine(extractPath, Path.GetFileName(entry.FullName)), true);
                             }
                         }
@@ -287,13 +293,13 @@ namespace Sentry.data.Infrastructure
                 }
                 else
                 {
-                    _job.JobLoggerMessage("Debug", $"uncompresszipfile extractdirectory source:{filePath} to:{extractPath}");
+                    _job.JobLoggerMessage(_logger, "Debug", $"uncompresszipfile extractdirectory source:{filePath} to:{extractPath}");
                     ZipFile.ExtractToDirectory(filePath, extractPath);
                 }
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Debug", $"uncompresszipfile failedextraction source:{filePath} to:{extractPath}", ex);
+                _job.JobLoggerMessage(_logger, "Debug", $"uncompresszipfile failedextraction source:{filePath} to:{extractPath}", ex);
             }            
         }
 
@@ -319,13 +325,13 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                _job.JobLoggerMessage("Info", $"Cleaning up Job temp directory ({dirPath})");
+                _job.JobLoggerMessage(_logger, "Info", $"Cleaning up Job temp directory ({dirPath})");
                 Directory.Delete(dirPath,true);
             }
             catch (Exception ex)
             {
                 // Log error but allow process to continue successfully
-                _job.JobLoggerMessage("Warn", $"Failed Deleting Job Temp Directory ({dirPath})", ex);
+                _job.JobLoggerMessage(_logger, "Warn", $"Failed Deleting Job Temp Directory ({dirPath})", ex);
             }
         }
     }

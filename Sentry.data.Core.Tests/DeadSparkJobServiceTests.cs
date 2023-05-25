@@ -53,7 +53,7 @@ namespace Sentry.data.Core.Tests
                 DataFlowStepID = 2
             });
 
-            mockProvider.Setup(e => e.GetDeadSparkJobs(DateTime.Today)).Returns(deadSparkJobsSetupList);
+            mockProvider.Setup(e => e.GetDeadSparkJobs(DateTime.Today,DateTime.Today)).Returns(deadSparkJobsSetupList);
             s3Provider.Setup(s3 => s3.ListObjects("SourceBucketName1", It.IsAny<string>(),null)).Returns(new List<string>(){ "_SUCCESS", "File" });
             s3Provider.Setup(s3 => s3.ListObjects("SourceBucketName2", It.IsAny<string>(), null)).Returns(new List<string>() { "File" });
 
@@ -62,7 +62,7 @@ namespace Sentry.data.Core.Tests
 
 
             // Act
-            List<DeadSparkJobDto> deadSparkJobDtoList = jobService.GetDeadSparkJobDtos(DateTime.Today);
+            List<DeadSparkJobDto> deadSparkJobDtoList = jobService.GetDeadSparkJobDtos(DateTime.Today, DateTime.Today);
 
             // Assert
             mockProvider.VerifyAll();
