@@ -11,6 +11,6 @@ CREATE TABLE [dbo].[DatasetFileDrop]
 	[DatasetID] [int] NULL,
 	[SchemaID] [int] NULL,
 	[CreateDTM] [datetime] NULL, 
-    CONSTRAINT [PK_DatasetFileDrop] PRIMARY KEY ([DatasetFileDropId])
+    CONSTRAINT [PK_DatasetFileDrop] PRIMARY KEY ([DatasetFileDropID])
 )
-GO
+
