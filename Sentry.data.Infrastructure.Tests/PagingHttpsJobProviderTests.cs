@@ -80,7 +80,6 @@ namespace Sentry.data.Infrastructure.Tests
             s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, null, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -160,7 +159,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -257,7 +255,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -378,7 +375,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -471,7 +467,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -578,7 +573,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -684,7 +678,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -784,7 +777,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -884,7 +876,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1038,7 +1029,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1157,7 +1147,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1280,7 +1269,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1322,7 +1310,6 @@ namespace Sentry.data.Infrastructure.Tests
 
             MockRepository repo = new MockRepository(MockBehavior.Strict);
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, featureFlags.Object);
 
@@ -1408,7 +1395,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1542,7 +1528,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1682,7 +1667,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1785,7 +1769,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1879,7 +1862,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -1988,7 +1970,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -2131,7 +2112,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -2251,7 +2231,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -2369,7 +2348,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -2486,7 +2464,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -2603,7 +2580,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 
@@ -2710,7 +2686,6 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.Dispose());
 
             Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, null, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
 

@@ -142,10 +142,7 @@ namespace Sentry.data.Core
                     _datasetContext.SaveChanges();
                     _logger.LogInformation($"Successfully saved new token.");
 
-                    if (_dataFeatures.CLA4931_SendMotiveEmail.GetValue())
-                    {
-                        _emailService.SendNewMotiveTokenAddedEmail(newToken);
-                    }
+                    _emailService.SendNewMotiveTokenAddedEmail(newToken);
                 }
             }
             catch (Exception e)

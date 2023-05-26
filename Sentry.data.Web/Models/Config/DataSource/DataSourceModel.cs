@@ -147,6 +147,5 @@ namespace Sentry.data.Web
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }
         public string HrempServiceEnv { get; set; }
-        public bool CLA2868_APIPaginationSupport { get; set; }
     }
 }
