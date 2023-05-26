@@ -12,7 +12,7 @@ namespace Sentry.data.Web
         {
             Downloads = dto.Downloads;
             DatasetFileCount = dto.DatasetFileCount;
-            DatasetFileConfigSchemas = dto.DatasetFileConfigSchemas?.Select(x => x.ToModel()).ToList();
+            DatasetFileConfigSchemas = dto.DatasetFileConfigSchemas?.Select(x => x.ToModel()).OrderBy(x => x.SchemaName).ToList();
             DatasetScopeTypeNames = dto.DatasetScopeTypeNames;
             OriginationCode = dto.OriginationCode;
             DataClassificationDescription = dto.DataClassificationDescription;
