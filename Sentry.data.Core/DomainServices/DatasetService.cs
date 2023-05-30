@@ -259,7 +259,10 @@ namespace Sentry.data.Core
 
             if (perms.InheritanceTicket != null)
             {
-                ar.InheritanceStatus = perms.InheritanceTicket.AddedPermissions.FirstOrDefault().IsEnabled;
+                if(perms.InheritanceTicket.AddedPermissions != null)
+                {
+                    ar.InheritanceStatus = perms.InheritanceTicket.AddedPermissions.FirstOrDefault().IsEnabled;
+                }
             }
 
             //determine the names of the default security groups
