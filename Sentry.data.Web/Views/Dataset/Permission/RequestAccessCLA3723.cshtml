@@ -32,7 +32,23 @@
         </ol>
         <div id="RequestAccessToSection" class="requestAccessStage">
             <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <em id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</em></button>
-            <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SaidKeyCode">Request Access to all @Model.SaidKeyCode Datasets</button>
+            @if (!Model.InheritanceStatus)
+            {
+                <div id="InheritanceWarningWrapper" data-title="Asset level permissions are not enabled for this dataset"> <!-- Use wrapper because disabled buttons block tooltips due to some pointer css -->
+                    <button type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" disabled>
+                        <em id="RequestAccessInheritanceWarning" class="fas fa-exclamation-triangle pr-1"></em>
+                        Request Access to all @Model.SaidKeyCode Datasets
+                    </button>
+                </div>
+            }
+            else
+            {
+                <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block"value="@Model.SaidKeyCode">
+                    Request Access to all @Model.SaidKeyCode Datasets
+                </button>
+            }
+
+
         </div>
         <div id="RequestAccessTypeSection" class="d-none requestAccessStage">
             <button id="RequestAccessTypeConsumeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Consumer/Query Access</button>

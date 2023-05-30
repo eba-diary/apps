@@ -17,5 +17,7 @@ namespace Sentry.data.Web
         public string ProducerDatasetGroupName { get; set; }
         public string ConsumeAssetGroupName { get; set; }
         public string ProducerAssetGroupName { get; set; }
+
+        public bool InheritanceStatus { get; set; }
     }
 }

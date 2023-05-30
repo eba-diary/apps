@@ -246,14 +246,21 @@ namespace Sentry.data.Core
         public async Task<AccessRequest> GetAccessRequestAsync(int datasetId)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-            
+
+            var perms = GetDatasetPermissions(ds.DatasetId);
+
             AccessRequest ar = new AccessRequest()
             {
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
                 SecurableObjectName = ds.DatasetName,
-                SaidKeyCode = ds.Asset.SaidKeyCode
+                SaidKeyCode = ds.Asset.SaidKeyCode,
             };
+
+            if (perms.InheritanceTicket != null)
+            {
+                ar.InheritanceStatus = perms.InheritanceTicket.AddedPermissions.FirstOrDefault().IsEnabled;
+            }
 
             //determine the names of the default security groups
             var securityGroups = _securityService.GetDefaultSecurityGroupDtos(ds);

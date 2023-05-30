@@ -2649,6 +2649,10 @@ $("#bundledDatasetFilesTable").dataTable().columnFilter({
         let consumeAssetGroupName = $("#consumeAssetGroupName").text();
         let producerAssetGroupName = $("#producerAssetGroupName").text();
 
+        $("#InheritanceWarningWrapper").tooltip({
+            placement: 'bottom'
+        });
+
         data.Dataset.addRequestAccessBreadcrumb("Access To", "#RequestAccessToSection")
         $("#RequestAccessToDatasetBtn").click(function (e) {
             var datasetName = $("#RequestAccessDatasetName").text();
