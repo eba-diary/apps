@@ -79,9 +79,7 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IS3ServiceProvider> s3Provider = repo.Create<IS3ServiceProvider>();
             s3Provider.Setup(x => x.UploadDataFile(stream.Object, "target-bucket", It.Is<string>(s => s.StartsWith("sub-folder/filename_")))).Returns("");
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, null, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, null, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -158,9 +156,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetTokenAuthenticationToken(dataSource)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -254,9 +250,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -374,9 +368,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -466,9 +458,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
 
@@ -572,9 +562,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
 
@@ -677,9 +665,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token").Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -776,9 +762,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -875,9 +859,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1028,9 +1010,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token5)).Returns("token5");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1146,9 +1126,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetTokenAuthenticationToken(dataSource)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1268,9 +1246,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1309,9 +1285,8 @@ namespace Sentry.data.Infrastructure.Tests
             RetrieverJob job = GetBaseRetrieverJob(dataSource, options, 1, 0);
 
             MockRepository repo = new MockRepository(MockBehavior.Strict);
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null);
 
             provider.Execute(job);
         }
@@ -1394,9 +1369,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1527,9 +1500,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1666,9 +1637,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1768,9 +1737,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -1861,9 +1828,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             Assert.ThrowsException<AggregateException>(() => provider.Execute(job));
 
@@ -1969,9 +1934,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.SetupSequence(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2").Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -2111,9 +2074,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -2230,9 +2191,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -2347,9 +2306,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -2463,9 +2420,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token2)).Returns("token2");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -2579,9 +2534,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, s3Provider.Object, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 
@@ -2685,9 +2638,7 @@ namespace Sentry.data.Infrastructure.Tests
             authorizationProvider.Setup(x => x.GetOAuthAccessToken(dataSource, token)).Returns("token");
             authorizationProvider.Setup(x => x.Dispose());
 
-            Mock<IDataFeatures> featureFlags = repo.Create<IDataFeatures>();
-
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, null, authorizationProvider.Object, generator.Object, fileProvider.Object, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(datasetContext.Object, null, authorizationProvider.Object, generator.Object, fileProvider.Object);
 
             provider.Execute(job);
 

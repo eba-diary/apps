@@ -254,7 +254,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             Mock<IDataFeatures> featureFlags = repository.Create<IDataFeatures>();
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, featureFlags.Object);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null);
 
             Mock<IBackgroundJobClient> backgroundClient = new Mock<IBackgroundJobClient>();
 
@@ -409,7 +409,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             datasetContext.Setup(x => x.SaveChanges(true));
 
-            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, null);
+            PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null);
 
             Mock<IBackgroundJobClient> backgroundClient = new Mock<IBackgroundJobClient>();
 
