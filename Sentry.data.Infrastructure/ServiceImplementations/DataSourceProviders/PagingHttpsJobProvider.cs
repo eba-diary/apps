@@ -26,18 +26,16 @@ namespace Sentry.data.Infrastructure
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IHttpClientGenerator _httpClientGenerator;
         private readonly IFileProvider _fileProvider;
-        private readonly IDataFeatures _featureFlags;
         #endregion
 
         #region Constructor
-        public PagingHttpsJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IFileProvider fileProvider, IDataFeatures featureFlags)
+        public PagingHttpsJobProvider(IDatasetContext datasetContext, IS3ServiceProvider s3ServiceProvider, IAuthorizationProvider authorizationProvider, IHttpClientGenerator httpClientGenerator, IFileProvider fileProvider)
         {
             _datasetContext = datasetContext;
             _s3ServiceProvider = s3ServiceProvider;
             _authorizationProvider = authorizationProvider;
             _httpClientGenerator = httpClientGenerator;
             _fileProvider = fileProvider;
-            _featureFlags = featureFlags;
         }
         #endregion
 
