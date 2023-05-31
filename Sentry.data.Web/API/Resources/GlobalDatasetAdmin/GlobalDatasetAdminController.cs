@@ -15,7 +15,7 @@ namespace Sentry.data.Web.API
     {
         private readonly IGlobalDatasetAdminService _globalDatasetAdminService;
 
-        public GlobalDatasetAdminController(IGlobalDatasetAdminService globalDatasetAdminService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
+        public GlobalDatasetAdminController(IGlobalDatasetAdminService globalDatasetAdminService, IApiDependency apiDependency) : base(apiDependency)
         {
             _globalDatasetAdminService = globalDatasetAdminService;
         }

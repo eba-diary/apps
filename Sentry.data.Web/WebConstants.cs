@@ -21,6 +21,7 @@
             public const string VERSION_SCHEMAS = VERSION + "/schemas";
             public const string VERSION_GLOBALDATASETS = VERSION + "/globaldatasets";
             public const string VERSION_GLOBALDATASETS_ADMIN = VERSION_GLOBALDATASETS + "/admin";
+            public const string VERSION_ASSISTANCE = VERSION + "/assistance";
         }
     }
 }

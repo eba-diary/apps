@@ -15,7 +15,7 @@ namespace Sentry.data.Web.API
     {
         private readonly ISchemaFlowService _schemaFlowService;
 
-        public SchemaController(ISchemaFlowService schemaFlowService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
+        public SchemaController(ISchemaFlowService schemaFlowService, IApiDependency apiDependency) : base(apiDependency)
         {
             _schemaFlowService = schemaFlowService;
         }

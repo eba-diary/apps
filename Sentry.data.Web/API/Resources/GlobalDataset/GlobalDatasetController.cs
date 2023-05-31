@@ -13,7 +13,7 @@ namespace Sentry.data.Web.API
     {
         private readonly IGlobalDatasetService _globalDatasetService;
 
-        public GlobalDatasetController(IGlobalDatasetService globalDatasetService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
+        public GlobalDatasetController(IGlobalDatasetService globalDatasetService, IApiDependency apiDependency) : base(apiDependency)
         {
             _globalDatasetService = globalDatasetService;
         }

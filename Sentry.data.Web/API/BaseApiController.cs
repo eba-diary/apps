@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
-using Sentry.data.Core.Exceptions;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -16,11 +15,11 @@ namespace Sentry.data.Web.API
         private readonly IValidationRegistry _validationRegistry;
         private readonly IDataFeatures _dataFeatures;
 
-        protected BaseApiController(IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures)
+        protected BaseApiController(IApiDependency apiDependency)
         {
-            _mapper = mapper;
-            _validationRegistry = validationRegistry;
-            _dataFeatures = dataFeatures;
+            _mapper = apiDependency.Mapper;
+            _validationRegistry = apiDependency.ValidationRegistry;
+            _dataFeatures = apiDependency.DataFeatures;
         }
 
         /// <summary>

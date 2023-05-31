@@ -15,7 +15,7 @@ namespace Sentry.data.Web.API
     {
         private readonly IDatasetService _datasetService;
 
-        public DatasetController(IDatasetService datasetService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
+        public DatasetController(IDatasetService datasetService, IApiDependency apiDependency) : base(apiDependency)
         {
             _datasetService = datasetService;
         }
