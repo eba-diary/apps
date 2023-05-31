@@ -529,7 +529,6 @@ namespace Sentry.data.Web.Controllers
         {
             DataSourceModel dsm = CreateSourceDropDown(new DataSourceModel());
             dsm.ReturnUrl = "/";
-            dsm.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
             CreateEvent("Viewed Data Source Creation Page");
             return View("DataSource/CreateDataSource", dsm);
         }
@@ -613,7 +612,6 @@ namespace Sentry.data.Web.Controllers
                 DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
                 DataSourceModel model = new DataSourceModel(dto);
                 model.ReturnUrl = "/DataFlow/Create";
-                model.CLA2868_APIPaginationSupport = _featureFlags.CLA2868_APIPaginationSupport.GetValue();
                 bool isMotive = int.Parse(Sentry.Configuration.Config.GetHostSetting("MotiveDataSourceId")) == sourceID;
                 foreach(var token in model.Tokens)
                 {

@@ -46,12 +46,6 @@ namespace Sentry.data.Infrastructure
         {
             Logger.Info($"Paging Https Retriever Job start - Job: {job.Id}");
 
-            if (!_featureFlags.CLA2869_AllowMotiveJobs.GetValue() && job.DataSource.Name.ToLower().Contains("motive"))
-            {
-                Logger.Error("Blocking Motive Job via Feature Flag.");
-                return;
-            }
-
             if (job.HasValidRequestVariables())
             {
                 using (_authorizationProvider)

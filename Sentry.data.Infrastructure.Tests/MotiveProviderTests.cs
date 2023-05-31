@@ -253,7 +253,6 @@ namespace Sentry.data.Infrastructure.Tests
             datasetContext.Setup(x => x.SaveChanges(true));
 
             Mock<IDataFeatures> featureFlags = repository.Create<IDataFeatures>();
-            featureFlags.Setup(x => x.CLA2869_AllowMotiveJobs.GetValue()).Returns(true);
 
             PagingHttpsJobProvider provider = new PagingHttpsJobProvider(null, null, null, null, null, featureFlags.Object);
 
