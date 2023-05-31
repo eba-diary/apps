@@ -70,6 +70,12 @@ pipeline {
  
                 // Gather up the test results and process them so they can be used by Sonar
                 dotNetGatherTestResults()
+
+                dir('Sentry.data.Web') {
+                   nodejs("Node 16") {
+                      bat 'npm run test'
+                   }
+                }
             }
         }
  
