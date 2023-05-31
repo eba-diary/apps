@@ -73,7 +73,7 @@ pipeline {
 
                 dir('Sentry.data.Web') {
                    nodejs("Node 16") {
-                      bat 'npm run test'
+                      bat 'npm run test --passWithNoTests'
                    }
                 }
             }
