@@ -257,9 +257,13 @@ namespace Sentry.data.Core
                 SaidKeyCode = ds.Asset.SaidKeyCode,
             };
 
-            if (perms != null && perms.InheritanceTicket != null && perms.InheritanceTicket.AddedPermissions != null)
+            if (perms != null && perms.InheritanceTicket != null)
             {
-                ar.InheritanceStatus = perms.InheritanceTicket.AddedPermissions.FirstOrDefault().IsEnabled;
+                var inheritancePerms = perms.InheritanceTicket.AddedPermissions.FirstOrDefault();
+                if(inheritancePerms != null)
+                {
+                    ar.InheritanceStatus = inheritancePerms.IsEnabled;
+                }
             }
 
             //determine the names of the default security groups
