@@ -16,7 +16,7 @@ namespace Sentry.data.Infrastructure
             _emailService = emailService;
         }
 
-        private IDatasetContext _datasetContext;
+        private readonly IDatasetContext _datasetContext;
         private readonly IEmailService _emailService;
 
         public void CheckConsumptionLayerStatus()
