@@ -52,7 +52,7 @@ namespace Sentry.data.Web.API
         }
         
         /// <summary>
-        /// Update existing dataset
+        /// Get dataset information
         /// </summary>
         [HttpGet]
         [Route("{id}")]

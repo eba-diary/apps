@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Sentry.data.Core;
-using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
@@ -10,7 +9,6 @@ using System.Web.Http;
 namespace Sentry.data.Web.API
 {
     [RoutePrefix(WebConstants.Routes.VERSION_GLOBALDATASETS)]
-    [WebApiAuthorizeUseApp]
     public class GlobalDatasetController : BaseApiController
     {
         private readonly IGlobalDatasetService _globalDatasetService;

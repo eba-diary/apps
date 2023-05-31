@@ -18,6 +18,7 @@ namespace Sentry.data.Core
         public virtual string SnowflakeTable { get; set; }
         public virtual string SnowflakeStatus { get; set; }
         public virtual SnowflakeConsumptionType SnowflakeType { get; set; }
+        public virtual DateTime LastChanged { get; set; }
 
         /// <summary>
         /// Implementation of the Visitor pattern.  Allows a class that implements <see cref="ISchemaConsumptionVisitor{T}"/>
