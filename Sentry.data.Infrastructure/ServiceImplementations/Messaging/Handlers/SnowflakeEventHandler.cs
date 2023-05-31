@@ -4,6 +4,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.Messaging.Common;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,6 +55,7 @@ namespace Sentry.data.Infrastructure
 
                         schema = _dsContext.GetById<FileSchema>(snowRequestedEvent.SchemaID);
                         UpdateSchemaConsumptionDetailsStatus(schema, ConsumptionLayerTableStatusEnum.Requested);
+
                         _dsContext.SaveChanges();
                         Logger.Info($"snowflakeeventhandler processed {baseEvent.EventType.ToUpper()} message");
                         break;
@@ -204,7 +206,7 @@ namespace Sentry.data.Infrastructure
 
         private void UpdateSchemaConsumptionDetailsStatus(FileSchema schema, ConsumptionLayerTableStatusEnum status)
         {
-            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => c.SnowflakeStatus = status.ToString());
+            schema.ConsumptionDetails.OfType<SchemaConsumptionSnowflake>().ToList().ForEach(c => { c.SnowflakeStatus = status.ToString(); c.LastChanged = DateTime.Now; });
         }
     }
 }

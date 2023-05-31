@@ -21,7 +21,8 @@ namespace Sentry.data.Web.Models.ApiModels.Schema20220609
                 SnowflakeStage = consumptionDetails.SnowflakeStage,
                 SnowflakeStatus = consumptionDetails.SnowflakeStatus,
                 SnowflakeTable = consumptionDetails.SnowflakeTable,
-                SnowflakeType = consumptionDetails.SnowflakeType
+                SnowflakeType = consumptionDetails.SnowflakeType,
+                LastChanged = consumptionDetails.LastChanged
             };
         }
 

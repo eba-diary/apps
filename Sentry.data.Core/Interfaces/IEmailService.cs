@@ -11,5 +11,6 @@ namespace Sentry.data.Core
         void SendS3SinkConnectorRequestEmail(DataFlow df, ConnectorCreateRequestDto requestDto, ConnectorCreateResponseDto responseDto);
         void SendNewMotiveTokenAddedEmail(DataSourceToken token);
         void SendMotiveDuplicateTokenEmail(DataSourceToken newToken, DataSourceToken oldToken);
+        void SendConsumptionLayerStaleEmail(IList<SchemaConsumptionSnowflake> staleConsumptionLayers);
     }
 }
