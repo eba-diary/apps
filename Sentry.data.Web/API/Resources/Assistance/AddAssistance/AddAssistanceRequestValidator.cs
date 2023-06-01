@@ -9,7 +9,6 @@ namespace Sentry.data.Web.API
             ConcurrentValidationResponse validationResponse = requestModel
                 .Validate(x => x.Summary).Required()
                 .Validate(x => x.Description).Required()
-                .Validate(x => x.ReporterAssociateId).Required()
                 .ValidationResponse;
 
             return Task.FromResult(validationResponse);

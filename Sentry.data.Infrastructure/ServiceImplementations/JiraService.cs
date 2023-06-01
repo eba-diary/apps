@@ -77,6 +77,11 @@ namespace Sentry.data.Infrastructure
             return ticketIds;
         }
 
+        public bool JiraUserExists(string associateId)
+        {
+            return true;
+        }
+
         /// <summary>
         /// Seach for issues in Jira
         /// </summary>

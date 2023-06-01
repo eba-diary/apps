@@ -678,5 +678,19 @@ namespace Sentry.data.Core
                 public const int ZERO = 0;
             }
         }
+
+        public static class JiraValues
+        {
+            public static class ProjectKeys
+            {
+                public const string CLA = "CLA";
+                public const string TIS = "TIS";
+            }
+
+            public static class IssueTypes
+            {
+                public const string SUPPORT_REQUEST = "Support Request";
+            }
+        }
     }
 }
