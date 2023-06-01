@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Sentry.data.Web.API
+﻿namespace Sentry.data.Web.API
 {
     public class AddAssistanceResponseModel : IResponseModel
     {
+        public string IssueKey { get; set; }
+        public string IssueLink { get; set; }
     }
 }

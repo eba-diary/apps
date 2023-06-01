@@ -612,14 +612,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\ApiDependency.cs" />
+    <Compile Include="API\ApiCommonDependency.cs" />
     <Compile Include="API\AutoMapperHelper.cs" />
     <Compile Include="API\DefaultProfile.cs" />
-    <Compile Include="API\Interfaces\IApiDependency.cs" />
     <Compile Include="API\Resources\Assistance\AddAssistance\AddAssistanceRequestModel.cs" />
     <Compile Include="API\Resources\Assistance\AddAssistance\AddAssistanceRequestValidator.cs" />
     <Compile Include="API\Resources\Assistance\AddAssistance\AddAssistanceResponseModel.cs" />
     <Compile Include="API\Resources\Assistance\AssistanceController.cs" />
+    <Compile Include="API\Resources\Assistance\AssistanceProfile.cs" />
     <Compile Include="API\Resources\Dataset\AddDataset\AddDatasetRequestModel.cs" />
     <Compile Include="API\Resources\Dataset\BaseDatasetRequestValidator.cs" />
     <Compile Include="API\Resources\Dataset\DatasetProfile.cs" />

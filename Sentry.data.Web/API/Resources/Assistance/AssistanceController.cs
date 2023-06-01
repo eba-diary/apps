@@ -8,17 +8,17 @@ using System.Web.Http;
 namespace Sentry.data.Web.API
 {
     [RoutePrefix(WebConstants.Routes.VERSION_ASSISTANCE)]
-    public class AssistanceController : BaseApiController
+    public class AssistanceController : BaseApiController<AssistanceController>
     {
         private readonly IAssistanceService _assistanceService;
 
-        public AssistanceController(IAssistanceService assistanceService, IApiDependency apiDependency) : base(apiDependency)
+        public AssistanceController(IAssistanceService assistanceService, ApiCommonDependency<AssistanceController> apiDependency) : base(apiDependency)
         {
             _assistanceService = assistanceService;
         }
 
         /// <summary>
-        /// Search global datasets
+        /// Add assistance request
         /// </summary>
         [HttpPost]
         [Route("")]

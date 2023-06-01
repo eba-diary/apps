@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Sentry.Common.Logging;
+using Microsoft.Extensions.Logging;
 using Sentry.data.Core;
 using System;
 using System.Net;
@@ -9,17 +9,19 @@ using System.Web.Http;
 
 namespace Sentry.data.Web.API
 {
-    public abstract class BaseApiController : ApiController
+    public abstract class BaseApiController<T> : ApiController
     {
         private readonly IMapper _mapper;
         private readonly IValidationRegistry _validationRegistry;
         private readonly IDataFeatures _dataFeatures;
+        private readonly ILogger<T> _logger;
 
-        protected BaseApiController(IApiDependency apiDependency)
+        protected BaseApiController(ApiCommonDependency<T> apiCommonDependency)
         {
-            _mapper = apiDependency.Mapper;
-            _validationRegistry = apiDependency.ValidationRegistry;
-            _dataFeatures = apiDependency.DataFeatures;
+            _mapper = apiCommonDependency.Mapper;
+            _validationRegistry = apiCommonDependency.ValidationRegistry;
+            _logger = apiCommonDependency.Logger;
+            _dataFeatures = apiCommonDependency.DataFeatures;
         }
 
         /// <summary>
@@ -196,22 +198,22 @@ namespace Sentry.data.Web.API
             }
             catch (ResourceNotFoundException notFound)
             {
-                Logger.Info($"API - Resource Id {notFound.ResourceId} not found for {notFound.ResourceAction}");
+                _logger.LogInformation($"API - Resource Id {notFound.ResourceId} not found for {notFound.ResourceAction}");
                 return NotFound();
             }
             catch (ResourceForbiddenException forbidden)
             {
-                Logger.Info($"API - {forbidden.UserId} does not have {forbidden.Permission} permission to {forbidden.ResourceAction} | Resource Id: {forbidden.ResourceId}");
+                _logger.LogInformation($"API - {forbidden.UserId} does not have {forbidden.Permission} permission to {forbidden.ResourceAction} | Resource Id: {forbidden.ResourceId}");
                 return StatusCode(HttpStatusCode.Forbidden);
             }
             catch (ResourceFeatureDisabledException featureNotEnabled)
             {
-                Logger.Info($"API - {featureNotEnabled.FeatureFlagName} not enabled to perform {featureNotEnabled.ResourceAction}");
+                _logger.LogInformation($"API - {featureNotEnabled.FeatureFlagName} not enabled to perform {featureNotEnabled.ResourceAction}");
                 return StatusCode(HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
-                Logger.Error($"API - Unexpected error occurred during API request", e);
+                _logger.LogError(e, $"API - Unexpected error occurred during API request");
                 return InternalServerError(e);
             }
         }
