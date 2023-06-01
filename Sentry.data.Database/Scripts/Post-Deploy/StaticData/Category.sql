@@ -8,7 +8,6 @@
 									(3, 'Government',				NULL, 'clcDkBlue',	'DS',	NULL),
 									(4, 'Geographic',				NULL, 'clcDkBlue',	'DS',	NULL),
 									(5, 'Weather',					NULL, 'clcDkBlue',	'DS',	NULL),
-									(6, 'Sentry',					NULL, 'clcDkBlue',	'DS',	NULL),
 									(7, 'Commercial Lines',			NULL, 'blueGray',	'RPT',	'CL'),
 									(8, 'Personal Lines',			NULL, 'orange',		'RPT',	'PL'),
 									(9, 'Claims',					NULL, 'gold',		'RPT',	NULL),

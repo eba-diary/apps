@@ -1,11 +1,18 @@
-﻿CREATE TABLE [dbo].[DatasetFileParquet](
-                [DatasetFileParquet_Id] [int] IDENTITY(1,1) NOT NULL,
-                [DatasetFile_Id] [int] NOT NULL,
-                [Schema_ID] [int] NULL,
-                [FileLocation] [varchar](250) NOT NULL,
-[Dataset_ID] INT NULL, 
-    PRIMARY KEY CLUSTERED 
+﻿CREATE TABLE [dbo].[DatasetFileParquet]
 (
-                [DatasetFileParquet_Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	[DatasetFileParquetID] [bigint] IDENTITY(1,1) NOT NULL,
+	[DatasetFileDropID] [bigint] NULL,
+	[FileNME] [varchar](250) NULL,
+	[ObjectBucket] [varchar](250) NULL,
+	[ObjectKey] [varchar](1000) NULL,
+	[ObjectStatus] [int] NULL,
+	[FlowExecutionGUID] [varchar](100) NULL,
+	[RunInstanceGUID] [varchar](100) NULL,
+	[DatasetID] [int] NULL,
+	[SchemaID] [int] NULL,
+	[UpdateDTM] [datetime] NULL,
+    [CreateDTM] [datetime] NULL,
+    CONSTRAINT [PK_DatasetFileParquet] PRIMARY KEY ([DatasetFileParquetID]),
+	CONSTRAINT [FK_DatasetFileParquet_DatasetFileDrop] FOREIGN KEY ([DatasetFileDropID]) REFERENCES [DatasetFileDrop]([DatasetFileDropId])
+) 
+

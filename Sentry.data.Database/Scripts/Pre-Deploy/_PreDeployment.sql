@@ -1,38 +1,7 @@
-﻿/*
-DECLARE @ScriptVersion AS VARCHAR(50) 
-SET @ScriptVersion = '2021.10.13_01_PreDeploy'
+﻿DECLARE @ScriptVersion AS VARCHAR(50); 
+DECLARE @ErrorMessage NVARCHAR(4000); 
+DECLARE @ErrorSeverity INT; 
+DECLARE @ErrorState INT; 
 
-BEGIN TRAN 
-  
-IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
-BEGIN TRY 
-
-  --insert one off script files here
-  :r ..\Pre-Deploy\SupportingScripts\Sprint_21_04_05\Update_CLA3048_StandardizeOnUTCTime_FeatureFlag_Value.sql
-  
-  --insert into the verision table so these scripts do not run again.
-  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
-
-END TRY 
-
-BEGIN CATCH 
-    DECLARE @Error_PreDepoly_Message NVARCHAR(4000); 
-    DECLARE @Error_PreDepoly_Severity INT; 
-    DECLARE @Error_PreDepoly_State INT; 
-  
-    SELECT 
-        @Error_PreDepoly_Message = ERROR_MESSAGE(), 
-        @Error_PreDepoly_Severity = ERROR_SEVERITY(), 
-        @Error_PreDepoly_State = ERROR_STATE(); 
-  
-    RAISERROR (@Error_PreDepoly_Message, 
-               @Error_PreDepoly_Severity, 
-               @Error_PreDepoly_State 
-               ); 
-  
-    ROLLBACK TRAN 
-    RETURN
-END CATCH 
-  
-COMMIT TRAN
-*/
+--Execute scripts intended to run before post-deploy scripts
+:r ..\Pre-Deploy\SupportingScripts\Release_03_02_36\CLA-5277_RemoveSentryCategory.sql
