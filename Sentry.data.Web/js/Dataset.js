@@ -155,7 +155,12 @@ data.Dataset = {
         }
         self.Status = displayStatus;
         let date = new Date(lastChanged);
-        self.LastChanged = date.toLocaleString('default', { month: 'long' }) + " " + date.getDate() + ", " + date.getFullYear();
+        if (date.getFullYear() != 1) {
+            self.LastChanged = date.toLocaleString('default', { month: 'long' }) + " " + date.getDate() + ", " + date.getFullYear();
+        }
+        else {
+            self.LastChanged = "";
+        }
     },
 
     // #region DELROY FUNCTIONS
