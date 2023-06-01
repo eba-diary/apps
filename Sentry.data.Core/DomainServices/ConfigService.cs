@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sentry.Configuration;
 using Sentry.data.Core.DTO.Retriever;
 using Sentry.data.Core.Entities;
@@ -994,67 +995,76 @@ namespace Sentry.data.Core
             //Refresh consumption layer
             foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any() && !w.DeleteInd))
             {
-                //Always generate hive table create event
-                HiveTableCreateModel hiveModel = new HiveTableCreateModel()
+                if (_featureFlags.CLA5211_SendNewSnowflakeEvents.GetValue())
                 {
-                    DatasetID = config.ParentDataset.DatasetId,
-                    SchemaID = config.Schema.SchemaId,
-                    RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
-                    InitiatorID = _userService.GetCurrentUser().AssociateId
-                };
-
-                try
-                {
-                    _logger.LogDebug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
-
-                    string topicName = null;
-                    if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
-                    {
-                        topicName = GetDSCEventTopic(config);
-                        _messagePublisher.Publish(topicName, hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
-                    }
-                    else
-                    {
-                        _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel), topicName);
-                    }
-
-                    _logger.LogDebug($"<generateschemacreateevent> sent {hiveModel.EventType.ToLower()} event");
+                    JObject syncConsumptionChangeInd = new JObject();
+                    syncConsumptionChangeInd.Add("SyncConsumption", "triggered");
+                    _schemaService.TryGenerateSnowflakeConsumptionCreateEvent(config.Schema, syncConsumptionChangeInd, true);
                 }
-                catch (Exception ex)
+                else
                 {
-                    _logger.LogError(ex, $"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(hiveModel)}");
-                    exceptionList.Add(ex);
-                }                
-
-                //Always generate snowflake table create event
-                SnowTableCreateModel snowModel = new SnowTableCreateModel()
-                {
-                    DatasetID = config.ParentDataset.DatasetId,
-                    SchemaID = config.Schema.SchemaId,
-                    RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
-                    InitiatorID = _userService.GetCurrentUser().AssociateId
-                };
-
-                try
-                {
-                    _logger.LogDebug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
-
-                    string topicName = null;
-                    if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                    //Always generate hive table create event
+                    HiveTableCreateModel hiveModel = new HiveTableCreateModel()
                     {
-                        topicName = GetDSCEventTopic(config);
-                        _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
-                    }
-                    else
+                        DatasetID = config.ParentDataset.DatasetId,
+                        SchemaID = config.Schema.SchemaId,
+                        RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                        InitiatorID = _userService.GetCurrentUser().AssociateId
+                    };
+
+                    try
                     {
-                        _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                        _logger.LogDebug($"<generateschemacreateevent> sending {hiveModel.EventType.ToLower()} event...");
+
+                        string topicName = null;
+                        if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                        {
+                            topicName = GetDSCEventTopic(config);
+                            _messagePublisher.Publish(topicName, hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                        }
+                        else
+                        {
+                            _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel), topicName);
+                        }
+
+                        _logger.LogDebug($"<generateschemacreateevent> sent {hiveModel.EventType.ToLower()} event");
                     }
-                    _logger.LogDebug($"<generateschemacreateevent> sent {snowModel.EventType.ToLower()} event");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
-                    exceptionList.Add(ex);
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(hiveModel)}");
+                        exceptionList.Add(ex);
+                    }
+
+                    //Always generate snowflake table create event
+                    SnowTableCreateModel snowModel = new SnowTableCreateModel()
+                    {
+                        DatasetID = config.ParentDataset.DatasetId,
+                        SchemaID = config.Schema.SchemaId,
+                        RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                        InitiatorID = _userService.GetCurrentUser().AssociateId
+                    };
+
+                    try
+                    {
+                        _logger.LogDebug($"<generateschemacreateevent> sending {snowModel.EventType.ToLower()} event...");
+
+                        string topicName = null;
+                        if (string.IsNullOrWhiteSpace(_featureFlags.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                        {
+                            topicName = GetDSCEventTopic(config);
+                            _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                        }
+                        else
+                        {
+                            _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                        }
+                        _logger.LogDebug($"<generateschemacreateevent> sent {snowModel.EventType.ToLower()} event");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"<generateschemacreateevent> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
+                        exceptionList.Add(ex);
+                    }
                 }
             }
 
