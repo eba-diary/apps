@@ -374,6 +374,7 @@
     <Compile Include="GlobalDatasetSearchServiceTests.cs" />
     <Compile Include="SchemaFieldProviderTests.cs" />
     <Compile Include="SnowflakeEventHandlerTests.cs" />
+    <Compile Include="AssistanceServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

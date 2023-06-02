@@ -1,5 +1,4 @@
-﻿using NHibernate.Mapping;
-using Sentry.Configuration;
+﻿using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.DependencyInjection;
 using Sentry.data.Core.DomainServices;
