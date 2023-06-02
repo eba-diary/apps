@@ -57,8 +57,8 @@ namespace Sentry.data.Infrastructure
             else
             {
                 jiraTicket.Reporter = Config.GetHostSetting("ServiceAccountID");
-                AddToDescription("Requester", $"{user.AssociateId} - {user.DisplayName}", descriptionMarkdown);
-                AddToDescription("Requester Email", user.EmailAddress, descriptionMarkdown);
+                AddToDescription("Reporter", $"{user.AssociateId} - {user.DisplayName}", descriptionMarkdown);
+                AddToDescription("Reporter Email", user.EmailAddress, descriptionMarkdown);
             }
 
             jiraTicket.Description = descriptionMarkdown.ToString();
