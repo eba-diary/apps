@@ -626,7 +626,7 @@ namespace Sentry.data.Core
             public const string CONFLUENT_CONNECTOR_USERNAME = "ConfluentConnectorUserName";
             public const string CONFLUENT_CONNECTOR_PASSWORD = "ConfluentConnectorPassword";
             public const string CONFLUENT_CONNECTOR_FLUSH_SIZE = "ConfluentConnectorFlushSize";
-            public const string S3CONNECTOR_PROXY = "EdgeWebProxyUrl";
+            public const string S3CONNECTOR_PROXY = "ConfluentConnectorProxy";
         }
 
         public static class DLPPEnvironments
