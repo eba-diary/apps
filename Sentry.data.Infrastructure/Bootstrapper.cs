@@ -257,8 +257,18 @@ namespace Sentry.data.Infrastructure
 
             jClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
 
-            registry.For<IJiraService>().Singleton().Use<JiraService>().
-                Ctor<HttpClient>().Is(jClient);
+            registry.For<IJiraService>().Singleton().Use<JiraService>()
+                .Ctor<HttpClient>().Is(jClient)
+                .Ctor<string>().Is(Configuration.Config.GetHostSetting("JiraServiceUrl"))
+                .Named("Security");
+
+            registry.For<IJiraService>().Singleton().Use<JiraService>()
+                .Ctor<HttpClient>().Is(jClient)
+                .Ctor<string>().Is(Configuration.Config.GetHostSetting("JiraServiceProdUrl"))
+                .Named("Assistance");
+
+            registry.For<ISecurityService>().Use<SecurityService>().Ctor<IJiraService>().Is(x => x.GetInstance<IJiraService>("Security"));
+            registry.For<IAssistanceService>().Use<AssistanceService>().Ctor<IJiraService>().Is(x => x.GetInstance<IJiraService>("Assistance"));
 
             //register Inev client
             var inevClient = new HttpClient(new HttpClientHandler()

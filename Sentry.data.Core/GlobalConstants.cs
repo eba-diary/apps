@@ -691,6 +691,21 @@ namespace Sentry.data.Core
             {
                 public const string SUPPORT_REQUEST = "Support Request";
             }
+
+            public static class CustomFieldNames
+            {
+                public const string SYSTEM = "System(s)";
+            }
+
+            public static class Systems
+            {
+                public const string DSC = "Data.Sentry.com";
+            }
+
+            public static class Labels
+            {
+                public const string ASSISTANCE = "DSCRequestAssistance";
+            }
         }
     }
 }

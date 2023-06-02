@@ -1,10 +1,10 @@
-﻿using Sentry.Configuration;
+﻿using NHibernate.Mapping;
+using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.DependencyInjection;
 using Sentry.data.Core.DomainServices;
 using Sentry.data.Core.Entities.Jira;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
 
@@ -21,7 +21,7 @@ namespace Sentry.data.Infrastructure
             _userService = userService;
         }
 
-        public Task<AddAssistanceResultDto> AddAssistanceAsync(AddAssistanceDto addAssistanceDto)
+        public async Task<AddAssistanceResultDto> AddAssistanceAsync(AddAssistanceDto addAssistanceDto)
         {
             if (!_dataFeatures.CLA4870_DSCAssistance.GetValue())
             {
@@ -32,13 +32,22 @@ namespace Sentry.data.Infrastructure
             {
                 Project = JiraValues.ProjectKeys.CLA,
                 IssueType = JiraValues.IssueTypes.SUPPORT_REQUEST,
-                Summary = addAssistanceDto.Summary
+                Summary = addAssistanceDto.Summary,
+                Labels = new List<string> { JiraValues.Labels.ASSISTANCE },
+                CustomFields = new List<JiraCustomField>
+                {
+                    new JiraCustomField
+                    {
+                        Name = JiraValues.CustomFieldNames.SYSTEM,
+                        Value = new List<object> { new { value = JiraValues.Systems.DSC } }
+                    }
+                }
             };
 
             Markdown descriptionMarkdown = BuildDescription(addAssistanceDto);
 
             IApplicationUser user = _userService.GetCurrentUser();
-            bool userExists = _jiraService.JiraUserExists(user.AssociateId);
+            bool userExists = await _jiraService.JiraUserExistsAsync(user.AssociateId);
 
             //not everyone has access to Jira, only set as reporter if they are a Jira user
             if (userExists)
@@ -47,18 +56,14 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
+                jiraTicket.Reporter = Config.GetHostSetting("ServiceAccountID");
                 AddToDescription("Requester", $"{user.AssociateId} - {user.DisplayName}", descriptionMarkdown);
                 AddToDescription("Requester Email", user.EmailAddress, descriptionMarkdown);
             }
 
             jiraTicket.Description = descriptionMarkdown.ToString();
 
-            JiraIssueCreateRequest createRequest = new JiraIssueCreateRequest()
-            {
-                Tickets = new List<JiraTicket> {  jiraTicket }
-            };
-
-            string issueKey = _jiraService.CreateJiraTickets(createRequest).First();
+            string issueKey = await _jiraService.CreateJiraTicketAsync(jiraTicket);
 
             AddAssistanceResultDto resultDto = new AddAssistanceResultDto
             {
@@ -66,7 +71,7 @@ namespace Sentry.data.Infrastructure
                 IssueLink = $"https://jira.sentry.com/browse/{issueKey}"
             };
 
-            return Task.FromResult(resultDto);
+            return resultDto;
         }
 
         #region Private
@@ -89,7 +94,7 @@ namespace Sentry.data.Infrastructure
             if (!string.IsNullOrWhiteSpace(value))
             {
                 markdown.AddBold($"{label}:");
-                markdown.Add(" " + value);
+                markdown.AddLine(" " + value);
             }
         }
         #endregion
