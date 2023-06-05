@@ -37,8 +37,13 @@ namespace Sentry.data.Infrastructure
                 {
                     new JiraCustomField
                     {
-                        Name = JiraValues.CustomFieldNames.SYSTEM,
-                        Value = new List<object> { new { value = JiraValues.Systems.DSC } }
+                        Name = JiraValues.CustomFieldNames.ENVIRONMENT,
+                        Value = new List<string> { Config.GetDefaultEnvironmentName() }
+                    },
+                    new JiraCustomField
+                    {
+                        Name = JiraValues.CustomFieldNames.ENVIRONMENT_TYPE,
+                        Value = new List<string> { Config.GetHostSetting("EnvironmentType") }
                     }
                 }
             };
@@ -55,7 +60,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                jiraTicket.Reporter = Config.GetHostSetting("ServiceAccountID");
+                jiraTicket.Reporter = Config.GetHostSetting("ServiceAccountID"); //"WB_DATA_I_TEST_V2";
                 AddToDescription("Reporter", $"{user.AssociateId} - {user.DisplayName}", descriptionMarkdown);
                 AddToDescription("Reporter Email", user.EmailAddress, descriptionMarkdown);
             }
@@ -81,7 +86,6 @@ namespace Sentry.data.Infrastructure
             descriptionMarkdown.AddLine(addAssistanceDto.Description);
             descriptionMarkdown.AddBreak();
             AddToDescription("Current Page", addAssistanceDto.CurrentPage, descriptionMarkdown);
-            AddToDescription("DSC Environment", Config.GetDefaultEnvironmentName(), descriptionMarkdown);
             AddToDescription("Dataset Name", addAssistanceDto.DatasetName, descriptionMarkdown);
             AddToDescription("Schema Name", addAssistanceDto.SchemaName, descriptionMarkdown);
 

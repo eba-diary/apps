@@ -1,8 +1,6 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sentry.Configuration;
 using Sentry.data.Core;
 using Sentry.data.Core.DependencyInjection;
 using Sentry.data.Core.DomainServices;
@@ -19,7 +17,7 @@ namespace Sentry.data.Infrastructure
 {
     public class JiraService : BaseDomainService<JiraService>, IJiraService
     {
-        private string _jiraBaseUrl;
+        private readonly string _jiraBaseUrl;
         private readonly HttpClient _httpClient;
 
         public JiraService(HttpClient httpClient, string jiraBaseUrl, DomainServiceCommonDependency<JiraService> commonDependency) : base(commonDependency)
@@ -110,14 +108,16 @@ namespace Sentry.data.Infrastructure
                 throw new JiraServiceException($"Issue type {jiraTicket.IssueType} not found in {jiraTicket.Project}");
             }
 
-            var customFields = GetCustomFields(projectKey, issueTypeId).ToList();
-            var includeDescription = IssueTypeHasField(projectKey, issueTypeId, "Description");
+            var issueType = GetIssueType(projectKey, issueTypeId);
+
+            var customFields = issueType.Values.Where(x => x.Schema.Custom != null).ToList();
+            var includeDescription = IssueTypeHasField(issueType, "Description");
             if (includeDescription)
             {
                 customFields = customFields.Where(x => x.Name != "Acceptance Criteria").ToList();
             }
-            var includeLabels = IssueTypeHasField(projectKey, issueTypeId, "Labels");
-            var includeComponents = IssueTypeHasField(projectKey, issueTypeId, "Component/s");
+            var includeLabels = IssueTypeHasField(issueType, "Labels");
+            var includeComponents = IssueTypeHasField(issueType, "Component/s");
             var jiraIssue = new JiraIssue(projectKey, jiraTicket.Summary, jiraTicket.Description, includeDescription, components.ToList(), includeComponents, jiraTicket.Labels, includeLabels, jiraTicket.Reporter, jiraTicket.IssueType);
             var fields = jiraIssue.JiraFields.fields;
             foreach (var field in jiraTicket.CustomFields)
@@ -200,17 +200,10 @@ namespace Sentry.data.Infrastructure
             return componentIds;
         }
 
-        /// <summary>
-        /// Get the list of available custom fields for an issue type in a project
-        /// </summary>
-        /// <param name="projectKey"></param>
-        /// <param name="issueTypeId"></param>
-        /// <returns></returns>
-        private IEnumerable<JiraField> GetCustomFields(string projectKey, string issueTypeId)
+        private JiraMetaResponse GetIssueType(string projectKey, string issueTypeId)
         {
             var response = _httpClient.GetAsync(_jiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes/{issueTypeId}").Result;
-            var r = JsonConvert.DeserializeObject<JiraMetaResponse>(response.Content.ReadAsStringAsync().Result);
-            return r.Values.Where(x => x.Schema.Custom != null).ToList();
+            return JsonConvert.DeserializeObject<JiraMetaResponse>(response.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -234,11 +227,9 @@ namespace Sentry.data.Infrastructure
         /// <param name="issueTypeId"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
-        private bool IssueTypeHasField(string projectKey, string issueTypeId, string fieldName)
+        private bool IssueTypeHasField(JiraMetaResponse issueType, string fieldName)
         {
-            var response = _httpClient.GetAsync(_jiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes/{issueTypeId}").Result;
-            var r = JsonConvert.DeserializeObject<JiraMetaResponse>(response.Content.ReadAsStringAsync().Result);
-            return r.Values.Any(x => x.Name == fieldName);
+            return issueType.Values.Any(x => x.Name == fieldName);
         }
 
         /// <summary>

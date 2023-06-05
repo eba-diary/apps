@@ -375,6 +375,7 @@
     <Compile Include="SchemaFieldProviderTests.cs" />
     <Compile Include="SnowflakeEventHandlerTests.cs" />
     <Compile Include="AssistanceServiceTests.cs" />
+    <Compile Include="JiraServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>

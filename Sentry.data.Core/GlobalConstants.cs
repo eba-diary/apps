@@ -694,7 +694,8 @@ namespace Sentry.data.Core
 
             public static class CustomFieldNames
             {
-                public const string SYSTEM = "System(s)";
+                public const string ENVIRONMENT = "Environment(s)";
+                public const string ENVIRONMENT_TYPE = "Environment Type";
             }
 
             public static class Systems

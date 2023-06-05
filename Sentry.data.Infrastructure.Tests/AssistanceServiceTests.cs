@@ -5,6 +5,7 @@ using NHibernate.Util;
 using Sentry.data.Core;
 using Sentry.data.Core.DependencyInjection;
 using Sentry.data.Core.Entities.Jira;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static Sentry.data.Core.GlobalConstants;
@@ -34,18 +35,23 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("Summary", x.Summary);
                 Assert.AreEqual(1, x.Labels.Count);
                 Assert.AreEqual(JiraValues.Labels.ASSISTANCE, x.Labels.First());
-                Assert.AreEqual(1, x.CustomFields.Count);
+                Assert.AreEqual(2, x.CustomFields.Count);
+
+                JiraCustomField customField = x.CustomFields.First();
+                Assert.AreEqual(JiraValues.CustomFieldNames.ENVIRONMENT, customField.Name);
+                Assert.AreEqual("DEV", ((List<string>)customField.Value).First());
+
+                customField = x.CustomFields.Last();
+                Assert.AreEqual(JiraValues.CustomFieldNames.ENVIRONMENT_TYPE, customField.Name);
+                Assert.AreEqual("NonProd", ((List<string>)customField.Value).First());
+
                 Assert.AreEqual("000000", x.Reporter);
                 Assert.IsTrue(x.Description.Contains("Description"));
                 Assert.IsTrue(x.Description.Contains("*Current Page:* data.sentry.com/Search/Datasets"));
-                Assert.IsTrue(x.Description.Contains("*DSC Environment:* DEV"));
                 Assert.IsFalse(x.Description.Contains("Dataset Name"));
                 Assert.IsFalse(x.Description.Contains("Schema Name"));
                 Assert.IsFalse(x.Description.Contains("Reporter"));
                 Assert.IsFalse(x.Description.Contains("Reporter Email"));
-
-                JiraCustomField customField = x.CustomFields.First();
-                Assert.AreEqual(JiraValues.CustomFieldNames.SYSTEM, customField.Name);
             });
 
             Mock<ILogger<AssistanceService>> logger = mr.Create<ILogger<AssistanceService>>();
@@ -94,18 +100,23 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual("Summary", x.Summary);
                 Assert.AreEqual(1, x.Labels.Count);
                 Assert.AreEqual(JiraValues.Labels.ASSISTANCE, x.Labels.First());
-                Assert.AreEqual(1, x.CustomFields.Count);
+                Assert.AreEqual(2, x.CustomFields.Count);
+
+                JiraCustomField customField = x.CustomFields.First();
+                Assert.AreEqual(JiraValues.CustomFieldNames.ENVIRONMENT, customField.Name);
+                Assert.AreEqual("DEV", ((List<string>)customField.Value).First());
+
+                customField = x.CustomFields.Last();
+                Assert.AreEqual(JiraValues.CustomFieldNames.ENVIRONMENT_TYPE, customField.Name);
+                Assert.AreEqual("NonProd", ((List<string>)customField.Value).First());
+
                 Assert.IsNotNull(x.Reporter);
                 Assert.IsTrue(x.Description.Contains("Description"));
                 Assert.IsTrue(x.Description.Contains("*Current Page:* data.sentry.com/Search/Datasets"));
-                Assert.IsTrue(x.Description.Contains("*DSC Environment:* DEV"));
                 Assert.IsTrue(x.Description.Contains("*Dataset Name:* Dataset Name"));
                 Assert.IsTrue(x.Description.Contains("*Schema Name:* Schema Name"));
                 Assert.IsTrue(x.Description.Contains(@"*Reporter:* 000000 \- bar, foo"));
                 Assert.IsTrue(x.Description.Contains("*Reporter Email:* foo.bar@sentry.com"));
-
-                JiraCustomField customField = x.CustomFields.First();
-                Assert.AreEqual(JiraValues.CustomFieldNames.SYSTEM, customField.Name);
             });
 
             Mock<ILogger<AssistanceService>> logger = mr.Create<ILogger<AssistanceService>>();
