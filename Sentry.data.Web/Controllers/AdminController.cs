@@ -16,7 +16,7 @@ using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using Sentry.data.Web;
 using Sentry.data.Web.Models.AdminPage;
-
+using Sentry.data.Core.Interfaces;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -29,8 +29,11 @@ namespace Sentry.data.Web.Controllers
         private readonly IDeadSparkJobService _deadSparkJobService;
         private readonly ISupportLinkService _supportLinkService;
         private readonly IDataFeatures _dataFeatures;
+        private readonly IDataFlowMetricService _dataFlowMetricService;
 
-        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, ISupportLinkService supportLinkService, IAuditService auditSerivce, IDataFeatures dataFeatures)
+        public AdminController(IDatasetService datasetService, IDeadSparkJobService deadSparkJobService, IKafkaConnectorService connectorService, 
+                                ISupportLinkService supportLinkService, IAuditService auditSerivce, IDataFeatures dataFeatures,
+                                IDataFlowMetricService dataFlowMetricService)
         {
             _connectorService = connectorService;
             _datasetService = datasetService;
@@ -38,6 +41,7 @@ namespace Sentry.data.Web.Controllers
             _deadSparkJobService = deadSparkJobService;
             _supportLinkService = supportLinkService;
             _dataFeatures = dataFeatures;
+            _dataFlowMetricService = dataFlowMetricService;
         }
 
       
@@ -326,57 +330,33 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public JsonResult GetDatasetProcessingActivityForGrid(string activityType)
         {
-            List<DatasetProcessActivityModel> processActivityResultsModels = new List<DatasetProcessActivityModel>() { 
-                new DatasetProcessActivityModel() { DatasetName="Dataset",  DatasetId = 1, FileCount=1,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset2", DatasetId = 2, FileCount=3,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset3", DatasetId = 3, FileCount=4,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset4", DatasetId = 4, FileCount=6,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset5", DatasetId = 5, FileCount=8,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset6", DatasetId = 6, FileCount=32, RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset7", DatasetId = 7, FileCount=2,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset8", DatasetId = 8, FileCount=6,  RecentRun = DateTime.Now},
-                new DatasetProcessActivityModel() { DatasetName="Dataset9", DatasetId = 9, FileCount=1,  RecentRun = DateTime.Now}
-            };
+            List<DatasetProcessActivityDto> datasetProcessActivityDtos = _dataFlowMetricService.GetAllTotalFiles();
 
-            return Json(new { data = processActivityResultsModels });
+            List<DatasetProcessActivityModel> datasetProcessActivityModels = datasetProcessActivityDtos.MapToModelList();
+
+            return Json(new { data = datasetProcessActivityModels });
         }
 
         [Route("Admin/GetSchemaProcessingActivityForGrid/{activityType?}/{datasetId?}")]
         [HttpPost]
         public JsonResult GetSchemaProcessingActivityForGrid(string activityType, int datasetId)
         {
-            List<SchemaProcessActivityModel> processActivityResultsModels = new List<SchemaProcessActivityModel>() {
-                new SchemaProcessActivityModel() { SchemaName="Schema4", SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=3, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema1", SchemaId = 4, DatasetId = datasetId, FileCount=5, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=1, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema3", SchemaId = 4, DatasetId = datasetId, FileCount=8, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema",  SchemaId = 4, DatasetId = datasetId, FileCount=8, RecentRun = DateTime.Now},
-                new SchemaProcessActivityModel() { SchemaName="Schema5", SchemaId = 4, DatasetId = datasetId, FileCount=0, RecentRun = DateTime.Now}
-            };
+            List<SchemaProcessActivityDto> schemaProcessActivityDtos = _dataFlowMetricService.GetAllTotalFilesByDataset(datasetId);
 
+            List<SchemaProcessActivityModel> schemaProcessActivityModels = schemaProcessActivityDtos.MapToModelList();
 
-            return Json(new { data = processActivityResultsModels });
+            return Json(new { data = schemaProcessActivityModels });
         }
 
-        [Route("Admin/GetDatasetFileProcessingActivityForGrid/{activityType?}/{schemaId?}/{datasetId?}")]
+        [Route("Admin/GetDatasetFileProcessingActivityForGrid/{activityType?}/{schemaId?}")]
         [HttpPost]
-        public JsonResult GetDatasetFileProcessingActivityForGrid(string activityType, int schemaId, int datasetId)
+        public JsonResult GetDatasetFileProcessingActivityForGrid(string activityType, int schemaId)
         {
-            List<DatasetFileProcessActivityModel> processActivityResultsModels = new List<DatasetFileProcessActivityModel>() {
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile4", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile",  FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile8", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile7", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile5", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile1", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now},
-                new DatasetFileProcessActivityModel() { FileName="DatasetFile2", FlowExecutionGuid="20230502105411", LastFlowStep = "ConvertToParquet", LastEventTime = DateTime.Now}
-            };
+            List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllTotalFilesBySchema(schemaId);
 
+            List<DatasetFileProcessActivityModel> datasetFileProcessActivityModels = datasetFileProcessActivityDtos.MapToModelList();
 
-            return Json(new { data = processActivityResultsModels });
+            return Json(new { data = datasetFileProcessActivityModels });
         }
     }
 }

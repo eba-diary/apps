@@ -184,7 +184,7 @@ data.Admin = {
     {
         if ($.fn.DataTable.isDataTable("#processActivityResultsTable"))
         {
-            table.destroy();
+            $("#processActivityResultsTable").DataTable().destroy();
             $("#processActivityResultsTable").empty();
         }
 
@@ -227,7 +227,7 @@ data.Admin = {
                 }
             },
             { data: "FileCount", title: "File Count", className: "fileCount" },
-            { data: "RecentRun", title: "Most Recent Run", className: "RecentRun", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
+            { data: "LastEventTime", title: "Most Recent Run", className: "LastEventTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
         ];
 
         var orderObj = [1, 'desc'];
@@ -281,7 +281,7 @@ data.Admin = {
                 }
             },
             { data: "FileCount", title: "File Count", className: "fileCount" },
-            { data: "RecentRun", title: "Most Recent Run", className: "RecentRun", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
+            { data: "LastEventTime", title: "Most Recent Run", className: "LastEventTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } }
         ];
 
         var orderObj = [1, 'desc'];
@@ -314,14 +314,14 @@ data.Admin = {
         {
             var schemaId = $(this).find("a").data("schema-id");
 
-            data.Admin.ProcessActivityDatasetFileConfig($(this).text(), schemaId, datasetId);
+            data.Admin.ProcessActivityDatasetFileConfig($(this).text(), schemaId);
 
             return false;
         });
     },
 
     // used to create dataset file json column configuration for ProcessActivityTableInit
-    ProcessActivityDatasetFileConfig: function (schemaName, schemaId, datasetId)
+    ProcessActivityDatasetFileConfig: function (schemaName, schemaId)
     {
         var activityType = $("#ActivityType").val();
 
@@ -336,7 +336,7 @@ data.Admin = {
 
         var orderObj = [3, 'desc'];
 
-        var ajaxUrl = data.Admin.GetProcessActivityDatasetFileUrl(activityType, schemaId, datasetId)
+        var ajaxUrl = data.Admin.GetProcessActivityDatasetFileUrl(activityType, schemaId)
 
         data.Admin.ProcessActivityTableInit(columnObj, orderObj, ajaxUrl);
     },
@@ -601,9 +601,9 @@ data.Admin = {
         return "GetSchemaProcessingActivityForGrid?activityType=" + activityType + "&datasetId=" + datasetId;
     },
 
-    GetProcessActivityDatasetFileUrl: function (activityType, schemaId, datasetId)
+    GetProcessActivityDatasetFileUrl: function (activityType, schemaId)
     {
-        return "GetDatasetFileProcessingActivityForGrid?activityType=" + activityType + "&schemaId=" + schemaId+ "&datasetId=" + datasetId;
+        return "GetDatasetFileProcessingActivityForGrid?activityType=" + activityType + "&schemaId=" + schemaId;
     },
 
     //****************************************************************************************************
