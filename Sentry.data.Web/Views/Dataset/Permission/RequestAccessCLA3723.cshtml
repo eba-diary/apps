@@ -32,7 +32,23 @@
         </ol>
         <div id="RequestAccessToSection" class="requestAccessStage">
             <button id="RequestAccessToDatasetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SecurableObjectId">Request Access to <em id="RequestAccessDatasetName" class="font-style-normal">@Model.DatasetName Dataset</em></button>
-            <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" value="@Model.SaidKeyCode">Request Access to all @Model.SaidKeyCode Datasets</button>
+            @if (!Model.InheritanceStatus)
+            {
+                <div id="InheritanceWarningWrapper" data-title="Asset level permissions are not enabled for this dataset"> <!-- Use wrapper because disabled buttons block tooltips due to some pointer css -->
+                    <button type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block" disabled>
+                        <em id="RequestAccessInheritanceWarning" class="fas fa-exclamation-triangle pr-1"></em>
+                        Request Access to all @Model.SaidKeyCode Datasets
+                    </button>
+                </div>
+            }
+            else
+            {
+                <button id="RequestAccessToAssetBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block"value="@Model.SaidKeyCode">
+                    Request Access to all @Model.SaidKeyCode Datasets
+                </button>
+            }
+
+
         </div>
         <div id="RequestAccessTypeSection" class="d-none requestAccessStage">
             <button id="RequestAccessTypeConsumeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Consumer/Query Access</button>
@@ -45,15 +61,15 @@
                     AD Groups must be requested in non-prod environments. See <a target="_blank" href="https://confluence.sentry.com/display/CLA/Dataset+Access">Here</a>.
                 </div>
             }
-            <h6 class="pt-1">To Query in Snowflake UI, DSC, Tableau, or Superset:</h6>
+            <h6 class="pt-1">To Query via Snowflake:</h6>
             <p class="mb-0">Request the entitlement for both normal and RA accounts.</p>
             <div class="btn-group" role="group">
                 <button id="RequestAccessConsumeMyAccessBtn" type="button" onclick="window.open('https://myaccess.sentry.com/','_blank')" class="btn btn-default waves-effect waves-light requestAccessButton ml-0">Use MyAccess to Request <em id="RequestAccessConsumeEntitlement" class="font-style-normal"></em></button>
                 <button id="RequestAccessConsumeCopyBtn" type="button" class="w-20 btn btn-default waves-effect waves-light requestAccessButton mr-0" data-toggle="tooltip" data-placement="right" title="Copy to clipboard" data-original-title="Copy to clipboard" md-z-index="9999"><i class="far fa-copy fa-2x"></i></button>
             </div>
-            <h6 class="pt-1">To Query from SageMaker or other AWS services:</h6>
+            <h6 class="pt-1">To Query S3 Files Directly:</h6>
             <button id="RequestAccessConsumeAwsBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request AWS IAM Access</button>
-            <h6 class="pt-1">To request access for Snowflake Service Accounts:</h6>
+            <h6 class="pt-1">To Request Access for a Service Account:</h6>
             <button id="RequestAccessConsumeSnowflakeBtn" type="button" class="btn btn-default waves-effect waves-light requestAccessButton btn-block">Request Snowflake Account Access</button>
         </div>
         <div id="RequestAccessManageTypeSection" class="d-none requestAccessStage">

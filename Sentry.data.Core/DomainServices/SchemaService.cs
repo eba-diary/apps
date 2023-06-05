@@ -188,8 +188,15 @@ namespace Sentry.data.Core
 
                     DeleteElasticIndexForSchema(schemaId);
                     IndexElasticFieldsForSchema(schemaId, ds.DatasetId, revision.Fields);
-                    GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
-                                        
+                    if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+                    {
+                        TryGenerateSnowflakeConsumptionCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+                    }
+                    else
+                    {
+                        GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+                    }
+
                     return revision.SchemaRevision_Id;
                 }
             }
@@ -306,7 +313,14 @@ namespace Sentry.data.Core
         {
             DeleteElasticIndexForSchema(revision.ParentSchema.SchemaId);
             IndexElasticFieldsForSchema(revision.ParentSchema.SchemaId, datasetId, revision.Fields);
-            GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+            if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+            {
+                TryGenerateSnowflakeConsumptionCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+            }
+            else
+            {
+                GenerateConsumptionLayerCreateEvent(revision, JObject.Parse("{\"revision\":\"added\"}"));
+            }
         }
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
@@ -354,7 +368,14 @@ namespace Sentry.data.Core
             */
             try
             {
-                GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
+                if(_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
+                {
+                    TryGenerateSnowflakeConsumptionCreateEvent(fileConfig.Schema, whatPropertiesChanged);
+                }
+                else
+                {
+                    GenerateConsumptionLayerEvents(fileConfig.Schema, whatPropertiesChanged);
+                }
             }
             catch (Exception ex)
             {
@@ -448,6 +469,123 @@ namespace Sentry.data.Core
             int schemaId = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == targetDatasetId && w.Schema.Name == schemaName && w.Schema.ObjectStatus == GlobalEnums.ObjectStatusEnum.Active).Select(s => s.Schema.SchemaId).FirstOrDefault();
 
             return (schemaId, (schemaId != 0));
+        }
+
+        private bool ShouldGenerateSnowConsumptionCreateRequest(SchemaRevision schemaRevision, JObject propertyDeltaList)
+        {
+            //Do nothing if there is no revision associated with schema
+            if (schemaRevision == null)
+            {
+                return false;
+            }
+
+            /* schema column updates trigger, this will trigger for initial schema column add along with any updates there after */
+            if (propertyDeltaList.ContainsKey("revision") && propertyDeltaList.GetValue("revision").ToString().ToLower() == "added")
+            {
+                return true;
+            }
+            /* schema configuration trigger for createCurrentView regardless true\false */
+            else if (_eventGeneratingUpdateFields.Any(x => propertyDeltaList.ContainsKey(x)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void TryGenerateSnowflakeConsumptionCreateEvent(FileSchema schema, JObject propertyDeltaList)
+        {
+            SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
+            if (ShouldGenerateSnowConsumptionCreateRequest(latestRevision, propertyDeltaList))
+            {
+                PublishSnowflakeConsumptionCreateRequest(latestRevision, propertyDeltaList);
+            }
+        }
+        
+        public void TryGenerateSnowflakeConsumptionCreateEvent(SchemaRevision latestRevision, JObject propertyDeltaList)
+        {
+            if (ShouldGenerateSnowConsumptionCreateRequest(latestRevision, propertyDeltaList))
+            {
+                PublishSnowflakeConsumptionCreateRequest(latestRevision, propertyDeltaList);
+            }
+        }
+        
+        public void TryGenerateSnowflakeConsumptionCreateEvent(FileSchema schema, JObject propertyDeltaList, bool forceGenerate)
+        {
+            SchemaRevision latestRevision = schema.Revisions.OrderByDescending(o => o.SchemaRevision_Id).FirstOrDefault();
+            if (ShouldGenerateSnowConsumptionCreateRequest(latestRevision, propertyDeltaList) || forceGenerate)
+            {
+                PublishSnowflakeConsumptionCreateRequest(latestRevision, propertyDeltaList);
+            }
+        }
+
+        private void PublishSnowflakeConsumptionCreateRequest(SchemaRevision schemaRevision, JObject propertyDeltaList)
+        {
+            int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaRevision.ParentSchema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
+
+            SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+            {
+                EventType = GlobalConstants.SnowConsumptionMessageTypes.CREATE_REQUEST,
+                DatasetID = dsId,
+                SchemaID = schemaRevision.ParentSchema.SchemaId,
+                RevisionID = schemaRevision.SchemaRevision_Id,
+                InitiatorID = _userService.GetCurrentUser().AssociateId,
+                ChangeIND = propertyDeltaList.ToString(Formatting.None)
+            };
+
+            try
+            {
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = GetDSCEventTopic(dsId);
+                    _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"failed sending event: {snowModel}");
+            }
+        }
+        
+        public void PublishSnowflakeConsumptionDeleteRequest(Schema schema)
+        {
+            int dsId = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).Select(s => s.ParentDataset.DatasetId).FirstOrDefault();
+
+            JObject schemaDeletedChangeInd = new JObject();
+            schemaDeletedChangeInd.Add("schema", "deleted");
+
+            SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+            {
+                EventType = GlobalConstants.SnowConsumptionMessageTypes.DELETE_REQUEST,
+                DatasetID = dsId,
+                SchemaID = schema.SchemaId,
+                RevisionID = 0,
+                InitiatorID = _userService.GetCurrentUser().AssociateId,
+                ChangeIND = schemaDeletedChangeInd.ToString(Formatting.None)
+            };
+
+            try
+            {
+                string topicName = null;
+                if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
+                {
+                    topicName = GetDSCEventTopic(dsId);
+                    _messagePublisher.Publish(topicName, snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel));
+                }
+                else
+                {
+                    _messagePublisher.PublishDSCEvent(snowModel.SchemaID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"failed sending event: {snowModel}");
+            }
         }
 
         public void GenerateConsumptionLayerEvents(FileSchema schema, JObject propertyDeltaList)
@@ -1591,7 +1729,8 @@ namespace Sentry.data.Core
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.PARQUET_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaParquet,
+                    LastChanged = DateTime.Now
                 },
                 new SchemaConsumptionSnowflake()
                 {
@@ -1602,7 +1741,8 @@ namespace Sentry.data.Core
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAWQUERY_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRawQuery,
+                    LastChanged = DateTime.Now
                 },
                 new SchemaConsumptionSnowflake()
                 {
@@ -1613,7 +1753,8 @@ namespace Sentry.data.Core
                     SnowflakeStatus = ConsumptionLayerTableStatusEnum.NameReserved.ToString(),
                     SnowflakeStage = GlobalConstants.SnowflakeStageNames.RAW_STAGE,
                     SnowflakeWarehouse = GlobalConstants.SnowflakeWarehouse.WAREHOUSE_NAME,
-                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw
+                    SnowflakeType = SnowflakeConsumptionType.DatasetSchemaRaw,
+                    LastChanged = DateTime.Now
                 }
             });
 

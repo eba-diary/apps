@@ -1,4 +1,6 @@
-﻿namespace Sentry.data.Core
+﻿using System;
+
+namespace Sentry.data.Core
 {
     /// <summary>
     /// Represents how a schema can be consumed from Snowflake
@@ -11,6 +13,7 @@
         public virtual string SnowflakeSchema { get; set; }
         public virtual string SnowflakeTable { get; set; }
         public virtual string SnowflakeStatus { get; set; }
+        public virtual DateTime LastChanged { get; set; }
         public virtual SnowflakeConsumptionType SnowflakeType { get; set; }
 
         /// <summary>

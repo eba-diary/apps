@@ -339,6 +339,7 @@
     <Compile Include="ApacheLivyProviderTests.cs" />
     <Compile Include="DataFlowMetricServiceTests.cs" />
     <Compile Include="Helpers\MockLoggingService.cs" />
+    <Compile Include="MetadataMonitorServiceTests.cs" />
     <Compile Include="MockClasses.cs" />
     <Compile Include="MockClasses\MockJobStorage.cs" />
     <Compile Include="MotiveProviderTests.cs" />
@@ -372,6 +373,7 @@
     <Compile Include="GlobalDatasetServiceTests.cs" />
     <Compile Include="GlobalDatasetSearchServiceTests.cs" />
     <Compile Include="SchemaFieldProviderTests.cs" />
+    <Compile Include="SnowflakeEventHandlerTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -469,6 +471,10 @@
     <ProjectReference Include="..\Sentry.data.Infrastructure\Sentry.data.Infrastructure.csproj">
       <Project>{c766d10b-0008-4cc8-a0c0-5818e5ee464a}</Project>
       <Name>Sentry.data.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
+      <Project>{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}</Project>
+      <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

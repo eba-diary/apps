@@ -246,14 +246,25 @@ namespace Sentry.data.Core
         public async Task<AccessRequest> GetAccessRequestAsync(int datasetId)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-            
+
+            var perms = GetDatasetPermissions(ds.DatasetId);
+
             AccessRequest ar = new AccessRequest()
             {
                 ApproverList = new List<KeyValuePair<string, string>>(),
                 SecurableObjectId = ds.DatasetId,
                 SecurableObjectName = ds.DatasetName,
-                SaidKeyCode = ds.Asset.SaidKeyCode
+                SaidKeyCode = ds.Asset.SaidKeyCode,
             };
+
+            if (perms != null && perms.InheritanceTicket != null)
+            {
+                var inheritancePerms = perms.InheritanceTicket.AddedPermissions.FirstOrDefault();
+                if(inheritancePerms != null)
+                {
+                    ar.InheritanceStatus = inheritancePerms.IsEnabled;
+                }
+            }
 
             //determine the names of the default security groups
             var securityGroups = _securityService.GetDefaultSecurityGroupDtos(ds);
@@ -359,7 +370,7 @@ namespace Sentry.data.Core
                 await _datasetContext.AddAsync(dataset);
                 await _datasetContext.SaveChangesAsync();
 
-                GenerateSnowSchemaCreateForDataset(dataset);
+                GenerateSnowSchemaEventForDataset(dataset, false);
 
                 // Create a Hangfire job that will setup the default security groups for this new dataset
                 _securityService.EnqueueCreateDefaultSecurityForDataset(dataset.DatasetId);
@@ -403,7 +414,7 @@ namespace Sentry.data.Core
             Dataset dataset = _datasetContext.GetById<Dataset>(datasetId);
 
             // Publish a message to create the Schema in Snowflake 
-            GenerateSnowSchemaCreateForDataset(dataset);
+            GenerateSnowSchemaEventForDataset(dataset, false);
 
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(datasetId);
@@ -431,7 +442,7 @@ namespace Sentry.data.Core
             _schemaService.PublishSchemaEvent(dto.DatasetId, configDto.SchemaId);
             _datasetContext.SaveChanges();
 
-            GenerateSnowSchemaCreateForDataset(ds);
+            GenerateSnowSchemaEventForDataset(ds, false);
 
             // Create a Hangfire job that will setup the default security groups for this new dataset
             _securityService.EnqueueCreateDefaultSecurityForDataset(ds.DatasetId);
@@ -906,6 +917,8 @@ namespace Sentry.data.Core
 
         private void MarkForDelete(Dataset ds, IApplicationUser user)
         {
+            GenerateSnowSchemaEventForDataset(ds, true);
+
             ds.CanDisplay = false;
             ds.DeleteInd = true;
             ds.DeleteIssuer = (user == null)? _userService.GetCurrentUser().AssociateId : user.AssociateId;
@@ -1121,39 +1134,59 @@ namespace Sentry.data.Core
             return $"{Configuration.Config.GetHostSetting("SentryDataBaseUrl")}/Dataset/Detail/{datasetId}";
         }
 
-        private void GenerateSnowSchemaCreateForDataset(Dataset dataset)
+        private void GenerateSnowSchemaEventForDataset(Dataset dataset, bool isDelete)
         {
             JObject datasetCreatedChangeInd = new JObject();
-            datasetCreatedChangeInd.Add("dataset", "added");
+            datasetCreatedChangeInd.Add("dataset", isDelete ? "deleted" : "added");
 
-            //Always generate snowflake table create event
-            SnowSchemaCreateModel snowModel = new SnowSchemaCreateModel()
+            int datasetId = dataset.DatasetId;
+            string jsonPayload;
+
+            if (_dataFeatures.CLA5211_SendNewSnowflakeEvents.GetValue())
             {
-                DatasetID = dataset.DatasetId,
-                InitiatorID = _userService.GetCurrentUser().AssociateId,
-                ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
-            };
+                SnowConsumptionMessageModel snowModel = new SnowConsumptionMessageModel()
+                {
+                    EventType = isDelete ? SnowConsumptionMessageTypes.DELETE_REQUEST : SnowConsumptionMessageTypes.CREATE_REQUEST,
+                    SchemaID = 0,
+                    RevisionID = 0,
+                    DatasetID = datasetId,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId,
+                    ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
+                };
+                jsonPayload = JsonConvert.SerializeObject(snowModel);
+            }
+            else
+            {
+                SnowSchemaCreateModel snowModel = new SnowSchemaCreateModel()
+                {
+                    DatasetID = datasetId,
+                    InitiatorID = _userService.GetCurrentUser().AssociateId,
+                    ChangeIND = datasetCreatedChangeInd.ToString(Formatting.None)
+                };
+                jsonPayload = JsonConvert.SerializeObject(snowModel);
+            }
 
             try
             {
-                _logger.LogInformation($"<GenerateSnowSchemaCreateForDataset> sending event: {JsonConvert.SerializeObject(snowModel)}");
+                _logger.LogInformation($"{nameof(GenerateSnowSchemaEventForDataset)} sending event: {jsonPayload}");
 
                 string topicName = null;
                 if (string.IsNullOrWhiteSpace(_dataFeatures.CLA4260_QuartermasterNamedEnvironmentTypeFilter.GetValue()))
                 {
                     topicName = new DscEventTopicHelper().GetDSCTopic(dataset);
-                    _messagePublisher.Publish(topicName, snowModel.DatasetID.ToString(), JsonConvert.SerializeObject(snowModel));
+                    _messagePublisher.Publish(topicName, datasetId.ToString(), jsonPayload);
                 }
                 else
                 {
-                    _messagePublisher.PublishDSCEvent(snowModel.DatasetID.ToString(), JsonConvert.SerializeObject(snowModel), topicName);
+                    _messagePublisher.PublishDSCEvent(datasetId.ToString(), jsonPayload, topicName);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"<GenerateSnowSchemaCreateForDataset> failed sending event: {JsonConvert.SerializeObject(snowModel)}");
+                _logger.LogError(ex, $"{nameof(GenerateSnowSchemaEventForDataset)} failed sending event: {jsonPayload}");
             }
         }
+        
         #endregion
 
     }

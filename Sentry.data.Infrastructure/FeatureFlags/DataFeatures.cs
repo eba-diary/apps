@@ -39,18 +39,14 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion { get; }
         public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL { get; }
         public IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics { get; }
-        public IFeatureFlag<bool> CLA3945_Telematics { get; }
-        public IFeatureFlag<bool> CLA2868_APIPaginationSupport { get; }
         public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration { get; }
-        public IFeatureFlag<bool> CLA4485_DropCompaniesFile { get; }
-        public IFeatureFlag<bool> CLA2869_AllowMotiveJobs { get; }
-        public IFeatureFlag<bool> CLA4931_SendMotiveEmail { get; }
         public IFeatureFlag<bool> CLA4925_ParquetFileType { get; }
         public IFeatureFlag<bool> CLA4912_API { get; }
         public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents { get; }
         public IFeatureFlag<bool> CLA4993_JSMTicketProvider { get; }
         public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability { get; }
         public IFeatureFlag<bool> CLA3214_VariantDataType { get; }
+        public IFeatureFlag<bool> CLA5211_SendNewSnowflakeEvents { get; }
 
         public DataFeatures(IUserService userService, ILdClient ldClient)
         {
@@ -78,18 +74,14 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA3878_ManageSchemasAccordion = new BooleanFeatureFlagAmbientContext("CLA3878_ManageSchemasAccordion", false, _ldClient, () => LdUser);
             CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL = new BooleanFeatureFlagAmbientContext("CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL", false, _ldClient, () => LdUser);
             CLA4411_Goldeneye_Consume_NP_Topics = new BooleanFeatureFlagAmbientContext("CLA4411_Goldeneye_Consume_NP_Topics", false, _ldClient, () => LdUser);
-            CLA3945_Telematics = new BooleanFeatureFlagAmbientContext("CLA3945_Telematics", false, _ldClient, () => LdUser);
-            CLA2868_APIPaginationSupport = new BooleanFeatureFlagAmbientContext("CLA2868_APIPaginationSupport", false, _ldClient, () => LdUser);
             CLA1797_DatasetSchemaMigration = new BooleanFeatureFlagAmbientContext("CLA1797_DatasetSchemaMigration", false, _ldClient, () => LdUser);
-            CLA4485_DropCompaniesFile = new BooleanFeatureFlagAmbientContext("CLA4485_DropCompaniesFile", false, _ldClient, () => LdUser);
-            CLA2869_AllowMotiveJobs = new BooleanFeatureFlagAmbientContext("CLA2869_AllowMotiveJobs", false, _ldClient, () => LdUser);
-            CLA4931_SendMotiveEmail = new BooleanFeatureFlagAmbientContext("CLA4931_SendMotiveEmail", false, _ldClient, () => LdUser);
             CLA4925_ParquetFileType = new BooleanFeatureFlagAmbientContext("CLA4925_ParquetFileType", false, _ldClient, () => LdUser);
             CLA4912_API = new BooleanFeatureFlagAmbientContext("CLA4912_API", false, _ldClient, () => LdUser);
             CLA5024_PublishReprocessingEvents = new BooleanFeatureFlagAmbientContext("CLA5024_PublishReprocessingEvents", false, _ldClient, () => LdUser);
             CLA4993_JSMTicketProvider = new BooleanFeatureFlagAmbientContext("CLA4993_JSMTicketProvider", false, _ldClient, () => LdUser);
             CLA4789_ImprovedSearchCapability = new BooleanFeatureFlagAmbientContext("CLA4789_ImprovedSearchCapability", false, _ldClient, () => LdUser);
             CLA3214_VariantDataType = new BooleanFeatureFlagAmbientContext("CLA3214_VariantDataType", false, _ldClient, () => LdUser);
+            CLA5211_SendNewSnowflakeEvents = new BooleanFeatureFlagAmbientContext("CLA5211_SendNewSnowflakeEvents", false, _ldClient, () => LdUser);
         }
 
         /// <summary>

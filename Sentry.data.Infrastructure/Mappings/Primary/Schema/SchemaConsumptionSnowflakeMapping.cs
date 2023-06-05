@@ -32,7 +32,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.SnowflakeSchema);
             Property(x => x.SnowflakeStatus);
             Property(x => x.SnowflakeStage);
-            Property(x => x.SnowflakeWarehouse); 
+            Property(x => x.SnowflakeWarehouse);
+            Property(x => x.LastChanged);
             Property(x => x.SnowflakeType,
                      attr => {
                      attr.Column("Snowflake_TYP");

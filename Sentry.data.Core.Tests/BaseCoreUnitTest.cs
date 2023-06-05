@@ -98,18 +98,14 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA3878_ManageSchemasAccordion => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4433_SEND_S3_SINK_CONNECTOR_REQUEST_EMAIL => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4411_Goldeneye_Consume_NP_Topics => new MockBooleanFeatureFlag(true);
-            public IFeatureFlag<bool> CLA3945_Telematics => new MockBooleanFeatureFlag(true);
-            public IFeatureFlag<bool> CLA2868_APIPaginationSupport => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA1797_DatasetSchemaMigration => new MockBooleanFeatureFlag(true);
-            public IFeatureFlag<bool> CLA4485_DropCompaniesFile => new MockBooleanFeatureFlag(true);
-            public IFeatureFlag<bool> CLA2869_AllowMotiveJobs => new MockBooleanFeatureFlag(true);
-            public IFeatureFlag<bool> CLA4931_SendMotiveEmail => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4925_ParquetFileType => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4912_API => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA5024_PublishReprocessingEvents => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4993_JSMTicketProvider => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA3214_VariantDataType => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA5211_SendNewSnowflakeEvents => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4553_PlatformActivity => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA5112_PlatformActivity_TotalFiles_ViewPage => new MockBooleanFeatureFlag(true);
         }
