@@ -48,6 +48,7 @@
                 @*<label class="active" for="">Schema <em>(Optional)</em></label>*@
                 @Html.LabelFor(x => x.SelectedSchema, new { @class = Model.SelectedSchema.Any() ? "active" : "" })
                 @Html.DropDownListFor(x => x.SelectedSchema, Model.SchemaList, new { @class = "mdb-select", multiple = "True", searchable = "Search here..." })
+                <button id="SelectedSchemaApplyBtn" class="btn-save btn btn-primary btn-sm waves-effect waves-light">Apply</button>
             </div>
         </div>
     </div>
