@@ -62,17 +62,18 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public async Task<bool> JiraUserExistsAsync(string associateId)
         {
-            var response = await _httpClient.GetAsync(_jiraBaseUrl + $"user/search?username={associateId}");
-            
-            if (response.IsSuccessStatusCode)
+            using (var response = await _httpClient.GetAsync(_jiraBaseUrl + $"user/search?username={associateId}"))
             {
-                JArray users = JArray.Parse(await response.Content.ReadAsStringAsync());
-                return users.Any();
-            }
-            else
-            {
-                _logger.LogInformation($"Jira User does not exist for {associateId}");
-                return false;
+                if (response.IsSuccessStatusCode)
+                {
+                    JArray users = JArray.Parse(await response.Content.ReadAsStringAsync());
+                    return users.Any();
+                }
+                else
+                {
+                    _logger.LogWarning($"Error attempting to get Jira user {associateId}. Error: {response.Content.ReadAsStringAsync().Result}");
+                    return false;
+                }
             }
         }
 
@@ -83,13 +84,15 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public dynamic IssueSearch(JiraSearchRequest jql)
         {
-            var response = _httpClient.PostAsync(_jiraBaseUrl + "issue", new StringContent(jql.ToString())).Result;
-            if (!response.IsSuccessStatusCode)
+            using (var response = _httpClient.PostAsync(_jiraBaseUrl + "issue", new StringContent(jql.ToString())).Result)
             {
-                _logger.LogError(response.Content.ToString());
-                throw new JiraServiceException($"Unable to search for issues with following JQL: {jql}. Status code: {response.StatusCode}.");
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError(response.Content.ToString());
+                    throw new JiraServiceException($"Unable to search for issues with following JQL: {jql}. Status code: {response.StatusCode}.");
+                }
+                return JsonConvert.DeserializeObject<dynamic>(response.Content.ToString());
             }
-            return JsonConvert.DeserializeObject<dynamic>(response.Content.ToString());
         }
 
         #region Private
@@ -148,15 +151,16 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         private string ValidateAndReturnProject(string projectKey)
         {
-            var response = _httpClient.GetAsync(_jiraBaseUrl + $"project/{projectKey}").Result;
-
-            if (!response.IsSuccessStatusCode)
+            using (var response = _httpClient.GetAsync(_jiraBaseUrl + $"project/{projectKey}").Result)
             {
-                _logger.LogError(response.Content.ToString());
-                throw new JiraServiceException($"Unable to validate project with key: {projectKey}. Status code: {response.StatusCode}.");
-            }
-            var projResponse = JsonConvert.DeserializeObject<JiraProjectResponse>(response.Content.ReadAsStringAsync().Result);
-            return projResponse.Id;
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError(response.Content.ToString());
+                    throw new JiraServiceException($"Unable to validate project with key: {projectKey}. Status code: {response.StatusCode}.");
+                }
+                var projResponse = JsonConvert.DeserializeObject<JiraProjectResponse>(response.Content.ReadAsStringAsync().Result);
+                return projResponse.Id;
+            }                
         }
 
         /// <summary>
@@ -186,24 +190,29 @@ namespace Sentry.data.Infrastructure
             {
                 return new List<string>();
             }
-            var response = _httpClient.GetAsync(_jiraBaseUrl + $"project/{projectKey}/components").Result;
-            var componentResponse = JsonConvert.DeserializeObject<List<JiraComponentResponse>>(response.Content.ReadAsStringAsync().Result);
-            var componentIds = new List<string>();
-            foreach (var component in components)
+
+            using (var response = _httpClient.GetAsync(_jiraBaseUrl + $"project/{projectKey}/components").Result)
             {
-                var compId = componentResponse.Find((item) => item.name == component);
-                if (compId is object)
+                var componentResponse = JsonConvert.DeserializeObject<List<JiraComponentResponse>>(response.Content.ReadAsStringAsync().Result);
+                var componentIds = new List<string>();
+                foreach (var component in components)
                 {
-                    componentIds.Add(compId.id);
+                    var compId = componentResponse.Find((item) => item.name == component);
+                    if (compId is object)
+                    {
+                        componentIds.Add(compId.id);
+                    }
                 }
+                return componentIds;
             }
-            return componentIds;
         }
 
         private JiraMetaResponse GetIssueType(string projectKey, string issueTypeId)
         {
-            var response = _httpClient.GetAsync(_jiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes/{issueTypeId}").Result;
-            return JsonConvert.DeserializeObject<JiraMetaResponse>(response.Content.ReadAsStringAsync().Result);
+            using (var response = _httpClient.GetAsync(_jiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes/{issueTypeId}").Result)
+            {
+                return JsonConvert.DeserializeObject<JiraMetaResponse>(response.Content.ReadAsStringAsync().Result);
+            }
         }
 
         /// <summary>
@@ -214,10 +223,12 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         private string GetIssueTypeId(string projectKey, string issueType)
         {
-            var response = _httpClient.GetAsync(_jiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes").Result;
-            var r = JsonConvert.DeserializeObject<JiraIssuetypeResponse>(response.Content.ReadAsStringAsync().Result);
-            var issueTypeId = r.Values.FirstOrDefault(x => x.Name == issueType).Id;
-            return issueTypeId;
+            using (var response = _httpClient.GetAsync(_jiraBaseUrl + $"issue/createmeta/{projectKey}/issuetypes").Result)
+            {
+                var r = JsonConvert.DeserializeObject<JiraIssuetypeResponse>(response.Content.ReadAsStringAsync().Result);
+                var issueTypeId = r.Values.FirstOrDefault(x => x.Name == issueType).Id;
+                return issueTypeId;
+            }
         }
 
         /// <summary>
@@ -239,24 +250,16 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public string CreateAndValidateJiraIssue(JiraIssue issueInfo)
         {
-            var response = CreateJiraIssue(issueInfo);
-            if (!response.IsSuccessStatusCode)
+            using (var response = _httpClient.PostAsync(_jiraBaseUrl + "issue", new StringContent(issueInfo.ToJson(), Encoding.UTF8, "application/json")).Result)
             {
-                throw new JiraServiceException($"Creating Jira issue resulted in error. Status code: {response.StatusCode}. Error: {response.Content}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new JiraServiceException($"Creating Jira issue resulted in error. Status code: {response.StatusCode}. Error: {response.Content}");
+                }
+                var issueResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(response.Content.ReadAsStringAsync().Result);
+                _logger.LogInformation($"Jira issue {issueResponse.key} created.");
+                return issueResponse.key;
             }
-            var issueResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(response.Content.ReadAsStringAsync().Result);
-            _logger.LogInformation($"Jira issue {issueResponse.key} created.");
-            return issueResponse.key;
-        }
-
-        /// <summary>
-        /// Create Jira Issue
-        /// </summary>
-        /// <param name="ticketInfo"></param>
-        /// <returns></returns>
-        private HttpResponseMessage CreateJiraIssue(JiraIssue ticketInfo)
-        {
-            return _httpClient.PostAsync(_jiraBaseUrl + "issue", new StringContent(ticketInfo.ToJson(), Encoding.UTF8, "application/json")).Result;
         }
 
         /// <summary>
@@ -264,18 +267,19 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="jiraIssue"></param>
         /// <returns></returns>
-        public async Task<string> CreateJiraIssueAsync(JiraIssue jiraIssue)
+        private async Task<string> CreateJiraIssueAsync(JiraIssue jiraIssue)
         {
-            var response = await _httpClient.PostAsync(_jiraBaseUrl + "issue", new StringContent(jiraIssue.ToJson(), Encoding.UTF8, "application/json"));
-
-            if (!response.IsSuccessStatusCode)
+            using (var response = await _httpClient.PostAsync(_jiraBaseUrl + "issue", new StringContent(jiraIssue.ToJson(), Encoding.UTF8, "application/json")))
             {
-                throw new JiraServiceException($"Creating Jira issue resulted in error. Status code: {response.StatusCode}. Error: {response.Content.ReadAsStringAsync().Result}");
-            }
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new JiraServiceException($"Creating Jira issue resulted in error. Status code: {response.StatusCode}. Error: {response.Content.ReadAsStringAsync().Result}");
+                }
 
-            var issueResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(await response.Content.ReadAsStringAsync());
-            _logger.LogInformation($"Jira issue {issueResponse.key} created.");
-            return issueResponse.key;
+                var issueResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(await response.Content.ReadAsStringAsync());
+                _logger.LogInformation($"Jira issue {issueResponse.key} created.");
+                return issueResponse.key;
+            }
         }
         #endregion
     }

@@ -60,7 +60,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
-                jiraTicket.Reporter = Config.GetHostSetting("ServiceAccountID"); //"WB_DATA_I_TEST_V2";
+                jiraTicket.Reporter = Config.GetHostSetting("ServiceAccountID");
                 AddToDescription("Reporter", $"{user.AssociateId} - {user.DisplayName}", descriptionMarkdown);
                 AddToDescription("Reporter Email", user.EmailAddress, descriptionMarkdown);
             }
