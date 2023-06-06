@@ -32,6 +32,10 @@
         });
 
         data.MigrationRequest.initNamedEnvironmentEvents();
+
+        $('#SelectedSchemaApplyBtn').on("click", function () {
+            $(document).click(); // This closes the MultiSelector
+        });
     },
 
     InitForSchema: function (datasetId) {
