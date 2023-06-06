@@ -698,11 +698,6 @@ namespace Sentry.data.Core
                 public const string ENVIRONMENT_TYPE = "Environment Type";
             }
 
-            public static class Systems
-            {
-                public const string DSC = "Data.Sentry.com";
-            }
-
             public static class Labels
             {
                 public const string ASSISTANCE = "DSCRequestAssistance";
