@@ -194,6 +194,7 @@ namespace Sentry.data.Core
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
             result.DatasetId = ds.DatasetId;
             result.DatasetName = ds.DatasetName;
+            result.DatasetNamedEnvironment = ds.NamedEnvironment;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
             result.Approvers = _saidService.GetApproversByKeyCodeAsync(ds.Asset.SaidKeyCode).Result;

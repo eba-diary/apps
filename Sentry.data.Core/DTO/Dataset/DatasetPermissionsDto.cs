@@ -14,7 +14,8 @@ namespace Sentry.data.Core
     public class DatasetPermissionsDto
     {
         public int DatasetId { get; set; }
-        public string DatasetName { get; set; }    
+        public string DatasetName { get; set; }
+        public string DatasetNamedEnvironment { get; set; }
         public string DatasetSaidKeyCode { get; set; }
         public IList<SecurablePermission> Permissions { get; set; }
         public IList<SAIDRole> Approvers { get; set; }
