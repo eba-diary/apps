@@ -47,6 +47,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         public IFeatureFlag<bool> CLA4789_ImprovedSearchCapability { get; }
         public IFeatureFlag<bool> CLA3214_VariantDataType { get; }
         public IFeatureFlag<bool> CLA5211_SendNewSnowflakeEvents { get; }
+        public IFeatureFlag<bool> CLA4870_DSCAssistance { get; }
 
         public DataFeatures(IUserService userService, ILdClient ldClient)
         {
@@ -82,6 +83,7 @@ namespace Sentry.data.Infrastructure.FeatureFlags
             CLA4789_ImprovedSearchCapability = new BooleanFeatureFlagAmbientContext("CLA4789_ImprovedSearchCapability", false, _ldClient, () => LdUser);
             CLA3214_VariantDataType = new BooleanFeatureFlagAmbientContext("CLA3214_VariantDataType", false, _ldClient, () => LdUser);
             CLA5211_SendNewSnowflakeEvents = new BooleanFeatureFlagAmbientContext("CLA5211_SendNewSnowflakeEvents", false, _ldClient, () => LdUser);
+            CLA4870_DSCAssistance = new BooleanFeatureFlagAmbientContext("CLA4870_DSCAssistance", false, _ldClient, () => LdUser);
         }
 
         /// <summary>
@@ -126,7 +128,6 @@ namespace Sentry.data.Infrastructure.FeatureFlags
         */
         public IFeatureFlag<bool> CLA3241_DisableDfsDropLocation { get; } = new BooleanFeatureFlag("CLA3241_DisableDfsDropLocation", databaseRepo_longCache);
         public IFeatureFlag<bool> CLA3819_EgressEdgeMigration { get; } = new BooleanFeatureFlag("CLA3819_EgressEdgeMigration", databaseRepo_longCache);
-
         #endregion
 
     }

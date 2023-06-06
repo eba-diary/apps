@@ -413,6 +413,7 @@
     <Compile Include="AppSettings\HostSettingsWrapper.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Common.cs" />
+    <Compile Include="ServiceImplementations\AssistanceService.cs" />
     <Compile Include="ServiceImplementations\Elastic\ElasticDocumentClient.cs" />
     <Compile Include="Exceptions\AcceptableErrorException.cs" />
     <Compile Include="Exceptions\GoogleBigQueryJobProviderException.cs" />

@@ -374,6 +374,8 @@
     <Compile Include="GlobalDatasetSearchServiceTests.cs" />
     <Compile Include="SchemaFieldProviderTests.cs" />
     <Compile Include="SnowflakeEventHandlerTests.cs" />
+    <Compile Include="AssistanceServiceTests.cs" />
+    <Compile Include="JiraServiceTests.cs" />
     <Compile Include="UserFavoriteServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -454,6 +456,21 @@
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="ExpectedJSON\Jira_Project.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\Jira_IssueTypes.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\Jira_IssueType.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\Jira_Create.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ExpectedJSON\Jira_User.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="ExpectedJSON\PagingHttps_AcceptableErrorResponse.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
