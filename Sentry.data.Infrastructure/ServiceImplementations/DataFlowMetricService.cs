@@ -87,6 +87,13 @@ namespace Sentry.data.Infrastructure
             return fileGroups;
         }
 
+        public long GetAllTotalFilesCount()
+        {
+            long docCount = _dataFlowMetricProvider.GetAllTotalFiles().SearchTotal;
+
+            return docCount;
+        }
+
         public List<DatasetProcessActivityDto> GetAllTotalFiles()
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFiles().ToDto();

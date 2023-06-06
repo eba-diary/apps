@@ -272,6 +272,27 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
+        public void GetAllTotalFilesCount_MappedReturn()
+        {
+            //arrange
+            var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(stubDataFlowMetricProvider.Object, stubIDatasetContext.Object);
+
+            stubDataFlowMetricProvider.Setup(x => x.GetAllTotalFiles()).Returns(GetElasticDataFlowMetricList());
+
+            //act
+            long docCount= dataFlowMetricService.GetAllTotalFilesCount();
+
+            //assert
+            Assert.AreEqual(2, docCount);
+
+            stubDataFlowMetricProvider.VerifyAll();
+            stubIDatasetContext.VerifyAll();
+        }
+
+        [TestMethod]
         public void GetAllTotalFiles_MappedReturn()
         {
             //arrange
@@ -431,7 +452,7 @@ namespace Sentry.data.Infrastructure.Tests
 
             return new ElasticResult<DataFlowMetric>
             {
-                SearchTotal = 1,
+                SearchTotal = 2,
                 Documents = new List<DataFlowMetric>()
                 {
                     new DataFlowMetric()

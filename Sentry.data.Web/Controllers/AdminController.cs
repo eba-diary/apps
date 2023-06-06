@@ -230,13 +230,13 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index()
         {
             // service method that returns the number of completed files
-            int totalCompletedFiles = 1051;
+            long totalCompletedFiles = _dataFlowMetricService.GetAllTotalFilesCount();
 
             // service method that return the number of inflight files
-            int totalInFlightFiles = 306;
+            long totalInFlightFiles = 306;
 
             // service method that return the number of failed files
-            int totalFailedFiles = 2;
+            long totalFailedFiles = 2;
 
             AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
             {
