@@ -10,10 +10,10 @@ namespace Sentry.data.Core.Interfaces
     {
         List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto);
 
-        DataFlowMetricSearchResultDto GetAllTotalFilesByDataset(int datasetId);
+        ElasticResult<DataFlowMetric> GetAllTotalFilesByDataset(int datasetId);
 
-        DataFlowMetricSearchResultDto GetAllTotalFilesBySchema(int schemaId);
+        ElasticResult<DataFlowMetric> GetAllTotalFilesBySchema(int schemaId);
 
-        DataFlowMetricSearchResultDto GetAllTotalFiles();
+        ElasticResult<DataFlowMetric> GetAllTotalFiles();
     }
 }

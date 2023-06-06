@@ -89,33 +89,29 @@ namespace Sentry.data.Infrastructure
 
         public List<DatasetProcessActivityDto> GetAllTotalFiles()
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFiles();
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFiles().ToDto();
 
-            List<DataFlowMetric> entityList = dataFlowMetricSearchResultDto.DataFlowMetricResults;
-            List<DataFlowMetricDto> dtoList = entityList.Select(x => MapToDto(x)).ToList();
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+                                                                                                                MapToDto(x)).ToList();
 
             List<DatasetProcessActivityDto> datasetProcessActivityDtos = new List<DatasetProcessActivityDto>();
 
-            foreach (var items in dataFlowMetricSearchResultDto.TermsAggregate.Buckets)
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
             {
                 DatasetProcessActivityDto datasetProcessActivityDto = new DatasetProcessActivityDto();
 
-                if(int.TryParse(items.Key, out int datasetId))
+                Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == item.key).FirstOrDefault();
+
+                DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.DatasetId == item.key).Max(x => x.MetricGeneratedDateTime);
+
+                if(currentDataset != null)
                 {
-                    Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == datasetId).FirstOrDefault();
+                    datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;
+                    datasetProcessActivityDto.DatasetId = item.key;
+                    datasetProcessActivityDto.FileCount = item.docCount;
+                    datasetProcessActivityDto.LastEventTime = lastEventTime;
 
-                    DateTime lastEventTime = dtoList.Where(x => x.DatasetId == datasetId).Max(x => x.MetricGeneratedDateTime);
-
-                    if(currentDataset != null)
-                    {
-                        datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;
-                        datasetProcessActivityDto.DatasetName = datasetId.ToString();
-                        datasetProcessActivityDto.DatasetId = datasetId;
-                        datasetProcessActivityDto.FileCount = (long)items.DocCount;
-                        datasetProcessActivityDto.LastEventTime = lastEventTime;
-
-                        datasetProcessActivityDtos.Add(datasetProcessActivityDto);
-                    }
+                    datasetProcessActivityDtos.Add(datasetProcessActivityDto);
                 }
             }
 
@@ -124,32 +120,30 @@ namespace Sentry.data.Infrastructure
 
         public List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId)
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId);
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
 
-            List<DataFlowMetric> entityList = dataFlowMetricSearchResultDto.DataFlowMetricResults;
-            List<DataFlowMetricDto> dtoList = entityList.Select(x => MapToDto(x)).ToList();
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+                                                                                                                MapToDto(x)).ToList();
 
             List<SchemaProcessActivityDto> schemaProcessActivityDtos = new List<SchemaProcessActivityDto>();
 
-            foreach(var items in dataFlowMetricSearchResultDto.TermsAggregate.Buckets)
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
             {
                 SchemaProcessActivityDto schemaProcessActivityDto = new SchemaProcessActivityDto();
 
-                if (int.TryParse(items.Key, out int schemaId))
+                Schema currentSchema = _context.Schema.Where(x => x.SchemaId == item.key).FirstOrDefault();
+
+                DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.SchemaId == item.key).Max(x => x.MetricGeneratedDateTime);
+
+                if (currentSchema != null)
                 {
-                    Schema currentSchema = _context.Schema.Where(x => x.SchemaId == schemaId).FirstOrDefault();
+                    schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;
+                    schemaProcessActivityDto.DatasetId = datasetId;
+                    schemaProcessActivityDto.SchemaId = item.key;
+                    schemaProcessActivityDto.FileCount = item.docCount;
+                    schemaProcessActivityDto.LastEventTime = lastEventTime;
 
-                    DateTime lastEventTime = dtoList.Where(x => x.SchemaId == schemaId).Max(x => x.MetricGeneratedDateTime);
-
-                    if (currentSchema != null)
-                    {
-                        schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;
-                        schemaProcessActivityDto.SchemaId = schemaId;
-                        schemaProcessActivityDto.FileCount = (long)items.DocCount;
-                        schemaProcessActivityDto.LastEventTime = lastEventTime;
-
-                        schemaProcessActivityDtos.Add(schemaProcessActivityDto);
-                    }
+                    schemaProcessActivityDtos.Add(schemaProcessActivityDto);
                 }
             }
 
@@ -158,18 +152,18 @@ namespace Sentry.data.Infrastructure
 
         public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId);
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId).ToDto();
 
-            List<DataFlowMetric> entityList = dataFlowMetricSearchResultDto.DataFlowMetricResults;
-            List<DataFlowMetricDto> dtoList = entityList.Select(x => MapToDto(x)).ToList();
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+                                                                                                                MapToDto(x)).ToList();
 
             List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = new List<DatasetFileProcessActivityDto>();
 
-            foreach (var items in dtoList)
+            foreach (DataFlowMetricDto items in dataFlowMetricDtoList)
             {
                 DatasetFileProcessActivityDto datasetFileProcessActivityDto = new DatasetFileProcessActivityDto()
                 {
-                    FileName = items.DataFlowName,
+                    FileName = items.FileName,
                     FlowExecutionGuid = items.FlowExecutionGuid,
                     LastFlowStep = items.TotalFlowSteps,
                     LastEventTime = items.MetricGeneratedDateTime

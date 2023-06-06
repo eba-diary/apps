@@ -510,6 +510,11 @@ namespace Sentry.data.Core
                 public const string FUNCTION = "Function";
                 public const string TAG = "Tag";
             }
+
+            public static class DataFlowMetric
+            {
+                public const string DOCCOUNT = "Doc Count";
+            }
         }
 
         public static class SearchDisplayNames

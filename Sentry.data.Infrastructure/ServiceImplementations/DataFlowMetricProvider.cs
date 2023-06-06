@@ -18,17 +18,17 @@ namespace Sentry.data.Infrastructure
             _elasticDocumentClient = elasticDocumentClient;
         }
 
-        public DataFlowMetricSearchResultDto GetAllTotalFilesByDataset(int datasetId)
+        public ElasticResult<DataFlowMetric> GetAllTotalFilesByDataset(int datasetId)
         {
             return GetTotalFiles(datasetId: datasetId);
         }
 
-        public DataFlowMetricSearchResultDto GetAllTotalFilesBySchema(int schemaId)
+        public ElasticResult<DataFlowMetric> GetAllTotalFilesBySchema(int schemaId)
         {
             return GetTotalFiles(schemaId: schemaId);
         }
 
-        public DataFlowMetricSearchResultDto GetAllTotalFiles()
+        public ElasticResult<DataFlowMetric> GetAllTotalFiles()
         {
             return GetTotalFiles();
         }
@@ -64,7 +64,7 @@ namespace Sentry.data.Infrastructure
 
         /// GetTotalFiles allows for different amounts of parameters to be passed in. 
         /// This allows for managemnet of scope for the elastic query
-        private DataFlowMetricSearchResultDto GetTotalFiles(int? datasetId = null, int? schemaId = null)
+        private ElasticResult<DataFlowMetric> GetTotalFiles(int? datasetId = null, int? schemaId = null)
         {
             // list of query container descriptors to filter elastic search
             List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> Filter = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
@@ -106,18 +106,11 @@ namespace Sentry.data.Infrastructure
                                                                                         .Filter(Filter)
                                                                                         .MustNot(MustNot)
                                                                                         .Must(Must)))
-                                                                                .Aggregations(aggregations => aggregations.Terms("file_count", df => df.Field(aggregation_field)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOCCOUNT, df => df.Field(aggregation_field)))
                                                                                 .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
 
 
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = new DataFlowMetricSearchResultDto()
-            {
-                SearchTotal = elasticResult.SearchTotal,
-                DataFlowMetricResults = elasticResult.Documents.ToList(),
-                TermsAggregate = elasticResult.Aggregations.Terms("file_count")
-            };
-
-            return dataFlowMetricSearchResultDto;
+            return elasticResult;
         }
     }
 }
