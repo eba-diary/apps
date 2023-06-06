@@ -14,6 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "@jest/globals": "^29.5.0",
+    "@types/bootstrap": "^5.2.6",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
@@ -38,6 +39,7 @@
     "@fancyapps/fancybox": "^3.5.7",
     "@fortawesome/fontawesome-free": "^6.2.1",
     "@sentry-insurance/InternalFrontendTemplate": "^6.1.1",
+    "@types/jquery": "^3.5.16",
     "bootbox": "^6.0.0",
     "datatables.net": "^1.13.1",
     "datatables.net-bs4": "^1.13.1",
@@ -45,6 +47,7 @@
     "datatables.net-buttons-bs4": "^2.3.3",
     "datatables.net-responsive": "^2.4.0",
     "datatables.net-responsive-bs4": "^2.4.0",
+    "jquery": "^3.7.0",
     "jquery-ajax-unobtrusive": "^3.2.6",
     "jquery-throttle-debounce": "^1.0.0",
     "jquery-ui": "^1.13.2",
