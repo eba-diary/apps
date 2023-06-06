@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
             AddAssistanceResultDto resultDto = new AddAssistanceResultDto
             {
                 IssueKey = issueKey,
-                IssueLink = $"https://jira.sentry.com/browse/{issueKey}"
+                IssueLink = $"{Config.GetHostSetting("JiraUrl")}browse/{issueKey}"
             };
 
             return resultDto;

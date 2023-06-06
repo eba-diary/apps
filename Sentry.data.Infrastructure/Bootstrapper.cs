@@ -264,7 +264,7 @@ namespace Sentry.data.Infrastructure
 
             registry.For<IJiraService>().Singleton().Use<JiraService>()
                 .Ctor<HttpClient>().Is(jClient)
-                .Ctor<string>().Is(Configuration.Config.GetHostSetting("JiraServiceProdUrl"))
+                .Ctor<string>().Is(Configuration.Config.GetHostSetting("AssistanceJiraServiceUrl"))
                 .Named("Assistance");
 
             registry.For<ISecurityService>().Use<SecurityService>().Ctor<IJiraService>().Is(x => x.GetInstance<IJiraService>("Security"));

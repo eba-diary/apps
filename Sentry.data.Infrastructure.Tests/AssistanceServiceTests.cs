@@ -73,7 +73,7 @@ namespace Sentry.data.Infrastructure.Tests
             AddAssistanceResultDto result = await assistanceService.AddAssistanceAsync(addAssistanceDto);
 
             Assert.AreEqual("CLA-000", result.IssueKey);
-            Assert.AreEqual("https://jira.sentry.com/browse/CLA-000", result.IssueLink);
+            Assert.AreEqual("https://jiraqual.sentry.com/browse/CLA-000", result.IssueLink);
 
             mr.VerifyAll();
         }
@@ -110,7 +110,7 @@ namespace Sentry.data.Infrastructure.Tests
                 Assert.AreEqual(JiraValues.CustomFieldNames.ENVIRONMENT_TYPE, customField.Name);
                 Assert.AreEqual("NonProd", ((List<string>)customField.Value).First());
 
-                Assert.IsNotNull(x.Reporter);
+                Assert.AreEqual("000000", x.Reporter);
                 Assert.IsTrue(x.Description.Contains("Description"));
                 Assert.IsTrue(x.Description.Contains("*Current Page:* data.sentry.com/Search/Datasets"));
                 Assert.IsTrue(x.Description.Contains("*Dataset Name:* Dataset Name"));
@@ -140,7 +140,7 @@ namespace Sentry.data.Infrastructure.Tests
             AddAssistanceResultDto result = await assistanceService.AddAssistanceAsync(addAssistanceDto);
 
             Assert.AreEqual("CLA-000", result.IssueKey);
-            Assert.AreEqual("https://jira.sentry.com/browse/CLA-000", result.IssueLink);
+            Assert.AreEqual("https://jiraqual.sentry.com/browse/CLA-000", result.IssueLink);
 
             mr.VerifyAll();
         }
