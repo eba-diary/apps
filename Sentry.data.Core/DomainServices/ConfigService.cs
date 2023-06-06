@@ -511,7 +511,26 @@ namespace Sentry.data.Core
         {
             DataSource ds = _datasetContext.DataSources.Where(x => x.Id == id).FetchSecurityTree(_datasetContext).FirstOrDefault();
 
-            return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            var user = _userService.GetCurrentUser();
+
+            var dataSourceSecurity = _securityService.GetUserSecurity(ds, user);
+
+            if(!dataSourceSecurity.CanEditDataSource) //if can't edit data source, check if they have manage permission on datasets using the source.
+            {
+                var datasets = _datasetContext.Jobs.Where(j => j.DataSource.Id == id).Select(r => r.DataFlow.DatasetId).ToHashSet();
+
+                foreach (var datasetId in datasets)
+                {
+                    UserSecurity userSecurity = _securityService.GetUserSecurity(_datasetContext.GetById<Dataset>(datasetId), user);
+                    if (userSecurity.CanManageSchema)
+                    {
+                        dataSourceSecurity.CanEditDataSource = true;
+                        return dataSourceSecurity;
+                    }
+                }
+            }
+
+            return dataSourceSecurity;
         }
 
         public async Task<AccessRequest> GetDataSourceAccessRequest(int dataSourceId)
