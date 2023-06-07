@@ -15,7 +15,6 @@ namespace Sentry.data.Web.WebApi.Controllers
         private readonly IDatasetContext _datasetContext;
         private readonly IDataSourceService _dataSourceService;
 
-
         public DataSourceController(IDatasetContext dsContext, IDataSourceService dataSourceService)
         {
             _datasetContext = dsContext;
@@ -79,22 +78,26 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         [HttpPost]
         [ApiVersionBegin(WebAPI.Version.v20220609)]
-        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("RunMotiveBackfill/{tokenId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         public IHttpActionResult RunMotiveBackfill(int tokenId)
         {
-            //act
-            var result = _dataSourceService.KickOffMotiveBackfill(tokenId);
-            //return
-            if (!result)
+            try
             {
-                return BadRequest("Token backfill failed.");
-            }
+                var result = _dataSourceService.KickOffMotiveBackfill(tokenId);
+                if (!result)
+                {
+                    return BadRequest("Token backfill failed.");
+                }
 
-            return Ok("Token backfill successfully triggered.");
+                return Ok("Token backfill successfully triggered.");
+            }
+            catch (ResourceForbiddenException)
+            {
+                return Unauthorized();
+            }
         }
     }
 }
