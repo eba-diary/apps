@@ -52,7 +52,8 @@ namespace Sentry.data.Infrastructure
                 DatasetFileId = entity.DatasetFileId,
                 ProcessStartDateTime = entity.ProcessStartDateTime,
                 StatusCode = entity.StatusCode,
-                DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
+                /*DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()*/
+                DataFlowStepName = "TEST"
             };
         }
 
@@ -98,7 +99,57 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFiles().ToDto();
 
-            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+            return MapDatasetProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+
+        public List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
+
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+        public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId).ToDto();
+
+            return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+        public long GetAllFailedFilesCount()
+        {
+            long docCount = _dataFlowMetricProvider.GetAllFailedFiles().SearchTotal;
+
+            return docCount;
+        }
+
+        public List<DatasetProcessActivityDto> GetAllFailedFiles()
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFiles().ToDto();
+
+            return MapDatasetProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+
+        public List<SchemaProcessActivityDto> GetAllFailedFilesByDataset(int datasetId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFilesByDataset(datasetId).ToDto();
+
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+        public List<DatasetFileProcessActivityDto> GetAllFailedFilesBySchema(int schemaId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFilesBySchema(schemaId).ToDto();
+
+            return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+        #region PRIVATE PROCESS ACTIVITY MAPPING FUNCTIONS
+        public List<DatasetProcessActivityDto> MapDatasetProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
+        {
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
                                                                                                                 MapToDto(x)).ToList();
 
             List<DatasetProcessActivityDto> datasetProcessActivityDtos = new List<DatasetProcessActivityDto>();
@@ -107,13 +158,14 @@ namespace Sentry.data.Infrastructure
             {
                 DatasetProcessActivityDto datasetProcessActivityDto = new DatasetProcessActivityDto();
 
-                Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == item.key).FirstOrDefault();
+                /*Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == item.key).FirstOrDefault();*/
 
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.DatasetId == item.key).Max(x => x.MetricGeneratedDateTime);
 
-                if(currentDataset != null)
+                if (lastEventTime != null)
                 {
-                    datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;
+                    /*datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;*/
+                    datasetProcessActivityDto.DatasetName = "DATASET";
                     datasetProcessActivityDto.DatasetId = item.key;
                     datasetProcessActivityDto.FileCount = item.docCount;
                     datasetProcessActivityDto.LastEventTime = lastEventTime;
@@ -125,27 +177,25 @@ namespace Sentry.data.Infrastructure
             return datasetProcessActivityDtos;
         }
 
-        public List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId)
+        private List<SchemaProcessActivityDto> MapSchemaProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
-
-            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
                                                                                                                 MapToDto(x)).ToList();
-
             List<SchemaProcessActivityDto> schemaProcessActivityDtos = new List<SchemaProcessActivityDto>();
 
             foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
             {
                 SchemaProcessActivityDto schemaProcessActivityDto = new SchemaProcessActivityDto();
 
-                Schema currentSchema = _context.Schema.Where(x => x.SchemaId == item.key).FirstOrDefault();
+                /*Schema currentSchema = _context.Schema.Where(x => x.SchemaId == item.key).FirstOrDefault();*/
 
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.SchemaId == item.key).Max(x => x.MetricGeneratedDateTime);
 
-                if (currentSchema != null)
+                if (lastEventTime != null)
                 {
-                    schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;
-                    schemaProcessActivityDto.DatasetId = datasetId;
+                    /*schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;*/
+                    schemaProcessActivityDto.SchemaName = "SCHEMA";
+                    schemaProcessActivityDto.DatasetId = dataFlowMetricDtoList[0].DatasetId;
                     schemaProcessActivityDto.SchemaId = item.key;
                     schemaProcessActivityDto.FileCount = item.docCount;
                     schemaProcessActivityDto.LastEventTime = lastEventTime;
@@ -157,12 +207,10 @@ namespace Sentry.data.Infrastructure
             return schemaProcessActivityDtos;
         }
 
-        public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
+        private List<DatasetFileProcessActivityDto> MapDatasetFileProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId).ToDto();
-
-            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
-                                                                                                                MapToDto(x)).ToList();
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
+                                                                                                               MapToDto(x)).ToList();
 
             List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = new List<DatasetFileProcessActivityDto>();
 
@@ -181,5 +229,6 @@ namespace Sentry.data.Infrastructure
 
             return datasetFileProcessActivityDtos;
         }
+        #endregion
     }
 }

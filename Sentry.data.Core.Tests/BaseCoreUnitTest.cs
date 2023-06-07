@@ -108,6 +108,7 @@ namespace Sentry.data.Core.Tests
             public IFeatureFlag<bool> CLA5211_SendNewSnowflakeEvents => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4553_PlatformActivity => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA5112_PlatformActivity_TotalFiles_ViewPage => new MockBooleanFeatureFlag(true);
+            public IFeatureFlag<bool> CLA5260_PlatformActivity_FileFailures_ViewPage => new MockBooleanFeatureFlag(true);
             public IFeatureFlag<bool> CLA4870_DSCAssistance => new MockBooleanFeatureFlag(true);
         }
     }

@@ -33,6 +33,21 @@ namespace Sentry.data.Infrastructure
             return GetTotalFiles();
         }
 
+        public ElasticResult<DataFlowMetric> GetAllFailedFilesByDataset(int datasetId)
+        {
+            return GetFailedFiles(datasetId: datasetId);
+        }
+
+        public ElasticResult<DataFlowMetric> GetAllFailedFilesBySchema(int schemaId)
+        {
+            return GetFailedFiles(schemaId: schemaId);
+        }
+
+        public ElasticResult<DataFlowMetric> GetAllFailedFiles()
+        {
+            return GetFailedFiles();
+        }
+
         //returns list of data flow metrics matching searchdto criteria
         public List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto)
         {
@@ -106,7 +121,51 @@ namespace Sentry.data.Infrastructure
                                                                                         .Filter(Filter)
                                                                                         .MustNot(MustNot)
                                                                                         .Must(Must)))
-                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOCCOUNT, df => df.Field(aggregation_field)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
+                                                                                .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
+
+
+            return elasticResult;
+        }
+
+        private ElasticResult<DataFlowMetric> GetFailedFiles(int? datasetId = null, int? schemaId = null)
+        {
+            // list of query container descriptors to filter elastic search
+            List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> Filter = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
+            List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> Must = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
+
+            // defines the aggregation filter to allow aggregation on Dataset Id
+            Expression<Func<DataFlowMetric, int>> aggregation_field = o => o.DatasetId;
+
+            // Add term must statemnet that look for jobs with a F (failed) statuscode
+            Must.Add(fq => fq.Terms(t => t.Field(f => f.StatusCode).Terms("F")));
+
+            // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
+            Must.Add(fq => fq.DateRange(t => t.Field(f => f.FileCreatedDateTime)
+                                                .GreaterThanOrEquals(DateMath.Now.Subtract("19h"))
+                                                .LessThan(DateMath.Now.Add("1d"))
+                                                .Format("yyyyMMdd'T'HHmmss.SSSZ")));
+
+            // checking if filtering on datasetId is required
+            if (datasetId.HasValue)
+            {
+                // If a datasetId is provided, override the aggregation_field group by Scehma Id instead 
+                aggregation_field = o => o.SchemaId;
+
+                Filter.Add(fq => fq.Terms(t => t.Field(f => f.DatasetId).Terms(datasetId.Value)));
+            }
+
+            // checking if filtering on schemaId is required
+            if (schemaId.HasValue)
+            {
+                Filter.Add(fq => fq.Terms(t => t.Field(f => f.SchemaId).Terms(schemaId.Value)));
+            }
+
+            // Elastic Search Query
+            ElasticResult<DataFlowMetric> elasticResult = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s.Query(q => q.Bool(b => b
+                                                                                        .Filter(Filter)
+                                                                                        .Must(Must)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
                                                                                 .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
 
 

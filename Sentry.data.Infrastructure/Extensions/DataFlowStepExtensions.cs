@@ -16,7 +16,7 @@ namespace Sentry.data.Infrastructure
 
             List<DataFlowMetricSearchAggregateDto> termsAggregates = new List<DataFlowMetricSearchAggregateDto>();
 
-            foreach (var item in rootResult.Aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOCCOUNT).Buckets)
+            foreach (var item in rootResult.Aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT).Buckets)
             {
                 int.TryParse(item.Key, out int key);
 
