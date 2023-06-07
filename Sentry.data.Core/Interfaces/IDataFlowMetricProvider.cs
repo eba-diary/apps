@@ -9,5 +9,11 @@ namespace Sentry.data.Core.Interfaces
     public interface IDataFlowMetricProvider
     {
         List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto);
+
+        ElasticResult<DataFlowMetric> GetAllTotalFilesByDataset(int datasetId);
+
+        ElasticResult<DataFlowMetric> GetAllTotalFilesBySchema(int schemaId);
+
+        ElasticResult<DataFlowMetric> GetAllTotalFiles();
     }
 }

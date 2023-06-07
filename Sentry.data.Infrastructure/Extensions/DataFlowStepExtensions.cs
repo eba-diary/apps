@@ -1,18 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.DataProcessing;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure
 {
-    public static class DataFlowStepExtensions
+    public static class DataFlowMetricExtensions
     {
-        public static string GenerateStepEventKey(DataFlowStep step)
+        public static DataFlowMetricSearchResultDto ToDto(this ElasticResult<DataFlowMetric> rootResult)
         {
-            return $"{step.DataFlow.FlowStorageCode}-{step.Id}";
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = new DataFlowMetricSearchResultDto();
+
+            dataFlowMetricSearchResultDto.SearchTotal = rootResult.SearchTotal;
+            dataFlowMetricSearchResultDto.DataFlowMetricResults = rootResult.Documents.ToList();
+
+            List<DataFlowMetricSearchAggregateDto> termsAggregates = new List<DataFlowMetricSearchAggregateDto>();
+
+            foreach (var item in rootResult.Aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOCCOUNT).Buckets)
+            {
+                int.TryParse(item.Key, out int key);
+
+                termsAggregates.Add(new DataFlowMetricSearchAggregateDto() { key = key, docCount = (long)item.DocCount });
+            }
+
+            dataFlowMetricSearchResultDto.TermAggregates = termsAggregates;
+
+            return dataFlowMetricSearchResultDto;
         }
     }
 }

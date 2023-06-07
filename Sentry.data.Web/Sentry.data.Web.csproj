@@ -699,6 +699,7 @@
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Controllers\WebApi\DataSourceController.cs" />
+    <Compile Include="Extensions\ProcessActivityExtensions.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DataSourceTokenExtension.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
