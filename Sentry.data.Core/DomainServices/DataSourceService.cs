@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core.DependencyInjection;
 using Sentry.data.Core.DomainServices;
+using Sentry.data.Core.Entities.Jira;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace Sentry.data.Core
         private readonly IMotiveProvider _motiveProvider;
         private readonly HttpClient client;
         private readonly IEmailService _emailService;
+        private readonly IConfigService _configService;
+        private readonly IUserService _userService;
         #endregion
 
         #region Constructor
@@ -28,13 +31,18 @@ namespace Sentry.data.Core
                             IEncryptionService encryptionService,
                             HttpClient httpClient,
                             IMotiveProvider motiveProvider,
-                            IEmailService emailService, DomainServiceCommonDependency<DataSourceService> commonDependencies) : base(commonDependencies)
+                            IEmailService emailService,
+                            IConfigService configService,
+                            IUserService userService,
+                            DomainServiceCommonDependency<DataSourceService> commonDependencies) : base(commonDependencies)
         {
             _datasetContext = datasetContext;
             _encryptionService = encryptionService;
             client = httpClient;
             _motiveProvider = motiveProvider;
             _emailService = emailService;
+            _configService = configService;
+            _userService = userService;
         }
         #endregion
 
@@ -177,16 +185,22 @@ namespace Sentry.data.Core
             }
         }
 
-        public bool KickOffMotiveBackfill(DataSourceToken token)
+        public bool KickOffMotiveBackfill(int tokenId)
         {
             try
             {
+                var token = _datasetContext.GetById<DataSourceToken>(tokenId);
+                var security = _configService.GetUserSecurityForDataSource(token.ParentDataSource.Id);
+                if(!security.CanEditDataSource)
+                {
+                    throw new ResourceForbiddenException(_userService.GetCurrentUser().AssociateId, nameof(UserSecurity.CanEditDataSource), "Motive Backfill", token.ParentDataSource.Id);
+                }
                 _motiveProvider.EnqueueBackfillBackgroundJob(token);
                 return true;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Backfilling token {token.Id} failed with message.");
+                _logger.LogError(e, $"Backfilling token {tokenId} failed with message.");
                 return false;
             }
         }
