@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -11,11 +10,11 @@ namespace Sentry.data.Web.API
 {
     [RoutePrefix(WebConstants.Routes.VERSION_SCHEMAS)]
     [WebApiAuthorizeUseApp]
-    public class SchemaController : BaseApiController
+    public class SchemaController : BaseApiController<SchemaController>
     {
         private readonly ISchemaFlowService _schemaFlowService;
 
-        public SchemaController(ISchemaFlowService schemaFlowService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
+        public SchemaController(ISchemaFlowService schemaFlowService, ApiCommonDependency<SchemaController> apiDependency) : base(apiDependency)
         {
             _schemaFlowService = schemaFlowService;
         }

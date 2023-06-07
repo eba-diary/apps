@@ -1,0 +1,128 @@
+{
+  "maxResults": 50,
+  "startAt": 0,
+  "total": 15,
+  "isLast": true,
+  "values": [
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/10200",
+      "id": "10200",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12520&avatarType=issuetype",
+      "name": "Question",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/10501",
+      "id": "10501",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12513&avatarType=issuetype",
+      "name": "Maintenance",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/10601",
+      "id": "10601",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12503&avatarType=issuetype",
+      "name": "Defect",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/10700",
+      "id": "10700",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=18409&avatarType=issuetype",
+      "name": "Request",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11006",
+      "id": "11006",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=14101&avatarType=issuetype",
+      "name": "User Story",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11203",
+      "id": "11203",
+      "description": "Issue type used for capacity planning for Agile projects in the Capacity View",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=15605&avatarType=issuetype",
+      "name": "Capacity",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11600",
+      "id": "11600",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12511&avatarType=issuetype",
+      "name": "Feature",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11601",
+      "id": "11601",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=18114&avatarType=issuetype",
+      "name": "WIP Defect",
+      "subtask": true
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11700",
+      "id": "11700",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12508&avatarType=issuetype",
+      "name": "Risk",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11701",
+      "id": "11701",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12500&avatarType=issuetype",
+      "name": "Issue",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/11800",
+      "id": "11800",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12500&avatarType=issuetype",
+      "name": "Administration",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/12100",
+      "id": "12100",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12500&avatarType=issuetype",
+      "name": "Support Request",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/12200",
+      "id": "12200",
+      "description": "",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12500&avatarType=issuetype",
+      "name": "TimeOnly",
+      "subtask": false
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/5",
+      "id": "5",
+      "description": "The sub-task of the issue",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12516&avatarType=issuetype",
+      "name": "Sub-task",
+      "subtask": true
+    },
+    {
+      "self": "https://jira.sentry.com/rest/api/2/issuetype/6",
+      "id": "6",
+      "description": "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+      "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12507&avatarType=issuetype",
+      "name": "Epic",
+      "subtask": false
+    }
+  ]
+}

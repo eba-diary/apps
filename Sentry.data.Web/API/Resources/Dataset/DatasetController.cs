@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Sentry.data.Core;
+﻿using Sentry.data.Core;
 using Sentry.data.Web.WebApi;
 using Sentry.WebAPI.Versioning;
 using Swashbuckle.Swagger.Annotations;
@@ -11,11 +10,11 @@ namespace Sentry.data.Web.API
 {
     [RoutePrefix(WebConstants.Routes.VERSION_DATASETS)]
     [WebApiAuthorizeUseApp]
-    public class DatasetController : BaseApiController
+    public class DatasetController : BaseApiController<DatasetController>
     {
         private readonly IDatasetService _datasetService;
 
-        public DatasetController(IDatasetService datasetService, IMapper mapper, IValidationRegistry validationRegistry, IDataFeatures dataFeatures) : base(mapper, validationRegistry, dataFeatures)
+        public DatasetController(IDatasetService datasetService, ApiCommonDependency<DatasetController> apiDependency) : base(apiDependency)
         {
             _datasetService = datasetService;
         }

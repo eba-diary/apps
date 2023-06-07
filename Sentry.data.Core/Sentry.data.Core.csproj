@@ -334,6 +334,8 @@
     <Compile Include="DomainServices\SampleService\SampleDomainService.cs" />
     <Compile Include="DomainServices\SchemaFlowService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DTO\Assistance\AddAssistanceDto.cs" />
+    <Compile Include="DTO\Assistance\AddAssistanceResultDto.cs" />
     <Compile Include="DTO\AuditDto.cs" />
     <Compile Include="DTO\BaseAuditDto.cs" />
     <Compile Include="DTO\Admin\SupportLinkDto.cs" />
@@ -667,6 +669,7 @@
     <Compile Include="Entities\Search\SearchHighlightable.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetSearchService.cs" />
+    <Compile Include="Interfaces\IAssistanceService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />

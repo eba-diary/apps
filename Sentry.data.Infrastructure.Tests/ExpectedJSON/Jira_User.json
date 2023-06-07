@@ -1,0 +1,19 @@
+[
+  {
+    "self": "https://jira.sentry.com/rest/api/2/user?username=000000",
+    "key": "000000",
+    "name": "000000",
+    "emailAddress": "foo.bar@sentry.com",
+    "avatarUrls": {
+      "48x48": "https://jira.sentry.com/secure/useravatar?ownerId=000000&avatarId=18057",
+      "24x24": "https://jira.sentry.com/secure/useravatar?size=small&ownerId=000000&avatarId=18057",
+      "16x16": "https://jira.sentry.com/secure/useravatar?size=xsmall&ownerId=000000&avatarId=18057",
+      "32x32": "https://jira.sentry.com/secure/useravatar?size=medium&ownerId=000000&avatarId=18057"
+    },
+    "displayName": "bar foo",
+    "active": true,
+    "deleted": false,
+    "timeZone": "America/Chicago",
+    "locale": "en_US"
+  }
+]
