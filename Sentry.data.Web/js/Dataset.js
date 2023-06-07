@@ -1018,7 +1018,7 @@ data.Dataset = {
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.AccessRequest.InitForDataset($(this).data("id"));
+            Data.DatasetAuthorization.InitForDataset($(this).data("id"));
         });
 
         $("[id^='btnMigrationRqeuest']").off('click').on('click', function (e) {

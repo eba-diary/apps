@@ -1410,9 +1410,9 @@
     <TypeScriptCompile Include="src\prettycron.ts" />
     <TypeScriptCompile Include="src\quill.ts" />
     <TypeScriptCompile Include="src\site.ts" />
-    <TypeScriptCompile Include="ts\Common.d.ts" />
-    <TypeScriptCompile Include="ts\Common.ts" />
-    <TypeScriptCompile Include="ts\DatasetAuthorization.ts" />
+    <TypeScriptCompile Include="src\ts\Global.d.ts" />
+    <TypeScriptCompile Include="src\ts\Common.ts" />
+    <TypeScriptCompile Include="src\ts\Dataset\Authorization\DatasetAuthorization.ts" />
     <TypeScriptCompile Include="webpack.config.ts" />
   </ItemGroup>
   <PropertyGroup>

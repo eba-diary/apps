@@ -1,21 +1,29 @@
-﻿import { Common } from "./Common";
-import * as Sentry from '@sentry-insurance/InternalFrontendTemplate';
-import SentryModal from '@sentry-insurance/InternalFrontendTemplate/dist/Interfaces/SentryModal';
+﻿import { Common } from "../../Common";
+import { ShowModalWithSpinner, ShowModalCustom } from '@sentry-insurance/InternalFrontendTemplate/dist/Sentry.Common.js';
+import SentryModal from '@sentry-insurance/InternalFrontendTemplate/dist/Interfaces/SentryModal'; 
+import "bootstrap/js/dist/collapse";
+import "bootstrap/js/dist/tooltip";
+import "bootstrap/js/dist/popover"
+import "bootstrap/js/dist/modal"
 
 export namespace DatasetAuthorization {
 
     export async function InitForDataset(datasetId: number): Promise<void> {
+        //try and axe the old modal
+        $("#RequestAccessModal").remove();
 
-        let modal: SentryModal = Sentry.ShowModalWithSpinner("Request Dataset Access");
-
-        $(modal).attr("id", "RequestAccessModal");
+        let modal: SentryModal = ShowModalWithSpinner("Request Dataset Access");
+        
+        $(modal).attr("id", "RequestAccessModal"); 
 
         let createRequestUrl: string = "/Dataset/AccessRequest/?datasetId=" + encodeURI(datasetId.toString());
 
         await $.get(createRequestUrl, function (e) {
             modal.ReplaceModalBody(e);
             $("#RequestAccessFormSection select").materialSelect();
-            initRequestAccessWorkflow();
+            initRequestAccessWorkflow().catch(function (err) {
+                console.log(err);
+            });
         });
 
     }
@@ -67,7 +75,7 @@ export namespace DatasetAuthorization {
         });
 
         addRequestAccessBreadcrumb("Access To", "#RequestAccessToSection")
-        $("#RequestAccessToDatasetBtn").click(function (e) {
+        $("#RequestAccessToDatasetBtn").on('click', function (e) {
             let datasetName: string = $("#RequestAccessDatasetName").text();
             $("#RequestAccess_Scope").val('0')
             editActiveRequestAccessBreadcrumb(datasetName);
@@ -75,28 +83,30 @@ export namespace DatasetAuthorization {
             $("#RequestAccessManageEntitlement").text(producerDatasetGroupName);
             onAccessToSelection(e);
         });
-        $("#RequestAccessToAssetBtn").click(function (e) {
+        $("#RequestAccessToAssetBtn").on ('click', function (e) {
             $("#RequestAccess_Scope").val('1')
-            editActiveRequestAccessBreadcrumb(e.target.value);
+            let assetName: string = $("#RequestAccessAssetName").text();
+
+            editActiveRequestAccessBreadcrumb(assetName);
             $("#RequestAccessConsumeEntitlement").text(consumeAssetGroupName);
             $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
             onAccessToSelection(e);
         });
-        $("#RequestAccessTypeConsumeBtn").click(function (e) {
+        $("#RequestAccessTypeConsumeBtn").on('click', function (e) {
             editActiveRequestAccessBreadcrumb("Consumer");
             requestAccessCleanActiveBreadcrumb();
             addRequestAccessBreadcrumb("Consumer Type", "#RequestAccessConsumerTypeSection");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessConsumerTypeSection").removeClass("d-none");
         });
-        $("#RequestAccessTypeManageBtn").click(function (e) {
+        $("#RequestAccessTypeManageBtn").on('click', function (e) {
             editActiveRequestAccessBreadcrumb("Producer");
             requestAccessCleanActiveBreadcrumb();
             addRequestAccessBreadcrumb("Producer Request", "#RequestAccessManageTypeSection");
             $("#RequestAccessTypeSection").addClass("d-none");
             $("#RequestAccessManageTypeSection").removeClass("d-none");
         });
-        $("#RequestAccessConsumeSnowflakeBtn").click(function (e) {
+        $("#RequestAccessConsumeSnowflakeBtn").on('click', function (e) {
             editActiveRequestAccessBreadcrumb("Snowflake Account");
             requestAccessCleanActiveBreadcrumb();
             addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
@@ -104,7 +114,7 @@ export namespace DatasetAuthorization {
             $("#RequestAccessFormSection").removeClass("d-none");
             setupFormSnowflakeAccount();
         });
-        $("#RequestAccessConsumeAwsBtn").click(function (e) {
+        $("#RequestAccessConsumeAwsBtn").on('click', function (e) {
             editActiveRequestAccessBreadcrumb("AWS IAM");
             requestAccessCleanActiveBreadcrumb();
             addRequestAccessBreadcrumb("Create Request", "#RequestAccessFormSection");
@@ -113,7 +123,7 @@ export namespace DatasetAuthorization {
             setupFormAwsIam();
         });
         $("#RequestAccess_SelectedApprover").materialSelect();
-        $("#RequestAccessSubmit").click(function () {
+        $("#RequestAccessSubmit").on('click', function () {
             if (validateRequestAccessModal()) {
                 $("#RequestAccessLoading").removeClass('d-none');
                 $("#RequestAccessBody").addClass('d-none');
@@ -126,27 +136,34 @@ export namespace DatasetAuthorization {
                         $("#RequestAccessBody").removeClass('d-none');
                         $("#RequestAccessBody").html(data);
                     }
+                }).catch(function (err) {
+                    console.log(err);
                 });
             }
             else {
                 $("#AccessRequestValidationMessage").removeClass("d-none");
             }
         });
-        $("#RequestAccessManageCopyBtn").click(function () {
-            Common.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
+        $("#RequestAccessManageCopyBtn").on('click', function () {
+            Common.copyTextToClipboard($("#RequestAccessManageEntitlement").text()).catch(function (err) {
+                console.log(err);
+            });
         });
-        $("#RequestAccessConsumeCopyBtn").click(function () {
-            
-            Common.copyTextToClipboard($("#RequestAccessConsumeEntitlement").text());
+        $("#RequestAccessConsumeCopyBtn").on('click', function () {
+            Common.copyTextToClipboard($("#RequestAccessConsumeEntitlement").text()).catch(function (err) {
+                console.log(err);
+            });;
         });
     }
 
-    function managePermissionsInit(): void {
+    export function ManagePermissionsInit(): void {
         manageInheritanceInit();
         removePermissionModalInit();
         $("#RequestAccessButton").off('click').on('click', function (e) {
             e.preventDefault();
-            InitForDataset($(this).data("id"));
+            InitForDataset($(this).data("id")).catch(function (err) {
+                console.log(err);
+            });
         });
     }
 
@@ -207,15 +224,19 @@ export namespace DatasetAuthorization {
 
 
         $("#Inheritance_SelectedApprover").materialSelect();
-        $("#inheritanceSwitch label").click(function () {
+        $("#inheritanceSwitch label").on('click', function () {
             $("#inheritanceModal").modal('show');
         });
-        updateInheritanceStatus();
+        updateInheritanceStatus().catch(function (err) {
+            console.log(err);
+        });
         //Event to refresh inheritance switch on modal close
         $("#inheritanceModal").on('hide.bs.modal', function () {
-            updateInheritanceStatus();
+            updateInheritanceStatus().catch(function (err) {
+                console.log(err);
+            });
         });
-        $("#inheritanceModalSubmit").click(function () {
+        $("#inheritanceModalSubmit").on('click', function () {
             if (validateInheritanceModal()) {
                 $("#InheritanceLoading").removeClass('d-none');
                 $("#InheritanceModalBody").addClass('d-none');
@@ -231,8 +252,10 @@ export namespace DatasetAuthorization {
                         $("#InheritanceModalBody").removeClass('d-none');
                         $("#InheritanceModalFooter").removeClass('d-none');
                         //show the user if their request was submitted successfully
-                        Sentry.ShowModalCustom("", data);
+                        ShowModalCustom("", data);
                     }
+                }).catch(function (err) {
+                    console.log(err);
                 });
             }
             else {
@@ -243,7 +266,7 @@ export namespace DatasetAuthorization {
     }
 
     function removePermissionModalInit(): void {
-        $(".removePermissionIcon").click(function (e) {
+        $(".removePermissionIcon").on('click', function (e) {
             let cells = $(e.target).parent().parent().children();
             let scope: string = $(cells[0]).text();
             let identity: string = $(cells[1]).text();
@@ -256,7 +279,7 @@ export namespace DatasetAuthorization {
         $("#removePermissionModal").on('hide.bs.modal', function () {
             removePermissionModalOnClose();
         });
-        $("#removePermissionModalSubmit").click(function () {
+        $("#removePermissionModalSubmit").on('click', function () {
             if (validateRemovePermissionModal()) {
                 $("#RemovePermissionLoading").removeClass("d-none");
                 $("#RemovePermissionModalForm").addClass("d-none");
@@ -271,6 +294,8 @@ export namespace DatasetAuthorization {
                         $("#RemovePermissionRequestResult").html(data);
                         $("#RemovePermissionRequestResult").removeClass("d-none");
                     }
+                }).catch(function (err) {
+                    console.log(err);
                 });
             }
             else {
@@ -331,7 +356,7 @@ export namespace DatasetAuthorization {
         return valid;
     }
 
-    function onAccessToSelection(event): void {
+    function onAccessToSelection(event): void { 
         requestAccessCleanActiveBreadcrumb();
         addRequestAccessBreadcrumb("Access Type", "#RequestAccessTypeSection");
         $("#RequestAccessToSection").addClass("d-none");
@@ -339,8 +364,8 @@ export namespace DatasetAuthorization {
     }
 
     function buildBreadcrumbReturnToStepHandler(element: JQuery<HTMLElement>): void {
-        element.click(function () {
-            var jumpBackTo = element.attr("value");
+        element.on('click', function () {
+            let jumpBackTo = element.attr("value");
             $('#AccessRequestForm div.requestAccessStage:not(.d-none)').addClass('d-none');
             $(jumpBackTo).removeClass('d-none');
             element.nextAll().remove();
@@ -392,8 +417,8 @@ export namespace DatasetAuthorization {
     }
 
     function requestAccessValidateAwsArnIam(): boolean {
-        var pattern = /^arn:aws:iam::\d{12}:role\/+./;
-        var valid = pattern.test($("#RequestAccess_AwsArn").val());
+        let pattern: RegExp = /^arn:aws:iam::\d{12}:role\/+./;
+        let valid: boolean = pattern.test($("#RequestAccess_AwsArn").val().toString());
         if (valid) {
             $("#AccessRequestAwsArnValidationMessage").addClass("d-none");
             return true;
@@ -406,7 +431,7 @@ export namespace DatasetAuthorization {
 
     function requestAccessValidateSnowflakeAccount(): boolean {
         let valid = $("#RequestAccess_SnowflakeAccount").val() != '';
-        valid = valid && $("#RequestAccess_SnowflakeAccount").val().length < 255;
+        valid = valid && $("#RequestAccess_SnowflakeAccount").val().toString().length < 255;
         if (valid) {
             $("#AccessRequestSnowflakeValidationMessage").addClass("d-none");
             return true;
