@@ -52,8 +52,8 @@ namespace Sentry.data.Infrastructure
                 DatasetFileId = entity.DatasetFileId,
                 ProcessStartDateTime = entity.ProcessStartDateTime,
                 StatusCode = entity.StatusCode,
-                /*DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()*/
-                DataFlowStepName = "TEST"
+                DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
+
             };
         }
 
@@ -107,7 +107,7 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
 
-            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto);
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto, datasetId);
         }
 
         public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
@@ -136,7 +136,7 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFilesByDataset(datasetId).ToDto();
 
-            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto);
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto, datasetId);
         }
 
         public List<DatasetFileProcessActivityDto> GetAllFailedFilesBySchema(int schemaId)
@@ -158,14 +158,13 @@ namespace Sentry.data.Infrastructure
             {
                 DatasetProcessActivityDto datasetProcessActivityDto = new DatasetProcessActivityDto();
 
-                /*Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == item.key).FirstOrDefault();*/
+                Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == item.key).FirstOrDefault();
 
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.DatasetId == item.key).Max(x => x.MetricGeneratedDateTime);
 
-                if (lastEventTime != null)
+                if(currentDataset != null)
                 {
-                    /*datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;*/
-                    datasetProcessActivityDto.DatasetName = "DATASET";
+                    datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;
                     datasetProcessActivityDto.DatasetId = item.key;
                     datasetProcessActivityDto.FileCount = item.docCount;
                     datasetProcessActivityDto.LastEventTime = lastEventTime;
@@ -177,7 +176,7 @@ namespace Sentry.data.Infrastructure
             return datasetProcessActivityDtos;
         }
 
-        private List<SchemaProcessActivityDto> MapSchemaProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
+        private List<SchemaProcessActivityDto> MapSchemaProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto, int datasetId)
         {
             List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
                                                                                                                 MapToDto(x)).ToList();
@@ -187,15 +186,14 @@ namespace Sentry.data.Infrastructure
             {
                 SchemaProcessActivityDto schemaProcessActivityDto = new SchemaProcessActivityDto();
 
-                /*Schema currentSchema = _context.Schema.Where(x => x.SchemaId == item.key).FirstOrDefault();*/
+                Schema currentSchema = _context.Schema.Where(x => x.SchemaId == item.key).FirstOrDefault();
 
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.SchemaId == item.key).Max(x => x.MetricGeneratedDateTime);
 
-                if (lastEventTime != null)
+                if (currentSchema != null)
                 {
-                    /*schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;*/
-                    schemaProcessActivityDto.SchemaName = "SCHEMA";
-                    schemaProcessActivityDto.DatasetId = dataFlowMetricDtoList[0].DatasetId;
+                    schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;
+                    schemaProcessActivityDto.DatasetId = datasetId;
                     schemaProcessActivityDto.SchemaId = item.key;
                     schemaProcessActivityDto.FileCount = item.docCount;
                     schemaProcessActivityDto.LastEventTime = lastEventTime;
