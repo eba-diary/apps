@@ -177,17 +177,16 @@ namespace Sentry.data.Core
             }
         }
 
-        public bool KickOffMotiveBackfill(int tokenId)
+        public bool KickOffMotiveBackfill(DataSourceToken token)
         {
             try
             {
-                var token = _datasetContext.GetById<DataSourceToken>(tokenId);
                 _motiveProvider.EnqueueBackfillBackgroundJob(token);
                 return true;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Backfilling token {tokenId} failed with message.");
+                _logger.LogError(e, $"Backfilling token {token.Id} failed with message.");
                 return false;
             }
         }

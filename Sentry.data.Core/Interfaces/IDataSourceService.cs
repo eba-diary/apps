@@ -13,6 +13,6 @@ namespace Sentry.data.Core
         List<AuthenticationTypeDto> GetAuthenticationTypeDtos();
         Task<bool> ExchangeAuthToken(DataSource dataSource, string authToken);
         Task<bool> KickOffMotiveOnboarding(int tokenId);
-        bool KickOffMotiveBackfill(int tokenId);
+        bool KickOffMotiveBackfill(DataSourceToken token);
     }
 }

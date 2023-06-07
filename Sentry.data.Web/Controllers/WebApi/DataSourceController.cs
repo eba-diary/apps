@@ -14,12 +14,13 @@ namespace Sentry.data.Web.WebApi.Controllers
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IDataSourceService _dataSourceService;
+        private readonly IConfigService _configService;
 
-
-        public DataSourceController(IDatasetContext dsContext, IDataSourceService dataSourceService)
+        public DataSourceController(IDatasetContext dsContext, IDataSourceService dataSourceService, IConfigService configService)
         {
             _datasetContext = dsContext;
             _dataSourceService = dataSourceService;
+            _configService = configService;
         }
 
         /// <summary>
@@ -79,22 +80,29 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         [HttpPost]
         [ApiVersionBegin(WebAPI.Version.v20220609)]
-        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("RunMotiveBackfill/{tokenId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK)]
         [SwaggerResponse(System.Net.HttpStatusCode.BadRequest)]
         [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError)]
         public IHttpActionResult RunMotiveBackfill(int tokenId)
         {
-            //act
-            var result = _dataSourceService.KickOffMotiveBackfill(tokenId);
-            //return
-            if (!result)
+            var token = _datasetContext.GetById<DataSourceToken>(tokenId);
+
+            var security = _configService.GetUserSecurityForDataSource(token.ParentDataSource.Id);
+
+            if (security.CanEditDataSource)
             {
-                return BadRequest("Token backfill failed.");
+                var result = _dataSourceService.KickOffMotiveBackfill(token);
+
+                if (!result)
+                {
+                    return BadRequest("Token backfill failed.");
+                }
+
+                return Ok("Token backfill successfully triggered.");
             }
 
-            return Ok("Token backfill successfully triggered.");
+            return Unauthorized();
         }
     }
 }
