@@ -1,6 +1,7 @@
 ﻿import { Common } from "../../Common";
 import { ShowModalWithSpinner, ShowModalCustom } from '@sentry-insurance/InternalFrontendTemplate/dist/Sentry.Common.js';
 import SentryModal from '@sentry-insurance/InternalFrontendTemplate/dist/Interfaces/SentryModal'; 
+import { SecurityTicketSimple } from './SecurityTicketSimple'
 import "bootstrap/js/dist/collapse";
 import "bootstrap/js/dist/tooltip";
 import "bootstrap/js/dist/popover"
@@ -440,12 +441,5 @@ export namespace DatasetAuthorization {
             $("#AccessRequestSnowflakeValidationMessage").removeClass("d-none");
             return false;
         }
-    }
-
-
-    interface SecurityTicketSimple {
-        TicketId: string,
-        TicketStatus: string,
-        InheritanceActive: boolean
     }
 }

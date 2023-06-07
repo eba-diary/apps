@@ -1410,6 +1410,7 @@
     <TypeScriptCompile Include="src\prettycron.ts" />
     <TypeScriptCompile Include="src\quill.ts" />
     <TypeScriptCompile Include="src\site.ts" />
+    <TypeScriptCompile Include="src\ts\Dataset\Authorization\SecurityTicketSimple.d.ts" />
     <TypeScriptCompile Include="src\ts\Global.d.ts" />
     <TypeScriptCompile Include="src\ts\Common.ts" />
     <TypeScriptCompile Include="src\ts\Dataset\Authorization\DatasetAuthorization.ts" />
