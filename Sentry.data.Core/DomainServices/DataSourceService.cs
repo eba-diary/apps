@@ -187,14 +187,14 @@ namespace Sentry.data.Core
 
         public bool KickOffMotiveBackfill(int tokenId)
         {
+            var token = _datasetContext.GetById<DataSourceToken>(tokenId);
+            var security = _configService.GetUserSecurityForDataSource(token.ParentDataSource.Id);
+            if (!security.CanEditDataSource)
+            {
+                throw new ResourceForbiddenException(_userService.GetCurrentUser().AssociateId, nameof(UserSecurity.CanEditDataSource), "Motive Backfill", token.ParentDataSource.Id);
+            }
             try
             {
-                var token = _datasetContext.GetById<DataSourceToken>(tokenId);
-                var security = _configService.GetUserSecurityForDataSource(token.ParentDataSource.Id);
-                if(!security.CanEditDataSource)
-                {
-                    throw new ResourceForbiddenException(_userService.GetCurrentUser().AssociateId, nameof(UserSecurity.CanEditDataSource), "Motive Backfill", token.ParentDataSource.Id);
-                }
                 _motiveProvider.EnqueueBackfillBackgroundJob(token);
                 return true;
             }
