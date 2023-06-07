@@ -110,24 +110,20 @@ function config(env, argv): webpack.Configuration {
 
 function getPageEntryPoints() {
     let entryObjects = {};
-    AddEntryPoints('./Components/**/*.ts', '.ts', entryObjects, true);
-    AddEntryPoints('./src/ts/**/*.ts', '.ts', entryObjects, false);
+    AddEntryPoints('./Components/**/*.ts', '.ts', entryObjects);
+    AddEntryPoints('./src/ts/**/*.ts', '.ts', entryObjects);
     return entryObjects;
 }
 
-function AddEntryPoints(globPattern: string, suffix: string, entryObjects: any, legacy: boolean) {
+function AddEntryPoints(globPattern: string, suffix: string, entryObjects: any) {
     let regEx = /\//g;
     const files = glob.sync(globPattern);
     for (const fileName of files) {
         //filename = ./Components/CompName/CompName.ts
         const key = fileName.substring(8).replace(regEx, '.').replace(suffix, '').split('.').at(-1);
         //key = CompName
-        if (legacy) {
-            entryObjects[key] = { import: fileName, dependOn: 'main', library: { name: ['Data'], type: 'var' } };
-        }
-        else {
-            entryObjects[key] = { import: fileName, library: { name: ['Data'], type: 'var' } };
-        }
+        entryObjects[key] = { import: fileName, library: { name: ['Data'], type: 'var' } };
+
     }
 }
 
