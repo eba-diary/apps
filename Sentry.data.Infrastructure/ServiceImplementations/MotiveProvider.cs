@@ -105,6 +105,7 @@ namespace Sentry.data.Infrastructure
                 var jobs = _datasetContext.Jobs.Where(j => schemaIdList.Contains(j.FileSchema.SchemaId) && !j.FileSchema.CreateCurrentView && j.IsEnabled).ToList();
 
                 HTTPSSource source = _datasetContext.GetById<HTTPSSource>(int.Parse(Config.GetHostSetting("MotiveDataSourceId")));
+                source.RequestHeaders = new List<RequestHeader>();
                 
                 //Disable all other tokens and make a list to enable them again later
                 List<int> tokensToEnable = new List<int>();
@@ -115,16 +116,25 @@ namespace Sentry.data.Infrastructure
                 }
 
                 tokenToBackfill.Enabled = true;
+                source.AllTokens.First(t => t.Id == tokenToBackfill.Id).Enabled = true;
+
+                foreach (var job in jobs)
+                {
+                    job.DataSource = source; //manually set the source to avoid nhibernate supplying a DS proxy instead
+                }
 
                 try
                 {
+                    DateTime backfillDateTime = DateTime.Today.AddYears(-1);
+                    string jobDateValue = backfillDateTime.ToString("yyyy-MM-dd");
                     //change start date and trigger jobs
                     foreach (var job in jobs)
                     {
                         Common.Logging.Logger.Info($"Attempting backfill of {job.DataFlow.Name} on token {tokenToBackfill}");
                         var dateParameter = job.RequestVariables.First(rv => rv.VariableName == "dateValue");
                         var currentDateValue = dateParameter.VariableValue; //hold onto old value
-                        dateParameter.VariableValue = Config.GetHostSetting("MotiveBackfillDate");
+                        
+                        dateParameter.VariableValue = jobDateValue;
                         _backfillJobProvider.Execute(job);
                         //reset retriever job param
                         dateParameter.VariableValue = currentDateValue;
