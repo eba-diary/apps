@@ -86,7 +86,7 @@ namespace Sentry.data.Infrastructure
         [DisplayName("Motive Backfill Job")]   /* Used for displaying useful name in hangfire */
         public void EnqueueBackfillBackgroundJob(DataSourceToken toBackfill)
         {
-            _backgroundJobClient.Enqueue<MotiveProvider>(x => x.MotiveTokenBackfill(toBackfill));
+            _backgroundJobClient.Enqueue<MotiveProvider>(x => x.MotiveTokenBackfill(toBackfill, DateTime.Today.AddYears(-1)));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="tokenToBackfill">Token we want load data for.</param>
         /// <returns></returns>
-        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
+        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill, DateTime dateToBackfill)
         {
             try
             {
@@ -125,8 +125,7 @@ namespace Sentry.data.Infrastructure
 
                 try
                 {
-                    DateTime backfillDateTime = DateTime.Today.AddYears(-1);
-                    string jobDateValue = backfillDateTime.ToString("yyyy-MM-dd");
+                    string jobDateValue = dateToBackfill.ToString("yyyy-MM-dd");
                     //change start date and trigger jobs
                     foreach (var job in jobs)
                     {
