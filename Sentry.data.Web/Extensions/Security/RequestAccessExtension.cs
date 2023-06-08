@@ -98,7 +98,8 @@ namespace Sentry.data.Web
                 ConsumeDatasetGroupName = core.ConsumeDatasetGroupName,
                 ProducerDatasetGroupName = core.ProducerDatasetGroupName,
                 ConsumeAssetGroupName = core.ConsumeAssetGroupName,
-                ProducerAssetGroupName = core.ProducerAssetGroupName
+                ProducerAssetGroupName = core.ProducerAssetGroupName,
+                InheritanceStatus = core.InheritanceStatus
             };
         }
 

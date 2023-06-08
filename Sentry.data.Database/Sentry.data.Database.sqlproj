@@ -176,6 +176,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_29" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_35" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Release_03_02_36" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_37" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -440,6 +441,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_29\CLA-5076_SetGlobalDatasetId.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Release_03_02_37\CLA-5327_BackfillSchemaConsumptionLastChanged.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />

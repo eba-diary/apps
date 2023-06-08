@@ -29,7 +29,6 @@
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.ReturnUrl)
     @Html.HiddenFor(model => model.PrimaryContactId)
-    @Html.HiddenFor(model => model.CLA2868_APIPaginationSupport)
 
     <div class="card pt-3">
         <div class="card-body pt-0 px-lg-5">
@@ -82,11 +81,8 @@
             </div>
 
             <div id="pagingPanel" class="form-group">
-                @if (Model.CLA2868_APIPaginationSupport)
-                {
-                    <input type="checkbox" value="true" class="form-check-input" id="SupportsPaging" name="SupportsPaging" checked="@Model.SupportsPaging">
-                    @Html.LabelFor(m => m.SupportsPaging, htmlAttributes: new { @class = "form-check-label" })
-                }
+                <input type="checkbox" value="true" class="form-check-input" id="SupportsPaging" name="SupportsPaging" checked="@Model.SupportsPaging">
+                @Html.LabelFor(m => m.SupportsPaging, htmlAttributes: new { @class = "form-check-label" })
             </div>
 
             <div id="userPassPanel">

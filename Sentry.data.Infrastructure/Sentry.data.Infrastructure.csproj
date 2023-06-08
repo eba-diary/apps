@@ -601,6 +601,7 @@
     <Compile Include="ServiceImplementations\Messaging\SnowflakeEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\FileDeleteEventService.cs" />
     <Compile Include="ServiceImplementations\Messaging\SparkConverterEventService.cs" />
+    <Compile Include="ServiceImplementations\MetadataMonitorService.cs" />
     <Compile Include="ServiceImplementations\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\DeadJobProvider.cs" />
     <Compile Include="ServiceImplementations\MockApacheLivyProvider.cs" />

@@ -620,12 +620,13 @@ namespace Sentry.data.Core
             public const string DATASETEMAIL = "DatasetMgmtEmail";
             public const string S3SINKEMAILTO = "S3SinkEmailRequestTO";
             public const string MOTIVEEMAILTO = "MotiveEmailTo";
+            public const string STALECONSUMPTIONEMAILTO = "StaleConsumptionEmailTo";
             public const string MAIN_WEB_URL = "SentryDataBaseUrl";
             public const string CONFLUENT_CONNECTOR_API = "ConfluentConnectorApi";
             public const string CONFLUENT_CONNECTOR_USERNAME = "ConfluentConnectorUserName";
             public const string CONFLUENT_CONNECTOR_PASSWORD = "ConfluentConnectorPassword";
             public const string CONFLUENT_CONNECTOR_FLUSH_SIZE = "ConfluentConnectorFlushSize";
-            public const string S3CONNECTOR_PROXY = "EdgeWebProxyUrl";
+            public const string S3CONNECTOR_PROXY = "ConfluentConnectorProxy";
         }
 
         public static class DLPPEnvironments
