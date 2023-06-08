@@ -34,11 +34,11 @@ namespace Sentry.data.Web.Controllers
         {
             ViewData["fluid"] = true;
 
-            /*List<Dataset> dsList = _dsContext.Datasets.Where(x=> x.CanDisplay).ToList();*/
+            List<Dataset> dsList = _dsContext.Datasets.Where(x => x.CanDisplay).ToList();
 
             HomeModel hm = new HomeModel()
             {
-                /*DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET),*/
+                DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET),
                 Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
                 DisplayDataflowMetadata = _featureFlags.Expose_Dataflow_Metadata_CLA_2146.GetValue(),
