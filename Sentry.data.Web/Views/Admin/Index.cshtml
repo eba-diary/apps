@@ -23,7 +23,7 @@
                     <div class="column card-result-layout-0">
                         <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalFiles" })">
                             <div class="process-activity-cards card card-hover m-1">
-                                <div class="card-body bg-success position-relative">
+                                <div class="card-body bg-success bg-gradient position-relative">
                                     <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalCompletedFiles</strong></h2>
                                     <h6 class="text-right text-white font-italic pb-3 pt-0 mb-0">Completed Files</h6>
                                     <i class="fa-regular fa-file" style="color: #ffffff;"></i>
@@ -51,7 +51,7 @@
                     <div class="column card-result-layout-0">
                         <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalFailedFiles" })">
                             <div class="process-activity-cards card card-hover m-1">
-                                <div class="card-body bg-danger">
+                                <div class="card-body bg-danger bg-gradient position-relative">
                                     <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalFailedFiles</strong></h2>
                                     <h6 class="text-right text-white font-italic pb-3 pt-0 mb-0">File Failures</h6>
                                     <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
@@ -65,7 +65,7 @@
                 <div class="column card-result-layout-0">
                     <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "InFlightFiles" })">
                         <div class="process-activity-cards card card-hover m-1">
-                            <div class="card-body bg-primary">
+                            <div class="card-body bg-primary bg-gradient position-relative">
                                 <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalInFlightFiles</strong></h2>
                                 <h6 class="text-right text-white font-italic pb-3 pt-0 mb-0">In Flight Files</h6>
                                 <i class="fa-solid fa-plane-departure" style="color: #ffffff;"></i>
