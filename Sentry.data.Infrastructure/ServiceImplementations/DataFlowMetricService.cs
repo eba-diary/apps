@@ -107,19 +107,16 @@ namespace Sentry.data.Infrastructure
             {
                 DatasetProcessActivityDto datasetProcessActivityDto = new DatasetProcessActivityDto();
 
-                Dataset currentDataset = _context.Datasets.Where(x => x.DatasetId == item.key).FirstOrDefault();
+                string datasetName = _context.Datasets.Where(x => x.DatasetId == item.key).Select(s => s.DatasetName).FirstOrDefault();
 
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.DatasetId == item.key).Max(x => x.MetricGeneratedDateTime);
 
-                if(currentDataset != null)
-                {
-                    datasetProcessActivityDto.DatasetName = currentDataset.DatasetName;
-                    datasetProcessActivityDto.DatasetId = item.key;
-                    datasetProcessActivityDto.FileCount = item.docCount;
-                    datasetProcessActivityDto.LastEventTime = lastEventTime;
+                datasetProcessActivityDto.DatasetName = datasetName;
+                datasetProcessActivityDto.DatasetId = item.key;
+                datasetProcessActivityDto.FileCount = item.docCount;
+                datasetProcessActivityDto.LastEventTime = lastEventTime;
 
-                    datasetProcessActivityDtos.Add(datasetProcessActivityDto);
-                }
+                datasetProcessActivityDtos.Add(datasetProcessActivityDto);
             }
 
             return datasetProcessActivityDtos;
@@ -138,20 +135,17 @@ namespace Sentry.data.Infrastructure
             {
                 SchemaProcessActivityDto schemaProcessActivityDto = new SchemaProcessActivityDto();
 
-                Schema currentSchema = _context.Schema.Where(x => x.SchemaId == item.key).FirstOrDefault();
+                string schemaName = _context.FileSchema.Where(x => x.SchemaId == item.key).Select(s => s.Name).FirstOrDefault();
 
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.SchemaId == item.key).Max(x => x.MetricGeneratedDateTime);
 
-                if (currentSchema != null)
-                {
-                    schemaProcessActivityDto.SchemaName = currentSchema.SchemaEntity_NME;
-                    schemaProcessActivityDto.DatasetId = datasetId;
-                    schemaProcessActivityDto.SchemaId = item.key;
-                    schemaProcessActivityDto.FileCount = item.docCount;
-                    schemaProcessActivityDto.LastEventTime = lastEventTime;
+                schemaProcessActivityDto.SchemaName = schemaName;
+                schemaProcessActivityDto.DatasetId = datasetId;
+                schemaProcessActivityDto.SchemaId = item.key;
+                schemaProcessActivityDto.FileCount = item.docCount;
+                schemaProcessActivityDto.LastEventTime = lastEventTime;
 
-                    schemaProcessActivityDtos.Add(schemaProcessActivityDto);
-                }
+                schemaProcessActivityDtos.Add(schemaProcessActivityDto);
             }
 
             return schemaProcessActivityDtos;
