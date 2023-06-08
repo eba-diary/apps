@@ -351,21 +351,21 @@ namespace Sentry.data.Infrastructure.Tests
 
             stubDataFlowMetricProvider.Setup(x => x.GetAllTotalFilesByDataset(It.IsAny<int>())).Returns(GetElasticDataFlowMetricList());
 
-            List<Schema> schemas = new List<Schema>();
+            List<FileSchema> schemas = new List<FileSchema>();
 
             schemas.Add(new FileSchema()
             {
-                SchemaEntity_NME = "TEST1",
+                Name = "TEST1",
                 SchemaId = 1
             });
 
             schemas.Add(new FileSchema()
             {
-                SchemaEntity_NME = "TEST2",
+                Name = "TEST2",
                 SchemaId = 2
             });
 
-            stubIDatasetContext.Setup(x => x.Schema).Returns(schemas.AsQueryable());
+            stubIDatasetContext.Setup(x => x.FileSchema).Returns(schemas.AsQueryable());
 
             DateTime assertDateTime = new DateTime(2023, 6, 6, 12, 35, 0);
 
@@ -500,21 +500,21 @@ namespace Sentry.data.Infrastructure.Tests
 
             stubDataFlowMetricProvider.Setup(x => x.GetAllFailedFilesByDataset(It.IsAny<int>())).Returns(GetElasticDataFlowMetricList());
 
-            List<Schema> schemas = new List<Schema>();
+            List<FileSchema> schemas = new List<FileSchema>();
 
             schemas.Add(new FileSchema()
             {
-                SchemaEntity_NME = "TEST1",
+                Name = "TEST1",
                 SchemaId = 1
             });
 
             schemas.Add(new FileSchema()
             {
-                SchemaEntity_NME = "TEST2",
+                Name = "TEST2",
                 SchemaId = 2
             });
 
-            stubIDatasetContext.Setup(x => x.Schema).Returns(schemas.AsQueryable());
+            stubIDatasetContext.Setup(x => x.FileSchema).Returns(schemas.AsQueryable());
 
             DateTime assertDateTime = new DateTime(2023, 6, 6, 12, 35, 0);
 
