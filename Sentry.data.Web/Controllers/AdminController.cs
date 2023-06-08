@@ -243,9 +243,9 @@ namespace Sentry.data.Web.Controllers
                 TotalCompletedFiles = totalCompletedFiles,
                 TotalInFlightFiles = totalInFlightFiles,
                 TotalFailedFiles = totalFailedFiles,
-                CLA4553_FeatureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue(),
-                CLA5112_FeatureFlag = _dataFeatures.CLA5112_PlatformActivity_TotalFiles_ViewPage.GetValue(),
-                CLA5260_FeatureFlag = _dataFeatures.CLA5260_PlatformActivity_FileFailures_ViewPage.GetValue()
+                CLA4553_PlatformActivity = _dataFeatures.CLA4553_PlatformActivity.GetValue(),
+                CLA5112_PlatformActivity_TotalFiles_ViewPage = _dataFeatures.CLA5112_PlatformActivity_TotalFiles_ViewPage.GetValue(),
+                CLA5260_PlatformActivity_FileFailures_ViewPage = _dataFeatures.CLA5260_PlatformActivity_FileFailures_ViewPage.GetValue()
             };
 
             return View(adminElasticFileModel);
