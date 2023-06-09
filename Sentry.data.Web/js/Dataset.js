@@ -1729,7 +1729,7 @@ data.Dataset = {
                 if (xhr.status == 200) {
                     var responseJson = JSON.parse(xhr.response);
                     if (responseJson.Success) {
-                            data.Dataset.makeToast("success", "File has been successfully uploaded to S3. It may take a few moments before the file is visible in the Files tab.");
+                        data.Dataset.makeToast("success", "File has been successfully uploaded to S3. It may take a few moments before the file is visible in the Files tab.");
                     }
                     else {
                         data.Dataset.makeToast("error", responseJson.Message);
