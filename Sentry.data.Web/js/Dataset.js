@@ -1740,6 +1740,9 @@ data.Dataset = {
                 }
 
                 $("#data-file-upload-modal").modal("hide");
+
+                //BOOTSTRAP BACKDROP HAZE/GRAY STAYS EVEN AFTER MODAL HIDE SO EXCPLICITLY REMOVE BACKDROP AFTER MODAL CLOSE
+                $('.modal-backdrop').remove();
             };
 
             xhr.send(new FormData(form));
