@@ -158,7 +158,7 @@ namespace Sentry.data.Infrastructure
                         job.RequestVariables = otherRequestVariables;
                     }
 
-                    tokenToBackfill.BackfillComplete = true;
+                    source.AllTokens.First(t => t.Id == tokenToBackfill.Id).BackfillComplete = true;
                 }
                 catch (Exception e) //Catch error here so we continue on to restore tokens. 
                 {
