@@ -340,7 +340,7 @@ namespace Sentry.data.Infrastructure.Tests
             motiveProvider.MotiveTokenBackfill(backfillToken, DateTime.Today.AddDays(-7));
 
             //backfill marked complete
-            Assert.IsTrue(backfillToken.BackfillComplete);
+            Assert.IsTrue(dataSource.AllTokens.First(t => t.Id == backfillToken.Id).BackfillComplete);
 
             //all token state is back  to what it should be
             Assert.IsFalse(token0.Enabled);
@@ -554,7 +554,7 @@ namespace Sentry.data.Infrastructure.Tests
             motiveProvider.MotiveTokenBackfill(backfillToken, DateTime.Today.AddDays(-7));
 
             //backfill marked complete
-            Assert.IsFalse(backfillToken.BackfillComplete);
+            Assert.IsFalse(dataSource.AllTokens.First(t => t.Id == backfillToken.Id).BackfillComplete);
 
             //all token state is back  to what it should be
             Assert.IsFalse(token0.Enabled);
