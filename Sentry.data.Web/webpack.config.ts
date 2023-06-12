@@ -122,7 +122,7 @@ function AddEntryPoints(globPattern: string, suffix: string, entryObjects: any) 
         //filename = ./Components/CompName/CompName.ts
         const key = fileName.substring(8).replace(regEx, '.').replace(suffix, '').split('.').at(-1);
         //key = CompName
-        entryObjects[key] = { import: fileName, library: { name: ['Data'], type: 'var' } };
+        entryObjects[key] = { import: fileName, library: { name: ['Data'], type: 'var' }, dependOn: 'main' };
 
     }
 }
