@@ -227,7 +227,6 @@ namespace Sentry.data.Infrastructure
                                                                                 .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
                                                                                 .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
 
-
             return elasticResult;
         }
 
