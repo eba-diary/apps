@@ -233,18 +233,19 @@ namespace Sentry.data.Web.Controllers
             long totalCompletedFiles = _dataFlowMetricService.GetAllTotalFilesCount();
 
             // service method that return the number of inflight files
-            long totalInFlightFiles = 306;
+            long totalInFlightFiles = 0;
 
             // service method that return the number of failed files
-            long totalFailedFiles = 2;
+            long totalFailedFiles = _dataFlowMetricService.GetAllFailedFilesCount();
 
             AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
             {
-                CompletedFiles = totalCompletedFiles,
-                InFlightFiles = totalInFlightFiles,
-                FailedFiles = totalFailedFiles,
-                CLA4553_FeatureFlag = _dataFeatures.CLA4553_PlatformActivity.GetValue(),
-                CLA5112_FeatureFlag = _dataFeatures.CLA5112_PlatformActivity_TotalFiles_ViewPage.GetValue()
+                TotalCompletedFiles = totalCompletedFiles,
+                TotalInFlightFiles = totalInFlightFiles,
+                TotalFailedFiles = totalFailedFiles,
+                CLA4553_PlatformActivity = _dataFeatures.CLA4553_PlatformActivity.GetValue(),
+                CLA5112_PlatformActivity_TotalFiles_ViewPage = _dataFeatures.CLA5112_PlatformActivity_TotalFiles_ViewPage.GetValue(),
+                CLA5260_PlatformActivity_FileFailures_ViewPage = _dataFeatures.CLA5260_PlatformActivity_FileFailures_ViewPage.GetValue()
             };
 
             return View(adminElasticFileModel);
@@ -296,23 +297,23 @@ namespace Sentry.data.Web.Controllers
             return View(model);
         }
 
-        public ActionResult ProcessActivityResults(string activityType)
+        public ActionResult ProcessActivityResults(string selectedPage)
         {
             ProcessActivityModel processActivityModel = new ProcessActivityModel();
 
-            switch (activityType)
+            switch (selectedPage)
             {
                 case "TotalFiles":
-                    processActivityModel.PageTitle = "Total Files";
-                    processActivityModel.ActivityType = "TotalFiles";
+                    processActivityModel.PageTitle = ProcessActivityType.TOTAL_FILES.GetDescription();
+                    processActivityModel.ActivityType = Convert.ToInt32(ProcessActivityType.TOTAL_FILES);
                     break;
-                case "FailedFiles":
-                    processActivityModel.PageTitle = "Failed Files";
-                    processActivityModel.ActivityType = "FailedFiles";
+                case "TotalFailedFiles":
+                    processActivityModel.PageTitle = ProcessActivityType.FAILED_FILES.GetDescription();
+                    processActivityModel.ActivityType = Convert.ToInt32(ProcessActivityType.FAILED_FILES);
                     break;
-                case "InFlightFiles":
-                    processActivityModel.PageTitle = "In Flight Files";
-                    processActivityModel.ActivityType = "InFlightFiles";
+                case "TotalInFlightFiles":
+                    processActivityModel.PageTitle = ProcessActivityType.IN_FLIGHT_FILES.GetDescription();
+                    processActivityModel.ActivityType = Convert.ToInt32(ProcessActivityType.IN_FLIGHT_FILES);
                     break;
             }
 
@@ -328,9 +329,24 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Admin/GetDatasetProcessingActivityForGrid/{activityType?}")]
         [HttpPost]
-        public JsonResult GetDatasetProcessingActivityForGrid(string activityType)
+        public JsonResult GetDatasetProcessingActivityForGrid(int activityType)
         {
-            List<DatasetProcessActivityDto> datasetProcessActivityDtos = _dataFlowMetricService.GetAllTotalFiles();
+            ProcessActivityType processActivityType = Utility.FindEnumFromId<ProcessActivityType>(activityType);
+
+            List<DatasetProcessActivityDto> datasetProcessActivityDtos = null;
+
+            switch (processActivityType)
+            {
+                case ProcessActivityType.TOTAL_FILES:
+                    datasetProcessActivityDtos = _dataFlowMetricService.GetAllTotalFiles();
+                    break;
+                case ProcessActivityType.FAILED_FILES:
+                    datasetProcessActivityDtos = _dataFlowMetricService.GetAllFailedFiles();
+                    break;
+                case ProcessActivityType.IN_FLIGHT_FILES:
+                    break;
+            }
+             
 
             List<DatasetProcessActivityModel> datasetProcessActivityModels = datasetProcessActivityDtos.MapToModelList();
 
@@ -339,9 +355,24 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Admin/GetSchemaProcessingActivityForGrid/{activityType?}/{datasetId?}")]
         [HttpPost]
-        public JsonResult GetSchemaProcessingActivityForGrid(string activityType, int datasetId)
+        public JsonResult GetSchemaProcessingActivityForGrid(int activityType, int datasetId)
         {
-            List<SchemaProcessActivityDto> schemaProcessActivityDtos = _dataFlowMetricService.GetAllTotalFilesByDataset(datasetId);
+            ProcessActivityType processActivityType = Utility.FindEnumFromId<ProcessActivityType>(activityType);
+
+            List<SchemaProcessActivityDto> schemaProcessActivityDtos = null;
+
+            switch (processActivityType)
+            {
+                case ProcessActivityType.TOTAL_FILES:
+                    schemaProcessActivityDtos = _dataFlowMetricService.GetAllTotalFilesByDataset(datasetId);
+                    break;
+                case ProcessActivityType.FAILED_FILES:
+                    schemaProcessActivityDtos = _dataFlowMetricService.GetAllFailedFilesByDataset(datasetId);
+                    break;
+                case ProcessActivityType.IN_FLIGHT_FILES:
+                    break;
+            }
+
 
             List<SchemaProcessActivityModel> schemaProcessActivityModels = schemaProcessActivityDtos.MapToModelList();
 
@@ -350,9 +381,24 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Admin/GetDatasetFileProcessingActivityForGrid/{activityType?}/{schemaId?}")]
         [HttpPost]
-        public JsonResult GetDatasetFileProcessingActivityForGrid(string activityType, int schemaId)
+        public JsonResult GetDatasetFileProcessingActivityForGrid(int activityType, int schemaId)
         {
-            List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllTotalFilesBySchema(schemaId);
+            ProcessActivityType processActivityType = Utility.FindEnumFromId<ProcessActivityType>(activityType);
+
+            List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = null;
+
+            switch (processActivityType)
+            {
+                case ProcessActivityType.TOTAL_FILES:
+                    datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllTotalFilesBySchema(schemaId);
+                    break;
+                case ProcessActivityType.FAILED_FILES:
+                    datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllFailedFilesBySchema(schemaId);
+                    break;
+                case ProcessActivityType.IN_FLIGHT_FILES:
+                    break;
+            }
+
 
             List<DatasetFileProcessActivityModel> datasetFileProcessActivityModels = datasetFileProcessActivityDtos.MapToModelList();
 

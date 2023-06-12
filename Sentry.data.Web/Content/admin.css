@@ -110,15 +110,6 @@ table#metricGroupsTable td.metric-detail-control {
     clear: both;
 }
 
-.failure_style {
-    color: red;
-    font-size: 45px;
-}
-
-.num_style {
-    font-size: 45px;
-}
-
 .activity-container {
     width: 200px;
 }
@@ -143,4 +134,16 @@ table#metricGroupsTable td.metric-detail-control {
 
 .dead-job-select-all {
     vertical-align: middle !important;
+}
+
+.process-activity-cards i {
+    position: absolute;
+    left: 30px;
+    top: 25px;
+    font-size: 5em;
+    opacity: .2;
+}
+
+.bg-gradient {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0))  !important;
 }

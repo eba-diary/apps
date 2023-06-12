@@ -567,6 +567,7 @@
     <Compile Include="Factories\Fields\VariantFieldFactory.cs" />
     <Compile Include="GlobalEnums\AccessRequestType.cs" />
     <Compile Include="GlobalEnums\AccessScope.cs" />
+    <Compile Include="GlobalEnums\ProcessActivityType.cs" />
     <Compile Include="GlobalEnums\AuditSearchType.cs" />
     <Compile Include="GlobalEnums\AuditType.cs" />
     <Compile Include="GlobalEnums\DatasetFileStatusType.cs" />

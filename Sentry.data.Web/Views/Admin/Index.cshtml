@@ -9,53 +9,72 @@
 
 <html>
 <body>
-    @if (Model.CLA4553_FeatureFlag)
-    {
-        <div id="dashboard">
-
-            <div>
-                <h1>Welcome to the Admin Page</h1>
-            </div>
-            <div class="processingActivityDiv">
-                <h3>Processing Activity</h3>
-                <br />
-                <div class="row">
-                    @if (Model.CLA5112_FeatureFlag)
-                    {
-                    <div class="column">
-                        <div class="activity-container">
-                            <h5>Total Files Today</h5>
-                            <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { activityType = "TotalFiles" })">View</a>
-                            <button id="buttonCompletedFiles"><strong class="num_style">@Model.CompletedFiles</strong></button>
-                        </div>
-
+    <div id="dashboard">
+    
+        <div>
+            <h1>Welcome to the Admin Page</h1>
+        </div>
+        <div class="processingActivityDiv">
+            <h3>Processing Activity</h3>
+            <br />
+            <div class="ml-0 row">
+                @if (Model.CLA5112_FeatureFlag)
+                {
+                    <div class="column card-result-layout-0">
+                        <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalFiles" })">
+                            <div class="process-activity-cards card card-hover m-1">
+                                <div class="card-body bg-success bg-gradient position-relative">
+                                    <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalCompletedFiles</strong></h2>
+                                    <h6 class="text-right text-white font-italic pb-3 pt-0 mb-0">Completed Files</h6>
+                                    <i class="fa-regular fa-file" style="color: #ffffff;"></i>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    }
+                }
 
-                   @* Commented out could will be used in future development and future versions of this page
 
-                   <div class="column">
-                        <div class="container">
-                            <h5>Files In-Flight</h5>
-                            <button id="buttonInFlightFiles"><strong class="num_style">@Model.InFlightFiles</strong></button>
-                        </div>
+                @if (Model.CLA5260_FeatureFlag)
+                {
 
-                    </div>
-                    <div class="column">
-                        <div class="container">
-                            <h5>File Failures</h5>
-                            <button id="buttonFailedFiles"><strong class="failure_style">@Model.FailedFiles</strong></button>
-                        </div>
-
+                  @*<div class="column card-result-layout-0">
+                        <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalFailedFiles" })">
+                            <div class="card card-hover m-1">
+                                <div class="card-body primary">
+                                    <h4 class="text-right card-title pt-0 mb-0">File Failures</h4>
+                                    <hr />
+                                    <p><strong class="failure_style">@Model.TotalFailedFiles</strong></p>
+                                </div>
+                            </div>
+                        </a>
                     </div>*@
+                    <div class="column card-result-layout-0">
+                        <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalFailedFiles" })">
+                            <div class="process-activity-cards card card-hover m-1">
+                                <div class="card-body bg-danger bg-gradient position-relative">
+                                    <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalFailedFiles</strong></h2>
+                                    <h6 class="text-right text-white font-italic pb-3 pt-0 mb-0">File Failures</h6>
+                                    <i class="fa-regular fa-file-excel" style="color: #ffffff;"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+
+
+                <div class="column card-result-layout-0">
+                    <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "InFlightFiles" })">
+                        <div class="process-activity-cards card card-hover m-1">
+                            <div class="card-body bg-primary bg-gradient position-relative">
+                                <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalInFlightFiles</strong></h2>
+                                <h6 class="text-right text-white font-italic pb-3 pt-0 mb-0">In Flight Files</h6>
+                                <i class="fa-solid fa-plane-departure" style="color: #ffffff;"></i>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
-    }
-    else
-    {
-        <h1>You do not have the right permissions to see this page</h1>
-    }
-
+    </div>
 </body>
 </html>

@@ -40,5 +40,6 @@ namespace Sentry.data.Core
         IFeatureFlag<bool> CLA3214_VariantDataType { get; }
         IFeatureFlag<bool> CLA5211_SendNewSnowflakeEvents { get; }
         IFeatureFlag<bool> CLA4870_DSCAssistance { get; }
+        IFeatureFlag<bool> CLA5260_PlatformActivity_FileFailures_ViewPage { get; }
     }
 }

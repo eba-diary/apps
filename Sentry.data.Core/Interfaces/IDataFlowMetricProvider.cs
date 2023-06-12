@@ -15,5 +15,11 @@ namespace Sentry.data.Core.Interfaces
         ElasticResult<DataFlowMetric> GetAllTotalFilesBySchema(int schemaId);
 
         ElasticResult<DataFlowMetric> GetAllTotalFiles();
+
+        ElasticResult<DataFlowMetric> GetAllFailedFilesByDataset(int datasetId);
+
+        ElasticResult<DataFlowMetric> GetAllFailedFilesBySchema(int schemaId);
+
+        ElasticResult<DataFlowMetric> GetAllFailedFiles();
     }
 }

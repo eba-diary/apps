@@ -513,7 +513,7 @@ namespace Sentry.data.Core
 
             public static class DataFlowMetric
             {
-                public const string DOCCOUNT = "Doc Count";
+                public const string DOC_COUNT = "Doc Count";
             }
         }
 

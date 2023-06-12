@@ -53,6 +53,7 @@ namespace Sentry.data.Infrastructure
                 ProcessStartDateTime = entity.ProcessStartDateTime,
                 StatusCode = entity.StatusCode,
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
+
             };
         }
 
@@ -98,7 +99,57 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFiles().ToDto();
 
-            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+            return MapDatasetProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+
+        public List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
+
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto, datasetId);
+        }
+
+        public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId).ToDto();
+
+            return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+        public long GetAllFailedFilesCount()
+        {
+            long docCount = _dataFlowMetricProvider.GetAllFailedFiles().SearchTotal;
+
+            return docCount;
+        }
+
+        public List<DatasetProcessActivityDto> GetAllFailedFiles()
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFiles().ToDto();
+
+            return MapDatasetProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+
+        public List<SchemaProcessActivityDto> GetAllFailedFilesByDataset(int datasetId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFilesByDataset(datasetId).ToDto();
+
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto, datasetId);
+        }
+
+        public List<DatasetFileProcessActivityDto> GetAllFailedFilesBySchema(int schemaId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllFailedFilesBySchema(schemaId).ToDto();
+
+            return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+        #region PRIVATE PROCESS ACTIVITY MAPPING FUNCTIONS
+        public List<DatasetProcessActivityDto> MapDatasetProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
+        {
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
                                                                                                                 MapToDto(x)).ToList();
 
             List<DatasetProcessActivityDto> datasetProcessActivityDtos = new List<DatasetProcessActivityDto>();
@@ -122,13 +173,10 @@ namespace Sentry.data.Infrastructure
             return datasetProcessActivityDtos;
         }
 
-        public List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId)
+        private List<SchemaProcessActivityDto> MapSchemaProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto, int datasetId)
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
-
-            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
                                                                                                                 MapToDto(x)).ToList();
-
             List<SchemaProcessActivityDto> schemaProcessActivityDtos = new List<SchemaProcessActivityDto>();
 
             foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
@@ -151,12 +199,10 @@ namespace Sentry.data.Infrastructure
             return schemaProcessActivityDtos;
         }
 
-        public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
+        private List<DatasetFileProcessActivityDto> MapDatasetFileProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
         {
-            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId).ToDto();
-
-            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
-                                                                                                                MapToDto(x)).ToList();
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
+                                                                                                               MapToDto(x)).ToList();
 
             List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = new List<DatasetFileProcessActivityDto>();
 
@@ -175,5 +221,6 @@ namespace Sentry.data.Infrastructure
 
             return datasetFileProcessActivityDtos;
         }
+        #endregion
     }
 }
