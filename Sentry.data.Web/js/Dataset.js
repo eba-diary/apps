@@ -1740,9 +1740,6 @@ data.Dataset = {
                 }
 
                 $("#data-file-upload-modal").modal("hide");
-
-                //BOOTSTRAP BACKDROP HAZE/GRAY STAYS EVEN AFTER MODAL HIDE SO EXCPLICITLY REMOVE BACKDROP AFTER MODAL CLOSE
-                $('.modal-backdrop').remove();
             };
 
             xhr.send(new FormData(form));
@@ -1840,7 +1837,7 @@ data.Dataset = {
         var datasetFileTable = $("#datasetFilesTable").DataTable();
         datasetFileTable.column(".deleteFile").visible(datasetDetailModel.DisplayDatasetFileDelete);
 
-        var parent = $("#datasetFilesTable_filter").parent();
+        const parent = $("#datasetFilesTable_filter").parent();
         parent.parent().css("align-items", "end");
 
         if (datasetDetailModel.DisplayDatasetFileUpload) {
