@@ -2,10 +2,6 @@
 import { ShowModalWithSpinner, ShowModalCustom } from '@sentry-insurance/InternalFrontendTemplate/dist/Sentry.Common.js';
 import SentryModal from '@sentry-insurance/InternalFrontendTemplate/dist/Interfaces/SentryModal'; 
 import { SecurityTicketSimple } from './SecurityTicketSimple'
-import "bootstrap/js/dist/collapse";
-import "bootstrap/js/dist/tooltip";
-import "bootstrap/js/dist/popover"
-import "bootstrap/js/dist/modal"
 
 export namespace DatasetAuthorization {
 
