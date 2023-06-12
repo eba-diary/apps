@@ -146,6 +146,35 @@ namespace Sentry.data.Infrastructure
             return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
         }
 
+        public long GetAllInFlightFilesCount()
+        {
+            long docCount = _dataFlowMetricProvider.GetAllInFlightFiles().SearchTotal;
+
+            return docCount;
+        }
+
+        public List<DatasetProcessActivityDto> GetAllInFlightFiles()
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllInFlightFiles().ToDto();
+
+            return MapDatasetProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
+
+        public List<SchemaProcessActivityDto> GetAllInFlightFilesByDataset(int datasetId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllInFlightFilesByDataset(datasetId).ToDto();
+
+            return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto, datasetId);
+        }
+
+        public List<DatasetFileProcessActivityDto> GetAllInFlightFilesBySchema(int schemaId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllInFlightFilesBySchema(schemaId).ToDto();
+
+            return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
+        }
+
         #region PRIVATE PROCESS ACTIVITY MAPPING FUNCTIONS
         public List<DatasetProcessActivityDto> MapDatasetProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
         {

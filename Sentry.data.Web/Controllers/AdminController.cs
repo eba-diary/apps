@@ -207,8 +207,6 @@ namespace Sentry.data.Web.Controllers
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Adding Support Link failed");
             }
-
-            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was successfully added to database");
         }
 
         // removes a support link from the link farm
@@ -233,7 +231,7 @@ namespace Sentry.data.Web.Controllers
             long totalCompletedFiles = _dataFlowMetricService.GetAllTotalFilesCount();
 
             // service method that return the number of inflight files
-            long totalInFlightFiles = 0;
+            long totalInFlightFiles = _dataFlowMetricService.GetAllInFlightFilesCount();
 
             // service method that return the number of failed files
             long totalFailedFiles = _dataFlowMetricService.GetAllFailedFilesCount();
@@ -344,6 +342,7 @@ namespace Sentry.data.Web.Controllers
                     datasetProcessActivityDtos = _dataFlowMetricService.GetAllFailedFiles();
                     break;
                 case ProcessActivityType.IN_FLIGHT_FILES:
+                    datasetProcessActivityDtos = _dataFlowMetricService.GetAllInFlightFiles();
                     break;
             }
              
@@ -370,6 +369,7 @@ namespace Sentry.data.Web.Controllers
                     schemaProcessActivityDtos = _dataFlowMetricService.GetAllFailedFilesByDataset(datasetId);
                     break;
                 case ProcessActivityType.IN_FLIGHT_FILES:
+                    schemaProcessActivityDtos = _dataFlowMetricService.GetAllInFlightFilesByDataset(datasetId);
                     break;
             }
 
@@ -396,6 +396,7 @@ namespace Sentry.data.Web.Controllers
                     datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllFailedFilesBySchema(schemaId);
                     break;
                 case ProcessActivityType.IN_FLIGHT_FILES:
+                    datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllInFlightFilesBySchema(schemaId);
                     break;
             }
 

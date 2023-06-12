@@ -18,7 +18,7 @@
             <h3>Processing Activity</h3>
             <br />
             <div class="ml-0 row">
-                @if (Model.CLA5112_FeatureFlag)
+                @if (Model.CLA5112_PlatformActivity_TotalFiles_ViewPage)
                 {
                     <div class="column card-result-layout-0">
                         <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalFiles" })">
@@ -34,7 +34,7 @@
                 }
 
 
-                @if (Model.CLA5260_FeatureFlag)
+                @if (Model.CLA5260_PlatformActivity_FileFailures_ViewPage)
                 {
 
                   @*<div class="column card-result-layout-0">
@@ -63,7 +63,7 @@
 
 
                 <div class="column card-result-layout-0">
-                    <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "InFlightFiles" })">
+                    <a data-nav-id="datafilereprocessing" class="side-nav-links" href="@Url.Action("ProcessActivityResults", "Admin", new { selectedPage = "TotalInFlightFiles" })">
                         <div class="process-activity-cards card card-hover m-1">
                             <div class="card-body bg-primary bg-gradient position-relative">
                                 <h2 class="text-right text-white pt-3 mb-0"><strong>@Model.TotalInFlightFiles</strong></h2>

@@ -48,6 +48,21 @@ namespace Sentry.data.Infrastructure
             return GetFailedFiles();
         }
 
+        public ElasticResult<DataFlowMetric> GetAllInFlightFilesByDataset(int datasetId)
+        {
+            return GetInFlightFiles(datasetId: datasetId);
+        }
+
+        public ElasticResult<DataFlowMetric> GetAllInFlightFilesBySchema(int schemaId)
+        {
+            return GetInFlightFiles(schemaId: schemaId);
+        }
+
+        public ElasticResult<DataFlowMetric> GetAllInFlightFiles()
+        {
+            return GetInFlightFiles();
+        }
+
         //returns list of data flow metrics matching searchdto criteria
         public List<DataFlowMetric> GetDataFlowMetrics(DataFlowMetricSearchDto dto)
         {
@@ -90,16 +105,13 @@ namespace Sentry.data.Infrastructure
             Expression<Func<DataFlowMetric, int>> aggregation_field = o => o.DatasetId;
 
             // adds a filter to get files that have executionorder == maxexecutionorder
-            Filter.Add(fq => fq.Script(t => t.Script(f => f.Source("doc['executionorder'].value == doc['maxexecutionorder'].value"))));
+            Filter.Add(GetMaxExecutionOrderFilter());
+
+            // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
+            Must.Add(GetDateRangeFilter());
 
             // adds a filter to ensure that files with a null run instance guid are returned
             MustNot.Add(fq => fq.Exists(t => t.Field(f => f.RunInstanceGuid)));
-
-            // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
-            Must.Add(fq => fq.DateRange(t => t.Field(f => f.FileCreatedDateTime)
-                                                .GreaterThanOrEquals(DateMath.Now.Subtract("19h"))
-                                                .LessThan(DateMath.Now.Add("1d"))
-                                                .Format("yyyyMMdd'T'HHmmss.SSSZ")));
 
             // checking if filtering on datasetId is required
             if (datasetId.HasValue)
@@ -141,10 +153,7 @@ namespace Sentry.data.Infrastructure
             Must.Add(fq => fq.Terms(t => t.Field(f => f.StatusCode).Terms("F")));
 
             // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
-            Must.Add(fq => fq.DateRange(t => t.Field(f => f.FileCreatedDateTime)
-                                                .GreaterThanOrEquals(DateMath.Now.Subtract("19h"))
-                                                .LessThan(DateMath.Now.Add("1d"))
-                                                .Format("yyyyMMdd'T'HHmmss.SSSZ")));
+            Must.Add(GetDateRangeFilter());
 
             // checking if filtering on datasetId is required
             if (datasetId.HasValue)
@@ -170,6 +179,69 @@ namespace Sentry.data.Infrastructure
 
 
             return elasticResult;
+        }
+
+        private ElasticResult<DataFlowMetric> GetInFlightFiles(int? datasetId = null, int? schemaId = null)
+        {
+            // list of query container descriptors to filter elastic search
+            List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> Filter = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
+            List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> MustNot = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
+            List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> Must = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
+
+            // defines the aggregation filter to allow aggregation on Dataset Id
+            Expression<Func<DataFlowMetric, int>> aggregation_field = o => o.DatasetId;
+
+            // adds a filter to get files that have executionorder == maxexecutionorder
+            Filter.Add(GetMaxExecutionOrderFilter());
+
+            // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
+            Must.Add(GetDateRangeFilter());
+
+            // adds a filter to ensure that files with a null run instance guid are returned`
+            MustNot.Add(fq => fq.Exists(t => t.Field(f => f.RunInstanceGuid)));
+
+            // Elastic Search Query
+            ElasticResult<DataFlowMetric> comepletedResults = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s.Query(q => q.Bool(b => b
+                                                                                        .Filter(Filter)
+                                                                                        .MustNot(MustNot)
+                                                                                        .Must(Must)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
+                                                                                .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
+
+            List<int> CompletedDatasetIds = new List<int>();
+
+            foreach (var item in comepletedResults.Aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT).Buckets)
+            {
+                int.TryParse(item.Key, out int key);
+
+                CompletedDatasetIds.Add(key);
+            }
+
+            MustNot.Clear();
+
+            MustNot.Add(fq => fq.Terms(t => t.Terms(CompletedDatasetIds)));
+
+            ElasticResult<DataFlowMetric> elasticResult = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s.Query(q => q.Bool(b => b
+                                                                                        .Filter(Filter)
+                                                                                        .MustNot(MustNot)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
+                                                                                .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
+
+
+            return elasticResult;
+        }
+
+        private Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer> GetMaxExecutionOrderFilter()
+        {
+            return fq => fq.Script(t => t.Script(f => f.Source("doc['executionorder'].value == doc['maxexecutionorder'].value")));
+        }
+
+        private Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer> GetDateRangeFilter(string lessThan = "19h", string greaterThan = "1d")
+        {
+            return fq => fq.DateRange(t => t.Field(f => f.FileCreatedDateTime)
+                                                .GreaterThanOrEquals(DateMath.Now.Subtract(lessThan))
+                                                .LessThan(DateMath.Now.Add(greaterThan))
+                                                .Format("yyyyMMdd'T'HHmmss.SSSZ"));
         }
     }
 }
