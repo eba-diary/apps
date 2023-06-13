@@ -62,6 +62,7 @@ Argument_Metadata.TargetBucketName,
 Argument_Metadata.TargetKey,
 Argument_Metadata.Dataset_ID,
 Argument_Metadata.[Schema_ID],
+Argument_Metadata.DatasetFileDropID,
 CASE
     WHEN Submission.Created > '2023-03-31 17:05:00' THEN REVERSE(SUBSTRING(REVERSE(Argument_Metadata.TargetKey),0,16))
     ELSE REVERSE(SUBSTRING(REVERSE(Argument_Metadata.TargetKey),0,35))
@@ -81,7 +82,8 @@ CROSS APPLY OPENJSON(Option_Metadata.arguments, '$') WITH (
     TargetBucketName varchar(250) '$.ProgramArguments.TargetBucketName',
     TargetKey varchar(250) '$.ProgramArguments.TargetKey',
     Dataset_ID bigint '$.Dataset_ID',
-    [Schema_ID] bigint '$.Schema_ID'
+    [Schema_ID] bigint '$.Schema_ID',
+    DatasetFileDropID varchar(250) '$.DatasetFileDropID'
 ) Argument_Metadata
 where 
     JobHistory.State = 'Dead'
@@ -123,6 +125,7 @@ DATEPART(HOUR, TSD.Created) as 'Hour of Day',
 TSD.Dataset_ID,
 SCM.[Schema_Id],
 DF.DatasetFile_Id,
+TSD.DatasetFileDropID,
 DFlow.Id as 'DataFlow_ID',
 DFlowStep.Id as 'DataFlowStep_ID',
 TSD.sub_Created,
