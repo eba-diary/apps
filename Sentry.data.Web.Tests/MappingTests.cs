@@ -57,6 +57,7 @@ namespace Sentry.data.Web.Tests
                     SchemaName = "Schema Name",
                     SourceKey = "Source Key",
                     FlowExecutionGuid = "FlowExecutionGuid",
+                    RunInstanceGuid = "RunInstanceGuid",
                     ReprocessingRequired = true,
                     SubmissionID = i,
                     SourceBucketName = "SourceBucketName",
@@ -65,6 +66,7 @@ namespace Sentry.data.Web.Tests
                     LivyDriverlogUrl = "LivyDriverlogUrl",
                     LivySparkUiUrl = "LivySparkUiUrl",
                     DatasetFileID = i,
+                    DatasetFileDropID = i,
                     DataFlowStepID = i
                 });
             }
@@ -80,6 +82,7 @@ namespace Sentry.data.Web.Tests
                 Assert.AreEqual(dpjModelList[i].SchemaName, dpjDtoList[i].SchemaName);
                 Assert.AreEqual(dpjModelList[i].SourceKey, dpjDtoList[i].SourceKey);
                 Assert.AreEqual(dpjModelList[i].FlowExecutionGuid, dpjDtoList[i].FlowExecutionGuid);
+                Assert.AreEqual(dpjModelList[i].RunInstanceGuid, dpjDtoList[i].RunInstanceGuid);
                 Assert.AreEqual(dpjModelList[i].ReprocessingRequired, dpjDtoList[i].ReprocessingRequired);
                 Assert.AreEqual(dpjModelList[i].SubmissionID, dpjDtoList[i].SubmissionID);
                 Assert.AreEqual(dpjModelList[i].SourceBucketName, dpjDtoList[i].SourceBucketName);
@@ -88,6 +91,7 @@ namespace Sentry.data.Web.Tests
                 Assert.AreEqual(dpjModelList[i].LivyDriverlogUrl, dpjDtoList[i].LivyDriverlogUrl);
                 Assert.AreEqual(dpjModelList[i].LivySparkUiUrl, dpjDtoList[i].LivySparkUiUrl);
                 Assert.AreEqual(dpjModelList[i].DatasetFileID, dpjDtoList[i].DatasetFileID);
+                Assert.AreEqual(dpjModelList[i].DatasetFileDropID, dpjDtoList[i].DatasetFileDropID);
                 Assert.AreEqual(dpjModelList[i].DataFlowStepID, dpjDtoList[i].DataFlowStepID);
             }
 
@@ -104,6 +108,7 @@ namespace Sentry.data.Web.Tests
                 SchemaName = "Schema Name",
                 SourceKey = "Source Key",
                 FlowExecutionGuid = "FlowExecutionGuid",
+                RunInstanceGuid = "RunInstanceGuid",
                 ReprocessingRequired = true,
                 SubmissionID = 1,
                 SourceBucketName = "SourceBucketName",
@@ -112,6 +117,7 @@ namespace Sentry.data.Web.Tests
                 LivyDriverlogUrl = "LivyDriverlogUrl",
                 LivySparkUiUrl = "LivySparkUiUrl",
                 DatasetFileID = 1,
+                DatasetFileDropID = 1,
                 DataFlowStepID = 1
             };
 
@@ -124,6 +130,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(dpjModel.SchemaName, dsjDto.SchemaName);
             Assert.AreEqual(dpjModel.SourceKey, dsjDto.SourceKey);
             Assert.AreEqual(dpjModel.FlowExecutionGuid, dsjDto.FlowExecutionGuid);
+            Assert.AreEqual(dpjModel.RunInstanceGuid, dsjDto.RunInstanceGuid);
             Assert.AreEqual(dpjModel.ReprocessingRequired, dsjDto.ReprocessingRequired);
             Assert.AreEqual(dpjModel.SubmissionID, dsjDto.SubmissionID);
             Assert.AreEqual(dpjModel.SourceBucketName, dsjDto.SourceBucketName);
@@ -132,6 +139,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual(dpjModel.LivyDriverlogUrl, dsjDto.LivyDriverlogUrl);
             Assert.AreEqual(dpjModel.LivySparkUiUrl, dsjDto.LivySparkUiUrl);
             Assert.AreEqual(dpjModel.DatasetFileID, dsjDto.DatasetFileID);
+            Assert.AreEqual(dpjModel.DatasetFileDropID, dsjDto.DatasetFileDropID);
             Assert.AreEqual(dpjModel.DataFlowStepID, dsjDto.DataFlowStepID);
 
         }

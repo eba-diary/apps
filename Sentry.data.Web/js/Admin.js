@@ -525,6 +525,10 @@ data.Admin = {
             '<td>' + d.DatasetFileID + '</td>' +
             '</tr>' +
             '<tr>' +
+            '<td><b>Dataset File Drop ID</b>: </td>' +
+            '<td>' + d.DatasetFileDropID + '</td>' +
+            '</tr>' +
+            '<tr>' +
             '<td><b>Livy Spark Ui Url</b>:</td>' +
             '<td>' + d.LivySparkUiUrl + '</td>' +
             '</tr>' +

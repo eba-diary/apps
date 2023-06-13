@@ -37,6 +37,7 @@ namespace Sentry.data.Web
                 LivyDriverlogUrl = deadSparkJobDto.LivyDriverlogUrl,
                 LivySparkUiUrl = deadSparkJobDto.LivySparkUiUrl,
                 DatasetFileID = deadSparkJobDto.DatasetFileID,
+                DatasetFileDropID = deadSparkJobDto.DatasetFileDropID,
                 DataFlowStepID = deadSparkJobDto.DataFlowStepID
             };
 
