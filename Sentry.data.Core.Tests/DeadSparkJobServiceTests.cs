@@ -32,6 +32,7 @@ namespace Sentry.data.Core.Tests
                 LivyDriverlogUrl = "LivyDriverlogUrl",
                 LivySparkUiUrl = "LivySparkUiUrl",
                 DatasetFileID = 1,
+                DatasetFileDropID = 1,
                 DataFlowStepID = 1
             });
 
@@ -50,6 +51,7 @@ namespace Sentry.data.Core.Tests
                 LivyDriverlogUrl = "LivyDriverlogUrl",
                 LivySparkUiUrl = "LivySparkUiUrl",
                 DatasetFileID = 2,
+                DatasetFileDropID = 2,
                 DataFlowStepID = 2
             });
 
@@ -80,6 +82,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("LivyDriverlogUrl", deadSparkJobDtoList[0].LivyDriverlogUrl);
             Assert.AreEqual("LivySparkUiUrl", deadSparkJobDtoList[0].LivySparkUiUrl);
             Assert.AreEqual(1, deadSparkJobDtoList[0].DatasetFileID);
+            Assert.AreEqual(1, deadSparkJobDtoList[0].DatasetFileDropID);
             Assert.AreEqual(1, deadSparkJobDtoList[0].DataFlowStepID);
 
             Assert.AreEqual(DateTime.Today, deadSparkJobDtoList[1].SubmissionTime);
@@ -95,6 +98,7 @@ namespace Sentry.data.Core.Tests
             Assert.AreEqual("LivyDriverlogUrl", deadSparkJobDtoList[1].LivyDriverlogUrl);
             Assert.AreEqual("LivySparkUiUrl", deadSparkJobDtoList[1].LivySparkUiUrl);
             Assert.AreEqual(2, deadSparkJobDtoList[1].DatasetFileID);
+            Assert.AreEqual(2, deadSparkJobDtoList[1].DatasetFileDropID);
             Assert.AreEqual(2, deadSparkJobDtoList[1].DataFlowStepID);
         }
     }

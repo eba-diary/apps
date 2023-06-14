@@ -45,6 +45,7 @@ namespace Sentry.data.Infrastructure
                     deadSparkJob.DatasetID =            DatabaseHelper.SafeDatabaseInt(row["Dataset_ID"]);
                     deadSparkJob.SchemaID =             DatabaseHelper.SafeDatabaseInt(row["Schema_ID"]);
                     deadSparkJob.DatasetFileID =        DatabaseHelper.SafeDatabaseInt(row["DatasetFile_ID"]);
+                    deadSparkJob.DatasetFileDropID =    DatabaseHelper.SafeDatabaseInt(row["DatasetFileDrop_ID"]);
                     deadSparkJob.DataFlowID =           DatabaseHelper.SafeDatabaseInt(row["DataFlow_ID"]);
                     deadSparkJob.DataFlowStepID =       DatabaseHelper.SafeDatabaseInt(row["DataFlowStep_ID"]);
                     deadSparkJob.SubmissionCreated =    DatabaseHelper.SafeDatabaseDate(row["sub_Created"]);

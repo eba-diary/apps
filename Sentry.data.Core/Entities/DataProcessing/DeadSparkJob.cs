@@ -25,6 +25,7 @@ namespace Sentry.data.Core
         public int DatasetID { get; set; }
         public int SchemaID { get; set; }
         public int DatasetFileID { get; set; }
+        public int DatasetFileDropID { get; set; }
         public int DataFlowID { get; set; }
         public int DataFlowStepID { get; set; }
     }
