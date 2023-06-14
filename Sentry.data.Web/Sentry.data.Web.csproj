@@ -723,7 +723,6 @@
     <Compile Include="Models\AdminPage\DataFlowMetricModel.cs" />
     <Compile Include="Models\AdminPage\DataFlowMetricSearchModel.cs" />
     <Compile Include="Models\AdminPage\DatasetSelectionModel.cs" />
-    <Compile Include="Models\AdminPage\AdminElasticFileModel.cs" />
     <Compile Include="Models\AdminPage\DatasetProcessActivityModel.cs" />
     <Compile Include="Models\AdminPage\ReprocessDeadSparkJobModel.cs" />
     <Compile Include="Models\AdminPage\SupportLinkWrapper.cs" />

@@ -157,6 +157,12 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllInFlightFiles().ToDto();
 
+            // ammend doc counts by dataset id
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
+            {
+                item.docCount = GetDataFlowMetricResultsCountByFunc(dataFlowMetricSearchResultDto, x => x.DatasetId == item.key);
+            }
+
             return MapDatasetProcessActivityDtos(dataFlowMetricSearchResultDto);
         }
 
@@ -165,6 +171,12 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllInFlightFilesByDataset(datasetId).ToDto();
 
+            // ammend doc counts by schema id
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
+            {
+                item.docCount = GetDataFlowMetricResultsCountByFunc(dataFlowMetricSearchResultDto, x => x.SchemaId == item.key);
+            }
+
             return MapSchemaProcessActivityDtos(dataFlowMetricSearchResultDto, datasetId);
         }
 
@@ -172,11 +184,17 @@ namespace Sentry.data.Infrastructure
         {
             DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllInFlightFilesBySchema(schemaId).ToDto();
 
+            // ammend doc counts by dataset file id
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
+            {
+                item.docCount = GetDataFlowMetricResultsCountByFunc(dataFlowMetricSearchResultDto, x => x.DatasetFileId == item.key);
+            }
+
             return MapDatasetFileProcessActivityDtos(dataFlowMetricSearchResultDto);
         }
 
         #region PRIVATE PROCESS ACTIVITY MAPPING FUNCTIONS
-        public List<DatasetProcessActivityDto> MapDatasetProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
+        private List<DatasetProcessActivityDto> MapDatasetProcessActivityDtos(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto)
         {
             List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x =>
                                                                                                                 MapToDto(x)).ToList();
@@ -188,7 +206,7 @@ namespace Sentry.data.Infrastructure
                 DatasetProcessActivityDto datasetProcessActivityDto = new DatasetProcessActivityDto();
 
                 string datasetName = _context.Datasets.Where(x => x.DatasetId == item.key).Select(s => s.DatasetName).FirstOrDefault();
-
+                
                 DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.DatasetId == item.key).Max(x => x.MetricGeneratedDateTime);
 
                 datasetProcessActivityDto.DatasetName = datasetName;
@@ -241,7 +259,7 @@ namespace Sentry.data.Infrastructure
                 {
                     FileName = items.FileName,
                     FlowExecutionGuid = items.FlowExecutionGuid,
-                    LastFlowStep = items.TotalFlowSteps,
+                    LastFlowStep = items.CurrentFlowStep,
                     LastEventTime = items.MetricGeneratedDateTime
                 };
 
@@ -249,6 +267,12 @@ namespace Sentry.data.Infrastructure
             }
 
             return datasetFileProcessActivityDtos;
+        }
+
+        // Find count of results by passed in predicate
+        private int GetDataFlowMetricResultsCountByFunc(DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto, Func<DataFlowMetric,bool> predicate)
+        {
+            return dataFlowMetricSearchResultDto.DataFlowMetricResults.Count(predicate);
         }
         #endregion
     }

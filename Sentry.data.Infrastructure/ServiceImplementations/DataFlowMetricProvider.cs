@@ -105,7 +105,7 @@ namespace Sentry.data.Infrastructure
             Expression<Func<DataFlowMetric, int>> aggregation_field = o => o.DatasetId;
 
             // adds a filter to get files that have executionorder == maxexecutionorder
-            Filter.Add(GetMaxExecutionOrderFilter());
+            Filter.Add(fq => fq.Script(t => t.Script(f => f.Source($"doc['executionorder'].value == doc['maxexecutionorder'].value"))));
 
             // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
             Must.Add(GetDateRangeFilter());
@@ -133,7 +133,8 @@ namespace Sentry.data.Infrastructure
                                                                                         .Filter(Filter)
                                                                                         .MustNot(MustNot)
                                                                                         .Must(Must)))
-                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Size(ElasticQueryValues.Size.MAX)
+                                                                                    .Field(aggregation_field)))
                                                                                 .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
 
 
@@ -174,7 +175,8 @@ namespace Sentry.data.Infrastructure
             ElasticResult<DataFlowMetric> elasticResult = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s.Query(q => q.Bool(b => b
                                                                                         .Filter(Filter)
                                                                                         .Must(Must)))
-                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Size(ElasticQueryValues.Size.MAX)
+                                                                                    .Field(aggregation_field)))
                                                                                 .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
 
 
@@ -188,51 +190,71 @@ namespace Sentry.data.Infrastructure
             List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> MustNot = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
             List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>> Must = new List<Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer>>();
 
+            // return all completed files
+            ElasticResult<DataFlowMetric> completedResults = GetTotalFiles(datasetId : datasetId, schemaId : schemaId);
+
+            // return all failed files
+            ElasticResult<DataFlowMetric> failedResults = GetFailedFiles(datasetId: datasetId, schemaId: schemaId);
+            
+            List<int> mustNotDatasetFileIds = new List<int>();
+
+            // create list of completed processed dataset file ids
+            foreach (var item in completedResults.Documents)
+            {
+                mustNotDatasetFileIds.Add(item.DatasetFileId);
+            }
+
+            // create list of failed dataset file ids
+            foreach (var item in failedResults.Documents)
+            {
+                mustNotDatasetFileIds.Add(item.DatasetFileId);
+            }
+
+            // filters against list of dataset file id's
+            MustNot.Add(fq => fq.Terms(t => t.Field(f=>f.DatasetFileId).Terms(mustNotDatasetFileIds)));
+
+            // adds a filter to ensure that files with a null run instance guid are returned
+            MustNot.Add(fq => fq.Exists(t => t.Field(f => f.RunInstanceGuid)));
+
+            // Add data range must statement that look for jobs in a range of -19hrs from current time to 24hrs from current time
+            Must.Add(GetDateRangeFilter());
+
             // defines the aggregation filter to allow aggregation on Dataset Id
             Expression<Func<DataFlowMetric, int>> aggregation_field = o => o.DatasetId;
 
-            // adds a filter to get files that have executionorder == maxexecutionorder
-            Filter.Add(GetMaxExecutionOrderFilter());
-
-            // Add data range must statemnet that look for jobs in a range of -19hrs from current time to 24hrs from current time
-            Must.Add(GetDateRangeFilter());
-
-            // adds a filter to ensure that files with a null run instance guid are returned`
-            MustNot.Add(fq => fq.Exists(t => t.Field(f => f.RunInstanceGuid)));
-
-            // Elastic Search Query
-            ElasticResult<DataFlowMetric> comepletedResults = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s.Query(q => q.Bool(b => b
-                                                                                        .Filter(Filter)
-                                                                                        .MustNot(MustNot)
-                                                                                        .Must(Must)))
-                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
-                                                                                .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
-
-            List<int> CompletedDatasetIds = new List<int>();
-
-            foreach (var item in comepletedResults.Aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT).Buckets)
+            // checking if filtering on datasetId is required
+            if (datasetId.HasValue)
             {
-                int.TryParse(item.Key, out int key);
+                // If a datasetId is provided, override the aggregation_field group by Scehma Id instead 
+                aggregation_field = o => o.SchemaId;
 
-                CompletedDatasetIds.Add(key);
+                Filter.Add(fq => fq.Terms(t => t.Field(f => f.DatasetId).Terms(datasetId.Value)));
             }
 
-            MustNot.Clear();
+            // checking if filtering on schemaId is required
+            if (schemaId.HasValue)
+            {
+                Filter.Add(fq => fq.Terms(t => t.Field(f => f.SchemaId).Terms(schemaId.Value)));
+            }
 
-            MustNot.Add(fq => fq.Terms(t => t.Terms(CompletedDatasetIds)));
 
             ElasticResult<DataFlowMetric> elasticResult = _elasticDocumentClient.SearchAsync<DataFlowMetric>(s => s.Query(q => q.Bool(b => b
-                                                                                        .Filter(Filter)
-                                                                                        .MustNot(MustNot)))
-                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Field(aggregation_field)))
+                                                                                        .MustNot(MustNot)
+                                                                                        .Must(Must)
+                                                                                        .Filter(Filter)))
+                                                                                .Aggregations(aggregations => aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT, df => df.Size(ElasticQueryValues.Size.MAX)
+                                                                                    .Field(aggregation_field)))
                                                                                 .Size(ElasticQueryValues.Size.MAX).Sort(sq => sq.Descending(dq => dq.EventMetricId))).Result;
 
-            return elasticResult;
-        }
+            // set documents list to distinct list of documents with the highest execution order
+            elasticResult.Documents = elasticResult.Documents.GroupBy(g => g.DatasetFileId)
+                                                            .Select(s => s
+                                                            .OrderByDescending(o => o.ExecutionOrder).First()).ToList();
 
-        private Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer> GetMaxExecutionOrderFilter()
-        {
-            return fq => fq.Script(t => t.Script(f => f.Source("doc['executionorder'].value == doc['maxexecutionorder'].value")));
+            // update search total to match update documents list
+            elasticResult.SearchTotal = elasticResult.Documents.Count();
+
+            return elasticResult;
         }
 
         private Func<QueryContainerDescriptor<DataFlowMetric>, QueryContainer> GetDateRangeFilter(string lessThan = "19h", string greaterThan = "1d")

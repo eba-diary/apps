@@ -18,9 +18,9 @@ namespace Sentry.data.Infrastructure
 
             foreach (var item in rootResult.Aggregations.Terms(FilterCategoryNames.DataFlowMetric.DOC_COUNT).Buckets)
             {
-                int.TryParse(item.Key, out int key);
+                int.TryParse(item.Key, out int id);
 
-                termsAggregates.Add(new DataFlowMetricSearchAggregateDto() { key = key, docCount = (long)item.DocCount });
+                termsAggregates.Add(new DataFlowMetricSearchAggregateDto() { key = id, docCount = (long)item.DocCount });
             }
 
             dataFlowMetricSearchResultDto.TermAggregates = termsAggregates;
