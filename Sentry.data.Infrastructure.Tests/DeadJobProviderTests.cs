@@ -49,6 +49,7 @@ namespace Sentry.data.Infrastructure.Tests
             dataTable.Columns.Add("DatasetFile_ID");
             dataTable.Columns.Add("DataFlow_ID");
             dataTable.Columns.Add("DataFlowStep_ID");
+            dataTable.Columns.Add("DatasetFileDrop_ID");
 
             dataTable.Rows.Add(1, DateTime.Today, "DatasetName", 
                 "SchemaName", "SourceBucketName", "SourceKey", 
@@ -56,7 +57,7 @@ namespace Sentry.data.Infrastructure.Tests
                 "LivyAppID", "LivyDriverlogUrl", "LivySparkUiUrl", 
                 1, 1, "TriggerKey",
                 "TriggerBucket", "FlowExecutionGuid", "RunInstanceGuid", 1,
-                1, 1, 1, 1);
+                1, 1, 1, 1, 1);
 
             dataTable.Rows.Add(2, DateTime.Today, "DatasetName",
                 "SchemaName", "SourceBucketName", "SourceKey",
@@ -64,10 +65,7 @@ namespace Sentry.data.Infrastructure.Tests
                 "LivyAppID", "LivyDriverlogUrl", "LivySparkUiUrl",
                 2, 2, "TriggerKey",
                 "TriggerBucket", "FlowExecutionGuid", "RunInstanceGuid", 2,
-                2, 2, 2, 2);
-
-
-
+                2, 2, 2, 2, 2);
 
             //Act
             mockExecuter.Setup(e => e.ExecuteQuery(It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(dataTable);
@@ -91,6 +89,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("LivySparkUiUrl", deadSparkJobList[0].LivySparkUiUrl);
             Assert.AreEqual(1, deadSparkJobList[0].DatasetFileID);
             Assert.AreEqual(1, deadSparkJobList[0].DataFlowStepID);
+            Assert.AreEqual(1, deadSparkJobList[0].DatasetFileDropID);
 
             Assert.AreEqual(DateTime.Today, deadSparkJobList[1].SubmissionCreated);
             Assert.AreEqual("DatasetName", deadSparkJobList[1].DatasetName);
@@ -107,6 +106,7 @@ namespace Sentry.data.Infrastructure.Tests
             Assert.AreEqual("LivySparkUiUrl", deadSparkJobList[1].LivySparkUiUrl);
             Assert.AreEqual(2, deadSparkJobList[1].DatasetFileID);
             Assert.AreEqual(2, deadSparkJobList[1].DataFlowStepID);
+            Assert.AreEqual(2, deadSparkJobList[1].DatasetFileDropID);
         }
 
         [TestMethod]
@@ -142,6 +142,7 @@ namespace Sentry.data.Infrastructure.Tests
             dataTable.Columns.Add("DatasetFile_ID");
             dataTable.Columns.Add("DataFlow_ID");
             dataTable.Columns.Add("DataFlowStep_ID");
+            dataTable.Columns.Add("DatasetFileDrop_ID");
 
             dataTable.Rows.Add(1, DateTime.Today, "DatasetName     ",
                 "SchemaName     ", "SourceBucketName", "SourceKey",
@@ -149,7 +150,7 @@ namespace Sentry.data.Infrastructure.Tests
                 "LivyAppID", "LivyDriverlogUrl", "LivySparkUiUrl",
                 1, 1, "TriggerKey",
                 "TriggerBucket", "FlowExecutionGuid", "RunInstanceGuid", 1,
-                1, 1, 1, 1);
+                1, 1, 1, 1, 1);
 
 
             mockExecuter.Setup(e => e.ExecuteQuery(It.IsAny<DateTime>(), It.IsAny<DateTime>())).Returns(dataTable);
