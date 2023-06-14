@@ -408,12 +408,12 @@ namespace Sentry.data.Infrastructure.Tests
             //assert
             Assert.AreEqual("fileName", datasetFileProcessActivityDtos[0].FileName);
             Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[0].FlowExecutionGuid);
-            Assert.AreEqual(0, datasetFileProcessActivityDtos[0].LastFlowStep);
+            Assert.AreEqual(1, datasetFileProcessActivityDtos[0].LastFlowStep);
             Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[0].LastEventTime);
 
             Assert.AreEqual("fileName", datasetFileProcessActivityDtos[1].FileName);
             Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[1].FlowExecutionGuid);
-            Assert.AreEqual(0, datasetFileProcessActivityDtos[1].LastFlowStep);
+            Assert.AreEqual(2, datasetFileProcessActivityDtos[1].LastFlowStep);
             Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[1].LastEventTime);
 
             stubDataFlowMetricProvider.VerifyAll();
@@ -557,12 +557,12 @@ namespace Sentry.data.Infrastructure.Tests
             //assert
             Assert.AreEqual("fileName", datasetFileProcessActivityDtos[0].FileName);
             Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[0].FlowExecutionGuid);
-            Assert.AreEqual(0, datasetFileProcessActivityDtos[0].LastFlowStep);
+            Assert.AreEqual(1, datasetFileProcessActivityDtos[0].LastFlowStep);
             Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[0].LastEventTime);
 
             Assert.AreEqual("fileName", datasetFileProcessActivityDtos[1].FileName);
             Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[1].FlowExecutionGuid);
-            Assert.AreEqual(0, datasetFileProcessActivityDtos[1].LastFlowStep);
+            Assert.AreEqual(2, datasetFileProcessActivityDtos[1].LastFlowStep);
             Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[1].LastEventTime);
 
             stubDataFlowMetricProvider.VerifyAll();
@@ -685,12 +685,12 @@ namespace Sentry.data.Infrastructure.Tests
             //assert
             Assert.AreEqual("fileName", datasetFileProcessActivityDtos[0].FileName);
             Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[0].FlowExecutionGuid);
-            Assert.AreEqual(0, datasetFileProcessActivityDtos[0].LastFlowStep);
+            Assert.AreEqual(1, datasetFileProcessActivityDtos[0].LastFlowStep);
             Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[0].LastEventTime);
 
             Assert.AreEqual("fileName", datasetFileProcessActivityDtos[1].FileName);
             Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[1].FlowExecutionGuid);
-            Assert.AreEqual(0, datasetFileProcessActivityDtos[1].LastFlowStep);
+            Assert.AreEqual(2, datasetFileProcessActivityDtos[1].LastFlowStep);
             Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[1].LastEventTime);
 
             stubDataFlowMetricProvider.VerifyAll();
