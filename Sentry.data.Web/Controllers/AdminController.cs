@@ -207,8 +207,6 @@ namespace Sentry.data.Web.Controllers
             {
                 return Content(System.Net.HttpStatusCode.InternalServerError.ToString(), "Adding Support Link failed");
             }
-
-            return Content(System.Net.HttpStatusCode.OK.ToString(), "Support Link was successfully added to database");
         }
 
         // removes a support link from the link farm
@@ -229,27 +227,10 @@ namespace Sentry.data.Web.Controllers
         //below methods all return admin page views
         public ActionResult Index()
         {
-            // service method that returns the number of completed files
-            long totalCompletedFiles = _dataFlowMetricService.GetAllTotalFilesCount();
-
-            // service method that return the number of inflight files
-            long totalInFlightFiles = 0;
-
-            // service method that return the number of failed files
-            long totalFailedFiles = _dataFlowMetricService.GetAllFailedFilesCount();
-
-            AdminElasticFileModel adminElasticFileModel = new AdminElasticFileModel()
-            {
-                TotalCompletedFiles = totalCompletedFiles,
-                TotalInFlightFiles = totalInFlightFiles,
-                TotalFailedFiles = totalFailedFiles,
-                CLA4553_PlatformActivity = _dataFeatures.CLA4553_PlatformActivity.GetValue(),
-                CLA5112_PlatformActivity_TotalFiles_ViewPage = _dataFeatures.CLA5112_PlatformActivity_TotalFiles_ViewPage.GetValue(),
-                CLA5260_PlatformActivity_FileFailures_ViewPage = _dataFeatures.CLA5260_PlatformActivity_FileFailures_ViewPage.GetValue()
-            };
-
-            return View(adminElasticFileModel);
+            return View();
         }
+
+
 
         public ActionResult DataFileReprocessing()
         {
@@ -344,6 +325,7 @@ namespace Sentry.data.Web.Controllers
                     datasetProcessActivityDtos = _dataFlowMetricService.GetAllFailedFiles();
                     break;
                 case ProcessActivityType.IN_FLIGHT_FILES:
+                    datasetProcessActivityDtos = _dataFlowMetricService.GetAllInFlightFiles();
                     break;
             }
              
@@ -370,6 +352,7 @@ namespace Sentry.data.Web.Controllers
                     schemaProcessActivityDtos = _dataFlowMetricService.GetAllFailedFilesByDataset(datasetId);
                     break;
                 case ProcessActivityType.IN_FLIGHT_FILES:
+                    schemaProcessActivityDtos = _dataFlowMetricService.GetAllInFlightFilesByDataset(datasetId);
                     break;
             }
 
@@ -396,6 +379,7 @@ namespace Sentry.data.Web.Controllers
                     datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllFailedFilesBySchema(schemaId);
                     break;
                 case ProcessActivityType.IN_FLIGHT_FILES:
+                    datasetFileProcessActivityDtos = _dataFlowMetricService.GetAllInFlightFilesBySchema(schemaId);
                     break;
             }
 
@@ -403,6 +387,33 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileProcessActivityModel> datasetFileProcessActivityModels = datasetFileProcessActivityDtos.MapToModelList();
 
             return Json(new { data = datasetFileProcessActivityModels });
+        }
+
+        [Route("Admin/GetTotalFileCount")]
+        [HttpPost]
+        public JsonResult GetTotalFileCount()
+        {
+            long totalCount = _dataFlowMetricService.GetAllTotalFilesCount();
+
+            return Json(new { totalCount = totalCount });
+        }
+
+        [Route("Admin/GetAllFailedFilesCount")]
+        [HttpPost]
+        public JsonResult GetAllFailedFilesCount()
+        {
+            long totalCount = _dataFlowMetricService.GetAllFailedFilesCount();
+
+            return Json(new { totalCount = totalCount });
+        }
+
+        [Route("Admin/GetInFlightFileCount")]
+        [HttpPost]
+        public JsonResult GetInFlightFileCount()
+        {
+            long totalCount = _dataFlowMetricService.GetAllInFlightFilesCount();
+
+            return Json(new { totalCount = totalCount });
         }
     }
 }

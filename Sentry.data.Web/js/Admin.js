@@ -148,6 +148,75 @@ data.Admin = {
 
 
 
+    // #region ADMIN HOME PAGE FUNCTIONS
+
+    //****************************************************************************************************
+    // ADMIN HOME PAGE FUNCTIONS
+    //****************************************************************************************************
+
+    AdminHomePageInit: function ()
+    {
+        // Get Total File Count
+        $.ajax({
+            type: "POST",
+            url: "Admin/GetTotalFileCount",
+            contentType: "application/json",
+            success: function (data)
+            {
+                $("#total-file h2").html(data.totalCount);
+                $("#total-file .indeterminate").hide();
+            },
+            error: function (msg)
+            {
+                $("#total-file h2").html("N/A");
+                $("#total-file .indeterminate").hide();
+            }
+        });
+
+        // Get Failed File Count
+        $.ajax({
+            type: "POST",
+            url: "Admin/GetAllFailedFilesCount",
+            contentType: "application/json",
+            success: function (data)
+            {
+                $("#failed-file h2").html(data.totalCount);
+                $("#failed-file .indeterminate").hide();
+            },
+            error: function (msg)
+            {
+                alert(msg);
+                $("#failed-file h2").html("N/A");
+                $("#failed-file .indeterminate").hide();
+            }
+        });
+
+        // Get In Flight File Count
+        $.ajax({
+            type: "POST",
+            url: "Admin/GetInFlightFileCount",
+            contentType: "application/json",
+            success: function (data)
+            {
+                $("#in-flight-file h2").html(data.totalCount);
+                $("#in-flight-file .indeterminate").hide();
+            },
+            error: function (msg)
+            {
+                $("#in-flight-file h2").html("N/A");
+                $("#in-flight-file .indeterminate").hide();
+            }
+        });
+    },
+
+    //****************************************************************************************************
+    //END ADMIN HOME PAGE FUNCTIONS
+    //****************************************************************************************************
+
+    // #endregion
+
+
+
     // #region PROCESS ACTIVITY FUNCTIONS
 
     //****************************************************************************************************

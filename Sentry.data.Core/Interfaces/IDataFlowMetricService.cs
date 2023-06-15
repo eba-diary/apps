@@ -17,5 +17,9 @@ namespace Sentry.data.Core.Interfaces
         List<DatasetProcessActivityDto> GetAllFailedFiles();
         List<DatasetFileProcessActivityDto> GetAllFailedFilesBySchema(int schemaId);
         List<SchemaProcessActivityDto> GetAllFailedFilesByDataset(int datasetId);
+        long GetAllInFlightFilesCount();
+        List<DatasetProcessActivityDto> GetAllInFlightFiles();
+        List<DatasetFileProcessActivityDto> GetAllInFlightFilesBySchema(int schemaId);
+        List<SchemaProcessActivityDto> GetAllInFlightFilesByDataset(int datasetId);
     }
 }
