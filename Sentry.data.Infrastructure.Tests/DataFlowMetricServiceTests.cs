@@ -7,6 +7,7 @@ using Sentry.data.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Sentry.data.Core.GlobalConstants;
 
 namespace Sentry.data.Infrastructure.Tests
 {
@@ -271,6 +272,155 @@ namespace Sentry.data.Infrastructure.Tests
         }
 
         [TestMethod]
+        public void GetAllTotalFilesCount_MappedReturn()
+        {
+            //arrange
+            var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(stubDataFlowMetricProvider.Object, stubIDatasetContext.Object);
+
+            stubDataFlowMetricProvider.Setup(x => x.GetAllTotalFiles()).Returns(GetElasticDataFlowMetricList());
+
+            //act
+            long docCount= dataFlowMetricService.GetAllTotalFilesCount();
+
+            //assert
+            Assert.AreEqual(2, docCount);
+
+            stubDataFlowMetricProvider.VerifyAll();
+            stubIDatasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetAllTotalFiles_MappedReturn()
+        {
+            //arrange
+            var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(stubDataFlowMetricProvider.Object, stubIDatasetContext.Object);
+
+            stubDataFlowMetricProvider.Setup(x => x.GetAllTotalFiles()).Returns(GetElasticDataFlowMetricList());
+
+            List<Dataset> datasets = new List<Dataset>();
+
+            datasets.Add(new Dataset()
+            {
+                DatasetName = "TEST1",
+                DatasetId = 1
+            });
+
+            datasets.Add(new Dataset()
+            {
+                DatasetName = "TEST2",
+                DatasetId = 2
+            });
+
+            stubIDatasetContext.Setup(x => x.Datasets).Returns(datasets.AsQueryable());
+
+            DateTime assertDateTime = new DateTime(2023, 6, 6, 12, 35, 0);
+
+            //act
+            List<DatasetProcessActivityDto> datasetProcessActivityDtos = dataFlowMetricService.GetAllTotalFiles();
+
+
+            //assert
+            Assert.AreEqual("TEST1", datasetProcessActivityDtos[0].DatasetName);
+            Assert.AreEqual(1, datasetProcessActivityDtos[0].DatasetId);
+            Assert.AreEqual(1, datasetProcessActivityDtos[0].FileCount);
+            Assert.AreEqual(assertDateTime, datasetProcessActivityDtos[0].LastEventTime);
+
+            Assert.AreEqual("TEST2", datasetProcessActivityDtos[1].DatasetName);
+            Assert.AreEqual(2, datasetProcessActivityDtos[1].DatasetId);
+            Assert.AreEqual(1, datasetProcessActivityDtos[1].FileCount);
+            Assert.AreEqual(assertDateTime, datasetProcessActivityDtos[1].LastEventTime);
+
+            stubDataFlowMetricProvider.VerifyAll();
+            stubIDatasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetAllTotalFilesByDataset_MappedReturn()
+        {
+            //arrange
+            var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(stubDataFlowMetricProvider.Object, stubIDatasetContext.Object);
+
+            stubDataFlowMetricProvider.Setup(x => x.GetAllTotalFilesByDataset(It.IsAny<int>())).Returns(GetElasticDataFlowMetricList());
+
+            List<FileSchema> schemas = new List<FileSchema>();
+
+            schemas.Add(new FileSchema()
+            {
+                Name = "TEST1",
+                SchemaId = 1
+            });
+
+            schemas.Add(new FileSchema()
+            {
+                Name = "TEST2",
+                SchemaId = 2
+            });
+
+            stubIDatasetContext.Setup(x => x.FileSchema).Returns(schemas.AsQueryable());
+
+            DateTime assertDateTime = new DateTime(2023, 6, 6, 12, 35, 0);
+
+            //act
+            List<SchemaProcessActivityDto> schemaProcessActivityDtos = dataFlowMetricService.GetAllTotalFilesByDataset(1);
+
+            //assert
+            Assert.AreEqual("TEST1", schemaProcessActivityDtos[0].SchemaName);
+            Assert.AreEqual(1, schemaProcessActivityDtos[0].SchemaId);
+            Assert.AreEqual(1, schemaProcessActivityDtos[0].DatasetId);
+            Assert.AreEqual(1, schemaProcessActivityDtos[0].FileCount);
+            Assert.AreEqual(assertDateTime, schemaProcessActivityDtos[0].LastEventTime);
+
+            Assert.AreEqual("TEST2", schemaProcessActivityDtos[1].SchemaName);
+            Assert.AreEqual(2, schemaProcessActivityDtos[1].SchemaId);
+            Assert.AreEqual(1, schemaProcessActivityDtos[1].DatasetId);
+            Assert.AreEqual(1, schemaProcessActivityDtos[1].FileCount);
+            Assert.AreEqual(assertDateTime, schemaProcessActivityDtos[1].LastEventTime);
+
+            stubDataFlowMetricProvider.VerifyAll();
+            stubIDatasetContext.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetAllTotalFilesBySchema_MappedReturn()
+        {
+            //arrange
+            var stubDataFlowMetricProvider = new Mock<IDataFlowMetricProvider>();
+            var stubIDatasetContext = new Mock<IDatasetContext>();
+
+            DataFlowMetricService dataFlowMetricService = new DataFlowMetricService(stubDataFlowMetricProvider.Object, stubIDatasetContext.Object);
+
+            stubDataFlowMetricProvider.Setup(x => x.GetAllTotalFilesBySchema(It.IsAny<int>())).Returns(GetElasticDataFlowMetricList());
+
+            DateTime assertDateTime = new DateTime(2023, 6, 6, 12, 35, 0);
+
+            //act
+            List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = dataFlowMetricService.GetAllTotalFilesBySchema(1);
+
+            //assert
+            Assert.AreEqual("fileName", datasetFileProcessActivityDtos[0].FileName);
+            Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[0].FlowExecutionGuid);
+            Assert.AreEqual(0, datasetFileProcessActivityDtos[0].LastFlowStep);
+            Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[0].LastEventTime);
+
+            Assert.AreEqual("fileName", datasetFileProcessActivityDtos[1].FileName);
+            Assert.AreEqual("executionGuid", datasetFileProcessActivityDtos[1].FlowExecutionGuid);
+            Assert.AreEqual(0, datasetFileProcessActivityDtos[1].LastFlowStep);
+            Assert.AreEqual(assertDateTime, datasetFileProcessActivityDtos[1].LastEventTime);
+
+            stubDataFlowMetricProvider.VerifyAll();
+            stubIDatasetContext.VerifyAll();
+        }
+
+        [TestMethod]
         public void GetDataFlowMetrics_MappedReturn()
         {
             //arrange
@@ -283,7 +433,7 @@ namespace Sentry.data.Infrastructure.Tests
                 SchemaId = 1
             };
 
-            stubIElasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<Func<Nest.SearchDescriptor<DataFlowMetric>, ISearchRequest>>())).ReturnsAsync(GetDataFlowMetricList);
+            stubIElasticDocumentClient.Setup(x => x.SearchAsync(It.IsAny<Func<Nest.SearchDescriptor<DataFlowMetric>, ISearchRequest>>())).ReturnsAsync(GetElasticDataFlowMetricList);
 
             DataFlowMetricProvider stubDataFlowMetricProvider = new DataFlowMetricProvider(stubIElasticDocumentClient.Object);
 
@@ -296,11 +446,13 @@ namespace Sentry.data.Infrastructure.Tests
             stubIElasticDocumentClient.VerifyAll();
         }
 
-        private ElasticResult<DataFlowMetric> GetDataFlowMetricList()
+        private ElasticResult<DataFlowMetric> GetElasticDataFlowMetricList()
         {
-            return new ElasticResult<DataFlowMetric>()
+            DateTime assertDateTime = new DateTime(2023, 6, 6, 12, 35, 0);
+
+            return new ElasticResult<DataFlowMetric>
             {
-                SearchTotal = 1,
+                SearchTotal = 2,
                 Documents = new List<DataFlowMetric>()
                 {
                     new DataFlowMetric()
@@ -328,7 +480,7 @@ namespace Sentry.data.Infrastructure.Tests
                         FileCreatedDateTime = DateTime.Now,
                         FileName = "fileName",
                         SaidKeyCode = "keyCode",
-                        EventMetricCreatedDateTime = DateTime.Now,
+                        EventMetricCreatedDateTime = assertDateTime,
                         DatasetFileId = 1,
                         ProcessStartDateTime = DateTime.Now,
                         StatusCode = "statusCode"
@@ -358,12 +510,32 @@ namespace Sentry.data.Infrastructure.Tests
                         FileCreatedDateTime = DateTime.Now,
                         FileName = "fileName",
                         SaidKeyCode = "keyCode",
-                        EventMetricCreatedDateTime = DateTime.Now,
+                        EventMetricCreatedDateTime = assertDateTime,
                         DatasetFileId = 2,
                         ProcessStartDateTime = DateTime.Now,
                         StatusCode = "statusCode"
                     }
-        }
+                },
+                Aggregations = new AggregateDictionary(new Dictionary<string, IAggregate>
+                {
+                    [FilterCategoryNames.DataFlowMetric.DOCCOUNT] = new BucketAggregate()
+                    {
+                        SumOtherDocCount = 0,
+                        Items = new List<KeyedBucket<object>>
+                        {
+                            new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                            {
+                                DocCount = 1,
+                                Key = "1"
+                            },
+                            new KeyedBucket<object>(new Dictionary<string, IAggregate>())
+                            {
+                                DocCount = 1,
+                                Key = "2"
+                            }
+                        }.AsReadOnly()
+                    }
+                })
             };
         }
     }

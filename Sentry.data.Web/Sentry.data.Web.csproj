@@ -612,8 +612,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ApiCommonDependency.cs" />
     <Compile Include="API\AutoMapperHelper.cs" />
     <Compile Include="API\DefaultProfile.cs" />
+    <Compile Include="API\Resources\Assistance\AddAssistance\AddAssistanceRequestModel.cs" />
+    <Compile Include="API\Resources\Assistance\AddAssistance\AddAssistanceRequestValidator.cs" />
+    <Compile Include="API\Resources\Assistance\AddAssistance\AddAssistanceResponseModel.cs" />
+    <Compile Include="API\Resources\Assistance\AssistanceController.cs" />
+    <Compile Include="API\Resources\Assistance\AssistanceProfile.cs" />
     <Compile Include="API\Resources\Dataset\AddDataset\AddDatasetRequestModel.cs" />
     <Compile Include="API\Resources\Dataset\BaseDatasetRequestValidator.cs" />
     <Compile Include="API\Resources\Dataset\DatasetProfile.cs" />
@@ -693,6 +699,7 @@
     <Compile Include="Controllers\WebApi\DataFileController.cs" />
     <Compile Include="Controllers\WebApi\DataFlowController.cs" />
     <Compile Include="Controllers\WebApi\DataSourceController.cs" />
+    <Compile Include="Extensions\ProcessActivityExtensions.cs" />
     <Compile Include="Extensions\AuditExtensions.cs" />
     <Compile Include="Extensions\DataSourceTokenExtension.cs" />
     <Compile Include="Extensions\DeadSparkJobExtensions.cs" />
@@ -1410,6 +1417,10 @@
     <TypeScriptCompile Include="src\prettycron.ts" />
     <TypeScriptCompile Include="src\quill.ts" />
     <TypeScriptCompile Include="src\site.ts" />
+    <TypeScriptCompile Include="src\ts\Dataset\Authorization\SecurityTicketSimple.d.ts" />
+    <TypeScriptCompile Include="src\ts\Global.d.ts" />
+    <TypeScriptCompile Include="src\ts\Common.ts" />
+    <TypeScriptCompile Include="src\ts\Dataset\Authorization\DatasetAuthorization.ts" />
     <TypeScriptCompile Include="webpack.config.ts" />
   </ItemGroup>
   <PropertyGroup>

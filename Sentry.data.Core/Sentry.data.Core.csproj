@@ -334,6 +334,8 @@
     <Compile Include="DomainServices\SampleService\SampleDomainService.cs" />
     <Compile Include="DomainServices\SchemaFlowService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
+    <Compile Include="DTO\Assistance\AddAssistanceDto.cs" />
+    <Compile Include="DTO\Assistance\AddAssistanceResultDto.cs" />
     <Compile Include="DTO\AuditDto.cs" />
     <Compile Include="DTO\BaseAuditDto.cs" />
     <Compile Include="DTO\Admin\SupportLinkDto.cs" />
@@ -343,7 +345,11 @@
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFileFlowMetricsDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchAggregateDto.cs" />
     <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchDto.cs" />
+    <Compile Include="DTO\Admin\DatasetProcessActivityDto.cs" />
+    <Compile Include="DTO\Admin\DatasetFileProcessActivityDto.cs" />
+    <Compile Include="DTO\Admin\SchemaProcessActivityDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryAssetCategoriesDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryCategoryDto.cs" />
     <Compile Include="DTO\DataInventory\DataInventoryEventableDto.cs" />
@@ -433,6 +439,7 @@
     <Compile Include="DTO\Security\AdSecurityGroupEnvironmentType.cs" />
     <Compile Include="DTO\Security\AdSecurityGroupType.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="DTO\DataFlowMetric\DataFlowMetricSearchResultDto.cs" />
     <Compile Include="Entities\DataFlowMetrics\DataFlowMetric.cs" />
     <Compile Include="Entities\Admin\SupportLink.cs" />
     <Compile Include="Entities\DataInventory\DataInventory.cs" />
@@ -662,6 +669,7 @@
     <Compile Include="Entities\Search\SearchHighlightable.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetAdminService.cs" />
     <Compile Include="Interfaces\GlobalDataset\IGlobalDatasetSearchService.cs" />
+    <Compile Include="Interfaces\IAssistanceService.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />

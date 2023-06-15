@@ -12,7 +12,7 @@ CASE WHEN FORMAT(MAX(CreateDTM),'yyyy-MM-dd') BETWEEN FORMAT(DATEADD(DAY,-7,GETD
 THEN  'Y'
 ELSE 'N'
 END as Success_IND
-FROM DatasetFileConverted DFC JOIN Dataset D on d.Dataset_ID = DFC.DatasetID
+FROM DatasetFileParquet DFC JOIN Dataset D on d.Dataset_ID = DFC.DatasetID
 JOIN [schema] s on dfc.SchemaID = s.Schema_Id
 JOIN DatasetCategory DC on D.Dataset_ID = DC.Dataset_ID
 JOIN Category C on DC.Category_ID = C.ID

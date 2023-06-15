@@ -194,6 +194,7 @@ namespace Sentry.data.Core
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
             result.DatasetId = ds.DatasetId;
             result.DatasetName = ds.DatasetName;
+            result.DatasetNamedEnvironment = ds.NamedEnvironment;
             result.DatasetSaidKeyCode = ds.Asset.SaidKeyCode;
             result.Permissions = _securityService.GetSecurablePermissions(ds);
             result.Approvers = _saidService.GetApproversByKeyCodeAsync(ds.Asset.SaidKeyCode).Result;
@@ -1066,7 +1067,7 @@ namespace Sentry.data.Core
             dto.TagIds = new List<string>();
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.CategoryName = ds.DatasetCategories.First().Name;
-            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + GetUrl(ds.DatasetId);
+            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "%20(" + ds.NamedEnvironment + ")&body=%0D%0A" + GetUrl(ds.DatasetId);
             dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
             dto.SAIDAssetKeyCode = ds.Asset.SaidKeyCode;
             dto.NamedEnvironment = ds.NamedEnvironment;

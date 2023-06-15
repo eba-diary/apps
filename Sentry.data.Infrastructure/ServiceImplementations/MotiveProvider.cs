@@ -86,7 +86,7 @@ namespace Sentry.data.Infrastructure
         [DisplayName("Motive Backfill Job")]   /* Used for displaying useful name in hangfire */
         public void EnqueueBackfillBackgroundJob(DataSourceToken toBackfill)
         {
-            _backgroundJobClient.Enqueue<MotiveProvider>(x => x.MotiveTokenBackfill(toBackfill));
+            _backgroundJobClient.Enqueue<MotiveProvider>(x => x.MotiveTokenBackfill(toBackfill, DateTime.Today.AddYears(-1)));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="tokenToBackfill">Token we want load data for.</param>
         /// <returns></returns>
-        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill)
+        public bool MotiveTokenBackfill(DataSourceToken tokenToBackfill, DateTime dateToBackfill)
         {
             try
             {
@@ -105,6 +105,7 @@ namespace Sentry.data.Infrastructure
                 var jobs = _datasetContext.Jobs.Where(j => schemaIdList.Contains(j.FileSchema.SchemaId) && !j.FileSchema.CreateCurrentView && j.IsEnabled).ToList();
 
                 HTTPSSource source = _datasetContext.GetById<HTTPSSource>(int.Parse(Config.GetHostSetting("MotiveDataSourceId")));
+                source.RequestHeaders = new List<RequestHeader>();
                 
                 //Disable all other tokens and make a list to enable them again later
                 List<int> tokensToEnable = new List<int>();
@@ -115,22 +116,49 @@ namespace Sentry.data.Infrastructure
                 }
 
                 tokenToBackfill.Enabled = true;
+                source.AllTokens.First(t => t.Id == tokenToBackfill.Id).Enabled = true;
+
+                foreach (var job in jobs)
+                {
+                    job.DataSource = source; //manually set the source to avoid nhibernate supplying a DS proxy instead
+                }
 
                 try
                 {
+                    string jobDateValue = dateToBackfill.ToString("yyyy-MM-dd");
                     //change start date and trigger jobs
                     foreach (var job in jobs)
                     {
                         Common.Logging.Logger.Info($"Attempting backfill of {job.DataFlow.Name} on token {tokenToBackfill}");
-                        var dateParameter = job.RequestVariables.First(rv => rv.VariableName == "dateValue");
-                        var currentDateValue = dateParameter.VariableValue; //hold onto old value
-                        dateParameter.VariableValue = Config.GetHostSetting("MotiveBackfillDate");
+
+                        var currentDateValue = job.RequestVariables.First(rv => rv.VariableName == "dateValue").VariableValue;
+
+                        var backfillDateParameter = new RequestVariable
+                        {
+                            VariableName = "dateValue",
+                            VariableValue = jobDateValue,
+                            VariableIncrementType = RequestVariableIncrementType.DailyExcludeToday
+                        };
+
+                        var otherRequestVariables = job.RequestVariables.Where(rv => rv.VariableName != "dateValue").ToList();
+
+                        otherRequestVariables.Add(backfillDateParameter);
+
+                        job.RequestVariables = otherRequestVariables;
+
                         _backfillJobProvider.Execute(job);
+
                         //reset retriever job param
-                        dateParameter.VariableValue = currentDateValue;
+                        otherRequestVariables = otherRequestVariables.Where(rv => rv.VariableName != "dateValue").ToList();
+
+                        backfillDateParameter.VariableValue = currentDateValue;
+
+                        otherRequestVariables.Add(backfillDateParameter);
+
+                        job.RequestVariables = otherRequestVariables;
                     }
 
-                    tokenToBackfill.BackfillComplete = true;
+                    source.AllTokens.First(t => t.Id == tokenToBackfill.Id).BackfillComplete = true;
                 }
                 catch (Exception e) //Catch error here so we continue on to restore tokens. 
                 {

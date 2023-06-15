@@ -11,8 +11,8 @@ namespace Sentry.data.Web.Models.AdminPage
 
         public int DatasetId { get; set; }
 
-        public int FileCount { get; set; }
+        public long FileCount { get; set; }
 
-        public DateTime RecentRun { get; set; }
+        public DateTime LastEventTime { get; set; }
     }
 }

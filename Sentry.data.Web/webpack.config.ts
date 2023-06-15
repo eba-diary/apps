@@ -1,5 +1,6 @@
 ﻿import * as path from 'path';
 import * as webpack from 'webpack';
+import * as glob from 'glob';
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import * as CopyWebpackPlugin from 'copy-webpack-plugin';
@@ -21,6 +22,7 @@ function config(env, argv): webpack.Configuration {
             'quill_css': './src/quill.scss',
             'fancybox': './src/fancybox.ts',
             'fancybox_css': './src/fancybox.scss',
+            ...getPageEntryPoints()
         },
         output: {
             clean: true,
@@ -41,7 +43,7 @@ function config(env, argv): webpack.Configuration {
                 patterns: [
                     { from: 'node_modules/@sentry-insurance/InternalFrontendTemplate/Images', to: 'images' }
                 ]
-            })
+            }),
         ],
         optimization: {
             minimizer: [
@@ -68,8 +70,16 @@ function config(env, argv): webpack.Configuration {
                 },
                 {   // support for *.ts files
                     test: /\.ts$/,
-                    use: ['ts-loader'],
-                    exclude: /node_modules/,
+                    use: [
+                        {
+                            loader: 'ts-loader',
+                        }
+                    ],
+                    exclude: /node_modules|\.d\.ts$/,
+                },
+                {
+                    test: /\.d\.ts$/,
+                    loader: 'ignore-loader'
                 },
                 {
                     // expose dateSelect function in yadcf
@@ -91,10 +101,30 @@ function config(env, argv): webpack.Configuration {
                 //    Module not found: Error: Can't resolve '/fonts/SourceCodePro/SourceSerifPro-Regular.woff' 
                 '../img': '@sentry-insurance/mdbootstrap/img',
                 '/fonts': '../fonts',
-            }
+                'VueUtil': path.resolve(__dirname, 'src/ts/VueUtil.ts')
+            },
+            modules: [path.resolve(__dirname), 'node_modules']
         }
     }
+}
 
+function getPageEntryPoints() {
+    let entryObjects = {};
+    AddEntryPoints('./Components/**/*.ts', '.ts', entryObjects);
+    AddEntryPoints('./src/ts/**/*.ts', '.ts', entryObjects);
+    return entryObjects;
+}
+
+function AddEntryPoints(globPattern: string, suffix: string, entryObjects: any) {
+    let regEx = /\//g;
+    const files = glob.sync(globPattern);
+    for (const fileName of files) {
+        //filename = ./Components/CompName/CompName.ts
+        const key = fileName.substring(8).replace(regEx, '.').replace(suffix, '').split('.').at(-1);
+        //key = CompName
+        entryObjects[key] = { import: fileName, library: { name: ['Data'], type: 'var' }, dependOn: 'main' };
+
+    }
 }
 
 export default config;

@@ -1,0 +1,3099 @@
+{
+  "maxResults": 50,
+  "startAt": 0,
+  "total": 22,
+  "isLast": true,
+  "values": [
+    {
+      "required": false,
+      "schema": {
+        "type": "user",
+        "system": "assignee"
+      },
+      "name": "Assignee",
+      "fieldId": "assignee",
+      "autoCompleteUrl": "https://jira.sentry.com/rest/api/latest/user/assignable/search?issueKey=null&username=",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "attachment",
+        "system": "attachment"
+      },
+      "name": "Attachment",
+      "fieldId": "attachment",
+      "hasDefaultValue": false,
+      "operations": []
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "component",
+        "system": "components"
+      },
+      "name": "Component/s",
+      "fieldId": "components",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://jira.sentry.com/rest/api/2/component/17609",
+          "id": "17609",
+          "name": "DataArchitectsSplatteringCode"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/component/20800",
+          "id": "20800",
+          "name": "Lake Effect",
+          "description": "Team SHO+1"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/component/34000",
+          "id": "34000",
+          "name": "LakeWatch",
+          "description": "Team Madison"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/component/17800",
+          "id": "17800",
+          "name": "StratoSurfers"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/component/19705",
+          "id": "19705",
+          "name": "theStateStreetCrewSuite2"
+        }
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "number",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:float",
+        "customId": 10002
+      },
+      "name": "Story Points",
+      "fieldId": "customfield_10002",
+      "hasDefaultValue": true,
+      "operations": [
+        "set"
+      ],
+      "defaultValue": 0.0
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "string",
+        "custom": "com.pyxis.greenhopper.jira:gh-sprint",
+        "customId": 10005
+      },
+      "name": "Sprint",
+      "fieldId": "customfield_10005",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "any",
+        "custom": "com.pyxis.greenhopper.jira:gh-epic-link",
+        "customId": 10006
+      },
+      "name": "Epic Link",
+      "fieldId": "customfield_10006",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:textarea",
+        "customId": 10303
+      },
+      "name": "Resolution Description",
+      "fieldId": "customfield_10303",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "date",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:datepicker",
+        "customId": 13601
+      },
+      "name": "Constraint Date",
+      "fieldId": "customfield_13601",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "string",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:labels",
+        "customId": 16303
+      },
+      "name": "Environment(s)",
+      "fieldId": "customfield_16303",
+      "autoCompleteUrl": "https://jira.sentry.com/rest/api/1.0/labels/null/suggest?customFieldId=16303&query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "string",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:labels",
+        "customId": 16306
+      },
+      "name": "Environment Type",
+      "fieldId": "customfield_16306",
+      "autoCompleteUrl": "https://jira.sentry.com/rest/api/1.0/labels/null/suggest?customFieldId=16306&query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "option",
+        "custom": "com.atlassian.jira.plugin.system.customfieldtypes:radiobuttons",
+        "customId": 16307
+      },
+      "name": "Acceptance Required",
+      "fieldId": "customfield_16307",
+      "hasDefaultValue": true,
+      "operations": [
+        "set"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://jira.sentry.com/rest/api/2/customFieldOption/32972",
+          "value": "Yes",
+          "id": "32972",
+          "disabled": false
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/customFieldOption/32973",
+          "value": "No",
+          "id": "32973",
+          "disabled": false
+        }
+      ],
+      "defaultValue": {
+        "self": "https://jira.sentry.com/rest/api/2/customFieldOption/32973",
+        "value": "No",
+        "id": "32973",
+        "disabled": false
+      }
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "string",
+        "system": "description"
+      },
+      "name": "Description",
+      "fieldId": "description",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "date",
+        "system": "duedate"
+      },
+      "name": "Due Date",
+      "fieldId": "duedate",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "version",
+        "system": "fixVersions"
+      },
+      "name": "Fix Version/s",
+      "fieldId": "fixVersions",
+      "hasDefaultValue": false,
+      "operations": [
+        "set",
+        "add",
+        "remove"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53513",
+          "id": "53513",
+          "name": "Not Applicable",
+          "archived": false,
+          "released": false,
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/22002",
+          "id": "22002",
+          "name": "DSC 19.03.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-03-13",
+          "userReleaseDate": "03/13/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/22010",
+          "id": "22010",
+          "name": "DSC 19.03.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-03-19",
+          "userReleaseDate": "03/19/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/20657",
+          "id": "20657",
+          "name": "DSC 19.01.14",
+          "archived": false,
+          "released": true,
+          "startDate": "2019-01-11",
+          "releaseDate": "2019-01-14",
+          "userStartDate": "01/11/2019",
+          "userReleaseDate": "01/14/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/20814",
+          "id": "20814",
+          "name": "Portal Req 257448",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-02-14",
+          "userReleaseDate": "02/14/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/20815",
+          "id": "20815",
+          "description": "BI UI Release",
+          "name": "DSC 19.01.24",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-01-25",
+          "userReleaseDate": "01/25/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/20713",
+          "id": "20713",
+          "description": "Interactive Query : GA & BI Portal",
+          "name": "DSC 19.02.14",
+          "archived": false,
+          "released": true,
+          "startDate": "2019-01-01",
+          "releaseDate": "2019-02-14",
+          "userStartDate": "01/01/2019",
+          "userReleaseDate": "02/14/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/21111",
+          "id": "21111",
+          "description": "Security Release",
+          "name": "DSC 19.02.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-02-21",
+          "userReleaseDate": "02/21/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/21317",
+          "id": "21317",
+          "name": "DSC 19.02.18",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-02-18",
+          "userReleaseDate": "02/18/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/21125",
+          "id": "21125",
+          "name": "DSC 19.02.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-02-18",
+          "userReleaseDate": "02/18/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/21321",
+          "id": "21321",
+          "name": "DSC 19.02.27",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-02-27",
+          "userReleaseDate": "02/27/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/21403",
+          "id": "21403",
+          "name": "DSC 19.03.27",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-03-27",
+          "userReleaseDate": "03/27/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/21919",
+          "id": "21919",
+          "name": "DSC 19.04.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-04-05",
+          "userReleaseDate": "04/05/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/22819",
+          "id": "22819",
+          "name": "DSC 19.04.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-04-10",
+          "userReleaseDate": "04/10/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23701",
+          "id": "23701",
+          "description": "Claim IQ /Mitchell Files",
+          "name": "DSC 19.05.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-05-05",
+          "userReleaseDate": "05/05/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23621",
+          "id": "23621",
+          "name": "DSC 19.05.08",
+          "archived": false,
+          "released": true,
+          "startDate": "2019-05-06",
+          "releaseDate": "2019-05-10",
+          "userStartDate": "05/06/2019",
+          "userReleaseDate": "05/10/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/22821",
+          "id": "22821",
+          "name": "DSC 19.05.15 TEST Release",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-05-15",
+          "userReleaseDate": "05/15/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23817",
+          "id": "23817",
+          "name": "DSC 19.05.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-05-15",
+          "userReleaseDate": "05/15/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/22743",
+          "id": "22743",
+          "description": "Cluster Security",
+          "name": "DSC 19.05.22",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-05-22",
+          "userReleaseDate": "05/22/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23648",
+          "id": "23648",
+          "name": "DSC 19.06.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-06-05",
+          "userReleaseDate": "06/05/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23649",
+          "id": "23649",
+          "name": "DSC 19.06.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-06-12",
+          "userReleaseDate": "06/12/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23930",
+          "id": "23930",
+          "name": "DSC 19.06.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-06-14",
+          "userReleaseDate": "06/14/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23650",
+          "id": "23650",
+          "name": "DSC 19.06.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-06-19",
+          "userReleaseDate": "06/19/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/23651",
+          "id": "23651",
+          "name": "DSC 19.06.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-06-26",
+          "userReleaseDate": "06/26/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/24470",
+          "id": "24470",
+          "name": "DSC 19.07.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-07-17",
+          "userReleaseDate": "07/17/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/24471",
+          "id": "24471",
+          "name": "DSC 19.07.31",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-07-31",
+          "userReleaseDate": "07/31/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/26429",
+          "id": "26429",
+          "name": "DSC 19.08.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-08-02",
+          "userReleaseDate": "08/02/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/26600",
+          "id": "26600",
+          "name": "DSC 19.08.07",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-08-07",
+          "userReleaseDate": "08/07/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/26275",
+          "id": "26275",
+          "name": "DSC 19.08.21",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-08-21",
+          "userReleaseDate": "08/21/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/26801",
+          "id": "26801",
+          "name": "DSC 19.08.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-08-28",
+          "userReleaseDate": "08/28/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/26912",
+          "id": "26912",
+          "description": "Cherwell Prod Integration",
+          "name": "DSC 19.09.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-09-08",
+          "userReleaseDate": "09/08/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/26839",
+          "id": "26839",
+          "name": "DSC 19.09.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-09-11",
+          "userReleaseDate": "09/11/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27052",
+          "id": "27052",
+          "name": "DSC 19.09.18",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-09-18",
+          "userReleaseDate": "09/18/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27022",
+          "id": "27022",
+          "name": "DSC 19.09.25",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-09-25",
+          "userReleaseDate": "09/25/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27108",
+          "id": "27108",
+          "name": "DSC 19.09.30",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-09-30",
+          "userReleaseDate": "09/30/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27101",
+          "id": "27101",
+          "name": "DSC 19.10.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-10-10",
+          "userReleaseDate": "10/10/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27143",
+          "id": "27143",
+          "name": "DSC 19.10.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-10-11",
+          "userReleaseDate": "10/11/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27242",
+          "id": "27242",
+          "name": "DSC 19.10.16",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-10-16",
+          "userReleaseDate": "10/16/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27156",
+          "id": "27156",
+          "name": "DSC 19.10.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-10-17",
+          "userReleaseDate": "10/17/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/29302",
+          "id": "29302",
+          "name": "DSC 19.10.18",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-10-18",
+          "userReleaseDate": "10/18/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/27243",
+          "id": "27243",
+          "name": "DSC 19.11.06",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-06",
+          "userReleaseDate": "11/06/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/30457",
+          "id": "30457",
+          "name": "DSC 19.11.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-08",
+          "userReleaseDate": "11/08/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/30518",
+          "id": "30518",
+          "name": "DSC 19.11.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-12",
+          "userReleaseDate": "11/12/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/30340",
+          "id": "30340",
+          "name": "DSC 19.11.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-13",
+          "userReleaseDate": "11/13/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/30904",
+          "id": "30904",
+          "name": "DSC 19.11.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-15",
+          "userReleaseDate": "11/15/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/31145",
+          "id": "31145",
+          "description": "Claim IQ Updates",
+          "name": "DSC 19.11.22",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-22",
+          "userReleaseDate": "11/22/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/31138",
+          "id": "31138",
+          "name": "DSC 19.11.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-11-26",
+          "userReleaseDate": "11/26/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/31304",
+          "id": "31304",
+          "name": "DSC 19.12.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-12-05",
+          "userReleaseDate": "12/05/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/31802",
+          "id": "31802",
+          "name": "DSC 19.12.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-12-11",
+          "userReleaseDate": "12/11/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/32232",
+          "id": "32232",
+          "name": "DSC 19.12.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2019-12-19",
+          "userReleaseDate": "12/19/2019",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/32132",
+          "id": "32132",
+          "name": "DSC 20.01.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-01-08",
+          "userReleaseDate": "01/08/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/32528",
+          "id": "32528",
+          "name": "DSC 20.01.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-01-13",
+          "userReleaseDate": "01/13/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33303",
+          "id": "33303",
+          "name": "DSC 20.01.30",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-01-30",
+          "userReleaseDate": "01/30/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33471",
+          "id": "33471",
+          "name": "DSC 20.02.06",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-02-06",
+          "userReleaseDate": "02/06/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33513",
+          "id": "33513",
+          "name": "DSC 20.02.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-02-17",
+          "userReleaseDate": "02/17/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33520",
+          "id": "33520",
+          "name": "DSC 20.02.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-02-20",
+          "userReleaseDate": "02/20/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33514",
+          "id": "33514",
+          "name": "DSC 20.02.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-02-26",
+          "userReleaseDate": "02/26/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33920",
+          "id": "33920",
+          "name": "DSC 20.03.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-03-02",
+          "userReleaseDate": "03/02/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/33825",
+          "id": "33825",
+          "name": "DSC 20.03.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-03-11",
+          "userReleaseDate": "03/11/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/34043",
+          "id": "34043",
+          "name": "DSC 20.03.25",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-03-25",
+          "userReleaseDate": "03/25/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/34607",
+          "id": "34607",
+          "name": "DSC 20.03.31",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-03-31",
+          "userReleaseDate": "03/31/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/34705",
+          "id": "34705",
+          "name": "DSC 20.04.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-04-08",
+          "userReleaseDate": "04/08/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/34912",
+          "id": "34912",
+          "name": "DSC 20.04.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-04-15",
+          "userReleaseDate": "04/15/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/34911",
+          "id": "34911",
+          "name": "DSC 20.04.29",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-04-29",
+          "userReleaseDate": "04/29/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35341",
+          "id": "35341",
+          "name": "DSC 20.05.07",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-05-07",
+          "userReleaseDate": "05/07/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35604",
+          "id": "35604",
+          "name": "DSC 20.05.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-05-14",
+          "userReleaseDate": "05/14/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35930",
+          "id": "35930",
+          "name": "DSC 20.05.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-05-28",
+          "userReleaseDate": "05/28/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35837",
+          "id": "35837",
+          "name": "DSC 20.06.03",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-06-03",
+          "userReleaseDate": "06/03/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35943",
+          "id": "35943",
+          "name": "DSC 20.06.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-06-10",
+          "userReleaseDate": "06/10/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35869",
+          "id": "35869",
+          "name": "DSC 20.06.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-06-17",
+          "userReleaseDate": "06/17/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/35870",
+          "id": "35870",
+          "name": "DSC 20.06.24",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-06-24",
+          "userReleaseDate": "06/24/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/36132",
+          "id": "36132",
+          "name": "DSC 20.07.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-07-08",
+          "userReleaseDate": "07/08/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/36158",
+          "id": "36158",
+          "name": "DSC 20.07.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-07-20",
+          "userReleaseDate": "07/20/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/36134",
+          "id": "36134",
+          "name": "DSC 20.07.29",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-07-29",
+          "userReleaseDate": "07/29/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/36135",
+          "id": "36135",
+          "name": "DSC 20.08.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-08-12",
+          "userReleaseDate": "08/12/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/36136",
+          "id": "36136",
+          "name": "DSC 20.08.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-08-26",
+          "userReleaseDate": "08/26/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/36802",
+          "id": "36802",
+          "name": "DSC 20.08.29",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-08-29",
+          "userReleaseDate": "08/29/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37226",
+          "id": "37226",
+          "name": "DSC 20.09.04",
+          "archived": false,
+          "released": true,
+          "startDate": "2020-09-04",
+          "releaseDate": "2020-09-04",
+          "userStartDate": "09/04/2020",
+          "userReleaseDate": "09/04/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37236",
+          "id": "37236",
+          "name": "DSC 20.09.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-09-10",
+          "userReleaseDate": "09/10/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37243",
+          "id": "37243",
+          "name": "DSC 20.09.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-09-15",
+          "userReleaseDate": "09/15/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37527",
+          "id": "37527",
+          "name": "DSC 20.09.30",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-09-30",
+          "userReleaseDate": "09/30/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37506",
+          "id": "37506",
+          "name": "DSC 20.10.07",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-10-07",
+          "userReleaseDate": "10/07/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37825",
+          "id": "37825",
+          "name": "DSC 20.10.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-10-12",
+          "userReleaseDate": "10/12/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/37827",
+          "id": "37827",
+          "name": "DSC 20.10.14",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-10-14",
+          "userReleaseDate": "10/14/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38206",
+          "id": "38206",
+          "name": "DSC 20.10.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-10-28",
+          "userReleaseDate": "10/28/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38212",
+          "id": "38212",
+          "name": "DSC 20.11.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-11-02",
+          "userReleaseDate": "11/02/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38231",
+          "id": "38231",
+          "name": "DSC 20.11.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-11-12",
+          "userReleaseDate": "11/12/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38382",
+          "id": "38382",
+          "name": "DSC 20.11.18",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-11-18",
+          "userReleaseDate": "11/18/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38509",
+          "id": "38509",
+          "name": "DSC 20.11.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-11-19",
+          "userReleaseDate": "11/19/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38515",
+          "id": "38515",
+          "name": "DSC 20.11.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-11-20",
+          "userReleaseDate": "11/20/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38383",
+          "id": "38383",
+          "name": "DSC 20.11.30",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-11-30",
+          "userReleaseDate": "11/30/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38623",
+          "id": "38623",
+          "name": "DSC 20.12.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-12-02",
+          "userReleaseDate": "12/02/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38610",
+          "id": "38610",
+          "name": "DSC 20.12.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-12-10",
+          "userReleaseDate": "12/10/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38858",
+          "id": "38858",
+          "name": "DSC 20.12.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2020-12-15",
+          "userReleaseDate": "12/15/2020",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39052",
+          "id": "39052",
+          "name": "DSC 21.01.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-01-05",
+          "userReleaseDate": "01/05/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39067",
+          "id": "39067",
+          "name": "DSC 21.01.07",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-01-07",
+          "userReleaseDate": "01/07/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38840",
+          "id": "38840",
+          "name": "DSC 21.01.14",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-01-14",
+          "userReleaseDate": "01/14/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/38841",
+          "id": "38841",
+          "name": "DSC 21.01.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-01-28",
+          "userReleaseDate": "01/28/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39437",
+          "id": "39437",
+          "name": "DSC 21.02.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-02-02",
+          "userReleaseDate": "02/02/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39441",
+          "id": "39441",
+          "name": "DSC 21.02.03",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-02-03",
+          "userReleaseDate": "02/03/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39459",
+          "id": "39459",
+          "name": "DSC 21.02.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-02-15",
+          "userReleaseDate": "02/15/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39474",
+          "id": "39474",
+          "name": "DSC 21.02.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-02-17",
+          "userReleaseDate": "02/17/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39389",
+          "id": "39389",
+          "name": "DSC 21.03.01",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-03-01",
+          "userReleaseDate": "03/01/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39825",
+          "id": "39825",
+          "name": "DSC 21.03.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-03-10",
+          "userReleaseDate": "03/10/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39664",
+          "id": "39664",
+          "name": "DSC 21.03.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-03-11",
+          "userReleaseDate": "03/11/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/39928",
+          "id": "39928",
+          "name": "DSC 21.03.16",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-03-16",
+          "userReleaseDate": "03/16/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/40138",
+          "id": "40138",
+          "name": "DSC 21.04.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-04-08",
+          "userReleaseDate": "04/08/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/40404",
+          "id": "40404",
+          "name": "DSC 21.04.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-04-28",
+          "userReleaseDate": "04/28/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/40945",
+          "id": "40945",
+          "name": "DSC 21.04.29",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-04-29",
+          "userReleaseDate": "04/29/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/40964",
+          "id": "40964",
+          "name": "DSC 21.05.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-05-13",
+          "userReleaseDate": "05/13/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41007",
+          "id": "41007",
+          "name": "DSC 21.05.14",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-05-14",
+          "userReleaseDate": "05/14/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41806",
+          "id": "41806",
+          "name": "DSC 21.05.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-05-20",
+          "userReleaseDate": "05/20/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41813",
+          "id": "41813",
+          "name": "DSC 21.05.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-05-26",
+          "userReleaseDate": "05/26/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41835",
+          "id": "41835",
+          "name": "DSC 21.06.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-06-02",
+          "userReleaseDate": "06/02/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41945",
+          "id": "41945",
+          "name": "DSC 21.06.09",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-06-09",
+          "userReleaseDate": "06/09/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41941",
+          "id": "41941",
+          "name": "DSC 21.06.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-06-10",
+          "userReleaseDate": "06/10/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/41947",
+          "id": "41947",
+          "name": "DSC 21.06.23",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-06-23",
+          "userReleaseDate": "06/23/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/42414",
+          "id": "42414",
+          "name": "DSC 21.07.06",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-07-06",
+          "userReleaseDate": "07/06/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/42042",
+          "id": "42042",
+          "name": "DSC 21.07.14",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-07-14",
+          "userReleaseDate": "07/14/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/42346",
+          "id": "42346",
+          "name": "DSC 21.07.21",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-07-21",
+          "userReleaseDate": "07/21/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/42810",
+          "id": "42810",
+          "name": "DSC 21.08.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-08-02",
+          "userReleaseDate": "08/02/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/42932",
+          "id": "42932",
+          "name": "DSC.21.08.09.259074",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-08-09",
+          "userReleaseDate": "08/09/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/42334",
+          "id": "42334",
+          "name": "DSC 21.08.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-08-11",
+          "userReleaseDate": "08/11/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43604",
+          "id": "43604",
+          "name": "DSC 21.08.23",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-08-23",
+          "userReleaseDate": "08/23/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43114",
+          "id": "43114",
+          "name": "DSC 21.08.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-08-26",
+          "userReleaseDate": "08/26/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43610",
+          "id": "43610",
+          "name": "DSC 21.09.01",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-09-01",
+          "userReleaseDate": "09/01/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43437",
+          "id": "43437",
+          "name": "DSC 21.09.09",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-09-09",
+          "userReleaseDate": "09/09/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43566",
+          "id": "43566",
+          "name": "DSC 21.09.14",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-09-14",
+          "userReleaseDate": "09/14/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43551",
+          "id": "43551",
+          "name": "DSC 21.09.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-09-15",
+          "userReleaseDate": "09/15/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43584",
+          "id": "43584",
+          "name": "DSC 21.09.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-09-20",
+          "userReleaseDate": "09/20/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/43700",
+          "id": "43700",
+          "name": "DSC 21.10.06",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-10-06",
+          "userReleaseDate": "10/06/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44101",
+          "id": "44101",
+          "name": "DSC 21.10.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-10-05",
+          "userReleaseDate": "10/05/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44116",
+          "id": "44116",
+          "name": "DSC 21.10.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-10-11",
+          "userReleaseDate": "10/11/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44613",
+          "id": "44613",
+          "name": "DSC 21.10.27",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-10-27",
+          "userReleaseDate": "10/27/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44622",
+          "id": "44622",
+          "name": "DSC 21.11.01",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-11-01",
+          "userReleaseDate": "11/01/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44709",
+          "id": "44709",
+          "name": "DSC 21.11.04",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-11-04",
+          "userReleaseDate": "11/04/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44735",
+          "id": "44735",
+          "name": "DSC 21.11.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-11-08",
+          "userReleaseDate": "11/08/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44734",
+          "id": "44734",
+          "name": "DSC 2.0.2",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-11-18",
+          "userReleaseDate": "11/18/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/44743",
+          "id": "44743",
+          "name": "DSC 2.0.3",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-12-08",
+          "userReleaseDate": "12/08/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/45609",
+          "id": "45609",
+          "name": "DSC 2.0.4",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2021-12-14",
+          "userReleaseDate": "12/14/2021",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/45610",
+          "id": "45610",
+          "name": "DSC 2.0.5",
+          "archived": false,
+          "released": true,
+          "startDate": "2022-01-05",
+          "releaseDate": "2022-01-05",
+          "userStartDate": "01/05/2022",
+          "userReleaseDate": "01/05/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46105",
+          "id": "46105",
+          "name": "DSC 2.0.6",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-01-19",
+          "userReleaseDate": "01/19/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46309",
+          "id": "46309",
+          "name": "DSC 2.0.7",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-01-19",
+          "userReleaseDate": "01/19/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46377",
+          "id": "46377",
+          "name": "CLA 22.0.7.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-01-24",
+          "userReleaseDate": "01/24/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46310",
+          "id": "46310",
+          "name": "DSC 2.0.8",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-01-26",
+          "userReleaseDate": "01/26/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46349",
+          "id": "46349",
+          "name": "DSC 2.0.9",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-02-02",
+          "userReleaseDate": "02/02/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46560",
+          "id": "46560",
+          "name": "DSC 2.0.9 HF1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-02-07",
+          "userReleaseDate": "02/07/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46612",
+          "id": "46612",
+          "description": "Description",
+          "name": "DSC 3.0.0",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-02-09",
+          "userReleaseDate": "02/09/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46613",
+          "id": "46613",
+          "name": "DSC 3.0.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-02-16",
+          "userReleaseDate": "02/16/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46614",
+          "id": "46614",
+          "name": "DSC 3.0.2",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-02-23",
+          "userReleaseDate": "02/23/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46743",
+          "id": "46743",
+          "name": "DSC 3.0.3",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-03-02",
+          "userReleaseDate": "03/02/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46744",
+          "id": "46744",
+          "name": "DSC 3.0.4",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-03-09",
+          "userReleaseDate": "03/09/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46745",
+          "id": "46745",
+          "name": "DSC 3.0.5",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-03-16",
+          "userReleaseDate": "03/16/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46746",
+          "id": "46746",
+          "name": "DSC 3.0.6",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-03-23",
+          "userReleaseDate": "03/23/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/46747",
+          "id": "46747",
+          "name": "DSC 3.0.7",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-03-30",
+          "userReleaseDate": "03/30/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47503",
+          "id": "47503",
+          "name": "DSC 3.0.8",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-04-06",
+          "userReleaseDate": "04/06/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48101",
+          "id": "48101",
+          "name": "DSC 3.0.8 HF1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-04-11",
+          "userReleaseDate": "04/11/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47504",
+          "id": "47504",
+          "name": "DSC 3.0.9",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-04-14",
+          "userReleaseDate": "04/14/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48104",
+          "id": "48104",
+          "name": "DSC 3.0.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-04-20",
+          "userReleaseDate": "04/20/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47903",
+          "id": "47903",
+          "description": "Bootstrap Updates Only",
+          "name": "DSC 3.1.0",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-04-27",
+          "userReleaseDate": "04/27/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47904",
+          "id": "47904",
+          "name": "DSC 3.1.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-05-04",
+          "userReleaseDate": "05/04/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48634",
+          "id": "48634",
+          "name": "DSC 3.1.1 HF 1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-05-09",
+          "userReleaseDate": "05/09/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47905",
+          "id": "47905",
+          "name": "DSC 3.1.2",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-05-11",
+          "userReleaseDate": "05/11/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47526",
+          "id": "47526",
+          "name": "DSC 3.1.3",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-05-18",
+          "userReleaseDate": "05/18/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47527",
+          "id": "47527",
+          "name": "DSC 3.1.4",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-06-01",
+          "userReleaseDate": "06/01/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/47528",
+          "id": "47528",
+          "name": "DSC 3.1.5",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-06-01",
+          "userReleaseDate": "06/01/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48709",
+          "id": "48709",
+          "name": "DSC 3.1.6",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-06-13",
+          "userReleaseDate": "06/13/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48710",
+          "id": "48710",
+          "name": "DSC 3.1.7",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-06-22",
+          "userReleaseDate": "06/22/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48711",
+          "id": "48711",
+          "name": "DSC 3.1.8",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-06-28",
+          "userReleaseDate": "06/28/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49314",
+          "id": "49314",
+          "name": "DSC 3.1.9",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-07-06",
+          "userReleaseDate": "07/06/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49915",
+          "id": "49915",
+          "name": "DSC 3.1.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-07-13",
+          "userReleaseDate": "07/13/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49916",
+          "id": "49916",
+          "name": "DSC 3.1.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-07-21",
+          "userReleaseDate": "07/21/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49917",
+          "id": "49917",
+          "name": "DSC 3.1.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-07-27",
+          "userReleaseDate": "07/27/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49946",
+          "id": "49946",
+          "name": "DSC 3.1.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-08-03",
+          "userReleaseDate": "08/03/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/48251",
+          "id": "48251",
+          "name": "N/A",
+          "archived": false,
+          "released": false,
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59948",
+          "id": "59948",
+          "name": "DSC DLPP 3.2.40",
+          "archived": false,
+          "released": false,
+          "startDate": "2023-06-28",
+          "userStartDate": "06/28/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59947",
+          "id": "59947",
+          "name": "DSC DATA 3.2.40",
+          "archived": false,
+          "released": false,
+          "startDate": "2023-06-28",
+          "userStartDate": "06/28/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59946",
+          "id": "59946",
+          "name": "DSC DLPP 3.2.39",
+          "archived": false,
+          "released": false,
+          "startDate": "2023-06-21",
+          "userStartDate": "06/21/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59945",
+          "id": "59945",
+          "name": "DSC DATA 3.2.39",
+          "archived": false,
+          "released": false,
+          "startDate": "2023-06-21",
+          "userStartDate": "06/21/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59414",
+          "id": "59414",
+          "name": "DSC DLPP 3.2.38",
+          "archived": false,
+          "released": false,
+          "releaseDate": "2023-06-14",
+          "overdue": false,
+          "userReleaseDate": "06/14/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59413",
+          "id": "59413",
+          "name": "DSC DATA 3.2.38",
+          "archived": false,
+          "released": false,
+          "releaseDate": "2023-06-14",
+          "overdue": false,
+          "userReleaseDate": "06/14/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59411",
+          "id": "59411",
+          "name": "DSC DATA 3.2.37",
+          "archived": false,
+          "released": false,
+          "releaseDate": "2023-06-07",
+          "overdue": false,
+          "userReleaseDate": "06/07/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59410",
+          "id": "59410",
+          "name": "DSC DLPP 3.2.36",
+          "archived": false,
+          "released": false,
+          "releaseDate": "2023-06-05",
+          "overdue": false,
+          "userReleaseDate": "06/05/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59409",
+          "id": "59409",
+          "name": "DSC DATA 3.2.36",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-31",
+          "userReleaseDate": "05/31/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59407",
+          "id": "59407",
+          "name": "DSC DATA 3.2.35",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-24",
+          "userReleaseDate": "05/24/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59406",
+          "id": "59406",
+          "name": "DSC DLPP 3.2.34",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-24",
+          "userReleaseDate": "05/24/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59405",
+          "id": "59405",
+          "name": "DSC DATA 3.2.34",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-17",
+          "userReleaseDate": "05/17/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59404",
+          "id": "59404",
+          "name": "DSC DLPP 3.2.33",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-10",
+          "userReleaseDate": "05/10/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59403",
+          "id": "59403",
+          "name": "DSC DATA 3.2.33",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-10",
+          "userReleaseDate": "05/10/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59402",
+          "id": "59402",
+          "name": "DSC DLPP 3.2.32",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-03",
+          "userReleaseDate": "05/03/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59401",
+          "id": "59401",
+          "name": "DSC DATA 3.2.32",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-03",
+          "userReleaseDate": "05/03/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57453",
+          "id": "57453",
+          "name": "DSC DATA 3.2.31",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-26",
+          "userReleaseDate": "04/26/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57452",
+          "id": "57452",
+          "name": "DSC DLPP 3.2.30",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-19",
+          "userReleaseDate": "04/19/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57451",
+          "id": "57451",
+          "name": "DSC DATA 3.2.30",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-19",
+          "userReleaseDate": "04/19/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57450",
+          "id": "57450",
+          "name": "DSC DLPP 3.2.29",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-12",
+          "userReleaseDate": "04/12/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57449",
+          "id": "57449",
+          "name": "DSC DATA 3.2.29",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-13",
+          "userReleaseDate": "04/13/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57806",
+          "id": "57806",
+          "name": "DSC LAMBDA 3.2.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-02",
+          "userReleaseDate": "04/02/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57447",
+          "id": "57447",
+          "name": "DSC DATA 3.2.28",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-05",
+          "userReleaseDate": "04/05/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57446",
+          "id": "57446",
+          "name": "DSC DLPP 3.2.27",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-31",
+          "userReleaseDate": "03/31/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/58516",
+          "id": "58516",
+          "name": "DSC DATA 3.2.27.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-29",
+          "userReleaseDate": "03/29/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57445",
+          "id": "57445",
+          "name": "DSC DATA 3.2.27",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-29",
+          "userReleaseDate": "03/29/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57443",
+          "id": "57443",
+          "name": "DSC DATA 3.2.26",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-22",
+          "userReleaseDate": "03/22/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55817",
+          "id": "55817",
+          "name": "DSC DLPP 3.2.25",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-23",
+          "userReleaseDate": "03/23/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55816",
+          "id": "55816",
+          "name": "DSC DATA 3.2.25",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-15",
+          "userReleaseDate": "03/15/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55815",
+          "id": "55815",
+          "name": "DSC DLPP 3.2.24",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-08",
+          "userReleaseDate": "03/08/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55814",
+          "id": "55814",
+          "name": "DSC DATA 3.2.24",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-08",
+          "userReleaseDate": "03/08/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55813",
+          "id": "55813",
+          "name": "DSC DATA 3.2.23",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-02",
+          "userReleaseDate": "03/02/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55811",
+          "id": "55811",
+          "name": "DSC DLPP 3.2.22",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-01",
+          "userReleaseDate": "03/01/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55810",
+          "id": "55810",
+          "name": "DSC DATA 3.2.22",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-22",
+          "userReleaseDate": "02/22/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55809",
+          "id": "55809",
+          "name": "DSC DLPP 3.2.21",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-15",
+          "userReleaseDate": "02/15/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55808",
+          "id": "55808",
+          "name": "DSC DATA 3.2.21",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-16",
+          "userReleaseDate": "02/16/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55807",
+          "id": "55807",
+          "name": "DSC DLPP 3.2.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-08",
+          "userReleaseDate": "02/08/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55806",
+          "id": "55806",
+          "description": "This release includes the automation of S3 Sink Connectors to allow consumers to create them on their own and minimize the involvement of DSC engineers. In addition dataflow edit functionality has been enhanced to allow limit audience edit functionality on the dataflows.",
+          "name": "DSC DATA 3.2.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-09",
+          "userReleaseDate": "02/09/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55334",
+          "id": "55334",
+          "name": "DSC DLPP SPARK 3.2.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-02",
+          "userReleaseDate": "02/02/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55367",
+          "id": "55367",
+          "name": "DSC DLPP 3.2.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-01",
+          "userReleaseDate": "02/01/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55368",
+          "id": "55368",
+          "name": "DSC DATA 3.2.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-01",
+          "userReleaseDate": "02/01/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55333",
+          "id": "55333",
+          "name": "DSC DATA 3.2.18",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-25",
+          "userReleaseDate": "01/25/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55381",
+          "id": "55381",
+          "name": "DSC DLPP Automation of S3 Sink Connectors",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-23",
+          "userReleaseDate": "01/23/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55332",
+          "id": "55332",
+          "name": "DSC DLPP 3.2.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-18",
+          "userReleaseDate": "01/18/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55331",
+          "id": "55331",
+          "name": "DSC DATA 3.2.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-19",
+          "userReleaseDate": "01/19/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55330",
+          "id": "55330",
+          "name": "DSC DLPP 3.2.16",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-11",
+          "userReleaseDate": "01/11/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55329",
+          "id": "55329",
+          "name": "DSC DATA 3.2.16",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-11",
+          "userReleaseDate": "01/11/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55328",
+          "id": "55328",
+          "name": "DSC DLPP 3.2.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-04",
+          "userReleaseDate": "01/04/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/55327",
+          "id": "55327",
+          "name": "DSC DATA 3.2.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-04",
+          "userReleaseDate": "01/04/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54368",
+          "id": "54368",
+          "name": "DSC DATA 3.2.13",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-12-21",
+          "userReleaseDate": "12/21/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54366",
+          "id": "54366",
+          "description": "Description",
+          "name": "DSC DATA 3.2.12",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-12-14",
+          "userReleaseDate": "12/14/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54365",
+          "id": "54365",
+          "name": "DSC DLPP 3.2.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-12-07",
+          "userReleaseDate": "12/07/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49947",
+          "id": "49947",
+          "name": "DSC 3.1.14",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-08-10",
+          "userReleaseDate": "08/10/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49948",
+          "id": "49948",
+          "name": "DSC 3.1.15",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-08-17",
+          "userReleaseDate": "08/17/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/49949",
+          "id": "49949",
+          "name": "DSC 3.1.16",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-08-24",
+          "userReleaseDate": "08/24/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/51719",
+          "id": "51719",
+          "name": "DSC 3.1.17",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-08-31",
+          "userReleaseDate": "08/31/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/51720",
+          "id": "51720",
+          "name": "DSC 3.1.18",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-09-07",
+          "userReleaseDate": "09/07/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/51721",
+          "id": "51721",
+          "name": "DSC 3.1.19",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-09-14",
+          "userReleaseDate": "09/14/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53034",
+          "id": "53034",
+          "name": "DSC DATA 3.1.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-09-21",
+          "userReleaseDate": "09/21/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/52810",
+          "id": "52810",
+          "description": "Turn on DLPP - JAVA only",
+          "name": "DSC DLPP 3.2.00",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-10",
+          "userReleaseDate": "10/10/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/52742",
+          "id": "52742",
+          "name": "DSC DATA 3.2.01",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-09-28",
+          "userReleaseDate": "09/28/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/52743",
+          "id": "52743",
+          "name": "DSC DATA 3.2.02",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-04",
+          "userReleaseDate": "10/04/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53803",
+          "id": "53803",
+          "name": "DSC DATA 3.2.03",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-12",
+          "userReleaseDate": "10/12/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53804",
+          "id": "53804",
+          "name": "DSC DLPP 3.2.03",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-10",
+          "userReleaseDate": "10/10/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53722",
+          "id": "53722",
+          "name": "DSC DATA 3.2.04",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-19",
+          "userReleaseDate": "10/19/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53725",
+          "id": "53725",
+          "name": "DSC DATA 3.2.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-26",
+          "userReleaseDate": "10/26/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53726",
+          "id": "53726",
+          "name": "DSC DLPP 3.2.05",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-10-27",
+          "userReleaseDate": "10/27/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54364",
+          "id": "54364",
+          "name": "DSC DATA 3.2.11",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-12-07",
+          "userReleaseDate": "12/07/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54447",
+          "id": "54447",
+          "name": "DSC DLPP 3.2.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-30",
+          "userReleaseDate": "11/30/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54446",
+          "id": "54446",
+          "name": "DSC DATA 3.2.10",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-30",
+          "userReleaseDate": "11/30/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54445",
+          "id": "54445",
+          "name": "DSC DLPP 3.2.09",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-22",
+          "userReleaseDate": "11/22/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54444",
+          "id": "54444",
+          "name": "DSC DATA 3.2.09",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-22",
+          "userReleaseDate": "11/22/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54442",
+          "id": "54442",
+          "name": "DSC DATA 3.2.08",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-15",
+          "userReleaseDate": "11/15/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54441",
+          "id": "54441",
+          "name": "DSC DLPP 3.2.07",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-09",
+          "userReleaseDate": "11/09/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/54440",
+          "id": "54440",
+          "name": "DSC DATA 3.2.07",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-09",
+          "userReleaseDate": "11/09/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/53752",
+          "id": "53752",
+          "name": "DSC DATA 3.2.06",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2022-11-02",
+          "userReleaseDate": "11/02/2022",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/56722",
+          "id": "56722",
+          "name": "DSC DLPP Lambda 2023.01.24",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-23",
+          "userReleaseDate": "01/23/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/56723",
+          "id": "56723",
+          "name": "DSC DLPP Hotfix",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-01-23",
+          "userReleaseDate": "01/23/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57115",
+          "id": "57115",
+          "name": "DSC DATA 3.2.20.1",
+          "archived": false,
+          "released": true,
+          "startDate": "2023-02-13",
+          "releaseDate": "2023-02-13",
+          "userStartDate": "02/13/2023",
+          "userReleaseDate": "02/13/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57618",
+          "id": "57618",
+          "name": "DSC LAMBDA CLA4992",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-28",
+          "userReleaseDate": "02/28/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57621",
+          "id": "57621",
+          "name": "DSC DATA 3.2.21.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-02-23",
+          "userReleaseDate": "02/23/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/57912",
+          "id": "57912",
+          "description": "Cherwell HotFix",
+          "name": "DSC DATA 3.2.24.1",
+          "archived": false,
+          "released": true,
+          "startDate": "2023-03-13",
+          "releaseDate": "2023-03-13",
+          "userStartDate": "03/13/2023",
+          "userReleaseDate": "03/13/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/58922",
+          "id": "58922",
+          "name": "DSC DLPP 3.2.25.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-03-27",
+          "userReleaseDate": "03/27/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59400",
+          "id": "59400",
+          "description": "Release Parquet File Type",
+          "name": "DSC DATA 3.2.27.2",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-03",
+          "userReleaseDate": "04/03/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59818",
+          "id": "59818",
+          "name": "DSC DLPP Lambda 2023.04.20",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-04-20",
+          "userReleaseDate": "04/20/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59744",
+          "id": "59744",
+          "description": "Hot Fix for Data Inventory Load Defect",
+          "name": "DSC DATA 3.2.34.1",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-18",
+          "userReleaseDate": "05/18/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59957",
+          "id": "59957",
+          "name": "DSC DLPP 3.2.34 SPARK",
+          "archived": false,
+          "released": true,
+          "releaseDate": "2023-05-25",
+          "userReleaseDate": "05/25/2023",
+          "projectId": 16900
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/version/59958",
+          "id": "59958",
+          "name": "DSC DLPP 3.2.36 SPARK",
+          "archived": false,
+          "released": false,
+          "releaseDate": "2023-06-01",
+          "overdue": true,
+          "userReleaseDate": "06/01/2023",
+          "projectId": 16900
+        }
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "issuelinks",
+        "system": "issuelinks"
+      },
+      "name": "Linked Issues",
+      "fieldId": "issuelinks",
+      "autoCompleteUrl": "https://jira.sentry.com/rest/api/2/issue/picker?currentProjectId=&showSubTaskParent=true&showSubTasks=true&currentIssueKey=null&query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "add"
+      ]
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "issuetype",
+        "system": "issuetype"
+      },
+      "name": "Issue Type",
+      "fieldId": "issuetype",
+      "hasDefaultValue": false,
+      "operations": [],
+      "allowedValues": [
+        {
+          "self": "https://jira.sentry.com/rest/api/2/issuetype/12100",
+          "id": "12100",
+          "description": "",
+          "iconUrl": "https://jira.sentry.com/secure/viewavatar?size=xsmall&avatarId=12500&avatarType=issuetype",
+          "name": "Support Request",
+          "subtask": false,
+          "avatarId": 12500
+        }
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "array",
+        "items": "string",
+        "system": "labels"
+      },
+      "name": "Labels",
+      "fieldId": "labels",
+      "autoCompleteUrl": "https://jira.sentry.com/rest/api/1.0/labels/suggest?query=",
+      "hasDefaultValue": false,
+      "operations": [
+        "add",
+        "set",
+        "remove"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "priority",
+        "system": "priority"
+      },
+      "name": "Priority",
+      "fieldId": "priority",
+      "hasDefaultValue": true,
+      "operations": [
+        "set"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://jira.sentry.com/rest/api/2/priority/1",
+          "iconUrl": "https://jira.sentry.com/images/icons/priorities/blocker.svg",
+          "name": "Blocker",
+          "id": "1"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/priority/2",
+          "iconUrl": "https://jira.sentry.com/images/icons/priorities/critical.svg",
+          "name": "Critical",
+          "id": "2"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.sentry.com/images/icons/priorities/major.svg",
+          "name": "Major",
+          "id": "3"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/priority/4",
+          "iconUrl": "https://jira.sentry.com/images/icons/priorities/minor.svg",
+          "name": "Minor",
+          "id": "4"
+        },
+        {
+          "self": "https://jira.sentry.com/rest/api/2/priority/5",
+          "iconUrl": "https://jira.sentry.com/images/icons/priorities/trivial.svg",
+          "name": "Trivial",
+          "id": "5"
+        }
+      ],
+      "defaultValue": {
+        "self": "https://jira.sentry.com/rest/api/2/priority/3",
+        "iconUrl": "https://jira.sentry.com/images/icons/priorities/major.svg",
+        "name": "Major",
+        "id": "3"
+      }
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "project",
+        "system": "project"
+      },
+      "name": "Project",
+      "fieldId": "project",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ],
+      "allowedValues": [
+        {
+          "self": "https://jira.sentry.com/rest/api/2/project/16900",
+          "id": "16900",
+          "key": "CLA",
+          "name": "Cloud Analytics",
+          "projectTypeKey": "software",
+          "avatarUrls": {
+            "48x48": "https://jira.sentry.com/secure/projectavatar?pid=16900&avatarId=20512",
+            "24x24": "https://jira.sentry.com/secure/projectavatar?size=small&pid=16900&avatarId=20512",
+            "16x16": "https://jira.sentry.com/secure/projectavatar?size=xsmall&pid=16900&avatarId=20512",
+            "32x32": "https://jira.sentry.com/secure/projectavatar?size=medium&pid=16900&avatarId=20512"
+          }
+        }
+      ]
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "user",
+        "system": "reporter"
+      },
+      "name": "Reporter",
+      "fieldId": "reporter",
+      "autoCompleteUrl": "https://jira.sentry.com/rest/api/latest/user/search?username=",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": true,
+      "schema": {
+        "type": "string",
+        "system": "summary"
+      },
+      "name": "Summary",
+      "fieldId": "summary",
+      "hasDefaultValue": false,
+      "operations": [
+        "set"
+      ]
+    },
+    {
+      "required": false,
+      "schema": {
+        "type": "timetracking",
+        "system": "timetracking"
+      },
+      "name": "Time Tracking",
+      "fieldId": "timetracking",
+      "hasDefaultValue": false,
+      "operations": [
+        "set",
+        "edit"
+      ]
+    }
+  ]
+}

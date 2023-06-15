@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using Sentry.Configuration;
-using Sentry.data.Core;
-using Sentry.data.Core.GlobalEnums;
-using System;
+﻿using Sentry.data.Core;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Sentry.data.Web
 {

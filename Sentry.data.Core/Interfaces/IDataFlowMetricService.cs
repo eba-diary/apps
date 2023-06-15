@@ -9,5 +9,9 @@ namespace Sentry.data.Core.Interfaces
     public interface IDataFlowMetricService
     {
         List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto);
+        long GetAllTotalFilesCount();
+        List<DatasetProcessActivityDto> GetAllTotalFiles();
+        List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId);
+        List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId);
     }
 }

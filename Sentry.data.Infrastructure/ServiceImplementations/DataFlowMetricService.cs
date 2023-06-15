@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Interfaces;
 
 namespace Sentry.data.Infrastructure
@@ -54,6 +55,7 @@ namespace Sentry.data.Infrastructure
                 DataFlowStepName = _context.DataFlowStep.Where(w => w.Id == entity.DataFlowStepId).Select(x => x.Action.Name).FirstOrDefault()
             };
         }
+
         //Takes search dto with DatasetId, SchemaId, and an optional DatasetFileId, returns elastic result with all matching flow events and divides them into groups based on fileId
         public List<DataFileFlowMetricsDto> GetFileMetricGroups(DataFlowMetricSearchDto searchDto)
         {
@@ -70,17 +72,108 @@ namespace Sentry.data.Infrastructure
                     FlowEvents = group.OrderByDescending(x => x.EventMetricId).ToList(),
                 };
                 DataFlowMetricDto mostRecentMetric = fileGroup.FlowEvents.First();
+
                 fileGroup.FirstEventTime = group.Where(x => x.RunInstanceGuid == mostRecentMetric.RunInstanceGuid).Min(x => x.MetricGeneratedDateTime);
                 fileGroup.LastEventTime = group.Where(x => x.RunInstanceGuid == mostRecentMetric.RunInstanceGuid).Max(x => x.MetricGeneratedDateTime);
                 fileGroup.Duration = (fileGroup.LastEventTime - fileGroup.FirstEventTime).TotalSeconds.ToString();
                 fileGroup.TargetCode = "target" + fileGroup.DatasetFileId.ToString();
                 fileGroup.AllEventsPresent = mostRecentMetric.TotalFlowSteps == mostRecentMetric.CurrentFlowStep;
                 fileGroup.AllEventsComplete = mostRecentMetric.StatusCode == "C";
+
                 fileGroups.Add(fileGroup);
             }
             fileGroups = fileGroups.OrderByDescending(x => x.FirstEventTime).ToList();
 
             return fileGroups;
+        }
+
+        public long GetAllTotalFilesCount()
+        {
+            long docCount = _dataFlowMetricProvider.GetAllTotalFiles().SearchTotal;
+
+            return docCount;
+        }
+
+        public List<DatasetProcessActivityDto> GetAllTotalFiles()
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFiles().ToDto();
+
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+                                                                                                                MapToDto(x)).ToList();
+
+            List<DatasetProcessActivityDto> datasetProcessActivityDtos = new List<DatasetProcessActivityDto>();
+
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
+            {
+                DatasetProcessActivityDto datasetProcessActivityDto = new DatasetProcessActivityDto();
+
+                string datasetName = _context.Datasets.Where(x => x.DatasetId == item.key).Select(s => s.DatasetName).FirstOrDefault();
+
+                DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.DatasetId == item.key).Max(x => x.MetricGeneratedDateTime);
+
+                datasetProcessActivityDto.DatasetName = datasetName;
+                datasetProcessActivityDto.DatasetId = item.key;
+                datasetProcessActivityDto.FileCount = item.docCount;
+                datasetProcessActivityDto.LastEventTime = lastEventTime;
+
+                datasetProcessActivityDtos.Add(datasetProcessActivityDto);
+            }
+
+            return datasetProcessActivityDtos;
+        }
+
+        public List<SchemaProcessActivityDto> GetAllTotalFilesByDataset(int datasetId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesByDataset(datasetId).ToDto();
+
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+                                                                                                                MapToDto(x)).ToList();
+
+            List<SchemaProcessActivityDto> schemaProcessActivityDtos = new List<SchemaProcessActivityDto>();
+
+            foreach (DataFlowMetricSearchAggregateDto item in dataFlowMetricSearchResultDto.TermAggregates)
+            {
+                SchemaProcessActivityDto schemaProcessActivityDto = new SchemaProcessActivityDto();
+
+                string schemaName = _context.FileSchema.Where(x => x.SchemaId == item.key).Select(s => s.Name).FirstOrDefault();
+
+                DateTime lastEventTime = dataFlowMetricDtoList.Where(x => x.SchemaId == item.key).Max(x => x.MetricGeneratedDateTime);
+
+                schemaProcessActivityDto.SchemaName = schemaName;
+                schemaProcessActivityDto.DatasetId = datasetId;
+                schemaProcessActivityDto.SchemaId = item.key;
+                schemaProcessActivityDto.FileCount = item.docCount;
+                schemaProcessActivityDto.LastEventTime = lastEventTime;
+
+                schemaProcessActivityDtos.Add(schemaProcessActivityDto);
+            }
+
+            return schemaProcessActivityDtos;
+        }
+
+        public List<DatasetFileProcessActivityDto> GetAllTotalFilesBySchema(int schemaId)
+        {
+            DataFlowMetricSearchResultDto dataFlowMetricSearchResultDto = _dataFlowMetricProvider.GetAllTotalFilesBySchema(schemaId).ToDto();
+
+            List<DataFlowMetricDto> dataFlowMetricDtoList = dataFlowMetricSearchResultDto.DataFlowMetricResults.Select(x => 
+                                                                                                                MapToDto(x)).ToList();
+
+            List<DatasetFileProcessActivityDto> datasetFileProcessActivityDtos = new List<DatasetFileProcessActivityDto>();
+
+            foreach (DataFlowMetricDto items in dataFlowMetricDtoList)
+            {
+                DatasetFileProcessActivityDto datasetFileProcessActivityDto = new DatasetFileProcessActivityDto()
+                {
+                    FileName = items.FileName,
+                    FlowExecutionGuid = items.FlowExecutionGuid,
+                    LastFlowStep = items.TotalFlowSteps,
+                    LastEventTime = items.MetricGeneratedDateTime
+                };
+
+                datasetFileProcessActivityDtos.Add(datasetFileProcessActivityDto);
+            }
+
+            return datasetFileProcessActivityDtos;
         }
     }
 }

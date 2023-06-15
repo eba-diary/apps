@@ -328,6 +328,8 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="API\Assistance\AddAssistance\AddAssistanceModelMappingTests.cs" />
+    <Compile Include="API\Assistance\AddAssistance\AddAssistanceRequestValidatorTests.cs" />
     <Compile Include="API\Dataset\AddDataset\AddDatasetModelMappingTests.cs" />
     <Compile Include="API\BaseModelMappingTests.cs" />
     <Compile Include="API\Dataset\GetDataset\GetDatasetModelMappingTests.cs" />

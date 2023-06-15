@@ -93,7 +93,6 @@ namespace Sentry.data.Core
 
         [PropertyName("statuscode")]
         public string StatusCode { get; set; }
-
         #endregion
     }
 }

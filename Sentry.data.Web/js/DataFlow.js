@@ -116,7 +116,7 @@
         $("#RequestAccessManageEntitlement").text(producerAssetGroupName);
 
         $("#RequestAccessManageCopyBtn").click(function () {
-            data.Dataset.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
+            Data.Common.copyTextToClipboard($("#RequestAccessManageEntitlement").text());
         });
 
     },

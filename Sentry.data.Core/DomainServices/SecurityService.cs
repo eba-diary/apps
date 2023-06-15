@@ -542,9 +542,9 @@ namespace Sentry.data.Core
 
         internal void BuildS3TicketForDatasetAndTicket(Dataset dataset, SecurityTicket ticket, bool isAddingPermission = true)
         {
-            string project = "TIS";
+            string project = JiraValues.ProjectKeys.TIS;
             string summary = (ticket.IsAddingPermission && isAddingPermission ? "Create or Update" : "Remove") + " S3 Access Point with the following policy";
-            string issueType = "Support Request";
+            string issueType = JiraValues.IssueTypes.SUPPORT_REQUEST;
 
             //Build Description
             string account = Sentry.Configuration.Config.GetHostSetting("AwsAccountId");

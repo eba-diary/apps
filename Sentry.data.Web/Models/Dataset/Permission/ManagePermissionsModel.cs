@@ -15,6 +15,7 @@ namespace Sentry.data.Web
         {
             DatasetId = permissions.DatasetId;
             DatasetName = permissions.DatasetName;
+            DatasetNamedEnvironment = permissions.DatasetNamedEnvironment;
             DatasetSaidKeyCode = permissions.DatasetSaidKeyCode;
 
             foreach (var permission in permissions.Permissions)
@@ -42,6 +43,7 @@ namespace Sentry.data.Web
 
         public int DatasetId { get; set; }
         public string DatasetName { get; set; }
+        public string DatasetNamedEnvironment { get; set; }
         public string DatasetSaidKeyCode { get; set; }
         public IList<ManagePermissionModel> DscPermissions { get; set; } = new List<ManagePermissionModel>();
         public IList<ManagePermissionModel> AwsIamPermissions { get; set; } = new List<ManagePermissionModel>();
