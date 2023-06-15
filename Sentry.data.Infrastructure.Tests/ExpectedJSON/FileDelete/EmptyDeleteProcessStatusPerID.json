@@ -1,0 +1,8 @@
+{
+  "DeleteProcessStatus": "Failure",
+  "EventType": "FILE_DELETE_RESPONSE",
+  "RequestGUID": "20220606110640049",
+  "DeleteProcessStatusPerID": [
+
+  ]
+}

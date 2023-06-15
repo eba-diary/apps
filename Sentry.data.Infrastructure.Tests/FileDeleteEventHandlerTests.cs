@@ -1,17 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Sentry.data.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Sentry.FeatureFlags;
-using Sentry.FeatureFlags.Mock;
 
 namespace Sentry.data.Infrastructure.Tests
 {
     [TestClass]
-    public class FileDeleteEventHandlerTests
+    public class FileDeleteEventHandlerTests : BaseInfrastructureUnitTest
     {
         [TestMethod]
         public void Process_Success_For_Delete_Failure_FileNotFoundParquet_Deleted_Sucessfully()
@@ -19,8 +14,7 @@ namespace Sentry.data.Infrastructure.Tests
             //ARRANGE
             MockRepository mockRepository = new MockRepository(MockBehavior.Loose);
             Mock<IEventService> mockEventService = mockRepository.Create<IEventService>();
-            Mock<IDatasetFileService> mockDataFileService = mockRepository.Create<IDatasetFileService>();
-            
+            Mock<IDatasetFileService> mockDataFileService = mockRepository.Create<IDatasetFileService>();            
 
             //mock features
             Mock<IFeatureFlag<bool>> feature = mockRepository.Create<IFeatureFlag<bool>>();
@@ -29,87 +23,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
             
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Failure'
-                                        },
-                                        {
-                                          'DatasetFileId': 4000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Success'
-                                        },
-                                        {
-                                          'DatasetFileId': 5000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'unknown'
-                                        }
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/MultipleFiles_ParquetNotFound.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object,mockDataFileService.Object,mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -119,7 +33,6 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFileService.VerifyAll();
         }
 
-
         [TestMethod]
         public void Process_LegitFailure_For_Delete_Failure()
         {
@@ -128,7 +41,6 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IEventService> mockEventService = mockRepository.Create<IEventService>();
             Mock<IDatasetFileService> mockDataFileService = mockRepository.Create<IDatasetFileService>();
 
-
             //mock features
             Mock<IFeatureFlag<bool>> feature = mockRepository.Create<IFeatureFlag<bool>>();
             feature.Setup(x => x.GetValue()).Returns(true);
@@ -136,87 +48,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'Darko',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Failure'
-                                        },
-                                        {
-                                          'DatasetFileId': 4000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Success'
-                                        },
-                                        {
-                                          'DatasetFileId': 5000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'unknown'
-                                        }
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/ParquetFailed.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -225,7 +57,6 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Deleted), Times.AtMost(1));
             mockDataFileService.VerifyAll();
         }
-
 
         [TestMethod]
         public void Process_OverallFailure_But_Parquet_Success()
@@ -243,39 +74,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'Success',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Failure'
-                                        }
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/OverallFailure_ParquetSuccess.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -283,8 +82,6 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Deleted), Times.Once);
             mockDataFileService.VerifyAll();
         }
-
-
 
         [TestMethod]
         public void Process_OverallFailure_But_Parquet_Failure_Raw_Success_MakeSureStillDeleteFailure()
@@ -302,39 +99,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'Success',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'Belgrade',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Failure'
-                                        }
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/OverallFailure_ParquetFailure.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -342,11 +107,6 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure), Times.Once);
             mockDataFileService.VerifyAll();
         }
-
-
-
-
-
 
         [TestMethod]
         public void Process_Parquet_Not_Found()
@@ -364,40 +124,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquets',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Failure'
-                                        }
-                                        
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/ParquetNotFound.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -406,8 +133,6 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFileService.VerifyAll();
 
         }
-
-
 
         [TestMethod]
         public void Process_NoDeleteProcessStatus()
@@ -425,40 +150,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatusadfslj': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Failure'
-                                        }
-                                        
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/NoDeleteProcessStatus.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -476,7 +168,6 @@ namespace Sentry.data.Infrastructure.Tests
             Mock<IEventService> mockEventService = mockRepository.Create<IEventService>();
             Mock<IDatasetFileService> mockDataFileService = mockRepository.Create<IDatasetFileService>();
 
-
             //mock features
             Mock<IFeatureFlag<bool>> feature = mockRepository.Create<IFeatureFlag<bool>>();
             feature.Setup(x => x.GetValue()).Returns(true);
@@ -484,14 +175,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/NoDeleteProcessStatusPerID.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -499,25 +183,13 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure), Times.Never);
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Deleted), Times.Never);
 
-
-
-
-            string mockMessage2 = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        
-                                      ]
-                                    }
-                                    ";
+            string mockMessage2 = GetDataString("FileDelete/EmptyDeleteProcessStatusPerID.json");
             handle.HandleLogic(mockMessage2);
+
             //VERIFY
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Pending_Delete_Failure), Times.Never);
             mockDataFileService.Verify(x => x.UpdateObjectStatus(It.IsAny<int[]>(), Core.GlobalEnums.ObjectStatusEnum.Deleted), Times.Never);
         }
-
 
         [TestMethod]
         public void Empty_DeleteProcessStatusPerIDProcess()
@@ -535,14 +207,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [ ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/EmptyDeleteProcessStatusPerID.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -567,87 +232,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatusbad': 'Failure'
-                                        },
-                                        {
-                                          'DatasetFileId': 4000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Success'
-                                        },
-                                        {
-                                          'DatasetFileId': 5000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'unknown'
-                                        }
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/BadDatasetFileDropIdDeleteStatus.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -671,40 +256,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': 'DeleteProcessStatusPerID': 
-                                        [
-                                            {
-                                              'DatasetFileId': 3000,
-                                              'DeletedFiles': [
-                                                {
-                                                  'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                                  'deleteProcessStatus': 'NotFound',
-                                                  'fileType': 'RawQuery',
-                                                  'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                                },
-                                                {
-                                                  'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                                  'deleteProcessStatus': 'NotFound',
-                                                  'fileType': 'Raw',
-                                                  'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                                },
-                                                {
-                                                  'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                                  'deleteProcessStatus': 'NotFound',
-                                                  'fileType': 'Parquet',
-                                                  'key': []
-                                                }
-                                              ],
-                                              'DatasetFileIdDeleteStatus': 'Failure'
-                                            } 
-                                       ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/ParquetNotFound.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 
@@ -729,87 +281,7 @@ namespace Sentry.data.Infrastructure.Tests
             mockDataFeatureService.SetupGet(x => x.CLA4049_ALLOW_S3_FILES_DELETE).Returns(feature.Object);
             mockDataFileService.Setup(x => x.UpdateObjectStatus(It.IsAny<int[]>(), It.IsAny<Core.GlobalEnums.ObjectStatusEnum>()));
 
-            string mockMessage = @"
-                                    {
-                                      'DeleteProcessStatus': 'Failure',
-                                      'EventType': 'FILE_DELETE_RESPONSE',
-                                      'RequestGUID': '20220606110640049',
-                                      'DeleteProcessStatusPerID': [
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'success'
-                                        },
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'Success'
-                                        },
-                                        {
-                                          'DatasetFileId': 3000,
-                                          'DeletedFiles': [
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'RawQuery',
-                                              'key': 'rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Raw',
-                                              'key': 'raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv'
-                                            },
-                                            {
-                                              'bucket': 'sentry-dlst-qual-dataset-ae2',
-                                              'deleteProcessStatus': 'NotFound',
-                                              'fileType': 'Parquet',
-                                              'key': []
-                                            }
-                                          ],
-                                          'DatasetFileIdDeleteStatus': 'failure'
-                                        }
-                                      ]
-                                    }
-                                    ";
+            string mockMessage = GetDataString("FileDelete/MultipleFiles_Success.json");
             FileDeleteEventHandler handle = new FileDeleteEventHandler(mockEventService.Object, mockDataFileService.Object, mockDataFeatureService.Object);
             handle.HandleLogic(mockMessage);
 

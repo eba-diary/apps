@@ -153,24 +153,18 @@ namespace Sentry.data.Infrastructure
             string status = GlobalConstants.DeleteFileResponseStatus.ERROR;
 
             //IF THIS IS NULL, ERROR IMMEDIATEY
-            if (single.DatasetFileIdDeleteStatus == null)
+            if (single.DatasetFileDropIdDeleteStatus == null)
             {
                 return status;
             }
 
             //SUCCESS = SUCCESS OR (FAILURE and NOTFOUND)
-            if (   single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS
-                    ||
-                    (
-                        single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
-                            && single.DeletedFiles.Exists(w => ( (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND || (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS ) && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET)
-                    )
-            )
+            if (IsParquetDeleted(single))
             {
                 status = GlobalConstants.DeleteFileResponseStatus.SUCCESS;
             }
             //FAILURE
-            else if (single.DatasetFileIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE)
+            else if (single.DatasetFileDropIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE)
             {
                 status = GlobalConstants.DeleteFileResponseStatus.FAILURE;
             }
@@ -187,6 +181,14 @@ namespace Sentry.data.Infrastructure
         void IMessageHandler<string>.Init()
         {
             Logger.Info("FileDeleteEventhandlerInitialized");
+        }
+
+        private bool IsParquetDeleted(DeleteFilesResponseSingleStatusModel single)
+        {
+            return single.DatasetFileDropIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS
+                || (single.DatasetFileDropIdDeleteStatus.ToUpper() == GlobalConstants.DeleteFileResponseStatus.FAILURE
+                    && single.DeletedFiles.Exists(w => ((w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.NOTFOUND || (w.DeleteProcessStatus)?.ToUpper() == GlobalConstants.DeleteFileResponseStatus.SUCCESS)
+                                                            && (w.FileType)?.ToUpper() == GlobalConstants.DeleteFileResponseFileType.PARQUET));
         }
     }
 }

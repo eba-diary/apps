@@ -1,0 +1,79 @@
+{
+  "DeleteProcessStatus": "Failure",
+  "EventType": "FILE_DELETE_RESPONSE",
+  "RequestGUID": "20220606110640049",
+  "DeleteProcessStatusPerID": [
+    {
+      "DatasetFileId": 3000,
+      "DeletedFiles": [
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "RawQuery",
+          "key": "rawquery/DATA/QUAL/3171319/2022/1/24/00_kb_001_20220124031643505.csv"
+        },
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "Raw",
+          "key": "raw/DATA/QUAL/3171319/2022/1/24/20220124031643505/00_kb_001.csv"
+        },
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "Parquet",
+          "key": []
+        }
+      ],
+      "DatasetFileDropIdDeleteStatus": "success"
+    },
+    {
+      "DatasetFileId": 3000,
+      "DeletedFiles": [
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "RawQuery",
+          "key": "rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv"
+        },
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "Raw",
+          "key": "raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv"
+        },
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "Parquet",
+          "key": []
+        }
+      ],
+      "DatasetFileDropIdDeleteStatus": "Success"
+    },
+    {
+      "DatasetFileId": 3000,
+      "DeletedFiles": [
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "RawQuery",
+          "key": "rawquery/DATA/QUAL/3171319/2022/2/16/zzz0101_20220216194839240.csv"
+        },
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "Raw",
+          "key": "raw/DATA/QUAL/3171319/2022/2/16/20220216194839240/zzz0101.csv"
+        },
+        {
+          "bucket": "sentry-dlst-qual-dataset-ae2",
+          "deleteProcessStatus": "NotFound",
+          "fileType": "Parquet",
+          "key": []
+        }
+      ],
+      "DatasetFileDropIdDeleteStatus": "failure"
+    }
+  ]
+}
