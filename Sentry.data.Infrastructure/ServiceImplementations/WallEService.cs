@@ -23,18 +23,17 @@ namespace Sentry.data.Infrastructure
 
         }
 
-        public async Task Run()
+        public Task Run()
         {
             _runGuid = Guid.NewGuid();
             _logger.LogInformation($"walleservice-run-initiated - guid:{_runGuid}");
-            List<Task> tasks = new List<Task>();
-
-            tasks.Add(Task.Factory.StartNew(() => { DeleteSchemas(); }));
-            tasks.Add(Task.Factory.StartNew(() => { DeleteDatasets(); }));
-
-                await Task.WhenAll(tasks);
+            
+            DeleteSchemas();
+            DeleteDatasets();
 
             _logger.LogInformation($"walleservice-run-completed - guid:{_runGuid}");
+
+            return Task.CompletedTask;
         }
 
         private void DeleteSchemas()
