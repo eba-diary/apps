@@ -122,10 +122,10 @@
           <placeName ref="#Paris">Paris</placeName>. <date when="1889-12-01">December 1st,
             1889</date>. </dateline>
         <p><pb n="1"/> Sailed from <placeName ref="#New_York">New York</placeName>, <date
-            when="1889-11-16">Saturday November 16<hi rend="superscript">th</hi></date> on <name
+            when="1889-11-16">Saturday November 16th</date> on <name
             type="boat" ref="#SS_Bourgogne">S.S. Bourgogne</name>, and arrived at <placeName
             ref="#Arrondissement_du_Havre">Havre</placeName>
-          <date when="1889-11-24">Nov. 24<hi rend="superscript">th</hi></date> at noon. A dull and
+          <date when="1889-11-24">Nov. 24th</date> at noon. A dull and
           uneventful voyage - and a most disagreeable landing in a heavy storm of wind and rain, in
           a tug, with no protection but that our umbrellas and wraps gave us. Came to our old
           quarters at <name type="hotel" ref="#Hotel_Chatham">Hotel Chatham</name>.</p>
@@ -135,8 +135,7 @@
           <name type="hotel" ref="#Shepheards_Hotel">Shepheards Hotel</name>
           <placeName ref="#Cairo">Cairo</placeName> - <placeName ref="#Egypt"
             >Egypt</placeName>.<date when="1889-12-12">Dec. 12. 1889</date>. </dateline>
-        <p> We left <placeName ref="#Paris">Paris</placeName> on the <date when="1889-12-05">5<hi
-              rend="superscript">th</hi></date> at 8.30 a.m. for <placeName ref="#Marseilles"
+        <p> We left <placeName ref="#Paris">Paris</placeName> on the <date when="1889-12-05">5th</date> at 8.30 a.m. for <placeName ref="#Marseilles"
             >Marseilles</placeName>. I had been suffering with a severe cold, and confined to the
           house and often to my room during our stay in <placeName ref="#Paris">Paris</placeName>.
           The weather was raw and cold all the time, and the day of our journey to <placeName
